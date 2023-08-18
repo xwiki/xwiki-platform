@@ -58,9 +58,9 @@ import org.xwiki.extension.test.po.UnusedPagesPane;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.repository.test.TestExtension;
 import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedIT;
-import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.EntityDiff;
+import org.xwiki.test.ui.po.diff.RawChanges;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -822,7 +822,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(progressBar.getMessage(), lastLogItem.getMessage());
 
         MergeConflictPane mergeConflictPane = progressPane.getMergeConflict();
-        ChangesPane changesPane = mergeConflictPane.getChanges();
+        RawChanges changesPane = mergeConflictPane.getChanges();
         assertEquals(Arrays.asList("Page properties", "XWiki.WikiMacroClass[0]"), changesPane.getChangedEntities());
 
         EntityDiff pagePropertiesDiff = changesPane.getEntityDiff("Page properties");

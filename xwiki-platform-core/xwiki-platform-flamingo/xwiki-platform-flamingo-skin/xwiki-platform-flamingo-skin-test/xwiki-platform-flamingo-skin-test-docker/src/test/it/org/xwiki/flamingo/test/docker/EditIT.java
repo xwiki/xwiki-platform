@@ -959,7 +959,7 @@ public class EditIT
             wikiEditPage.setContent(newContent);
 
             DocumentSyntaxPicker documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
-            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentSyntaxPicker.getAvailableSyntaxes());
+            assertEquals(Arrays.asList("xhtml/1.0", "xwiki/2.1"), documentSyntaxPicker.getAvailableSyntaxes());
             assertEquals("xwiki/2.1", documentSyntaxPicker.getSelectedSyntax());
 
             SyntaxConversionConfirmationModal confirmationModal = documentSyntaxPicker.selectSyntaxById("xhtml/1.0");

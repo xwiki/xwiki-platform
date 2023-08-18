@@ -30,6 +30,7 @@ import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * A bridge allowing to isolate the {@link org.xwiki.component.wiki.WikiComponentManager} from the old model.
@@ -84,6 +85,32 @@ public interface WikiComponentBridge
      * @throws WikiComponentException if the document can't be retrieved or if it doesn't contain a component definition
      */
     WikiComponentScope getScope(DocumentReference reference) throws WikiComponentException;
+
+    /**
+     * The role type priority represents the priority for ordering components sharing the same type: it can be used to
+     * order the components when retrieving a list of components of the same type. The lower the value, the higher the
+     * priority.
+     *
+     * @param reference a reference to a document
+     * @return the role type priority of the component.
+     * @throws WikiComponentException if the document can't be retrieved or if it doesn't contain a component definition
+     * @since 15.4RC1
+     */
+    @Unstable
+    int getRoleTypePriority(DocumentReference reference) throws WikiComponentException;
+
+    /**
+     * The role hint priority represents the priority for ordering components sharing the same type and hint: it can be
+     * used to decide which component should be overridden when loading them. The lower the value, the higher the
+     * priority.
+     *
+     * @param reference a reference to a document
+     * @return the role hint priority of the component.
+     * @throws WikiComponentException if the document can't be retrieved or if it doesn't contain a component definition
+     * @since 15.4RC1
+     */
+    @Unstable
+    int getRoleHintPriority(DocumentReference reference) throws WikiComponentException;
 
     /**
      * @param reference a reference to a document holding a wiki component

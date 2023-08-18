@@ -68,9 +68,11 @@
   <div class="box errormessage">
     #set($allowedSpaces = $createAllowedSpaces)
     #if ($allowedSpaces.size() == 1)
-      $services.localization.render('core.create.template.allowedspace.inline', [$templateProvider, $allowedSpaces.get(0)])
+      $escapetool.xml($services.localization.render('core.create.template.allowedspace.inline', [$templateProvider,
+        $allowedSpaces.get(0)]))
     #else
-      $services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider, $allowedSpaces.toString()])
+      $escapetool.xml($services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider,
+        $allowedSpaces.toString()]))
     #end
   </div>
 #end
@@ -79,7 +81,7 @@
   <div class='box errormessage'>
       ## Use the 'existingDocumentReference' context binding set by the create action for this case.
       $services.localization.render('core.create.page.error.docalreadyexists',
-        ["${existingDocumentReference}",
+        [$escapetool.xml("${existingDocumentReference}"),
          $xwiki.getURL($existingDocumentReference, 'view', ''),
          $xwiki.getURL($existingDocumentReference, 'edit', '')
         ]
@@ -90,7 +92,7 @@
 #if("$!exception" != '' && $exception.code == 11018)
 <div class='box errormessage'>
   ## Use the 'invalidNameReference' context binding set by the create action for this case.
-  $services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference])
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference]))
 </div>
 #end
 
@@ -265,8 +267,8 @@
 ## ---------------------------------------------------------------------------------------------------------
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
-## FIXME: Using the 'container' class when displayed in an ajax call by clicking on a Wanted Link so that it looks good (proper margins) in the popup.
-<form action="$doc.getURL('create')" method="post" id="create" class="xform #if($request.ajax)container#end">
+#set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
+<form action="$doc.getURL('create')" method="post" id="create" class="xform">
   <fieldset>
 
   ## Deprecated: Pass along any received page parent.
@@ -276,18 +278,16 @@
   ## By the past, it was "xwiki/create.js" which created this field, but it was causing problems when the user sent the
   ## form before the JavaScript code was executed.
   <input type="hidden" name="templateprovider" id="templateprovider" value="" />
+  <input type="hidden" name="form_token" value="$!{escapetool.xml($services.csrf.getToken())}"/>
 
   <div class='row'>
-    ## Hide the first column when displayed in an AJAX call by clicking on a Wanted Link (because we know the target
-    ## location from the link reference) or when the current document is new (because the create action uses the location
-    ## of the current document as target in this case).
-    #if (!$request.ajax && !$doc.isNew())
+    ## Hide the first column when displayed in an AJAX call by clicking on a Wanted Link, because we know the target
+    ## location from the link reference.
+    #if (!$isAjaxRequest)
       ## Determine the parent reference for the new document.
       #set ($parentReference = $spaceReference)
       #if (!$parentReference)
         ## No parent reference specified.
-        ## We keep this code although we tested above that the current document is not new because in the future we may
-        ## want to support changing the target location even if the current document is new.
         #if ($doc.isNew())
           ## Encourage the user to create the current document.
           #set ($parentReference = $doc.documentReference.parent)
@@ -309,6 +309,9 @@
       ## Display the location picker.
       <div class='col-xs-12 col-lg-6'>
         #template('locationPicker_macros.vm')
+        ## The create action doesn't support changing the location when the current document doesn't exist (i.e. it
+        ## forces you to create the current document that is missing). For this reason we make the name and parent fields
+        ## read-only when the current document is new.
         #locationPicker({
           'id': 'target',
           'title': {
@@ -327,14 +330,16 @@
             'hint': 'core.create.spaceReference.hint',
             'name': 'spaceReference',
             'reference': $parentReference,
-            'placeholder': 'core.create.spaceReference.placeholder'
+            'placeholder': 'core.create.spaceReference.placeholder',
+            'readOnly': $doc.isNew()
           },
           'name': {
             'label': 'core.create.name.label',
             'hint': 'core.create.name.hint',
             'name': 'name',
             'value': $name,
-            'placeholder': 'core.create.name.placeholder'
+            'placeholder': 'core.create.name.placeholder',
+            'readOnly': $doc.isNew()
           }
         })
       </div>
@@ -347,10 +352,20 @@
       #set ($spaceReferenceLocalString = $services.model.serialize($spaceReference, 'local'))
       <input type='hidden' id='spaceReference' name='spaceReference' value="$!{escapetool.xml($spaceReferenceLocalString)}" />
     #end
-    ## FIXME: When displayed in an ajax call by clicking on a Wanted Link, the responsive classes consider the calling document (large screen)
-    ## as the viewport and not the popup (small screen), so we can not use them since they create problems instead of fixing them.
-    <div class='#if(!$request.ajax)col-xs-12 col-lg-6#end'>
+    <div class='col-xs-12#if (!$isAjaxRequest) col-lg-6#end'>
       <dl>
+        #if ($isAjaxRequest)
+          ## The first column that shows the location preview is hidden when creating a new page from a Wanted Link so we
+          ## need to show this information elsewhere. Even if the target page reference can't be modified by the user,
+          ## they should still see where the page is going to be created.
+          <dt>
+            <label>$escapetool.xml($services.localization.render('core.create.pageTitle'))</label>
+          </dt>
+          <dl>
+            #set ($targetDocumentReference = $services.model.createDocumentReference($name, $spaceReference))
+            #hierarchy($targetDocumentReference)
+          </dl>
+        #end
         ## ---------------------------------------------------------------------------------------------------------
         ## Page type
         ## ---------------------------------------------------------------------------------------------------------
@@ -359,7 +374,10 @@
         ## Terminal page - Advanced users
         ## ---------------------------------------------------------------------------------------------------------
         #set ($hidden = '')
-        #if (!($isAdvancedUser || $isSuperAdmin) || $deprecatedSpaceCreate)
+        ## Top level documents cannot be terminal.
+        #set ($isTopLevelDoc = $doc.documentReference.name == 'WebHome' &&
+          $doc.documentReference.lastSpaceReference.parent.type == 'WIKI')
+        #if (!($isAdvancedUser || $isSuperAdmin) || $deprecatedSpaceCreate || ($doc.isNew() && $isTopLevelDoc))
           #set ($hidden = 'hidden')
         #end
         <dt class="$hidden">

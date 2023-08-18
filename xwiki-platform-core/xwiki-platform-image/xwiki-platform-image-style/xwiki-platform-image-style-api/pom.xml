@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-image-style</artifactId>
-    <version>15.3-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-image-style-api</artifactId>
   <name>XWiki Platform - Image - Style - API</name>
   <description>API to get defined Image styles.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.53</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager. -->
     <xwiki.extension.name>API for the Image Style Application</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
@@ -58,6 +58,30 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-test</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-html5</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-event</artifactId>
+      <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

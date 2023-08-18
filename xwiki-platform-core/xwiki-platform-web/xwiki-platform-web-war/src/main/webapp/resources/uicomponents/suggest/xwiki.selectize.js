@@ -113,8 +113,13 @@ define('xwiki-selectize', [
     onDropdownOpen: function(dropdown) {
       dropdown.addClass('active');
     },
-    persist: false,
-    preload: 'focus',
+    // We normally don't want to persist the custom values (free text) that the user selects but unfortunately Selectize
+    // marks all loaded values (fetched from the server) as user values and so they get removed on delete / backspace if
+    // we don't enable persistence. It's better to have some extra suggestions (coming from the free text selected by
+    // the user) than to miss some suggestions because they were wrongly removed. We could try to patch Selectize to fix
+    // the way it handles custom user suggestions but it's safer to simply enable persistence.
+    persist: true,
+    preload: true,
     render: {
       item: renderItem,
       option: renderOption,

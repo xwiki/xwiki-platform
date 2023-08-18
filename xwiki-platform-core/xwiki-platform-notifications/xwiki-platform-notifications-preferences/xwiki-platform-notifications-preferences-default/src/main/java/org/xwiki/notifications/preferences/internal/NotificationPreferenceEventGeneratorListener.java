@@ -58,7 +58,10 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
     public static final String NAME = "NotificationPreferenceEventGeneratorListener";
 
     private static final RegexEntityReference REFERENCE =
-        BaseObjectReference.any(DefaultModelBridge.NOTIFICATION_PREFERENCE_CLASS_STRING);
+        BaseObjectReference.any(DefaultNotificationPreferenceModelBridge.NOTIFICATION_PREFERENCE_CLASS_STRING);
+
+    private static final RegexEntityReference GROUPING_STRATEGY_PREFERENCE_REFERENCE =
+        BaseObjectReference.any(NotificationEventGroupingStrategyPreferenceDocumentInitializer.REFERENCE_STRING);
 
     @Inject
     private ObservationManager observation;
@@ -68,8 +71,14 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
      */
     public NotificationPreferenceEventGeneratorListener()
     {
-        super(NAME, new XObjectAddedEvent(REFERENCE), new XObjectUpdatedEvent(REFERENCE),
-            new XObjectDeletedEvent(REFERENCE));
+        super(NAME,
+            new XObjectAddedEvent(REFERENCE),
+            new XObjectUpdatedEvent(REFERENCE),
+            new XObjectDeletedEvent(REFERENCE),
+            new XObjectAddedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE),
+            new XObjectUpdatedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE),
+            new XObjectDeletedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE)
+        );
     }
 
     @Override
@@ -89,7 +98,7 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
 
     private EntityReference getEntityReference(DocumentReference source)
     {
-        if (source.getLocalDocumentReference().equals(DefaultModelBridge.GLOBAL_PREFERENCES)) {
+        if (source.getLocalDocumentReference().equals(DefaultNotificationPreferenceModelBridge.GLOBAL_PREFERENCES)) {
             return source.getWikiReference();
         } else {
             return source;

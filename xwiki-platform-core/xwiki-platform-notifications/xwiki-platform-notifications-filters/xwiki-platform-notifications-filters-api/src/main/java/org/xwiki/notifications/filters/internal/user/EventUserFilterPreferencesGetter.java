@@ -68,8 +68,8 @@ public class EventUserFilterPreferencesGetter
      * @since 10.3
      * @since 9.11.5
      */
-    public boolean isUsedFollowed(String testUser, Collection<NotificationFilterPreference> filterPreferences,
-            NotificationFormat format)
+    public boolean isUserFollowed(String testUser, Collection<NotificationFilterPreference> filterPreferences,
+                                  NotificationFormat format)
     {
         return getPreferences(filterPreferences, format, NotificationFilterType.INCLUSIVE).anyMatch(
             pref -> StringUtils.equals(pref.getUser(), testUser)

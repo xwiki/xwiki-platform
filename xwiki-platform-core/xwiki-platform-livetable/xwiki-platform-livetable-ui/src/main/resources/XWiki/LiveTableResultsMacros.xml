@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.LiveTableResultsMacros" locale="">
+<xwikidoc version="1.5" reference="XWiki.LiveTableResultsMacros" locale="">
   <web>XWiki</web>
   <name>LiveTableResultsMacros</name>
   <language/>
@@ -138,6 +138,8 @@
   #set($order = "$!request.sort")
   #if ($order == 'doc.location')
     #set ($order = 'doc.fullName')
+  #elseif ($order == 'email' &amp;&amp; $services.mail.general.shouldObfuscate())
+    #set ($order = '')
   #end
   #set ($orderSql = '')
   #if($order != '')
@@ -437,14 +439,21 @@
       #set($discard = $itemDoc.use($className))
       #set($discard = $row.put('doc_objectCount', $itemDoc.getObjectNumbers($className)))
       #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
-      #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
       #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
       #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
       #set($rawTitle = $translatedDoc.title)
       #if($rawTitle != $row['doc_title'])
         #set($discard = $row.put('doc_title_raw', $rawTitle))
       #end
-      #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))
+      #set ($metadataAuthor = $translatedDoc.authors.originalMetadataAuthor)
+      #if ($metadataAuthor == $services.user.getGuestUserReference())
+        ## Special handling for guest so that it displays unknown user.
+        #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($NULL)))
+      #else
+        #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($metadataAuthor)))
+      #end
+
+      #set($discard = $row.put('doc_author_url', $xwiki.getURL($metadataAuthor)))
       #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
       #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
       #set($discard = $row.put('doc_hidden', $translatedDoc.isHidden()))

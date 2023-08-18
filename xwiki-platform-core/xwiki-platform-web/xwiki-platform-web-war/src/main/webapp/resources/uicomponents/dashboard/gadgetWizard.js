@@ -20,8 +20,8 @@
 /*!
 #set ($paths = {
   'css': {
-    'macroWizard': $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-webjar',
-      'plugins/xwiki-macro/macroWizard.min.css', {'evaluate': true})
+    'macroWizard': $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins',
+      'xwiki-macro/macroWizard.min.css', {'evaluate': true})
   }
 })
 #set ($l10nKeys = [

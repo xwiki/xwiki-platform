@@ -23,8 +23,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,19 +93,29 @@ public class DefaultURLSecurityManager implements URLSecurityManager
 
     private Set<String> trustedDomains;
 
-    private void computeTrustedDomains()
+    private synchronized void computeTrustedDomains()
     {
-        this.trustedDomains = new HashSet<>(this.urlConfiguration.getTrustedDomains());
+        // Check if another thread already computed the list of trusted domains.
+        if (this.trustedDomains != null) {
+            return;
+        }
+
+        Set<String> result = ConcurrentHashMap.newKeySet();
+        result.addAll(this.urlConfiguration.getTrustedDomains());
 
         try {
             for (WikiDescriptor wikiDescriptor : wikiDescriptorManager.getAll()) {
-                this.trustedDomains.addAll(wikiDescriptor.getAliases());
+                result.addAll(wikiDescriptor.getAliases());
             }
         } catch (WikiManagerException e) {
             logger.warn("Error while getting wiki descriptor to fill list of trusted domains: [{}]. "
                 + "The subwikis won't be taken into account for the list of trusted domains.",
                 ExceptionUtils.getRootCauseMessage(e));
         }
+
+        // Set the list of trusted domains only at the end to avoid exposing an incomplete list of trusted domains to
+        // other threads.
+        this.trustedDomains = result;
     }
 
     private String getCurrentDomain()

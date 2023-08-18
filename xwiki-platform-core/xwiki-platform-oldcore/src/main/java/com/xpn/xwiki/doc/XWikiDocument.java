@@ -2757,7 +2757,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public Map<DocumentReference, List<BaseObject>> getXObjects()
     {
-        return (Map) this.publicXObjects;
+        return this.publicXObjects;
     }
 
     /**
@@ -4191,7 +4191,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getTags(XWikiContext context)
     {
-        ListProperty prop = (ListProperty) getTagProperty(context);
+        ListProperty prop = (ListProperty) getTagProperty();
 
         // I don't know why we need to XML-escape the list of tags but for backwards compatibility we need to keep doing
         // this. When this method was added it was using ListProperty#getTextValue() which used to return
@@ -4204,7 +4204,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         List<String> tagList = null;
 
-        BaseProperty prop = getTagProperty(context);
+        BaseProperty prop = getTagProperty();
         if (prop != null) {
             tagList = (List<String>) prop.getValue();
         }
@@ -4212,7 +4212,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return tagList;
     }
 
-    private BaseProperty getTagProperty(XWikiContext context)
+    private BaseProperty getTagProperty()
     {
         BaseObject tags = getObject(XWikiConstant.TAG_CLASS);
 
@@ -4629,7 +4629,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         this.getAttachmentList().clear();
         for (XWikiAttachment attach : sourceDocument.getAttachmentList()) {
-            XWikiAttachment newAttach = (XWikiAttachment) attach.clone();
+            XWikiAttachment newAttach = attach.clone();
 
             setAttachment(newAttach);
         }
@@ -6704,16 +6704,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setLocale(Locale locale)
     {
-        this.locale = locale;
+        if (!Objects.equals(this.locale, locale)) {
+            this.locale = locale;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
 
-        // Clean various caches
+            // Clean various caches
 
-        this.keyCache = null;
-        this.localKeyCache = null;
-        this.documentReferenceWithLocaleCache = null;
-        this.pageReferenceWithLocaleCache = null;
+            this.keyCache = null;
+            this.localKeyCache = null;
+            this.documentReferenceWithLocaleCache = null;
+            this.pageReferenceWithLocaleCache = null;
+        }
     }
 
     /**
@@ -6745,9 +6747,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setDefaultLocale(Locale defaultLocale)
     {
-        this.defaultLocale = defaultLocale;
+        if (!Objects.equals(this.defaultLocale, defaultLocale)) {
+            this.defaultLocale = defaultLocale;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
+        }
     }
 
     public int getTranslation()
@@ -6957,7 +6961,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return getDeltas(
                 Diff.diff(ToString.stringToArray(prevDoc.getContent()), ToString.stringToArray(getContent())));
         } catch (Exception ex) {
-            LOGGER.debug("Exception getting differences from previous version: " + ex.getMessage());
+            LOGGER.debug("Exception getting differences from previous version", ex);
         }
 
         return new ArrayList<Delta>();
@@ -7262,90 +7266,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             result.setDoc(doc);
         }
         return result;
-    }
-
-    /**
-     * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
-     * which list the document we are renaming as their parent.
-     * <p>
-     * See {@link #rename(DocumentReference, List, List, XWikiContext)} for more details.
-     *
-     * @param newDocumentReference the new document reference
-     * @param context the ubiquitous XWiki Context
-     * @throws XWikiException in case of an error
-     * @since 2.2M2
-     * @deprecated use
-     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
-     */
-    @Deprecated(since = "12.5RC1")
-    public void rename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
-    {
-        rename(newDocumentReference, getBackLinkedReferences(context), context);
-    }
-
-    /**
-     * Rename the current document and all the links pointing to it in the list of passed backlink documents. The
-     * renaming algorithm takes into account the fact that there are several ways to write a link to a given page and
-     * all those forms need to be renamed. For example the following links all point to the same page:
-     * <ul>
-     * <li>[Page]</li>
-     * <li>[Page?param=1]</li>
-     * <li>[currentwiki:Page]</li>
-     * <li>[CurrentSpace.Page]</li>
-     * <li>[currentwiki:CurrentSpace.Page]</li>
-     * </ul>
-     * <p>
-     * Note: links without a space are renamed with the space added and all documents which have the document being
-     * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
-     * </p>
-     *
-     * @param newDocumentReference the new document reference
-     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
-     *            modified to point to the new document reference
-     * @param context the ubiquitous XWiki Context
-     * @throws XWikiException in case of an error
-     * @since 2.2M2
-     * @deprecated use
-     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
-     */
-    @Deprecated(since = "12.5RC1")
-    public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
-        XWikiContext context) throws XWikiException
-    {
-        rename(newDocumentReference, backlinkDocumentReferences, getChildrenReferences(context), context);
-    }
-
-    /**
-     * Same as {@link #rename(DocumentReference, List, XWikiContext)} but the list of documents having the current
-     * document as their parent is passed in parameter.
-     *
-     * @param newDocumentReference the new document reference
-     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
-     *            modified to point to the new document reference
-     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
-     *            document reference
-     * @param context the ubiquitous XWiki Context
-     * @throws XWikiException in case of an error
-     * @since 2.2M2
-     * @deprecated use
-     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
-     */
-    @Deprecated(since = "12.5RC1")
-    public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
-        List<DocumentReference> childDocumentReferences, XWikiContext context) throws XWikiException
-    {
-        // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
-        // something fails in the middle...
-
-        // TODO: Why do we verify if the document has just been created and not been saved.
-        // If the user is trying to rename to the same name... In that case, simply exits for efficiency.
-        if (isNew() || getDocumentReference().equals(newDocumentReference)) {
-            return;
-        }
-        context.getWiki().renameByCopyAndDelete(this,
-            newDocumentReference,
-            backlinkDocumentReferences,
-            childDocumentReferences, context);
     }
 
     /**
@@ -7677,9 +7597,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setDefaultTemplate(String defaultTemplate)
     {
-        this.defaultTemplate = defaultTemplate;
+        if (!Objects.equals(this.defaultTemplate, defaultTemplate)) {
+            this.defaultTemplate = defaultTemplate;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
+        }
     }
 
     public Vector<BaseObject> getComments()
@@ -8685,15 +8607,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void setCustomClass(String customClass)
     {
-        this.customClass = customClass;
-        setMetaDataDirty(true);
+        if (!Objects.equals(this.customClass, customClass)) {
+            this.customClass = customClass;
+            setMetaDataDirty(true);
+        }
     }
 
     public void setValidationScript(String validationScript)
     {
-        this.validationScript = validationScript;
+        if (!Objects.equals(this.validationScript, validationScript)) {
+            this.validationScript = validationScript;
 
-        setMetaDataDirty(true);
+            setMetaDataDirty(true);
+        }
     }
 
     public String getValidationScript()
@@ -8971,6 +8897,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return <code>true</code> if the document is hidden and does not appear among the results of
      *         {@link com.xpn.xwiki.api.XWiki#searchDocuments(String)}, <code>false</code> otherwise.
      */
+    @Override
     public Boolean isHidden()
     {
         return this.hidden;

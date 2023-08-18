@@ -52,7 +52,8 @@ public class ObjectsAtPageVersionResourceImpl extends BaseObjectsResource implem
 
             Objects objects = objectFactory.createObjects();
 
-            List<com.xpn.xwiki.objects.BaseObject> objectList = getBaseObjects(doc);
+            List<com.xpn.xwiki.objects.BaseObject> objectList =
+                getBaseObjects(doc.getDocumentReferenceWithLocale(), version);
 
             RangeIterable<com.xpn.xwiki.objects.BaseObject> ri =
                     new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);

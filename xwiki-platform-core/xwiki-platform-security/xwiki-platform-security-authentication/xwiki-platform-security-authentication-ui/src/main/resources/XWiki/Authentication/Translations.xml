@@ -48,7 +48,16 @@ authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the
 authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
 authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled
-authentication.admin.heading=Authentication Security</content>
+authentication.admin.heading=Authentication Security
+
+security.authservice.admin.title=Authentication service
+security.authservice.admin.currentAuthService=Current Authentication service
+security.authservice.admin.component.label=Set authentication service:
+security.authservice.admin.component.save=Save
+security.authservice.admin.component.noService=No alternative authentication service can be found.
+security.authservice.admin.other.warning=The current authentication service cannot be modified because it's injected by a custom system.
+security.authservice.admin.class.warning=The current authentication service cannot be modified because it's controlled by the xwiki.cfg configuration file.
+</content>
   <object>
     <name>XWiki.Authentication.Translations</name>
     <number>0</number>

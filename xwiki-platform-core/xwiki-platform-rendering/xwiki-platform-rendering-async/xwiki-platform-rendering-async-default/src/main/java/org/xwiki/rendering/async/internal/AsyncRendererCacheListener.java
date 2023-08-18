@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.async.internal;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -33,6 +34,7 @@ import org.xwiki.component.event.ComponentDescriptorEvent;
 import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.authorization.event.RightUpdatedEvent;
 
@@ -56,6 +58,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Singleton
 @Named(AsyncRendererCacheListener.NAME)
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class AsyncRendererCacheListener extends AbstractEventListener
 {
     /**

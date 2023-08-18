@@ -21,12 +21,11 @@ ul.xlist li.showAllResults.loading {
   background-position:6px center;
 }
 
-ul.xlist li.showAllResults div.xitemcontainer {
-  margin-left:0;
-  padding-left:10px;
-  border: 1px solid #EEEEEE;
+ul.xlist li.showAllResults button.xitemcontainer {
+  margin-left: 0;
+  padding-left: 10px;
   font-size: 1em;
-  height: 25px;
+  height: 100%;
   padding-right: 10px;
   padding-top: 3px;
   text-align: right;

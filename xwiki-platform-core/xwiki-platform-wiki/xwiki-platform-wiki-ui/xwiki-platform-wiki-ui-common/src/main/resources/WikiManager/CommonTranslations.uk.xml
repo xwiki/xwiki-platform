@@ -1,0 +1,64 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="uk">
+  <web>WikiManager</web>
+  <name>CommonTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.wikis=Вікі
+admin.wikis.descriptor=Дескриптор
+admin.wikis.descriptor.description=Налаштувати дескриптор вікі
+admin.wiki.description=Опишіть свою вікі (красива назва та опис) і вкажіть її власника та домашню сторінку.
+platform.wiki.admin.wiki.ownerProblemConfirmation=Користувача нового власника не існує, або він може походити з іншої вікі.\nВи впевнені, що бажаєте його використати та продовжити операцію збереження?
+platform.wiki.admin.wiki.csrfInvalidError=Недійсний токен безпеки (CSRF). Будь ласка, оновіть сторінку та спробуйте ще раз.
+platform.wiki.admin.wiki.requiredFieldsError=Поле 'Домашня сторінка' не може бути пустим.
+platform.wiki.admin.wiki.ownerWarning=Попередження: якщо ви зміните це, попередній власник втратить свої права власності. Якщо це ви, переконайтеся, що ви не заблокували себе на вікі. Якщо це станеться помилково, вам потрібно буде зв’язатися з адміністраторами основної вікі або скористатися обліковим записом суперадміністратора.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wiki=Вікі
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

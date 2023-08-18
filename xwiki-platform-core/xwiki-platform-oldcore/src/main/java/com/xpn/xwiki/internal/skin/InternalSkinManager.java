@@ -42,6 +42,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -131,7 +132,7 @@ public class InternalSkinManager implements Initializable
                 }
 
             }
-        });
+        }, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
     }
 
     public Skin getSkin(String id)

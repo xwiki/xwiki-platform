@@ -33,6 +33,8 @@ import org.xwiki.diff.Conflict;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.diff.internal.DefaultConflictDecision;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -62,6 +64,9 @@ public class MergeScriptService implements ScriptService
     @Inject
     private MergeManager mergeManager;
 
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
     /**
      * Perform a merge 3 points between the currentDocument and the newDocument, the previousDocument being the common
      * ancestor of both documents. This operation doesn't save anything.
@@ -84,7 +89,8 @@ public class MergeScriptService implements ScriptService
         MergeDocumentResult mergeResult =
             mergeManager.mergeDocument(previousDoc, newDoc, currentDoc, mergeConfiguration);
 
-        return new MergeDocumentResultScript(mergeResult, contextProvider.get());
+        return new MergeDocumentResultScript(mergeResult, contextProvider.get(),
+            this.contextualAuthorizationManager.hasAccess(Right.PROGRAM));
     }
 
     /**

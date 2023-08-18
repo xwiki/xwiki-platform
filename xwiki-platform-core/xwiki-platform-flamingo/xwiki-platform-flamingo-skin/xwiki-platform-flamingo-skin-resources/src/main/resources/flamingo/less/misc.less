@@ -16,6 +16,12 @@
   }
 }
 
+// Suggests ===================================================================
+
+div.suggestItems .hide-button {
+  .text-muted-smaller;
+}
+
 // Labels =====================================================================
 
 .language {
@@ -201,10 +207,18 @@
     text-align: left;
   }
   .xAdditional {
+    &.recoverPassword {
+      text-align: right;
+    }
+    flex-grow: 1;
     font-size: .8em;
     font-weight: normal;
-    float: right;
     margin-top: .3em;
+  }
+  .submitSection {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1em;
   }
 }
 
@@ -496,4 +510,13 @@ a.html-diff-context-toggle {
   .label {
     color: @text-color;
   }
+}
+
+// Select
+.xwiki-select-option-highlighted {
+  background-color: @breadcrumb-bg;
+}
+
+.xwiki-select-option-selected {
+  background-color: @nav-link-hover-bg;
 }

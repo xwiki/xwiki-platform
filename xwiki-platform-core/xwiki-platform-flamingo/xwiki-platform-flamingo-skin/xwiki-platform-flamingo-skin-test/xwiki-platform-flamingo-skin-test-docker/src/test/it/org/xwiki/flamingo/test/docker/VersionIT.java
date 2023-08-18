@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -286,4 +287,38 @@ class VersionIT
         assertEquals(CONTENT1, vp.getContent());
     }
 
+    /**
+     * See XWIKI-21188
+     */
+    @Test
+    @Order(6)
+    void testDeleteAllButFirstVersion(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.rest().delete(testReference);
+
+        // Create first version of the page
+        setup.rest().savePage(testReference, "1.1", TITLE);
+
+        // Create a few more
+        setup.rest().savePage(testReference, "2.1", TITLE);
+        setup.rest().savePage(testReference, "3.1", TITLE);
+        setup.rest().savePage(testReference, "4.1", TITLE);
+
+        // View the page
+        ViewPage vp = setup.gotoPage(testReference);
+        // TODO: Remove when XWIKI-6688 (Possible race condition when clicking on a tab at the bottom of a page in
+        // view mode) is fixed.
+        vp.waitForDocExtraPaneActive("comments");
+
+        // Verify and delete the latest version.
+        HistoryPane historyTab = vp.openHistoryDocExtraPane();
+        assertEquals("4.1", historyTab.getCurrentVersion());
+        historyTab = historyTab.deleteRangeVersions("2.1", "4.1");
+
+        // Verify that the current version is now the first one.
+        assertEquals("1.1", historyTab.getCurrentVersion());
+        Page page = (Page) setup.rest().get(testReference);
+        assertEquals("1.1", page.getVersion());
+        assertEquals("1.1", page.getContent());
+    }
 }

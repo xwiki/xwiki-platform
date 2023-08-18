@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -95,6 +96,14 @@ public class CreateAction extends XWikiAction
      * Local entity reference serializer hint.
      */
     private static final String LOCAL_SERIALIZER_HINT = "local";
+
+    /**
+     * The name of the parameter that contains the form token.
+     */
+    private static final String FORM_TOKEN_PARAMETER = "form_token";
+
+    @Inject
+    private CSRFToken csrf;
 
     /**
      * The action to perform when creating a new page from a template.
@@ -185,9 +194,12 @@ public class CreateAction extends XWikiAction
         checkRights(newDocumentReference.getLastSpaceReference(), context);
 
         // Check if the document to create already exists and if it respects the name strategy
+        // Also check the CSRF token.
         XWikiDocument newDocument = context.getWiki().getDocument(newDocumentReference, context);
         if (handler.isDocumentAlreadyExisting(newDocument) || handler.isDocumentPathTooLong(newDocumentReference)
-            || !this.isEntityReferenceNameValid(newDocumentReference)) {
+            || !this.isEntityReferenceNameValid(newDocumentReference)
+            || !this.csrf.isTokenValid(context.getRequest().getParameter(FORM_TOKEN_PARAMETER)))
+        {
             return CREATE_TEMPLATE;
         }
 
@@ -257,8 +269,11 @@ public class CreateAction extends XWikiAction
             action = actionOnCreate == ActionOnCreate.SAVE_AND_VIEW ? "save" : getEditMode(template, context);
         }
 
+        // The form token from the request (validated above).
+        String formToken = context.getRequest().getParameter(FORM_TOKEN_PARAMETER);
+
         // Perform a redirection to the selected action of the document to create.
-        String redirectParams = getRedirectParameters(parent, title, template, actionOnCreate);
+        String redirectParams = getRedirectParameters(parent, title, template, actionOnCreate, formToken);
         String redirectURL = newDocument.getURL(action, redirectParams, context);
         redirectURL = context.getResponse().encodeRedirectURL(redirectURL);
         if (context.getRequest().getParameterMap().containsKey("ajax")) {
@@ -318,7 +333,8 @@ public class CreateAction extends XWikiAction
         xwiki.saveDocument(newDocument, context);
     }
 
-    private String getRedirectParameters(String parent, String title, String template, ActionOnCreate actionOnCreate)
+    private String getRedirectParameters(String parent, String title, String template, ActionOnCreate actionOnCreate,
+        String formToken)
     {
         if (actionOnCreate == ActionOnCreate.SAVE_AND_EDIT) {
             // We don't need to pass any parameters because the document is saved before the redirect using the
@@ -334,8 +350,7 @@ public class CreateAction extends XWikiAction
             redirectParams += "&title=" + Util.encodeURI(title, null);
         }
         // Both the save and the edit action might require a CSRF token
-        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
-        redirectParams += "&form_token=" + Util.encodeURI(csrf.getToken(), null);
+        redirectParams += "&form_token=" + Util.encodeURI(formToken, null);
 
         return redirectParams;
     }
@@ -444,7 +459,6 @@ public class CreateAction extends XWikiAction
 
     /**
      * @param template the template to create document from
-     * @param resolver the resolver to use to resolve the template document reference
      * @param context the context of the current request
      * @return the default edit mode for a document created from the passed template
      * @throws XWikiException in case something goes wrong accessing template document

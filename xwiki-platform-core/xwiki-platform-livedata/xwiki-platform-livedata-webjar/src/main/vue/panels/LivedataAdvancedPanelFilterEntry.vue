@@ -121,7 +121,7 @@ export default {
   visibility: visible;
 }
 .livedata-filter-container .delete-filter:hover {
-  background-color: #ccc4;
+  background-color: @panel-default-heading-bg;
 }
 .livedata-filter-container .delete-filter:active {
   background-color: unset;

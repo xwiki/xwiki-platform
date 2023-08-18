@@ -67,6 +67,7 @@
           to prevent sorting the column unintentionally.
         -->
         <div
+          role="presentation"
           class="handle"
           :title="$t('livedata.action.reorder.hint')"
           @click.stop
@@ -89,7 +90,7 @@
         Use the stop propagation modifier on click event
         to prevent sorting the column unintentionally.
       -->
-      <div class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
+      <div role="presentation" class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
         v-mousedownmove="resizeColumnInit"
         @mousedownmove="resizeColumn"
         @click.stop

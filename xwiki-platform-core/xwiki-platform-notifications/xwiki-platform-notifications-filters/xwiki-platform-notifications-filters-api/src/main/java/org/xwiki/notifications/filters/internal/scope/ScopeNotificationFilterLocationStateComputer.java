@@ -59,18 +59,18 @@ public class ScopeNotificationFilterLocationStateComputer
     public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
         EntityReference location)
     {
-        return isLocationWatched(filterPreferences, location, null, null, false, true).isWatched();
+        return isLocationWatched(filterPreferences, location, null, null, false, true, false).isWatched();
     }
 
     /**
      * @param filterPreferences the collection of all preferences to take into account
      * @param location a location
-     * @return {@code true} if the location is watched by the user, for any of format but for all events only.
+     * @return {@code true} if the location is watched by the user, for all formats and for all events only.
      */
     public boolean isLocationWatchedWithAllEventTypes(Collection<NotificationFilterPreference> filterPreferences,
         EntityReference location)
     {
-        return isLocationWatched(filterPreferences, location, null, null, true, true).isWatched();
+        return isLocationWatched(filterPreferences, location, null, null, true, true, true).isWatched();
     }
 
     /**
@@ -88,6 +88,8 @@ public class ScopeNotificationFilterLocationStateComputer
      * @param format the notification format (can be {@code null} in which cases all formats are accepted)
      * @param onlyGivenType if {@code true} only the given {@code evenType} is taken into account. If {@code false}, the
      *                      given type and filters matching all types are taken into account.
+     * @param onlyGivenFormat if {@code true} the filter preference should match exactly the format requested even if
+     *      *                 it's {@code null}.
      * @param location the location to check
      * @param checkInclusiveFilters if {@code true} both inclusive and exclusive filters are considered.
      *                              if {@code false} only exclusive filters are considered.
@@ -95,16 +97,16 @@ public class ScopeNotificationFilterLocationStateComputer
      */
     public WatchedLocationState isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
         EntityReference location, String eventType, NotificationFormat format, boolean onlyGivenType,
-        boolean checkInclusiveFilters)
+        boolean checkInclusiveFilters, boolean onlyGivenFormat)
     {
         // TODO: write a unit test with a complex set of preferences
 
-        ScopeNotificationFilterPreferencesHierarchy preferences
-                = preferencesGetter.getScopeFilterPreferences(filterPreferences, eventType, format, onlyGivenType);
+        ScopeNotificationFilterPreferencesHierarchy preferences = preferencesGetter
+                .getScopeFilterPreferences(filterPreferences, eventType, format, onlyGivenType, onlyGivenFormat);
 
         if (preferences.isEmpty()) {
-            // If there is no filter preference, then the location is watched (no filter = we get everything)
-            return new WatchedLocationState(true);
+            // If there is no filter preference, then nothing is watched.
+            return new WatchedLocationState(false);
         }
 
         WatchedLocationState state = handleExclusiveFilters(location, preferences);
@@ -114,8 +116,8 @@ public class ScopeNotificationFilterLocationStateComputer
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
         if (!checkInclusiveFilters || !it.hasNext()) {
-            // No inclusive filters ==  we get everything, so the location is watched
-            return new WatchedLocationState(true);
+            // No inclusive filters == we get nothing, so it's not watched.
+            return new WatchedLocationState(false);
         }
 
         boolean match = false;
@@ -155,6 +157,7 @@ public class ScopeNotificationFilterLocationStateComputer
             // If the exclusive filter match the event location...
             if (match(pref, location) && deepLevel > deepestLevel) {
                 state = WatchedState.NOT_WATCHED;
+                startingDate = pref.getStartingDate();
                 deepestLevel = deepLevel;
 
                 // then we watch the location if there is at least an inclusive filter child matching it

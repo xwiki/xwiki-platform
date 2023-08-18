@@ -130,7 +130,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
 
         EntityResourceReference reference =
             new EntityResourceReference(buildEntityReference(wikiReference, spaceNames, pageName, attachmentName),
-                EntityResourceAction.fromString(action));
+                EntityResourceAction.fromString(action), extendedURL.getURI().getFragment());
 
         copyParameters(extendedURL, reference);
 

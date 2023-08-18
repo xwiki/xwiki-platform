@@ -51,8 +51,9 @@ class XWikiWebSocketRequestStubTest
     void verifyStub() throws Exception
     {
         Map<String, List<String>> headers = new LinkedHashMap<>();
-        headers.put("Cookie", Collections.singletonList(
-            "JSESSIONID=abc; username=\"foo\"; password=\"bar\"; rememberme=\"false\"; validation=\"xyz\""));
+        // Note that we duplicate the JSESSIONID in order to check that it doesn't fail the cookie parsing.
+        headers.put("Cookie", Collections.singletonList("JSESSIONID=abc; username=\"foo\";"
+            + " password=\"bar\"; rememberme=\"false\"; JSESSIONID=abc; validation=\"xyz\""));
         headers.put("Date", Collections.singletonList("Tue, 3 Jun 2008 11:05:30 GMT"));
         headers.put("Int", Arrays.asList("12", "31"));
 
@@ -79,7 +80,7 @@ class XWikiWebSocketRequestStubTest
         assertArrayEquals(new String[] {"red", "blue"}, stub.getParameterValues("color"));
 
         assertEquals("xyz", stub.getCookie("validation").getValue());
-        assertEquals(5, stub.getCookies().length);
+        assertEquals(6, stub.getCookies().length);
 
         assertEquals(1212491130000L, stub.getDateHeader("daTe"));
         assertEquals(-1, stub.getDateHeader("missing"));

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
@@ -3065,9 +3067,13 @@ public class Document extends Api
      */
     public void rename(DocumentReference newReference) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
-            this.getDoc().rename(newReference, getXWikiContext());
+        XWiki xWiki = this.context.getWiki();
+        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+            xWiki.getDocument(newReference, this.context), this.context)) {
+            List<DocumentReference> backLinkedReferences = getDocument().getBackLinkedReferences(this.context);
+            List<DocumentReference> childrenReferences = getDocument().getChildrenReferences(this.context);
+            xWiki.renameDocument(getDocumentReference(), newReference, true, backLinkedReferences, childrenReferences,
+                    this.context);
         }
     }
 
@@ -3138,8 +3144,9 @@ public class Document extends Api
     public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
+        XWiki xWiki = this.context.getWiki();
+        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+            xWiki.getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
             // Let's make sure the user has edit permission on any page given which is not actually a child.
@@ -3150,14 +3157,14 @@ public class Document extends Api
             while (counter > 0) {
                 counter--;
                 if (!actuallyChildren.contains(childDocumentNames.get(counter))
-                    && !this.context.getWiki().checkAccess("edit",
-                        this.context.getWiki().getDocument(childDocumentNames.get(counter), this.context),
+                    && !xWiki.checkAccess("edit",
+                        xWiki.getDocument(childDocumentNames.get(counter), this.context),
                         this.context)) {
                     return;
                 }
             }
-
-            this.getDoc().rename(newReference, backlinkDocumentNames, childDocumentNames, getXWikiContext());
+            xWiki.renameDocument(getDocumentReference(), newReference, true, backlinkDocumentNames, childDocumentNames,
+                    this.context);
         }
     }
 
@@ -3165,20 +3172,26 @@ public class Document extends Api
      * Allow to easily access any revision of a document
      *
      * @param revision the version to access
-     * @return the document corresponding to the requested revision or {@code null} if the revision does not exist.
+     * @return the document corresponding to the requested revision or {@code null} if the revision does not exist or
+     * access is denied.
      */
     public Document getDocumentRevision(String revision)
     {
         try {
-            XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(this.doc, revision);
+            DocumentRevisionProvider revisionProvider = getDocumentRevisionProvider();
+            revisionProvider.checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, getDocumentReference(), revision);
+            XWikiDocument documentRevision = revisionProvider.getRevision(this.doc, revision);
 
             return documentRevision != null ? new Document(documentRevision, this.context) : null;
+        } catch (AuthorizationException e) {
+            LOGGER.info("Access denied for loading revision [{}] of document [{}]: [{}]", revision,
+                getDocumentReferenceWithLocale(), ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             LOGGER.error("Failed to load revision [{}] of document [{}]", revision, getDocumentReferenceWithLocale(),
                 e);
-
-            return null;
         }
+
+        return null;
     }
 
     /**

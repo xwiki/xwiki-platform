@@ -54,7 +54,8 @@ require([
 
     if (typeof answerCallback === 'function') {
       // Display the question
-      var displayerURL = XWiki.contextPath + '/job/wiki/' + xm.wiki + '/question/' + job.id.join('/');
+      var encodedJobId = job.id.map(encodeURIComponent).join('/');
+      var displayerURL = XWiki.contextPath + '/job/wiki/' + xm.wiki + '/question/' + encodedJobId;
 
       // Remember the answer callback
       jobQuestion.data('answerCallback', answerCallback);
@@ -238,7 +239,7 @@ require([
           if (typeof data === 'function') {
             return data();
           } else {
-            var answerURL = XWiki.contextPath + '/job/question/' + jobId.join('/');
+            var answerURL = XWiki.contextPath + '/job/question/' + jobId.map(encodeURIComponent).join('/');
 
             return {
               url: answerURL,

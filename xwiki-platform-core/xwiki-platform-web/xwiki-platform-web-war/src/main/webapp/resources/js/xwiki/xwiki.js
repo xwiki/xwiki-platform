@@ -424,7 +424,9 @@ Object.extend(XWiki, {
                         'platform.core.rendering.noRendererForSectionEdit'));
                       editSectionLink.href = '#' + (node.id || '');
                   } else {
-                      editSectionLink.href = window.docediturl + "?section=" + sectionCount;
+                      // FIXME: Use the xwiki-meta module to get the form token when we switch to jQuery/RequireJS.
+                      var formToken = document.documentElement.getAttribute('data-xwiki-form-token');
+                      editSectionLink.href = window.docediturl + "?section=" + sectionCount + '&form_token=' + formToken;
                   }
 
                   node.appendChild(editSectionLink);
@@ -1412,7 +1414,7 @@ XWiki.Document = Class.create({
       return encodeURIComponent(spaceSegment);
     }).join('/spaces/');
     url = url.replace("__space__", spaceSegments);
-    url = url.replace("__page__", this.page);
+    url = url.replace("__page__", encodeURIComponent(this.page));
     if (entity) {
       url += "/" + entity;
     }
@@ -1423,6 +1425,52 @@ XWiki.Document = Class.create({
   },
   getDocumentReference : function() {
     return this.documentReference;
+  }
+});
+XWiki.Attachment = Class.create({
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment('filename',
+   *            new XWiki.Document(new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page'))
+   */
+  initialize : function(filenameOrAttachmentReference, document) {
+    if (typeof filenameOrAttachmentReference === 'string') {
+      // The first argument is a filename.
+      this.filename = filenameOrAttachmentReference;
+      this.document = document;
+    } else {
+      // The first argument is an attachment reference (or it is null).
+      // We ignore the other argument since all the needed information is on the reference
+      this.initializeFromReference(filenameOrAttachmentReference);
+    }
+  },
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment(new XWiki.AttachmentReference('filename',
+   *            new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page')))
+   */
+  initializeFromReference : function(attachmentReference) {
+    this.filename = attachmentReference.name;
+    this.document = new XWiki.Document(attachmentReference.parent);
+  },
+  /**
+   * Gets a URL pointing to this attachment.
+   */
+  getURL : function(queryString, fragment) {
+    // Make sure to not have a double // in the computed URL for WebHome documents since that will fail on Tomcat by
+    // default.
+    var downloadURL = this.document.getURL('download');
+    var attachmentURL = downloadURL + (downloadURL.endsWith('/') ? 'WebHome/' : '/')
+        + encodeURIComponent(this.filename);
+    if (queryString) {
+      attachmentURL += '?' + queryString;
+    }
+    if (fragment) {
+      attachmentURL += '#' + fragment;
+    }
+    return attachmentURL;
   }
 });
 /* Initialize the document URL factory, and create XWiki.currentDocument.

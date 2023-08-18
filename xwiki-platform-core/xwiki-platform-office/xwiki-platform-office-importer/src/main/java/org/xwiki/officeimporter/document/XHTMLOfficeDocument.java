@@ -19,12 +19,12 @@
  */
 package org.xwiki.officeimporter.document;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Set;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xml.html.HTMLUtils;
 
 /**
@@ -43,7 +43,7 @@ public class XHTMLOfficeDocument implements OfficeDocument
     /**
      * Artifacts for this office document.
      */
-    private Set<File> artifactFiles;
+    private Map<String, OfficeDocumentArtifact> artifactsMap;
 
     private OfficeConverterResult converterResult;
 
@@ -51,14 +51,17 @@ public class XHTMLOfficeDocument implements OfficeDocument
      * Creates a new {@link XHTMLOfficeDocument}.
      *
      * @param document the w3c dom representing the office document.
-     * @param artifactFiles artifacts for this office document.
+     * @param artifacts artifacts for this office document.
      * @param converterResult the {@link OfficeConverterResult} used to build that object.
-     * @since 13.1RC1
+     * @since 14.10.8
+     * @since 15.3RC1
      */
-    public XHTMLOfficeDocument(Document document, Set<File> artifactFiles, OfficeConverterResult converterResult)
+    @Unstable
+    public XHTMLOfficeDocument(Document document, Map<String, OfficeDocumentArtifact> artifacts,
+        OfficeConverterResult converterResult)
     {
         this.document = document;
-        this.artifactFiles = artifactFiles;
+        this.artifactsMap = artifacts;
         this.converterResult = converterResult;
     }
 
@@ -75,9 +78,9 @@ public class XHTMLOfficeDocument implements OfficeDocument
     }
 
     @Override
-    public Set<File> getArtifactsFiles()
+    public Map<String, OfficeDocumentArtifact> getArtifactsMap()
     {
-        return this.artifactFiles;
+        return this.artifactsMap;
     }
 
     @Override

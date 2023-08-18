@@ -26,23 +26,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.standard.StandardURLConfiguration;
 import org.xwiki.url.internal.standard.WikiReferenceExtractor;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link BinEntityResourceReferenceResolver}.
@@ -50,7 +52,7 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 6.1M2
  */
-public class BinEntityResourceReferenceResolverTest
+class BinEntityResourceReferenceResolverTest
 {
     private BinEntityResourceReferenceResolver resolver;
 
@@ -64,8 +66,8 @@ public class BinEntityResourceReferenceResolverTest
 
     private StandardURLConfiguration configuration;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         this.resolver = new BinEntityResourceReferenceResolver();
 
@@ -86,7 +88,7 @@ public class BinEntityResourceReferenceResolverTest
     }
 
     @Test
-    public void createResourceWhenViewActionHidden() throws Exception
+    void createResourceWhenViewActionHidden() throws Exception
     {
         when(this.configuration.isViewActionHidden()).thenReturn(true);
 
@@ -149,7 +151,7 @@ public class BinEntityResourceReferenceResolverTest
     }
 
     @Test
-    public void createResourceWhenViewActionShown() throws Exception
+    void createResourceWhenViewActionShown() throws Exception
     {
         when(this.configuration.isViewActionHidden()).thenReturn(false);
 
@@ -185,7 +187,7 @@ public class BinEntityResourceReferenceResolverTest
     }
 
     @Test
-    public void createResourceWhenSpaceAndPageNamesContainDots() throws Exception
+    void createResourceWhenSpaceAndPageNamesContainDots() throws Exception
     {
         EntityReference reference = buildEntityReference("wiki", Arrays.asList("space.with.dots"), "page.with.dots");
         testCreateResource("http://localhost/bin/view/space.with.dots/page.with.dots", "view",
@@ -193,7 +195,7 @@ public class BinEntityResourceReferenceResolverTest
     }
 
     @Test
-    public void createResourceWhenFileActionAction() throws Exception
+    void createResourceWhenFileActionAction() throws Exception
     {
         EntityReference singleSpaceReference =
             buildEntityReference("wiki", Arrays.asList("space"), "page", "attachment.ext");
@@ -222,7 +224,7 @@ public class BinEntityResourceReferenceResolverTest
     }
 
     @Test
-    public void createResourceWhenURLHasParameters() throws Exception
+    void createResourceWhenURLHasParameters() throws Exception
     {
         EntityReference fullReference = buildEntityReference("wiki", Arrays.asList("space"), "page");
         ResourceReference resource =
@@ -244,7 +246,18 @@ public class BinEntityResourceReferenceResolverTest
         assertEquals(expectedMap, resource.getParameters());
     }
 
-    private ResourceReference testCreateResource(String testURL, String expectedActionName,
+    @Test
+    void createEntityResourceWhenURLHasAnchor() throws Exception
+    {
+        EntityReference fullReference = buildEntityReference("wiki", Arrays.asList("space"), "page");
+        EntityResourceReference resource =
+            testCreateResource("http://localhost/bin/view/space/page#anchor", "view",
+                fullReference, fullReference, EntityType.DOCUMENT);
+
+        assertEquals("anchor", resource.getAnchor());
+    }
+
+    private EntityResourceReference testCreateResource(String testURL, String expectedActionName,
         EntityReference expectedReference, EntityReference returnedReference, EntityType expectedEntityType)
         throws Exception
     {

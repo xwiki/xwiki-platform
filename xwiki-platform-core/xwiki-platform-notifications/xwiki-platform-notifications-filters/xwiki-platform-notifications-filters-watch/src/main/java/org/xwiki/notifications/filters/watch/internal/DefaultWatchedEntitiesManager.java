@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,14 +31,12 @@ import org.apache.commons.compress.utils.Sets;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
-import org.xwiki.notifications.preferences.internal.XWikiEventTypesEnabler;
 
 /**
  * Default implementation of {@link WatchedEntitiesManager}.
@@ -53,9 +50,6 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
 {
     @Inject
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
-    @Inject
-    private XWikiEventTypesEnabler xwikiEventTypesEnabler;
 
     @Override
     public void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException
@@ -96,20 +90,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             return;
         }
 
-        if (shouldBeWatched) {
-            // If the notifications for the XWiki app (create, update, delete, addComment) are not enabled but autowatch
-            // is on, then we need to enable the notifications in the user preferences.
-            // We do that because it has no sense for a user to use the "AutoWatch" feature when the notifications are
-            // not enabled.
-            // Moreover, it makes the notifications feature discoverable. It means that, by default, all pages where the
-            // user has made a contribution will generate notifications. That's probably what users expect from a
-            // notification area.
-            // Now we only enable those events in case of a watch: it doesn't make sense to enable them in case of
-            // unwatch.
-            xwikiEventTypesEnabler.ensureXWikiNotificationsAreEnabled(user);
-        }
-
-        Iterator<NotificationFilterPreference> filterPreferences = getAllEventsFilterPreferences(user).iterator();
+        Iterator<NotificationFilterPreference> filterPreferences =
+                notificationFilterPreferenceManager.getFilterPreferences(user).iterator();
 
         boolean thereIsAMatch = false;
 
@@ -126,6 +108,11 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
                         && notificationFilterPreference.isEnabled() == shouldBeWatched) {
                     enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference, user);
                 }
+            } else if (shouldDisableFilter(entity, notificationFilterPreference, shouldBeWatched)) {
+                // Disable custom filters that might be contradictory.
+                notificationFilterPreferenceManager.setFilterPreferenceEnabled(user,
+                        notificationFilterPreference.getId(),
+                        false);
             }
         }
 
@@ -136,12 +123,24 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         }
     }
 
+    private boolean shouldDisableFilter(WatchedEntityReference entity, NotificationFilterPreference filterPreference,
+                                        boolean shouldBeWatched)
+    {
+        if (entity.match(filterPreference) && filterPreference.isEnabled()) {
+            if (shouldBeWatched) {
+                return filterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE;
+            } else {
+                return filterPreference.getFilterType() == NotificationFilterType.INCLUSIVE;
+            }
+        }
+        return false;
+    }
+
     private boolean entityIsAlreadyInDesiredState(WatchedEntityReference entity, DocumentReference user,
             boolean desiredState) throws NotificationException
     {
         // If the notifications are enabled and the entity is already in the desired state, then we have nothing to do
-        return !xwikiEventTypesEnabler.isNotificationDisabled(user)
-            && entity.isWatchedWithAllEventTypes(user) == desiredState;
+        return entity.isWatchedWithAllEventTypes(user) == desiredState;
     }
 
     private void enableOrDeleteFilter(boolean enable, NotificationFilterPreference notificationFilterPreference,
@@ -157,17 +156,6 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
             notificationFilterPreferenceManager.deleteFilterPreference(user,
                     notificationFilterPreference.getId());
         }
-    }
-
-    private Stream<NotificationFilterPreference> getAllEventsFilterPreferences(DocumentReference user)
-            throws NotificationException
-    {
-        // A filter preferences object concerning all event is a filter that has no even set and that concern
-        // concerns all notification formats.
-        return notificationFilterPreferenceManager.getFilterPreferences(user).stream().filter(
-            filterPreference -> filterPreference.getEventTypes().isEmpty()
-            && filterPreference.getNotificationFormats().size() == NotificationFormat.values().length
-        );
     }
 
     private NotificationFilterPreference createFilterPreference(WatchedEntityReference entity, boolean shouldBeWatched)

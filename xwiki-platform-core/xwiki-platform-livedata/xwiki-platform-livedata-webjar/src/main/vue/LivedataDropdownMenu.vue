@@ -51,7 +51,7 @@
 
       <li>
         <!-- Refresh -->
-        <a href="#" @click.prevent="logic.updateEntries()">
+        <a href="#" @click.prevent="logic.updateEntries()" class="livedata-action-refresh">
           <XWikiIcon :icon-descriptor="{name: 'repeat'}" /> 
           {{ $t('livedata.action.refresh') }}
         </a>
@@ -129,13 +129,20 @@ export default {
 
 <style>
 
-.livedata-dropdown-menu .btn-default {
-  background-color: #f8f8f8;
-  background-image: none;
-  border-color: #e5e5e5;
-  box-shadow: none;
-  color: #333333;
-  text-shadow: none;
+.livedata-dropdown-menu {
+  // Similar to .flat-buttons()
+  .btn-default {
+    background-color: @breadcrumb-bg;
+    background-image: none;
+    border-color: @dropdown-divider-bg;
+    box-shadow: none;
+    color: @dropdown-link-color;
+    text-shadow: none;
+  }
+
+  .btn-default:hover, .btn-default:active, .btn-default:focus, .open .dropdown-toggle {
+      border-color: darken(@dropdown-divider-bg, 10%);
+  }
 }
 
 .livedata-dropdown-menu .btn-default span {

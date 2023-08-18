@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 import javax.inject.Inject;
@@ -59,6 +60,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -233,9 +235,46 @@ public abstract class XWikiAction implements LegacyAction
         return this.autorization;
     }
 
+    /**
+     * @deprecated use {@link #localizePlainOrReturnKey(String, Object...)} instead. The new API doesn't XML-escape
+     *             the translation as it's supposed to be used in a context where the target syntax is plain text.
+     */
+    @Deprecated(since = "14.10.12,15.5RC1")
     protected String localizePlainOrKey(String key, Object... parameters)
     {
-        return XMLUtils.escape(StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key));
+        // TODO: Review all calls to localizePlainOrKey() and once this is done change this method implementation to
+        // use:
+        //   return localizeOrKey(key, Syntax.PLAIN_1_0, parameters)
+        return XMLUtils.escape(Objects.toString(getLocalization().getTranslationPlain(key, parameters), key));
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
+    {
+        String result;
+        try {
+            result = Objects.toString(getLocalization().getTranslation(key, syntax, parameters), key);
+        } catch (LocalizationException e) {
+            // Return the key in case of error but log a warning
+            LOGGER.warn("Error rendering the translation for key [{}] in syntax [{}]. Using the translation key "
+                + "instead. Root cause: [{}]", key, syntax.toIdString(), ExceptionUtils.getRootCauseMessage(e));
+            result = key;
+        }
+        return result;
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizePlainOrReturnKey(String key, Object... parameters)
+    {
+        return localizeOrReturnKey(key, Syntax.PLAIN_1_0, parameters);
     }
 
     protected JobProgressManager getProgress()
@@ -557,7 +596,7 @@ public abstract class XWikiAction implements LegacyAction
                 getProgress().startStep(this, "Search and execute entity resource handler");
 
                 // Call the new Entity Resource Reference Handler.
-                ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
+                ResourceReferenceHandler<ResourceType> entityResourceReferenceHandler = Utils.getComponent(
                     new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
                 EntityResourceReference entityResourceReference =
                     (EntityResourceReference) Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
@@ -1154,11 +1193,15 @@ public abstract class XWikiAction implements LegacyAction
 
         try {
             String jsonAnswerAsString = mapper.writeValueAsString(answer);
-            context.getResponse().setContentType("application/json");
-            context.getResponse().setContentLength(jsonAnswerAsString.length());
-            context.getResponse().setStatus(status);
-            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
-            context.getResponse().getWriter().print(jsonAnswerAsString);
+            XWikiResponse response = context.getResponse();
+            String encoding = context.getWiki().getEncoding();
+            response.setContentType("application/json");
+            // Set the content length to the number of bytes, not the
+            // string length, so as to handle multi-byte encodings
+            response.setContentLength(jsonAnswerAsString.getBytes(encoding).length);
+            response.setStatus(status);
+            response.setCharacterEncoding(encoding);
+            response.getWriter().print(jsonAnswerAsString);
             context.setResponseSent(true);
         } catch (IOException e) {
             throw new XWikiException("Error while sending JSON answer.", e);

@@ -71,8 +71,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
         // TODO: Mail.MailResender can be removed on XWIKI-20557 is closed
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:(MailIT\\..*|Mail\\.MailResender)\n"
-            + "mail.sender.database.resendAutomaticallyAtStartup=false",
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:(MailIT\\..*|Mail\\.MailResender)",
         // Add the Scheduler plugin used by Mail Resender Scheduler Job
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"
     },
@@ -251,8 +250,28 @@ class MailIT
         // now that the mail server is set correctly.
         verifyIndividualResend();
 
-        // Step 9: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
+        // Step 9: Verify we can delete a mail in the UI
+        verifyMailDelete();
+
+        // Step 10: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
         verifyMailResenderSchedulerJob(setup);
+    }
+
+    private void verifyMailDelete()
+    {
+        // Delete the mail in send_success state from the verifyIndividualResend() test
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn("Status", "send_success");
+        int count = tableLayout.countRows();
+        tableLayout.clickAction(1, "mailsendingaction_delete");
+
+        // Wait for the success message to be displayed
+        statusPage.waitUntilContent("\\QThe mail has been deleted successfully\\E");
+
+        // Verify that the LT has one item less
+        tableLayout = statusPage.getLiveData().getTableLayout();
+        assertEquals(count - 1, tableLayout.countRows());
     }
 
     private void verifyIndividualResend()
@@ -272,13 +291,16 @@ class MailIT
 
     private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception
     {
-        // Send a mail that we set in prepare_error state for the test below. This is achieved using a custom
+        // Note: we don't need to disable automatic resend for the Mail Scheduler job since by default it only resends
+        // once per day and since the XWiki is just created, the resend will ony happen in about 24 hours from now,
+        // leaving enough time for the test to finish...
+
+        // Send a mail that we set in prepare_success state for the test below. This is achieved using a custom
         // Test DatabaseMailListener component.
         sendMailWithPrepareSuccessState(setup);
 
-        // Navigate to the scheduler job UI, schedule and then trigger the mail resender job
+        // Navigate to the scheduler job UI, and trigger the mail resender job so that it executes now
         SchedulerHomePage shp = SchedulerHomePage.gotoPage();
-        shp.clickJobActionSchedule("Mail Resender");
         shp.clickJobActionTrigger("Mail Resender");
 
         // Wait and assert the received email due to the resend.

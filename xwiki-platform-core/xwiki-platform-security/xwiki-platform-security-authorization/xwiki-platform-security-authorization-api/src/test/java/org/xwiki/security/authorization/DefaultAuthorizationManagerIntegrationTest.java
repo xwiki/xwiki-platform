@@ -79,6 +79,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -698,6 +699,24 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
 
         assertAccess(new RightSet(List.of(LOGIN, REGISTER, VIEW, DELETE)), getXUser("userA") ,
             getXDoc("docDeleteAllowA", "any space"));
+
+        /* In the situation where a global user (userA) is in a global group (groupA) that is in another global group
+         (groupB) that is in a local group (groupC) that is in a subwiki (subwiki), ensure that removing the local
+         group (groupC) from the cache removes the access entries for the global user (userA) in the subwiki as
+         otherwise permissions based on groupC are not recalculated when a member of groupC is removed. This
+         verifies that memberships between groups are correctly mirrored in the shadow entries for the subwiki. */
+        SecurityCache securityCache = this.componentManager.getInstance(SecurityCache.class);
+        UserSecurityReference subwikiGroupC =
+            this.securityReferenceFactory.newUserReference(getUser("groupC", "subwiki"));
+        UserSecurityReference userA = this.securityReferenceFactory.newUserReference(getXUser("userA"));
+        SecurityReference docC =
+            this.securityReferenceFactory.newEntityReference(getDoc("docAllowGroupC", "any space", "subwiki"));
+
+        assertNotNull(securityCache.get(subwikiGroupC));
+        assertNotNull(securityCache.get(userA, docC));
+        securityCache.remove(subwikiGroupC);
+        assertNull(securityCache.get(userA, docC));
+        assertNotNull(securityCache.get(userA));
     }
 
     @Test

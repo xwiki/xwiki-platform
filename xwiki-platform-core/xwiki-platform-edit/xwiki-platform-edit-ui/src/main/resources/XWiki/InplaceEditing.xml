@@ -1024,6 +1024,10 @@ require(['jquery'], function($) {
     }
     // Disable the edit buttons and hide the section edit links.
     editButton.add(translateButton).addClass('disabled');
+    editButton.attr('aria-disabled', 'true');
+    var reference = editButton.attr('href');
+    editButton.removeAttr('href');
+    editButton.attr('role', 'link');
     $('#xwikicontent').children(':header').children('.edit_section').addClass('hidden');
     event.preventDefault();
     const handler = event.data;
@@ -1037,6 +1041,9 @@ require(['jquery'], function($) {
         // * the translate button is restored (if needed) by the editInPlace module
         // * the section edit links are restored when the document is rendered for view
         editButton.removeClass('disabled');
+        editButton.removeAttr('aria-disabled');
+        editButton.removeAttr('role');
+        editButton.attr('href', reference);
       });
     // Fallback on the standalone edit mode if we fail to load the required modules.
     }, disableInPlaceEditing.bind(event.target));

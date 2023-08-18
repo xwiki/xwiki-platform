@@ -19,20 +19,26 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.live;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Default implementation for {@link PrefilteringMimeMessageIterator}.
@@ -46,16 +52,24 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
     implements PrefilteringMimeMessageIterator
 {
     @Inject
+    private GroupingEventManager groupingEventManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @Inject
     private LiveNotificationEmailEventFilter eventFilter;
 
-    private Map<DocumentReference, CompositeEvent> events;
+    private Map<DocumentReference, List<Event>> events;
 
     @Override
-    public void initialize(Map<DocumentReference, CompositeEvent> events, Map<String, Object> factoryParameters,
+    public void initialize(Map<DocumentReference, List<Event>> events, Map<String, Object> factoryParameters,
         EntityReference templateReference)
     {
         this.events = events;
-        super.initialize(events.keySet().iterator(), factoryParameters, templateReference);
+        super.initialize(events.keySet().iterator(), factoryParameters, templateReference,
+                NotificationEmailInterval.LIVE);
     }
 
     /**
@@ -66,12 +80,21 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
     @Override
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
-        CompositeEvent event = this.events.get(user);
+        List<Event> eventList = this.events.get(user);
+        UserReference userReference = this.userReferenceResolver.resolve(user);
+        // FIXME: Should we use a dedicated target for live email?
+        List<CompositeEvent> compositeEvents =
+            this.groupingEventManager.getCompositeEvents(eventList, userReference, "email");
 
-        if (this.eventFilter.canAccessEvent(user, event)) {
-            return Collections.singletonList(event);
+        List<CompositeEvent> result = new ArrayList<>();
+
+        // We perform the filtering here for optimization: it avoids checking each individual event one by one
+        // We could in the future change the implementation to put directly the filtering in the GroupingEventManager
+        for (CompositeEvent compositeEvent : compositeEvents) {
+            if (this.eventFilter.canAccessEvent(user, compositeEvent)) {
+                result.add(compositeEvent);
+            }
         }
-
-        return Collections.emptyList();
+        return result;
     }
 }

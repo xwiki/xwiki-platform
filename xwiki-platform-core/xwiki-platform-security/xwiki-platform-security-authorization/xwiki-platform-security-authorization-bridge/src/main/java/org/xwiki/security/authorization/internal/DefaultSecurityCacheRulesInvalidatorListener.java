@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -66,6 +67,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 @Component
 @Named(DefaultSecurityCacheRulesInvalidatorListener.NAME)
 @Singleton
+@Priority(SecurityCache.CACHE_INVALIDATION_PRIORITY)
 public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventListener
 {
     /**

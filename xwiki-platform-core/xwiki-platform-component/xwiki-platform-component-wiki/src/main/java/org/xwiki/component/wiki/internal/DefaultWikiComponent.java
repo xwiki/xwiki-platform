@@ -66,6 +66,16 @@ public class DefaultWikiComponent implements WikiComponent
     private String roleHint;
 
     /**
+     * @see #getRoleTypePriority()
+     */
+    private int roleTypePriority;
+
+    /**
+     * @see #getRoleHintPriority()
+     */
+    private int roleHintPriority;
+
+    /**
      * @see #getScope()
      */
     private WikiComponentScope scope;
@@ -220,5 +230,35 @@ public class DefaultWikiComponent implements WikiComponent
     public void setSyntax(Syntax syntax)
     {
         this.syntax = syntax;
+    }
+
+    @Override
+    public int getRoleTypePriority()
+    {
+        return this.roleTypePriority;
+    }
+
+    /**
+     * @param roleTypePriority the role type priority of the component
+     * @since 15.4RC1
+     */
+    public void setRoleTypePriority(int roleTypePriority)
+    {
+        this.roleTypePriority = roleTypePriority;
+    }
+
+    @Override
+    public int getRoleHintPriority()
+    {
+        return this.roleTypePriority;
+    }
+
+    /**
+     * @param roleHintPriority the role hint priority of the component
+     * @since 15.4RC1
+     */
+    public void setRoleHintPriority(int roleHintPriority)
+    {
+        this.roleHintPriority = roleHintPriority;
     }
 }

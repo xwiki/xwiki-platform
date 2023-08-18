@@ -278,7 +278,7 @@ public class NotificationPreferenceScriptService implements ScriptService
     {
         List<NotificationPreference> preferences
                 = notificationPreferenceManager.getAllPreferences(documentAccessBridge.getCurrentUserReference());
-        return preferences.stream().anyMatch(NotificationPreference::isNotificationEnabled);
+        return preferences.isEmpty() || preferences.stream().anyMatch(NotificationPreference::isNotificationEnabled);
     }
 
     /**
@@ -397,6 +397,6 @@ public class NotificationPreferenceScriptService implements ScriptService
                 return preference.isNotificationEnabled();
             }
         }
-        return false;
+        return allPreferences.isEmpty();
     }
 }

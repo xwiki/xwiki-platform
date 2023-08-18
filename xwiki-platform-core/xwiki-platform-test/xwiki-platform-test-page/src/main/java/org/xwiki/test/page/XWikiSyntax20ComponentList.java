@@ -24,10 +24,12 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.xwiki.rendering.internal.listener.ListenerRegistry;
 import org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser;
 import org.xwiki.rendering.internal.parser.reference.type.AttachmentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.DocumentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.SpaceResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.wikimodel.WikiModelParserListenerBuilder;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
@@ -57,6 +59,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     SpaceResourceReferenceTypeParser.class,
     AttachmentResourceReferenceTypeParser.class,
     XWiki20ResourceReferenceTypeSerializer.class,
+    ListenerRegistry.class,
+    WikiModelParserListenerBuilder.class
 })
 @Inherited
 public @interface XWikiSyntax20ComponentList

@@ -59,7 +59,7 @@ public class LikeButton extends BaseElement
     public boolean canBeClicked()
     {
         WebElement button = getButton();
-        return !button.getAttribute("class").contains("disabled");
+        return button.isEnabled();
     }
 
     /**

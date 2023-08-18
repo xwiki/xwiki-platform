@@ -42,7 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -57,7 +56,6 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipOutputStream;
 
-import javax.annotation.Priority;
 import javax.inject.Provider;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -114,6 +112,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -171,6 +170,7 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authservice.internal.AuthServiceManager;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -340,6 +340,8 @@ public class XWiki implements EventListener
 
     private XWikiAuthService authService;
 
+    private AuthServiceManager authServices;
+
     private XWikiRightService rightService;
 
     private XWikiGroupService groupService;
@@ -489,6 +491,8 @@ public class XWiki implements EventListener
     private AuthorizationManager authorizationManager;
 
     private ReferenceUpdater referenceUpdater;
+
+    private CoreExtensionRepository coreExtensions;
 
     private ConfigurationSource getConfiguration()
     {
@@ -847,6 +851,24 @@ public class XWiki implements EventListener
         }
 
         return this.referenceUpdater;
+    }
+
+    private AuthServiceManager getAuthServiceManager()
+    {
+        if (this.authServices == null) {
+            this.authServices = Utils.getComponent(AuthServiceManager.class);
+        }
+
+        return this.authServices;
+    }
+
+    public CoreExtensionRepository getCoreExtensionRepository()
+    {
+        if (this.coreExtensions == null) {
+            this.coreExtensions = Utils.getComponent(CoreExtensionRepository.class);
+        }
+
+        return this.coreExtensions;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1396,25 +1418,6 @@ public class XWiki implements EventListener
             List<MandatoryDocumentInitializer> initializers =
                 Utils.getComponentList(MandatoryDocumentInitializer.class);
 
-            // Sort the initializers based on priority. Lower priority values are first.
-            Collections.sort(initializers, new Comparator<MandatoryDocumentInitializer>()
-            {
-                @Override
-                public int compare(MandatoryDocumentInitializer left, MandatoryDocumentInitializer right)
-                {
-                    Priority leftPriority = left.getClass().getAnnotation(Priority.class);
-                    int leftPriorityValue =
-                        leftPriority != null ? leftPriority.value() : MandatoryDocumentInitializer.DEFAULT_PRIORITY;
-
-                    Priority rightPriority = right.getClass().getAnnotation(Priority.class);
-                    int rightPriorityValue =
-                        rightPriority != null ? rightPriority.value() : MandatoryDocumentInitializer.DEFAULT_PRIORITY;
-
-                    // Compare the two.
-                    return leftPriorityValue - rightPriorityValue;
-                }
-            });
-
             getObservationManager().notify(MandatoryDocumentsInitializingEvent.EVENT, null);
 
             getProgress().pushLevelProgress(initializers.size(), this);
@@ -1657,21 +1660,23 @@ public class XWiki implements EventListener
     public String getVersion()
     {
         if (this.version == null) {
-            try {
-                InputStream is = getResourceAsStream(VERSION_FILE);
-                try {
+            try (InputStream is = getResourceAsStream(VERSION_FILE)) {
+                if (is != null) {
                     XWikiConfig properties = new XWikiConfig(is);
                     this.version = properties.getProperty(VERSION_FILE_PROPERTY);
-                } finally {
-                    IOUtils.closeQuietly(is);
                 }
             } catch (Exception e) {
-                // Failed to retrieve the version, log a warning and default to "Unknown"
-                LOGGER.warn("Failed to retrieve XWiki's version from [" + VERSION_FILE + "], using the ["
-                    + VERSION_FILE_PROPERTY + "] property.", e);
-                this.version = "Unknown version";
+                // Failed to retrieve the version, log a warning
+                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property.", VERSION_FILE,
+                    VERSION_FILE_PROPERTY, e);
+            }
+
+            if (this.version == null) {
+                // Fallback on the version of the environment extension
+                this.version = getCoreExtensionRepository().getEnvironmentExtension().getId().getVersion().getValue();
             }
         }
+
         return this.version;
     }
 
@@ -2060,6 +2065,10 @@ public class XWiki implements EventListener
             // Switch to document wiki
             context.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
+            // Remember the dirty flags statuses so that they can be restored if needed
+            boolean metadataDirty = document.isMetaDataDirty();
+            boolean contentDirty = document.isContentDirty();
+
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
@@ -2090,6 +2099,12 @@ public class XWiki implements EventListener
                         }
                     }
                 }
+            }
+
+            // Restore dirty flags #saveDocument was called with metadata dirty flag to false
+            if (!metadataDirty) {
+                document.setMetaDataDirty(metadataDirty);
+                document.setContentDirty(contentDirty);
             }
 
             // Actually save the document.
@@ -3574,9 +3589,6 @@ public class XWiki implements EventListener
 
     public void flushCache(XWikiContext context)
     {
-        // We need to flush the virtual wiki list
-        this.initializedWikis = new ConcurrentHashMap<>();
-
         // We need to flush the group service cache
         if (this.groupService != null) {
             this.groupService.flushCache();
@@ -4711,6 +4723,12 @@ public class XWiki implements EventListener
 
         XWikiDocumentArchive archive = document.getDocumentArchive(context);
 
+        if (archive.getNodes(upperBound, lowerBound).isEmpty()) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                String.format("Cannot find any revision to delete matching the range defined by [%s] and [%s]",
+                    lowerBound, upperBound));
+        }
         // Remove the versions
         archive.removeVersions(upperBound, lowerBound, context);
 
@@ -4734,7 +4752,10 @@ public class XWiki implements EventListener
 
             // Update the archive
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
-            document.setDocumentArchive(archive);
+            // Make sure the cached document archive is updated too
+            XWikiDocument cachedDocument =
+                context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context);
+            cachedDocument.setDocumentArchive(archive);
 
             // There are still some versions left.
             // If we delete the most recent (current) version, then rollback to latest undeleted version.
@@ -4826,48 +4847,39 @@ public class XWiki implements EventListener
             XWikiDocument sourceDocument = this.getDocument(sourceDocumentReference, context);
             XWikiDocument targetDocument = this.getDocument(targetDocumentReference, context);
 
-            ConfigurationSource xwikiproperties = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
-            boolean useAtomicRename = xwikiproperties.getProperty("refactoring.rename.useAtomicRename", Boolean.TRUE);
-
             // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
             // the overwritten is accepted.
             if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
-                if (!useAtomicRename) {
-                    this.renameByCopyAndDelete(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
-                        childDocumentReferences, context);
-                    result = true;
-                } else {
-                    // Ensure that the current context contains the wiki reference of the source document.
-                    WikiReference wikiReference = context.getWikiReference();
-                    context.setWikiReference(sourceDocumentReference.getWikiReference());
+                // Ensure that the current context contains the wiki reference of the source document.
+                WikiReference wikiReference = context.getWikiReference();
+                context.setWikiReference(sourceDocumentReference.getWikiReference());
 
-                    try {
-                        // rename main document
-                        this.atomicRenameDocument(sourceDocument, targetDocumentReference, context);
+                try {
+                    // rename main document
+                    this.atomicRenameDocument(sourceDocument, targetDocumentReference, context);
 
-                        // handle translations
-                        List<Locale> translationLocales = sourceDocument.getTranslationLocales(context);
-                        for (Locale translationLocale : translationLocales) {
-                            DocumentReference translatedSourceReference =
-                                new DocumentReference(sourceDocumentReference, translationLocale);
-                            DocumentReference translatedTargetReference =
-                                new DocumentReference(targetDocumentReference, translationLocale);
-                            XWikiDocument translatedSourceDoc = this.getDocument(translatedSourceReference, context);
-                            this.atomicRenameDocument(translatedSourceDoc, translatedTargetReference, context);
-                        }
-                    } finally {
-                        context.setWikiReference(wikiReference);
+                    // handle translations
+                    List<Locale> translationLocales = sourceDocument.getTranslationLocales(context);
+                    for (Locale translationLocale : translationLocales) {
+                        DocumentReference translatedSourceReference =
+                            new DocumentReference(sourceDocumentReference, translationLocale);
+                        DocumentReference translatedTargetReference =
+                            new DocumentReference(targetDocumentReference, translationLocale);
+                        XWikiDocument translatedSourceDoc = this.getDocument(translatedSourceReference, context);
+                        this.atomicRenameDocument(translatedSourceDoc, translatedTargetReference, context);
                     }
-
-                    // Step 4: Refactor the relative links contained in the document to make sure they are relative
-                    // to the new document's location.
-                    // Step 5: For each child document, update its parent reference.
-                    // Step 6: For each backlink to rename, parse the backlink document and replace the links with
-                    // the new name.
-                    this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
-                        childDocumentReferences, context);
-                    result = true;
+                } finally {
+                    context.setWikiReference(wikiReference);
                 }
+
+                // Step 4: Refactor the relative links contained in the document to make sure they are relative
+                // to the new document's location.
+                // Step 5: For each child document, update its parent reference.
+                // Step 6: For each backlink to rename, parse the backlink document and replace the links with
+                // the new name.
+                this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
+                    childDocumentReferences, context);
+                result = true;
             }
         }
 
@@ -4926,48 +4938,6 @@ public class XWiki implements EventListener
                 renameLinks(backlinkDocument, sourceDoc.getDocumentReference(), newDocumentReference, context);
             }
         }
-    }
-
-    /**
-     * Perform a rename of document by copying the document and deleting the old one.
-     * This operation must be used only in case of document rename from one wiki to another, since it's not supported
-     * by the atomic store operation.
-     *
-     * @param newDocumentReference the new document reference
-     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
-     *            modified to point to the new document reference
-     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
-     *            document reference
-     * @param context the ubiquitous XWiki Context
-     * @throws XWikiException in case of an error
-     * @since 12.5
-     * @deprecated Old implementation of the rename by copy and delete. Since 12.5 the implementation using
-     * {@link XWikiStoreInterface#renameXWikiDoc(XWikiDocument, DocumentReference, XWikiContext)} should be preferred.
-     */
-    @Deprecated
-    public void renameByCopyAndDelete(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
-        List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
-        XWikiContext context) throws XWikiException
-    {
-        // Step 1: Copy the document and all its translations under a new document with the new reference.
-        copyDocument(sourceDoc.getDocumentReference(), newDocumentReference, false, context);
-
-        // Step 2: For each child document, update its parent reference.
-        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
-        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
-        // document's location.
-        updateLinksForRename(sourceDoc, newDocumentReference, backlinkDocumentReferences, childDocumentReferences,
-            context);
-
-        // Step 5: Delete the old document
-        deleteDocument(sourceDoc, context);
-
-        // Get new document
-        XWikiDocument newDocument = getDocument(newDocumentReference, context);
-
-        // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
-        // invalid XWikiDocument object as it's been deleted...
-        sourceDoc.clone(newDocument);
     }
 
     /**
@@ -5969,7 +5939,7 @@ public class XWiki implements EventListener
             if (isLDAP()) {
                 authClass = "com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl";
             } else {
-                authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
+                return null;
             }
         }
 
@@ -5997,10 +5967,15 @@ public class XWiki implements EventListener
                 try {
                     Class<? extends XWikiAuthService> authClass = getAuthServiceClass();
 
-                    setAuthService(authClass);
+                    if (authClass != null) {
+                        // Remember the authenticator instance corresponding to the configured class
+                        setAuthService(authClass);
+                    } else {
+                        // Search for the configured component based auth service
+                        return getAuthServiceManager().getAuthService();
+                    }
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to get the configured AuthService class, fallbacking on standard authenticator",
-                        e);
+                    LOGGER.error("Failed to get the configured AuthService, fallbacking on standard authenticator", e);
 
                     this.authService = new XWikiAuthServiceImpl();
 
@@ -6012,6 +5987,16 @@ public class XWiki implements EventListener
 
             return this.authService;
         }
+    }
+
+    /**
+     * @return true if the auth service is a component, false when it's based on the old xwiki.cfg's authclass property
+     *         or if it's directly injected through {@link #setAuthService(Class)}
+     * @since 15.3RC1
+     */
+    public boolean isAuthServiceComponent()
+    {
+        return this.authService == null;
     }
 
     private void setAuthService(Class<? extends XWikiAuthService> authClass)

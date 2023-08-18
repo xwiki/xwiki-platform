@@ -122,6 +122,20 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     }
 
     @Override
+    public int getRoleTypePriority(DocumentReference reference) throws WikiComponentException
+    {
+        BaseObject componentObject = getComponentObject(reference);
+        return componentObject.getIntValue(COMPONENT_ROLE_TYPE_PRIORITY_FIELD, ComponentDescriptor.DEFAULT_PRIORITY);
+    }
+
+    @Override
+    public int getRoleHintPriority(DocumentReference reference) throws WikiComponentException
+    {
+        BaseObject componentObject = getComponentObject(reference);
+        return componentObject.getIntValue(COMPONENT_ROLE_HINT_PRIORITY_FIELD, ComponentDescriptor.DEFAULT_PRIORITY);
+    }
+
+    @Override
     public Map<String, XDOM> getHandledMethods(DocumentReference reference) throws WikiComponentException
     {
         Map<String, XDOM> handledMethods = new HashMap<String, XDOM>();

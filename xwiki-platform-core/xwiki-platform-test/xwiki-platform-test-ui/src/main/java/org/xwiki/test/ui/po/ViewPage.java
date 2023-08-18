@@ -114,7 +114,7 @@ public class ViewPage extends BasePage
      */
     public WebElement getTranslateButton()
     {
-        return getDriver().findElement(By.cssSelector("#tmTranslate > a[role='button']"));
+        return getDriver().findElement(By.cssSelector("#tmTranslate > a.btn"));
     }
 
     /**
@@ -206,7 +206,7 @@ public class ViewPage extends BasePage
     /**
      * Waits until the page has the passed content by refreshing the page
      * 
-     * @param expectedValue the content value to wait for (in regex format)
+     * @param expectedValue the content value to wait for (in regex format), can be a subset of the full content
      * @since 4.0M1
      */
     public void waitUntilContent(final String expectedValue)
@@ -221,10 +221,10 @@ public class ViewPage extends BasePage
                 public Boolean apply(WebDriver driver)
                 {
                     // Note: don't refresh the page here since that would fail use cases (imagine some async process
-                    // executing, the refresh will just start over that async process!). In addition users don't need
+                    // executing, the refresh will just start over that async process!). In addition, users don't need
                     // to click refresh so the tests shouldn't do that either.
                     lastContent[0] = getContent();
-                    return Boolean.valueOf(pattern.matcher(lastContent[0]).matches());
+                    return Boolean.valueOf(pattern.matcher(lastContent[0]).find());
                 }
             });
         } catch (TimeoutException e) {

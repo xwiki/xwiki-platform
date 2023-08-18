@@ -42,7 +42,7 @@
   #set ($escapedUserName = $escapetool.xml($xwiki.getPlainUserName($userReference)))
   #getUserAvatarURL($userReference $avatarURL 30)
   &lt;span class="user"&gt;##
-    &lt;img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="$escapedUserName" /&gt;##
+    &lt;img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" /&gt;##
     &lt;span class="user-name"&gt;$escapedUserName&lt;/span&gt;##
   &lt;/span&gt;##
 #end

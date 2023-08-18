@@ -38,7 +38,6 @@ Disallow: /xwiki/bin/upload/
 Disallow: /xwiki/bin/temp/
 Disallow: /xwiki/bin/downloadrev/
 Disallow: /xwiki/bin/dot/
-Disallow: /xwiki/bin/svg/
 Disallow: /xwiki/bin/delattachment/
 Disallow: /xwiki/bin/skin/
 Disallow: /xwiki/bin/jsx/
@@ -47,7 +46,6 @@ Disallow: /xwiki/bin/login/
 Disallow: /xwiki/bin/loginsubmit/
 Disallow: /xwiki/bin/loginerror/
 Disallow: /xwiki/bin/logout/
-Disallow: /xwiki/bin/charting/
 Disallow: /xwiki/bin/lock/
 Disallow: /xwiki/bin/redirect/
 Disallow: /xwiki/bin/admin/

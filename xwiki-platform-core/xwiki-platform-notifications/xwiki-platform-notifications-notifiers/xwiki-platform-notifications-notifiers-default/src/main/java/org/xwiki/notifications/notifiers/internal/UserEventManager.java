@@ -197,8 +197,8 @@ public class UserEventManager implements Initializable
         NotificationFormat format)
     {
         try {
-            for (NotificationPreference notificationPreference : this.notificationPreferenceManager
-                .getAllPreferences(user)) {
+            List<NotificationPreference> allPreferences = this.notificationPreferenceManager.getAllPreferences(user);
+            for (NotificationPreference notificationPreference : allPreferences) {
                 if (notificationPreference.getFormat() == format
                     && notificationPreference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
                     && notificationPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)
@@ -214,6 +214,7 @@ public class UserEventManager implements Initializable
                             || !event.getDate().before(notificationPreference.getStartDate()));
                 }
             }
+            return allPreferences.isEmpty();
         } catch (NotificationException e) {
             this.logger.warn("Unable to retrieve the notifications preferences of [{}]: {}", user,
                 ExceptionUtils.getRootCauseMessage(e));
@@ -299,7 +300,6 @@ public class UserEventManager implements Initializable
                     // Do nothing
             }
         }
-
         return false;
     }
 }

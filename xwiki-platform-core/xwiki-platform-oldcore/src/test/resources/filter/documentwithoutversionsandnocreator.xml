@@ -1,0 +1,52 @@
+<wiki name="wiki">
+  <wikiSpace name="space">
+    <wikiDocument name="page">
+      <wikiDocumentLocale>
+        <p>
+          <parameters>
+            <entry>
+              <string>lastrevision</string>
+              <string>2.1</string>
+            </entry>
+          </parameters>
+        </p>
+        <wikiDocumentRevision revision="1.1">
+          <p>
+            <parameters>
+              <entry>
+                <string>revision_author</string>
+                <string>XWiki.author1</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2000-01-02 00:00:00.0 UTC</date>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string>content1</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiDocumentRevision>
+        <wikiDocumentRevision revision="2.1">
+          <p>
+            <parameters>
+              <entry>
+                <string>revision_author</string>
+                <string>XWiki.author2</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2000-01-04 00:00:00.0 UTC</date>
+              </entry>
+              <entry>
+                <string>content</string>
+                <string>content1</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiDocumentRevision>
+      </wikiDocumentLocale>
+    </wikiDocument>
+  </wikiSpace>
+</wiki>

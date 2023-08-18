@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-authentication</artifactId>
-    <version>15.3-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-authentication-ui</artifactId>
   <packaging>xar</packaging>
@@ -32,6 +32,11 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Authentication Application</xwiki.extension.name>
+
+    <xwiki.extension.features>
+      <!-- A contrib extension to use with versions of the authentication administration which does not support authservice -->
+      org.xwiki.contrib:authservice-backport-ui
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

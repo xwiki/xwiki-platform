@@ -27,7 +27,7 @@
 #######################################################
 ##!source.syntax=xwiki/2.1
 {{velocity}}
-{{html wiki='true'}}
+{{html clean='false'}}
 #if($request.xpage == 'children')
   #template('startpage.vm')
     <div class="main layoutsubsection">
@@ -84,6 +84,8 @@
       'childrenOf': $doc.space,
       '$doc': $doc.documentReference
     }))
+    {{/html}}
+
     {{liveData
       id='childrenIndex'
       source='liveTable'
@@ -91,6 +93,8 @@
       properties='doc.title,doc.location,doc.date,doc.author,_actions'
       sort='doc.location:asc'
       }}$jsontool.serialize($liveDataConfig){{/liveData}}
+    
+    {{html clean='false'}}
   #end
 #end
 #######################################################

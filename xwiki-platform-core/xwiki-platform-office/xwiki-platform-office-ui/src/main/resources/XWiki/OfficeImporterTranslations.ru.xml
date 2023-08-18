@@ -39,8 +39,19 @@
   <content>office.createForm.type.name=Страница из Office
 office.createForm.type.description=Импорт документов Office в wiki-страницы
 office.form.error.noDocument=Вы должны использовать {0}создать{1} для импорта документа Office.
-office.form.append.hint=Документ уже существует! Добавить результат к существующей wiki-странице
-
+office.import.document.hint=Выберите офисный документ для импорта.
+office.import.target.hint=Страница, на которую будет импортировано содержимое офисного документа.
+office.import.overwriteContent=Перезаписать существующий контент
+office.import.overwriteContent.hint=Целевая страница уже существует. Вы можете либо перезаписать его содержимое, либо добавить к существующему содержимому.
+office.import.overwriteContent.confirmationMessage=Вы уверены, что хотите перезаписать содержимое целевой страницы?
+office.import.overwriteContent.confirmationAction=Перезаписать
+office.import.headingLevelsToSplit.hint=Импортируйте выбранные уровни заголовков и соответствующие им разделы на отдельные дочерние страницы, связанные с родительской страницей.
+office.import.childPagesNaming.hint=Выберите, как назвать дочерние страницы, созданные при разделении импортированного содержимого.
+office.import.terminalChildPages=Терминальные дочерние страницы
+office.import.terminalChildPages.hint=Дополнительно: Сделать созданные дочерние страницы терминальными. Терминальные страницы не могут иметь дочерних элементов и обычно используются в приложениях, разработке или в старых версиях XWiki.
+office.import.inProgress=Импорт офисного документа...
+office.import.done=Офисный документ импортирован
+office.import.failed=Не удалось импортировать офисный документ
 office.config.serverType.hint=Тип сервера Office. Может быть внутренним (локальным) или внешним (удаленным).
 office.config.serverPort.hint=Номер порта, используемый для подключения к экземпляру сервера Office
 office.config.autoStart.hint=Укажите, должен ли сервер Office запускаться / подключаться автоматически при запуске XWiki
@@ -48,5 +59,14 @@ office.config.serverPath.hint=Путь к установке Office
 office.config.serverState.connected=Подключен
 office.config.serverState.notConnected=Не подключен
 office.config.serverState.confError=Неправильные настройки
-office.config.serverState.error=Ошибка</content>
+office.config.serverState.error=Ошибка
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=Документ уже существует! Добавить результат к существующей wiki-странице
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

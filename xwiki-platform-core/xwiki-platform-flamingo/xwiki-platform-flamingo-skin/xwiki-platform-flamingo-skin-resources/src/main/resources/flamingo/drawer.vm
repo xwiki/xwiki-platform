@@ -21,7 +21,8 @@
 ##
 ## Display the drawer
 ##
-<nav class="drawer-nav" id="tmDrawer">
+<nav class="drawer-nav" id="tmDrawer"
+aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.label'))">
   <ul class="drawer-menu">
     ##
     ## Drawer header (with elements concerning the current user: profile, login, logout, register, etc...)

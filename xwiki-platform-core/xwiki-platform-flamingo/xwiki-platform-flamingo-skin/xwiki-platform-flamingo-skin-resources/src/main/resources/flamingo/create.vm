@@ -20,6 +20,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
   <div id="mainContentArea">
+    #template('hierarchy.vm')
     ## ---------------------------------------------------------------------------------------------------------
     ## Since this template can be used for creating a Page or a Space, compute its title based on the passed
     ## "tocreate" parameter which can be either "page" or "space". If no "tocreate" parameter is passed then we

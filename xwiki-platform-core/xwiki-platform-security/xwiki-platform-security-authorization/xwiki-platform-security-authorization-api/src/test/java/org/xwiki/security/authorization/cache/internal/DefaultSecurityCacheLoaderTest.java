@@ -26,7 +26,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Set;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +40,6 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
-import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityEntryReader;
@@ -56,11 +54,10 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -104,6 +101,9 @@ public class DefaultSecurityCacheLoaderTest
         securityCacheLoader = mocker.getInstance(SecurityCacheLoader.class);
     }
 
+    /**
+     * Test that after fixing XWIKI-18508 the security cache loader ignores exceptions from the cache.
+     */
     @Test
     public void loadWithConflictingInsertionException() throws Exception
     {
@@ -147,19 +147,8 @@ public class DefaultSecurityCacheLoaderTest
         doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry);
         doThrow(ConflictingInsertionException.class).when(securityCache).add(securityAccessEntry, null);
 
-        try {
-            securityCacheLoader.load(user, entity);
-            fail();
-        } catch (AuthorizationException e) {
-            assertEquals("Failed to load the cache in 5 attempts. Giving up. when checking  "
-                + "access to [wiki:Space.Document] for user [wiki:Users.mflorea]", e.getMessage());
-            assertTrue(ExceptionUtils.getRootCauseMessage(e).contains("ConflictingInsertionException"));
-        }
+        assertEquals(securityAccessEntry, this.securityCacheLoader.load(user, entity));
 
-        // Assert that we've also emitted a log
-        assertEquals(1, this.logRule.size());
-        assertEquals(
-            "Failed to load the cache in 5 attempts. Giving up. For user [Document wiki:Users.mflorea] and entity [Document wiki:Space.Document].",
-            this.logRule.getMessage(0));
+        verify(securityCache).add(securityAccessEntry, null);
     }
 }

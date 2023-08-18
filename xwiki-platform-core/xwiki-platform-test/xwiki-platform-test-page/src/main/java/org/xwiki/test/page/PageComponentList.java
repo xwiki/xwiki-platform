@@ -76,6 +76,7 @@ import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityRefer
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.internal.transformation.macro.RawBlockFilterUtils;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
+import org.xwiki.rendering.internal.wiki.WikiModelProvider;
 import org.xwiki.resource.internal.DefaultResourceReferenceManager;
 import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
@@ -163,6 +164,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     URLResourceReferenceTypeParser.class,
     DefaultMacroContentParser.class,
     DefaultSyntaxRegistry.class,
+    WikiModelProvider.class,
 
     // Resource
     DefaultResourceReferenceManager.class,

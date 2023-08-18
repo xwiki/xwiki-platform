@@ -823,7 +823,7 @@ $fn
 <h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="#if ($isLarge)large#{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
+(% class="#if ($isLarge)large #{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
 {{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
@@ -1521,7 +1521,7 @@ $Msz MB##
   <tr class="xwiki-livetable-display-filters">
     #foreach ($column in $columns)
       #set ($columnProperties = $columnsProperties.get($column))
-      ## Note: Even though the column is hidden, we still need a (pottentially hidden) TD to generate valid HTML
+      ## Note: Even though the column is hidden, we still need a (potentially hidden) TD to generate valid HTML
       <td class="xwiki-livetable-display-header-filter #if ("$!columnProperties.type" == 'hidden')hidden#end">
         #if ($columnProperties.type != 'hidden')
           #if ($columnProperties.filterable != false && "$!column" != '_actions')
@@ -2423,6 +2423,11 @@ $string##
 #macro (userPicker_input $multiSelect $parameters)
   #if ($multiSelect)
     #set ($discard = $parameters.put('multiple', 'multiple'))
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.userPicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.userPicker.single.title')))
   #end
   #set ($discard = $parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
   #suggestInput($parameters)
@@ -2456,6 +2461,13 @@ $string##
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-pages"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.pagePicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.pagePicker.single.title')))
+  #end
   #suggestInput($parameters)
 #end
 
@@ -2475,6 +2487,13 @@ $string##
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-attachments"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.attachmentPicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.attachmentPicker.single.title')))
+  #end
   #suggestInput($parameters)
 #end
 
@@ -2623,40 +2642,47 @@ Recursive title display detected!##
       <input type="text" id="${escapedId}-filter" class="xwiki-select-filter"
         placeholder="$escapetool.xml($services.localization.render('web.widgets.select.filter.placeholder'))" />
     </p>
-    <div class="xwiki-select-options">
-      <ul>
-        #set ($count = 0)
-        #foreach ($category in $options)
-          <li class="xwiki-select-category">$category.name (<span class="xwiki-select-category-count">$category.options.size()</span>)
-            <ul>
-              #foreach ($option in $category.options)
-                #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
-                  #set ($checked = 'checked="checked"')
-                  #set ($class = 'xwiki-select-option-selected')
-                #else
-                  #set ($checked = '')
-                  #set ($class = '')
+    <span id="${escapedId}-listbox-label" hidden>
+      $escapetool.xml($services.localization.render('web.widgets.select.listbox.label', [$fieldName]))
+    </span>
+    <span id="${escapedId}-listbox-description" hidden>
+      $escapetool.xml($services.localization.render('web.widgets.select.listbox.description'))
+    </span>
+    <div id="${escapedId}-listbox" role='listbox' class='xwiki-select-options' tabindex='0'
+      aria-labelledby="${escapedId}-listbox-label" aria-describedby="${escapedId}-listbox-description"
+      aria-activedescendant="${fieldName}_0_option">
+      #set ($count = 0)
+      #foreach ($category in $options)
+        <span id="${escapedId}-group${count}-label" role='presentation'>
+          $category.name (<span class="xwiki-select-category-count">$category.options.size()</span>)
+        </span>
+        <ul role='group' class="xwiki-select-category" aria-labelledby="${escapedId}-group${count}-label">
+          #foreach ($option in $category.options)
+            #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
+              #set ($checked = 'checked="checked"')
+              #set ($class = 'xwiki-select-option-selected xwiki-select-option-highlighted')
+            #else
+              #set ($checked = '')
+              #set ($class = '')
+            #end
+            #set ($otherData = '')
+            #foreach($data in $option.data.keySet())
+              #set ($otherData = "$otherData data-${escapetool.xml($data)} = '$escapetool.xml($option.data.get($data))'")
+            #end
+            <li id="${fieldName}_${count}_option" role='option' class="xwiki-select-option $class">
+              <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked $otherData/>
+              <span class="xwiki-select-option-icon">$!services.icon.renderHTML($option.icon)</span>
+              <div>
+                <label for="${fieldName}_${count}">$escapetool.xml($option.name)</label>
+                #if ("$!option.description" != '')
+                  <p class="xHint">$escapetool.xml($option.description)</p>
                 #end
-                #set ($otherData = '')
-                #foreach($data in $option.data.keySet())
-                  #set ($otherData = "$otherData data-${escapetool.xml($data)} = '$escapetool.xml($option.data.get($data))'")
-                #end
-                <li class="xwiki-select-option $class">
-                  <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked $otherData/>
-                  <span class="xwiki-select-option-icon">$!services.icon.renderHTML($option.icon)</span>
-                  <div>
-                    <label for="${fieldName}_${count}">$escapetool.xml($option.name)</label>
-                    #if ("$!option.description" != '')
-                      <p class="xHint">$escapetool.xml($option.description)</p>
-                    #end
-                  </div>
-                </li>
-                #set ($count = $count + 1)
-              #end
-            </ul>
-          </li>
-        #end
-      </ul>
+              </div>
+            </li>
+            #set ($count = $count + 1)
+          #end
+        </ul>
+      #end
     </div>
   </div>
 #end
@@ -2685,10 +2711,15 @@ Recursive title display detected!##
   #end
   #if ($field.getProperty('multiSelect').value == 1)
     #set ($parameters.multiple = 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.xpropertyPicker.multi.title')))
     #set ($separators = $field.getProperty('separators').value)
     #if ("$!separators" != '')
       #set ($parameters.separators = $separators)
     #end
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.xpropertyPicker.single.title')))
   #end
   #suggestInput($parameters)
 #end
@@ -2775,6 +2806,13 @@ Recursive title display detected!##
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') xwiki-selectize suggest-classes"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.classPicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.classPicker.single.title')))
+  #end
   #suggestInput($parameters 'classPicker_displayOptions')
 #end
 
@@ -2934,7 +2972,7 @@ Recursive title display detected!##
   <div class="user" data-reference="$escapetool.xml($docReference)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($docReference $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
     </span>
     <a href="$xwiki.getURL($docReference)">$escapetool.xml($docReference.name)</a>
   </div>

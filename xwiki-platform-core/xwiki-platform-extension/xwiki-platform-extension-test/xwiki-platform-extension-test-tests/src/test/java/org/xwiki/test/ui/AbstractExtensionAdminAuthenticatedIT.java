@@ -56,7 +56,7 @@ public class AbstractExtensionAdminAuthenticatedIT extends AbstractTest
 
         // This will not be null if we are in the middle of allTests
         if (repositoryTestUtils == null || extensionTestUtils == null) {
-            AllITs.initExtensions(context);
+            AllIT.initExtensions(context);
         }
     }
 

@@ -160,7 +160,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     private void initListener()
     {
         // register XWikiCacheStore as listener to remote document events
-        this.observationManager.addListener(this);
+        this.observationManager.addListener(this, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
     }
 
     private void initCache() throws CacheException

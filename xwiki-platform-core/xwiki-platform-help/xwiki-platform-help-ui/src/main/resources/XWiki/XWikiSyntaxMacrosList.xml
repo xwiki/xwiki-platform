@@ -55,7 +55,7 @@
   #set ($discard = $wikiMacroMap.put($macroObject.id, [$macroDocument.documentReference.toString(), $macroObject.visibility]))
 #end
 |={{translation key='help.macroList.id'/}}|={{translation key='help.macroList.name'/}}|={{translation key='help.macroList.categories'/}}|={{translation key='help.macroList.description'/}}|={{translation key='help.macroList.visibility'/}}
-#foreach ($descriptor in $services.rendering.getMacroDescriptors('xwiki/2.1'))
+#foreach ($descriptor in $collectiontool.sort($services.rendering.getMacroDescriptors('xwiki/2.1'), 'id.id:asc'))
   #set ($wikiMacroData = $wikiMacroMap.get($descriptor.id.id))
   #if ("$!wikiMacroData" != '')
     #set ($displayId = "[[$services.rendering.escape($services.rendering.escape($descriptor.id, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$wikiMacroData.get(0)]]")

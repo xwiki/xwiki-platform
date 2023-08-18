@@ -163,7 +163,10 @@
         #set ($closingTag = '')
       #end
       class="$stringtool.join($classNames, ' ')">#if ($item.url)<a href="$item.url"
-        >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
+      #if ($foreach.index == 0 && !$options.plain)
+        title="$escapetool.xml($services.localization.render('core.menu.type.home'))"
+      #end
+      >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
     #end##
   </li></ol>
 #end

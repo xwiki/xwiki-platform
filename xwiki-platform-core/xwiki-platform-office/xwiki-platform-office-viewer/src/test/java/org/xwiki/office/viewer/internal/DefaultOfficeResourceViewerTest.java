@@ -21,7 +21,6 @@ package org.xwiki.office.viewer.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import java.util.Optional;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -50,6 +48,7 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.internal.document.ByteArrayOfficeDocumentArtifact;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.block.Block;
@@ -281,7 +280,7 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -311,7 +310,7 @@ class DefaultOfficeResourceViewerTest
         when(attachment.getContentInputStream(this.context)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -365,7 +364,7 @@ class DefaultOfficeResourceViewerTest
         when(attachment.getContentInputStream(this.context)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -440,7 +439,7 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -471,28 +470,25 @@ class DefaultOfficeResourceViewerTest
         ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
         when(documentAccessBridge.getAttachmentContent(attachmentReference)).thenReturn(attachmentContent);
 
-        ResourceReference imageReference = new ResourceReference("slide0.png", ResourceType.URL);
+        String imageName = "slide0.png";
+        ResourceReference imageReference = new ResourceReference(imageName, ResourceType.URL);
         ExpandedMacroBlock galleryMacro =
             new ExpandedMacroBlock("gallery", Collections.singletonMap("width", "300px"), null, false);
         galleryMacro.addChild(new ImageBlock(imageReference, true));
         XDOM xdom = new XDOM(Collections.<Block>singletonList(galleryMacro));
 
-        File artifact = new File(this.tempDir, "slide0.png");
-        try (FileOutputStream fos = new FileOutputStream(artifact)) {
-            IOUtils.write(new byte[8], fos);
-        }
         OfficeConverterResult converterResult = mock(OfficeConverterResult.class);
-        XDOMOfficeDocument xdomOfficeDocument = new XDOMOfficeDocument(xdom, Collections.singleton(artifact),
-            componentManager, converterResult);
+        XDOMOfficeDocument xdomOfficeDocument = new XDOMOfficeDocument(xdom, Collections.singletonMap(imageName,
+            new ByteArrayOfficeDocumentArtifact(imageName, new byte[8])), componentManager, converterResult);
 
         when(presentationBuilder.build(attachmentContent, attachmentReference.getName(), documentReference))
             .thenReturn(xdomOfficeDocument);
 
         Map<String, ?> viewParameters = Collections.singletonMap("ownerDocument", documentReference);
         TemporaryResourceReference temporaryResourceReference = new TemporaryResourceReference("officeviewer",
-            Arrays.asList(String.valueOf(viewParameters.hashCode()), "slide0.png"), documentReference);
+            Arrays.asList(String.valueOf(viewParameters.hashCode()), imageName), documentReference);
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("url", "to", "slide0.png"));
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("url", "to", imageName));
         when(this.resourceReferenceSerializer.serialize(temporaryResourceReference)).thenReturn(extendedURL);
 
         XDOM output = this.officeResourceViewer.createView(attachResourceRef, viewParameters);

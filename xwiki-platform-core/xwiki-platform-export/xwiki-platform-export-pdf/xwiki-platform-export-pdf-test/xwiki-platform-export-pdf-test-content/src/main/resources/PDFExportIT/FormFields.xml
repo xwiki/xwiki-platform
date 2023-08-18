@@ -38,7 +38,7 @@
   <hidden>false</hidden>
   <content>{{html clean="false"}}
 &lt;form class="xform"&gt;
-  &lt;dd&gt;
+  &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for="testTitle"&gt;Title&lt;/label&gt;
     &lt;/dt&gt;

@@ -1,0 +1,44 @@
+{
+  "bundles": [
+    {
+      "name": "xwiki-resource/resourcePicker.bundle.min.js",
+      "includes": [
+        "xwiki-resource/*.js"
+      ],
+      "excludes": [
+        "**/*.min.*",
+        "**/plugin.js"
+      ]
+    },
+    {
+      "name": "xwiki-macro/macroWizard.bundle.min.js",
+      "includes": [
+        "xwiki-macro/*.js"
+      ],
+      "excludes": [
+        "**/*.min.*",
+        "**/plugin.js"
+      ]
+    },
+    {
+      "name": "xwiki-image/imageWizard.bundle.min.js",
+      "includes": [
+        "xwiki-image/*.js"
+      ],
+      "excludes": [
+        "**/*.min.*",
+        "**/plugin.js"
+      ]
+    },
+    {
+      "name": "xwiki-icon/icon.bundle.min.js",
+      "includes": [
+        "xwiki-icon/*.js"
+      ],
+      "excludes": [
+        "**/*.min.*",
+        "**/plugin.js"
+      ]
+    }
+  ]
+}

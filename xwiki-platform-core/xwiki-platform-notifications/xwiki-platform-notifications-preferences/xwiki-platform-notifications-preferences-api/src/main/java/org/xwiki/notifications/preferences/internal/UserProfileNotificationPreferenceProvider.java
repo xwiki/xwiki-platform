@@ -60,7 +60,7 @@ public class UserProfileNotificationPreferenceProvider extends AbstractDocumentN
     public List<NotificationPreference> getPreferencesForUser(DocumentReference user)
             throws NotificationException
     {
-        return cachedModelBridge.getNotificationsPreferences(user);
+        return cachedNotificationPreferenceModelBridge.getNotificationsPreferences(user);
     }
 
     @Override

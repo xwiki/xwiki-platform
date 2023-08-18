@@ -37,6 +37,8 @@ import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.user.internal.document.DocumentUserReference;
 
+import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
@@ -59,12 +61,19 @@ class UserReferenceConverterTest
     @InjectMockComponents
     private UserReferenceConverter converter;
 
+    @InjectMockComponents
+    private DocumentReferenceConverter documentReferenceConverter;
+
     @MockComponent
     @Named("current")
     private UserReferenceResolver<String> userReferenceResolver;
 
     @MockComponent
     private UserReferenceSerializer<String> userReferenceSerializer;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
 
     @Test
     void convertToType()
@@ -74,6 +83,18 @@ class UserReferenceConverterTest
 
         UserReference result = this.converter.convertToType(null, "space.userPage");
         assertEquals(userReference, result);
+    }
+
+    @Test
+    void convertToDocumentReference()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "user");
+        UserReference userReference = new DocumentUserReference(documentReference, false);
+
+        when(this.documentUserReferenceSerializer.serialize(userReference)).thenReturn(documentReference);
+
+        DocumentReference result = this.converterManager.convert(DocumentReference.class, userReference);
+        assertEquals(documentReference, result);
     }
 
     @Test

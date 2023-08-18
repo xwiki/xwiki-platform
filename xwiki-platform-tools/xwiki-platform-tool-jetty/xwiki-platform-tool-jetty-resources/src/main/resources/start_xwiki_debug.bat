@@ -43,7 +43,7 @@ if not defined JETTY_DEBUG_PORT (
 if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx1024m
 set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=%JETTY_DEBUG_PORT%
 
-REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
+REM The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if not defined JETTY_PORT (
   REM Alternatively, it can be passed to this script as the first argument
   set JETTY_PORT=%1
@@ -52,7 +52,7 @@ if not defined JETTY_PORT (
   )
 )
 
-REM The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+REM The port on which Jetty listens for a Stop command can be defined in an environment variable called JETTY_STOP_PORT
 if not defined JETTY_STOP_PORT (
   set JETTY_STOP_PORT=8079
 )
@@ -74,6 +74,13 @@ set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
 if "%JAVA_PATH%"=="" set JAVA_PATH=java
 REM Handle the case when JAVA_HOME is set by the user
 if not "%JAVA_HOME%" == "" set JAVA_PATH=%JAVA_HOME%\bin\java.exe
+
+REM TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 is fixed. In summary we need this to allow the XWiki
+REM code or 3rd party code to use reflection to access private variables (setAccessible() calls).
+REM See https://tinyurl.com/tdhkn6mp
+set XWIKI_OPENS_LANG=--add-opens java.base/java.lang=ALL-UNNAMED
+set XWIKI_OPENS_UTIL=--add-opens java.base/java.util=ALL-UNNAMED
+set XWIKI_OPTS=%XWIKI_OPENS_LANG% %XWIKI_OPENS_UTIL% %XWIKI_OPTS%
 
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}

@@ -17,7 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(['jquery', 'xwiki-page-ready', 'xwiki-job-runner', 'jsTree', 'tree-finder'], function($, pageReady, JobRunner) {
+define([
+  'jquery',
+  'xwiki-page-ready',
+  'xwiki-job-runner',
+  'jsTree',
+  'xwiki-tree-finder'
+], function($, pageReady, JobRunner) {
   'use strict';
 
   // jsTree uses the underscore notation for its API, instead of camel case.

@@ -65,7 +65,7 @@ public class CheckAnnotationClassEventListener implements EventListener
     /**
      * The matched events.
      */
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentUpdatedEvent(
+    private static final List<Event> EVENTS = Arrays.asList(new DocumentUpdatedEvent(
         CONFIGURATION_DOCUMENT_REFERENCE), new DocumentCreatedEvent(CONFIGURATION_DOCUMENT_REFERENCE));
 
     @Inject

@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions</artifactId>
-    <version>15.3-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mentions-notifications</artifactId>
   <name>XWiki Platform - Mentions - Notifications</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
     <!-- This component must be installed at the farm level because 
          org.xwiki.eventstream.store.internal.RecordableEventListener.convertEvent uses
          org.xwiki.component.manager.ComponentManager. To be removed once XWIKI-17359 is fixed. -->

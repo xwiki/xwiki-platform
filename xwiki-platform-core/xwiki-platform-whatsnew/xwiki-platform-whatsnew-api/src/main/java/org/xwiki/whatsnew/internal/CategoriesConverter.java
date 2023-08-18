@@ -20,6 +20,7 @@
 package org.xwiki.whatsnew.internal;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class CategoriesConverter extends AbstractConverter<Set<NewsCategory>>
     protected Set<NewsCategory> convertToType(Type targetType, Object value)
     {
         if (value == null) {
-            return null;
+            return Collections.emptySet();
         }
 
         if (value instanceof Set) {

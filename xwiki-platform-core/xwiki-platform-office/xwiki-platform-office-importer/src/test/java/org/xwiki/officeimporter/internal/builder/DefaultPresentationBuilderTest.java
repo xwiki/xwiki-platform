@@ -28,7 +28,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -46,7 +48,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.internal.document.FileOfficeDocumentArtifact;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
@@ -151,7 +155,7 @@ class DefaultPresentationBuilderTest
 
         when(officeConverterResult.getAllFiles()).thenReturn(allFiles);
 
-        when(this.officeConverter.convertDocument(Collections.singletonMap("file.odp", officeFileStream), "file.odp",
+        when(this.officeConverter.convertDocument(Collections.singletonMap("input.odp", officeFileStream), "input.odp",
             "img0.html")).thenReturn(officeConverterResult);
 
         HTMLCleanerConfiguration config = mock(HTMLCleanerConfiguration.class);
@@ -170,9 +174,11 @@ class DefaultPresentationBuilderTest
         XDOMOfficeDocument result = this.presentationBuilder.build(officeFileStream, "file.odp", documentReference);
 
         verify(config).setParameters(Collections.singletonMap("targetDocument", "wiki:Path.To.Page"));
-        Set<File> expectedArtifacts = slideNumbers.stream().map(slideNumber ->
-            new File(this.outputDirectory, String.format("file-slide%d.jpg", slideNumber))).collect(Collectors.toSet());
-        assertEquals(expectedArtifacts, result.getArtifactsFiles());
+        Map<String, OfficeDocumentArtifact> expectedArtifacts = slideNumbers.stream()
+            .map(slideNumber -> new FileOfficeDocumentArtifact(String.format("file-slide%d.jpg", slideNumber),
+                new File(this.outputDirectory, String.format("img%d.jpg", slideNumber))))
+            .collect(Collectors.toMap(OfficeDocumentArtifact::getName, Function.identity()));
+        assertEquals(expectedArtifacts, result.getArtifactsMap());
 
         assertEquals("wiki:Path.To.Page", result.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
 

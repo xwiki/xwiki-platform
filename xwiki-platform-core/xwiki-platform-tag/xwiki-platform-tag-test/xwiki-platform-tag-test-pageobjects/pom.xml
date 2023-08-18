@@ -24,8 +24,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tag</artifactId>
-    <version>15.3-SNAPSHOT</version>
+    <artifactId>xwiki-platform-tag-test</artifactId>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tag-test-pageobjects</artifactId>
   <name>XWiki Platform - Tag - Page Objects</name>

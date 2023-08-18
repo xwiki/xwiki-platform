@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor-test</artifactId>
-    <version>15.3-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
   <name>XWiki Platform - CKEditor - Tests - Docker</name>
@@ -58,6 +58,25 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <dependency>
+      <!-- We need this to test the mentions Quick Action. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mentions-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- We need this to test the code snippet Quick Action. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- We need this to test that uninstalled macros are listed in the Quick Actions. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-index</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -83,6 +102,26 @@
       <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <!-- Used by the image plugin to search for resources. (This is not in xwiki-platform-ckeditor-ui because it breaks the flavor.) -->
+    <!-- See https://github.com/xwiki/xwiki-platform/pull/2280#discussion_r1284086007 -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <!-- Required for tests involving subwikis. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -112,14 +151,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
+              <systemPropertyVariables>
                 <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
                      WEB-INF/lib -->
-                <property>
-                  <name>xwiki.test.ui.profiles</name>
-                  <value>clover</value>
-                </property>
-              </systemProperties>
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

@@ -19,8 +19,6 @@
  */
 package org.xwiki.wysiwyg.internal.importer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
@@ -39,6 +36,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
@@ -167,11 +165,12 @@ public class OfficeAttachmentImporter implements AttachmentImporter
             xdomOfficeDocument = documentBuilder.build(officeFileStream, officeFileName, targetDocRef, filterStyles);
         }
         // Attach the images extracted from the imported office document to the target wiki document.
-        for (File artifact : xdomOfficeDocument.getArtifactsFiles()) {
-
-            AttachmentReference artifactReference = new AttachmentReference(artifact.getName(), targetDocRef);
-            try (FileInputStream fis = new FileInputStream(artifact)) {
-                documentAccessBridge.setAttachmentContent(artifactReference, IOUtils.toByteArray(fis));
+        for (Map.Entry<String, OfficeDocumentArtifact> entry : xdomOfficeDocument.getArtifactsMap().entrySet()) {
+            String filename = entry.getKey();
+            OfficeDocumentArtifact artifact = entry.getValue();
+            AttachmentReference artifactReference = new AttachmentReference(filename, targetDocRef);
+            try (InputStream is = artifact.getContentInputStream()) {
+                this.documentAccessBridge.setAttachmentContent(artifactReference, is);
             }
         }
         String result = xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0");

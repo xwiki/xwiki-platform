@@ -1,4 +1,3 @@
-org.xwiki.export.pdf.internal.job.DocumentRenderer
 org.xwiki.export.pdf.internal.job.PDFExportJob
 org.xwiki.export.pdf.internal.job.PDFExportJobInitializer
 org.xwiki.export.pdf.internal.macro.PDFTocMacro

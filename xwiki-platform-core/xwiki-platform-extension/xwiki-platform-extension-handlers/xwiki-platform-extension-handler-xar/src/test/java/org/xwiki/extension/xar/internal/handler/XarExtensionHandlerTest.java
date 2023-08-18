@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,8 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -88,15 +84,6 @@ import static org.mockito.Mockito.when;
 @AllComponents
 public class XarExtensionHandlerTest
 {
-    private void importXIP(InputStream stream) throws IOException
-    {
-        ZipArchiveInputStream zais = new ZipArchiveInputStream(stream);
-
-        for (ZipArchiveEntry entry = zais.getNextZipEntry(); entry != null; entry = zais.getNextZipEntry()) {
-            entry.getName();
-        }
-    }
-
     private MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     private MockitoComponentManager componentManager = this.oldcore.getMocker();

@@ -27,6 +27,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -63,14 +64,32 @@ public class EntityResourceReference extends AbstractResourceReference
     private EntityResourceAction action;
 
     /**
+     * @see #getAnchor()
+     */
+    private String anchor;
+
+    /**
      * @param entityReference the entity reference being wrapped
      * @param action the instance representing the technical Action id (e.g. View, Download, etc)
      */
     public EntityResourceReference(EntityReference entityReference, EntityResourceAction action)
     {
+        this(entityReference, action, null);
+    }
+
+    /**
+     * @param entityReference the entity reference being wrapped
+     * @param action the instance representing the technical Action id (e.g. View, Download, etc)
+     * @param anchor the anchor
+     * @since 15.4RC1
+     */
+    @Unstable
+    public EntityResourceReference(EntityReference entityReference, EntityResourceAction action, String anchor)
+    {
         setType(TYPE);
         setEntityReference(entityReference);
         setAction(action);
+        setAnchor(anchor);
     }
 
     /**
@@ -103,6 +122,26 @@ public class EntityResourceReference extends AbstractResourceReference
     public void setEntityReference(EntityReference entityReference)
     {
         this.entityReference = entityReference;
+    }
+
+    /**
+     * @return the anchor
+     * @since 15.4RC1
+     */
+    @Unstable
+    public String getAnchor()
+    {
+        return this.anchor;
+    }
+
+    /**
+     * @param anchor the anchor
+     * @since 15.4RC1
+     */
+    @Unstable
+    public void setAnchor(String anchor)
+    {
+        this.anchor = anchor;
     }
 
     /**
@@ -145,6 +184,7 @@ public class EntityResourceReference extends AbstractResourceReference
             .append(getEntityReference())
             .append(getLocale())
             .append(getAction())
+            .append(getAnchor())
             .toHashCode();
     }
 
@@ -166,6 +206,7 @@ public class EntityResourceReference extends AbstractResourceReference
             .append(getEntityReference(), rhs.getEntityReference())
             .append(getLocale(), rhs.getLocale())
             .append(getAction(), rhs.getAction())
+            .append(getAnchor(), rhs.getAnchor())
             .isEquals();
     }
 
@@ -177,6 +218,7 @@ public class EntityResourceReference extends AbstractResourceReference
         builder.append("reference", getEntityReference());
         builder.append("action", getAction());
         builder.append("locale", getLocale());
+        builder.append("anchor", getAnchor());
         return builder.toString();
     }
 }

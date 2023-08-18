@@ -101,7 +101,7 @@ public class XWikiBlogNewsCategoryConverter
     private List<String> getMappedCategoriesForURL(Set<NewsCategory> categories)
     {
         // TODO: Until https://jira.xwiki.org/browse/BLOG-198 is implemented, the XWiki Blog app only supports
-        // a single category. Thus FTM, we use the "Blog.What's New for XWiki" one to get all news under that
+        // a single category. Thus, FTM, we use the "Blog.What's New for XWiki" one to get all news under that
         // category.
         // Once it's fixed, uncomment the following line:
         /*

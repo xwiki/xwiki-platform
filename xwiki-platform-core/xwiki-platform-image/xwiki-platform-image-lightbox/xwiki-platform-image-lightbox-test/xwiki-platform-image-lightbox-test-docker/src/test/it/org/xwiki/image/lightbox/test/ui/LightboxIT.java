@@ -137,7 +137,7 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getImageWithCaptionAndManuallyAddedId(IMAGES.get(0)));
+        testUtils.createPage(testReference, getFigureWithImage(IMAGES.get(0), "manuallyAddedImageId"));
         LightboxPage lightboxPage = new LightboxPage();
 
         String lastUploadDate =
@@ -392,7 +392,7 @@ class LightboxIT
     {
         enableLightbox(testUtils, true);
 
-        testUtils.createPage(testReference, this.getImageWithoutId(IMAGES.get(0)));
+        testUtils.createPage(testReference, getFigureWithImage(IMAGES.get(0), ""));
         LightboxPage lightboxPage = new LightboxPage();
 
         lightboxPage.attachFile(testConfiguration.getBrowser().getTestResourcesPath(), IMAGES.get(0));
@@ -466,34 +466,6 @@ class LightboxIT
         return sb.toString();
     }
 
-    private String getImageWithCaptionAndManuallyAddedId(String image)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("{{figure}}\n[[image:");
-        sb.append(image);
-        sb.append("||width=120 height=120]]\n\n");
-        sb.append("{{figureCaption}}{{id name=\"manuallyAddedImageId\"/}}\n");
-        sb.append("Caption{{/figureCaption}}\n\n");
-        sb.append("{{/figure}}\n\n");
-
-        return sb.toString();
-    }
-
-    private String getImageWithoutId(String image)
-    {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("{{figure}}\n[[image:");
-        sb.append(image);
-        sb.append("||width=120 height=120]]\n\n");
-        sb.append("{{figureCaption}}{{id name=''/}}\n");
-        sb.append("Caption{{/figureCaption}}\n\n");
-        sb.append("{{/figure}}\n\n");
-
-        return sb.toString();
-    }
-
     private String getImageWithAlt(String image)
     {
         StringBuilder sb = new StringBuilder();
@@ -505,18 +477,27 @@ class LightboxIT
         return sb.toString();
     }
 
+    private String getFigureWithImage(String image, String id)
+    {
+        return String.format("{{html wiki='true'}}\n"
+                + "<figure>\n"
+                + "[[image:%s||width=120 height=120]]\n"
+                + "<figcaption>{{id name=\"%s\"/}}Caption</figcaption>\n"
+                + "\n"
+                + "</figure>\n"
+                + "{{/html}}",
+            image, id);
+    }
+
     private String getPartiallyDisabledLightboxContent(String image)
     {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("{{figure}}\n[[image:");
-        sb.append(image);
-        sb.append("||width=120 height=120 data-xwiki-lightbox=\"false\"]]\n\n");
-        sb.append("[[image:");
-        sb.append(image);
-        sb.append("||width=120 height=120]]\n\n");
-        sb.append("{{/figure}}");
-
-        return sb.toString();
+        return String.format("{{html wiki='true'}}\n"
+            + "<figure>\n"
+            + "[[image:%s||width=120 height=120 data-xwiki-lightbox=\"false\"]]\n"
+            + "\n"
+            + "[[image:%s||width=120 height=120]]\n"
+            + "\n"
+            + "</figure>\n"
+            + "{{/html}}", image, image);
     }
 }

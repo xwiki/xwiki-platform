@@ -76,7 +76,7 @@ export default {
   margin-bottom: 1rem;
   padding: 12px;
   border-radius: 5px;
-  background-color: #ddd4;
+  background-color: @panel-default-heading-bg;
 }
 
 </style>

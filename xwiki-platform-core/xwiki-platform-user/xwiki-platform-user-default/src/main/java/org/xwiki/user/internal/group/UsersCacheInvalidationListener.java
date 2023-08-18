@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.internal.group;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,6 +30,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -46,6 +48,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 @Component
 @Named(UsersCacheInvalidationListener.NAME)
 @Singleton
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class UsersCacheInvalidationListener extends AbstractEventListener
 {
     /**

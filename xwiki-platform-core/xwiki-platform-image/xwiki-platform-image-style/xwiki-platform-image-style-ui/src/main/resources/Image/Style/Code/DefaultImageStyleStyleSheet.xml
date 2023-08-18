@@ -145,29 +145,70 @@
     <property>
       <code>#template('colorThemeInit.vm')
 
+figure[data-xwiki-image-style-border="true"],
 img[data-xwiki-image-style-border="true"] {
   border: 3px solid $theme.borderColor;
+  box-sizing: content-box;
 }
 
+figure[data-xwiki-image-style-border="true"] img[data-xwiki-image-style-border="true"] {
+  border: none;
+}
+
+figure[data-xwiki-image-style-alignment="start"],
 img[data-xwiki-image-style-alignment="start"],
-img[data-xwiki-image-style-text-wrap="true"],
+div[data-xwiki-image-style-alignment="start"],
 span[data-xwiki-image-style-alignment="start"],
+figure[data-xwiki-image-style-text-wrap="true"],
+img[data-xwiki-image-style-text-wrap="true"],
+div[data-xwiki-image-style-text-wrap="true"],
 span[data-xwiki-image-style-text-wrap="true"] {
   float: left;
+  margin-right: 0.5em;
 }
 
-img[data-xwiki-image-style-alignment="center"], span[data-xwiki-image-style-alignment="center"] {
+figure[data-xwiki-image-style-alignment="start"] img[data-xwiki-image-style-alignment="start"],
+figure[data-xwiki-image-style-text-wrap="true"] img[data-xwiki-image-style-text-wrap="true"],
+div[data-xwiki-image-style-alignment="start"] figure[data-xwiki-image-style-alignment="start"],
+div[data-xwiki-image-style-text-wrap="true"] figure[data-xwiki-image-style-text-wrap="true"] {
+  float: initial;
+  margin-right: auto;
+}
+
+figure[data-xwiki-image-style-alignment="center"],
+img[data-xwiki-image-style-alignment="center"],
+div[data-xwiki-image-style-alignment="center"],
+span[data-xwiki-image-style-alignment="center"]{
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
 
+figure[data-xwiki-image-style-alignment="center"],
 span[data-xwiki-image-style-alignment="center"] {
   text-align: center;
 }
 
-img[data-xwiki-image-style-alignment="end"], span[data-xwiki-image-style-alignment="end"] {
+figure[data-xwiki-image-style-alignment="end"],
+img[data-xwiki-image-style-alignment="end"],
+div[data-xwiki-image-style-alignment="end"],
+span[data-xwiki-image-style-alignment="end"]{
   float: right;
+  margin-left: 0.5em;
+}
+
+div[data-xwiki-image-style-alignment="end"] figure[data-xwiki-image-style-alignment="end"],
+figure[data-xwiki-image-style-alignment="end"] img[data-xwiki-image-style-alignment="end"] {
+  float: initial;
+  margin-left: auto;
+}
+
+figure.image {
+  max-width: 100%;
+}
+
+figure.image figcaption {
+  padding: 0 0.5em;
 }
 
 /* CKEditor specific style. */

@@ -30,7 +30,7 @@
     <LivedataAdvancedPanels/>
 
     <!-- Where the layouts are going to be displayed -->
-    <LivedataLayout :layout-id="layoutId"/>
+    <LivedataLayout :layout-id="layoutId" v-if="translationsLoaded"/>
 
     <!-- Displays the footnotes once the layout is loaded. -->
     <LivedataFootnotes v-if="layoutLoaded" />
@@ -106,7 +106,8 @@ export default {
   
   data() {
     return {
-      layoutLoaded: false
+      layoutLoaded: false,
+      translationsLoaded: false
     }
   },
   
@@ -115,6 +116,9 @@ export default {
     this.logic.onEvent("layoutLoaded", () => {
       this.layoutLoaded = true;
     });
+    this.logic.translationsLoaded().finally(() => {
+      this.translationsLoaded = true;
+    })
   }
 
 };

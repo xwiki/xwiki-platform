@@ -19,21 +19,27 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.sources.NotificationManager;
+import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
+import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Default implementation of {@link PeriodicMimeMessageIterator}.
@@ -47,7 +53,17 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     implements PeriodicMimeMessageIterator
 {
     @Inject
-    private NotificationManager notificationManager;
+    private ParametrizedNotificationManager notificationManager;
+
+    @Inject
+    private DefaultNotificationParametersFactory notificationParametersFactory;
+
+    @Inject
+    private GroupingEventManager groupingEventManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     private Date lastTrigger;
 
@@ -57,13 +73,22 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     {
         this.lastTrigger = lastTrigger;
 
-        super.initialize(userIterator, factoryParameters, templateReference);
+        super.initialize(userIterator, factoryParameters, templateReference, userIterator.getInterval());
     }
 
     @Override
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
-        return this.notificationManager.getEvents(this.serializer.serialize(user), NotificationFormat.EMAIL,
-            Integer.MAX_VALUE / 4, null, this.lastTrigger, Collections.emptyList());
+        NotificationParameters notificationParameters = new NotificationParameters();
+        notificationParameters.user = user;
+        notificationParameters.format = NotificationFormat.EMAIL;
+        notificationParameters.expectedCount = Integer.MAX_VALUE / 4;
+        notificationParameters.fromDate = this.lastTrigger;
+        notificationParameters.endDateIncluded = false;
+        notificationParametersFactory.useUserPreferences(notificationParameters);
+        UserReference userReference = this.userReferenceResolver.resolve(user);
+
+        List<Event> rawEvents = this.notificationManager.getRawEvents(notificationParameters);
+        return this.groupingEventManager.getCompositeEvents(rawEvents, userReference, NotificationFormat.EMAIL.name());
     }
 }

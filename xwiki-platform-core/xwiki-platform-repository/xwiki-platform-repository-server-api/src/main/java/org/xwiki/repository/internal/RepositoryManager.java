@@ -232,7 +232,7 @@ public class RepositoryManager implements Initializable, Disposable
         }
 
         // Listen to modifications
-        this.observation.addListener(listener);
+        this.observation.addListener(listener, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
     }
 
     @Override

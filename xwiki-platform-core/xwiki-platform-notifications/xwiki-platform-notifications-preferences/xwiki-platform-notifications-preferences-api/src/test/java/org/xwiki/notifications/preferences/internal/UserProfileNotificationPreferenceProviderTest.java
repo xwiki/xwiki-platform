@@ -49,12 +49,12 @@ public class UserProfileNotificationPreferenceProviderTest
     public final MockitoComponentMockingRule<UserProfileNotificationPreferenceProvider> mocker =
             new MockitoComponentMockingRule<>(UserProfileNotificationPreferenceProvider.class);
 
-    private ModelBridge cachedModelBridge;
+    private NotificationPreferenceModelBridge cachedNotificationPreferenceModelBridge;
 
     @Before
     public void setUp() throws Exception
     {
-        cachedModelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
+        cachedNotificationPreferenceModelBridge = mocker.registerMockComponent(NotificationPreferenceModelBridge.class, "cached");
     }
 
     @Test
@@ -84,9 +84,9 @@ public class UserProfileNotificationPreferenceProviderTest
 
         mocker.getComponentUnderTest().savePreferences(Arrays.asList(pref1, pref2, pref3));
 
-        verify(cachedModelBridge, times(1)).saveNotificationsPreferences(eq(userReference),
+        verify(cachedNotificationPreferenceModelBridge, times(1)).saveNotificationsPreferences(eq(userReference),
                 any(List.class));
-        verify(cachedModelBridge, times(1)).saveNotificationsPreferences(eq(userReference2),
+        verify(cachedNotificationPreferenceModelBridge, times(1)).saveNotificationsPreferences(eq(userReference2),
                 any(List.class));
     }
 }

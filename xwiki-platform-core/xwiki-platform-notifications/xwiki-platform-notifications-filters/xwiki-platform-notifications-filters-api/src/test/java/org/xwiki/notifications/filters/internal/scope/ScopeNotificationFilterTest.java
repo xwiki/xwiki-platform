@@ -233,11 +233,11 @@ class ScopeNotificationFilterTest
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
                 this.scopeNotificationFilter.filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
 
-        // Test with wikiB:SpaceH.DocumentI - kept because nothing match and there is no top level inclusive filter
+        // Test with wikiB:SpaceH.DocumentI - filtered because nothing match and there is no top level inclusive filter
         Event event5 = mock(Event.class);
         when(event5.getDocument()).thenReturn(new DocumentReference("wikiB", "SpaceH", "DocumentI"));
         when(event5.getDate()).thenReturn(new Date(100));
-        assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
+        assertEquals(NotificationFilter.FilterPolicy.FILTER,
                 this.scopeNotificationFilter.filterEvent(event5, user, filterPreferences, NotificationFormat.ALERT));
     }
 

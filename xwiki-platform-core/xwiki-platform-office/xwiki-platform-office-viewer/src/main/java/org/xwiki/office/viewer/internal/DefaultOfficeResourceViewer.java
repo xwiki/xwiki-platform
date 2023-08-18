@@ -20,12 +20,10 @@
 package org.xwiki.office.viewer.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +58,7 @@ import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.properties.ConverterManager;
@@ -200,30 +199,25 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      * images that are view artifacts.
      * 
      * @param xdom the XDOM whose image blocks are to be processed
-     * @param artifactFiles specify which of the image blocks should be processed; only the image blocks
+     * @param artifactMap specify which of the image blocks should be processed; only the image blocks
      *          that were generated during the office import process should be processed
      * @param ownerDocumentReference specifies the document that owns the office file
      * @param parameters the build parameters. Note that currently only {@code filterStyles} is supported and if "true"
      *            it means that styles will be filtered to the maximum and the focus will be put on importing only the
      * @return the set of temporary files corresponding to image artifacts
      */
-    private Set<File> processImages(XDOM xdom, Set<File> artifactFiles, DocumentReference ownerDocumentReference,
-        Map<String, ?> parameters)
+    private Set<File> processImages(XDOM xdom, Map<String, OfficeDocumentArtifact> artifactMap,
+        DocumentReference ownerDocumentReference, Map<String, ?> parameters)
     {
         // Process all image blocks.
         Set<File> temporaryFiles = new HashSet<>();
         List<ImageBlock> imgBlocks = xdom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
         if (!imgBlocks.isEmpty()) {
-            Map<String, File> fileMap = new HashMap<>();
-            for (File file : artifactFiles) {
-                fileMap.put(file.getName(), file);
-            }
-
             for (ImageBlock imgBlock : imgBlocks) {
                 String imageReference = imgBlock.getReference().getReference();
 
                 // Check whether there is a corresponding artifact.
-                if (fileMap.containsKey(imageReference)) {
+                if (artifactMap.containsKey(imageReference)) {
                     try {
                         List<String> resourcePath =
                             Arrays.asList(String.valueOf(parameters.hashCode()), imageReference);
@@ -231,10 +225,13 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                             new TemporaryResourceReference(MODULE_NAME, resourcePath, ownerDocumentReference);
 
                         // Write the image into a temporary file.
-                        File artifact = fileMap.get(imageReference);
+                        OfficeDocumentArtifact artifact = artifactMap.get(imageReference);
 
-                        File tempFile = this.temporaryResourceStore.createTemporaryFile(temporaryResourceReference,
-                            new FileInputStream(artifact));
+                        File tempFile;
+                        try (InputStream inputStream = artifact.getContentInputStream()) {
+                            tempFile = this.temporaryResourceStore.createTemporaryFile(temporaryResourceReference,
+                                inputStream);
+                        }
 
                         // Create a URL image reference which links to above temporary image file.
                         String temporaryResourceURL =
@@ -429,7 +426,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                 // specified by the owner document reference. This way we ensure the path to the temporary files
                 // doesn't contain redundant information and so it remains as small as possible (considering that the
                 // path length is limited on some environments).
-                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(),
+                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsMap(),
                     attachmentReference.getDocumentReference(), parameters);
                 view = new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
                     temporaryFiles);
@@ -457,7 +454,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             try (XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters))
             {
                 XDOM xdom = xdomOfficeDocument.getContentDocument();
-                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsFiles(), ownerDocument,
+                Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifactsMap(), ownerDocument,
                     parameters);
                 view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
 

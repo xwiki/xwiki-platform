@@ -139,16 +139,16 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         assertEquals("help.macroList.categories", includeMacroRowTds.get(2).text());
         assertEquals("help.macroList.description", includeMacroRowTds.get(3).text());
         assertEquals("help.macroList.visibility", includeMacroRowTds.get(4).text());
-        assertWikiMacro(trs.get(1), "mymacro", "/xwiki/bin/view/XWiki/MyMacro", "My Macro",
-            Set.of("Category1", "Category2"), "My Macro Description", "XWiki.WikiMacroClass_visibility_WIKI");
-        assertJavaMacro(trs.get(2), "velocity", "Velocity", "Development", "Executes a Velocity script.",
+        assertJavaMacro(trs.get(1), "html", "HTML", "Development", "Inserts HTML or XHTML code into the page.",
             "XWiki.WikiMacroClass_visibility_Global");
-        assertJavaMacro(trs.get(3), "translation", "Translation", "Content",
-            "Display a translation message.", "XWiki.WikiMacroClass_visibility_Global");
-        assertJavaMacro(trs.get(4), "html", "HTML", "Development", "Inserts HTML or XHTML code into the page.",
-            "XWiki.WikiMacroClass_visibility_Global");
-        assertJavaMacro(trs.get(5), "include", "Include", "Content",
+        assertJavaMacro(trs.get(2), "include", "Include", "Content",
             "Include other pages into the current page.",
+            "XWiki.WikiMacroClass_visibility_Global");
+        assertWikiMacro(trs.get(3), "mymacro", "/xwiki/bin/view/XWiki/MyMacro", "My Macro",
+            Set.of("Category1", "Category2"), "My Macro Description", "XWiki.WikiMacroClass_visibility_WIKI");
+        assertJavaMacro(trs.get(4), "translation", "Translation", "Content",
+            "Display a translation message.", "XWiki.WikiMacroClass_visibility_Global");
+        assertJavaMacro(trs.get(5), "velocity", "Velocity", "Development", "Executes a Velocity script.",
             "XWiki.WikiMacroClass_visibility_Global");
     }
 

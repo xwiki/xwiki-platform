@@ -48,5 +48,13 @@ authentication.admin.isAuthenticationSecurityEnabled.label=Включить ил
 authentication.admin.isAuthenticationSecurityEnabled.hint=Отключение механизма безопасности аутентификации также сбрасывает записи об ошибках аутентификации.
 authentication.admin.isAuthenticationSecurityEnabled.disabled=Отключено
 authentication.admin.isAuthenticationSecurityEnabled.enabled=Включено
-### Missing: authentication.admin.heading=Authentication Security</content>
+### Missing: authentication.admin.heading=Authentication Security
+security.authservice.admin.title=Служба аутентификации
+security.authservice.admin.currentAuthService=Текущая служба аутентификации
+security.authservice.admin.component.label=Установить службу аутентификации:
+security.authservice.admin.component.save=Сохранить
+security.authservice.admin.component.noService=Альтернативная служба аутентификации не найдена.
+security.authservice.admin.other.warning=Текущую службу проверки подлинности нельзя изменить, поскольку она внедряется пользовательской системой.
+security.authservice.admin.class.warning=Текущую службу аутентификации нельзя изменить, поскольку она управляется файлом конфигурации xwiki.cfg.
+</content>
 </xwikidoc>

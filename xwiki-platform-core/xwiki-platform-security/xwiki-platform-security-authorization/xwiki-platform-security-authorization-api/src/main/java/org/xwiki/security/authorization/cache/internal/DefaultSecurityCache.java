@@ -23,8 +23,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -33,10 +36,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.map.AbstractReferenceMap;
+import org.apache.commons.collections4.map.ReferenceMap;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -105,8 +109,16 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /** The cache instance. */
     private Cache<SecurityCacheEntry> cache;
 
-    /** The new entry being added. */
-    private SecurityCacheEntry newEntry;
+    /**
+     * A map of all entries that are strongly referenced somewhere. This includes all entries in the above cache, but
+     * also all entries that are referenced as parents somewhere and that are thus required for the hierarchy to be
+     * complete and to support correct hierarchical cache invalidation. When an entry is removed from the cache, the
+     * GC will also remove it from the internal entries unless it is still referenced as a parent somewhere else. For
+     * this to work, the only strong references to SecurityCacheEntry are stored during entry creation, in the cache
+     * and in the list of parents.
+     */
+    private final Map<String, SecurityCacheEntry> internalEntries =
+        new ReferenceMap<>(AbstractReferenceMap.ReferenceStrength.HARD, AbstractReferenceMap.ReferenceStrength.WEAK);
 
     /**
      * @return a new configured security cache
@@ -136,7 +148,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Cache entry.
      */
-    private class SecurityCacheEntry implements DisposableCacheValue
+    private class SecurityCacheEntry
     {
         /**
          * The cached security entry.
@@ -228,7 +240,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 throw new ParentEntryEvictedException(String.format(
                     "The first parent with reference [%s] for the entry [%s] with wiki [%s] is no longer "
                         + "available in the cache.",
-                    parent1, entry, wiki));
+                    entry.getReference(), entry, wiki));
             }
             SecurityCacheEntry parent2 = (isSelf) ? parent1
                 : (wiki != null) ? DefaultSecurityCache.this.getShadowEntry(entry.getUserReference(), wiki)
@@ -237,6 +249,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 throw new ParentEntryEvictedException(String.format(
                     "The second parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available "
                         + "in the cache.",
+                    entry.getUserReference(), entry, wiki));
+            }
+            if (!parent2.isUser()) {
+                throw new ParentEntryEvictedException(String.format(
+                    "The second parent [%s] for the entry [%s] with wiki [%s] is not a user entry.",
                     parent2, entry, wiki));
             }
             this.parents = (isSelf) ? Arrays.asList(parent1) : Arrays.asList(parent1, parent2);
@@ -287,8 +304,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             this.entry = entry;
             int parentSize = groups.size() + ((parentReference == null) ? 0 : 1);
             if (parentSize > 0) {
-                this.parents = new ArrayList<>(parentSize);
                 if (parentReference != null) {
+                    this.parents = new ArrayList<>(parentSize);
                     SecurityCacheEntry parent = DefaultSecurityCache.this.getEntry(parentReference);
                     if (parent == null) {
                         throw new ParentEntryEvictedException(String.format(
@@ -297,36 +314,45 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                             parentReference, entry, groups));
                     }
                     this.parents.add(parent);
+                    this.parents.addAll(getParentGroups(groups, parentReference));
+                    // Wait until here to avoid that in case of an exception there is a reference to the new object
+                    // in the parent's children.
                     parent.addChild(this);
+                } else {
+                    this.parents = getParentGroups(groups, null);
                 }
-                addParentGroups(groups, parentReference);
-                logNewEntry();
             } else {
                 this.parents = null;
-                logNewEntry();
             }
+            logNewEntry();
         }
 
         /**
-         * Add provided groups as parent of this entry, excluding the main parent reference.
+         * Get group entries for the provided parents, excluding the main parent reference.
+         * <p>
+         * If loading all of them succeeds, this entry is added as child of all of them.
          *
          * @param groups the list of groups to add.
          * @param parentReference the main parent reference to exclude.
          * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
          */
-        private void addParentGroups(Collection<GroupSecurityReference> groups, SecurityReference parentReference)
+        private Collection<SecurityCacheEntry> getParentGroups(Collection<GroupSecurityReference> groups,
+            SecurityReference parentReference)
             throws ParentEntryEvictedException
         {
+            Collection<SecurityCacheEntry> result = new ArrayList<>(groups.size());
             for (GroupSecurityReference group : groups) {
-                if (group.equals(parentReference)) {
-                    continue;
-                }
                 SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
                     ? DefaultSecurityCache.this.getShadowEntry(group, ((SecurityShadowEntry) entry).getWikiReference())
                     : DefaultSecurityCache.this.getEntry(group);
                 if (parent == null) {
                     throw new ParentEntryEvictedException(String
                         .format("The parent with reference [%s] is no longer available in the cache", parentReference));
+                }
+
+                if (!parent.isUser()) {
+                    throw new ParentEntryEvictedException(
+                        String.format("The parent [%s] is not a group entry.", parent.getEntry()));
                 }
 
                 // Make sure the group really is stored as such (can happen if that the right of the group was checked
@@ -336,9 +362,17 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     ((GroupSecurityEntry) parent.getEntry()).setGroupReference(group);
                 }
 
-                this.parents.add(parent);
-                parent.addChild(this);
+                // Do not add the main parent reference but still execute all checks to be sure that it is a group.
+                if (!group.equals(parentReference)) {
+                    result.add(parent);
+                }
             }
+
+            // Wait until here to be sure that no children are added if there is an exception while collecting the
+            // parents.
+            result.forEach(parent -> parent.addChild(this));
+
+            return result;
         }
 
         /**
@@ -355,13 +389,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
             if (groups != null && !groups.isEmpty()) {
                 if (this.parents == null) {
-                    this.parents = new ArrayList<>(groups.size());
-                    addParentGroups(groups, null);
+                    this.parents = getParentGroups(groups, null);
                 } else {
                     SecurityCacheEntry parent = this.parents.iterator().next();
-                    this.parents = new ArrayList<>(groups.size() + 1);
-                    this.parents.add(parent);
-                    addParentGroups(groups, parent.entry.getReference());
+                    // Ensure that parents aren't modified if an exception is thrown.
+                    Collection<SecurityCacheEntry> newParents = new ArrayList<>(groups.size() + 1);
+                    newParents.add(parent);
+                    newParents.addAll(getParentGroups(groups, parent.entry.getReference()));
+                    this.parents = newParents;
                 }
             }
 
@@ -415,21 +450,15 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * children recursively. This method is not thread safe in regards to the cache, proper locking should be done
          * externally.
          */
-        @Override
         public void dispose()
         {
             if (!disposed) {
+                DefaultSecurityCache.this.cache.remove(getKey());
+                DefaultSecurityCache.this.internalEntries.remove(getKey());
                 disposed = true;
 
-                // Try to limit the conflicts caused by cache invalidation.
-                // There is still one entry removed from the cache but retries should help deal with that.
-                suspendInvalidation();
-                try {
-                    disconnectFromParents();
-                    disposeChildren();
-                } finally {
-                    resumeInvalidation();
-                }
+                disconnectFromParents();
+                disposeChildren();
             }
         }
 
@@ -452,18 +481,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                         if (logger.isDebugEnabled()) {
                             logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
                         }
-                        // XWIKI-13746: Prevent an addition in progress to bite his own entry in a bad way.
-                        if (child == newEntry) {
-                            child.dispose();
-                        } else {
-                            try {
-                                DefaultSecurityCache.this.cache.remove(child.getKey());
-                            } catch (Throwable e) {
-                                logger.error("Security cache failure during eviction of entry [{}]", child.getKey(), e);
-                            }
-                        }
+                        child.dispose();
                     }
                 }
+                // Avoid the extra work of the garbage collector by clearing the set.
+                children.clear();
             }
         }
 
@@ -475,7 +497,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         private void addChild(SecurityCacheEntry entry)
         {
             if (this.children == null) {
-                this.children = new ArrayList<>();
+                // Use a weak set to avoid that upper entries in the hierarchy prevent their children from being
+                // garbage collected and removed from internalEntries.
+                this.children = Collections.newSetFromMap(new WeakHashMap<>());
             }
             this.children.add(entry);
         }
@@ -610,12 +634,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(SecurityReference reference)
     {
-        readLock.lock();
-        try {
-            return cache.get(getEntryKey(reference));
-        } finally {
-            readLock.unlock();
-        }
+        return getInternal(getEntryKey(reference));
     }
 
     /**
@@ -626,12 +645,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(UserSecurityReference userReference, SecurityReference reference)
     {
-        readLock.lock();
-        try {
-            return cache.get(getEntryKey(userReference, reference));
-        } finally {
-            readLock.unlock();
-        }
+        return getInternal(getEntryKey(userReference, reference));
     }
 
     /**
@@ -642,9 +656,43 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getShadowEntry(SecurityReference userReference, SecurityReference wiki)
     {
+        return getInternal(getShadowEntryKey(userReference, wiki));
+    }
+
+    /**
+     * Get a security cache entry from the cache or the internal map. In the latter case, the entry is re-inserted
+     * into the cache. This method can be called without locking, it uses the read lock internally.
+     *
+     * @param key the key of the entry to retrieve
+     * @throws IllegalStateException if the entry has been disposed (this should never happen)
+     * @return the entry corresponding to the given key, null if none is available in the cache
+     */
+    private SecurityCacheEntry getInternal(String key)
+    {
         readLock.lock();
         try {
-            return cache.get(getShadowEntryKey(userReference, wiki));
+            SecurityCacheEntry result = cache.get(key);
+            if (result == null) {
+                // Try to get the entry from the internal map which may have, e.g., parents that are no longer in the
+                // cache but still referenced by entries in the cache.
+                // Synchronize to avoid concurrent modification of the map as get() may trigger the eviction of
+                // garbage collected entries. All other operations are done under the write lock.
+                synchronized (this.internalEntries) {
+                    result = this.internalEntries.get(key);
+                }
+
+                if (result != null) {
+                    // Try re-inserting the entry into the cache to give it another chance of being stored directly.
+                    this.cache.set(key, result);
+                }
+            }
+
+            if (result != null && result.disposed) {
+                throw new IllegalCacheStateException(
+                    String.format("Entry [%s] has been disposed without being removed from the cache.", result));
+            }
+
+            return result;
         } finally {
             readLock.unlock();
         }
@@ -669,7 +717,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     private boolean isAlreadyInserted(String key, SecurityEntry entry, Collection<GroupSecurityReference> groups)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        SecurityCacheEntry oldEntry = cache.get(key);
+        SecurityCacheEntry oldEntry = getInternal(key);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
                 // Another thread has inserted an entry which is different from this entry!
@@ -694,27 +742,27 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Add a new entry in the cache and prevent cache container deadlock (in cooperation with the entry dispose method)
      * in case adding the entry cause this same entry to be evicted.
-     * 
+     *
      * @param key the key of the entry to be added.
      * @param entry the entry to add.
-     * @throws ConflictingInsertionException when the entry have been disposed while being added, the full load should
-     *             be retried.
      */
-    private void addEntry(String key, SecurityCacheEntry entry) throws ConflictingInsertionException
+    private void addEntry(String key, SecurityCacheEntry entry)
     {
-        try {
-            newEntry = entry;
-            cache.set(key, newEntry);
-            if (entry.disposed) {
-                // XWIKI-13746: The added entry have been disposed while being added, meaning that the eviction
-                // triggered by adding the entry has hit the entry itself, so remove it and fail.
-                cache.remove(key);
-                throw new ConflictingInsertionException(String.format(
-                    "The cache entry [%s] with key [%s] has been disposed by another thread while being added.", entry,
-                    key));
-            }
-        } finally {
-            newEntry = null;
+        cache.set(key, entry);
+        // Don't store access entries in the internal entries as they can never be the parent of another entry, and
+        // thus it is not important to keep them outside the cache. While this could be seen as an additional "cache"
+        // layer for access entries, this is not the purpose of the internal entries map. Instead, the size of the
+        // cache should be increased if this is desired.
+        if (!(entry.getEntry() instanceof SecurityAccessEntry)) {
+            this.internalEntries.put(key, entry);
+        }
+
+        if (entry.disposed) {
+            // This should never happen as entries cannot be disposed while being added to the cache as both
+            // operations require the write lock. However, if it happens, there is a serious bug in the code so
+            // better fail with an exception.
+            throw new IllegalCacheStateException(
+                String.format("Entry [%s] has been disposed while being added to the cache.", entry));
         }
     }
 
@@ -825,7 +873,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
             logger.debug("Added access entry [{}] into the cache.", key);
         } finally {
-            newEntry = null;
             writeLock.unlock();
         }
     }
@@ -838,7 +885,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     SecurityEntry get(String entryKey)
     {
-        SecurityCacheEntry entry = cache.get(entryKey);
+        SecurityCacheEntry entry = getInternal(entryKey);
         return (entry != null) ? entry.getEntry() : null;
     }
 
@@ -887,7 +934,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     if (logger.isDebugEnabled()) {
                         logger.debug("Remove outdated access entry for [{}].", getEntryKey(user, entity));
                     }
-                    this.cache.remove(entry.getKey());
+                    entry.dispose();
                 }
             } finally {
                 writeLock.unlock();
@@ -910,7 +957,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     if (logger.isDebugEnabled()) {
                         logger.debug("Remove outdated rule entry for [{}].", getEntryKey(entity));
                     }
-                    this.cache.remove(entry.getKey());
+                    entry.dispose();
                 }
             } finally {
                 writeLock.unlock();
@@ -932,11 +979,13 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             return null;
         }
 
-        for (SecurityCacheEntry parent : userEntry.parents) {
-            // Add the parent group (if we have not already seen it)
-            SecurityReference parentRef = parent.getEntry().getReference();
-            if (parentRef instanceof GroupSecurityReference) {
-                groups.add((GroupSecurityReference) parentRef);
+        if (userEntry.parents != null) {
+            for (SecurityCacheEntry parent : userEntry.parents) {
+                // Add the parent group (if we have not already seen it)
+                SecurityReference parentRef = parent.getEntry().getReference();
+                if (parentRef instanceof GroupSecurityReference) {
+                    groups.add((GroupSecurityReference) parentRef);
+                }
             }
         }
         return groups;
@@ -947,6 +996,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     {
         Collection<GroupSecurityReference> groups = new HashSet<>();
 
+        // Load the user entry. Then traverse its parents. Parents of user/group entries are never modified, even
+        // when the parent is removed from the cache. This makes this code safe despite not locking the cache.
         SecurityCacheEntry userEntry = (entityWiki != null) ? getShadowEntry(user, entityWiki) : getEntry(user);
 
         // If the user is not in the cache, or if it is, but not as a user, but as a regular document
@@ -959,29 +1010,24 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         // (instead of using the execution stack which would be more costly).
         Deque<SecurityCacheEntry> entriesToExplore = new ArrayDeque<>();
 
-        // Special case if the user is a shadow.
-        if (entityWiki != null) {
-            // We start with the parents of the original entry, and the parent of this shadow (excluding the original)
-            addParentsWhenEntryIsShadow(userEntry, user, groups, entriesToExplore);
-        } else {
-            // We start with the current user
-            entriesToExplore.add(userEntry);
-        }
+        // We start with the current user
+        entriesToExplore.add(userEntry);
 
         // Let's go
         while (!entriesToExplore.isEmpty()) {
             SecurityCacheEntry entry = entriesToExplore.pop();
 
-            // We add the parents of the current entry
-            addParentsToTheListOfEntriesToExplore(entry.parents, groups, entriesToExplore);
-
-            // If the entry has a shadow (in the concerned subwiki), we also add the parents of the shadow
-            if (entityWiki != null) {
-                GroupSecurityReference entryRef = (GroupSecurityReference) entry.getEntry().getReference();
-                if (entryRef.isGlobal()) {
-                    SecurityCacheEntry shadow = getShadowEntry(entryRef, entityWiki);
-                    if (shadow != null) {
-                        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, entry);
+            if (entry.parents != null) {
+                // We add the parents of the current entry
+                for (SecurityCacheEntry parent : entry.parents) {
+                    // When exploring the parents of a global user in a given wiki, only explore parents that are
+                    // either from the desired wiki or that are shadow entries. This avoids leaving that wiki and
+                    // ensures that for a group, all parents in the wanted wiki are explored (otherwise, e.g., the main
+                    // wiki's entry of a group could be explored that lacks the subwiki parents).
+                    if (isEntryGroupInWiki(parent, entityWiki)
+                        && (groups.add((GroupSecurityReference) parent.getEntry().getReference())))
+                    {
+                        entriesToExplore.add(parent);
                     }
                 }
             }
@@ -990,59 +1036,13 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         return groups;
     }
 
-    private void addParentsWhenEntryIsShadow(SecurityCacheEntry shadow, UserSecurityReference user,
-        Collection<GroupSecurityReference> groups, Deque<SecurityCacheEntry> entriesToExplore)
+    private static boolean isEntryGroupInWiki(SecurityCacheEntry entry, SecurityReference entityWiki)
     {
-        SecurityCacheEntry originalEntry = getEntry(user);
-
-        // We add the parents of the original (but not the original, otherwise we could have the same group twice)
-        addParentsToTheListOfEntriesToExplore(originalEntry.parents, groups, entriesToExplore);
-        // And we add the parent groups of the shadow
-        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, originalEntry);
-    }
-
-    /**
-     * Add the parents of an entry to the list of entries to explore.
-     *
-     * @param parents the parents of the entry
-     * @param groups the collection where we store the found groups
-     * @param entriesToExplore the collection holding the entries we still have to explore
-     */
-    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
-        Collection<GroupSecurityReference> groups, Deque<SecurityCacheEntry> entriesToExplore)
-    {
-        addParentsToTheListOfEntriesToExplore(parents, groups, entriesToExplore, null);
-    }
-
-    /**
-     * Add the parents of an entry to the list of entries to explore.
-     *
-     * @param parents the parents of the entry
-     * @param groups the collection where we store the found groups
-     * @param entriesToExplore the collection holding the entries we still have to explore
-     * @param originalEntry the original entry of the current entry (if the current entry is a shadow), null otherwise
-     */
-    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
-        Collection<GroupSecurityReference> groups, Deque<SecurityCacheEntry> entriesToExplore,
-        SecurityCacheEntry originalEntry)
-    {
-        if (parents == null) {
-            return;
-        }
-
-        for (SecurityCacheEntry parent : parents) {
-            // skip this parent if the entry is a shadow and the parent is the original entry
-            // (ie: don't explore the original entry)
-            if (originalEntry != null && parent == originalEntry) {
-                continue;
-            }
-
-            // Add the parent group (if we have not already seen it)
-            SecurityReference parentRef = parent.getEntry().getReference();
-            if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference) parentRef)) {
-                entriesToExplore.add(parent);
-            }
-        }
+        SecurityReference reference = entry.getEntry().getReference();
+        return reference instanceof GroupSecurityReference
+            && (entityWiki == null
+            || (entry.getEntry() instanceof SecurityShadowEntry
+            || entityWiki.equals(reference.getWikiReference())));
     }
 
     @Override

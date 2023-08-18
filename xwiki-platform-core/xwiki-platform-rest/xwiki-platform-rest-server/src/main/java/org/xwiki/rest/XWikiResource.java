@@ -269,6 +269,13 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         // Get a specific version if requested to
         if (version != null) {
             doc = doc.getDocumentRevision(version);
+
+            // This could be access denied or unauthorized, just always throw a not found as it should be the more
+            // frequent case, and it could even be considered to be more secure to not show the user if something
+            // exists or not if it is inaccessible.
+            if (doc == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
         }
 
         // Check if the doc is locked.

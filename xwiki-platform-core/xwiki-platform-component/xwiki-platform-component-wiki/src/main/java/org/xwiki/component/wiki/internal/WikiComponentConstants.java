@@ -146,6 +146,20 @@ public interface WikiComponentConstants
     String COMPONENT_ROLE_TYPE_FIELD = "roleType";
 
     /**
+     * The role hint priority property of both {@link #COMPONENT_CLASS}.
+     * 
+     * @since 15.4RC1
+     */
+    String COMPONENT_ROLE_HINT_PRIORITY_FIELD = "roleHintPriority";
+
+    /**
+     * The role type priority property of both {@link #COMPONENT_CLASS}.
+     * 
+     * @since 15.4RC1
+     */
+    String COMPONENT_ROLE_TYPE_PRIORITY_FIELD = "roleTypePriority";
+
+    /**
      * The scope of the {@link #COMPONENT_CLASS}.
      */
     String COMPONENT_SCOPE_FIELD = "scope";

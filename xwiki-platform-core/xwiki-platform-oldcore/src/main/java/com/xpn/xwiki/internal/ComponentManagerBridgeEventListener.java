@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -44,6 +45,9 @@ import com.xpn.xwiki.web.Utils;
 @Component
 @Singleton
 @Named("componentManagerBridge")
+// We need this listener to be initialized very because it's responsible for making the ComponentManager available for
+// non component code (not setting 0 just in case something would really like to be the absolute first listener)
+@Priority(10)
 public class ComponentManagerBridgeEventListener extends AbstractEventListener implements EventListener, Initializable
 {
     /**

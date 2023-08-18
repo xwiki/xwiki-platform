@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.3-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -126,18 +126,18 @@
                  Single justification example:
             -->
             <revapi.differences>
-              <justification>Young API</justification>
+              <justification>Replaced getXWikiHost() with getXWikiURI() in unstable configuration API.</justification>
               <criticality>documented</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method int java.lang.Comparable&lt;T&gt;::compareTo(T) @ org.xwiki.whatsnew.NewsSourceItem</new>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.export.pdf.PDFExportConfiguration::getXWikiHost()</old>
                 </item>
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
-                  <new>method java.util.Optional&lt;java.lang.String&gt; org.xwiki.whatsnew.NewsSourceItem::getImageURL()</new>
+                  <new>method java.net.URI org.xwiki.export.pdf.PDFExportConfiguration::getXWikiURI() throws java.net.URISyntaxException</new>
                 </item>
               </differences>
             </revapi.differences>
@@ -155,7 +155,6 @@
     <module>xwiki-platform-application</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
-    <module>xwiki-platform-autotag</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
@@ -169,7 +168,6 @@
     <module>xwiki-platform-dashboard</module>
     <module>xwiki-platform-date</module>
     <module>xwiki-platform-diff</module>
-    <module>xwiki-platform-diffplugin</module>
     <module>xwiki-platform-display</module>
     <module>xwiki-platform-edit</module>
     <module>xwiki-platform-eventstream</module>
@@ -179,7 +177,6 @@
     <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-flavor</module>
-    <module>xwiki-platform-graphviz</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-help</module>
     <module>xwiki-platform-icon</module>
@@ -228,7 +225,6 @@
     <module>xwiki-platform-skin</module>
     <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
-    <module>xwiki-platform-svg</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-template</module>
     <module>xwiki-platform-test</module>
@@ -267,19 +263,16 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <systemProperties combine.children="append">
+                <systemPropertyVariables>
                   <!-- This is required by the Oracle JDBC driver when running configuration tests on Oracle, as
                        otherwise it fails with:
                          SQLException: ORA-00604: error occurred at recursive SQL level 1
                          ORA-01882: timezone region not found
-                       It's required at this level since TestContainers used JDBC to verify that the Oracle database is
+                       It's required at this level since TestContainers uses JDBC to verify that the Oracle database is
                        started.
                   -->
-                  <property>
-                    <name>oracle.jdbc.timezoneAsRegion</name>
-                    <value>false</value>
-                  </property>
-                </systemProperties>
+                  <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
+                </systemPropertyVariables>
               </configuration>
             </plugin>
           </plugins>
@@ -302,30 +295,24 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-surefire-plugin</artifactId>
               <configuration>
-                <systemProperties combine.children="append">
+                <systemPropertyVariables>
                   <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
                        failing.
                        TODO: Remove this property once all functional tests have been moved to use the failsafe plugin
                   -->
-                  <property>
-                    <name>screenshotDirectory</name>
-                    <value>${project.build.directory}/screenshots</value>
-                  </property>
-                </systemProperties>
+                  <screenshotDirectory>${project.build.directory}/screenshots</screenshotDirectory>
+                </systemPropertyVariables>
               </configuration>
             </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <systemProperties combine.children="append">
+                <systemPropertyVariables>
                   <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is
                        failing (only used by non-docker UI tests) -->
-                  <property>
-                    <name>screenshotDirectory</name>
-                    <value>${project.build.directory}/screenshots</value>
-                  </property>
-                </systemProperties>
+                  <screenshotDirectory>${project.build.directory}/screenshots</screenshotDirectory>
+                </systemPropertyVariables>
               </configuration>
             </plugin>
           </plugins>

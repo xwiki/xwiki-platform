@@ -114,7 +114,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #3e7cbc;
+  background-color: @btn-primary-bg;
 }
 
 .layout-loader.waiting.visible {

@@ -22,14 +22,29 @@ package org.xwiki.attachment.validation.internal;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
+import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
+import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -60,6 +75,22 @@ class DefaultAttachmentValidationConfigurationTest
     @MockComponent
     @Named("xwikiproperties")
     private ConfigurationSource xWikiPropertiesConfigurationSource;
+
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    @Mock
+    private XWikiContext xwikiContext;
+
+    @Mock
+    private XWiki wiki;
+
+    @BeforeEach
+    void setUp()
+    {
+        when(this.contextProvider.get()).thenReturn(this.xwikiContext);
+        when(this.xwikiContext.getWiki()).thenReturn(this.wiki);
+    }
 
     @Test
     void getAllowedMimetypesInConfigurationSource()
@@ -156,5 +187,30 @@ class DefaultAttachmentValidationConfigurationTest
         verify(this.wikiConfigurationSource).getProperty(ALLOWED_MIMETYPES_FIELD);
         verify(this.wikiConfigurationSource).getProperty(ALLOWED_MIMETYPES_FIELD);
         verifyNoInteractions(this.xWikiPropertiesConfigurationSource);
+    }
+
+    @Test
+    void getMaxUploadSize()
+    {
+        XWikiDocument previous = mock(XWikiDocument.class);
+        when(this.xwikiContext.getDoc()).thenReturn(previous);
+        this.configuration.getMaxUploadSize(null);
+        verify(this.wiki).getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, this.xwikiContext);
+        verify(this.xwikiContext).setDoc(previous);
+    }
+
+    @Test
+    void getMaxUploadSizeWithReference() throws Exception
+    {
+        DocumentReference entityReference = new DocumentReference("xwiki", "Space", "Page");
+        XWikiDocument previous = mock(XWikiDocument.class);
+        XWikiDocument doc = mock(XWikiDocument.class);
+        when(this.xwikiContext.getDoc()).thenReturn(previous);
+        when(this.wiki.getDocument(any(EntityReference.class), any())).thenReturn(doc);
+        this.configuration.getMaxUploadSize(entityReference);
+        verify(this.wiki).getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, this.xwikiContext);
+        InOrder inOrder = inOrder(this.xwikiContext);
+        inOrder.verify(this.xwikiContext).setDoc(doc);
+        inOrder.verify(this.xwikiContext).setDoc(previous);
     }
 }

@@ -19,12 +19,9 @@
  */
 package org.xwiki.officeimporter.internal.splitter;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
@@ -105,10 +103,10 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
             }
 
             // Rewire artifacts.
-            Set<File> artifactsFiles = relocateArtifacts(doc, officeDocument);
+            Map<String, OfficeDocumentArtifact> artifactsMap = relocateArtifacts(doc, officeDocument);
 
             // Create the resulting XDOMOfficeDocument.
-            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsFiles, componentManager,
+            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsMap, componentManager,
                 officeDocument.getConverterResult());
             result.put(targetDocumentDescriptor, splitDocument);
         }
@@ -117,27 +115,25 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     }
 
     /**
-     * Move artifacts (i.e. embedded images) from the original office document to a specific wiki document corresponding
-     * to a section. Only the artifacts from that section are moved.
+     * Copy artifacts (i.e. embedded images) from the original office document to a specific wiki document corresponding
+     * to a section. Only the artifacts from that section are copied.
      * 
      * @param sectionDoc the newly created wiki document corresponding to a section of the original office document
      * @param officeDocument the office document being splitted into wiki documents
      * @return the relocated artifacts
      */
-    private Set<File> relocateArtifacts(WikiDocument sectionDoc, XDOMOfficeDocument officeDocument)
+    private Map<String, OfficeDocumentArtifact> relocateArtifacts(WikiDocument sectionDoc,
+        XDOMOfficeDocument officeDocument)
     {
-        Set<File> artifacts = officeDocument.getArtifactsFiles();
-        Set<File> result = new HashSet<>();
+        Map<String, OfficeDocumentArtifact> artifacts = officeDocument.getArtifactsMap();
+        Map<String, OfficeDocumentArtifact> result = new HashMap<>();
         List<ImageBlock> imageBlocks =
             sectionDoc.getXdom().getBlocks(new ClassBlockMatcher(ImageBlock.class), Axes.DESCENDANT);
-        if (!imageBlocks.isEmpty()) {
-            Map<String, File> fileMap = new HashMap<>();
-            artifacts.forEach(item -> fileMap.put(item.getName(), item));
-            for (ImageBlock imageBlock : imageBlocks) {
-                String imageReference = imageBlock.getReference().getReference();
-                File file = fileMap.get(imageReference);
-                result.add(file);
-                artifacts.remove(file);
+        for (ImageBlock imageBlock : imageBlocks) {
+            String imageReference = imageBlock.getReference().getReference();
+            OfficeDocumentArtifact artifact = artifacts.get(imageReference);
+            if (artifact != null) {
+                result.put(imageReference, artifact);
             }
         }
         return result;

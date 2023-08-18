@@ -104,12 +104,13 @@ function initWrapper({provide} = {}) {
 describe('LivedataPagination.vue', () => {
   it('Displays the pagination when the limit is an existing page size', () => {
     const wrapper = initWrapper();
-    expect(wrapper.find("select").html()).toBe('<select>\n' +
-      '  <option value="10">10</option>\n' +
-      '  <option value="20">20</option>\n' +
-      '  <option value="30">30</option>\n' +
-      '  <option value="100">100</option>\n' +
-      '</select>')
+    const select = wrapper.find("select");
+    expect(select.attributes('title')).toContain('livedata.pagination.selectPageSize')
+    const options = wrapper.findAll("select>*");
+    expect(options.at(0).html()).toBe('<option value="10">10</option>');
+    expect(options.at(1).html()).toBe('<option value="20">20</option>');
+    expect(options.at(2).html()).toBe('<option value="30">30</option>');
+    expect(options.at(3).html()).toBe('<option value="100">100</option>');
   })
 
   it('Displays the pagination when the limit is not an existing page size', () => {
@@ -126,13 +127,12 @@ describe('LivedataPagination.vue', () => {
     });
     // The 25 pagination appears in the select options even if it is not part of the default page sizes ([10, 20,
     // 30, 100]).
-    expect(wrapper.find("select").html()).toBe('<select>\n' +
-      '  <option value="10">10</option>\n' +
-      '  <option value="20">20</option>\n' +
-      '  <option value="25">25</option>\n' +
-      '  <option value="30">30</option>\n' +
-      '  <option value="100">100</option>\n' +
-      '</select>')
+    const options = wrapper.findAll("select>*");
+    expect(options.at(0).html()).toBe('<option value="10">10</option>');
+    expect(options.at(1).html()).toBe('<option value="20">20</option>');
+    expect(options.at(2).html()).toBe('<option value="25">25</option>');
+    expect(options.at(3).html()).toBe('<option value="30">30</option>');
+    expect(options.at(4).html()).toBe('<option value="100">100</option>');
   })
 
   it('Displays the pagination indexes when there is no entries', () => {

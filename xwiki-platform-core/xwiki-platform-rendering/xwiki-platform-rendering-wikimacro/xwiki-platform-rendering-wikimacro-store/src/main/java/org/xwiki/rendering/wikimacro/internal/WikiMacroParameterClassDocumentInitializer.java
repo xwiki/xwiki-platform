@@ -19,14 +19,18 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.util.Arrays;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
  * Update XWiki.WikiMacroParameterClass document with all required informations.
@@ -40,6 +44,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public class WikiMacroParameterClassDocumentInitializer extends AbstractMandatoryClassInitializer
     implements WikiMacroConstants
 {
+    private static final String PROPERTY_PIPE = "|";
+
     /**
      * Default constructor.
      */
@@ -55,6 +61,8 @@ public class WikiMacroParameterClassDocumentInitializer extends AbstractMandator
         xclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
         xclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
         xclass.addTextField(PARAMETER_DEFAULT_VALUE_PROPERTY, "Parameter default value", 30);
-        xclass.addTextField(PARAMETER_TYPE_PROPERTY, "Parameter type", 60);
+        xclass.addStaticListField(PARAMETER_TYPE_PROPERTY, "Parameter type", 1, false, false,
+            StringUtils.join(Arrays.asList(PARAMETER_TYPE_UNKNOWN, PARAMETER_TYPE_WIKI), PROPERTY_PIPE),
+            ListClass.DISPLAYTYPE_INPUT, PROPERTY_PIPE, PARAMETER_TYPE_UNKNOWN, ListClass.FREE_TEXT_ALLOWED, true);
     }
 }

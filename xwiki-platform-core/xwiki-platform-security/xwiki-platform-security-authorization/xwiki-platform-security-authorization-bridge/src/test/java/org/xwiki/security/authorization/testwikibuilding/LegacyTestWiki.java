@@ -59,6 +59,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
@@ -1069,6 +1070,9 @@ public class LegacyTestWiki extends AbstractTestWiki
                     will(returnValue(isNew));
                     allowing(mockedDocument).getXObjects();
                     will(returnValue(Collections.emptyMap()));
+                    allowing(mockedDocument)
+                        .getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE);
+                    will(returnValue(Collections.emptyList()));
                 }
             });
 

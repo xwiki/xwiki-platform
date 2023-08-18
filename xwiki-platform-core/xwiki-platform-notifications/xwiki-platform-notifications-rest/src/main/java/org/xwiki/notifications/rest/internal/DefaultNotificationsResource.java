@@ -91,7 +91,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         String maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
         String displayReadEvents, String displayReadStatus, String tags, String currentWiki, String async,
-        String asyncId) throws Exception
+        String asyncId, String target) throws Exception
     {
         // Build the response
         Response.ResponseBuilder response;
@@ -165,7 +165,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             // 3. Search events
             result = this.executor.submit(cacheKey,
                 () -> getCompositeEvents(notificationParameters),
-                Boolean.parseBoolean(async), count);
+                Boolean.parseBoolean(async), count, true);
         }
 
         return result;
@@ -243,7 +243,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             request.get("pages"), request.get("spaces"), request.get("wikis"), request.get("users"),
             request.get("count"), request.get("displayOwnEvents"), request.get("displayMinorEvents"),
             request.get("displaySystemEvents"), request.get("displayReadEvents"), request.get("displayReadStatus"),
-            request.get("tags"), request.get("currentWiki"), request.get("async"), request.get(ASYNC_ID));
+            request.get("tags"), request.get("currentWiki"), request.get("async"), request.get(ASYNC_ID), "alert");
     }
 
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,

@@ -27,7 +27,7 @@
 #######################################################
 ##!source.syntax=xwiki/2.1
 {{velocity}}
-{{html wiki='true'}}
+{{html clean='false'}}
 #if($request.xpage == 'siblings')
   #template("startpage.vm")
     <div class="main layoutsubsection">
@@ -69,6 +69,8 @@
   'exclude': $doc.fullName,
   '$doc': $doc.documentReference
 }))
+{{/html}}
+
 {{liveData
   id='siblingsIndex'
   source='liveTable'
@@ -76,6 +78,8 @@
   properties='doc.title,doc.location,doc.date,doc.author,_actions'
   sort='doc.location:asc'
   }}$jsontool.serialize($liveDataConfig){{/liveData}}
+
+{{html clean='false'}}
 #######################################################
 ##                   FOOTER
 #######################################################

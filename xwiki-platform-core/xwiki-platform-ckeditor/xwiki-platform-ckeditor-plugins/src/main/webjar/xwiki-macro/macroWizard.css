@@ -1,0 +1,166 @@
+#template('colorThemeInit.vm')
+
+.macro-selector.loading,
+.macro-editor.loading {
+  min-height: 1em;
+}
+
+.macro-selector > .errormessage,
+.macro-editor > .errormessage {
+  margin-bottom: 0;
+}
+
+ul.macro-list {
+  height: 300px;
+  margin: 5px 0;
+  overflow: auto;
+  padding: 0;
+  position: relative;
+}
+
+ul.macro-list > li {
+  cursor: pointer;
+  padding: 6px 12px;
+}
+ul.macro-list > li.selected {
+  background-color: #EEE;
+  background-color: $theme.highlightColor;
+}
+
+ul.macro-list .macro-name,
+ul.macro-parameters .macro-parameter-name {
+  color: #333;
+  color: $theme.textColor;
+}
+
+ul.macro-list .macro-description,
+ul.macro-list .macro-extension,
+.macro-editor .macro-description,
+ul.macro-parameters .macro-parameter-description,
+ul.macro-parameters > li.more,
+ul.macro-parameters > li.empty,
+ul.macro-parameter-group-members > li.more {
+  color: #656565;
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+}
+
+ul.macro-list .macro-extension {
+  margin-right: 1em;
+}
+
+.macro-name::first-letter,
+.macro-description::first-letter,
+.macro-parameter-name::first-letter,
+.macro-parameter-description::first-letter,
+.macro-parameter-group-name::first-letter {
+  text-transform: capitalize;
+}
+
+.dropdown-menu > li.macro-category > a {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  white-space: normal;
+}
+
+.macro-categories-badges .badge {
+  margin-right: 5px;
+}
+
+.macro-editor .macro-name {
+  font-size: larger;
+}
+
+ul.macro-parameters {
+  border-top: 1px dashed #E8E8E8;
+  border-top: 1px dashed $theme.borderColor;
+  list-style: none;
+  margin: .5em 0;
+  padding: 0;
+}
+
+ul.macro-parameters > li,
+ul.macro-parameter-group-members > li {
+  padding: .5em 0;
+}
+
+.macro-parameter.mandatory .macro-parameter-name:after {
+  color: #CC3333;
+  color: $theme.notificationErrorColor;
+  content: ' *';
+}
+
+.macro-parameter[data-type="boolean"],
+.macro-parameter[data-type="java.lang.Boolean"] {
+  position: relative;
+}
+.macro-parameter[data-type="boolean"] .macro-parameter-name,
+.macro-parameter[data-type="java.lang.Boolean"] .macro-parameter-name {
+  margin-left: 24px;
+}
+.macro-parameter[data-type="boolean"] .macro-parameter-field,
+.macro-parameter[data-type="java.lang.Boolean"] .macro-parameter-field {
+  position: absolute;
+  top: .5em;
+}
+.macro-parameter[data-type="boolean"] .macro-parameter-field input,
+.macro-parameter[data-type="java.lang.Boolean"] .macro-parameter-field input {
+  margin: 0;
+  padding: 0;
+}
+
+.macro-parameter-description {
+  margin-bottom: 5px;
+}
+
+ul.macro-parameters > .more,
+ul.macro-parameter-group-members > .more {
+  cursor: pointer;
+}
+ul.macro-parameters > .more a,
+ul.macro-parameter-group-members > .more a {
+  color: #656565;
+  color: $theme.textSecondaryColor;
+}
+
+ul.macro-parameters .arrow {
+  display: inline-block;
+  height: 0;
+  width: 0;
+}
+ul.macro-parameters .arrow-down {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #656565;
+  border-top: 4px solid $theme.textSecondaryColor;
+  margin-bottom: 1px;
+}
+ul.macro-parameters .arrow-right {
+  border-bottom: 4px solid transparent;
+  border-left: 4px solid #656565;
+  border-left: 4px solid $theme.textSecondaryColor;
+  border-top: 4px solid transparent;
+  margin-right: 4px;
+}
+
+.macro-parameter-group:not(.invisible) > .tab-content {
+  border-bottom: 1px solid $theme.borderColor;
+  border-left: 1px solid $theme.borderColor;
+  border-right: 1px solid $theme.borderColor;
+  padding: .5em;
+}
+
+ul.macro-parameter-group-members {
+  padding: 0;
+  list-style: none;
+}
+
+.macro-parameter-group.invisible {
+  /* We want to see the group members but hide the tabs. */
+  visibility: visible;
+}
+
+.macro-parameter-group.invisible > ul[role="tablist"] {
+  display: none;
+}

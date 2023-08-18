@@ -20,6 +20,7 @@
 package org.xwiki.whatsnew.internal;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.whatsnew.NewsCategory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -53,5 +55,13 @@ class CategoriesConverterTest
         assertTrue(results.contains(NewsCategory.ADVANCED_USER));
         assertTrue(results.contains(NewsCategory.EXTENSION));
         assertTrue(results.contains(NewsCategory.UNKNOWN));
+    }
+
+    @Test
+    void convertWhenNull()
+    {
+        Type type = new DefaultParameterizedType(null, Set.class, NewsCategory.class);
+
+        assertEquals(Collections.emptySet(), this.converter.convert(type, null));
     }
 }

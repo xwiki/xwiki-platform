@@ -9,8 +9,8 @@ paths: {
   // Tree
   'jsTree': '/webjars/jstree.min',
   'xwiki-job-runner': '/webjars/jobRunner.min',
-  'tree-finder': '/webjars/finder.min',
-  'tree': '/webjars/tree.min',
+  'xwiki-tree-finder': '/webjars/finder.min',
+  'xwiki-tree': '/webjars/tree.min',
 
   'xwiki-entityReference': 'uicomponents/model/entityReference.min'
 },

@@ -45,7 +45,7 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 @AllComponents
-public class WikiCopiedEventListenerTest
+public class WikiEventListenerTest
 {
     @Rule
     public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule();

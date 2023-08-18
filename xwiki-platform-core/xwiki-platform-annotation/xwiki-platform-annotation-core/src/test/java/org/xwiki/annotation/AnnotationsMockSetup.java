@@ -35,6 +35,7 @@ import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
 
@@ -110,8 +111,9 @@ public class AnnotationsMockSetup
      * @param docName the name of the document to setup expectations for
      * @throws IOServiceException if something wrong happens while mocking the documents access
      * @throws IOException if something wrong happens while mocking the documents access
+     * @throws ParseException if something wrong happens while mocking the syntax registry
      */
-    public void setupExpectations(final String docName) throws IOServiceException, IOException
+    public void setupExpectations(final String docName) throws IOServiceException, IOException, ParseException
     {
         mockery.checking(new Expectations()
         {
@@ -168,6 +170,8 @@ public class AnnotationsMockSetup
 
                 allowing(syntaxRegistry).getSyntax("xwiki/2.0");
                 will(returnValue(Optional.of(Syntax.XWIKI_2_0)));
+                allowing(syntaxRegistry).resolveSyntax("xwiki/2.0");
+                will(returnValue(Syntax.XWIKI_2_0));
             }
         });
     }

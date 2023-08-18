@@ -424,7 +424,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = context.scope_control.template = true
 #-#   velocity.properties = context.scope_control.macro = true
 #-#   velocity.properties = event_handler.include.class = org.xwiki.velocity.internal.util.RestrictParseLocationEventHandler
-#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector\,org.xwiki.velocity.introspection.MethodOverrideUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy
@@ -656,6 +656,35 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=xalan:serializer
 # extension.ignoredDependencies=xml-apis:xml-apis
 # extension.ignoredDependencies=xerces:xmlParserAPIs
+
+#-------------------------------------------------------------------------------------
+# Extension Manager - Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.5RC1]
+#-# When true, the security scan is enabled. This is the default; set to false to disable the scan.
+#-#
+# extension.security.scan.enabled = true
+
+#-# [Since 15.5RC1]
+#-# Specifies the delay before starting a new security scan after the last one has finished.
+#-# The default value is 24 hours.
+#-#
+# extension.security.scan.delay = 24
+
+#-# [Since 15.5RC1]
+#-# Specifies the url to use as the endpoint for the security scan rest queries.
+#-# The url must conform to the API documented here: https://google.github.io/osv.dev/post-v1-query/
+#-# The default value is https://api.osv.dev/v1/query.
+#-#
+# extension.security.scan.url = https://api.osv.dev/v1/query
+
+#-# [Since 15.6RC1]
+#-# Specifies the url to use as the endpoint for the security scan false-positive fetching rest queries.
+#-# The url must conform to the API documented here: http://e.x.o.doc...
+#-# The default value is https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
+#-#
+# extension.security.reviews.url = https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
 
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
@@ -956,16 +985,20 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 
 #-# [Since 14.10]
 #-# Define the list of allowed attachment mimetypes. By default, this list is empty, but you can specify a 
-#-# comma-separated list of allowed mimetypes. Note that a joker (*) can be used to accept any media type. Once this
-#-# list is not empty, any attachment with an unlisted mimetype will be rejected.
+#-# comma-separated list of allowed mimetypes. Note that a single star character (*) can be used in the defined allowed
+#-# mimetype and in this case the allowed mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment with an unlisted mimetype will be rejected.
 #-# For instance, if you want to only accept plain text and any kind of images, you can set the list to:
 #-# text/plain,image/*
 # attachment.upload.allowList=
 
 #-# [Since 14.10]
 #-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
-#-# comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this 
-#-# list is not empty, any attachment matching one of the listed mimetype will be rejected.
+#-# comma-separated list of blocked mimetypes. Note that a single star character (*) can be used in the defined blocked
+#-# mimetype and in this case the blocked mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment matching one of the listed mimetype will be rejected.
 #-# For instance, if you want to reject plain text and any kind of images, you can set the list to:
 #-# text/plain,image/*
 #-#
@@ -1113,12 +1146,6 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail item in the send queue has been sent.
 # mail.sender.sendQueueCapacity = 1000
 
-#-# [Since 12.9RC1]
-#-# Decides if XWiki should resend automatically mails that were prepared but not sent, at restart.
-#-# Note that emails that were in the prepare_error state are not resent since they failed to be saved and thus cannot
-#-# be resent.
-# mail.sender.database.resendAutomaticallyAtStartup = true
-
 #-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------
@@ -1255,14 +1282,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.rest.cache = true
 
-#-# [Since 12.6]
-#-# When this option is enabled the relation between users and events is evaluated and stored when the events are
-#-# generated instead of each time they are displayed.
-#-# /!\ The capability to disable the prefiltering is now deprecated and will be removed probably in 15.x XWiki cycle.
-#-#
-#-# The default is :
-# notifications.eventPrefilteringEnabled = true
-
 #-# [Since 12.5RC1]
 #-# The async notifications renderer is using a dedicated thread pool to limit the impact on the rest of the XWiki
 #-# instance.
@@ -1270,6 +1289,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The default is :
 # notifications.async.poolSize = 2
+
+#-# [Since 15.5RC1]
+#-# The hint of the strategy component to use for email grouping notifications. Default strategy is to group all
+#-# notifications in a single email, but other strategies can be provided, e.g. to send as many emails as there was
+#-# type of notifications. Check online documentation related to notification to see the list of available strategies.
+#-#
+#-# The default is :
+# notifications.emailGroupingStrategyHint = "default"
 
 #-------------------------------------------------------------------------------------
 # Mentions
@@ -1371,18 +1398,18 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# user.preferences.guest.displayHiddenDocuments = 1
 #-# user.preferences.guest.editor = Text
 
+#-# [Since 14.10.12]
+#-# [Since 15.5RC1]
+#-# When displaying an user in a compact mode we usually rely only on the user avatar and their full name. If this is
+#-# not enough to properly identify the user then this configuration can be used to display additional information.
+#-#
+#-# The name of the user property to be used as qualifier (hint) when displaying the user in a compact mode. This
+#-# configuration is not set by default, which means no additional information is displayed:
+# user.display.qualifierProperty =
+
 #-------------------------------------------------------------------------------------
 # Refactoring
 #-------------------------------------------------------------------------------------
-
-#-# [Since 12.5RC1]
-#-# Indicate to use the old implementation based on copy and delete, or the new implementation using an atomic operation
-#-# on database (which is a lot more performant).
-#-# This property aims at being removed in the future once the atomic rename has been validated to work 100% fine.
-#-# Only use it if you are facing an issue with the move/rename features.
-#-#
-#-# The default value is:
-# refactoring.rename.useAtomicRename = true
 
 #-# [Since 12.9RC1]
 #-# Indicates whether skipping the recycle bin when deleting pages is allowed for Advanced users.
@@ -1445,11 +1472,18 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The port number used for communicating with the headless Chrome web browser.
 # export.pdf.chromeRemoteDebuggingPort = 9222
 
-#-# The host name or IP address that the headless Chrome browser should use to access the XWiki instance (i.e. the print
-#-# preview page). Defaults to "host.xwiki.internal" which means the host running the Docker daemon; if XWiki runs
-#-# itself inside a Docker container then you should use the assigned network alias, provided both containers (XWiki and
-#-# Chrome) are in the same Docker network.
-# export.pdf.xwikiHost = host.xwiki.internal
+#-# [Since 14.10.15]
+#-# [Since 15.5.2]
+#-# [Since 15.7RC1]
+#-# The base URI that the headless Chrome browser should use to access the XWiki instance (i.e. the print preview page).
+#-# The host (domain or IP address) is mandatory but the scheme and port number are optional (they default on the scheme
+#-# and port number used when triggering the PDF export). Defaults to "host.xwiki.internal" which means the host running
+#-# the Docker daemon; if XWiki runs itself inside a Docker container then you should use the assigned network alias,
+#-# provided both containers (XWiki and Chrome) are in the same Docker network.
+#-#
+#-# Note that this configuration replaces the old "export.pdf.xwikiHost" configuration which is currently still taken
+#-# into account as a fall back in case this configuration is not set.
+# export.pdf.xwikiURI = host.xwiki.internal
 
 #-# The Docker image used to create the Docker container running the headless Chrome web browser.
 # export.pdf.chromeDockerImage = zenika/alpine-chrome:latest
@@ -1471,7 +1505,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The maximum content size, in kilobytes (KB), an user is allowed to export to PDF. In order to compute the content
 #-# size we sum the size of the HTML rendering for each of the XWiki documents included in the export. The size of
 #-# external resources, such as images, style sheets, JavaScript code is not taken into account. 0 means no limit.
-# export.pdf.maxContentSize = 100
+# export.pdf.maxContentSize = 5000
 
 #-# [Since 14.10]
 #-# The maximum number of PDF exports that can be executed in parallel (each PDF export needs a separate thread).
@@ -1528,5 +1562,28 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # whatsnew.source.xwikiorg.rssURL = https://extensions.xwiki.org/news
 # whatsnew.sources = xwikisas = xwikiblog
 # whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
+
+#-------------------------------------------------------------------------------------
+# XML Diff
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# If the compared documents contain images, they can be embedded as data URI to compare the images themselves
+#-# instead of their URLs. For this, images are downloaded via HTTP and embedded as data URI. Images are only
+#-# downloaded from trusted domains when enabled above. Still, this can be a security and stability risk as
+#-# downloading images can easily increase the server load. If this option is set to "false", no images are
+#-# downloaded by the diff and images are compared by URL instead.
+#-# Default is "true".
+# diff.xml.dataURI.enabled = true
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the maximum size in bytes of an image to be embedded into the XML diff output as data URI.
+#-# Default is 1MB.
+# diff.xml.dataURI.maximumContentSize = 1048576
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the timeout in seconds for downloading an image via HTTP to embed it into the XML diff output as data URI.
+#-# Default is 10 seconds.
+# diff.xml.dataURI.httpTimeout = 10
 
 $!xwikiPropertiesAdditionalProperties

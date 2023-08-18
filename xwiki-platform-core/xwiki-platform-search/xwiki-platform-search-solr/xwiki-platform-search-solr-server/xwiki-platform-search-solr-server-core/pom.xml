@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr-server</artifactId>
-    <version>15.3-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server-core</artifactId>
   <name>XWiki Platform - Search - SOLR - Server - Core</name>
@@ -78,10 +78,14 @@
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
-          <excludes>
-            <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
-            <exclude>src/**/update-script.js</exclude>
-          </excludes>
+          <licenseSets>
+            <licenseSet>
+              <excludes>
+                <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
+                <exclude>src/**/update-script.js</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
         </configuration>
       </plugin>
     </plugins>

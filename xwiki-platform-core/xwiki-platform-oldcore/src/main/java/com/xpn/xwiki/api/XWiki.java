@@ -46,8 +46,10 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.CurrentUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -658,12 +660,17 @@ public class XWiki extends Api
     {
         try {
             if (reference != null && getContextualAuthorizationManager().hasAccess(Right.VIEW, reference)) {
-                XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(reference, revision);
+                DocumentRevisionProvider revisionProvider = getDocumentRevisionProvider();
+                revisionProvider.checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, reference, revision);
+                XWikiDocument documentRevision = revisionProvider.getRevision(reference, revision);
 
                 if (documentRevision != null) {
                     return new Document(documentRevision, this.context);
                 }
             }
+        } catch (AuthorizationException e) {
+            LOGGER.info("Access denied for loading revision [{}] of document [{}]: [{}]", revision, reference,
+                ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             LOGGER.error("Failed to access revision [{}] of document {}", revision, reference, e);
         }

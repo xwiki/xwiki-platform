@@ -43,6 +43,7 @@ var XWiki = (function (XWiki) {
       document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
       document.observe("xwiki:suggest:updated", this.onSuggestUpdated.bindAsEventListener(this));
       document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
+      document.observe("xwiki:suggest:collapsed", this.onSuggestCollapsed.bindAsEventListener(this));
 
       this.createSuggest();
     },
@@ -85,7 +86,7 @@ var XWiki = (function (XWiki) {
     onSuggestUpdated: function(event) {
       // Check if there are any suggestions, taking into account that there is at least one suggestion used to link the
       // search page.
-      if (event.memo.container.select('.suggestItem').length == 1) {
+      if (event.memo.container.select('.suggestItem').length === 1) {
         // Show the "No results!" message.
         this.noResultsMessage.removeClassName('hidden').setStyle({'float': 'left'});
       }
@@ -114,6 +115,13 @@ var XWiki = (function (XWiki) {
     },
 
     /**
+     * Callback triggered when the suggest element is collapsed, because of a focusout event for example.
+     */
+    onSuggestCollapsed: function(event) {
+      this.suggest.clearSuggestions();
+    },
+
+    /**
      * Creates the underlaying suggest widget.
      */
     createSuggest: function() {
@@ -131,29 +139,27 @@ var XWiki = (function (XWiki) {
         .insert(new Element('div', {'class': 'clearfloats'}));
       var allResultsNode = new XWiki.widgets.XList([
         new XWiki.widgets.XListItem( content, {
-          'containerClasses': 'suggestItem',
-          'classes': 'showAllResults',
-          'eventCallbackScope' : this,
-          'noHighlight' : true,
-          'value' : valueNode
+          containerClasses: 'suggestItem',
+          classes: 'showAllResults',
+          eventCallbackScope: this,
+          noHighlight: true,
+          value: valueNode,
+          containerTagName: 'button'
         } ),
       ],
       {
         'classes' : 'suggestList',
         'eventListeners' : {
-          'click': function(event){
-            this.searchInput.up('form').submit();
-          },
           'mouseover':function(event){
-            this.suggest.clearHighlight();
-            this.suggest.iHighlighted = event.element();
-            event.element().addClassName('xhighlight');
+            this.suggest.setHighlight(event.currentTarget)
           }
         }
       });
       var allResults = allResultsNode.getElement();
+      allResultsNode.items[0].getElement().addEventListener('focusin',
+        (event) => this.suggest.setHighlight($(event.currentTarget)));
       this.suggest = new XWiki.widgets.Suggest( this.searchInput, {
-        parentContainer: $('searchSuggest'),
+        parentContainer: $('globalsearch'),
         className: 'searchSuggest horizontalLayout',
         fadeOnClear: false,
         align: "auto",

@@ -21,7 +21,10 @@ package org.xwiki.officeimporter.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -30,6 +33,7 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.internal.document.FileOfficeDocumentArtifact;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -39,6 +43,10 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,7 +89,15 @@ class ModelBridgeTest
 
         when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, documentReference)).thenReturn(true);
         when(doc.getContentAsString(syntaxId)).thenReturn(content);
-        when(doc.getArtifactsFiles()).thenReturn(Collections.singleton(artifact));
+        when(doc.getArtifactsMap())
+            .thenReturn(Collections.singletonMap(fileName, new FileOfficeDocumentArtifact(fileName, artifact)));
+        // Store all attachment contents that are set on the mock.
+        Map<AttachmentReference, byte[]> attachmentContents = new HashMap<>();
+        doAnswer((invocation) -> attachmentContents.put(
+            invocation.getArgument(0, AttachmentReference.class),
+            IOUtils.toByteArray(invocation.getArgument(1, InputStream.class))
+        )).when(this.documentAccessBridge)
+            .setAttachmentContent(any(AttachmentReference.class), any(InputStream.class));
 
         this.modelBridge.save(doc, documentReference, syntaxId, parentReference, title, false);
 
@@ -90,8 +106,10 @@ class ModelBridgeTest
             false);
         verify(documentAccessBridge).setDocumentParentReference(documentReference, parentReference);
         verify(documentAccessBridge).setDocumentTitle(documentReference, title);
-        verify(documentAccessBridge).setAttachmentContent(new AttachmentReference(fileName, documentReference),
-            fileContent);
+        assertEquals(1, attachmentContents.size());
+        AttachmentReference expectedAttachmentReference = new AttachmentReference(fileName, documentReference);
+        assertEquals(expectedAttachmentReference, attachmentContents.keySet().iterator().next());
+        assertArrayEquals(fileContent, attachmentContents.get(expectedAttachmentReference));
     }
 
     @Test

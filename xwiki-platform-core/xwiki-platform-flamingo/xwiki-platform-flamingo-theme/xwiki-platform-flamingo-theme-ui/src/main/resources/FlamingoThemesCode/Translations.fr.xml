@@ -39,7 +39,7 @@
   <content>platform.flamingo.themes.home.title=Thèmes pour Flamingo
 platform.flamingo.themes.home.currenttheme=Thème courant
 platform.flamingo.themes.home.otherthemes=Autres thèmes disponibles
-platform.flamingo.themes.home.warningOldColorThemeInstalled=C''est l''application pour gérer les thèmes Flamingo. Un thème Flamingo est une version personnalisable de toute skin basée sur Flamingo. Si vous souhaitez gérer les Thèmes de couleurs basés sur Colibri, vous devez aller à {0}Colibri Color Themes Application{1}.
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Vous êtes dans l''application pour gérer les thèmes Flamingo. Un thème Flamingo est une version personnalisable de toute skin basée sur Flamingo. Si vous souhaitez gérer les Thèmes de couleurs basés sur Colibri, rendez-vous sur {0}Colibri Color Themes Application{1}.
 platform.flamingo.themes.home.warningCurrentOldColorTheme=Le thème actuel est un thème de couleurs Colibri qui n'est pas optimisé pour fonctionner avec une skin basée sur Flamingo. Nous avons fait de notre mieux pour le rendre compatible, mais les résultats peuvent ne pas être optimaux.
 platform.flamingo.themes.home.useThisTheme=Utiliser ce thème
 platform.flamingo.themes.home.newThemeName=Nom du thème…

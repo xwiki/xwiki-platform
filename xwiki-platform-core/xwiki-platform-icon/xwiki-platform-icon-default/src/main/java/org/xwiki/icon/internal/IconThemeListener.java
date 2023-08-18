@@ -22,6 +22,7 @@ package org.xwiki.icon.internal;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -46,6 +47,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Named("iconTheme")
 @Singleton
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class IconThemeListener implements EventListener
 {
     private static final LocalDocumentReference ICON_THEME_CLASS =

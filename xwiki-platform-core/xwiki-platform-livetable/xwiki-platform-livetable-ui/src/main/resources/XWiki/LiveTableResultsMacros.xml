@@ -398,8 +398,6 @@
       'doc_space': $services.model.serialize($docReference.parent, 'local'),
       'doc_location': "#hierarchy($docReference,
         {'limit': 5,
-          'label': $services.model.serialize($docReference.name, 'local'),
-          'navigation': false,
           'plain': false,
           'local': true,
           'displayTitle': false

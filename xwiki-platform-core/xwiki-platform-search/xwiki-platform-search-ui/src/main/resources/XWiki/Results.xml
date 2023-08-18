@@ -65,9 +65,7 @@
           $services.localization.render('search.item.locatedIn')
           #set ($locationOptions = {
             'excludeSelf': true,
-            'limit': 6,
-            'label': $itemDoc.plainTitle,
-            'navigation': false
+            'limit': 6
           })
           #hierarchy($itemReference $locationOptions)
         &lt;/div&gt;

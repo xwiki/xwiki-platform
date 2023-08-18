@@ -119,8 +119,6 @@
     #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
     #set ($location = "#hierarchy($attachmentReference.parent, {
       'limit': 5,
-      'label': $attachmentReference.parent.parent.getName(),
-      'navigation': false,
       'plain': $hasAccess.equals(false),
       'local': true,
       'displayTitle': false

@@ -184,8 +184,7 @@
           #set ($templateReference = $services.model.resolveDocument($template))
           #hierarchy($templateReference {
             'local': true,
-            'selfIsActive': false,
-            'label': $!services.localization.render($doc.getPageReference().getName())
+            'selfIsActive': false
           })
         #end
       &lt;/dd&gt;

@@ -113,8 +113,16 @@ define('imageEditor', [
                     });
                     imageStyles.unshift({label: '---', value: ''});
                     callback(imageStyles);
+                    
+                    // Search for the type of the default image style by its identifier.
+                    const filteredValues = values.imageStyles.filter(
+                      (style) => style.identifier === defaultStyle.defaultStyle);
+                    let defaultType = "";
+                    if (filteredValues.length > 0) {
+                      defaultType = filteredValues[0].type;
+                    }
                     // Sets the default value once the values are loaded.
-                    imageStylesField.data('selectize').addItem(defaultStyle.defaultStyle || '');
+                    imageStylesField.data('selectize').addItem(defaultType || '');
                   }, function(err) {
                     reject(err);
                   });

@@ -9499,7 +9499,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * @return {@code true} when the required rights are activated for a given document, {@code false} otherwise
-     * @since 15.6RC1
+     * @since 15.7RC1
      */
     @Unstable
     public Boolean isRequiredRightsActivated()
@@ -9510,7 +9510,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * @param requiredRightsActivated set the required rights activation status of the current document. When
      *     {@code null}, the activation status is set to {@code false}
-     * @since 15.6RC1
+     * @since 15.7RC1
      */
     @Unstable
     public void setRequiredRightsActivated(Boolean requiredRightsActivated)

@@ -25,7 +25,7 @@ import org.xwiki.test.docker.junit5.UITest;
 
 /**
  * @version $Id$
- * @since 15.6RC1
+ * @since 15.7RC1
  */
 @UITest
 class AllIT

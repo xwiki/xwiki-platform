@@ -50,7 +50,7 @@ import static org.xwiki.security.authorization.internal.RequiredRightsSkipContex
  * the current request parameters.
  *
  * @version $Id$
- * @since 15.6RC1
+ * @since 15.7RC1
  */
 @Component
 @Singleton

@@ -36,7 +36,7 @@ import static org.xwiki.security.authorization.RuleState.UNDETERMINED;
  * Test of {@link XWikiSecurityAccess}.
  *
  * @version $Id$
- * @since 15.6RC1
+ * @since 15.7RC1
  */
 @ComponentTest
 class XWikiSecurityAccessTest

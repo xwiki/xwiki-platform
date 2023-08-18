@@ -64,7 +64,7 @@ public class XarDocumentModel
     /**
      * Introduce the concept of required rights.
      *
-     * @since 15.6RC1
+     * @since 15.7RC1
      */
     public static final String VERSION_16 = "1.6";
 
@@ -171,12 +171,12 @@ public class XarDocumentModel
     public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthor";
 
     /**
-     * @since 15.6RC1
+     * @since 15.7RC1
      */
     public static final String ELEMENT_REVISION_REQUIRED_RIGHTS = "requiredRights";
 
     /**
-     * @since 15.6RC1
+     * @since 15.7RC1
      */
     public static final String ELEMENT_REVISION_REQUIRED_RIGHTS_ACTIVATED = "requiredRightsActivated";
 

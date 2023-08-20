@@ -119,8 +119,8 @@ ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
 ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
 ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
 
-ckeditor.plugin.icon.iconsFetchFailed=Failed to retreive the icon list.
-ckeditor.plugin.icon.iconThemesFetchFailed=Failed to retreive the available icon themes.
+ckeditor.plugin.icon.iconsFetchFailed=Failed to retrieve the icon list.
+ckeditor.plugin.icon.iconThemesFetchFailed=Failed to retrieve the available icon themes.
 
 ckeditor.plugin.image.imageEditor.standardTab.title=Standard
 ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced

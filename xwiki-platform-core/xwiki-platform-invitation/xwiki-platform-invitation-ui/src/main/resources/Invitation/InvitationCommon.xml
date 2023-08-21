@@ -361,7 +361,7 @@
     ##
     &lt;dl&gt;
      &lt;dt&gt;&lt;label for="memo"&gt;$memoLabel&lt;/label&gt;&lt;/dt&gt;
-     &lt;dd&gt;&lt;input type="text" size="54" name="memo" /&gt;&lt;/dd&gt;
+     &lt;dd&gt;&lt;input id='memo' type="text" size="54" name="memo" /&gt;&lt;/dd&gt;
     &lt;/dl&gt;
     &lt;div class="bottombuttons"&gt;
      &lt;div class="buttons"&gt;

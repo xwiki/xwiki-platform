@@ -29,6 +29,16 @@
         "**/*.min.*",
         "**/plugin.js"
       ]
+    },
+    {
+      "name": "xwiki-icon/icon.bundle.min.js",
+      "includes": [
+        "xwiki-icon/*.js"
+      ],
+      "excludes": [
+        "**/*.min.*",
+        "**/plugin.js"
+      ]
     }
   ]
 }

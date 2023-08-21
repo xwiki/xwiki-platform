@@ -19,7 +19,6 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.repository.test.SolrTestUtils;
@@ -28,6 +27,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +48,13 @@ public abstract class AbstractCKEditorIT
 
     void edit(TestUtils setup, TestReference testReference)
     {
-        setup.deletePage(testReference);
+        edit(setup, testReference, true);
+    }
+    
+    void edit(TestUtils setup, TestReference testReference, boolean startFresh) {
+        if (startFresh) {
+            setup.deletePage(testReference, true);
+        }
         WYSIWYGEditPage.gotoPage(testReference);
         this.editor = new CKEditor("content").waitToLoad();
         this.textArea = this.editor.getRichTextArea();
@@ -77,19 +83,26 @@ public abstract class AbstractCKEditorIT
     protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
     {
         if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
-            // We pass the action because we don't want to wait for view mode to be loaded.
+            // Leaving the edit mode with unsaved changes triggers the confirmation alert which stops the navigation.
+            // Selenium doesn't wait for the new web page to be loaded after the alert is handled so we have to do this
+            // ourselves. Adding the page reload marker helps us detect when the new web page is loaded after the
+            // confirmation alert is handled.
+            setup.getDriver().addPageNotYetReloadedMarker();
+
+            // We pass the action because we don't want this call to wait for view mode to be loaded. We do our own wait
+            // (after handling the confirmation alert), as mentioned above.
             setup.gotoPage(testReference, "view");
+
             try {
-                // The page leave confirmation is not displayed right away so we have to wait for it. This is not
-                // optimal because the alert might no be shown at all, but most of the tests are leaving the editor with
-                // unsaved changes.
-                setup.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
                 // Confirm the page leave (discard unsaved changes) if we are asked for.
                 setup.getDriver().switchTo().alert().accept();
             } catch (Exception e) {
                 // The page leave confirmation hasn't been shown, probably because there were no unsaved changes.
-                // Continue with the rest of the tests.
             }
+
+            // Wait for the new web page to be loaded.
+            setup.getDriver().waitUntilPageIsReloaded();
+            new ViewPage();
         }
     }
 

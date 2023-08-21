@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -58,6 +59,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -121,6 +123,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
     @Inject
     protected SolrLinkSerializer linkSerializer;
+
+    @Inject
+    protected GeneralMailConfiguration generalMailConfiguration;
 
     private int shortTextLimit = -1;
 
@@ -387,7 +392,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param propertyClass the class that describes the given property
      * @param locale the locale of the indexed document
      */
-    private void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
+    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
         PropertyClass propertyClass, Locale locale)
     {
         Object propertyValue = property.getValue();
@@ -431,8 +436,10 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // Boolean properties are stored as integers (0 is false and 1 is true).
             Boolean booleanValue = ((Integer) propertyValue) != 0;
             setPropertyValue(solrDocument, property, new TypedValue(booleanValue), locale);
-        } else if (!(propertyClass instanceof PasswordClass)) {
-            // Avoid indexing passwords.
+        } else if (!(propertyClass instanceof PasswordClass)
+            && !((propertyClass instanceof EmailClass) && this.generalMailConfiguration.shouldObfuscate()))
+        {
+            // Avoid indexing passwords and, when obfuscation is enabled, emails.
             setPropertyValue(solrDocument, property, new TypedValue(propertyValue), locale);
         }
     }
@@ -447,7 +454,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document
      * @see "XWIKI-9417: Search does not return any results for Static List values"
      */
-    private void setStaticListPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
+    private void setStaticListPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
         StaticListClass propertyClass, Locale locale)
     {
         // The list of known values specified in the XClass.
@@ -482,7 +489,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param typedValue the value to add
      * @param locale the locale of the indexed document
      */
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
+    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         // Collect all the property values from all the objects of a document in a single (localized) field.

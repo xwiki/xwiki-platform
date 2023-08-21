@@ -292,7 +292,11 @@
     var selected = category.add(subtypes).find('.selected, input:checked').length &gt; 0;
     !selected &amp;&amp; category.addClass('closed');
     subtypes.toggle(selected);
-    category.find('.itemCount').on('click', function(event) {
+    var togglerButton = $('<button>', {
+      class: 'btn btn-xs media-type-toggler'
+    });
+    category.find('.itemCount').after(togglerButton);
+    togglerButton.on('click', function(event) {
       category.toggleClass('closed');
       subtypes.toggle();
     });
@@ -442,18 +446,18 @@
   background-color: $theme.highlightColor;
 }
 
-.mediaTypeCategory .itemCount {
+.mediaTypeCategory .media-type-toggler {
   background: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'light-grey-disclosure-arrow-down.png')") no-repeat scroll 100% 50% transparent;
   cursor: pointer;
   padding-right: 9px;
 }
-.mediaTypeCategory .itemCount:hover {
+.mediaTypeCategory .media-type-toggler:hover {
   background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'dark-grey-disclosure-arrow-down.png')")
 }
-.mediaTypeCategory.closed .itemCount {
+.mediaTypeCategory.closed .media-type-toggler {
   background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'light-grey-disclosure-arrow-left.png')")
 }
-.mediaTypeCategory.closed .itemCount:hover {
+.mediaTypeCategory.closed .media-type-toggler:hover {
   background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'dark-grey-disclosure-arrow-left.png')")
 }</code>
     </property>

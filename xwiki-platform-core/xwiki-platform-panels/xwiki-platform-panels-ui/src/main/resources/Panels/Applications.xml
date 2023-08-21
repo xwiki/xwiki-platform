@@ -590,6 +590,12 @@ require(['scriptaculous/effects'], function() {
   margin-left: 15px;
 }
 
+.panel-width-Small .applicationPanelMoreContainer > ul > li > a {
+  gap: .5em;
+  text-align: left;
+  margin-left: 0;
+}
+
 .panel-width-Small .applicationPanelMoreButton {
   flex-direction: column;
   padding: 0;
@@ -660,24 +666,24 @@ require(['scriptaculous/effects'], function() {
 }
 
 .panel-width-Medium .applicationsPanel &gt; li &gt; a,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a,
 .panel-width-Large .applicationsPanel &gt; li &gt; a,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a {
   padding: 0;
 }
 
 .panel-width-Medium .applicationsPanel &gt; li &gt; a:hover,
 .panel-width-Medium .applicationsPanel &gt; li &gt; a:focus,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:hover,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:focus,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button:hover,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button:focus,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:hover,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:focus,
 .panel-width-Large .applicationsPanel &gt; li &gt; a:hover,
 .panel-width-Large .applicationsPanel &gt; li &gt; a:focus,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:hover,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:focus,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button:hover,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button:focus,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:focus {
   background-color: transparent;

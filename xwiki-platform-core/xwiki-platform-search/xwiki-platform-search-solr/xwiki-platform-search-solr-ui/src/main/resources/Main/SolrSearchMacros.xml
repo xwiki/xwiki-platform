@@ -219,7 +219,13 @@
   #else
     #set ($facetPrettyName = $facetField.name)
   #end
-  &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt;
+  &lt;div class="search-facet-header"&gt;
+    $escapetool.xml($facetPrettyName)
+    &lt;button class="btn btn-xs facet-toggler"&gt;
+      &lt;span class="collapsed"&gt;$services.icon.renderHTML('caret-left')&lt;/span&gt;
+      &lt;span class="expanded"&gt;$services.icon.renderHTML('caret-down')&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
 #end
 
 #macro (displaySearchFacetBody $facetField)

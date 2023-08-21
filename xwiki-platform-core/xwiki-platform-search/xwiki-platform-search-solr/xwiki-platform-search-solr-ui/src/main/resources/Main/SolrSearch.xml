@@ -229,7 +229,7 @@
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.search-facet-header').on('click', function(event) {
+    facetsContainer.find('.facet-toggler').on('click', function(event) {
       $(event.target).parent('.search-facet').toggleClass('expanded');
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
@@ -798,6 +798,18 @@ a.search-result-highlightAll:after {
 
 .search-facet.expanded .search-facet-header {
   background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
+}
+
+.search-facet .search-facet-header .facet-toggler .collapsed {
+  display: none;
+}
+
+.search-facet.expanded .search-facet-header .facet-toggler .collapsed {
+  display: block;
+}
+
+.search-facet.expanded .search-facet-header .facet-toggler .expanded {
+  display: none;
 }
 
 .search-facet.expanded .search-facet-body {

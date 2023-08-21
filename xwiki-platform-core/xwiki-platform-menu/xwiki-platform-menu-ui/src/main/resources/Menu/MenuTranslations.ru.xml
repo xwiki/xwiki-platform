@@ -89,6 +89,7 @@ rendering.macro.menu.content.description=Определите структуру
 # Menu UI
 menu.ui.openSubMenu=Откройте подменю.
 menu.ui.closeSubMenu=Закройте подменю.
+menu.ui.horizontal.toggler.description=Переключает горизонтальное меню.
 
 # Menu WebHome
 menu.description=Это простое приложение, которое помогает вам создавать навигационные меню, которые будут отображаться либо горизонтально в виде верхней панели после заголовка страницы, либо вертикально на боковой панели.

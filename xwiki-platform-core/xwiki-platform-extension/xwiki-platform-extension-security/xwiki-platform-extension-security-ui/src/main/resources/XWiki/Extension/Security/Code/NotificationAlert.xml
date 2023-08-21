@@ -295,24 +295,24 @@
     </property>
     <property>
       <content>{{velocity}}
-      #if ($hasAdmin)
-        #set ($count = $services.extension.index.security.getVulnerableExtensionsCount())
-        #if ($count &gt; 0)
-          #set ($discard = $xwiki.ssx.use('XWiki.Extension.Security.Code.NotificationAlert'))
-        {{error}}
-          #set ($securityVulnerabilitiesTitle = $services.localization.render('extension.security.admin.title'))
-          #set ($securityListUrl = $xwiki.getURL(
-            'XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&amp;section=XWiki.Extension.Security.Code.Admin'))
-          #set ($htmlLink =
-            "&lt;a href='$escapetool.xml($securityListUrl)'&gt;$escapetool.xml($securityVulnerabilitiesTitle)&lt;/a&gt;")
-          #set ($parameters = [$count, $htmlLink])
+#if ($hasAdmin &amp;&amp; $services.extension.index.security.isSecurityScanEnabled())
+  #set ($count = $services.extension.index.security.getVulnerableExtensionsCount())
+  #if ($count &gt; 0)
+    #set ($discard = $xwiki.ssx.use('XWiki.Extension.Security.Code.NotificationAlert'))
+      {{error}}
+        #set ($securityVulnerabilitiesTitle = $services.localization.render('extension.security.admin.title'))
+        #set ($securityListUrl = $xwiki.getURL(
+          'XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&amp;section=XWiki.Extension.Security.Code.Admin'))
+        #set ($htmlLink =
+          "&lt;a href='$escapetool.xml($securityListUrl)'&gt;$escapetool.xml($securityVulnerabilitiesTitle)&lt;/a&gt;")
+        #set ($parameters = [$count, $htmlLink])
         {{html wiki='false'}}
           $services.localization.render('extension.security.notification.message', $parameters)
-        {{/html}}
-        {{/error}}
-        #end
-      #end
-      {{/velocity}}</content>
+      {{/html}}
+    {{/error}}
+  #end
+#end
+{{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.notifications</extensionPointId>

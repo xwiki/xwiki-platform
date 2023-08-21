@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import org.openqa.selenium.By;
@@ -280,7 +281,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementIsVisible(WebElement parentElement, final By locator)
     {
-        waitUntilElementsAreVisible(parentElement, new By[] {locator}, true);
+        waitUntilElementsAreVisible(parentElement, new By[] { locator }, true);
     }
 
     /**
@@ -452,16 +453,20 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementIsEnabled(WebElement element)
     {
-        waitUntilCondition(driver -> {
-            try {
-                return element.isEnabled();
-            } catch (NotFoundException e) {
-                return false;
-            } catch (StaleElementReferenceException e) {
-                // The element was removed from DOM in the meantime
-                return false;
-            }
-        });
+        waitUntilCondition(element, WebElement::isEnabled);
+    }
+
+    /**
+     * Waits until the given element is disabled.
+     *
+     * @param element the element to wait on
+     * @since 15.6RC1
+     * @since 15.5.1
+     * @since 14.10.15
+     */
+    public void waitUntilElementIsDisabled(WebElement element)
+    {
+        waitUntilCondition(element, Predicate.not(WebElement::isEnabled));
     }
 
     /**
@@ -928,5 +933,19 @@ public class XWikiWebDriver extends RemoteWebDriver
         } else {
             return chainFrom.moveToElement(target, newOffsetX, newOffsetY);
         }
+    }
+
+    private void waitUntilCondition(WebElement element, Predicate<WebElement> condition)
+    {
+        waitUntilCondition(driver -> {
+            try {
+                return condition.test(element);
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
+            }
+        });
     }
 }

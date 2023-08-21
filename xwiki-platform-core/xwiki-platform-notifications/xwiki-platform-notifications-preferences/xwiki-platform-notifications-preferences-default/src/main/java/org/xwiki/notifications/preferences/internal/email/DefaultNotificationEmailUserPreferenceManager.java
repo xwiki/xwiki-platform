@@ -20,21 +20,27 @@
 package org.xwiki.notifications.preferences.internal.email;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
-import org.xwiki.text.StringUtils;
+import org.xwiki.notifications.preferences.internal.NotificationEmailGroupingStrategyPreferenceDocumentInitializer;
+import org.xwiki.notifications.preferences.internal.NotificationEmailPreferenceDocumentInitializer;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -57,17 +63,9 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
 
     private static final String CODE = "Code";
 
-    private static final LocalDocumentReference EMAIL_PREFERENCES_CLASS = new LocalDocumentReference(
-        Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationEmailPreferenceClass"
-    );
-
     private static final LocalDocumentReference GLOBAL_PREFERENCES = new LocalDocumentReference(
         Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
     );
-
-    private static final String DIFF_TYPE = "diffType";
-
-    private static final String INTERVAL = "interval";
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -81,6 +79,9 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private NotificationConfiguration notificationConfiguration;
 
     @Inject
     private Logger logger;
@@ -100,8 +101,8 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     @Override
     public NotificationEmailDiffType getDiffType(UserReference userReference)
     {
-        return getStaticListPropertyPreference(DIFF_TYPE, NotificationEmailDiffType.class,
-            NotificationEmailDiffType.STANDARD, userReference);
+        return getStaticListPropertyPreference(NotificationEmailPreferenceDocumentInitializer.FIELD_DIFF_TYPE,
+                NotificationEmailDiffType.class, NotificationEmailDiffType.STANDARD, userReference);
     }
 
     @Override
@@ -113,8 +114,57 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     @Override
     public NotificationEmailInterval getInterval(UserReference userReference)
     {
-        return getStaticListPropertyPreference(INTERVAL, NotificationEmailInterval.class,
-            NotificationEmailInterval.DAILY, userReference);
+        return getStaticListPropertyPreference(NotificationEmailPreferenceDocumentInitializer.FIELD_INTERVAL,
+                NotificationEmailInterval.class, NotificationEmailInterval.DAILY, userReference);
+    }
+
+    @Override
+    public String getEmailGroupingStrategy(UserReference userReference, NotificationEmailInterval interval)
+    {
+        DocumentReference userDocumentReference = documentUserSerializer.serialize(userReference);
+        String result = getEmailGroupingStrategyFromDocument(userDocumentReference, interval);
+        if (StringUtils.isEmpty(result)) {
+            DocumentReference xwikiPref =
+                    new DocumentReference(GLOBAL_PREFERENCES, userDocumentReference.getWikiReference());
+            result = getEmailGroupingStrategyFromDocument(xwikiPref, interval);
+        }
+
+        WikiReference mainWikiReference = new WikiReference(this.wikiDescriptorManager.getMainWikiId());
+        if (StringUtils.isEmpty(result) && !userDocumentReference.getWikiReference().equals(mainWikiReference)) {
+            DocumentReference xwikiPref =
+                    new DocumentReference(GLOBAL_PREFERENCES, mainWikiReference);
+            result = getEmailGroupingStrategyFromDocument(xwikiPref, interval);
+        }
+
+        if (StringUtils.isEmpty(result)) {
+            result = this.notificationConfiguration.getEmailGroupingStrategyHint();
+        }
+        return result;
+    }
+
+    private String getEmailGroupingStrategyFromDocument(DocumentReference documentReference,
+                                                        NotificationEmailInterval interval)
+    {
+        DocumentReference xClassReference =
+                new DocumentReference(NotificationEmailGroupingStrategyPreferenceDocumentInitializer.REFERENCE,
+                        documentReference.getWikiReference());
+        try {
+            XWikiDocument userDocument =
+                    (XWikiDocument) documentAccessBridge.getDocumentInstance(documentReference);
+            List<BaseObject> objects = userDocument.getXObjects(xClassReference);
+            for (BaseObject object : objects) {
+                if (object != null && StringUtils.equalsIgnoreCase(interval.name(), object.getStringValue(
+                        NotificationEmailGroupingStrategyPreferenceDocumentInitializer.FIELD_EMAIL_INTERVAL))) {
+                    return object.getStringValue(
+                            NotificationEmailGroupingStrategyPreferenceDocumentInitializer.FIELD_STRATEGY);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Error while accessing document [{}] for reading email grouping strategy for interval [{}].",
+                    documentReference, interval, e);
+        }
+        return null;
     }
 
     private <T extends Enum<T>> T getStaticListPropertyPreference(String propertyName,
@@ -126,7 +176,8 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
             DocumentReference userDocumentReference = documentUserSerializer.serialize(user);
 
             // Get the config of the user
-            DocumentReference emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS,
+            DocumentReference emailClassReference = new DocumentReference(
+                    NotificationEmailPreferenceDocumentInitializer.REFERENCE,
                 userDocumentReference.getWikiReference());
             Object value = documentAccessBridge.getProperty(userDocumentReference, emailClassReference, propertyName);
             if (StringUtils.isNotBlank((String) value)) {
@@ -150,9 +201,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
      * wiki.
      *
      * @param userDocumentReference a user document reference
-     * @param propertyEnum a property enum
      * @param propertyName a property name
-     * @param <T>
      * @return
      */
     private <T extends Enum<T>> T getWikiPreference(DocumentReference userDocumentReference, Class<T> propertyEnum,
@@ -160,7 +209,8 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
     {
         T returnValue = null;
         // Get the config of the wiki
-        DocumentReference emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS,
+        DocumentReference emailClassReference = new DocumentReference(
+                NotificationEmailPreferenceDocumentInitializer.REFERENCE,
             userDocumentReference.getWikiReference());
         DocumentReference xwikiPref =
             new DocumentReference(GLOBAL_PREFERENCES, userDocumentReference.getWikiReference());
@@ -172,7 +222,8 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
             WikiReference mainWiki = new WikiReference(wikiDescriptorManager.getMainWikiId());
             if (!userDocumentReference.getWikiReference().equals(mainWiki)) {
                 xwikiPref = new DocumentReference(GLOBAL_PREFERENCES, mainWiki);
-                emailClassReference = new DocumentReference(EMAIL_PREFERENCES_CLASS, mainWiki);
+                emailClassReference = new DocumentReference(NotificationEmailPreferenceDocumentInitializer.REFERENCE,
+                        mainWiki);
                 value = documentAccessBridge.getProperty(xwikiPref, emailClassReference, propertyName);
                 if (StringUtils.isNotBlank((String) value)) {
                     returnValue = Enum.valueOf(propertyEnum, ((String) value).toUpperCase());

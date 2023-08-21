@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.6-SNAPSHOT</version>
+    <version>15.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -126,103 +126,18 @@
                  Single justification example:
             -->
             <revapi.differences>
-              <justification>This is an actual bug from aspectj reported in https://bugs.eclipse.org/bugs/show_bug.cgi?id=582107. The impact is ok as it concerns only Deprecated annotation.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeRemoved</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.doc.LazyXWikiDocument</old>
-                  <new>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.doc.LazyXWikiDocument</new>
-                  <annotation>@java.lang.Deprecated</annotation>
-                  <attribute>since</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeRemoved</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.doc.LazyXWikiDocument</old>
-                  <new>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.doc.LazyXWikiDocument</new>
-                  <annotation>@java.lang.Deprecated</annotation>
-                  <attribute>since</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeRemoved</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.doc.LazyXWikiDocument</old>
-                  <new>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.doc.LazyXWikiDocument</new>
-                  <annotation>@java.lang.Deprecated</annotation>
-                  <attribute>since</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeRemoved</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                  <new>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
-                  <annotation>@java.lang.Deprecated</annotation>
-                  <attribute>since</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeRemoved</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                  <new>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
-                  <annotation>@java.lang.Deprecated</annotation>
-                  <attribute>since</attribute>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeRemoved</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                  <new>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
-                  <annotation>@java.lang.Deprecated</annotation>
-                  <attribute>since</attribute>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>APIs moved to legacy but as we're analyzing transitive dependencies some other modules are reporting them.</justification>
-              <criticality>allowed</criticality>
+              <justification>Replaced getXWikiHost() with getXWikiURI() in unstable configuration API.</justification>
+              <criticality>documented</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.removed</code>
-                  <old>method void com.xpn.xwiki.XWiki::renameByCopyAndDelete(com.xpn.xwiki.doc.XWikiDocument, org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <old>method java.lang.String org.xwiki.export.pdf.PDFExportConfiguration::getXWikiHost()</old>
                 </item>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(org.xwiki.model.reference.DocumentReference, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>We voted to remove this old and unmaintained plugin for which there are alternatives.</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.plugin.svg.SVGPlugin</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.plugin.svg.SVGPluginApi</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class com.xpn.xwiki.web.SVGAction</old>
+                  <code>java.method.addedToInterface</code>
+                  <new>method java.net.URI org.xwiki.export.pdf.PDFExportConfiguration::getXWikiURI() throws java.net.URISyntaxException</new>
                 </item>
               </differences>
             </revapi.differences>

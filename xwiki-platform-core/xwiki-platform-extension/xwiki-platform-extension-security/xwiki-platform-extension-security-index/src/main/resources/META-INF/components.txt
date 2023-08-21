@@ -5,3 +5,5 @@ org.xwiki.extension.security.internal.analyzer.VulnerabilityIndexer
 org.xwiki.extension.security.internal.analyzer.osv.OsvResponseAnalyzer
 org.xwiki.extension.security.internal.listener.ExtensionSecurityInitializerListener
 org.xwiki.extension.security.internal.listener.ExtensionSecurityConfigDelayXObjectPropertyListener
+org.xwiki.extension.security.internal.DefaultReviewsFetcher
+org.xwiki.extension.security.internal.ReviewMapFilter

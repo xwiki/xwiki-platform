@@ -51,8 +51,8 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_dockerNetwork")
     private WebElement dockerNetworkInput;
 
-    @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_xwikiHost")
-    private WebElement xwikiHostInput;
+    @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_xwikiURI")
+    private WebElement xwikiURIInput;
 
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_chromeRemoteDebuggingPort")
     private WebElement chromeRemoteDebuggingPortInput;
@@ -171,22 +171,22 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     }
 
     /**
-     * @return the value of the XWiki host configuration
+     * @return the value of the XWiki URI configuration
      */
-    public String getXWikiHost()
+    public String getXWikiURI()
     {
-        return this.xwikiHostInput.getAttribute("value");
+        return this.xwikiURIInput.getAttribute("value");
     }
 
     /**
-     * Sets the value of the XWiki host configuration
-     * 
-     * @param value the new XWiki host value
+     * Sets the value of the XWiki URI configuration
+     *
+     * @param value the new XWiki URI value
      */
-    public void setXWikiHost(String value)
+    public void setXWikiURI(String value)
     {
-        this.xwikiHostInput.clear();
-        this.xwikiHostInput.sendKeys(value);
+        this.xwikiURIInput.clear();
+        this.xwikiURIInput.sendKeys(value);
     }
 
     /**

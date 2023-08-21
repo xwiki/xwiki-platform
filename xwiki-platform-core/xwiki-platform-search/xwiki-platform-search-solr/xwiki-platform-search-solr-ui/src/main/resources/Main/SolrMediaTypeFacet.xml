@@ -432,6 +432,12 @@
 .search-facet-body ul.mediaTypes &gt; li:hover {
   background-color: transparent;
 }
+
+.search-facet-body .mediaTypeCategory {
+  display: flex;
+  flex-basis: 100%;
+}
+
 .search-facet-body .mediaTypeCategory:hover {
   background-color: $theme.highlightColor;
 }

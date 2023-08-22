@@ -153,6 +153,9 @@
     "storeProperties": {
       "TEXT": {
         "FilterName": "Rich Text Format"
+      },
+      "WEB": {
+        "FilterName": "Rich Text Format"
       }
     }
   },

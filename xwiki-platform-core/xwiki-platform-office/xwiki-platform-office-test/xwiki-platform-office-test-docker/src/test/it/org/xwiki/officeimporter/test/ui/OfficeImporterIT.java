@@ -66,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
     }
 )
-public class OfficeImporterIT
+class OfficeImporterIT
 {
     private TestUtils setup;
 
@@ -90,7 +90,7 @@ public class OfficeImporterIT
     }
 
     @Test
-    public void verifyImport(TestInfo info)
+    void verifyImport(TestInfo info)
     {
         verifyImports(info);
         verifySplitByHeadings(info);

@@ -94,6 +94,13 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     }
 
     @Override
+    public int getChromeRemoteDebuggingTimeout()
+    {
+        return getProperty("chromeRemoteDebuggingTimeout",
+            PDFExportConfiguration.super.getChromeRemoteDebuggingTimeout());
+    }
+
+    @Override
     public URI getXWikiURI() throws URISyntaxException
     {
         // The old way to configure the XWiki URI was through the "xwikiHost" property. We keep supporting it for

@@ -29,7 +29,11 @@ import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
  *
  * @version $Id$
  */
-@UITest(servletEngine = ServletEngine.TOMCAT)
+@UITest(
+    // The servlet needs to be explicitly specified in AllIT too because otherwise ServletEngine#JETTY_STANDALONE is 
+    // used, leading to a configurations merge conflict.
+    servletEngine = ServletEngine.TOMCAT
+)
 public class AllIT
 {
     @Nested

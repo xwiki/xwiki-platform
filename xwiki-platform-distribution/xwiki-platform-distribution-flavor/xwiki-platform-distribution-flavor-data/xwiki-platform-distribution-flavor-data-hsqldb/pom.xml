@@ -33,6 +33,7 @@
   <description>XWiki Platform - Distribution - Flavor - Data - HSQLDB</description>
   <properties>
     <!-- Forces the settings to hsqldb to prevent them to be overridden by other database profiles (e.g., mysql)  -->
+    <!-- TODO: This is a temporary fix to allow the release of 15.7-rc-1, see XWIKI-21240. -->
     <xwiki.db>hsqldb</xwiki.db>
     <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
     <xwiki.db.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.jdbc.artifactId>

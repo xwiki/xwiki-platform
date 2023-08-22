@@ -31,20 +31,6 @@
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</description>
-  <properties>
-    <!-- Forces the settings to hsqldb to prevent them to be overridden by other database profiles (e.g., mysql)  -->
-    <!-- TODO: This is a temporary fix to allow the release of 15.7-rc-1, see XWIKI-21240. -->
-    <xwiki.db>hsqldb</xwiki.db>
-    <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
-    <xwiki.db.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.jdbc.artifactId>
-    <xwiki.db.jdbc.version>${hsqldb.version}</xwiki.db.jdbc.version>
-    <xwiki.db.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
-    <xwiki.db.connection.username>sa</xwiki.db.connection.username>
-    <xwiki.db.connection.password/>
-    <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
-    <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
-    <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -343,6 +329,18 @@
     <pathToDocuments>${project.build.directory}/documents</pathToDocuments>
     <xwikiExecutionArtifactId>xwiki-platform-distribution-flavor-jetty-hsqldb</xwikiExecutionArtifactId>
     <xwikiExecutionDirectory>${project.build.directory}/${xwikiExecutionArtifactId}-${project.version}</xwikiExecutionDirectory>
+    <!-- Forces the settings to hsqldb to prevent them to be overridden by other database profiles (e.g., mysql)  -->
+    <!-- TODO: This is a temporary fix to allow the release of 15.7-rc-1, see XWIKI-21240. -->
+    <xwiki.db>hsqldb</xwiki.db>
+    <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
+    <xwiki.db.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.jdbc.artifactId>
+    <xwiki.db.jdbc.version>${hsqldb.version}</xwiki.db.jdbc.version>
+    <xwiki.db.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
+    <xwiki.db.connection.username>sa</xwiki.db.connection.username>
+    <xwiki.db.connection.password/>
+    <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
+    <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
+    <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
   </properties>
   <profiles>
     <profile>

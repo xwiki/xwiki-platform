@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -48,12 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         // used one), because they need LibreOffice to be installed, and we cannot guarantee that it is installed on the
         // host machine.
         ServletEngine.JETTY_STANDALONE
-    },
-    properties = {
-        // Add the FileUploadPlugin which is needed by the test to upload some office files to import
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
-    }
-)
+    })
 class OfficeExporterIT
 {
     @BeforeEach
@@ -71,23 +67,29 @@ class OfficeExporterIT
     }
 
     @Test
-    void exportODT(TestUtils setup, TestReference testReference) throws Exception
+    void exportODT(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference) throws Exception
     {
-        export(setup, testReference, "odt", "application/vnd.oasis.opendocument.text");
+        export(setup, testConfiguration, testReference, "odt", "application/vnd.oasis.opendocument.text");
     }
 
     @Test
-    void exportRTF(TestUtils setup, TestReference testReference) throws Exception
+    void exportRTF(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference) throws Exception
     {
-        export(setup, testReference, "rtf", "rtf");
+        export(setup, testConfiguration, testReference, "rtf", "application/rtf");
     }
 
-    private static void export(TestUtils setup, TestReference testReference, String format, String expectedTikaDetect)
+    private static void export(TestUtils setup, TestConfiguration testConfiguration, TestReference testReference,
+        String format, String expectedTikaDetect)
         throws IOException, URISyntaxException
     {
         setup.createPage(testReference, "content", "title");
         String exportURL = setup.getURL(testReference, "export", "format=" + format);
-        URI externalURI = new URIBuilder(exportURL).setHost("localhost").build();
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
+        // Replace the host and port to match the one allowing to access the servlet externally.
+        URI externalURI = new URIBuilder(exportURL)
+            .setHost(servletEngine.getIP())
+            .setPort(servletEngine.getPort())
+            .build();
         try (InputStream inputStream = externalURI.toURL().openStream()) {
             assertEquals(expectedTikaDetect, TikaUtils.detect(inputStream));
         }

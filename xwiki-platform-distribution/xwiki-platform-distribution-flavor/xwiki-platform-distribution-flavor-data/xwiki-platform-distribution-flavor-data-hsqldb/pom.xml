@@ -31,6 +31,19 @@
   <name>XWiki Platform - Distribution - Flavor - Data - HSQLDB</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Data - HSQLDB</description>
+  <properties>
+    <!-- Forces the settings to hsqldb to prevent them to be overridden by other database profiles (e.g., mysql)  -->
+    <xwiki.db>hsqldb</xwiki.db>
+    <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
+    <xwiki.db.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.jdbc.artifactId>
+    <xwiki.db.jdbc.version>${hsqldb.version}</xwiki.db.jdbc.version>
+    <xwiki.db.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
+    <xwiki.db.connection.username>sa</xwiki.db.connection.username>
+    <xwiki.db.connection.password/>
+    <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
+    <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
+    <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.hsqldb</groupId>

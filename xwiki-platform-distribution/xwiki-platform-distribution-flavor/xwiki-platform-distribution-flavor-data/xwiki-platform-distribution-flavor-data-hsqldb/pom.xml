@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>15.7-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data-hsqldb</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data - HSQLDB</name>
@@ -40,7 +40,7 @@
     <xwiki.db.jdbc.version>${hsqldb.version}</xwiki.db.jdbc.version>
     <xwiki.db.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
     <xwiki.db.connection.username>sa</xwiki.db.connection.username>
-    <xwiki.db.connection.password/>
+    <xwiki.db.connection.password />
     <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>

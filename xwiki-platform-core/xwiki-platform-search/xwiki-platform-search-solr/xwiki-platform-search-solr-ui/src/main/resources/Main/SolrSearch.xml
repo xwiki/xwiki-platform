@@ -43,42 +43,6 @@
 {{velocity}}
 #handleSolrSearchRequest
 {{/velocity}}</content>
-  <attachment>
-    <filename>dark-grey-disclosure-arrow-down.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJUlEQVQIW2OIjIz8jwszAAkGbBJAwACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==</content>
-    <filesize>94</filesize>
-  </attachment>
-  <attachment>
-    <filename>dark-grey-disclosure-arrow-left.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJ0lEQVQI1y3GMQEAIAwDsGy4RCCiMDOOciU1Nsy6MHSgA33qh7RJH1DfCDMFeFsmAAAAAElFTkSuQmCC</content>
-    <filesize>96</filesize>
-  </attachment>
-  <attachment>
-    <filename>light-grey-disclosure-arrow-down.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzYJEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC</content>
-    <filesize>93</filesize>
-  </attachment>
-  <attachment>
-    <filename>light-grey-disclosure-arrow-left.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJUlEQVQI1zXKsQ0AIADDMLf//8ZJMFRMzpAc4HbQQQeVH5abwwPlkgTcUkPn+AAAAABJRU5ErkJggg==</content>
-    <filesize>94</filesize>
-  </attachment>
   <object>
     <name>Main.SolrSearch</name>
     <number>0</number>
@@ -230,7 +194,7 @@
 
     // Expand/Collapse toggle for each facet.
     facetsContainer.find('.facet-toggler').on('click', function(event) {
-      $(event.target).parent('.search-facet').toggleClass('expanded');
+      $(event.target).parents('.search-facet').toggleClass('expanded');
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
 
@@ -749,7 +713,6 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-header {
-  background: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-left.png')") no-repeat scroll 100% 50% transparent;
   color: $theme.titleColor;
   cursor: pointer;
   line-height: 1.4em;
@@ -796,20 +759,31 @@ a.search-result-highlightAll:after {
   padding: .1em .2em;
 }
 
-.search-facet.expanded .search-facet-header {
-  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
+.search-facet .search-facet-header .facet-toggler, button.facet-value-toggler {
+  background: transparent;
+  float: right;
 }
 
-.search-facet .search-facet-header .facet-toggler .collapsed {
-  display: none;
+button.facet-value-toggler:not(:active) {
+  color: $theme.btn-primary-color;
 }
 
-.search-facet.expanded .search-facet-header .facet-toggler .collapsed {
-  display: block;
+.search-facet .search-facet-header .facet-toggler:active, button.facet-value-toggler:active {
+  box-shadow: unset;
 }
 
-.search-facet.expanded .search-facet-header .facet-toggler .expanded {
-  display: none;
+.search-facet .search-facet-header .facet-toggler span, button.facet-value-toggler span {
+  transform: rotate(90deg);
+}
+
+.search-facet.expanded .search-facet-header .facet-toggler span, .expanded > button.facet-value-toggler span {
+  transform: rotate(0deg);
+}
+
+@media not (prefers-reduced-motion) {
+  .search-facet .search-facet-header .facet-toggler span, button.facet-value-toggler span {
+    transition: transform 0.2s ease;
+  }
 }
 
 .search-facet.expanded .search-facet-body {

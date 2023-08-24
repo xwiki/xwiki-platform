@@ -145,11 +145,11 @@ class PropertiesMergerTest
         original.setProperty("xwikiPropertiesAdditionalProperties", "a=b");
 
         Properties override = new Properties();
-        override.setProperty("xwikiPropertiesAdditionalProperties", "a=c");
+        override.setProperty("xwikiPropertiesAdditionalProperties", "c=d");
 
         Properties merge = merger.merge(original, override, false);
 
         assertEquals(1, merge.size());
-        assertEquals("a=b,a=c", merge.getProperty("xwikiPropertiesAdditionalProperties"));
+        assertEquals("a=b\nc=d", merge.getProperty("xwikiPropertiesAdditionalProperties"));
     }
 }

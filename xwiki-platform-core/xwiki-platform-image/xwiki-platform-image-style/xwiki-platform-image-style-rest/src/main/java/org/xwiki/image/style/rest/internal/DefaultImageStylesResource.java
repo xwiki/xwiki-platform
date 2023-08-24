@@ -77,12 +77,16 @@ public class DefaultImageStylesResource implements ImageStylesResource, XWikiRes
         throws ImageStyleException
     {
         String defaultStyle = this.imageStyleConfiguration.getDefaultStyle(wikiName, documentReference);
+        boolean forceDefaultStyle = this.imageStyleConfiguration.getForceDefaultStyle(wikiName, documentReference);
         Map<String, String> response;
         if (StringUtils.isEmpty(defaultStyle)) {
             this.contextProvider.get().getResponse().setStatus(NO_CONTENT.getStatusCode());
             response = Map.of();
         } else {
-            response = Map.of("defaultStyle", defaultStyle);
+            response = Map.of(
+                "defaultStyle", defaultStyle,
+                "forceDefaultStyle", Boolean.toString(forceDefaultStyle)
+            );
         }
         return response;
     }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="Image.Style.Code.ConfigurationClass" locale="">
+<xwikidoc version="1.5" reference="Image.Style.Code.ConfigurationClass" locale="">
   <web>Image.Style.Code</web>
   <name>ConfigurationClass</name>
   <language/>
@@ -74,6 +74,21 @@
       <valueField/>
       <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
     </defaultStyle>
+    <forceDefaultStyle>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>forceDefaultStyle</name>
+      <number>2</number>
+      <prettyName>forceDefaultStyle</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </forceDefaultStyle>
   </class>
   <object>
     <name>Image.Style.Code.ConfigurationClass</name>

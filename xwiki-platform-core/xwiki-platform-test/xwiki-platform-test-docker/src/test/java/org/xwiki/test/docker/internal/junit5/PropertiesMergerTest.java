@@ -135,4 +135,21 @@ class PropertiesMergerTest
         assertEquals("Cannot merge property [xwikiCfgVirtualUsepath] = [1] since it was already specified with value "
             + "[0]", exception.getMessage());
     }
+
+    @Test
+    void mergeWhenXWikiPropertiesAdditionalProperties() throws Exception
+    {
+        PropertiesMerger merger = new PropertiesMerger();
+
+        Properties original = new Properties();
+        original.setProperty("xwikiPropertiesAdditionalProperties", "a=b");
+
+        Properties override = new Properties();
+        override.setProperty("xwikiPropertiesAdditionalProperties", "a=c");
+
+        Properties merge = merger.merge(original, override, false);
+
+        assertEquals(1, merge.size());
+        assertEquals("a=b,a=c", merge.getProperty("xwikiPropertiesAdditionalProperties"));
+    }
 }

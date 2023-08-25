@@ -234,6 +234,7 @@ ckeditor.plugin.slash.action.table_cell_delete.hint=Remove the current table cel
 ckeditor.plugin.slash.action.table_delete.hint=Remove the current table from the content.
 
 ckeditor.plugin.slash.placeholder=Type / for quick actions...
+ckeditor.plugin.slash.dropdown.hint=Select the item to autocomplete.
 
 ckeditor.plugin.focusedplaceholder.placeholder.body=Body
 ckeditor.plugin.focusedplaceholder.placeholder.address=Address

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.migration;
+package org.xwiki.index.internal.migration;
 
 import java.util.List;
 
@@ -70,7 +70,8 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(140900000);
+        // Version updated because XWIKI-21091 was preventing the migration to work correctly on sub-wikis.
+        return new XWikiDBVersion(150502000);
     }
 
     @Override

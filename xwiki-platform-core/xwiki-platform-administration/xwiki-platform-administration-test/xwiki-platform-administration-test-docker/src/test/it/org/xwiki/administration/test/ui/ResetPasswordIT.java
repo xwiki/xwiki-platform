@@ -64,9 +64,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     properties = {
         // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
-        // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
+        // Pages created in the tests need to have PR since we ask for PR to send mails, so we need to exclude them from
         // the PR checker.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.ResetPassword|.*:XWiki\\.ResetPasswordComplete"
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\."
+            + "(ResetPassword|ResetPasswordComplete)"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus

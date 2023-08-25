@@ -56,6 +56,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -129,21 +130,7 @@ class ImagePluginIT extends AbstractCKEditorIT
     {
         // Create the image style as an admin.
         setup.loginAsSuperAdmin();
-        DocumentReference borderedStyleDocumentReference =
-            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code",
-                "ImageStyles"), "bordered");
-        setup.rest().delete(borderedStyleDocumentReference);
-        setup.rest().savePage(borderedStyleDocumentReference);
-        Object styleObject =
-            setup.rest().object(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass");
-        Property borderedProperty = new Property();
-        borderedProperty.setName("prettyName");
-        borderedProperty.setValue("Bordered");
-        Property typeProperty = new Property();
-        typeProperty.setName("type");
-        typeProperty.setValue("bordered");
-        styleObject.withProperties(borderedProperty, typeProperty);
-        setup.rest().add(styleObject);
+        createBorderedStyle(setup);
 
         // Then test the image styles on the image dialog as a standard user.
         createAndLoginStandardUser(setup);
@@ -676,6 +663,48 @@ class ImagePluginIT extends AbstractCKEditorIT
         assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
     }
 
+    @Test
+    void forceDefaultStyle(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // Change the configuration to have a default style and force it.
+        DocumentReference configurationReference =
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code"), "Configuration");
+        setup.updateObject(configurationReference, "Image.Style.Code.ConfigurationClass", 0,
+            "defaultStyle", "bordered",
+            "forceDefaultStyle", "1");
+
+        // Create the image style as an admin.
+        createBorderedStyle(setup);
+
+        // Then test the image styles on the image dialog as a standard user.
+        createAndLoginStandardUser(setup);
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        ImageDialogStandardEditForm imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
+        // Assert the available image styles as well as the one currently selected.
+        assertEquals(Set.of(""), imageDialogStandardEditForm.getListImageStyles());
+        assertEquals("", imageDialogStandardEditForm.getCurrentImageStyle());
+        assertEquals("Bordered", imageDialogStandardEditForm.getCurrentImageStyleLabel());
+        ImageDialogAdvancedEditForm imageDialogAdvancedEditForm = imageDialogEditModal.switchToAdvancedTab();
+        assertFalse(imageDialogAdvancedEditForm.isWidthEnabled());
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
     private ViewPage uploadAttachment(TestUtils setup, EntityReference entityReference, String attachmentName)
         throws Exception
     {
@@ -683,5 +712,22 @@ class ImagePluginIT extends AbstractCKEditorIT
         setup.attachFile(entityReference, attachmentName,
             getClass().getResourceAsStream("/ImagePlugin/" + attachmentName), false);
         return newPage;
+    }
+
+    private static void createBorderedStyle(TestUtils setup) throws Exception
+    {
+        DocumentReference borderedStyleDocumentReference =
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "bordered");
+        setup.rest().delete(borderedStyleDocumentReference);
+        setup.rest().savePage(borderedStyleDocumentReference);
+        Object styleObject = setup.rest().object(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass");
+        Property borderedProperty = new Property();
+        borderedProperty.setName("prettyName");
+        borderedProperty.setValue("Bordered");
+        Property typeProperty = new Property();
+        typeProperty.setName("type");
+        typeProperty.setValue("bordered");
+        styleObject.withProperties(borderedProperty, typeProperty);
+        setup.rest().add(styleObject);
     }
 }

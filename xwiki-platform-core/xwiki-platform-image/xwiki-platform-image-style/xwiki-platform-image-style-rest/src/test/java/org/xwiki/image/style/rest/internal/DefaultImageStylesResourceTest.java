@@ -100,8 +100,10 @@ class DefaultImageStylesResourceTest
     void getDefaultStyleIdentifier() throws Exception
     {
         when(this.imageStyleConfiguration.getDefaultStyle("wiki", "xwiki:Space.Page")).thenReturn("defaultStyle");
-        assertEquals(Map.of("defaultStyle", "defaultStyle"),
-            this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
+        assertEquals(Map.of(
+            "defaultStyle", "defaultStyle",
+            "forceDefaultStyle", "false"
+        ), this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
     }
 
     @Test

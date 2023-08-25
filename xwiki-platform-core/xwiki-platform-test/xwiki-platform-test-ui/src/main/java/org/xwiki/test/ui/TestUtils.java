@@ -2037,7 +2037,8 @@ public class TestUtils
 
     /**
      * Set global xwiki configuration options (as if the xwiki.cfg file had been modified). This is useful for testing
-     * configuration options.
+     * configuration options. This requires the {@code Test.XWikiConfigurationPageForTest} page to have Programming
+     * Rights (if the PR checker is enabled, you'll need to exclude this reference so that it can have PR).
      *
      * @param configuration the configuration in {@link Properties} format. For example "param1=value2\nparam2=value2"
      * @throws IOException if an error occurs while parsing the configuration
@@ -2053,9 +2054,9 @@ public class TestUtils
                 + "ConfigurationSource\", \"xwikicfg\"))\n"
                 + "#set($props = $config.getProperties())\n");
 
-            // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
+        // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
         // with a different xwiki.cfg file for each test that requires a configuration change, we use the following
-        // trick: We create a document and we access the XWiki object with a Velocity script inside that document.
+        // trick: We create a document, and we access the XWiki object with a Velocity script inside that document.
         for (Map.Entry<Object, Object> param : properties.entrySet()) {
             sb.append("#set($discard = $props.put('").append(param.getKey()).append("', '")
                 .append(param.getValue()).append("'))\n");

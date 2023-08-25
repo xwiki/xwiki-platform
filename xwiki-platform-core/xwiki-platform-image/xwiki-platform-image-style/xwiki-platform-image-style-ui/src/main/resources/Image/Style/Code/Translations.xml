@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="">
+<xwikidoc version="1.5" reference="Image.Style.Code.Translations" locale="">
   <web>Image.Style.Code</web>
   <name>Translations</name>
   <language/>
@@ -81,7 +81,9 @@ Image.Style.Code.ImageStyleClass_prettyName_hint=User oriented name of the image
 Image.Style.Code.ImageStyleClass_type=Type
 Image.Style.Code.ImageStyleClass_type_hint=The type of the image style (used as a css class).
 Image.Style.Code.ConfigurationClass_defaultStyle=Default Style
-Image.Style.Code.ConfigurationClass_defaultStyle_hint=The default image style for this wiki.</content>
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=The default image style for this wiki.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Force Default Style
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=When checked, the constraints of the default style are forced in the image configuration, and users are forced to choose a style.</content>
   <object>
     <name>Image.Style.Code.Translations</name>
     <number>0</number>

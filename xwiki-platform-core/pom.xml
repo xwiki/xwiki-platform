@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>15.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -138,6 +138,17 @@
                   <ignore>true</ignore>
                   <code>java.method.addedToInterface</code>
                   <new>method java.net.URI org.xwiki.export.pdf.PDFExportConfiguration::getXWikiURI() throws java.net.URISyntaxException</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <criticality>highlight</criticality>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.index.migration.R140300000XWIKI19614DataMigration</old>
+                  <justification>Moved to internal where this class should have been from the beginning.</justification>
                 </item>
               </differences>
             </revapi.differences>

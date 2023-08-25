@@ -163,8 +163,8 @@ class PDFExportIT
             // Author image.
             List<PDFImage> coverPageImages = pdf.getImagesFromPage(0);
             assertEquals(1, coverPageImages.size());
-            assertEquals(160, coverPageImages.get(0).getWidth());
-            assertEquals(160, coverPageImages.get(0).getHeight());
+            assertEquals(160, coverPageImages.get(0).getRawWidth());
+            assertEquals(160, coverPageImages.get(0).getRawHeight());
 
             //
             // Verify the table of contents page.
@@ -215,8 +215,8 @@ class PDFExportIT
             // The content of the child document shows an image.
             List<PDFImage> contentPageImages = pdf.getImagesFromPage(3);
             assertEquals(1, contentPageImages.size());
-            assertEquals(512, contentPageImages.get(0).getWidth());
-            assertEquals(512, contentPageImages.get(0).getHeight());
+            assertEquals(512, contentPageImages.get(0).getRawWidth());
+            assertEquals(512, contentPageImages.get(0).getRawHeight());
         }
     }
 
@@ -841,6 +841,86 @@ class PDFExportIT
 
             // Verify the content page.
             assertEquals("Section 1\nContent of first section.\n", pdf.getTextFromPage(1));
+        }
+    }
+
+    @Test
+    @Order(17)
+    void floatingImage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "FloatingImage"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should normally have 5 pages (the cover page plus 4 content pages) but out workaround for
+            // https://jira.xwiki.org/browse/XWIKI-21201 (Floating images and the text around them can be cut from the
+            // PDF export) generates more content pages (6) because the content is split into print pages as if the
+            // images are not floating.
+            assertEquals(7, pdf.getNumberOfPages());
+
+            //
+            // First content page.
+            //
+
+            // The first content page doesn't have any image because the first floating image didn't fit.
+            List<PDFImage> images = pdf.getImagesFromPage(1);
+            assertEquals(0, images.size());
+
+            //
+            // Second content page.
+            //
+
+            // The second content page should have the first floating image.
+            images = pdf.getImagesFromPage(2);
+            assertEquals(1, images.size());
+            assertEquals(450, Math.round(images.get(0).getHeight()));
+
+            // The first image is floating to the left.
+            assertEquals(36, Math.round(images.get(0).getOffsetLeft()));
+
+            // The paragraph after the image should be on the same page.
+            String text = pdf.getTextFromPage(2);
+            assertTrue(
+                text.startsWith(
+                    "Floating Image\n3 / 7\n" + "Donec sed ante interdum, finibus urna eget, ultricies purus."),
+                "Unexpected content: " + text);
+
+            //
+            // Third content page.
+            //
+
+            // The third content page should have the second floating image.
+            images = pdf.getImagesFromPage(3);
+            assertEquals(1, images.size());
+            assertEquals(442, Math.round(images.get(0).getHeight()));
+
+            // The second image is floating to the right.
+            assertEquals(403, Math.round(images.get(0).getOffsetLeft()));
+
+            // The paragraph after the image should be on the same page.
+            text = pdf.getTextFromPage(3);
+            // The content should start with this paragraph normally, but due to our workaround some content from the
+            // second page is moved to the third page.
+            assertTrue(text.contains("In aliquet tortor odio."), "Unexpected content: " + text);
+
+            //
+            // Fifth content page (should have been the fourth, but due to our workaround the PDF has more pages).
+            //
+
+            // The fifth (should have been the fourth) content page has the third floating image.
+            images = pdf.getImagesFromPage(5);
+            assertEquals(1, images.size());
+            assertEquals(457, Math.round(images.get(0).getHeight()));
+
+            // The third image is floating to the left.
+            assertEquals(36, Math.round(images.get(0).getOffsetLeft()));
+
+            // The text after the image should be on the same page (this image is inline between text).
+            text = pdf.getTextFromPage(5);
+            // The content should start with this text normally, but due to our workaround some content from the
+            // previous page is moved to this page.
+            assertTrue(text.contains("Nullam porta leo felis, ac viverra ante consectetur a."),
+                "Unexpected content: " + text);
         }
     }
 

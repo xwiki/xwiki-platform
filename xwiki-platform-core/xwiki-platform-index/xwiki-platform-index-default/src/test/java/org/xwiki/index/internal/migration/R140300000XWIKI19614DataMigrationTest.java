@@ -17,9 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.migration;
+package org.xwiki.index.internal.migration;
 
 import java.util.List;
+
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,6 +80,7 @@ class R140300000XWIKI19614DataMigrationTest
     private Execution execution;
 
     @MockComponent
+    @Named("current")
     private DocumentReferenceResolver<String> resolver;
 
     @RegisterExtension

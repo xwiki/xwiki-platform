@@ -63,7 +63,7 @@ public class ImageDialogAdvancedEditForm extends BaseElement
      */
     public void setWidth(int width)
     {
-        WebElement imageWidth = getDriver().findElement(By.cssSelector("#advanced [name='imageWidth']"));
+        WebElement imageWidth = getImageWidthElement();
         imageWidth.clear();
 
         String fullString = String.valueOf(width);
@@ -80,5 +80,23 @@ public class ImageDialogAdvancedEditForm extends BaseElement
             // re-enabled soon enough.
             getDriver().waitUntilElementIsEnabled(imageWidth);
         }
+    }
+
+    /**
+     * Checks if the width input field is enabled.
+     *
+     * @return {@code true} if the width input field is enabled, {@code false} otherwise
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.8RC1
+     */
+    public boolean isWidthEnabled()
+    {
+        return getImageWidthElement().isEnabled();
+    }
+
+    private WebElement getImageWidthElement()
+    {
+        return getDriver().findElement(By.cssSelector("#advanced [name='imageWidth']"));
     }
 }

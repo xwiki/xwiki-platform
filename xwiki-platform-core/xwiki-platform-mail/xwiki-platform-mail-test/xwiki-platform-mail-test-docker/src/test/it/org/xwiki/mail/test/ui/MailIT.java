@@ -70,7 +70,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
-        // TODO: Mail.MailResender can be removed on XWIKI-20557 is closed
+        // TODO: Mail.MailResender can be removed when XWIKI-20557 is closed
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:(MailIT\\..*|Mail\\.MailResender)",
         // Add the Scheduler plugin used by Mail Resender Scheduler Job
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"

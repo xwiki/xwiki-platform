@@ -35,7 +35,8 @@ define('xwiki-iconService', [
     return new Promise(function (resolve, reject) {
 
       if (cachedIconThemes) {
-        return resolve(cachedIconThemes);
+        resolve(cachedIconThemes);
+        return;
       }
 
       $.getJSON(getResourceURL('data_iconthemes'), function (data) {
@@ -51,6 +52,7 @@ define('xwiki-iconService', [
 
       if (cachedIcons[iconTheme]) {
         resolve(cachedIcons[iconTheme]);
+        return;
       }
 
       $.getJSON(getResourceURL('data_icons', {iconTheme}), function (dataIcons) {

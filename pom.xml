@@ -59,7 +59,7 @@
     <jetty.version>9.4.49.v20220914</jetty.version>
     <netty.version>4.1.97.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.2</dockerJava.version>
+    <dockerJava.version>3.3.3</dockerJava.version>
     <cvssCalculator.version>1.4.1</cvssCalculator.version>
     <solr.version>8.11.2</solr.version>
 

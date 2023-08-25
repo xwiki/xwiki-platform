@@ -62,7 +62,8 @@ public class R141004000XWIKI20285DataMigration extends AbstractDocumentsMigratio
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(141004000);
+        // Version updated because XWIKI-21091 was preventing the migration to work correctly on sub-wikis.
+        return new XWikiDBVersion(141016000);
     }
 
     @Override

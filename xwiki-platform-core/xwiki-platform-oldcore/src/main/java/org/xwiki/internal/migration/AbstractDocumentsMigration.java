@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.xwiki.index.TaskManager;
@@ -55,6 +56,7 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     protected Logger logger;
 
     @Inject
+    @Named("current")
     protected DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject

@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @UITest(
     properties = {
         // TODO: Find a way to avoid requiring PR in the test below (specifically "$xcontext.context" requires PR).
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:TextAreaIT\\.authors\\.WebHome"
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*TextAreaIT\\.authors\\.WebHome"
     }
 )
 class TextAreaIT

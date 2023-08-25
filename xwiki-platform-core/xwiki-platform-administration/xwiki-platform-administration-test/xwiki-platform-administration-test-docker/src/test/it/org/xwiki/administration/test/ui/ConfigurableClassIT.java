@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     //   have them.
     // - .*.testLockingAndUnlocking.* is needed because the test itself requires PR to call the
     //   $doc.getDocument().getLock() API for lack of a public API doing the same.
-    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:ConfigurableClassIT\\."
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*ConfigurableClassIT\\."
         + "(testCodeToExecutionAndAutoSandboxing.WebHome"
         + "|testLockingAndUnlocking.TestConfigurable1"
         + "|testLockingAndUnlocking.TestConfigurable2)"

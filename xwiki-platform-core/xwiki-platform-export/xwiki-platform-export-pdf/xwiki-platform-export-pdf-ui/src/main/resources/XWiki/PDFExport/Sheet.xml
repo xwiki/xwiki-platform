@@ -284,7 +284,46 @@ define('paged-polyfill-patched', ['paged-polyfill'], function(PagedPolyfill) {
     }
   }
 
-  Paged.registerHandlers(ShowInvisibleRowsOnPageBreaks);
+  /**
+   * This is a workaround for https://github.com/pagedjs/pagedjs/issues/153 (Floating images are always included in the
+   * current print page, even when they don't fit). We remove the floating style before the content is split into print
+   * pages and restore it afterwards. The downside is that we get some empty space at the end of the print page
+   * (proportional to the image size) but at least we don't loose data.
+   */
+  class FixFloatingImages extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforeParsed(content) {
+      // Look for floating images that were inserted by the user (using wiki syntax).
+      content.querySelectorAll([
+        '#xwikicontent img[data-xwiki-image-style-alignment="start"]',
+        '#xwikicontent img[data-xwiki-image-style-alignment="end"]',
+        '#xwikicontent img[data-xwiki-image-style-text-wrap="true"]'
+      ].join()).forEach((floatingImage) =&gt; {
+        // Save the current float value (to be restored after the content is split into print pages).
+        floatingImage.setAttribute('data-xwiki-export-pdf-original-float', floatingImage.style.cssFloat);
+        // Remove the floating style.
+        floatingImage.style.cssFloat = 'none';
+      });
+    }
+
+    afterRendered(pages) {
+      pages.forEach((page) =&gt; {
+        page.area.querySelectorAll('[data-xwiki-export-pdf-original-float]').forEach((element) =&gt; {
+          // Restore the original floating style.
+          element.style.cssFloat = element.getAttribute('data-xwiki-export-pdf-original-float');
+          element.removeAttribute('data-xwiki-export-pdf-original-float');
+        });
+      });
+    }
+  }
+
+  Paged.registerHandlers(
+    ShowInvisibleRowsOnPageBreaks,
+    FixFloatingImages
+  );
 
   return PagedPolyfill;
 });

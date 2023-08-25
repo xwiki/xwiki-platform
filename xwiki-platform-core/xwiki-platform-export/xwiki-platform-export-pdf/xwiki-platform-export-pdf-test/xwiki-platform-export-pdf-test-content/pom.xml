@@ -56,6 +56,13 @@
       <type>xar</type>
     </dependency>
     <dependency>
+      <!-- Used to test how floating images (with left / right aligment) are exported to PDF. -->
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-image-style-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
       <!-- Used to test the integration with Numbered Headings Application. -->
       <groupId>org.xwiki.contrib.numbered.content</groupId>
       <artifactId>application-numbered-content-headings-ui</artifactId>

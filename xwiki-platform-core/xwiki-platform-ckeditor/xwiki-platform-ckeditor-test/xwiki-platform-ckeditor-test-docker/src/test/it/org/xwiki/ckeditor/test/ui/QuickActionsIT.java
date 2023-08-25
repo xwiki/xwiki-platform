@@ -33,8 +33,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * All functional tests for Quick Actions.
  *

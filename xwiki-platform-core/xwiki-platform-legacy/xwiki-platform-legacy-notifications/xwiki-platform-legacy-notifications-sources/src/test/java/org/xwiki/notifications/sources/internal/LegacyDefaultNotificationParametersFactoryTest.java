@@ -357,7 +357,7 @@ class LegacyDefaultNotificationParametersFactoryTest
         parametersMap.remove(ParametersKey.CURRENT_WIKI);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
-        verify(wikiDescriptorManager, times(2)).getCurrentWikiId();
+        verify(wikiDescriptorManager, times(3)).getCurrentWikiId();
     }
 
     private DefaultNotificationFilterPreference getFilterPreference(String property, int number)

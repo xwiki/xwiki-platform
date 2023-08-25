@@ -144,13 +144,11 @@
             <revapi.differences>
               <differences>
                 <item>
+                  <criticality>highlight</criticality>
                   <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>field org.xwiki.internal.migration.AbstractDocumentsMigration.documentReferenceResolver @ org.xwiki.index.migration.R140300000XWIKI19614DataMigration</old>
-                  <new>field org.xwiki.internal.migration.AbstractDocumentsMigration.documentReferenceResolver @ org.xwiki.index.migration.R140300000XWIKI19614DataMigration</new>
-                  <annotation>@javax.inject.Named("current")</annotation>
-                  <justification>Young API</justification>
-                  <criticality>documented</criticality>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.index.migration.R140300000XWIKI19614DataMigration</old>
+                  <justification>Moved to legacy where this class should have been from the beginning.</justification>
                 </item>
               </differences>
             </revapi.differences>

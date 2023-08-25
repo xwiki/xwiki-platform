@@ -62,7 +62,7 @@ public class R150000000XWIKI20285DataMigration extends AbstractDocumentsMigratio
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(150000000);
+        return new XWikiDBVersion(150700000);
     }
 
     @Override

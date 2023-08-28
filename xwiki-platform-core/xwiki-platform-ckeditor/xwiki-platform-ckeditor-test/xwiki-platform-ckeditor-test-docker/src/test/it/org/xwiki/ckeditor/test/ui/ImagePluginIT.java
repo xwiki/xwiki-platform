@@ -503,17 +503,17 @@ class ImagePluginIT
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+        String imageURL = setup.getURL(attachmentReference, "download", "");
+        uploadAttachment(setup, testReference, attachmentName);
 
-        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(testReference).editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a with caption and alignment to center.
         ImageDialogSelectModal imageDialogSelectModal = editor.clickImageButton();
         // The WebHome part is important but is removed when serializing an attachment, adding it back before the 
         // attachment name.
-        String imageURL = setup.getURL(attachmentReference, "download", "");
-
+        
         imageDialogSelectModal.switchToUrlTab().setUrlValue(imageURL);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToAdvancedTab().setWidth(100);

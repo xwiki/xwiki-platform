@@ -526,15 +526,15 @@ class ImagePluginIT extends AbstractCKEditorIT
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+        String imageURL = setup.getURL(attachmentReference, "download", "");
+        uploadAttachment(setup, testReference, attachmentName);
 
-        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(testReference).editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a with caption and alignment to center.
         ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
 
-        String imageURL = setup.getURL(attachmentReference, "download", "");
         
         imageDialogSelectModal.switchToUrlTab().setUrlValue(imageURL);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();

@@ -43,7 +43,9 @@ import org.apache.pdfbox.util.Matrix;
 /**
  * Extracts images from a PDF document.
  * <p>
- * Adapted from {@link org.apache.pdfbox.examples.util.PrintImageLocations}.
+ * Adapted from the <a href=
+ * "https://github.com/apache/pdfbox/blob/2.0.29/examples/src/main/java/org/apache/pdfbox/examples/util/PrintImageLocations.java">PrintImageLocations.java</a>
+ * PDFBox example.
  * 
  * @since 14.10.16
  * @since 15.5.2

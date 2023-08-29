@@ -192,3 +192,7 @@ input.button, .buttonwrapper button, .buttonwrapper a {
     background-color: @navbar-default-link-hover-bg;
   }
 }
+
+.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-radius: 0 @border-radius-base @border-radius-base 0;
+}

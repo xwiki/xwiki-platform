@@ -65,6 +65,24 @@ table {
   height: 1em;
 }
 
+/* Underline links that are inline.
+  It's not possible to access text nodes with CSS, so we use the parent of the link element to
+  estimate if the link is in some text. Paragraphs, spans and divs are typically constituted of some text with
+  an inline link. On the contrary, li and dt are not, and we don't want their link child to be underlined.
+  This, added to the specifity of the .wikilink classes,
+  covers most cases seen on XWiki Standard, but is not a perfect selector. */
+p, span, div {
+  & > .wikilink,
+  & > .wikiexternallink,
+  & > .wikiinternallink,
+  & > .wikicreatelink {
+    & > a {
+      text-decoration: underline;
+    }
+  }
+}
+
+
 // Code =======================================================================
 
 pre {

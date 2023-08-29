@@ -110,7 +110,8 @@ class SolrToLiveDataEntryMapperTest
             "advice", "Translation Value",
             "name",
             "<a href='null' title='Ext Name'>Ext Name</a><br/><span class='xHint' title='org.test:ext/7.5'>org.test:ext/7.5</span>",
-            "wikis", "xwiki, s1"
+            "wikis", "xwiki, s1",
+            "extensionId", "org.test:ext/7.5"
         ), this.mapper.mapDocToEntries(this.doc));
     }
 }

@@ -108,6 +108,8 @@ public class SolrToLiveDataEntryMapper
     {
         return ofEntries(
             entry(NAME, buildExtensionName(doc)),
+            // Even if not displayed, the extension id must be returned as it is used as the id.
+            entry(EXTENSION_ID, buildExtensionId(doc)),
             entry(MAX_CVSS, buildMaxCVSS(doc)),
             entry(CVE_ID, buildCVEList(doc)),
             entry(FIX_VERSION, buildFixVersion(doc)),

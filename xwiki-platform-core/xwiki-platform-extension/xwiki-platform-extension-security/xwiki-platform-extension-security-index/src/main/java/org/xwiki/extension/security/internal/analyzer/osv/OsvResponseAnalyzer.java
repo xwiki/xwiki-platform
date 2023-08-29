@@ -43,7 +43,6 @@ import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-import static org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer.PLATFORM_PREFIX;
 
 /**
  * Analyze the provided {@link OsvResponse} and return an {@link ExtensionSecurityAnalysisResult}.
@@ -95,7 +94,7 @@ public class OsvResponseAnalyzer
     private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)
     {
         Optional<VulnObject> rvuln = Optional.empty();
-        boolean isPlatform = mavenId.startsWith(PLATFORM_PREFIX);
+        boolean isPlatform = OsvExtensionSecurityAnalyzer.isNotOnMavenCentral(mavenId);
         if (!isPlatform || isMatchesOneRange(mavenId, version, vuln)) {
             rvuln = Optional.of(vuln);
         }

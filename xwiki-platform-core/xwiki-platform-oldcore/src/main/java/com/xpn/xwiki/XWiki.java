@@ -4695,6 +4695,27 @@ public class XWiki implements EventListener
     public void deleteDocumentVersions(XWikiDocument document, String version1, String version2, XWikiContext context)
         throws XWikiException
     {
+        deleteDocumentVersions(document, version1, version2, false, context);
+    }
+
+    /**
+     * Delete a range of versions from a document history.
+     * 
+     * @param document the document from which to delete versions
+     * @param version1 one end of the versions range to remove
+     * @param version2 the other end of the versions range to remove
+     * @param triggeredByUser {@code true} if the API is called directly by an action from a user and checks need to
+     * be performed for the rollback (See: {@link #rollback(XWikiDocument, String, boolean, boolean, XWikiContext)}).
+     * @param context the XWiki context
+     * @throws XWikiException
+     * @since 14.10.17
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public void deleteDocumentVersions(XWikiDocument document, String version1, String version2,
+        boolean triggeredByUser, XWikiContext context) throws XWikiException
+    {
         Version v1 = new Version(version1);
         Version v2 = new Version(version2);
 
@@ -4736,19 +4757,21 @@ public class XWiki implements EventListener
                 .notify(new DocumentVersionRangeDeletingEvent(document.getDocumentReferenceWithLocale(),
                     lowerBound.toString(), upperBound.toString()), document, context);
 
+
+            // There are still some versions left.
+            // If we delete the most recent (current) version, then rollback to latest undeleted version.
+            // We do that right before updating the archive, in case it would cancel the action.
+            Version previousVersion = archive.getLatestVersion();
+            if (!document.getRCSVersion().equals(previousVersion)) {
+                context.getWiki().rollback(document, previousVersion.toString(), false, triggeredByUser, context);
+            }
+
             // Update the archive
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
             // Make sure the cached document archive is updated too
             XWikiDocument cachedDocument =
                 context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context);
             cachedDocument.setDocumentArchive(archive);
-
-            // There are still some versions left.
-            // If we delete the most recent (current) version, then rollback to latest undeleted version.
-            Version previousVersion = archive.getLatestVersion();
-            if (!document.getRCSVersion().equals(previousVersion)) {
-                context.getWiki().rollback(document, previousVersion.toString(), false, context);
-            }
 
             // Notify after versions delete
             getObservationManager()
@@ -7607,6 +7630,25 @@ public class XWiki implements EventListener
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision, XWikiContext xcontext)
         throws XWikiException
     {
+        return rollback(tdoc, rev, addRevision, false, xcontext);
+    }
+
+    /**
+     * @param tdoc the document to rollback
+     * @param rev the revision to rollback to
+     * @param addRevision true if a new revision should be created
+     * @param triggeredByUser {@code true} if this has been triggered by a user and a check needs to be performed
+     * @param xcontext the XWiki context
+     * @return the new document
+     * @throws XWikiException when failing to rollback the document
+     * @since 14.10.17
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision,
+        boolean triggeredByUser, XWikiContext xcontext) throws XWikiException
+    {
         LOGGER.debug("Rolling back [{}] to version [{}]", tdoc, rev);
 
         // Clone the document before modifying to avoid concurrency issues
@@ -7682,6 +7724,10 @@ public class XWiki implements EventListener
             // Make sure to save a new version even if nothing changed
             document.setMetaDataDirty(true);
             message = localizePlainOrKey("core.comment.rollback", rev);
+        }
+
+        if (triggeredByUser) {
+            checkSavingDocument(xcontext.getUserReference(), document, message, false, xcontext);
         }
 
         ObservationManager om = getObservationManager();

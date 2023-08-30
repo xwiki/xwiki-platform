@@ -73,6 +73,7 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.ReadOnlyXWikiContextProvider;
 import com.xpn.xwiki.internal.debug.DebugConfiguration;
+import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
@@ -216,7 +217,7 @@ public class XWikiMockitoTest
     }
 
     /**
-     * Verify that {@link XWiki#rollback(XWikiDocument, String, XWikiContext)} fires the right events.
+     * Verify that {@link XWiki#rollback(XWikiDocument, String, boolean, boolean, XWikiContext)} fires the right events.
      */
     @Test
     public void rollbackFiresEvents() throws Exception
@@ -236,17 +237,22 @@ public class XWikiMockitoTest
         XWikiDocument result = mock(XWikiDocument.class);
         when(result.getDocumentReference()).thenReturn(documentReference);
 
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "ContextUser");
+        this.context.setUserReference(userReference);
+
         String revision = "3.5";
         when(this.documentRevisionProvider.getRevision(document, revision)).thenReturn(result);
 
         this.componentManager.registerMockComponent(ContextualLocalizationManager.class);
 
-        xwiki.rollback(document, revision, context);
+        xwiki.rollback(document, revision, true, true, context);
 
         verify(observationManager).notify(new DocumentRollingBackEvent(documentReference, revision), document, context);
         verify(observationManager).notify(new DocumentUpdatingEvent(documentReference), document, context);
         verify(observationManager).notify(new DocumentUpdatedEvent(documentReference), document, context);
         verify(observationManager).notify(new DocumentRolledBackEvent(documentReference, revision), document, context);
+        verify(observationManager).notify(new UserUpdatingDocumentEvent(userReference, documentReference),
+            document, context);
     }
 
     @Test

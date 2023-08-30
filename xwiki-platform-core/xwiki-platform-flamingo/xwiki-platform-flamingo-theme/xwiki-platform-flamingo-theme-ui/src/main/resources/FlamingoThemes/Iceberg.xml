@@ -881,7 +881,7 @@
       <btn-info-bg/>
     </property>
     <property>
-      <btn-info-color/>
+      <btn-info-color>#000000</btn-info-color>
     </property>
     <property>
       <btn-primary-bg>#386da7</btn-primary-bg>

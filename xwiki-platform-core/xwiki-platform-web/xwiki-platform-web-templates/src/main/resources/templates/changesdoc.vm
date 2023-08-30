@@ -25,22 +25,22 @@
 #if ("$!previousOrigdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev2}")})
   #set ($changesTitle = $services.localization.render('core.viewers.diff.previousVersion'))
-  #set ($previousOrigdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&lt;</a>")
+  #set ($previousOrigdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('left')</a>")
 #end
 #if ("$!nextOrigdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev2}")})
   #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion'))
-  #set ($nextOrigdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&gt;</a>")
+  #set ($nextOrigdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('right')</a>")
 #end
 #if ("$!previousNewdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${previousNewdocVersion}")})
   #set ($changesTitle = $services.localization.render('core.viewers.diff.previousVersion'))
-  #set ($previousNewdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&lt;</a>")
+  #set ($previousNewdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('left')</a>")
 #end
 #if ("$!nextNewdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${nextNewdocVersion}")})
   #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion'))
-  #set ($nextNewdocLink = "<a class='changes-arrow' href='$changesLink' title='$changesTitle'>&gt;</a>")
+  #set ($nextNewdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('right')</a>")
 #end
 ## Display the previous change arrow only if there is a previous version of the original document and there is no extension version
 #if ("$!previousOrigdocVersion" != '' && "$!previousNewdocVersion" != '')

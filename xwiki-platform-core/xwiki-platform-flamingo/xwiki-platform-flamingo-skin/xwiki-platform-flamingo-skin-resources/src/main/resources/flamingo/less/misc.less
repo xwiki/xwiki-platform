@@ -357,33 +357,11 @@ dl.export-tree-legend dt + dd {
 
 // Viewer = changes -----------------------------------------------------------
 #changes-info {
-  background-color: @xwiki-background-secondary-color;
-  border: @border-width solid @xwiki-border-color;
   margin-top: (@grid-gutter-width / 2);
   margin-bottom: (@grid-gutter-width / 2);
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
   position: relative;
-  /* Background arrow */
-  &:before {
-    background: @xwiki-page-content-bg;
-    height: 2em;
-    right: 50%;
-    top: 4em;
-    width: 2em;
-  }
-  &:after {
-    border-bottom: 2em solid transparent;
-    border-left: 3em solid @xwiki-page-content-bg;
-    border-top: 2em solid transparent;
-    left: 50%;
-    top: 3em;
-  }
-  &:before, &:after {
-    content: "";
-    display: block;
-    position: absolute;
-  }
 }
 
 #changes-info-boxes {
@@ -407,7 +385,7 @@ dl.export-tree-legend dt + dd {
 }
 
 @media (max-width: @screen-xs-max) {
-  #changes-info:before, #changes-info:after {
+  #changes-info .changes-info-arrow {
     display: none; /* Hide the arrow for small resolutions */
   }
 }
@@ -416,16 +394,27 @@ dl.export-tree-legend dt + dd {
   white-space: nowrap;
 }
 
+.changes-arrow {
+  font-size: inherit;
+}
+
 .changes-arrow, .changes-arrow-left, .changes-arrow-right {
   &, &:hover, &:active, &:visited, &:focus {
-    color: @xwiki-page-content-bg;
-    text-decoration: none;
+    vertical-align: baseline;
     font-weight: 700;
   }
 }
 
-.changes-arrow-left, .changes-arrow-right {
-  font-size: 7em;
+#changes-arrows-box {
+  font-size: 1.5em;
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.changes-info-arrow {
+  font-size: 3em;
   line-height: 1;
 }
 

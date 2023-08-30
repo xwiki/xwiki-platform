@@ -581,20 +581,27 @@
 #macro (displayDocumentChangesHeader $from $to)
   <div id="changes-info">
     <div id="changes-info-boxes">
-      #if ("$!from.previousLink" != '')
-        <a href="$from.previousLink" class="changes-arrow-left"
-          title="$escapetool.xml($services.localization.render('core.viewers.diff.previousChange'))">&lt;</a>
+      #if ("$!from.previousLink" != '' || "$!to.nextLink" != '')
+        <div id='changes-arrows-box'>
+          #if ("$!from.previousLink" != '')
+            <a href="$from.previousLink" class="btn btn-default changes-arrow-left">
+              $services.icon.renderHTML('left') $escapetool.xml($services.localization.render('core.viewers.diff.previousChange'))
+            </a>
+          #end
+          #if ("$!to.nextLink" != '')
+            <a href="$to.nextLink" class="btn btn-default changes-arrow-right">
+              $escapetool.xml($services.localization.render('core.viewers.diff.nextChange')) $services.icon.renderHTML('right')
+            </a>
+          #end
+        </div>
       #end
       <div id="changes-info-box-from" class="changes-info-box">
         #displayDocumentVersionInfo($from.doc $from.version $from.previousVersionLink $from.nextVersionLink 'core.viewers.diff.from')
       </div> ## changes-info-box-from
+      <span role='presentation' class='changes-info-arrow'>$services.icon.renderHTML('right')</span>
       <div id="changes-info-box-to" class="changes-info-box">
         #displayDocumentVersionInfo($to.doc $to.version $to.previousVersionLink $to.nextVersionLink 'core.viewers.diff.to')
       </div> ## changes-info-box-to
-      #if ("$!to.nextLink" != '')
-        <a href="$to.nextLink" class="changes-arrow-right"
-          title="$escapetool.xml($services.localization.render('core.viewers.diff.nextChange'))">&gt;</a>
-      #end
     </div> ## changes-info-boxes
     <div id="changes-info-comment">
       $escapetool.xml($services.localization.render('core.viewers.diff.editComment'))

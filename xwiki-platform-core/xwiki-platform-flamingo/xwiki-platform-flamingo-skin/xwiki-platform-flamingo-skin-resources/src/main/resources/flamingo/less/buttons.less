@@ -15,18 +15,13 @@
 
 .btn-border(@color) {
   border: 1px solid @color;
-  border-bottom-color: darken(@color, 10%);
-}
-
-.btn-no-border(@color) {
-  border: 1px solid @color;
 }
 
 /* &-.button selectors are added in order to override the mapping and legacy usage of .button class */
 .btn {
   &-default {
     .btn-background(lighten(@btn-default-bg, 5%));
-    .btn-border(@btn-default-bg);
+    .btn-border(darken(@btn-default-bg, 5%));
 
     &:hover, 
     &:focus {
@@ -37,11 +32,11 @@
 
   &-primary {
     .btn-background(@btn-primary-bg);
-    .btn-no-border(@btn-primary-bg);
+    .btn-border(@btn-primary-bg);
 
     &:hover {
       .btn-background(darken(@btn-primary-bg, 5%));
-      .btn-no-border(darken(@btn-primary-bg, 5%));
+      .btn-border(darken(@btn-primary-bg, 5%));
     }
   }
 

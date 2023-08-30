@@ -24,7 +24,6 @@
 
 /* &-.button selectors are added in order to override the mapping and legacy usage of .button class */
 .btn {
-  border-radius: 8px;
   &-default {
     .btn-background(lighten(@btn-default-bg, 5%));
     .btn-border(@btn-default-bg);
@@ -42,7 +41,7 @@
 
     &:hover {
       .btn-background(darken(@btn-primary-bg, 5%));
-      .btn-no-border(@btn-primary-bg);
+      .btn-no-border(darken(@btn-primary-bg, 5%));
     }
   }
 
@@ -52,7 +51,7 @@
 
     &:hover {
       .btn-background(darken(@btn-success-bg, 5%));
-      .btn-border(@btn-success-bg);
+      .btn-border(darken(@btn-success-bg, 5%));
     }
   }
 
@@ -62,7 +61,7 @@
 
     &:hover {
       .btn-background(darken(@btn-info-bg, 5%));
-      .btn-border(@btn-info-bg);
+      .btn-border(darken(@btn-info-bg, 5%));
     }
   }
 
@@ -72,7 +71,7 @@
 
     &:hover {
       .btn-background(darken(@btn-warning-bg, 5%));
-      .btn-border(@btn-warning-bg);
+      .btn-border(darken(@btn-warning-bg, 5%));
     }
   }
 
@@ -82,7 +81,7 @@
 
     &:hover {
       .btn-background(darken(@btn-danger-bg, 5%));
-      .btn-border(@btn-danger-bg);
+      .btn-border(darken(@btn-danger-bg, 5%));
     }
   }
 }
@@ -134,7 +133,7 @@ input.button, .buttonwrapper button, .buttonwrapper a {
   .btn-border(@btn-primary-bg);
   &:hover {
     .btn-background(darken(@btn-primary-bg, 5%));
-    .btn-border(@btn-primary-bg);
+    .btn-border(darken(@btn-primary-bg, 5%));
   }
 }
 

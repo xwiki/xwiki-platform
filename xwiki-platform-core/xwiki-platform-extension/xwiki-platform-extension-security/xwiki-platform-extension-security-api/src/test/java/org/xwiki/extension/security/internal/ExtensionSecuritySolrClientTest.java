@@ -79,7 +79,7 @@ class ExtensionSecuritySolrClientTest
         assertEquals(42, this.solrClient.getVulnerableExtensionsCount());
 
         SolrQuery params = new SolrQuery();
-        params.addFilterQuery("security_maxCVSS:[0 TO 10]");
+        params.addFilterQuery("security_maxCVSS:{0 TO 10]");
         params.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
         verify(this.extensionIndexStore)
             .search(ArgumentMatchers.<SolrQuery>argThat(
@@ -104,7 +104,7 @@ class ExtensionSecuritySolrClientTest
         this.solrClient.solrQuery(liveDataQuery);
 
         SolrQuery params = new SolrQuery();
-        params.addFilterQuery("security_maxCVSS:[0 TO 10]");
+        params.addFilterQuery("security_maxCVSS:{0 TO 10]");
         params.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
 
         verify(this.extensionIndexStore)

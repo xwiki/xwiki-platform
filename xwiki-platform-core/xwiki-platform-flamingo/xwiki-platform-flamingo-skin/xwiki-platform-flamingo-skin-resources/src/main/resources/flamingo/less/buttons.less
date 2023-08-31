@@ -193,6 +193,12 @@ input.button, .buttonwrapper button, .buttonwrapper a {
   }
 }
 
-.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
-  border-radius: 0 @border-radius-base @border-radius-base 0;
+// Buttons groups ==================================================
+/* Manually overrides the default border round rules of the btn-group blocks in case of hidden input following the last
+   visible button.
+   The :not selectors are here to have a rule weight for this rule higher than the one making the intermediate buttons 
+   without rounded corners. */
+.btn-group > .btn-group-last:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: @border-radius-base;
+  border-bottom-right-radius: @border-radius-base;
 }

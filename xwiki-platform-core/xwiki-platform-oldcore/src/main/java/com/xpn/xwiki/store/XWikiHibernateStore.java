@@ -1916,7 +1916,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             boolean saveContent;
             if (exist) {
-                // Don't update the history if the document was actually not supposed to exist
+                // Don't update the history if the attachment was actually not supposed to exist
                 // Don't update the attachment version if document metadata dirty is forced false (any modification to
                 // the attachment automatically set document metadata dirty to true)
                 if (!deleted && attachment.isContentDirty() && attachment.getDoc().isMetaDataDirty()) {

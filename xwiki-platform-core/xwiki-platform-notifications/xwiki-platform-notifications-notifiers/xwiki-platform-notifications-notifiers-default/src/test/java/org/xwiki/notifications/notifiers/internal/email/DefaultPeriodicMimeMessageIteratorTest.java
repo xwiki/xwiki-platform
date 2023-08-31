@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -144,7 +145,7 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(event1.getUsers()).thenReturn(Sets.newSet(userB));
         when(event2.getUsers()).thenReturn(Sets.newSet(userB));
 
-        MimeMessage message = mock(MimeMessage.class);
+        ExtendedMimeMessage message = mock(ExtendedMimeMessage.class);
         when(this.factory.createMessage(TEMPLATE_REFERENCE, factoryParameters)).thenReturn(message, message);
 
         when(this.defaultNotificationEmailRenderer.renderHTML(eq(event1), anyString())).thenReturn("eventHTML1");

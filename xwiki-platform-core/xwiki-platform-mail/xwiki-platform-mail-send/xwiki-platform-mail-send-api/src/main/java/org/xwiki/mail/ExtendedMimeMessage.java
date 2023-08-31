@@ -20,6 +20,8 @@
 package org.xwiki.mail;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -49,9 +51,9 @@ public class ExtendedMimeMessage extends MimeMessage
     private String uniqueMessageId;
 
     /**
-     * See {@link #getExtraData()}.
+     * See {@link #getExtraData(String)}.
      */
-    private Object extraData;
+    private Map<String, Object> extraDataMap = new HashMap<>();
 
     /**
      * Create a new extended MimeMessage.
@@ -221,18 +223,22 @@ public class ExtendedMimeMessage extends MimeMessage
     }
 
     /**
-     * @param extraData see {@link #getExtraData()}
+     * See {@link #getExtraData(String)}.
+     *
+     * @param key the key under which the extra data value is registered
+     * @param value the extra data value
      * @since 14.10.16
      * @since 15.5.3
      * @since 15.8RC1
      */
     @Unstable
-    public void setExtraData(Object extraData)
+    public void addExtraData(String key, Object value)
     {
-        this.extraData = extraData;
+        this.extraDataMap.put(key, value);
     }
 
     /**
+     * @param key the key under which the extra data value has been registered
      * @return the extra data associated to this message. This is an easy way to pass some arbitrary data and get it
      *         back when a {@link MailListener} method is called. This data is not used by the mail sending process
      *         itself.
@@ -241,9 +247,9 @@ public class ExtendedMimeMessage extends MimeMessage
      * @since 15.8RC1
      */
     @Unstable
-    public Object getExtraData()
+    public Object getExtraData(String key)
     {
-        return this.extraData;
+        return this.extraDataMap.get(key);
     }
 
     private String getNotNullMessageId() throws MessagingException

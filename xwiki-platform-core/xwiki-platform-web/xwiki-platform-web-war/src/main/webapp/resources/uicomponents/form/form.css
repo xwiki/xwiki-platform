@@ -1,0 +1,7 @@
+/* Visually convey that the form is being submitted once a first submission was done on a form. */
+form.xwiki-form-submitting,
+form.xwiki-form-submitting input,
+form.xwiki-form-submitting select,
+form.xwiki-form-submitting button {
+  cursor: wait;
+}

@@ -38,7 +38,7 @@
 <div class="main layoutsubsection">
 ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea">
-<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
+<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform xwiki-submit-once">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
 #if("$!request.srid" != '')
   <input type="hidden" name="srid" value="$!escapetool.xml($request.srid)"/>
@@ -101,29 +101,5 @@
 </form>
 </main>## mainContentArea
 </div>## main
-<script type="text/javascript">
-  require(["jquery"], function ($) {
-    /**
-     * 
-     * @param formElement
-     */
-    function submitOnce(formElement) {
-      formElement.on("submit", function () {
-        const form = $(this);
-        const firstSubmission = form.data('submitted') === undefined;
-        form.data('submitted', true);
-        // Make the fields readonly, they can't be disabled as otherwise their values would not be submitted.
-        form.find(':input').prop('readonly', true);
-        // Disable the submit button to visually indicate that it is now inactive.
-        form.find('input[type="submit"]').prop('disabled', true);
-        return firstSubmission;
-      });
-    }
-
-    $(function () {
-      submitOnce($("#loginForm"));
-    })
-  });
-</script>
 #template("endpage.vm")
 #end

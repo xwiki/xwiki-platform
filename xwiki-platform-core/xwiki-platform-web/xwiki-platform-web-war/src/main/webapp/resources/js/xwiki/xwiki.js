@@ -1992,3 +1992,43 @@ document.observe("xwiki:dom:loaded", function() {
   interceptXMLHttpRequest();
   interceptFetch();
 })();
+
+/**
+ * Initializes the submit-once protection on the current page.
+ * Search for all form elements with a .xwiki-submit-once class one the document (or on an updated sub-part of the dom).
+ * For each form, once the form is submitted, mark it with the .xwiki-form-submitting class and prevent new submissions.
+ *
+ *  @since 14.10.17
+ *  @since 15.5.3
+ *  @since 15.8-rc-1
+ */
+document.observe('xwiki:dom:loaded', function () {
+  /**
+   * Initializes the root element by adding event listeners to all forms with the class 'form.xwiki-submit-once'.
+   * When a form is submitted, it prevents the submission if it is already being submitted and adds a class to visually
+   * convey that the form was submitted.
+   *
+   * @param {Element} rootElement - The root element where the forms are located.
+   */
+  function init(rootElement) {
+    Array.from(rootElement.getElementsByClassName('xwiki-submit-once')).forEach(form => {
+      form.addEventListener("submit", event => {
+        // Prevent if already submitting.
+        const submittingClass = 'xwiki-form-submitting';
+        if (form.classList.contains(submittingClass)) {
+          event.preventDefault();
+        } else {
+          // Add a class to visually convey that the form was submitted
+          form.classList.add(submittingClass);
+        }
+      })
+    });
+  }
+
+  init(document.documentElement);
+  document.observe('xwiki:dom:updated', (event) => {
+    event.memo.elements.each(function (element) {
+      init(element);
+    })
+  });
+});

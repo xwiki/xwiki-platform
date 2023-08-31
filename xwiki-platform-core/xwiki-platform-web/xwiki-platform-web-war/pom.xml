@@ -216,6 +216,7 @@
                 <include>**/confirmationBox.min.css</include>
                 <include>**/notification.min.css</include>
                 <include>**/suggest.min.css</include>
+                <include>**/form.min.css</include>
               </includes>
             </aggregation>
           </aggregations>

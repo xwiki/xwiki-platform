@@ -28,6 +28,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Base64;
+import org.xwiki.stability.Unstable;
 
 /**
  * Extension of the {@link javax.mail.internet.MimeMessage} in order to support processing by this mail API.
@@ -46,6 +47,11 @@ public class ExtendedMimeMessage extends MimeMessage
     private static final String XMAIL_TYPE_HEADER = "X-MailType";
 
     private String uniqueMessageId;
+
+    /**
+     * See {@link #getExtraData()}.
+     */
+    private Object extraData;
 
     /**
      * Create a new extended MimeMessage.
@@ -212,6 +218,32 @@ public class ExtendedMimeMessage extends MimeMessage
             }
         }
         return uniqueMessageId;
+    }
+
+    /**
+     * @param extraData see {@link #getExtraData()}
+     * @since 14.10.16
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public void setExtraData(Object extraData)
+    {
+        this.extraData = extraData;
+    }
+
+    /**
+     * @return the extra data associated to this message. This is an easy way to pass some arbitrary data and get it
+     *         back when a {@link MailListener} method is called. This data is not used by the mail sending process
+     *         itself.
+     * @since 14.10.16
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public Object getExtraData()
+    {
+        return this.extraData;
     }
 
     private String getNotNullMessageId() throws MessagingException

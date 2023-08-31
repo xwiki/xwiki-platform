@@ -152,6 +152,7 @@ notifications.settings.applications.title=Додатки
 notifications.settings.applications.hint=Це список додатків, які можуть надсилати сповіщення. Ви можете ввімкнути або вимкнути будь-який із них.
 notifications.settings.applications.forGuest=Увійдіть або зареєструйтесь, щоб керувати своїми налаштуваннями сповіщень.
 notifications.settings.applications.appName=Назва
+notifications.settings.applications.table.dropdown.toggle.label=Перемкнути деталі для сповіщень від додатків {0}.
 notifications.settings.events=Події
 notifications.settings.watch.title=Відстежувані сторінки
 notifications.settings.watch.autowatchmode=Автоматичне спостереження за сторінкою

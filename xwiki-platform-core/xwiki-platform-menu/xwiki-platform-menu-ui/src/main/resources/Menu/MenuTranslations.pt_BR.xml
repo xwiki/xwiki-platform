@@ -89,6 +89,7 @@ rendering.macro.menu.content.description=Defina a estrutura do menu usando a sin
 # Menu UI
 menu.ui.openSubMenu=Abra o submenu.
 menu.ui.closeSubMenu=Fechar o submenu.
+menu.ui.horizontal.toggler.description=Alternar o menu horizontal.
 
 # Menu WebHome
 menu.description=Este é um aplicativo simples que ajuda a criar menus de navegação para serem exibidos horizontalmente como uma barra superior após o cabeçalho da página ou verticalmente em um painel lateral.

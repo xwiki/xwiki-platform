@@ -42,6 +42,7 @@ extension.security.indexed.on=Indiziert am {0}. Alle Erweiterungen, die nach die
 extension.security.indexed.nojob=Es konnte keine frühere Indizierung gefunden werden.
 extension.security.admin.generalWarning=Es ist zu beachten, dass dieser Sicherheitsscan nicht alle installierten Erweiterungen umfasst. Erweiterungen, die nicht über den Erweiterungsmanager aktualisiert werden können, sind derzeit nicht enthalten.
 extension.security.admin.configuration.title=Konfiguration
+extension.security.admin.environment.explanation=Die in diesem Abschnitt aufgeführten Erweiterungen haben bekannte Schwachstellen, liegen aber außerhalb des Anwendungsbereichs von XWiki. Das bedeutet, dass die Erweiterungen von der Umgebung bereitgestellt werden, in der XWiki läuft (z.B. seine Servlet-Engine), und nicht durch ein Upgrade von XWiki oder einer seiner Erweiterungen behoben werden können.
 extension.security.notification.message=Wir haben {0} Erweiterungen mit bekannten Sicherheitslücken identifiziert, siehe die Details im {1} Bericht
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan aktiviert
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Wenn diese Option nicht markiert ist, wird der Sicherheitsscan nicht mehr ausgeführt
@@ -49,5 +50,7 @@ XWiki.Extension.Security.Code.ConfigClass_scanDelay=Scanverzögerung
 XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Die Anzahl der Stunden, die zwischen zwei Sicherheitsscans gewartet werden soll (Standard: 24h)
 XWiki.Extension.Security.Code.ConfigClass_scanURL=Scan-URL
 XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=Die Url, die als Remote-Quelle für den Sicherheitsscan verwendet werden soll (Standard: https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=Bewertungen-URL
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=Die Url, die als Remote-Quelle für die Sicherheitsüberprüfungen verwendet werden soll (Standard: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
 </content>
   </xwikidoc>

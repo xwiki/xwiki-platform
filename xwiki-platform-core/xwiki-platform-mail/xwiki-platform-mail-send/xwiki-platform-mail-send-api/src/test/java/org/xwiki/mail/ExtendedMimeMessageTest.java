@@ -188,12 +188,12 @@ class ExtendedMimeMessageTest
     }
 
     @Test
-    void getSetExtraData()
+    void getAddExtraData()
     {
         ExtendedMimeMessage message = new ExtendedMimeMessage();
         List<String> extraData = new ArrayList<>();
-        message.setExtraData(extraData);
+        message.addExtraData("test", extraData);
 
-        assertSame(extraData, message.getExtraData());
+        assertSame(extraData, message.getExtraData("test"));
     }
 }

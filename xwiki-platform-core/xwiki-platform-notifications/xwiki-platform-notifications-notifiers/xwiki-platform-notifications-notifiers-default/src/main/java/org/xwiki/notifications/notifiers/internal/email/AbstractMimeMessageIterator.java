@@ -93,6 +93,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private static final String EMAIL_USER = "emailUser";
 
+    private static final String MIMEMESSAGE_EXTRADATA_KEY = "notifications";
+
     @Inject
     protected Logger logger;
 
@@ -196,7 +198,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private void onPrepare(ExtendedMimeMessage message, boolean delete)
     {
         // Indicate that we don't need to send this user notification anymore
-        List<EntityEvent> events = (List<EntityEvent>) message.getExtraData();
+        List<EntityEvent> events = (List<EntityEvent>) message.getExtraData(MIMEMESSAGE_EXTRADATA_KEY);
 
         // Forget about the mail notification so that it's not sent again
         if (events != null && delete) {
@@ -406,7 +408,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             this.currentEvents.forEach(
                 ce -> ce.getEvents().forEach(event -> events.add(new DefaultEntityEvent(event, this.currentUsedId))));
 
-            message.setExtraData(events);
+            message.addExtraData(MIMEMESSAGE_EXTRADATA_KEY, events);
         } catch (Exception e) {
             this.logger.error(ERROR_MESSAGE, this.currentUser, e);
         } finally {

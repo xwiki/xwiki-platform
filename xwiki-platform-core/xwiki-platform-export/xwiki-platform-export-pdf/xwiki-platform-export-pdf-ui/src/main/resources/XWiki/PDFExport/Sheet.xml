@@ -85,6 +85,16 @@
   #set ($bodyTagStart = $htmlHeader.indexOf('&lt;body'))
   #set ($bodyContentStart = $htmlHeader.indexOf('&gt;', $bodyTagStart) + 1)
   $htmlHeader.substring(0, $headTagEnd)
+  ## When performing large multi-page exports the RequireJS timeout can be reached because there are many HTTP requests
+  ## and the browser uses a limited pool to handle them. We noticed this problem on a PDF export with many live tables
+  ## because they fetch their results pretty early, before many RequireJS modules are requested. In any case, we have
+  ## the page ready timeout to stop the export in case it takes too much time to load the print preview page. We don't
+  ## need another timeout for RequrieJS modules.
+  &lt;script&gt;
+  requirejs.config({
+    waitSeconds: 0
+  });
+  &lt;/script&gt;
   ## Inject the required skin extensions.
   #if ($pdfExportJobId)
     $!services.job.getJobStatus($pdfExportJobId).requiredSkinExtensions

@@ -32,6 +32,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
+import static java.util.Locale.ROOT;
+import static org.xwiki.localization.LocaleUtils.toLocale;
+
 /**
  * Allow to easily queue a document analysis task on a set documents to migrate. Sub-classes need to implement two
  * methods:
@@ -47,6 +50,23 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  */
 public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMigration
 {
+    /**
+     * A class representing a reference with a specific locale. This is useful as those information can be retrieved as
+     * is from the database without further parsing/serializing.
+     */
+    protected static class ReferenceWithLocale
+    {
+        public final String reference;
+
+        public final String locale;
+
+        public ReferenceWithLocale(String reference, String locale)
+        {
+            this.reference = reference;
+            this.locale = locale;
+        }
+    }
+
     @Inject
     protected Logger logger;
 
@@ -60,12 +80,14 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     @Override
     protected void hibernateMigrate() throws DataMigrationException
     {
-        List<String> selectedDocuments = selectDocuments();
+        List<ReferenceWithLocale> selectedDocuments = selectDocuments();
         logBeforeQueuingTasks(selectedDocuments);
 
-        for (String documentReference : selectedDocuments) {
-            XWikiDocument document = new XWikiDocument(this.documentReferenceResolver.resolve(documentReference));
-            logBeforeQueuingTask(document);
+        for (ReferenceWithLocale referenceWithLocale : selectedDocuments) {
+            XWikiDocument document =
+                new XWikiDocument(this.documentReferenceResolver.resolve(referenceWithLocale.reference),
+                    toLocale(referenceWithLocale.locale, ROOT));
+            logBeforeQueuingTask(referenceWithLocale);
             this.taskManager.addTask(getXWikiContext().getWikiId(), document.getId(), getTaskType());
         }
     }
@@ -78,14 +100,14 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     /**
      * @return the list of document ids to migrate
      */
-    protected abstract List<String> selectDocuments() throws DataMigrationException;
+    protected abstract List<ReferenceWithLocale> selectDocuments() throws DataMigrationException;
 
     /**
      * Prints an info log with the number of queued documents and the type of the task.
      *
      * @param documents the full list of documents that will be queued
      */
-    protected void logBeforeQueuingTasks(List<String> documents)
+    protected void logBeforeQueuingTasks(List<ReferenceWithLocale> documents)
     {
         this.logger.info("[{}] documents queued to task [{}]", documents.size(), getTaskType());
     }
@@ -93,10 +115,11 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     /**
      * Prints an info logs with an individual document and well as its queued task.
      *
-     * @param document a individual document that will be queued
+     * @param reference a unique document reference that will be queued
      */
-    protected void logBeforeQueuingTask(XWikiDocument document)
+    protected void logBeforeQueuingTask(ReferenceWithLocale reference)
     {
-        this.logger.info("document [{}] queued to task [{}]", document, getTaskType());
+        this.logger.info("document [{}] with locale [{}] queued to task [{}]", reference.reference, reference.locale,
+            getTaskType());
     }
 }

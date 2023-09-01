@@ -20,6 +20,7 @@
 package org.xwiki.index.internal.migration;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,7 +32,6 @@ import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -81,17 +81,21 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected List<String> selectDocuments() throws DataMigrationException
+    protected List<ReferenceWithLocale> selectDocuments() throws DataMigrationException
     {
-        List<String> documents;
+        List<ReferenceWithLocale> documents;
         XWikiContext context = getXWikiContext();
         XWiki wiki = getXWikiContext().getWiki();
         if (context.getWiki().hasBacklinks(context)) {
             try {
-                documents = wiki.getStore().getQueryManager()
-                    .createQuery("SELECT doc.fullName FROM XWikiDocument doc", Query.HQL)
+                documents = wiki.getStore()
+                    .getQueryManager()
+                    .createQuery("SELECT doc.fullName, doc.language FROM XWikiDocument doc", Query.HQL)
                     .setWiki(context.getWikiId())
-                    .execute();
+                    .<Object[]>execute()
+                    .stream()
+                    .map(array -> new ReferenceWithLocale(String.valueOf(array[0]), String.valueOf(array[1])))
+                    .collect(Collectors.toList());
             } catch (QueryException e) {
                 throw new DataMigrationException(
                     String.format("Failed retrieve the list of all the documents for wiki [%s].", wiki.getName()), e);
@@ -103,13 +107,13 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected void logBeforeQueuingTask(XWikiDocument document)
+    protected void logBeforeQueuingTask(ReferenceWithLocale document)
     {
         // No logs here as it would be too verbose (all documents of the wiki are queued).
     }
 
     @Override
-    protected void logBeforeQueuingTasks(List<String> documents)
+    protected void logBeforeQueuingTasks(List<ReferenceWithLocale> documents)
     {
         XWikiContext context = getXWikiContext();
         if (context.getWiki().hasBacklinks(context)) {

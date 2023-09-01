@@ -27,7 +27,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Class that holds the types of Rights and the types of States of a check-box
+ * Class that holds the types of Rights and the types of States of a check-box.
  * 
  * @version $Id$
  * @since 3.2M3
@@ -38,12 +38,39 @@ public class EditRightsPane extends BaseElement
     /** The known access rights. */
     public enum Right
     {
+        /**
+         * View right.
+         */
         VIEW,
+
+        /**
+         * Comment right.
+         */
         COMMENT,
+
+        /**
+         * Edit right.
+         */
         EDIT,
+
+        /**
+         * Delete right.
+         */
         DELETE,
+
+        /**
+         * Admin right.
+         */
         ADMIN,
+
+        /**
+         * Register right.
+         */
         REGISTER,
+
+        /**
+         * Programming right.
+         */
         PROGRAM;
 
         @Override
@@ -60,7 +87,7 @@ public class EditRightsPane extends BaseElement
         ALLOW("/xwiki/resources/js/xwiki/usersandgroups/img/allow.png"),
         DENY("/xwiki/resources/js/xwiki/usersandgroups/img/deny1.png");
 
-        String imageURL;
+        private final String imageURL;
 
         State(String imageURL)
         {
@@ -77,13 +104,15 @@ public class EditRightsPane extends BaseElement
             for (State s : values()) {
                 //  The URL may contain query string parameters (e.g. starting with 11.1RC1 the resource URLs can now
                 //  contain a query parameter to avoid cache issue) and we don't care about that to identify the state.
-                if ((button.getAttribute("src").contains(s.imageURL))) {
+                if ((button.getAttribute(SRC_ATTRIBUTE).contains(s.imageURL))) {
                     return s;
                 }
             }
             return NONE;
         }
     }
+
+    private static final String SRC_ATTRIBUTE = "src";
 
     private LiveTableElement rightsTable;
 
@@ -160,6 +189,33 @@ public class EditRightsPane extends BaseElement
         clickGuestRight(right.toString());
     }
 
+    private void internalClickRight(String rightName, String entityName)
+    {
+        try {
+            getDriver().executeJavascript(
+                "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
+            final By buttonLocator;
+            if (entityName == null) {
+                buttonLocator = By.xpath(
+                    String.format("*//tr[@id='unregistered']/td[@data-title='%s']/button/img", rightName));
+            } else {
+                buttonLocator = By.xpath(
+                    String.format("//*[@id='usersandgroupstable-display']//td[@class='username']"
+                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/button/img", entityName, rightName));
+            }
+            final WebElement button = getDriver().findElement(buttonLocator);
+            State currentState = State.getButtonImageState(button);
+            button.click();
+            // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
+            // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
+            // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
+            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, SRC_ATTRIBUTE,
+                currentState.getNextState().imageURL);
+        } finally {
+            getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
+        }
+    }
+
     /**
      * Click once on a right button for guest user, waiting for the next state to appear.
      *
@@ -168,22 +224,7 @@ public class EditRightsPane extends BaseElement
      */
     public void clickGuestRight(String rightName)
     {
-        try {
-            getDriver().executeJavascript(
-                "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
-            final By buttonLocator = By.xpath(
-                String.format("*//tr[@id='unregistered']/td[@data-title='%s']/button/img", rightName));
-            final WebElement button = getDriver().findElement(buttonLocator);
-            State currentState = State.getButtonImageState(button);
-            button.click();
-            // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
-            // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
-            // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "src",
-                currentState.getNextState().imageURL);
-        } finally {
-            getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
-        }
+        this.internalClickRight(rightName, null);
     }
 
     /**
@@ -206,23 +247,7 @@ public class EditRightsPane extends BaseElement
      */
     public void clickRight(String entityName, String rightName)
     {
-        try {
-            getDriver().executeJavascript(
-                "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
-            final By buttonLocator =
-                By.xpath(
-                    String.format("//*[@id='usersandgroupstable-display']//td[@class='username']"
-                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/button/img", entityName, rightName));
-            final WebElement button = getDriver().findElement(buttonLocator);
-            State currentState = State.getButtonImageState(button).getNextState();
-            button.click();
-            // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
-            // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
-            // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "src", currentState.imageURL);
-        } finally {
-            getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
-        }
+        this.internalClickRight(rightName, entityName);
     }
 
     /**
@@ -252,11 +277,20 @@ public class EditRightsPane extends BaseElement
         }
     }
 
+    /**
+     * Retrieve the URL for accessing the edit right editor of the given page.
+     * @param space the space where to locate the page
+     * @param page the page for which to set rights
+     * @return the URL to be used to access the editor, as a string
+     */
     public String getURL(String space, String page)
     {
         return getUtil().getURL(space, page, "edit", "editor=rights");
     }
 
+    /**
+     * @return the live table of the rights to be edited.
+     */
     public LiveTableElement getRightsTable()
     {
         if (this.rightsTable == null) {

@@ -924,6 +924,35 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(18)
+    void longTableCell(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LongTableCell"));
+        String expectedContent = viewPage.getContent();
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 4 pages: the cover page and 3 content pages.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            String firstPageContent = pdf.getTextFromPage(1).substring("LongTableCell\n2 / 4\n".length());
+            String secondPageContent = pdf.getTextFromPage(2).substring("LongTableCell\n3 / 4\n".length());
+            String thirdPageContent = pdf.getTextFromPage(3).substring("LongTableCell\n4 / 4\n".length());
+
+            // Verify that we don't lose content when a long table cell is split between multiple print pages.
+            String fragment = firstPageContent.substring(firstPageContent.length() - 40, firstPageContent.length())
+                + secondPageContent.substring(0, 40);
+            fragment = fragment.replace("\n", " ");
+            assertTrue(expectedContent.contains(fragment), "Missing content: " + fragment);
+
+            fragment = secondPageContent.substring(secondPageContent.length() - 40, secondPageContent.length())
+                + thirdPageContent.substring(0, 40);
+            fragment = fragment.replace("\n", " ");
+            assertTrue(expectedContent.contains(fragment), "Missing content: " + fragment);
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

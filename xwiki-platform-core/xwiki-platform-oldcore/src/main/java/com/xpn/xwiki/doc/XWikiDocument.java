@@ -219,11 +219,30 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static final String CLOSE_HTML_MACRO = "{{/html}}";
 
     /**
-     * List of characters that are special in XWiki syntax or HTML.
+     * A list of strings that are special in XWiki syntax or HTML. They don't contain strings that only have a
+     * special meaning at the start of a line.
      */
-    private static final char[] SPECIAL_SYMBOLS = new char[] { '!', '"', '#', '$', '%', '&',
-        '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`',
-        '{', '|', '}', '~', ']' };
+    private static final String[] SPECIAL_SYMBOLS = new String[] { "&", "<", "(%", "(((", "[[", "{", "**", "//", "--",
+        "__", "^^", ",,", "##", "image:", "attach:", "\\\\", "mailto:", "~" };
+
+    /**
+     * Pattern that matches special symbols that are special at the beginning of the line or the beginning of the
+     * string (as the string could be at the beginning of the line). As most of them also accept an arbitrary number of
+     * spaces, it is easier to match them using a regular expression. These are the starting characters of headings,
+     * lists, tables and quotes. Syntax for parameters and horizontal lines aren't included as they are already
+     * matched by the special symbols defined above.
+     */
+    private static final Pattern SPECIAL_SYMBOL_PATTERN = Pattern.compile("(\\n|^)"
+        // Syntax that allows an arbitrary number spaces at the beginning of the line.
+        + "(\\s*("
+        // Headings
+        + "="
+        // Lists - note that they need a space after the list symbol
+        + "|([*]+|[1*]+\\.|[:;])[:;]*\\s"
+        // Tables
+        + "|\\||![!=]"
+        // Quote doesn't allow spaces before the ">" symbol
+        + ")|>)");
 
     /**
      * An attachment waiting to be deleted at next document save.
@@ -3882,7 +3901,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // Add the {{html}}{{/html}} only when result contains special characters from HTML or XWiki syntax since
             // it's not needed for pure text
             if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
-                && StringUtils.containsAny(result, SPECIAL_SYMBOLS))
+                && (StringUtils.containsAny(result, SPECIAL_SYMBOLS) || SPECIAL_SYMBOL_PATTERN.matcher(result).find()))
             {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 // Escape closing HTML macro syntax.

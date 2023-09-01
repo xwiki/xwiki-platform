@@ -607,8 +607,7 @@ public class XWikiDocumentTest
 
         this.baseObject.setStringValue("string", "1 > 2");
 
-        assertEquals("{{html clean=\"false\" wiki=\"false\"}}1 > 2{{/html}}",
-            this.document.display("string", "view", this.oldcore.getXWikiContext()));
+        assertEquals("1 > 2", this.document.display("string", "view", this.oldcore.getXWikiContext()));
 
         assertEquals("{{html clean=\"false\" wiki=\"false\"}}<p>area</p>{{/html}}",
             this.document.display("area", "view", this.oldcore.getXWikiContext()));

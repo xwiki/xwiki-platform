@@ -20,18 +20,21 @@
 ## Since 15.8RC1
 ## This template renders the advice of an extension in the form of a button opening a modal with further explanations. 
 ## ---------------------------------------------------------------------------
+#template("extension.vm")
 #set ($modalId = "${extensionId}--${extensionVersion}")
 ## Replace the special chars to have a valid element id.
 #set ($modalId = $modalId.replaceAll('[.:]', '-'))
 #set ($extensionFullId = "${extensionId}/${extensionVersion}")
-<button type="button" class="btn btn-default btn-xs" data-toggle="modal"
+#set ($buttonLabel = $services.localization.render('extension.security.liveData.advice.modal.openButton',
+  [$extensionFullId]))
+<button type="button"
+        class="btn btn-default btn-xs"
+        data-toggle="modal"
         data-target="#$escapetool.xml($modalId)"
-        aria-controls="$escapetool.xml($modalId)">
-      <span class="sr-only">
-        $escapetool.xml($services.localization.render('extension.security.liveData.advice.modal.openButton',
-        [$extensionFullId]))
-      </span>
-  $services.icon.renderHTML('file-text')
+        aria-controls="$escapetool.xml($modalId)"
+        title="$escapetool.xml($buttonLabel)">
+  <span class="sr-only"> $escapetool.xml($buttonLabel)</span>
+  $services.icon.renderHTML('question')
 </button>
 <div class="modal fade security-vulnerability-detail-modal" tabindex="-1" role="dialog"
      id="$escapetool.xml($modalId)">
@@ -46,21 +49,22 @@
         </h2>
       </div>
       <div class="modal-body">
-        $escapetool.xml($services.localization.render($adviceId))
+        #if ($adviceId == 'extension.security.analysis.advice.upgradeFromEM')
+          #define($extensionManagerLink)<a href="$escapetool.xml($extensionManagerUrl)">##
+$escapetool.xml($services.localization.render("${adviceId}.0"))##
+</a>#end
+          $escapetool.xml($services.localization.render($adviceId, ['__link__'])).replaceFirst('__link__', $extensionManagerLink)
+        #else
+          $escapetool.xml($services.localization.render($adviceId))
+        #end
         #if ($backwardDependencies)
           <ul>
           #foreach ($backwardDependency in $backwardDependencies.entrySet())
             <li>
               $backwardDependency.key
               <ul>
-                #foreach($namespace in $backwardDependency.value)##
-                  <li>
-                    #if ("$!namespace" == '')
-                      $escapetool.xml($services.localization.render('extension.security.namespaces.global'))
-                    #else
-                      $namespace
-                    #end
-                  </li>
+                #foreach($namespace in $backwardDependency.value)
+                  <li>#displayExtensionNamespace($namespace)</li>
                 #end
               </ul>
             </li>

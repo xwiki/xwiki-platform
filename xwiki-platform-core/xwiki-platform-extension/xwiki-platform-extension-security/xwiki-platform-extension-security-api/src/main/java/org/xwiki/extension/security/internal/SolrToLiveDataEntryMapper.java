@@ -205,10 +205,12 @@ public class SolrToLiveDataEntryMapper
             currentScriptContext.setAttribute(EXTENSION_VERSION, extensionId.getVersion(), ENGINE_SCOPE);
             String adviceId = this.solrUtils.get(SECURITY_ADVICE, doc);
             currentScriptContext.setAttribute("adviceId", adviceId, ENGINE_SCOPE);
-            if (adviceId.equals(TRANSITIVE_DEPENDENCY_ADVICE)) {
+            if (Objects.equals(adviceId, TRANSITIVE_DEPENDENCY_ADVICE.getTranslationId())) {
                 currentScriptContext.setAttribute("backwardDependencies", getBackwardDependencies(extensionId),
                     ENGINE_SCOPE);
             }
+            currentScriptContext.setAttribute("extensionManagerUrl", getExtensionManagerLink(extensionId),
+                ENGINE_SCOPE);
             return this.templateManager.renderNoException("extension/security/liveData/advice.vm");
         }).orElse("");
     }
@@ -262,8 +264,6 @@ public class SolrToLiveDataEntryMapper
         // If the extension does not have a name and version indexed, we fall back to an extensionId parsing.
         // Note: this is not supposed to happen in practice.
         ExtensionId extensionId = this.extensionIndexStore.getExtensionId(doc);
-        List<BasicNameValuePair> parameters =
-            buildExtensionURLParameters(extensionId.getId(), extensionId.getVersion().getValue());
         if (doc.get(FieldUtils.NAME) != null) {
             extensionName = this.solrUtils.get(FieldUtils.NAME, doc);
         } else {
@@ -271,8 +271,7 @@ public class SolrToLiveDataEntryMapper
             String[] versionId = this.solrUtils.getId(doc).split("/");
             extensionName = versionId[0];
         }
-        String url = this.documentAccessBridge.getDocumentURL(new LocalDocumentReference("XWiki", "Extensions"),
-            VIEW_ACTION, URLEncodedUtils.format(parameters, Charset.defaultCharset()), null);
+        String url = getExtensionManagerLink(extensionId);
 
         String extensionNameEscaped = escapeXml(String.valueOf(extensionName));
         String extensionIdEscaped = escapeXml(buildExtensionId(doc));
@@ -282,15 +281,6 @@ public class SolrToLiveDataEntryMapper
             extensionNameEscaped,
             extensionIdEscaped,
             extensionIdEscaped
-        );
-    }
-
-    private static List<BasicNameValuePair> buildExtensionURLParameters(String extensionId, String extensionVersion)
-    {
-        return List.of(
-            new BasicNameValuePair("section", "XWiki.Extensions"),
-            new BasicNameValuePair(EXTENSION_ID, extensionId),
-            new BasicNameValuePair(EXTENSION_VERSION, extensionVersion)
         );
     }
 
@@ -328,5 +318,22 @@ public class SolrToLiveDataEntryMapper
             this.logger.warn("Failed to initialize a new execution context. Cause: [{}]", getRootCauseMessage(e));
             return Optional.empty();
         }
+    }
+
+    /**
+     * Returns the link to the extension manager for a given extension.
+     *
+     * @param extensionId the ID of the extension
+     * @return the link to the extension in the extension manager
+     */
+    private String getExtensionManagerLink(ExtensionId extensionId)
+    {
+        List<BasicNameValuePair> parameters = List.of(
+            new BasicNameValuePair("section", "XWiki.Extensions"),
+            new BasicNameValuePair(SolrToLiveDataEntryMapper.EXTENSION_ID, extensionId.getId()),
+            new BasicNameValuePair(EXTENSION_VERSION, extensionId.getVersion().getValue())
+        );
+        return this.documentAccessBridge.getDocumentURL(new LocalDocumentReference("XWiki", "Extensions"),
+            VIEW_ACTION, URLEncodedUtils.format(parameters, Charset.defaultCharset()), null);
     }
 }

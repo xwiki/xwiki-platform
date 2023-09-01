@@ -17,22 +17,18 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#template("xwikivars.vm")
-#template("layoutvars.vm")
-#template("htmlheader.vm")
-#template("skipnav.vm")
-#if($displayMainMenu)
-  <div id="menuview">
-    #template("menus_view.vm")
-  </div>
-#end
-#template("header.vm")
-
-<div class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end" id="contentcontainer">
-<div id="contentcontainerinner">
-<div class="leftsidecolumns">
-#if($hidecolumns && ($!hidecolumns == 1))
-  <div id="contentcolumn" class="contenthidelefthideright">
-#else
-  <div id="contentcolumn"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
-#end
+## Provide a way to skip directly to the main content of page
+## See: https://www.w3.org/TR/WCAG20-TECHS/G1.html
+<div class="skip-nav">
+  #if ("$!xcontext.action" == 'view' || "$!xcontext.action" == 'preview')
+    ## Point at #xwikicontent to skip over the navigation tools including the breadrumb
+    #set ($targetNav = '#xwikicontent')
+  #elseif (("$!xcontext.action" == 'inline' || "$!xcontext.action" == 'edit') && !$editConfirmation)
+    ## In edit mode, point at the title field
+    #set ($targetNav = '#editMeta')
+  #else
+    ## Point at '#mainContentArea' which is present in all pages that include "startpage.vm"
+    #set ($targetNav = '#mainContentArea')
+  #end
+  <a class="btn btn-default" href="$targetNav">$services.localization.render('skin.skipnav.links.content.title')</a>
+</div>

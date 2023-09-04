@@ -33,8 +33,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * All functional tests for Quick Actions.
  *
@@ -374,7 +372,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
 
-        AutocompleteDropdown link = new AutocompleteDropdown();
+        AutocompleteDropdown link = new AutocompleteDropdown().waitForItemSelected("[", "Upload Attachment");
         textArea.sendKeys("ali");
         link.waitForItemSelected("[ali", "alice");
         textArea.sendKeys(Keys.ENTER);
@@ -428,8 +426,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSelected("/emo", "Emoji");
         textArea.sendKeys(Keys.ENTER);
 
-        AutocompleteDropdown emoji = new AutocompleteDropdown();
-        assertEquals("🛩", emoji.getSelectedItem().getLabel());
+        AutocompleteDropdown emoji = new AutocompleteDropdown().waitForItemSelected(":sm", "🛩");
         textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "cat");
         emoji.waitForItemSelected(":cat", "🐈");
         textArea.sendKeys(Keys.ENTER);
@@ -503,5 +500,46 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
         // Click close on the Find and Replace dialog
         new CKEditorDialog().cancel();
+    }
+    
+    @Test
+    @Order(24)
+    void emojiClickTriggersDropDown() throws Exception
+    {
+        textArea.sendKeys("/emo");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/emo", "Emoji");
+        // Click on the emoji Quick Action.
+        qa.getSelectedItem().click();
+
+        AutocompleteDropdown emoji = new AutocompleteDropdown();
+        textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "cat");
+        emoji.waitForItemSelected(":cat", "🐈");
+        textArea.sendKeys(Keys.ENTER);
+
+        assertSourceEquals("🐈");
+    }
+
+    @Test
+    @Order(25)
+    void icon() throws Exception
+    {
+        textArea.sendKeys("/icon");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/icon", "Icon");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // Search and insert the wiki icon.
+        textArea.sendKeys("wiki");
+        AutocompleteDropdown icon = new AutocompleteDropdown().waitForItemSelected("icon::wiki", "wiki");
+        textArea.sendKeys(Keys.ENTER);
+        icon.waitForItemSubmitted();
+
+        // We wait for the editor to update because the icon quick action is using a macro.
+        textArea = editor.getRichTextArea();
+        textArea.waitUntilContentEditable();
+
+        assertSourceEquals("{{displayIcon name=\"wiki\"/}} ");
     }
 }

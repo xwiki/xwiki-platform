@@ -82,5 +82,7 @@ Image.Style.Code.ImageStyleClass_type=Тип
 Image.Style.Code.ImageStyleClass_type_hint=Тип стиля изображений (используется как класс css).
 Image.Style.Code.ConfigurationClass_defaultStyle=Стиль по умолчанию
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Стиль изображений по умолчанию для этой вики.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Сохранять стиль по умолчанию
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Если флажок установлен, то в конфигурации изображения принудительно сохраняются настройки стиля по умолчанию, и пользователю придется изменять стиль самостоятельно.
 </content>
 </xwikidoc>

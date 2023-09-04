@@ -256,6 +256,15 @@
       return withStrictHTMLEncoding(() => {
         return originalAutoCompletePrototype.getHtmlToInsert.apply(this, args);
       });
+    },
+    getTextWatcher: function(...args) {
+      // When pressing enter to select a shortcut Quick Action, the shortcut's textWatcher catches the event
+      // and opens the new drop-down. It however doesn't catch click events by default, which is an other
+      // way to select a Quick Action. This mitigation ensures the textWatchers are updated after
+      // a shortcut Quick Action's html is inserted.
+      const textWatcher = originalAutoCompletePrototype.getTextWatcher.apply(this, args);
+      this.editor.on("afterInsertHtml", function () {textWatcher.check(false);});
+      return textWatcher;
     }
   });
 
@@ -396,11 +405,8 @@
           // Get the text before the caret.
           var left = text.slice(0, offset),
               // Will look for the marker followed by text.
-              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$')),
-              // Do not show the Quick Actions dropdown when the query contains '::'
-              // Because another dropdown might appear
-              subMatch = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}::\\S{0,30}$'));
-          if (match && !subMatch) {
+              match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$'));
+          if (match) {
             return {
               start: match.index,
               end: offset
@@ -712,7 +718,14 @@
           name: editor.lang.common.image,
           iconClass: 'fa fa-image',
           description: editor.localization.get('xwiki-slash.action.img.hint'),
-          outputHTML: '/img::'
+          outputHTML: 'img::'
+        }, {
+          group: 'Content',
+          id: 'icon',
+          name: editor.localization.get('xwiki-slash.action.icon.name'),
+          iconClass: 'fa fa-image',
+          description: editor.localization.get('xwiki-slash.action.icon.hint'),
+          outputHTML: 'icon::'
         }, {
           group: 'Content',
           id: 'mention',

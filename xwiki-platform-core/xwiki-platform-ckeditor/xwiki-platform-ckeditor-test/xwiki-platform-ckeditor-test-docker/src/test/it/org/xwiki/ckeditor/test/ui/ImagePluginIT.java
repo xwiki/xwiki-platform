@@ -22,11 +22,15 @@ package org.xwiki.ckeditor.test.ui;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
@@ -37,16 +41,23 @@ import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Property;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -56,14 +67,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.7RC1
  */
 @UITest
-class ImagePluginIT
+class ImagePluginIT extends AbstractCKEditorIT
 {
+    
+    @BeforeAll
+    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception {
+        setup.loginAsSuperAdmin();
+        waitForSolrIndexing(setup, testConfiguration);
+    }
+    
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
     {
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
         setup.deletePage(testReference);
+    }
+    
+    @AfterEach
+    void afterEach(TestUtils setup, TestReference testReference)
+    {
+        maybeLeaveEditMode(setup, testReference);
     }
 
     @Test
@@ -106,21 +130,7 @@ class ImagePluginIT
     {
         // Create the image style as an admin.
         setup.loginAsSuperAdmin();
-        DocumentReference borderedStyleDocumentReference =
-            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code",
-                "ImageStyles"), "bordered");
-        setup.rest().delete(borderedStyleDocumentReference);
-        setup.rest().savePage(borderedStyleDocumentReference);
-        Object styleObject =
-            setup.rest().object(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass");
-        Property borderedProperty = new Property();
-        borderedProperty.setName("prettyName");
-        borderedProperty.setValue("Bordered");
-        Property typeProperty = new Property();
-        typeProperty.setName("type");
-        typeProperty.setValue("bordered");
-        styleObject.withProperties(borderedProperty, typeProperty);
-        setup.rest().add(styleObject);
+        createBorderedStyle(setup);
 
         // Then test the image styles on the image dialog as a standard user.
         createAndLoginStandardUser(setup);
@@ -516,17 +526,16 @@ class ImagePluginIT
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+        String imageURL = setup.getURL(attachmentReference, "download", "");
+        uploadAttachment(setup, testReference, attachmentName);
 
-        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(testReference).editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         // Insert a with caption and alignment to center.
         ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
-        // The WebHome part is important but is removed when serializing an attachment, adding it back before the 
-        // attachment name.
-        String imageURL = setup.getURL(attachmentReference, "download", "")
-            .replace("/" + attachmentName, "/WebHome/" + attachmentName);
+
+        
         imageDialogSelectModal.switchToUrlTab().setUrlValue(imageURL);
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToAdvancedTab().setWidth(100);
@@ -549,18 +558,176 @@ class ImagePluginIT
 
         assertEquals("[[image:" + imageURL + "||height=\"50\" width=\"50\"]]", savedPage.editWiki().getContent());
     }
-
-    private static void createAndLoginStandardUser(TestUtils setup)
+    
+    @Test
+    @Order(13)
+    void quickInsertImageThisPage(TestUtils setup,
+            TestReference testReference) throws Exception
     {
-        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
+        
+        // Upload an attachment to the page.
+        String attachmentName = "image.gif";
+        uploadAttachment(setup, testReference, attachmentName);
+        
+        // Move to the WYSIWYG edition page.
+        edit(setup, testReference, false);
+        
+        // Run the image quick action.
+        textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        
+        // Select the newly uploaded image.
+        textArea.sendKeys("image");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::image", attachmentName);
+        assertIterableEquals(List.of("This page"), img.getSelectedItem().getBadges());
+        textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+
+        assertSourceEquals("[[image:image.gif]]");
     }
 
-    private ViewPage uploadAttachment(TestUtils setup, TestReference testReference, String attachmentName)
+    @Test
+    @Order(14)
+    void quickInsertImageOtherPage(TestUtils setup,
+            TestReference testReference) throws Exception
+    {
+        // Create a child page.
+        DocumentReference otherPage = new DocumentReference("attachmentOtherPage",
+                        testReference.getLastSpaceReference());
+        
+        // Attach an image named "otherImage.gif" to the other page.
+        String otherAttachmentName = "otherImage.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(otherAttachmentName, otherPage);
+        uploadAttachment(setup, otherPage, otherAttachmentName);
+        
+        String attachmentName = "image.gif";
+        uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        edit(setup, testReference, false);
+        
+        // Run the image quick action.
+        textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        
+        // With the query "image", the image from the current page should be first.
+        textArea.sendKeys("image");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::image", attachmentName);
+        assertIterableEquals(List.of("This page"), img.getSelectedItem().getBadges());
+        // The image from the other page should be right after, because last uploaded on the instance.
+        textArea.sendKeys(Keys.DOWN);
+        img.waitForItemSelected("img::image", otherAttachmentName);
+        assertIterableEquals(List.of(""), img.getSelectedItem().getBadges());
+        textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+
+        assertSourceEquals("[[image:attachmentOtherPage@otherImage.gif]]");
+    }
+    
+    @ParameterizedTest
+    @WikisSource(mainWiki = false)
+    @Order(15)
+    void quickInsertImageSubWiki(WikiReference wiki, TestUtils setup,
+            TestLocalReference testLocalReference, TestReference testReference) throws Exception
+    {
+        DocumentReference subwikiDocumentReference = new DocumentReference(testLocalReference, wiki);
+
+        // Upload image to subwiki.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, subwikiDocumentReference);
+        uploadAttachment(setup, subwikiDocumentReference, attachmentName);
+        
+        // Move to the WYSIWYG edition page on the main wiki.
+        // We update the currentWiki attribute manually because TestUtils.gotoPage updates it only after
+        // navigating to the target page.
+        setup.setCurrentWiki("xwiki");
+        edit(setup, testReference, false);
+        
+        // Run the image quick action.
+        textArea.sendKeys("/image");
+        AutocompleteDropdown qa = new AutocompleteDropdown().waitForItemSelected("/image", "Image");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        
+        // Since there is no image on the current page, the image from the subwiki should be first.
+        textArea.sendKeys("image");
+        AutocompleteDropdown img = new AutocompleteDropdown().waitForItemSelected("img::image", attachmentName);
+        assertIterableEquals(List.of("External"), img.getSelectedItem().getBadges());
+        textArea.sendKeys(Keys.ENTER);
+        img.waitForItemSubmitted();
+        
+        assertSourceEquals("[[image:" + setup.serializeReference(attachmentReference) + "]]");
+    }
+
+    @Test
+    void forceDefaultStyle(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // Change the configuration to have a default style and force it.
+        DocumentReference configurationReference =
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code"), "Configuration");
+        setup.updateObject(configurationReference, "Image.Style.Code.ConfigurationClass", 0,
+            "defaultStyle", "bordered",
+            "forceDefaultStyle", "1");
+
+        // Create the image style as an admin.
+        createBorderedStyle(setup);
+
+        // Then test the image styles on the image dialog as a standard user.
+        createAndLoginStandardUser(setup);
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        ImageDialogStandardEditForm imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
+        // Assert the available image styles as well as the one currently selected.
+        assertEquals(Set.of(""), imageDialogStandardEditForm.getListImageStyles());
+        assertEquals("", imageDialogStandardEditForm.getCurrentImageStyle());
+        assertEquals("Bordered", imageDialogStandardEditForm.getCurrentImageStyleLabel());
+        ImageDialogAdvancedEditForm imageDialogAdvancedEditForm = imageDialogEditModal.switchToAdvancedTab();
+        assertFalse(imageDialogAdvancedEditForm.isWidthEnabled());
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
+    private ViewPage uploadAttachment(TestUtils setup, EntityReference entityReference, String attachmentName)
         throws Exception
     {
-        ViewPage newPage = setup.createPage(testReference, "", "");
-        setup.attachFile(testReference, attachmentName,
+        ViewPage newPage = setup.createPage(entityReference, "", "");
+        setup.attachFile(entityReference, attachmentName,
             getClass().getResourceAsStream("/ImagePlugin/" + attachmentName), false);
         return newPage;
+    }
+
+    private static void createBorderedStyle(TestUtils setup) throws Exception
+    {
+        DocumentReference borderedStyleDocumentReference =
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "bordered");
+        setup.rest().delete(borderedStyleDocumentReference);
+        setup.rest().savePage(borderedStyleDocumentReference);
+        Object styleObject = setup.rest().object(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass");
+        Property borderedProperty = new Property();
+        borderedProperty.setName("prettyName");
+        borderedProperty.setValue("Bordered");
+        Property typeProperty = new Property();
+        typeProperty.setName("type");
+        typeProperty.setValue("bordered");
+        styleObject.withProperties(borderedProperty, typeProperty);
+        setup.rest().add(styleObject);
     }
 }

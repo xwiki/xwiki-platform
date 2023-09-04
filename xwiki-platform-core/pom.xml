@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>15.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,22 +125,8 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Replaced getXWikiHost() with getXWikiURI() in unstable configuration API.</justification>
-              <criticality>documented</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String org.xwiki.export.pdf.PDFExportConfiguration::getXWikiHost()</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.addedToInterface</code>
-                  <new>method java.net.URI org.xwiki.export.pdf.PDFExportConfiguration::getXWikiURI() throws java.net.URISyntaxException</new>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

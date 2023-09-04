@@ -39,7 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @version $Id$
  * @since 11.4RC1
  */
-@UITest
+@UITest(properties = {
+    // Remove once https://jira.xwiki.org/browse/XWIKI-20529 is fixed. Right now AWM requires PR on the following
+    // docs.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\."
+        + "(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"
+})
 class NavigationPanelIT
 {
     @BeforeAll

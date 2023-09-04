@@ -222,36 +222,6 @@ define('xwiki-ckeditor', [
     var config = {
       filebrowserUploadUrl: uploadDisabled ? '' : getUploadURL(sourceDocument, 'filebrowser'),
       height: $(element).height(),
-      mentions: [
-        {
-          // We use the source document to compute the feed URL because we want the suggested link references to be
-          // relative to the edited document (we want the editor to output relative references as much as possible).
-          feed: sourceDocument.getURL('get', $.param({
-            sheet: 'CKEditor.LinkSuggestions',
-            outputSyntax: 'plain',
-            language: XWiki.locale
-          // Prevent the curly brackets from being URL encoded because they mark a placeholder that will be replaced
-          // with the text typed by the user (and CKEditor takes care of URL encoding it).
-          }) + '&amp;input={encodedQuery}'),
-          itemTemplate: [
-            '&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;',
-              '&lt;div&gt;',
-                '&lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;',
-                  // We have to output both icon types but normally only one is defined and the other is hidden.
-                  '&lt;img src="{iconURL}"/&gt;',
-                  '&lt;span class="{iconClass}"&gt;&lt;/span&gt;',
-                '&lt;/span&gt;',
-                '&lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;',
-              '&lt;/div&gt;',
-              '&lt;div class="ckeditor-autocomplete-item-hint"&gt;{hint}&lt;/div&gt;',
-            '&lt;/li&gt;'].join(''),
-          outputTemplate: '&lt;a href="{url}" data-reference="{typed}|-|{type}|-|{reference}"&gt;{label}&lt;/a&gt;',
-          followingSpace: true,
-          marker: '[',
-          minChars: 0,
-          itemsLimit: 6
-        }
-      ],
       // Used to resolve and serialize relative references. Also used to make HTTP requests with the right context.
       sourceDocument: sourceDocument,
       // The syntax of the edited content is not always the same as the syntax of the source document (which applies to

@@ -76,6 +76,17 @@ public interface PDFExportConfiguration
     int getChromeRemoteDebuggingPort();
 
     /**
+     * @return the number of seconds to wait for the Chrome remote debugging service to responde before giving up
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.7
+     */
+    default int getChromeRemoteDebuggingTimeout()
+    {
+        return 10;
+    }
+
+    /**
      * @return the base URI that the headless Chrome browser should use to access the XWiki instance (i.e. the print
      *         preview page); the host (domain or IP address) is mandatory but the scheme and port number are optional
      *         (they default on the scheme and port number used when triggering the PDF export); defaults to

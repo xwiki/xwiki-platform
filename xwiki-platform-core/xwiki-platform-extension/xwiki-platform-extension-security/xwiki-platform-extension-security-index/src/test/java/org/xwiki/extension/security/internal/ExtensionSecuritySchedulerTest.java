@@ -33,9 +33,11 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,11 +72,11 @@ class ExtensionSecuritySchedulerTest
     }
 
     @Test
-    void start()
+    void start() throws Exception
     {
-        this.scheduler.start();
-        verify(this.extensionSecurityConfiguration, timeout(1000)).isSecurityScanEnabled();
-        this.scheduler.start();
+        assertFalse(this.scheduler.start().get());
+        verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
+        assertFalse(this.scheduler.start().get());
         verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
         assertEquals("Extension security scan disabled.", this.logCapture.getMessage(0));
     }
@@ -83,21 +85,21 @@ class ExtensionSecuritySchedulerTest
     void startEnabled() throws Exception
     {
         when(this.extensionSecurityConfiguration.isSecurityScanEnabled()).thenReturn(true);
-        this.scheduler.start();
-        verify(this.extensionSecurityConfiguration, timeout(1000)).isSecurityScanEnabled();
-        verify(this.jobExecutor, timeout(1000)).execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());
-        this.scheduler.start();
+        assertTrue(this.scheduler.start().get());
+        verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
+        verify(this.jobExecutor).execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());
+        assertTrue(this.scheduler.start().get());
         verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
         verify(this.jobExecutor).execute(ExtensionSecurityJob.JOBTYPE, new ExtensionSecurityRequest());
     }
 
     @Test
-    void restart()
+    void restart() throws Exception
     {
-        this.scheduler.start();
-        verify(this.extensionSecurityConfiguration, timeout(1000)).isSecurityScanEnabled();
-        this.scheduler.restart();
-        verify(this.extensionSecurityConfiguration, timeout(1000).times(2)).isSecurityScanEnabled();
+        assertFalse(this.scheduler.start().get());
+        verify(this.extensionSecurityConfiguration).isSecurityScanEnabled();
+        assertFalse(this.scheduler.restart().get());
+        verify(this.extensionSecurityConfiguration, times(2)).isSecurityScanEnabled();
         assertEquals("Extension security scan disabled.", this.logCapture.getMessage(0));
         assertEquals("Extension security scan disabled.", this.logCapture.getMessage(1));
     }

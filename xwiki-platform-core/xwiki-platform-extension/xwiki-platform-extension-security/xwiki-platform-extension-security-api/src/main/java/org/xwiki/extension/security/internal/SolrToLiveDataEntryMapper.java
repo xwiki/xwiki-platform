@@ -21,13 +21,10 @@ package org.xwiki.extension.security.internal;
 
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -48,9 +45,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.search.solr.SolrUtils;
@@ -112,9 +107,9 @@ public class SolrToLiveDataEntryMapper
 
     @Inject
     private ExecutionContextManager contextManager;
-
+    
     @Inject
-    private InstalledExtensionRepository installedExtensionRepository;
+    private BackwardDependenciesResolver backwardDependenciesResolver;
 
     @Inject
     private Logger logger;
@@ -206,37 +201,14 @@ public class SolrToLiveDataEntryMapper
             String adviceId = this.solrUtils.get(SECURITY_ADVICE, doc);
             currentScriptContext.setAttribute("adviceId", adviceId, ENGINE_SCOPE);
             if (Objects.equals(adviceId, TRANSITIVE_DEPENDENCY_ADVICE.getTranslationId())) {
-                currentScriptContext.setAttribute("backwardDependencies", getBackwardDependencies(extensionId),
+                currentScriptContext.setAttribute("backwardDependencies",
+                    this.backwardDependenciesResolver.getExplicitlyInstalledBackwardDependencies(extensionId),
                     ENGINE_SCOPE);
             }
             currentScriptContext.setAttribute("extensionManagerUrl", getExtensionManagerLink(extensionId),
                 ENGINE_SCOPE);
             return this.templateManager.renderNoException("extension/security/liveData/advice.vm");
         }).orElse("");
-    }
-
-    private Map<InstalledExtension, Set<String>> getBackwardDependencies(ExtensionId extensionId)
-    {
-        Map<String, Collection<InstalledExtension>> backwardDependencies;
-        try {
-            backwardDependencies = this.installedExtensionRepository.getBackwardDependencies(extensionId, true);
-        } catch (ResolveException e) {
-            this.logger.warn("Failed to load the list of backward dependencies of [{}]. Cause: [{}]", extensionId,
-                getRootCauseMessage(e));
-            backwardDependencies = Map.of();
-        }
-
-        // Invert the map to have the list of namespaces for each extension.
-        Map<InstalledExtension, Set<String>> reversedBackwardDependencies = new HashMap<>();
-        backwardDependencies.forEach((namespace, installedExtensions) -> installedExtensions
-            .forEach(installedExtension -> reversedBackwardDependencies
-                .compute(installedExtension, (extension, oldNamespaces) -> {
-                    Set<String> newNamespaces = Objects.requireNonNullElseGet(oldNamespaces, HashSet::new);
-                    newNamespaces.add(namespace);
-                    return newNamespaces;
-                })));
-
-        return reversedBackwardDependencies;
     }
 
     private String buildFixVersion(SolrDocument doc)

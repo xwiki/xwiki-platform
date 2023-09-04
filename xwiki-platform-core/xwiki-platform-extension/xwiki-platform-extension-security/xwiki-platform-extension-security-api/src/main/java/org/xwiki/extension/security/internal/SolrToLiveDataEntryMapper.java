@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -107,7 +108,7 @@ public class SolrToLiveDataEntryMapper
 
     @Inject
     private ExecutionContextManager contextManager;
-    
+
     @Inject
     private BackwardDependenciesResolver backwardDependenciesResolver;
 
@@ -205,8 +206,13 @@ public class SolrToLiveDataEntryMapper
                     this.backwardDependenciesResolver.getExplicitlyInstalledBackwardDependencies(extensionId),
                     ENGINE_SCOPE);
             }
+
             currentScriptContext.setAttribute("extensionManagerUrl", getExtensionManagerLink(extensionId),
                 ENGINE_SCOPE);
+
+            // Provide a lambda to easily resolve a link to an extension in the extension manager by its id.
+            currentScriptContext.setAttribute("extensionManagerLinkResolver",
+                (Function<ExtensionId, String>) this::getExtensionManagerLink, ENGINE_SCOPE);
             return this.templateManager.renderNoException("extension/security/liveData/advice.vm");
         }).orElse("");
     }

@@ -61,7 +61,9 @@ $escapetool.xml($services.localization.render("${adviceId}.0"))##
           <ul>
           #foreach ($backwardDependency in $backwardDependencies.entrySet())
             <li>
-              $backwardDependency.key
+              <a href="$escapetool.xml($extensionManagerLinkResolver.apply($backwardDependency.key.id))">
+                $escapetool.xml($backwardDependency.key)
+              </a>
               <ul>
                 #foreach($namespace in $backwardDependency.value)
                   <li>#displayExtensionNamespace($namespace)</li>

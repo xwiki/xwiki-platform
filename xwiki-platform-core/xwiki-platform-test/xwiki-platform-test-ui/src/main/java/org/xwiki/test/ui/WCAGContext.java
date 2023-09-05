@@ -293,6 +293,7 @@ public class WCAGContext
     {
         return violationCountPerRule;
     }
+
     protected Map<String, Integer> getIncompleteCountPerRule()
     {
         return incompleteCountPerRule;

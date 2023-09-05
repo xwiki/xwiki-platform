@@ -20,6 +20,8 @@
 package org.xwiki.internal.migration;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,7 +34,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
-import static java.util.Locale.ROOT;
 import static org.xwiki.localization.LocaleUtils.toLocale;
 
 /**
@@ -84,11 +85,14 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
         logBeforeQueuingTasks(selectedDocuments);
 
         for (ReferenceWithLocale referenceWithLocale : selectedDocuments) {
-            XWikiDocument document =
-                new XWikiDocument(this.documentReferenceResolver.resolve(referenceWithLocale.reference),
-                    toLocale(referenceWithLocale.locale, ROOT));
-            logBeforeQueuingTask(referenceWithLocale);
-            this.taskManager.addTask(getXWikiContext().getWikiId(), document.getId(), getTaskType());
+            resolveLocale(referenceWithLocale).ifPresentOrElse(locale -> {
+                XWikiDocument document =
+                    new XWikiDocument(this.documentReferenceResolver.resolve(referenceWithLocale.reference),
+                        locale);
+                logBeforeQueuingTask(referenceWithLocale);
+                this.taskManager.addTask(getXWikiContext().getWikiId(), document.getId(), getTaskType());
+            }, () -> this.logger.warn("Unknown locale [{}]. Skipping document [{}]", referenceWithLocale.locale,
+                referenceWithLocale.reference));
         }
     }
 
@@ -121,5 +125,16 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     {
         this.logger.info("document [{}] with locale [{}] queued to task [{}]", reference.reference, reference.locale,
             getTaskType());
+    }
+
+    private static Optional<Locale> resolveLocale(ReferenceWithLocale referenceWithLocale)
+    {
+        Optional<Locale> locale;
+        try {
+            locale = Optional.ofNullable(toLocale(referenceWithLocale.locale));
+        } catch (IllegalArgumentException e) {
+            locale = Optional.empty();
+        }
+        return locale;
     }
 }

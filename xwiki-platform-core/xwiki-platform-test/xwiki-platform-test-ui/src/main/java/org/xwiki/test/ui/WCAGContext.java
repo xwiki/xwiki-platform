@@ -298,6 +298,7 @@ public class WCAGContext
     {
         return incompleteCountPerRule;
     }
+
     protected Map<String, Integer> getPassCountPerRule()
     {
         return passCountPerRule;

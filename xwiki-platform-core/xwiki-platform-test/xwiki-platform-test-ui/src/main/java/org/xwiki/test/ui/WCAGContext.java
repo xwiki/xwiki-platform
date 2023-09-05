@@ -303,7 +303,6 @@ public class WCAGContext
         return passCountPerRule;
     }
 
-
     protected Boolean isFailing(String ruleID)
     {
         return FAILS_ON_RULE.get(ruleID);

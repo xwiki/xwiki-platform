@@ -28,19 +28,21 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.xwiki.index.TaskManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.localization.LocaleUtils.toLocale;
 
 /**
  * Allow to easily queue a document analysis task on a set documents to migrate. Sub-classes need to implement two
  * methods:
  * <ul>
- *     <li>{@link #selectDocuments()}: return the list of document ids to queue for migration</li>
+ *     <li>{@link #selectDocuments()}: return the list of document references to queue for migration</li>
  *     <li>{@link #getTaskType()}: the type of the task to queue documents to</li>
  * </ul>
  *
@@ -51,23 +53,6 @@ import static org.xwiki.localization.LocaleUtils.toLocale;
  */
 public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMigration
 {
-    /**
-     * A class representing a reference with a specific locale. This is useful as those information can be retrieved as
-     * is from the database without further parsing/serializing.
-     */
-    protected static class ReferenceWithLocale
-    {
-        public final String reference;
-
-        public final String locale;
-
-        public ReferenceWithLocale(String reference, String locale)
-        {
-            this.reference = reference;
-            this.locale = locale;
-        }
-    }
-
     @Inject
     protected Logger logger;
 
@@ -81,18 +66,13 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     @Override
     protected void hibernateMigrate() throws DataMigrationException
     {
-        List<ReferenceWithLocale> selectedDocuments = selectDocuments();
+        List<DocumentReference> selectedDocuments = selectDocuments();
         logBeforeQueuingTasks(selectedDocuments);
 
-        for (ReferenceWithLocale referenceWithLocale : selectedDocuments) {
-            resolveLocale(referenceWithLocale).ifPresentOrElse(locale -> {
-                XWikiDocument document =
-                    new XWikiDocument(this.documentReferenceResolver.resolve(referenceWithLocale.reference),
-                        locale);
-                logBeforeQueuingTask(referenceWithLocale);
-                this.taskManager.addTask(getXWikiContext().getWikiId(), document.getId(), getTaskType());
-            }, () -> this.logger.warn("Unknown locale [{}]. Skipping document [{}]", referenceWithLocale.locale,
-                referenceWithLocale.reference));
+        for (DocumentReference documentReference : selectedDocuments) {
+            logBeforeQueuingTask(documentReference);
+            this.taskManager.addTask(getXWikiContext().getWikiId(), new XWikiDocument(documentReference).getId(),
+                getTaskType());
         }
     }
 
@@ -103,15 +83,21 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
 
     /**
      * @return the list of document ids to migrate
+     * @since 15.8RC1
+     * @since 14.10.17
+     * @since 15.5.3
      */
-    protected abstract List<ReferenceWithLocale> selectDocuments() throws DataMigrationException;
+    protected abstract List<DocumentReference> selectDocuments() throws DataMigrationException;
 
     /**
      * Prints an info log with the number of queued documents and the type of the task.
      *
      * @param documents the full list of documents that will be queued
+     * @since 15.8RC1
+     * @since 14.10.17
+     * @since 15.5.3
      */
-    protected void logBeforeQueuingTasks(List<ReferenceWithLocale> documents)
+    protected void logBeforeQueuingTasks(List<DocumentReference> documents)
     {
         this.logger.info("[{}] documents queued to task [{}]", documents.size(), getTaskType());
     }
@@ -119,22 +105,52 @@ public abstract class AbstractDocumentsMigration extends AbstractHibernateDataMi
     /**
      * Prints an info logs with an individual document and well as its queued task.
      *
-     * @param reference a unique document reference that will be queued
+     * @param documentReference a unique document reference that will be queued
+     * @since 15.8RC1
+     * @since 14.10.17
+     * @since 15.5.3
      */
-    protected void logBeforeQueuingTask(ReferenceWithLocale reference)
+    protected void logBeforeQueuingTask(DocumentReference documentReference)
     {
-        this.logger.info("document [{}] with locale [{}] queued to task [{}]", reference.reference, reference.locale,
-            getTaskType());
+        this.logger.info("document [{}] queued to task [{}]", documentReference, getTaskType());
     }
 
-    private static Optional<Locale> resolveLocale(ReferenceWithLocale referenceWithLocale)
+    /**
+     * Resolves a document reference with the specified locale.
+     *
+     * @param documentReference the document reference to resolve
+     * @param localeStr the locale in which to resolve the document reference
+     * @return an optional containing the resolved document reference with its locale, or an empty optional if
+     *     resolution fails
+     * @since 15.8RC1
+     * @since 14.10.17
+     * @since 15.5.3
+     */
+    protected Optional<DocumentReference> resolveDocumentReference(String documentReference, String localeStr)
     {
-        Optional<Locale> locale;
-        try {
-            locale = Optional.ofNullable(toLocale(referenceWithLocale.locale));
-        } catch (IllegalArgumentException e) {
-            locale = Optional.empty();
+        Optional<DocumentReference> optionalDocumentReference = parseLocale(localeStr)
+            .map(locale -> new DocumentReference(this.documentReferenceResolver.resolve(documentReference), locale));
+        if (optionalDocumentReference.isEmpty()) {
+            this.logger.warn("Failed to resolve document reference [{}] with locale [{}]", documentReference,
+                localeStr);
         }
-        return locale;
+        return optionalDocumentReference;
+    }
+
+    /**
+     * @param locale a string representation of a locale
+     * @return the resolved {@link Locale} or {@link Optional#empty()} in case of issue during the locale parsing
+     * @since 15.8RC1
+     * @since 14.10.17
+     * @since 15.5.3
+     */
+    private Optional<Locale> parseLocale(String locale)
+    {
+        try {
+            return Optional.ofNullable(toLocale(locale));
+        } catch (IllegalArgumentException e) {
+            this.logger.debug("Unable to resolve locale [{}]. Cause: [{}]", locale, getRootCauseMessage(e));
+            return Optional.empty();
+        }
     }
 }

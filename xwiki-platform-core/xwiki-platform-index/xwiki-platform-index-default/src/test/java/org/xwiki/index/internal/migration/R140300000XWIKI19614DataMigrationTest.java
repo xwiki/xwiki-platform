@@ -122,17 +122,17 @@ class R140300000XWIKI19614DataMigrationTest
         when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
 
         when(this.query.execute()).thenReturn(List.of(
-            new String[] { "xwiki.XWiki.Doc42", "" },
-            new String[] { "xwiki.XWiki.Doc43", "fr" }
+            new String[] { "XWiki.Doc42", "" },
+            new String[] { "XWiki.Doc43", "fr" }
         ));
-        when(this.resolver.resolve("xwiki.XWiki.Doc42")).thenReturn(doc42);
-        when(this.resolver.resolve("xwiki.XWiki.Doc43")).thenReturn(doc43);
+        when(this.resolver.resolve("XWiki.Doc42")).thenReturn(doc42);
+        when(this.resolver.resolve("XWiki.Doc43")).thenReturn(doc43);
 
         this.migration.migrate();
 
         verify(this.query).setWiki("wiki1");
         verify(this.taskManager).addTask("wiki1", -7672023672109484185L, "links");
-        verify(this.taskManager).addTask("wiki1", 6385844664744588369L, "links");
+        verify(this.taskManager).addTask("wiki1", -3303915339101339304L, "links");
 
         assertEquals("[2] documents queued to task [links]", this.logCapture.getMessage(0));
         assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());

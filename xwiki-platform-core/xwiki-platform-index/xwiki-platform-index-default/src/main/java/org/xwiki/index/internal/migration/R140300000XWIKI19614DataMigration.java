@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.internal.migration.AbstractDocumentsMigration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
@@ -81,9 +82,9 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected List<ReferenceWithLocale> selectDocuments() throws DataMigrationException
+    protected List<DocumentReference> selectDocuments() throws DataMigrationException
     {
-        List<ReferenceWithLocale> documents;
+        List<DocumentReference> documents;
         XWikiContext context = getXWikiContext();
         XWiki wiki = getXWikiContext().getWiki();
         if (context.getWiki().hasBacklinks(context)) {
@@ -94,7 +95,8 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
                     .setWiki(context.getWikiId())
                     .<Object[]>execute()
                     .stream()
-                    .map(array -> new ReferenceWithLocale(String.valueOf(array[0]), String.valueOf(array[1])))
+                    .flatMap(
+                        array -> resolveDocumentReference(String.valueOf(array[0]), String.valueOf(array[1])).stream())
                     .collect(Collectors.toList());
             } catch (QueryException e) {
                 throw new DataMigrationException(
@@ -107,13 +109,13 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected void logBeforeQueuingTask(ReferenceWithLocale document)
+    protected void logBeforeQueuingTask(DocumentReference documentReference)
     {
         // No logs here as it would be too verbose (all documents of the wiki are queued).
     }
 
     @Override
-    protected void logBeforeQueuingTasks(List<ReferenceWithLocale> documents)
+    protected void logBeforeQueuingTasks(List<DocumentReference> documents)
     {
         XWikiContext context = getXWikiContext();
         if (context.getWiki().hasBacklinks(context)) {

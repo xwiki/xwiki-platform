@@ -35,8 +35,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
-import static java.util.Locale.ROOT;
-import static org.xwiki.localization.LocaleUtils.toLocale;
 import static org.xwiki.query.Query.XWQL;
 
 /**
@@ -76,7 +74,7 @@ public class R150000000XWIKI20285DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected List<ReferenceWithLocale> selectDocuments() throws DataMigrationException
+    protected List<DocumentReference> selectDocuments() throws DataMigrationException
     {
         XWiki wiki = getXWikiContext().getWiki();
         try {
@@ -84,18 +82,14 @@ public class R150000000XWIKI20285DataMigration extends AbstractDocumentsMigratio
             // positive that wild be filtered out by the more accurate regex in
             // InvitationInternalDocumentParameterEscapingFixer.
             return wiki.getStore().getQueryManager()
-                .createQuery("SELECT doc.fullName, doc.language from Document doc where doc.content "
+                .createQuery("select doc.fullName, doc.language from Document doc where doc.content "
                     + "like '%{{info}}%services.localization.render%xe.invitation.internalDocument%{{/info}}%'", XWQL)
                 .<Object[]>execute()
                 .stream()
-                .map(array -> new ReferenceWithLocale(String.valueOf(array[0]), String.valueOf(array[1])))
+                .flatMap(array -> resolveDocumentReference(String.valueOf(array[0]), String.valueOf(array[1])).stream())
                 // Exclude document that are provided by extensions, because they are fixed using the usual xar upgrade
                 // mechanism.
-                .filter(documentReference -> {
-                    DocumentReference resolve = this.documentReferenceResolver.resolve(documentReference.reference);
-                    return !this.installedXARs.isExtensionDocument(
-                        new DocumentReference(resolve, toLocale(documentReference.locale, ROOT)));
-                })
+                .filter(documentReference -> !this.installedXARs.isExtensionDocument(documentReference))
                 .collect(Collectors.toList());
         } catch (QueryException e) {
             throw new DataMigrationException(

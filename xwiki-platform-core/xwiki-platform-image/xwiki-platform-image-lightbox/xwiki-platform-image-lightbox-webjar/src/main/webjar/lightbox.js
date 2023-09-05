@@ -256,7 +256,7 @@ define('xwiki-lightbox', [
         let offsetY = e.pageY;
         if (offsetX === 0 && offsetY === 0) {
           // When the click is triggered from keyboard,
-          // we display the lightbox menu modal from the toggler.
+          // we display the lightbox menu popover from the toggler.
           let offset = lightboxToggle.offset();
           offsetX = offset.left;
           offsetY = offset.top;
@@ -264,7 +264,7 @@ define('xwiki-lightbox', [
         popoverContainer.css({left: offsetX, top: offsetY});
         popoverContainer.popover('show');
         $('.openLightbox').focus();
-        /* The lightbox modal is generated at the end of the DOM tree.
+        /* The lightbox actions popover (bootstrap modal) is generated at the end of the DOM tree.
           Navigating with the keyboard to its end makes the focus cursor leave the document,
           and it's not possible to force it back where we want it.
           Since this position in the DOM is different to its visual position and this behavior is unexpected,
@@ -274,8 +274,8 @@ define('xwiki-lightbox', [
           before focus can be moved back to its expected position.
           This does not create a focus trap since this element and the lightbox can only be
           accessed from and leaving to a specific context.
-          Moving the modal to its proper place in the DOM involves UI changes that would need
-          a complete overhaul of the modal element, making it a worse alternative. */
+          Moving the popover to its proper place in the DOM involves UI changes that would need
+          a complete overhaul of the popover element, making it a worse alternative. */
         popoverContainer.append($("<div id='popoverKeyboardEscaper' class='sr-only' tabindex='0'>"));
         // Make sure the popover can be exited with basic keyboard navigation.
         let focusLeavingPopover = function (event) {

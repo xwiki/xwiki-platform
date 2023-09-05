@@ -210,6 +210,8 @@ public class DefaultIOService implements IOService
                 // use the object number as annotation id
                 if (object != null) {
                     String targetField = object.getStringValue(Annotation.TARGET_FIELD);
+                    // The legacy behavior is to have a non-empty target, which can lead to issues when the document
+                    // is moved. Now, we consider an object with an empty target as related to the containing document.
                     if (Objects.equals(localTargetId, targetField) || Objects.equals("", targetField)) {
                         result.add(loadAnnotationFromObject(object, localTargetId));
                     }

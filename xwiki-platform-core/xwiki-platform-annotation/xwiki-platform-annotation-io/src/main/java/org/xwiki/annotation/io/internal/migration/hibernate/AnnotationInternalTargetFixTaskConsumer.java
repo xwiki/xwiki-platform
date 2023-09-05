@@ -27,6 +27,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.component.annotation.Component;
@@ -67,12 +68,20 @@ public class AnnotationInternalTargetFixTaskConsumer implements TaskConsumer
     @Inject
     private TypedStringEntityReferenceResolver referenceResolver;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public void consume(DocumentReference documentReference, String version) throws IndexException
     {
         try {
             XWikiContext context = this.contextProvider.get();
-            task(context.getWiki().getDocument(documentReference, context));
+            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+            if (!document.isNew()) {
+                task(document);
+            } else {
+                this.logger.info("[{}] skipped because it does not exist", document);
+            }
         } catch (XWikiException e) {
             throw new IndexException(String.format("Failed to resolve document [%s]", documentReference), e);
         }

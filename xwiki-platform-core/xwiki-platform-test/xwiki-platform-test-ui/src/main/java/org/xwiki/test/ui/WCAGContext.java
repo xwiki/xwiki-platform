@@ -180,9 +180,9 @@ public class WCAGContext
         private WCAGTestResults(String testMethodName, String url, String pageClassName, Results axeResults)
         {
             // Count the amount of checks with each status
-            this.violationCount = amountOfChecks(axeResults.getViolations());
-            this.passCount = amountOfChecks(axeResults.getPasses());
-            this.incompleteCount = amountOfChecks(axeResults.getIncomplete());
+            this.violationCount = numberOfChecks(axeResults.getViolations());
+            this.passCount = numberOfChecks(axeResults.getPasses());
+            this.incompleteCount = numberOfChecks(axeResults.getIncomplete());
             if (this.incompleteCount != 0) {
                 this.incompleteReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName,
                     pageClassName, url, axeResults.getIncomplete());
@@ -196,7 +196,7 @@ public class WCAGContext
                 // the default behavior will be to add it to the fails.
                 // In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
                 .collect(Collectors.toList());
-            this.failCount = amountOfChecks(failingViolations);
+            this.failCount = numberOfChecks(failingViolations);
             if (this.failCount != 0) {
                 this.failReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                     url, failingViolations);
@@ -206,14 +206,14 @@ public class WCAGContext
                 .stream()
                 .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
                 .collect(Collectors.toList());
-            this.warnCount = amountOfChecks(warningViolations);
+            this.warnCount = numberOfChecks(warningViolations);
             if (this.warnCount != 0) {
                 this.warnReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
                     url, warningViolations);
             }
         }
 
-        private int amountOfChecks(List<Rule> violations)
+        private int numberOfChecks(List<Rule> violations)
         {
             return violations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
         }

@@ -67,7 +67,7 @@
 
 (((&amp;nbsp;)))
 {{warning}}
-$services.rendering.escape($services.localization.render('extension.security.admin.environment.explanation'), 'xwiki/2.1')
+{{translation key='extension.security.admin.environment.explanation'/}}
 {{/warning}}
 
 {{liveData

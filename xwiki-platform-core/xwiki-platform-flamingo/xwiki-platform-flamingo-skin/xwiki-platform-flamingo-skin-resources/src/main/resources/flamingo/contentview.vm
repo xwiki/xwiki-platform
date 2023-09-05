@@ -41,7 +41,7 @@ $services.progress.endStep()
 ## ----------------------------
 $services.progress.startStep('Display the title and content')
 ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
-<main class="xcontent">
+<main id="mainContentArea" class="xcontent">
   #template('contentheader.vm')
   #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.content.header.after'))
     $services.rendering.render($uix.execute(), 'xhtml/1.0')

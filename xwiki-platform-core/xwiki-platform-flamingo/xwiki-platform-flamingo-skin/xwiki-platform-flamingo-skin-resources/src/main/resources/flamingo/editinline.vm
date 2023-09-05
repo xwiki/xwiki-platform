@@ -31,7 +31,6 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($allowDocEdit = !(($doc.getLocked()==true)&&(!$force)) )
 ##
 <div class="main">
-<div id="mainContentArea">
 ## ----------------------------------------------------------------------------
 ## Start FORM at start of content area IF editing is allowed.
 ## ----------------------------------------------------------------------------
@@ -49,7 +48,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   </div>
 #end
 #template("hierarchy.vm")
-<main>
+<main id="mainContentArea">
 ## Display a warning in case the document is restricted to explain explain the reason for potential errors.
 ## Also, only display it to users with script right as it's very unlikely that others are impacted.
 #if ($doc.isRestricted() && $services.security.authorization.hasAccess('script'))
@@ -141,8 +140,7 @@ $renderedContent
 #set($editactions = "bottom")
 <div class="bottombuttons sticky-buttons">#template("editactions.vm")</div>
 </div> ## form
-</main>
+</main>## mainContentArea
 </form>
 #end ## can edit
-</div> ## mainContentArea
 </div> ## main

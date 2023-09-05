@@ -309,9 +309,8 @@
   #template('startpage.vm')
   #template('refactoring_macros.vm')
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
     #template("hierarchy.vm")
-    <main>
+    <main id="mainContentArea">
       #if ("$!request.copyId" != '')
         ## Display the copy status
         #handleCopyStatusRequest
@@ -323,6 +322,5 @@
       #end
     </main>
   </div>## mainContentArea
-  </div>## main
   #template('endpage.vm')
 #end

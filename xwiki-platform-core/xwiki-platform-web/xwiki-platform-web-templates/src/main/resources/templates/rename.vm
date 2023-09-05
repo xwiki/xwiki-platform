@@ -34,9 +34,8 @@
     #end
   #end
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
-    #template("hierarchy.vm")
-    <main>
+  #template("hierarchy.vm")
+  <main id="mainContentArea">
     #if ("$!request.renameId" != '')
       ## Display the rename status
       #template("renameStatus.vm")
@@ -104,7 +103,6 @@
     #end
     <div class="clearfloats"></div>
   </main>
-  </div>## mainContentArea
-  </div>## main
+  </div>
   #template("endpage.vm")
 #end

@@ -27,9 +27,8 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main">
-  <div id="mainContentArea">
   #template("hierarchy.vm")
-  <main>
+  <main id="mainContentArea">
   #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
   #template('contentheader.vm')
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
@@ -48,8 +47,7 @@
     #xwikimessageboxend()
   #end
   <div class="clearfloats"></div>
-  </main>
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>15.6-SNAPSHOT</version>
+    <version>15.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -694,10 +694,6 @@
                 **/api/DocumentSection.java,
                 **/api/Object.java,
                 **/api/XWiki.java,
-                **/atom/lifeblog/LifeblogServices.java,
-                **/atom/lifeblog/UserBlog.java,
-                **/atom/WSSEHttpHeader.java,
-                **/atom/XWikiHelper.java,
                 **/content/parsers/RenamePageReplaceLinkHandler.java,
                 **/criteria/api/XWikiCriteriaService.java,
                 **/criteria/impl/DurationFactory.java,
@@ -810,19 +806,6 @@
                 **/plugin/packaging/PackageException.java,
                 **/plugin/packaging/Package.java,
                 **/plugin/packaging/PackagePlugin.java,
-                **/plugin/query/DefaultQuery.java,
-                **/plugin/query/HibernateQuery.java,
-                **/plugin/query/IQueryFactory.java,
-                **/plugin/query/IQuery.java,
-                **/plugin/query/OrderClause.java,
-                **/plugin/query/QueryPluginApi.java,
-                **/plugin/query/QueryPlugin.java,
-                **/plugin/query/SecHibernateQuery.java,
-                **/plugin/query/SepStringBuffer.java,
-                **/plugin/query/XWikiCriteria.java,
-                **/plugin/query/XWikiNamespaceResolver.java,
-                **/plugin/query/XWikiQueryConstants.java,
-                **/plugin/query/XWikiQuery.java,
                 **/plugin/XWikiPluginManager.java,
                 **/pref/api/XWikiPrefService.java,
                 **/pref/impl/xwiki/XWikiPrefServiceImpl.java,
@@ -861,12 +844,6 @@
                 **/store/XWikiHibernateStore.java,
                 **/store/XWikiStoreInterface.java,
                 **/store/XWikiVersioningStoreInterface.java,
-                **/test/smtp/SimpleSmtpServer.java,
-                **/test/smtp/SmtpActionType.java,
-                **/test/smtp/SmtpMessage.java,
-                **/test/smtp/SmtpRequest.java,
-                **/test/smtp/SmtpResponse.java,
-                **/test/smtp/SmtpState.java,
                 **/user/api/XWikiAuthService.java,
                 **/user/api/XWikiGroupService.java,
                 **/user/api/XWikiRightNotFoundException.java,
@@ -895,7 +872,6 @@
                 **/web/CancelAction.java,
                 **/web/DeleteAction.java,
                 **/web/DeleteAttachmentAction.java,
-                **/web/DotAction.java,
                 **/web/DownloadAction.java,
                 **/web/DownloadRevAction.java,
                 **/web/EditAction.java,
@@ -908,7 +884,6 @@
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,
-                **/web/LifeBlogAction.java,
                 **/web/LockAction.java,
                 **/web/ObjectAddAction.java,
                 **/web/ObjectAddForm.java,

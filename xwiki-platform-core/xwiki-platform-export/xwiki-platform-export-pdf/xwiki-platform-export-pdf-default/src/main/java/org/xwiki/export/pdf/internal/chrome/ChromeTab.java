@@ -34,6 +34,7 @@ import javax.servlet.http.Cookie;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserTab;
 
 import com.github.kklisura.cdt.protocol.commands.Network;
@@ -79,10 +80,14 @@ public class ChromeTab implements BrowserTab
 
     private final ChromeDevToolsService browserDevToolsService;
 
-    ChromeTab(ChromeDevToolsService tabDevToolsService, ChromeDevToolsService browserDevToolsService)
+    private final PDFExportConfiguration configuration;
+
+    ChromeTab(ChromeDevToolsService tabDevToolsService, ChromeDevToolsService browserDevToolsService,
+        PDFExportConfiguration configuration)
     {
         this.tabDevToolsService = tabDevToolsService;
         this.browserDevToolsService = browserDevToolsService;
+        this.configuration = configuration;
     }
 
     @Override
@@ -169,7 +174,7 @@ public class ChromeTab implements BrowserTab
         Evaluate evaluate = runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
             /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
             /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
-            /* throwOnSideEffect */ false, /* timeout */ ChromeManager.REMOTE_DEBUGGING_TIMEOUT * 1000.0,
+            /* throwOnSideEffect */ false, /* timeout */ this.configuration.getChromeRemoteDebuggingTimeout() * 1000.0,
             /* disableBreaks */ true, /* replMode */ false, /* allowUnsafeEvalBlockedByCSP */ false,
             /* uniqueContextId */ null);
         checkEvaluation(evaluate, "Page ready.", "Failed to wait for page to be ready.",

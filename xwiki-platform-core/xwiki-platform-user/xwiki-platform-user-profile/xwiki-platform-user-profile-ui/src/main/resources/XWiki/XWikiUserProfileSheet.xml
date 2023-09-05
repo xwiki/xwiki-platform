@@ -39,6 +39,7 @@
   <content>{{velocity}}
 #if ($hasAdmin &amp;&amp; "$!request.userId" != "" &amp;&amp; ($request.action == "disable" || $request.action == "enable") &amp;&amp; $services.csrf.isTokenValid($request.csrf))
 #set ($user = $xwiki.getUser($request.userId))
+## TODO: User#getUser() requires Programming Rights. To be fixed, see https://jira.xwiki.org/browse/XWIKI-21238
 #set ($isCurrentUser = $user.getUser().userReference.equals($xcontext.userReference))
 #if (!$isCurrentUser &amp;&amp; $user.getUser().exists($xcontext.context))
   #set ($disabled = ($request.action == "disable"))

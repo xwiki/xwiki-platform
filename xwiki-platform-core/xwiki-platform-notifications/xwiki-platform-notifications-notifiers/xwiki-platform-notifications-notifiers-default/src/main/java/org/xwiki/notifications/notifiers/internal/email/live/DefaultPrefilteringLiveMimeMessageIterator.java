@@ -36,6 +36,7 @@ import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -67,7 +68,8 @@ public class DefaultPrefilteringLiveMimeMessageIterator extends AbstractMimeMess
         EntityReference templateReference)
     {
         this.events = events;
-        super.initialize(events.keySet().iterator(), factoryParameters, templateReference);
+        super.initialize(events.keySet().iterator(), factoryParameters, templateReference,
+                NotificationEmailInterval.LIVE);
     }
 
     /**

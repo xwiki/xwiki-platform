@@ -72,7 +72,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
         // Add the MailSender plugin used to send mails
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.mailsender.MailSenderPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.mailsender.MailSenderPlugin",
+        // The invitation app requires that InvitationGuestActions is saved with PR or a warning message will be
+        // displayed and will fail acceptInvitationToClosedWiki
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Invitation\\.InvitationGuestActions"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus

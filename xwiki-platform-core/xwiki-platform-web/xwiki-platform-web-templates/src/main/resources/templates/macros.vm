@@ -823,7 +823,7 @@ $fn
 <h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="#if ($isLarge)large#{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
+(% class="#if ($isLarge)large #{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
 {{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
@@ -2642,40 +2642,47 @@ Recursive title display detected!##
       <input type="text" id="${escapedId}-filter" class="xwiki-select-filter"
         placeholder="$escapetool.xml($services.localization.render('web.widgets.select.filter.placeholder'))" />
     </p>
-    <div class="xwiki-select-options">
-      <ul>
-        #set ($count = 0)
-        #foreach ($category in $options)
-          <li class="xwiki-select-category">$category.name (<span class="xwiki-select-category-count">$category.options.size()</span>)
-            <ul>
-              #foreach ($option in $category.options)
-                #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
-                  #set ($checked = 'checked="checked"')
-                  #set ($class = 'xwiki-select-option-selected')
-                #else
-                  #set ($checked = '')
-                  #set ($class = '')
+    <span id="${escapedId}-listbox-label" hidden>
+      $escapetool.xml($services.localization.render('web.widgets.select.listbox.label', [$fieldName]))
+    </span>
+    <span id="${escapedId}-listbox-description" hidden>
+      $escapetool.xml($services.localization.render('web.widgets.select.listbox.description'))
+    </span>
+    <div id="${escapedId}-listbox" role='listbox' class='xwiki-select-options' tabindex='0'
+      aria-labelledby="${escapedId}-listbox-label" aria-describedby="${escapedId}-listbox-description"
+      aria-activedescendant="${fieldName}_0_option">
+      #set ($count = 0)
+      #foreach ($category in $options)
+        <span id="${escapedId}-group${count}-label" role='presentation'>
+          $category.name (<span class="xwiki-select-category-count">$category.options.size()</span>)
+        </span>
+        <ul role='group' class="xwiki-select-category" aria-labelledby="${escapedId}-group${count}-label">
+          #foreach ($option in $category.options)
+            #if ("$!defaultValue" == $$option.value || ($count == 0 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
+              #set ($checked = 'checked="checked"')
+              #set ($class = 'xwiki-select-option-selected xwiki-select-option-highlighted')
+            #else
+              #set ($checked = '')
+              #set ($class = '')
+            #end
+            #set ($otherData = '')
+            #foreach($data in $option.data.keySet())
+              #set ($otherData = "$otherData data-${escapetool.xml($data)} = '$escapetool.xml($option.data.get($data))'")
+            #end
+            <li id="${fieldName}_${count}_option" role='option' class="xwiki-select-option $class">
+              <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked $otherData/>
+              <span class="xwiki-select-option-icon">$!services.icon.renderHTML($option.icon)</span>
+              <div>
+                <label for="${fieldName}_${count}">$escapetool.xml($option.name)</label>
+                #if ("$!option.description" != '')
+                  <p class="xHint">$escapetool.xml($option.description)</p>
                 #end
-                #set ($otherData = '')
-                #foreach($data in $option.data.keySet())
-                  #set ($otherData = "$otherData data-${escapetool.xml($data)} = '$escapetool.xml($option.data.get($data))'")
-                #end
-                <li class="xwiki-select-option $class">
-                  <input type="radio" name="$fieldName" value="$escapetool.xml($option.value)" id="${fieldName}_${count}" $checked $otherData/>
-                  <span class="xwiki-select-option-icon">$!services.icon.renderHTML($option.icon)</span>
-                  <div>
-                    <label for="${fieldName}_${count}">$escapetool.xml($option.name)</label>
-                    #if ("$!option.description" != '')
-                      <p class="xHint">$escapetool.xml($option.description)</p>
-                    #end
-                  </div>
-                </li>
-                #set ($count = $count + 1)
-              #end
-            </ul>
-          </li>
-        #end
-      </ul>
+              </div>
+            </li>
+            #set ($count = $count + 1)
+          #end
+        </ul>
+      #end
     </div>
   </div>
 #end

@@ -845,7 +845,7 @@
       <brand-primary/>
     </property>
     <property>
-      <brand-success>#56b881</brand-success>
+      <brand-success>#077537</brand-success>
     </property>
     <property>
       <brand-warning/>
@@ -881,7 +881,7 @@
       <btn-info-bg/>
     </property>
     <property>
-      <btn-info-color/>
+      <btn-info-color>#000000</btn-info-color>
     </property>
     <property>
       <btn-primary-bg>#386da7</btn-primary-bg>
@@ -890,7 +890,7 @@
       <btn-primary-color>#fff</btn-primary-color>
     </property>
     <property>
-      <btn-success-bg>#31754f</btn-success-bg>
+      <btn-success-bg/>
     </property>
     <property>
       <btn-success-color/>
@@ -973,6 +973,12 @@
 @gray-light: #727272;
 /* Gray-light is too light on a light backgrounds. @gray for muted text is easier to read. */
 @text-muted: @gray;
+/* The boxes background is too dark for links, we make it a lighter shade than bootstrap default. */
+@state-danger-bg: #f8ecec;
+@state-success-bg: #e5f3df;
+@state-info-bg: #e1f1f9;
+/* Input-color-placeholder is hardcoded in bootstrap, we need to override it. */
+@input-color-placeholder: @gray-light;
 
 /* Drawer */
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;

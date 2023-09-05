@@ -22,16 +22,17 @@ package org.xwiki.search.solr.internal;
 import java.util.Arrays;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.mail.GeneralMailConfigurationUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.observation.EventListener;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -47,22 +48,17 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class SolrIndexEventListenerTest
+@ComponentTest
+class SolrIndexEventListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EventListener> mocker =
-        new MockitoComponentMockingRule<EventListener>(SolrIndexEventListener.class);
+    @InjectMockComponents
+    private SolrIndexEventListener listener;
 
+    @MockComponent
     private SolrIndexer indexer;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        indexer = mocker.registerMockComponent(SolrIndexer.class);
-    }
-
     @Test
-    public void onDocumentDeleted() throws Exception
+    void onDocumentDeleted()
     {
         DocumentReference documentReference = new DocumentReference("aWiki", "aSpace", "aPage");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -70,26 +66,26 @@ public class SolrIndexEventListenerTest
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.getRealLocale()).thenReturn(Locale.FRENCH);
 
-        mocker.getComponentUnderTest().onEvent(new DocumentDeletedEvent(), document, null);
+        this.listener.onEvent(new DocumentDeletedEvent(), document, null);
 
-        verify(indexer).delete(new DocumentReference(documentReference, Locale.FRENCH), false);
+        verify(this.indexer).delete(new DocumentReference(documentReference, Locale.FRENCH), false);
     }
 
     @Test
-    public void onDocumentTranslationUpdated() throws Exception
+    void onDocumentTranslationUpdated()
     {
         XWikiDocument translation = mock(XWikiDocument.class);
         DocumentReference translationReference = new DocumentReference("wiki", "Path", "Page", Locale.FRENCH);
         when(translation.getDocumentReferenceWithLocale()).thenReturn(translationReference);
 
-        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), translation, null);
+        this.listener.onEvent(new DocumentUpdatedEvent(), translation, null);
 
         verify(this.indexer).index(translationReference, false);
         verify(this.indexer, times(1)).index(any(EntityReference.class), any(Boolean.class));
     }
 
     @Test
-    public void onDocumentDefaultTranslationUpdated() throws Exception
+    void onDocumentDefaultTranslationUpdated() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
 
@@ -100,11 +96,22 @@ public class SolrIndexEventListenerTest
         DocumentReference documentReference = new DocumentReference("wiki", "Path", "Page");
         when(document.getDocumentReference()).thenReturn(documentReference);
 
-        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), document, xcontext);
+        this.listener.onEvent(new DocumentUpdatedEvent(), document, xcontext);
 
         verify(this.indexer, times(3)).index(any(EntityReference.class), any(Boolean.class));
         verify(this.indexer).index(documentReference, false);
         verify(this.indexer).index(new DocumentReference(documentReference, Locale.FRENCH), false);
         verify(this.indexer).index(new DocumentReference(documentReference, Locale.GERMAN), false);
+    }
+
+    @Test
+    void onGeneralMailConfigurationUpdatedEvent()
+    {
+        this.listener.onEvent(new GeneralMailConfigurationUpdatedEvent(), null, null);
+        verify(this.indexer).index(null, true);
+
+        String otherWiki = "otherwiki";
+        this.listener.onEvent(new GeneralMailConfigurationUpdatedEvent(otherWiki), otherWiki, null);
+        verify(this.indexer).index(new WikiReference(otherWiki), true);
     }
 }

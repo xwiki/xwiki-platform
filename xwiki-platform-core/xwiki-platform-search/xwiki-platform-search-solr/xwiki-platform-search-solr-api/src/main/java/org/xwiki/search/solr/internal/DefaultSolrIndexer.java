@@ -24,10 +24,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
+import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -56,6 +58,7 @@ import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
@@ -292,6 +295,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private JobExecutor jobs;
 
+    @Inject
+    private DocumentContextExecutor documentContextExecutor;
+
+    @Inject
+    private Provider<XWikiContext> xWikiContextProvider;
+
     /**
      * The queue of index operation to perform.
      */
@@ -507,7 +516,20 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
         // If the entity type is supported, use the extractor to get the SolrInputDocuent.
         if (metadataExtractor != null) {
-            return metadataExtractor.getSolrDocument(reference);
+            // Set the document that belongs to the entity reference as context document to ensure that the correct
+            // settings are loaded for the current document/wiki.
+            XWikiContext context = this.xWikiContextProvider.get();
+            try {
+                XWikiDocument document = context.getWiki().getDocument(reference, context);
+
+                return this.documentContextExecutor.call(() -> metadataExtractor.getSolrDocument(reference), document);
+            } catch (SolrIndexerException | IllegalArgumentException e) {
+                // Re-throw to avoid wrapping exceptions that are declared in the method signature.
+                throw e;
+            } catch (Exception e) {
+                throw new SolrIndexerException("Error executing the indexer in the context of the document to index",
+                    e);
+            }
         }
 
         return null;

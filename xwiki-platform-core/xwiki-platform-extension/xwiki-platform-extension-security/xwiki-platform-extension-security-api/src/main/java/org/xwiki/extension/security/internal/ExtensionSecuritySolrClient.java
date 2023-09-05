@@ -37,6 +37,7 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.search.solr.SolrUtils;
 
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_FROM_ENVIRONMENT;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
@@ -67,6 +68,8 @@ public class ExtensionSecuritySolrClient
         WIKIS, FIELD_INSTALLED_NAMESPACES
     );
 
+    private static final String EXACT_MATCH_PATTERN = "%s:%s";
+
     @Inject
     private ExtensionIndexStore extensionIndexStore;
 
@@ -87,6 +90,8 @@ public class ExtensionSecuritySolrClient
         this.extensionIndexStore.createSolrQuery(new ExtensionQuery(), solrQuery);
 
         initFilter(solrQuery);
+        // Exclude the extensions with only safe vulnerabilities.
+        solrQuery.addFilterQuery("security_is_reviewed_safe:false");
         QueryResponse search = this.extensionIndexStore.search(solrQuery);
         return search.getResults().getNumFound();
     }
@@ -137,6 +142,13 @@ public class ExtensionSecuritySolrClient
                 }
             }
         }
+
+        Map<String, Object> parametersMap = liveDataQuery.getSource().getParameters();
+        String isFromEnvironment = Boolean.TRUE.toString();
+        if (!Objects.equals(parametersMap.get("isFromEnvironment"), Boolean.TRUE.toString())) {
+            isFromEnvironment = Boolean.FALSE.toString();
+        }
+        solrQuery.addFilterQuery(String.format(EXACT_MATCH_PATTERN, IS_FROM_ENVIRONMENT, isFromEnvironment));
     }
 
     private static void initFilter(SolrQuery solrQuery)
@@ -146,7 +158,8 @@ public class ExtensionSecuritySolrClient
         }
         // Only include extensions with a computed CVSS score, meaning that they have at least one known security
         // vulnerability.
-        solrQuery.addFilterQuery(String.format("%s:[0 TO 10]", SECURITY_MAX_CVSS));
+        solrQuery.addFilterQuery(String.format("%s:{0 TO 10]", SECURITY_MAX_CVSS));
+        solrQuery.addFilterQuery(String.format("(%s:[* TO *] OR is_installed:false)", FIELD_INSTALLED_NAMESPACES));
     }
 
     private static void initSort(LiveDataQuery liveDataQuery, SolrQuery solrQuery)

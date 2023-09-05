@@ -202,11 +202,11 @@
       <valueField/>
       <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
     </templates>
-    <xwikiHost>
+    <xwikiURI>
       <customDisplay>{{include reference="XWiki.PDFExport.ConfigurationDisplayer" /}}</customDisplay>
       <disabled>0</disabled>
-      <hint>XWiki.PDFExport.ConfigurationClass_xwikiHost.hint</hint>
-      <name>xwikiHost</name>
+      <hint>XWiki.PDFExport.ConfigurationClass_xwikiURI.hint</hint>
+      <name>xwikiURI</name>
       <number>5</number>
       <picker>0</picker>
       <prettyName>XWiki Host</prettyName>
@@ -215,7 +215,7 @@
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </xwikiHost>
+    </xwikiURI>
   </class>
   <object>
     <name>XWiki.PDFExport.ConfigurationClass</name>

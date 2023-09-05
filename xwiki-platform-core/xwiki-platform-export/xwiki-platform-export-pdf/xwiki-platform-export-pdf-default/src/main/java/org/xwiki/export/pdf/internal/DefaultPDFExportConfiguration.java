@@ -19,6 +19,8 @@
  */
 package org.xwiki.export.pdf.internal;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +47,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 @Singleton
 public class DefaultPDFExportConfiguration implements PDFExportConfiguration
 {
+    private static final String SCHEME_SEPARATOR = "//";
+
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource xwikiProperties;
@@ -90,9 +94,25 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     }
 
     @Override
-    public String getXWikiHost()
+    public int getChromeRemoteDebuggingTimeout()
     {
-        return getProperty("xwikiHost", "host.xwiki.internal");
+        return getProperty("chromeRemoteDebuggingTimeout",
+            PDFExportConfiguration.super.getChromeRemoteDebuggingTimeout());
+    }
+
+    @Override
+    public URI getXWikiURI() throws URISyntaxException
+    {
+        // The old way to configure the XWiki URI was through the "xwikiHost" property. We keep supporting it for
+        // backward compatibility with old XWiki instances that have this configuration set.
+        String xwikiURI = getProperty("xwikiURI", getProperty("xwikiHost", "host.xwiki.internal"));
+        // We allow the scheme to be omitted when configuring the XWiki URI (falls back to the scheme used when the PDF
+        // export was triggered) but we need to add the scheme separator for the URI to be valid and to make sure the
+        // host is not parsed as the path.
+        if (!xwikiURI.contains(SCHEME_SEPARATOR)) {
+            xwikiURI = SCHEME_SEPARATOR + xwikiURI;
+        }
+        return new URI(xwikiURI);
     }
 
     @Override

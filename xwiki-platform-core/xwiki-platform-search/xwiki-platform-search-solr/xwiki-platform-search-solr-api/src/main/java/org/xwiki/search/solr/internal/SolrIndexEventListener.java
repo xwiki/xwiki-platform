@@ -35,6 +35,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.GeneralMailConfigurationUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -75,7 +76,7 @@ public class SolrIndexEventListener implements EventListener
         new DocumentCreatedEvent(), new DocumentDeletedEvent(), new AttachmentAddedEvent(),
         new AttachmentDeletedEvent(), new AttachmentUpdatedEvent(), new XObjectAddedEvent(), new XObjectDeletedEvent(),
         new XObjectUpdatedEvent(), new XObjectPropertyAddedEvent(), new XObjectPropertyDeletedEvent(),
-        new XObjectPropertyUpdatedEvent(), new WikiDeletedEvent());
+        new XObjectPropertyUpdatedEvent(), new WikiDeletedEvent(), new GeneralMailConfigurationUpdatedEvent());
 
     /**
      * Logging framework.
@@ -175,6 +176,14 @@ public class SolrIndexEventListener implements EventListener
                 WikiReference wikiReference = new WikiReference(wikiName);
 
                 this.solrIndexer.get().delete(wikiReference, false);
+            } else if (event instanceof GeneralMailConfigurationUpdatedEvent) {
+                // Refresh the index when the mail configuration is changed because the mail configuration is used to
+                // decide if emails shall be indexed or not.
+                if (source instanceof String) {
+                    this.solrIndexer.get().index(new WikiReference((String) source), true);
+                } else {
+                    this.solrIndexer.get().index(null, true);
+                }
             }
         } catch (Exception e) {
             this.logger.error("Failed to handle event [{}] with source [{}]", event, source.toString(), e);

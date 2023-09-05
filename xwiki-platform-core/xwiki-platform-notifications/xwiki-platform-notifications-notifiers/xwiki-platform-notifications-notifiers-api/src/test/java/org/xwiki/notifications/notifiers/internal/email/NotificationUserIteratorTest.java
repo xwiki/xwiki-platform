@@ -32,6 +32,7 @@ import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
 import org.xwiki.notifications.preferences.internal.email.DefaultNotificationEmailUserPreferenceManager;
 import org.xwiki.query.Query;
@@ -89,6 +90,9 @@ class NotificationUserIteratorTest
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private NotificationConfiguration notificationConfiguration;
 
     @MockComponent
     @Named("document")

@@ -41,9 +41,10 @@
 ## Display form
 ## =======================================================
 #set ($params = {
-  'scan': ['scanEnabled', 'scanDelay', 'scanURL']
+  'scan': ['scanEnabled', 'scanDelay', 'scanURL', 'reviewsURL']
 })
 #set ($paramDoc = $xwiki.getDocument('XWiki.Extension.Security.Code.Config'))
+#set ($discard = $paramDoc.setHidden(true))
 #set ($paramClass = 'XWiki.Extension.Security.Code.ConfigClass')
 #set ($objectPolicy = 'updateOrCreate')
 #set ($discard = $paramDoc.getObject($paramClass, true))

@@ -50,6 +50,9 @@ bin
 # NetBeans
 nbproject
 
+# Visual Studio Code
+.vscode
+
 # Gradle Enterprise
 .mvn/.gradle-enterprise
 

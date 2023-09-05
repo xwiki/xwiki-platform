@@ -65,6 +65,20 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
     }
 
     /**
+     * Set the url of the reviews url field in the configuration section.
+     *
+     * @param url the url to set to the reviews url field
+     * @return the current page object
+     */
+    public ExtensionVulnerabilitiesAdminPage setReviewsURL(String url)
+    {
+        WebElement element = getDriver().findElement(By.id("XWiki.Extension.Security.Code.ConfigClass_0_reviewsURL"));
+        element.clear();
+        element.sendKeys(url);
+        return this;
+    }
+
+    /**
      * Save the configuration by clicking on the save button of the configuration form.
      */
     public void saveConfig()

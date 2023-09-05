@@ -68,7 +68,17 @@
 #macro (renderPDFSheet $pdfExportConfig)
   #set ($discard  = $response.setContentType('text/html'))
   #set ($discard = $xwiki.ssx.use($sheetReference))
-  #set ($discard = $xwiki.jsx.use($sheetReference))
+  ## Temporarily disable the JavaScript minification until we find a way to fix the following Closure Compiler error:
+  ##   [JSC_DYNAMIC_IMPORT_USAGE] Dynamic import expressions cannot be transpiled.
+  ## See https://github.com/google/closure-compiler/wiki/JS-Modules#dynamic-import-expressions
+  ## See also https://github.com/google/closure-compiler/issues/2770 ([FEATURE] Support dynamic import)
+  ## This error is unexpected considering that we disable the transpiling here
+  ## https://github.com/xwiki/xwiki-platform/blob/xwiki-platform-15.7/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-skinx/src/main/java/com/xpn/xwiki/web/sx/JsExtension.java#L91-L97
+  ## We're using STABLE as input ECMAScript version, see https://github.com/xwiki/xwiki-commons/blob/xwiki-commons-15.7/pom.xml#L2585
+  ## which is probably lower than ECMAScript 2020 (ES11) when support for dynamic imports was introduced.
+  ## See also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import
+  ## and https://caniuse.com/?search=import()
+  #set ($discard = $xwiki.jsx.use($sheetReference, {'minify': false}))
   #set ($discard = $xwiki.ssx.use($pdfExportConfig.template))
   #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
   ## Use the specified PDF file name as the title of the HTML page in order to have it suggested as file name when
@@ -85,6 +95,23 @@
   #set ($bodyTagStart = $htmlHeader.indexOf('&lt;body'))
   #set ($bodyContentStart = $htmlHeader.indexOf('&gt;', $bodyTagStart) + 1)
   $htmlHeader.substring(0, $headTagEnd)
+  &lt;script&gt;
+  requirejs.config({
+    ## When performing large multi-page exports the RequireJS timeout can be reached because there are many HTTP
+    ## requests and the browser uses a limited pool to handle them. We noticed this problem on a PDF export with many
+    ## live tables because they fetch their results pretty early, before many RequireJS modules are requested. In any
+    ## case, we have the page ready timeout to stop the export in case it takes too much time to load the print preview
+    ## page. We don't need another timeout for RequrieJS modules.
+    waitSeconds: 0,
+    ## PagedJS uses some utility functions that are not exposed by the RequireJS module, so we have to import them
+    ## ourselves from the WebJar in order to be able to patch PagedJS bugs.
+    config: {
+      'pagedjs-module': {
+        baseURL: $jsontool.serialize($services.webjars.url('org.webjars.npm:pagedjs', ''))
+      }
+    }
+  });
+  &lt;/script&gt;
   ## Inject the required skin extensions.
   #if ($pdfExportJobId)
     $!services.job.getJobStatus($pdfExportJobId).requiredSkinExtensions
@@ -260,137 +287,24 @@ require.config({
   }
 });
 
-/**
- * We have to patch Paged.js in order to fix:
- *
- * &lt;ul&gt;
- *   &lt;li&gt;
- *     Support for CSS Counters
- *     &lt;ul&gt;
- *       &lt;li&gt;when an element resets multiple counters, Paged.js generates a counter-increment rule with duplicated
- *         counters, e.g. counter-increment: ch2 -7 ch2 -7 ch3 1; note that it implements resets with negative
- *         increments; we need to keep only the last occurrence of a counter identifier in such a rule&lt;/li&gt;
- *       &lt;li&gt;when an element both resets and increments a counter, Paged.js generates a counter-increment rule that both
- *         decrements and increments the same counter, e.g. counter-increment: ch2 -7 ch2 1; we need to merge the two
- *         values by summing them&lt;/li&gt;
- *       &lt;li&gt;Paged.js doesn't support resetting or incrementing counter values using CSS variables (custom properties);
- *         we fixed this but only for the case when the CSS variable is set inline by the same element that resets or
- *         increments the counter; this limitation comes from the fact that the content is detached from the DOM
- *         document when the counters are processed by Paged.js (so window.getComputedStyle() won't give us the value of
- *         the CSS variable)&lt;/li&gt;
- *     &lt;/ul&gt;
- *   &lt;/li&gt;
- * &lt;/ul&gt;
- */
-define('paged-polyfill-patched', ['paged-polyfill'], function(PagedPolyfill) {
-  // Fix for https://gitlab.coko.foundation/pagedjs/pagedjs/-/issues/320 (resetting multiple counters breaks counters)
-  // See also https://jira.xwiki.org/browse/XWIKI-20556 (Wrong heading numbers in PDF export)
-  const Counters = window.Paged.registeredHandlers.find(handler =&gt; handler.name === 'Counters');
-  Counters.prototype.incrementCounterForElement = function(element, incrementArray) {
-    if (!element || !incrementArray || incrementArray.length === 0) return;
-
-    const ref = element.dataset.ref;
-    const increments = Array.from(this.styleSheet.cssRules).filter((rule) =&gt; {
-      return rule.selectorText === `[data-ref="${element.dataset.ref}"]:not([data-split-from])`
-        &amp;&amp; rule.style[0] === "counter-increment";
-    }).map(rule =&gt; rule.style.counterIncrement);
-
-    // Merge the current increments by adding the values because Paged.js generates both a decrement and an increment
-    // when the element resets and increments the counter at the same time.
-    increments.push(mergeIncrements(incrementArray, (prev, next) =&gt; (parseInt(prev) || 0) + (parseInt(next) || 0)));
-
-    // Keep the last value for each counter when merging with the previous increments.
-    const counterIncrement = mergeIncrements(increments, (prev, next) =&gt; next);
-    this.insertRule(`[data-ref="${ref}"]:not([data-split-from]) { counter-increment: ${counterIncrement} }`);
-  };
-
-  /**
-   * Merge multiple values of a counter-increment CSS rule, using the specified operator.
-   *
-   * @param incrementArray the values to merge, e.g. ['ch2 1', 'ch2 -7 ch3 1']
-   * @param operator the function used to merge counter values (e.g. keep the last value of a counter or sum the counter
-   *          values)
-   * @return the merged value of the counter-increment CSS rule
-   */
-  const mergeIncrements = function(incrementArray, operator) {
-    const increments = {};
-    incrementArray.forEach(increment =&gt; {
-      let values = increment.split(' ');
-      for (let i = 0; i &lt; values.length; i += 2) {
-        increments[values[i]] = operator(increments[values[i]], values[i + 1]);
-      }
-    });
-
-    return Object.entries(increments).map(([key, value]) =&gt; `${key} ${value}`).join(' ');
-  };
-
-  // Paged.js doesn't support counter-reset with CSS variables which is used for instance by the Numbered Headings
-  // Application to set the heading number to a specific value (coming from in-line style where a CSS variable is set).
-  const originalHandleReset = Counters.prototype.handleReset;
-  Counters.prototype.handleReset = function(declaration, rule) {
-    // A single counter-reset rule can reset multiple counters. For each counter an optional value can be specified
-    // (separated by a space). This optional value is a number most of the time, but it can also be a CSS variable name,
-    // which unfortunately is not supported by paged.js yet. To overcome this we:
-    // * replace the variable names with NaN (keeping a record of the used variable names)
-    // * call the original handleReset
-    // * replace NaN with the variable name in the collected counters
-    const resetsWithVar = {};
-    declaration.value.children.forEach((data, item) =&gt; {
-      if (data.type === 'Identifier' &amp;&amp; item.next?.data?.type === 'WhiteSpace' &amp;&amp;
-          item.next.next?.data?.type === 'Function' &amp;&amp; item.next.next.data.name === 'var') {
-        // Save the variable name.
-        const counterName = data.name;
-        const variableName = item.next.next.data.children.head.data.name;
-        resetsWithVar[counterName] = variableName;
-        // Replace the variable with a number in order to match the expected input of the original handleReset.
-        item.next.next.data.type = 'Number';
-        item.next.next.data.value = NaN;
-      }
-    });
-
-    const result = originalHandleReset.apply(this, arguments);
-
-    // Replace NaN with the variable name in the collected counters.
-    Object.entries(resetsWithVar).forEach(([counterName, variableName]) =&gt; {
-      this.counters[counterName].resets[result[0].selector].number = variableName;
-    });
-
-    return result;
-  };
-
-  // Overwrite in order to resolve CSS variable values from resets.
-  Counters.prototype.processCounterResets = function(parsed, counter) {
-    let reset;
-    for (let r in counter.resets) {
-      reset = counter.resets[r];
-      // Find elements for resets
-      let resetElements = parsed.querySelectorAll(reset.selector);
-      // Add counter data
-      for (var i = 0; i &lt; resetElements.length; i++) {
-        // Start XWiki customization.
-        let number = reset.number;
-        if (typeof number === 'string') {
-          // The value is specified using a CSS variable (custom property).
-          // FIXME: We get the variable value only from the inline style of the element because at this point the
-          // element is detached and thus using:
-          //
-          //    getComputedStyle(resetElements[i]).getPropertyValue(number)
-          //
-          // always returns an empty string. We could try to temporarily attach the element to get its computed style,
-          // but for now using the inline style is enough for us.
-          number = resetElements[i].style.getPropertyValue(number) || 0;
-        }
-        resetElements[i].setAttribute("data-counter-"+ counter.name +"-reset", number);
-        // End XWiki customization.
-        if (resetElements[i].getAttribute("data-counter-reset")) {
-          resetElements[i].setAttribute("data-counter-reset", resetElements[i].getAttribute("data-counter-reset") + " " + counter.name);
-        } else {
-          resetElements[i].setAttribute("data-counter-reset", counter.name);
-        }
-      }
+// PagedJS uses some utility functions that are not exposed by the RequireJS module, so we have to import them
+// ourselves in order to be able to patch PagedJS bugs.
+define('pagedjs-module', ['module'], function(module) {
+  return {
+    load: function (name, req, onload, config) {
+      import(module.config().baseURL + name).then(onload);
     }
   };
+});
 
+/**
+ * We have to patch Paged.js in order to fix various issues.
+ */
+define('paged-polyfill-patched', [
+  'paged-polyfill',
+  'pagedjs-module!src/utils/utils.js',
+  'pagedjs-module!src/utils/dom.js'
+], function(PagedPolyfill, Utils, DOMUtils) {
   /**
    * This is a workaround for the Chrome / Paged.js bug that makes table rows hidden when they are split between print
    * pages. See https://github.com/pagedjs/pagedjs/issues/114 . See also https://jira.xwiki.org/browse/XWIKI-20741 .
@@ -411,7 +325,187 @@ define('paged-polyfill-patched', ['paged-polyfill'], function(PagedPolyfill) {
     }
   }
 
-  Paged.registerHandlers(ShowInvisibleRowsOnPageBreaks);
+  /**
+   * This is a workaround for https://github.com/pagedjs/pagedjs/issues/153 (Floating images are always included in the
+   * current print page, even when they don't fit). We remove the floating style before the content is split into print
+   * pages and restore it afterwards. The downside is that we get some empty space at the end of the print page
+   * (proportional to the image size) but at least we don't loose data.
+   */
+  class FixFloatingImages extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforeParsed(content) {
+      // Look for floating images that were inserted by the user (using wiki syntax).
+      content.querySelectorAll([
+        '#xwikicontent img[data-xwiki-image-style-alignment="start"]',
+        '#xwikicontent img[data-xwiki-image-style-alignment="end"]',
+        '#xwikicontent img[data-xwiki-image-style-text-wrap="true"]'
+      ].join()).forEach((floatingImage) =&gt; {
+        // Save the current float value (to be restored after the content is split into print pages).
+        floatingImage.setAttribute('data-xwiki-export-pdf-original-float', floatingImage.style.cssFloat);
+        // Remove the floating style.
+        floatingImage.style.cssFloat = 'none';
+      });
+    }
+
+    afterRendered(pages) {
+      pages.forEach((page) =&gt; {
+        page.area.querySelectorAll('[data-xwiki-export-pdf-original-float]').forEach((element) =&gt; {
+          // Restore the original floating style.
+          element.style.cssFloat = element.getAttribute('data-xwiki-export-pdf-original-float');
+          element.removeAttribute('data-xwiki-export-pdf-original-float');
+        });
+      });
+    }
+  }
+
+  /**
+   * Make sure the table rows are complete before determining the overflow otherwise the table layout is different than
+   * in view mode. See XWIKI-21043 (The last lines of text from a print page are not always visible when they are inside
+   * a table cell that is split between print pages).
+   */
+  class FixTableLayout extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    layout(renderedContent, layoutMethod) {
+      if (typeof layoutMethod.rebuildTableRows === 'function') {
+        // Layout already patched.
+        return;
+      }
+
+      layoutMethod.rebuildTableRows = function (rendered, source) {
+        rendered.querySelectorAll("tr").forEach((renderedRow) =&gt; {
+          const sourceRow = DOMUtils.findElement(renderedRow, source, true);
+          // Skip if the row is fully rendered.
+          if (!sourceRow || renderedRow.childNodes.length &gt;= sourceRow.childNodes.length) {
+            return;
+          }
+          // Otherwise, we will append the missing cells. Note that we perform a deep clone of the missing cells
+          // because we don't want them to be skipped (if empty) when finding the overflow point (since this method is
+          // normally called right before the overflow is computed).
+          const sourceCells = [...sourceRow.childNodes];
+          for (let i = renderedRow.childNodes.length; i &lt; sourceCells.length; i++) {
+            this.append(sourceCells[i], rendered, null, false);
+          }
+        });
+      };
+
+      const originalFindBreakToken = layoutMethod.findBreakToken;
+      layoutMethod.findBreakToken = function(rendered, source) {
+        // Make sure the table rows are complete before determining the overflow, otherwise the table layout will be
+        // different than on the source document (e.g. different column widths). Moreover, we're rebuilding the table
+        // rows also after removing the overflown content for the same reason, to ensure the table layout is preserved.
+        this.rebuildTableRows(rendered, source);
+        return originalFindBreakToken.apply(this, arguments);
+      };
+
+      const originalAppend = layoutMethod.append;
+      layoutMethod.append = function(node, dest, breakToken, shallow = true, rebuild = true) {
+        // Check if the node is already appended.
+        if (DOMUtils.isElement(node)) {
+          // If the node is an element then we can look directly for it (based on data-ref attribute).
+          const existingElement = DOMUtils.findElement(node, dest, true);
+          if (existingElement) {
+            // The element is already appended, but maybe it was a shallow clone.
+            if (!shallow &amp;&amp; node.hasChildNodes() &amp;&amp; !existingElement.hasChildNodes()) {
+              // A shallow clone was previously appended, but now we need a deep clone.
+              const deepClone = DOMUtils.cloneNode(node, true);
+              // We reuse the existing element because it is already cached in indexOfRefs.
+              existingElement.append(...deepClone.childNodes);
+            }
+            return existingElement;
+          }
+        } else if (DOMUtils.isElement(node.parentNode)) {
+          // The node is most likely a text node, so we need to find its parent element.
+          const existingParent = DOMUtils.findElement(node.parentNode, dest, true);
+          // Check if the parent element was fully cloned.
+          if (existingParent &amp;&amp; existingParent.childNodes.length === node.parentNode.childNodes.length) {
+            return existingParent.childNodes[DOMUtils.indexOf(node)];
+          }
+        }
+
+        // This node hasn't been appended yet.
+        return originalAppend.apply(this, arguments);
+      };
+
+      layoutMethod.textBreak = function (node, start, end, vStart, vEnd) {
+        let wordwalker = DOMUtils.words(node);
+        let left = 0;
+        let right = 0;
+        let top = 0;
+        let bottom = 0;
+        let word, next, done, pos;
+        let offset;
+        while (!done) {
+         next = wordwalker.next();
+         word = next.value;
+         done = next.done;
+
+         if (!word) {
+          break;
+         }
+
+         pos = Utils.getBoundingClientRect(word);
+
+         left = Math.floor(pos.left);
+         right = Math.floor(pos.right);
+         top = Math.floor(pos.top);
+         bottom = Math.floor(pos.bottom);
+
+         if (left &gt;= end || top &gt;= vEnd) {
+          // The word is completely outside the bounds of the print page. We need to break before it.
+          offset = word.startOffset;
+          break;
+         }
+
+         if (right &gt; end || bottom &gt; vEnd) {
+          // The word is partially outside the print page (e.g. a word could be split / hyphenated on two lines of
+          // text and only the first part fits into the current print page; or simply because the end of the page
+          // truncates vertically the word). We need to see if any of its letters fit into the current print page.
+          let letterwalker = DOMUtils.letters(word);
+          let letter, nextLetter, doneLetter;
+
+          while (!doneLetter) {
+           // Note that the letter walker continues to walk beyond the end of the word, until the end of the
+           // text node.
+           nextLetter = letterwalker.next();
+           letter = nextLetter.value;
+           doneLetter = nextLetter.done;
+
+           if (!letter) {
+            break;
+           }
+
+           pos = Utils.getBoundingClientRect(letter);
+           right = Math.floor(pos.right);
+           bottom = Math.floor(pos.bottom);
+
+           // Stop if the letter exceeds the bounds of the print page. We need to break before it.
+           if (right &gt; end || bottom &gt; vEnd) {
+            offset = letter.startOffset;
+            done = true;
+
+            break;
+           }
+          }
+         }
+
+        }
+
+        return offset;
+      };
+    }
+  }
+
+  Paged.registerHandlers(
+    ShowInvisibleRowsOnPageBreaks,
+    FixFloatingImages,
+    FixTableLayout
+  );
 
   return PagedPolyfill;
 });
@@ -633,7 +727,9 @@ require([
 
   /**
    * Tables with absolute column / cell widths are printed very badly. There's not much we can do about it besides
-   * trying to replace the absolute widths with relative widths.
+   * trying to replace the absolute widths with relative widths. Besides that, even if the column / cell width is not
+   * specified it's still good to set it to a relative value in order to ensure that when a table is split between print
+   * pages then the layout is preserved from one page to the next.
    */
   const makeTableCellWidthRelative = function() {
     // Remove temporarily the maximum width limitation from the table in order to compute the cell width relative to the
@@ -644,12 +740,14 @@ require([
     });
 
     // If the table cell width is specified then replace its value with the corresponding percentage of the table width.
+    // If the cell width is not specified we still set it to a relative value in order to preserve the layout when the
+    // table is split between print pages.
     $('#xwikicontent th, #xwikicontent td').each(function() {
       const specifiedCellWidth = this.style.getPropertyValue('width') || this.getAttribute('width');
-      if (specifiedCellWidth &amp;&amp; !specifiedCellWidth.trimEnd().endsWith('%')) {
-        const computedCellWidth = $(this).width();
-        const rowWidth = $(this).parent().width();
-        const relativeCellWidth = Math.floor(computedCellWidth / rowWidth * 100);
+      if (!specifiedCellWidth || !specifiedCellWidth.trimEnd().endsWith('%')) {
+        const computedCellWidth = this.clientWidth;
+        const rowWidth = this.parentNode.clientWidth;
+        const relativeCellWidth = Math.floor(computedCellWidth / rowWidth * 10000) / 100;
         $(this).removeAttr('width').css({width: relativeCellWidth + '%'});
       }
     });
@@ -943,7 +1041,6 @@ require([
 
   .pdf-cover {
     page: cover;
-    break-after: page;
   }
 
   /**
@@ -954,7 +1051,6 @@ require([
 
   .pdf-toc {
     page: toc;
-    break-after: page;
   }
 
   .pdf-toc ul {

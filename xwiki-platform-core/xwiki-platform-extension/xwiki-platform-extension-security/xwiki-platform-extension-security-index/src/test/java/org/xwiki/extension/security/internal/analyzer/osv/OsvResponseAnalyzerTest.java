@@ -86,7 +86,6 @@ class OsvResponseAnalyzerTest
             securityVulnerabilityDescriptor1,
             securityVulnerabilityDescriptor2
         ));
-        expected.setAdvice("extension.security.analysis.advice.upgradeFromEM");
 
         assertEquals(expected,
             this.analyzer.analyzeOsvResponse("org.xwiki.platform:xwiki-platform-administration-ui", "13.10",
@@ -105,7 +104,6 @@ class OsvResponseAnalyzerTest
         securityVulnerabilityDescriptor.setScore(7.5);
         securityVulnerabilityDescriptor.setFixVersion(new DefaultVersion("15.7"));
         expected.setResults(List.of(securityVulnerabilityDescriptor));
-        expected.setAdvice("extension.security.analysis.advice.upgradeFromEM");
 
         assertEquals(expected,
             this.analyzer.analyzeOsvResponse("org.test:my-ext", "7.5", osvResponse));

@@ -299,6 +299,7 @@
 
 #contentmenu {
   .text-right();
+  .flat-buttons();
 
   .dropdown {
     display: inline-block;
@@ -316,5 +317,33 @@
     background-color: transparent;
   }
 
-  .flat-buttons();
+  .btn-group > dl.dropdown-menu {
+    & > dt.dropdown-header {
+      // Use the bootstrap style for our semantic architecture
+      &:extend(li.dropdown-header);
+      font-weight: initial;
+    }
+
+    & > dd:not(:last-child) {
+      // Add a css separator under the section
+      padding-bottom: 10px;
+      border-bottom: 1px solid @dropdown-divider-bg ;
+      margin-bottom: 10px;
+    }
+
+    & > dd > ul {
+      // Remove default list style
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+
+      & > li > a {
+        // Use the bootstrap style for our semantic architecture
+        &:extend(.dropdown-menu > li > a);
+        &:hover, &:focus-within {
+          &:extend(.dropdown-menu > li > a:hover);
+        }
+      }
+    }
+  }
 }

@@ -200,4 +200,10 @@ public class AllIT
     class NestedPagePickerIT extends PagePickerIT
     {
     }
+
+    @Nested
+    @DisplayName("Compare Tests")
+    class NestedCompareIT extends CompareIT
+    {
+    }
 }

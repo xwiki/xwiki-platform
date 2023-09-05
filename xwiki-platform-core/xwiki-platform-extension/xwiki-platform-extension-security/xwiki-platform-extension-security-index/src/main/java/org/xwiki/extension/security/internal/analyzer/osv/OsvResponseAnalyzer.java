@@ -43,7 +43,6 @@ import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-import static org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer.PLATFORM_PREFIX;
 
 /**
  * Analyze the provided {@link OsvResponse} and return an {@link ExtensionSecurityAnalysisResult}.
@@ -55,10 +54,6 @@ import static org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSec
 @Singleton
 public class OsvResponseAnalyzer
 {
-    /**
-     * Shared constant when the suggestion is to upgrade the extension from the Extension Manager.
-     */
-    private static final String UPGRADE_FROM_EM_ADVICE = "extension.security.analysis.advice.upgradeFromEM";
 
     @Inject
     private Logger logger;
@@ -81,14 +76,10 @@ public class OsvResponseAnalyzer
                     vulnerability)
                     .ifPresent(matchingVulns::add));
         }
-        Version currentVersion = new DefaultVersion(version);
-        ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult = new ExtensionSecurityAnalysisResult()
-            .setResults(matchingVulns.stream().map(vulnObject -> convert(vulnObject, currentVersion))
+
+        return new ExtensionSecurityAnalysisResult()
+            .setResults(matchingVulns.stream().map(vulnObject -> convert(vulnObject, new DefaultVersion(version)))
                 .collect(Collectors.toList()));
-        if (!extensionSecurityAnalysisResult.getSecurityVulnerabilities().isEmpty()) {
-            extensionSecurityAnalysisResult.setAdvice(UPGRADE_FROM_EM_ADVICE);
-        }
-        return extensionSecurityAnalysisResult;
     }
 
     private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject, Version currentVersion)
@@ -103,7 +94,7 @@ public class OsvResponseAnalyzer
     private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)
     {
         Optional<VulnObject> rvuln = Optional.empty();
-        boolean isPlatform = mavenId.startsWith(PLATFORM_PREFIX);
+        boolean isPlatform = OsvExtensionSecurityAnalyzer.isNotOnMavenCentral(mavenId);
         if (!isPlatform || isMatchesOneRange(mavenId, version, vuln)) {
             rvuln = Optional.of(vuln);
         }

@@ -73,7 +73,7 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
     {
         this.lastTrigger = lastTrigger;
 
-        super.initialize(userIterator, factoryParameters, templateReference);
+        super.initialize(userIterator, factoryParameters, templateReference, userIterator.getInterval());
     }
 
     @Override

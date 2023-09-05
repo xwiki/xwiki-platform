@@ -31,6 +31,7 @@ import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import org.xwiki.stability.Unstable;
 
 /**
  * Define the NotificationEmailPreferenceClass XClass.
@@ -72,6 +73,14 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
      */
     public static final String FIELD_INTERVAL = "interval";
 
+    /**
+     * The name of the field containing the diff type.
+     *
+     * @since 15.6RC1
+     */
+    @Unstable
+    public static final String FIELD_DIFF_TYPE = "diffType";
+
     private static final String SELECT = "select";
 
     private static final String SEPARATORS = "|, ";
@@ -93,6 +102,6 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
         String values = Arrays.stream(NotificationEmailDiffType.values()).map(v -> v.name())
             .reduce((v1, v2) -> String.format("%s|%s", v1, v2)).get();
 
-        xclass.addStaticListField("diffType", "Diff Type", 1, false, values, SELECT, SEPARATORS);
+        xclass.addStaticListField(FIELD_DIFF_TYPE, "Diff Type", 1, false, values, SELECT, SEPARATORS);
     }
 }

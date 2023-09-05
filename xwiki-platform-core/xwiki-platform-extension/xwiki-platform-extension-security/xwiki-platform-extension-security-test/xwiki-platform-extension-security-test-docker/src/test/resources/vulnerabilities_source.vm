@@ -25,8 +25,9 @@ ${line}")
 #end
 #set ($json = $jsontool.fromString($lines))
 #set ($extensionId = $json.get('package').get('name'))
+#set ($map = {})
 #if ($extensionId == 'org.xwiki.platform:xwiki-platform-administration-ui')
-{
+#set ($map = {
   "vulns": [
     {
       "id": "GHSA-4v38-964c-xjmw",
@@ -44,7 +45,7 @@ ${line}")
         "github_reviewed": true,
         "severity": "CRITICAL",
         "github_reviewed_at": "2023-04-19T18:26:35Z",
-        "nvd_published_at": null
+        "nvd_published_at": $null
       },
       "references": [
         {
@@ -117,7 +118,7 @@ ${line}")
         "github_reviewed": true,
         "severity": "CRITICAL",
         "github_reviewed_at": "2023-04-20T21:46:57Z",
-        "nvd_published_at": null
+        "nvd_published_at": $null
       },
       "references": [
         {
@@ -655,7 +656,6 @@ ${line}")
       ]
     }
   ]
-}
-#else
-{}
+})
 #end
+#jsonResponse($map)

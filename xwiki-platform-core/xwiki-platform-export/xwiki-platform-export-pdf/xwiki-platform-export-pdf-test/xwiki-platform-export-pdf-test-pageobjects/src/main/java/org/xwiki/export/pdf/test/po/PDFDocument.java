@@ -24,20 +24,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.action.PDAction;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
@@ -60,6 +57,8 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 public class PDFDocument implements AutoCloseable
 {
     private final PDDocument document;
+
+    private final PDFImageExtractor imageExtractor;
 
     /**
      * Fetches and parses a PDF document from a given URL.
@@ -91,6 +90,7 @@ public class PDFDocument implements AutoCloseable
             connection.setRequestProperty("Authorization", authHeaderValue);
         }
         this.document = PDDocument.load(IOUtils.toByteArray(connection));
+        this.imageExtractor = new PDFImageExtractor();
     }
 
     @Override
@@ -251,11 +251,11 @@ public class PDFDocument implements AutoCloseable
      */
     public List<PDFImage> getImages() throws IOException
     {
-        Map<String, PDImageXObject> images = new LinkedHashMap<>();
+        List<PDFImage> images = new ArrayList<>();
         for (PDPage page : this.document.getPages()) {
-            images.putAll(getImagesFromPage(page));
+            images.addAll(getImagesFromPage(page));
         }
-        return images.values().stream().map(PDFImage::new).collect(Collectors.toList());
+        return images;
     }
 
     /**
@@ -265,21 +265,11 @@ public class PDFDocument implements AutoCloseable
      */
     public List<PDFImage> getImagesFromPage(int pageNumber) throws IOException
     {
-        return getImagesFromPage(this.document.getPage(pageNumber)).values().stream().map(PDFImage::new)
-            .collect(Collectors.toList());
+        return getImagesFromPage(this.document.getPage(pageNumber));
     }
 
-    private Map<String, PDImageXObject> getImagesFromPage(PDPage page) throws IOException
+    private List<PDFImage> getImagesFromPage(PDPage page) throws IOException
     {
-        Map<String, PDImageXObject> images = new LinkedHashMap<>();
-
-        PDResources pdResources = page.getResources();
-        for (COSName name : pdResources.getXObjectNames()) {
-            if (pdResources.isImageXObject(name)) {
-                PDImageXObject pdxObjectImage = (PDImageXObject) pdResources.getXObject(name);
-                images.put(name.getName(), pdxObjectImage);
-            }
-        }
-        return images;
+        return this.imageExtractor.getImages(page);
     }
 }

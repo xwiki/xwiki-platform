@@ -139,7 +139,7 @@ administration.section.users.deleteUser.newAuthor.hint=Sélectionnez un utilisat
 administration.section.users.deleteUser.newAuthor.error=L''utilisateur sélectionné n''a pas les droits {0} !
 administration.section.users.deleteUser.newAuthor.programming=de programmation
 administration.section.users.deleteUser.newAuthor.script=script
-admin.usersgroups.extensionrights=Permissions des extensions
+admin.usersgroups.extensionrights=Droits des extensions
 
 # Other Category
 admin.other=Divers

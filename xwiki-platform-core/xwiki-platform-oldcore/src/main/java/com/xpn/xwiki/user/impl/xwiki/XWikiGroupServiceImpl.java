@@ -497,7 +497,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     fieldMap.put(fieldName, fieldPrefix);
                 } else {
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
-                    where.append(" and lower(doc." + fieldName + ") like ?" + parameterValues.size());
+                    // We do not support OR filters by default, however this may be useful in the case where users or
+                    // groups come with a manually defined title.
+                    if (fieldName.equals("name")) {
+                        where.append(String.format(" and (lower(doc.name) like ?%s or lower(doc.title) like ?%s)",
+                            parameterValues.size(), parameterValues.size()));
+                    } else {
+                        where.append(String.format(" and lower(doc.%s) like ?%s", fieldName, parameterValues.size()));
+                    }
                 }
             }
         }

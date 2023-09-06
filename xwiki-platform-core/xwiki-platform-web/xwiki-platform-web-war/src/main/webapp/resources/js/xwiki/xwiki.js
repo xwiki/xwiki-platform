@@ -1997,6 +1997,8 @@ document.observe("xwiki:dom:loaded", function() {
  * Initializes the submit-once protection on the current page.
  * Search for all form elements with a .xwiki-submit-once class one the document (or on an updated sub-part of the dom).
  * For each form, once the form is submitted, mark it with the .xwiki-form-submitting class and prevent new submissions.
+ * Note that currently we are expecting the form to be submitted without client side validation. It is not advised to
+ * add the xwiki-submit-once class on forms with client side validation.
  *
  *  @since 14.10.17
  *  @since 15.5.3
@@ -2004,7 +2006,7 @@ document.observe("xwiki:dom:loaded", function() {
  */
 require(['jquery'], ($) => {
   /**
-   * Initializes the root element by adding event listeners to all forms with the class 'form.xwiki-submit-once'.
+   * Initializes the root element by adding event listeners to all forms with the class 'xwiki-submit-once'.
    * When a form is submitted, it prevents the submission if it is already being submitted and adds a class to visually
    * convey that the form was submitted.
    *
@@ -2012,25 +2014,32 @@ require(['jquery'], ($) => {
    */
   function init(rootElement) {
     Array.from(rootElement.getElementsByClassName('xwiki-submit-once')).forEach(form => {
-      const submittingClass = 'xwiki-form-submitting';
-      form.classList.remove(submittingClass);
       // Use a submit event handler with namespace 'xwiki-submit-once'. Before defining a handler, any potentially 
       // registered listener is removed to prevent double registration of the same handler.
       $(form).off("submit.xwiki-submit-once").on("submit.xwiki-submit-once", (e) => {
+        const submittingClass = 'xwiki-form-submitting';
         // Prevent if already submitting.
         if (form.classList.contains(submittingClass)) {
+          // In case of canceled form submission (using the cancel button of the browser), the user will not be able to
+          // submit the form again, but will see the notification below. This should be a good enough hint for the user,
+          // who will manually reload the page.
+          new XWiki.widgets.Notification(
+            "$escapetool.javascript($services.localization.render('platform.web.login.formSubmitted'))", "warning");
           e.preventDefault();
         } else {
-          // Add a class to visually convey that the form was submitted
+          // Add a class to visually convey that the form was submitted. By default, the only visual clue is the cursor
+          // change to a "wait" spinning cursor.
           form.classList.add(submittingClass);
+          new XWiki.widgets.Notification(
+            "$escapetool.javascript($services.localization.render('platform.web.login.submittingForm'))", "info");
         }
       })
     });
   }
 
-  $(document).on('xwiki:dom:loaded xwiki:dom:updated', (event, data) => {
-    const container = data?.elements || [document.documentElement];
-    container.forEach(init);
+  $(document).on('xwiki:dom:updated', (event, data) => {
+    const containers = data?.elements || [document.documentElement];
+    containers.forEach(init);
   });
   $(() => init(document.documentElement));
 });

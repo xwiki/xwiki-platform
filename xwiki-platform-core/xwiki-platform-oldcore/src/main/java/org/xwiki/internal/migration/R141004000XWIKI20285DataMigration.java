@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.internal.extension.XARExtensionIndex;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
@@ -73,7 +74,7 @@ public class R141004000XWIKI20285DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected List<String> selectDocuments() throws DataMigrationException
+    protected List<DocumentReference> selectDocuments() throws DataMigrationException
     {
         XWiki wiki = getXWikiContext().getWiki();
         try {
@@ -81,14 +82,14 @@ public class R141004000XWIKI20285DataMigration extends AbstractDocumentsMigratio
             // positive that wild be filtered out by the more accurate regex in
             // InvitationInternalDocumentParameterEscapingFixer.
             return wiki.getStore().getQueryManager()
-                .createQuery("where doc.content "
+                .createQuery("select doc.fullName, doc.language from Document doc where doc.content "
                     + "like '%{{info}}%services.localization.render%xe.invitation.internalDocument%{{/info}}%'", XWQL)
-                .<String>execute()
+                .<Object[]>execute()
                 .stream()
+                .flatMap(array -> resolveDocumentReference(String.valueOf(array[0]), String.valueOf(array[1])).stream())
                 // Exclude document that are provided by extensions, because they are fixed using the usual xar upgrade
                 // mechanism.
-                .filter(documentReference -> !this.installedXARs.isExtensionDocument(
-                    this.documentReferenceResolver.resolve(documentReference)))
+                .filter(documentReference -> !this.installedXARs.isExtensionDocument(documentReference))
                 .collect(Collectors.toList());
         } catch (QueryException e) {
             throw new DataMigrationException(

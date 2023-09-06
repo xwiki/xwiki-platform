@@ -296,7 +296,7 @@
     }
     subtypes.toggle(selected);
     var togglerButton = category.find('.facet-value-toggler');
-    var dropdownID = category.attr('id')+'-dropdown';
+    var dropdownID = category.attr('id') + '-dropdown';
     subtypes.attr('id', dropdownID);
     togglerButton.attr('aria-controls', dropdownID);
     togglerButton.on('click', function() {

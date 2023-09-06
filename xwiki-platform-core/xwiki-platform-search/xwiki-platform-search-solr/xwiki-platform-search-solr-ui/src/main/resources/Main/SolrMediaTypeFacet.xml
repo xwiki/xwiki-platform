@@ -151,7 +151,8 @@
               $facetRequestValuesBackup.size())))
             #set ($discard = $facetRequestValues.removeAll($category.mediaTypes))
           #end
-          &lt;div id="mediatype-$stringtool.substringBefore($category.name, '\')" class="mediaTypeCategory"&gt;#displaySearchFacetValue($category {} 'displaySearchFacetValue_mediaType' true)&lt;/div&gt;
+          &lt;div id="mediatype-$stringtool.remove($stringtool.substringBetween($category.name, '(', '\'), ' ')"
+            class="mediaTypeCategory"&gt;#displaySearchFacetValue($category {} 'displaySearchFacetValue_mediaType' true)&lt;/div&gt;
           ## When a media type is selected, it's category should be unselected.
           #set ($facetRequestValues = [])
           #if ($facetRequestValuesBackup)

@@ -33,8 +33,8 @@
       #set ($previewClasses = 'btn-default')
       ## Add a btn-group-last class to the last visible elements of the button group as the hidden fields 
       ## added by editActionButton are ignored by the css selectors, preventing them from having roundered
-      ## corners on their right side.s
-      #if($previewenabled)
+      ## corners on their right side.
+      #if ($previewenabled)
         #set ($previewClasses = "$previewClasses btn-group-last")
       #else
         #set ($saveAndContinueClasses = "$saveAndContinueClasses btn-group-last")

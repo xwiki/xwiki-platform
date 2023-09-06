@@ -772,16 +772,19 @@ button.facet-value-toggler:not(:active) {
   box-shadow: unset;
 }
 
-.search-facet .search-facet-header .facet-toggler span, button.facet-value-toggler span {
+.search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
+.search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
   transform: rotate(90deg);
 }
 
-.search-facet.expanded .search-facet-header .facet-toggler span, .expanded > button.facet-value-toggler span {
+.search-facet.expanded .search-facet-header .facet-toggler > span, .expanded > button.facet-value-toggler > span,
+.search-facet.expanded .search-facet-header .facet-toggler > img, .expanded > button.facet-value-toggler > img {
   transform: rotate(0deg);
 }
 
 @media not (prefers-reduced-motion) {
-  .search-facet .search-facet-header .facet-toggler span, button.facet-value-toggler span {
+  .search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
+  .search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
     transition: transform 0.2s ease;
   }
 }

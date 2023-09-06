@@ -124,9 +124,6 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[{ca
 ** **Icon**: A reference in the form **##icon{{{:(}}}iconName)##**. Example: **##icon:accept##**
 *** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
 *** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##
-** **Icon**: A reference in the form **##icon{{{:(}}}iconName)##**. Example: **##icon:accept##**
-*** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
-*** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##
 ** **Data URI**: A reference in the form **##(data{{{:)}}}(content)##**. Example: **##{{{data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##**
 *** **##data:##** A required string identifying the image as being specified inline using the [[Data URI scheme&gt;&gt;https://en.wikipedia.org/wiki/Data_URI_scheme]].
 *** **##content##**: The encoded image. Example: ##{{{image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##

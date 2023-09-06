@@ -451,6 +451,10 @@
 .search-facet-body .facet-value-toggler:hover {
   background-color: $theme.highlightColor;
 }
+
+.mediaTypeCategory + ul {
+  flex-basis: 100%;
+}
 </code>
     </property>
     <property>

@@ -25,12 +25,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.xwiki.test.LogLevel.WARN;
-
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.extension.ExtensionId;
@@ -39,6 +33,11 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.xwiki.test.LogLevel.WARN;
 
 /**
  * Test of {@link BackwardDependenciesResolver}.

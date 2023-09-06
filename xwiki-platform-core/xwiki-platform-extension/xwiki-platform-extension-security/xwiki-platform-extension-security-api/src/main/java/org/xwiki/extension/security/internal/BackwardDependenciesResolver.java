@@ -112,15 +112,15 @@ public class BackwardDependenciesResolver
 
         Map<InstalledExtension, Set<String>> map = new HashMap<>();
         for (InstalledExtensionWithNamespace installedExtensionWithNamespace : notDependency) {
-            map.compute(installedExtensionWithNamespace.getInstalledExtension(), (installedExtension, strings) -> {
-                if (strings == null) {
-                    Set<String> strings1 = new HashSet<>();
-                    strings1.add(installedExtensionWithNamespace.getNamespace());
-                    return strings1;
+            map.compute(installedExtensionWithNamespace.getInstalledExtension(), (installedExtension, namespaces) -> {
+                if (namespaces == null) {
+                    Set<String> newNamespaces = new HashSet<>();
+                    newNamespaces.add(installedExtensionWithNamespace.getNamespace());
+                    return newNamespaces;
                 } else {
-                    strings.add(installedExtensionWithNamespace.getNamespace());
+                    namespaces.add(installedExtensionWithNamespace.getNamespace());
                 }
-                return strings;
+                return namespaces;
             });
         }
 

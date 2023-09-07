@@ -1036,7 +1036,7 @@
       <table-border-color/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#222222</text-color>
     </property>
     <property>
       <xwiki-page-content-bg/>

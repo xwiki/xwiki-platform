@@ -83,7 +83,7 @@
               <span class="xRequired">$services.localization.render('core.validation.required')</span>
             </label>
           </dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
+          <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="new-password" type=')</dd>
 
           <dt>
             <label for="register2_${prop.name}">
@@ -91,7 +91,7 @@
               <span class="xRequired">$services.localization.render('core.validation.required')</span>
             </label>
           </dt>
-          <dd>$doc.displayEdit($prop, 'register2_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
+          <dd>$doc.displayEdit($prop, 'register2_',  $obj).replace('type=', 'autocomplete="new-password" type=')</dd>
 
           #set ($prop = $class.email)
           <dt><label for="register_${prop.name}">$services.localization.render('core.register.email')</label></dt>

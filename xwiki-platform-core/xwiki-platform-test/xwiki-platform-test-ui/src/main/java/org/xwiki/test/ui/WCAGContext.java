@@ -602,8 +602,8 @@ public class WCAGContext
      */
     public static void writeWCAGReportToFile(File outputFile, String output) throws IOException
     {
-        FileWriter writer = new FileWriter(outputFile, StandardCharsets.UTF_8);
-        writer.write(output);
-        writer.close();
+        try (FileWriter writer = new FileWriter(outputFile, StandardCharsets.UTF_8)) {
+            writer.write(output);
+        }
     }
 }

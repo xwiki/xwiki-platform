@@ -19,8 +19,9 @@
  */
 package org.xwiki.flamingo.skin.test.po;
 
-import java.util.List;
+import java.util.Optional;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.livedata.test.po.LiveDataElement;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Represents the undelete action where a single page or a whole batch of pages can be restored.
  *
  * @version $Id$
- * @since 13.10RC1
+ * @since 15.8RC1
  */
 public class UndeletePage extends BasePage
 {
@@ -56,9 +57,6 @@ public class UndeletePage extends BasePage
 
     private static final String DELETED_BATCH_ID_PREFIX = "Deleted Batch ID\n";
 
-    @FindBy(xpath = "//input[@id = 'includeBatch']")
-    private List<WebElement> includeBatchCheckBoxes;
-
     @FindBy(xpath = "//div[@id = 'mainContentArea']/div[@class='xcontent']/form//a[@class = 'panel-collapse-carret']")
     private WebElement panelToggleLink;
 
@@ -75,11 +73,19 @@ public class UndeletePage extends BasePage
     private WebElement restoreButton;
 
     /**
+     * @return the checkbox for including the whole batch if there is any
+     */
+    private Optional<WebElement> getIncludeBatchCheckBox()
+    {
+        return getDriver().findElementsWithoutWaiting(By.id("includeBatch")).stream().findFirst();
+    }
+
+    /**
      * @return If there is a batch of pages that can be restored (otherwise it's just a single page).
      */
     public boolean hasBatch()
     {
-        return !this.includeBatchCheckBoxes.isEmpty();
+        return getIncludeBatchCheckBox().isPresent();
     }
 
     /**
@@ -87,7 +93,7 @@ public class UndeletePage extends BasePage
      */
     public boolean isBatchIncluded()
     {
-        return this.includeBatchCheckBoxes.get(0).isSelected();
+        return getIncludeBatchCheckBox().map(WebElement::isSelected).orElse(false);
     }
 
     /**
@@ -96,7 +102,7 @@ public class UndeletePage extends BasePage
     public void setBatchIncluded(boolean includeBatch)
     {
         if (isBatchIncluded() != includeBatch) {
-            this.includeBatchCheckBoxes.get(0).click();
+            getIncludeBatchCheckBox().orElseThrow().click();
         }
     }
 

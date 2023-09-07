@@ -36,23 +36,23 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
-{{html wiki='true' clean='false'}}
+{{html clean="false"}}
 #if ($xcontext.action == 'get' && "$!request.jobId" != '')
   #handleStatusRequest()
 #else
-  {{template name='startpage.vm' /}}
+  #template("startpage.vm")
   <div class="main">
     <div id="mainContentArea">
       #define($titleLink)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
       #set($titleToDisplay = $services.localization.render('core.restore.title', [$titleLink]))
       <div class="xcontent">
-        {{template name='contentheader.vm' /}}
+        #template('contentheader.vm')
         #controller()
         <div class="clearfloats"></div>
       </div> ## xcontent
     </div>## mainContentArea
   </div>## main
-  {{template name='endpage.vm' /}}
+  #template("endpage.vm")
 #end
 {{/html}}
 
@@ -85,7 +85,7 @@
   #handleStatusRequest()
 #end
 #macro (handleStatusRequest)
-  {{template name='job_macros.vm' /}}
+  #template('job_macros.vm')
   #set ($jobStatus = $services.job.getJobStatus($stringtool.split($request.jobId, '/')))
   #if ($jobStatus)
     #if ($xcontext.action == 'get')
@@ -103,11 +103,9 @@
 #macro (outputJobStatusJSON $jobStatus)
   #getJobStatusJSON($jobStatus $json)
   #set ($json.message = "#displayJobFinishedMessage($jobStatus)")
-  $response.setContentType('application/json')
   #jsonResponse($json)
 #end
 #macro (displayJobFinishedMessage $jobStatus)
-  {{template name='refactoringStatus_macros.vm' /}}
   #displayRefactoringJobFinishedMessage($jobStatus 'core.restore.status.success' 'core.restore.status.failure')
 #end
 #######################################################
@@ -187,6 +185,7 @@
           ]
         }
       })
+      {{/html}}
 
       {{liveData
         id='deletedBatch'
@@ -195,6 +194,7 @@
         properties='doc.name,doc.location,_actions'
         sort='doc.location'}}$jsontool.serialize($liveDataConfig){{/liveData}}
 
+      {{html clean="false"}}
     #end
     #displayPanel('panel-batch', 'panel-default', $heading, $body)
   #end

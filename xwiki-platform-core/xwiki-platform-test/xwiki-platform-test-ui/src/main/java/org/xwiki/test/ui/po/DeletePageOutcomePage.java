@@ -203,7 +203,7 @@ public class DeletePageOutcomePage extends ViewPage
     /**
      * Clicks on the batch link. Goes to the undelete action.
      *
-     * @since 13.10RC1
+     * @since 15.8RC1
      */
     public void clickBatchLink()
     {

@@ -27,7 +27,7 @@ import org.openqa.selenium.support.FindBy;
  * Represents the status page of a refactoring job.
  *
  * @version $Id$
- * @since 13.10RC1
+ * @since 15.8RC1
  */
 public class RefactoringStatusPage extends BasePage
 {
@@ -51,6 +51,9 @@ public class RefactoringStatusPage extends BasePage
         return this;
     }
 
+    /**
+     * @return the status message displayed on the page after the job finished
+     */
     public String getInfoMessage()
     {
         return this.message.getText();

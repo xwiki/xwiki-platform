@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the status page of the restore refactoring action.
  *
  * @version $Id$
- * @since 13.10RC1
+ * @since 15.8RC1
  */
 public class RestoreStatusPage extends RefactoringStatusPage
 {

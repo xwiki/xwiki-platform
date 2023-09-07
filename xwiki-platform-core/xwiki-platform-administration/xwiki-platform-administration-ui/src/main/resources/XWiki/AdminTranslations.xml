@@ -44,7 +44,7 @@ administration.sectionTitle=Administration: {0}
 administration.sectionTitle.page=Page Administration: {0}
 administration.sectionTitle.wiki=Wiki Administration: {0}
 administration.sectionTitle.global=Global Administration: {0}
-administration.menu.label=Administration category picker.
+administration.menu.label=Administration sections.
 administration.menu.search.hint=Search for...
 administration.menu.search.noResults=No results.
 

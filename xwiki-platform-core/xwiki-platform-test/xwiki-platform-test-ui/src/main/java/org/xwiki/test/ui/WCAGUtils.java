@@ -136,9 +136,9 @@ public class WCAGUtils
         }
     }
 
-    /** Logs the amount of violations at the level of the test suite.
-    *
-    */
+    /**
+     * Logs the number of violations at the level of the test suite.
+     */
     private void logViolationCount(boolean isFailingViolations)
     {
         Map<String, Integer> violationCounts = wcagContext.getViolationCountPerRule();

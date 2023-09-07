@@ -288,12 +288,7 @@
     #foreach ($suggestionResult in $suggestionResults)
       #set ($suggestionResultsDocReference = $services.solr.resolveDocument($suggestionResult))
       #set ($suggestionDocument = $xwiki.getDocument($suggestionResultsDocReference))
-      &lt;li&gt;&lt;a
-        href="$escapetool.xml($suggestionDocument.getURL())"&gt;
-        #hierarchy($suggestionResultsDocReference, {
-          'plain' : true, 'local' : true
-        })
-      &lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="$escapetool.xml($suggestionDocument.getURL())"&gt;#hierarchy($suggestionResultsDocReference, {'plain' : true, 'local' : true})&lt;/a&gt;&lt;/li&gt;
     #end
     &lt;/ul&gt;
   &lt;/div&gt;

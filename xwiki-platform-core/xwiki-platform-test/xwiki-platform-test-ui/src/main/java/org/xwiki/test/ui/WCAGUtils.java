@@ -39,6 +39,11 @@ public class WCAGUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(WCAGUtils.class);
 
+    private static final String FILENAME_OVERVIEW = "wcagOverview.txt";
+    private static final String FILENAME_INCOMPLETE = "wcagIncompletes.txt";
+    private static final String FILENAME_WARNING = "wcagWarnings.txt";
+    private static final String FILENAME_FAILING = "wcagFails.txt";
+
     /**
      * Cached accessibility results.
      */
@@ -106,32 +111,28 @@ public class WCAGUtils
 
         File wcagDir = new File(getWCAGReportPathOnHost());
         Files.createDirectory(wcagDir.toPath());
-        String outputName = "wcagOverview.txt";
-        File overviewFile = new File(wcagDir, outputName);
+        File overviewFile = new File(wcagDir, WCAGUtils.FILENAME_OVERVIEW);
         WCAGContext.writeWCAGReportToFile(overviewFile, this.wcagContext.buildOverview());
 
         if (this.wcagContext.hasWCAGIncomplete()) {
-            outputName = "wcagIncomplete.txt";
             LOGGER.error(
                 "There are [{}] incomplete accessibility checks in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGIncompleteCount(), getWCAGReportPathOnHost(), outputName);
-            File incompleteFile = new File(wcagDir, outputName);
+                this.wcagContext.getWCAGIncompleteCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_INCOMPLETE);
+            File incompleteFile = new File(wcagDir, WCAGUtils.FILENAME_INCOMPLETE);
             WCAGContext.writeWCAGReportToFile(incompleteFile, this.wcagContext.buildIncompleteReport());
         }
         if (this.wcagContext.hasWCAGWarnings()) {
-            outputName = "wcagWarnings.txt";
             LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), outputName);
+                this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_WARNING);
             logViolationCount(false);
-            File warningsFile = new File(wcagDir, outputName);
+            File warningsFile = new File(wcagDir, WCAGUtils.FILENAME_WARNING);
             WCAGContext.writeWCAGReportToFile(warningsFile, this.wcagContext.buildWarningsReport());
         }
         if (this.wcagContext.hasWCAGFails()) {
-            outputName = "wcagFails.txt";
             LOGGER.error("There are [{}] accessibility fails in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGFailCount(), getWCAGReportPathOnHost(), outputName);
+                this.wcagContext.getWCAGFailCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_FAILING);
             logViolationCount(true);
-            File failsFile = new File(wcagDir, outputName);
+            File failsFile = new File(wcagDir, WCAGUtils.FILENAME_FAILING);
             WCAGContext.writeWCAGReportToFile(failsFile, this.wcagContext.buildFailsReport());
         }
     }

@@ -70,7 +70,6 @@ public class UserEventDispatcherListener extends AbstractEventListener
         // Don't do anything if notifications in general is disabled
         if (this.notificationConfiguration.isEnabled()) {
             if (event instanceof EventStreamAddedEvent) {
-                // Find out the users to associate with the event
                 if (!this.remoteState.isRemoteState()) {
                     // Make sure to wakeup dispatcher
                     this.dispatcher.onEvent((org.xwiki.eventstream.Event) source);

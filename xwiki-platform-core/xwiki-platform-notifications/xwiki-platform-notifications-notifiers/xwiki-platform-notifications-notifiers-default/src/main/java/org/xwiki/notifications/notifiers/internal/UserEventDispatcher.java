@@ -143,6 +143,7 @@ public class UserEventDispatcher implements Disposable
 
     /**
      * Indicate an event just been created.
+     * @param event the event that has been created
      */
     public void onEvent(Event event)
     {

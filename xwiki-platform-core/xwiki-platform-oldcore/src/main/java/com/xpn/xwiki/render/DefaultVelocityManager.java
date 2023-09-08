@@ -19,7 +19,10 @@
  */
 package com.xpn.xwiki.render;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +36,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
-import org.apache.commons.io.output.NullWriter;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -41,6 +43,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.environment.Environment;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -57,7 +60,6 @@ import org.xwiki.template.event.TemplateUpdatedEvent;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -74,7 +76,6 @@ import com.xpn.xwiki.api.DeprecatedContext;
  */
 @Component
 @Singleton
-// TODO: refactor to move it in xwiki-commons, the dependencies on the model are actually quite minor
 public class DefaultVelocityManager implements VelocityManager, Initializable
 {
     private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
@@ -120,6 +121,9 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
 
     @Inject
     private AuthorExecutor authorExecutor;
+
+    @Inject
+    private Environment environment;
 
     @Inject
     private Logger logger;
@@ -264,51 +268,63 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         // Get the location of the skin's macros.vm file
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        final Template template;
+        final Template skinMacrosTemplate;
         if (xcontext != null && xcontext.getWiki() != null) {
-            template = getVelocityEngineMacrosTemplate();
+            skinMacrosTemplate = getVelocityEngineMacrosTemplate();
         } else {
-            template = null;
+            skinMacrosTemplate = null;
         }
 
-        String cacheKey = template != null ? template.getId() : "default";
+        String cacheKey = skinMacrosTemplate != null ? skinMacrosTemplate.getId() : "default";
 
         // Get the Velocity Engine to use
         VelocityEngine velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
         if (velocityEngine == null) {
-            // Note 1: This block is synchronized to prevent threads from creating several instances of
-            // Velocity Engines (for the same skin).
-            // Note 2: We do this instead of marking the whole method as synchronized since it seems this method is
-            // called quite often and we would incur the synchronization penalty. Ideally the engine should be
-            // created only when a new skin is created and not be on the main execution path.
-            synchronized (this) {
-                velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
-                if (velocityEngine == null) {
-                    velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, null);
+            velocityEngine = createVelocityEngine(cacheKey, skinMacrosTemplate);
+        }
 
-                    if (template != null) {
-                        // Local macros template
-                        // We execute it ourself to support any kind of template, Velocity only support resource
-                        // template by default
-                        try {
-                            final VelocityEngine finalVelocityEngine = velocityEngine;
+        return velocityEngine;
+    }
 
-                            this.authorExecutor.call(() -> {
-                                finalVelocityEngine.evaluate(new XWikiVelocityContext(), NullWriter.NULL_WRITER, "",
-                                    template.getContent().getContent());
+    private synchronized VelocityEngine createVelocityEngine(String cacheKey, Template skinMacrosTemplate)
+        throws XWikiVelocityException
+    {
+        VelocityEngine velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
+        if (velocityEngine == null) {
+            velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, null);
 
-                                return null;
-                            }, template.getContent().getAuthorReference(),
-                                template.getContent().getDocumentReference());
-                        } catch (Exception e) {
-                            this.logger.error("Failed to evaluate macros templates [{}]", template.getPath(), e);
-                        }
-                    }
-                }
+            // Add default macros to the engine
+            try {
+                injectBaseMacros(velocityEngine, skinMacrosTemplate);
+            } catch (Exception e) {
+                throw new XWikiVelocityException("Failed to load global macros for engine with key [" + cacheKey + "]",
+                    e);
             }
         }
 
         return velocityEngine;
+    }
+
+    private void injectBaseMacros(VelocityEngine velocityEngine, Template skinMacrosTemplate) throws Exception
+    {
+        // Inject main macros
+        try (InputStream stream = this.environment.getResourceAsStream("/templates/macros.vm")) {
+            if (stream != null) {
+                try (InputStreamReader reader = new InputStreamReader(stream)) {
+                    org.apache.velocity.Template mainMacros = velocityEngine.compile("", reader);
+
+                    velocityEngine.addGlobalMacros(mainMacros.getMacros());
+                }
+            }
+        }
+
+        // Inject skin macros
+        if (skinMacrosTemplate != null) {
+            org.apache.velocity.Template skinMacros =
+                velocityEngine.compile("", new StringReader(skinMacrosTemplate.getContent().getContent()));
+
+            velocityEngine.addGlobalMacros(skinMacros.getMacros());
+        }
     }
 
     @Override

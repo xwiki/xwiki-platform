@@ -1,0 +1,2 @@
+org.xwiki.platform.security.requiredrights.internal.XWikiDocumentRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.RequiredRightsScriptService

@@ -31,6 +31,8 @@ import org.xwiki.rendering.macro.script.DefaultScriptMacroParameters;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Default Script Macro Permission policy: delegate to specific Script Macro Permission Policy using the
@@ -65,4 +67,5 @@ public class DefaultScriptMacroPermissionPolicy extends AbstractScriptMacroPermi
         }
         return hasPermission;
     }
+// TODO
 }

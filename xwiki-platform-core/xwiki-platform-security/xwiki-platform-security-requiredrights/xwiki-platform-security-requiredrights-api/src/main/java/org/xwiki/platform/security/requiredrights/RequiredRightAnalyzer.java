@@ -17,41 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.script;
+package org.xwiki.platform.security.requiredrights;
+
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
- * Decides whether a Script Macro can execute or not. Script Macros should implement this Role with a Hint being the
- * same as the Macro Hint.
+ * Analyze an object for required rights and returns a list of the missing required right.
  *
+ * @param <T> the type of the analyzed object
  * @version $Id$
- * @since 4.1M1
+ * @since 15.8RC1
  */
+@Unstable
 @Role
-public interface MacroPermissionPolicy
+public interface RequiredRightAnalyzer<T>
 {
     /**
-     * Verifies if the current execution Script Macro is allowed to execute its content or not.
-     *
-     * @param parameters the executing macro parameters
-     * @param context the transformation context in which the current macro is executing
-     * @return true if the script can execute or false otherwise
+     * @param object the object to analyze
+     * @return a list of analysis results
+     * @throws RequiredRightsException in case of error during the analysis
      */
-    boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context);
-
-    /**
-     * Retrieves the required permission level for executing the script macro.
-     *
-     * @return the required permission level
-     * @since 15.8RC1
-     */
-    @Unstable
-    default Right getRequiredRight()
-    {
-        return Right.PROGRAM;
-    }
+    List<RequiredRightAnalysisResult> analyze(T object) throws RequiredRightsException;
 }

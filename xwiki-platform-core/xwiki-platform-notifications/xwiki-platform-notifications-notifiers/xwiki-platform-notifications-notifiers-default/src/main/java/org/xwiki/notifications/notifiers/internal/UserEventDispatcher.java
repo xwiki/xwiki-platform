@@ -22,9 +22,7 @@ package org.xwiki.notifications.notifiers.internal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -35,9 +33,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.phase.Disposable;
-import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -75,7 +70,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  */
 @Component(roles = UserEventDispatcher.class)
 @Singleton
-public class UserEventDispatcher implements Disposable
+public class UserEventDispatcher
 {
     private static final long BATCH_SIZE = 100;
 
@@ -120,80 +115,9 @@ public class UserEventDispatcher implements Disposable
     private RemoteObservationManagerConfiguration remoteObservation;
 
     @Inject
-    private ExecutionContextManager contextManager;
-
-    @Inject
-    private Execution execution;
-
-    @Inject
     private Logger logger;
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-    private volatile boolean running;
-
-    /**
-     * Start the scheduler.
-     */
-    public void initialize()
-    {
-        // Schedule a job to regularly check if any event prefiltering was missed or a previous run failed
-        this.scheduler.scheduleWithFixedDelay(this::run, 0, 1, TimeUnit.HOURS);
-    }
-
-    /**
-     * Indicate an event just been created.
-     * @param event the event that has been created
-     */
-    public void onEvent(Event event)
-    {
-        try {
-            if (getSupportedEventTypes().contains(event.getType()) && !this.running) {
-                // Make sure to wakeup the dispatcher
-                this.scheduler.execute(this::run);
-            }
-        } catch (EventStreamException e) {
-            this.logger.error("Failed to get supported event types", e);
-        }
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        // Stop the scheduling
-        this.scheduler.shutdownNow();
-    }
-
-    private void run()
-    {
-        // Indicate the pre-filtering is running
-        this.running = true;
-
-        Thread currenthread = Thread.currentThread();
-
-        // Reduce the priority of this thread since it's not a critical task and it might be expensive
-        currenthread.setPriority(Thread.NORM_PRIORITY - 1);
-        // Set a more explicit thread name
-        currenthread.setName("User event dispatcher thread");
-
-        try {
-            // Initialize a new context for the run
-            this.contextManager.initialize(new ExecutionContext());
-
-            flush();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (Throwable e) {
-            // Catching Throwable to make sure we don't kill the scheduler which triggered this run
-            this.logger.error("Failed to pre-filter events", e);
-        } finally {
-            // Indicate the pre-filtering is not running anymore
-            this.running = false;
-
-            // Remove any remaining context
-            this.execution.removeContext();
-        }
-    }
+    private CompletableFuture<?> lastSave;
 
     private Set<String> getSupportedEventTypes() throws EventStreamException
     {
@@ -208,7 +132,7 @@ public class UserEventDispatcher implements Disposable
      * 
      * @throws Exception when failing
      */
-    private void flush() throws Exception
+    public void flush() throws Exception
     {
         // Get supported events types
         Set<String> types = getSupportedEventTypes();
@@ -230,8 +154,8 @@ public class UserEventDispatcher implements Disposable
         query.setLimit(BATCH_SIZE);
 
         // Events to ignore
-        List<String> handledEvents = new ArrayList<>();
-        query.not().in(Event.FIELD_ID, handledEvents);
+        List<String> failedEvents = new ArrayList<>();
+        query.not().in(Event.FIELD_ID, failedEvents);
 
         // Keep getting the BATCH_SIZE oldest not pre-filtered events (except the handled ones) until we cannot find any
         // left
@@ -246,12 +170,14 @@ public class UserEventDispatcher implements Disposable
                 for (Event event : it) {
                     try {
                         prefilterEvent(event, types);
-                        // We need to keep a list of handled events since the processing of the events is async:
-                        // without it, we might end up processing multiple times same events.
-                        handledEvents.add(event.getId());
+                        if (this.lastSave != null) {
+                            this.lastSave.join();
+                        }
+
                     } catch (Exception e) {
                         this.logger.warn("Failed to pre filter event with id [{}]: {}", event.getId(),
                             ExceptionUtils.getRootCauseMessage(e));
+                        failedEvents.add(event.getId());
                     }
                 }
             }
@@ -264,7 +190,7 @@ public class UserEventDispatcher implements Disposable
             dispatch(event);
         } else {
             // Remember this event does not need to be pre-filtered
-            this.events.prefilterEvent(event);
+            this.lastSave = this.events.prefilterEvent(event);
         }
     }
 
@@ -323,7 +249,7 @@ public class UserEventDispatcher implements Disposable
             }
 
             // Remember we are done pre filtering this event
-            this.events.prefilterEvent(event);
+            this.lastSave = this.events.prefilterEvent(event);
         } else {
             // Try to find users listening to this event
 
@@ -400,16 +326,16 @@ public class UserEventDispatcher implements Disposable
         }
 
         // Remember we are done pre filtering this event
-        this.events.prefilterEvent(event);
+        this.lastSave = this.events.prefilterEvent(event);
     }
 
     private void saveEventStatus(Event event, String entityId)
     {
-        this.events.saveEventStatus(new DefaultEventStatus(event, entityId, false));
+        this.lastSave = this.events.saveEventStatus(new DefaultEventStatus(event, entityId, false));
     }
 
     private void saveMailEntityEvent(Event event, String entityId)
     {
-        this.events.saveMailEntityEvent(new DefaultEntityEvent(event, entityId));
+        this.lastSave = this.events.saveMailEntityEvent(new DefaultEntityEvent(event, entityId));
     }
 }

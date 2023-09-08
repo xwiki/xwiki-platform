@@ -48,7 +48,7 @@ public class UserEventDispatcherListener extends AbstractEventListener
     public static final String NAME = "org.xwiki.notifications.notifiers.internal.UserEventDispatcherListener";
 
     @Inject
-    private UserEventDispatcher dispatcher;
+    private UserEventDispatcherScheduler dispatcher;
 
     @Inject
     private NotificationConfiguration notificationConfiguration;

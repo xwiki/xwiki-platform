@@ -90,10 +90,13 @@ public class CompositeEvent
         if (similarity < similarityBetweenEvents) {
             throw new NotificationException("Invalid addition of an event inside a CompositeEvent");
         }
-        similarityBetweenEvents = similarity;
-        events.add(event);
-        // Ensure the events are always sorted by date (more recent firsts)
-        Collections.sort(events, (e1, e2) -> e2.getDate().compareTo(e1.getDate()));
+        // We never want to add twice same event
+        if (!events.contains(event)) {
+            similarityBetweenEvents = similarity;
+            events.add(event);
+            // Ensure the events are always sorted by date (more recent firsts)
+            Collections.sort(events, (e1, e2) -> e2.getDate().compareTo(e1.getDate()));
+        }
     }
 
     /**

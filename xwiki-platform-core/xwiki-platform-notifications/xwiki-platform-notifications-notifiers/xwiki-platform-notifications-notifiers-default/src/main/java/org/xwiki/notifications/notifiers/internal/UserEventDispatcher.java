@@ -230,10 +230,10 @@ public class UserEventDispatcher implements Disposable
         query.setLimit(BATCH_SIZE);
 
         // Events to ignore
-        List<String> failedEvents = new ArrayList<>();
-        query.not().in(Event.FIELD_ID, failedEvents);
+        List<String> handledEvents = new ArrayList<>();
+        query.not().in(Event.FIELD_ID, handledEvents);
 
-        // Keep getting the BATCH_SIZE oldest not pre-filtered events (except the failed ones) until we cannot find any
+        // Keep getting the BATCH_SIZE oldest not pre-filtered events (except the handled ones) until we cannot find any
         // left
         do {
             try (EventSearchResult result = this.events.search(query)) {
@@ -246,12 +246,12 @@ public class UserEventDispatcher implements Disposable
                 for (Event event : it) {
                     try {
                         prefilterEvent(event, types);
+                        // We need to keep a list of handled events since the processing of the events is async:
+                        // without it, we might end up processing multiple times same events.
+                        handledEvents.add(event.getId());
                     } catch (Exception e) {
                         this.logger.warn("Failed to pre filter event with id [{}]: {}", event.getId(),
                             ExceptionUtils.getRootCauseMessage(e));
-
-                        // Remember the failed event to not query it again
-                        failedEvents.add(event.getId());
                     }
                 }
             }

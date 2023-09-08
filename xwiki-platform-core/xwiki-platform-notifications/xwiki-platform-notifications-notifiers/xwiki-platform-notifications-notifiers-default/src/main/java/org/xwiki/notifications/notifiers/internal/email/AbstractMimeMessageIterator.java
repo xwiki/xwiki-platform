@@ -165,7 +165,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private EntityReference templateReference;
 
-    private Iterator<List<CompositeEvent>> processingEvents = null;
+    private Iterator<List<CompositeEvent>> processingEvents;
 
     private List<CompositeEvent> currentEvents = Collections.emptyList();
 
@@ -218,14 +218,14 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
                 strategy = this.componentManager
                         .getInstance(NotificationEmailGroupingStrategy.class, emailGroupingStrategyHint);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Error while loading NotificationEmailGroupingStrategy with hint [{}]. " +
-                                "Fallback on default strategy. Root cause: [{}]",
+                this.logger.warn("Error while loading NotificationEmailGroupingStrategy with hint [{}]. "
+                        + "Fallback on default strategy. Root cause: [{}]",
                         emailGroupingStrategyHint, ExceptionUtils.getRootCauseMessage(e));
                 this.logger.debug("Root cause of the error was: ", e);
             }
         } else {
-            this.logger.warn("Cannot find a NotificationEmailGroupingStrategy with hint [{}]. " +
-                    "Fallback on default strategy.", emailGroupingStrategyHint);
+            this.logger.warn("Cannot find a NotificationEmailGroupingStrategy with hint [{}]. "
+                + "Fallback on default strategy.", emailGroupingStrategyHint);
         }
         return strategy;
     }

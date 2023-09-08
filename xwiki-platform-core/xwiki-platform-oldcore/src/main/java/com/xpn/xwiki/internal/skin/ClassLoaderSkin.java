@@ -50,7 +50,7 @@ public class ClassLoaderSkin extends AbstractResourceSkin
      * @param configuration the skin internal configuration, used to access the default parent skin id
      * @param logger a logger used to log warning in case of error when parsing a skin's syntax
      * @param xcontextProvider a wiki context provide, used to give access to the context when resolving the skin's
-     *     rsources.
+     *     resources.
      * @param urlConfiguration the url configuration used to resolve the url of the skin's resources
      * @param classLoader the class loader used to lookup the skin
      */

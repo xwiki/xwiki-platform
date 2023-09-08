@@ -19,7 +19,10 @@
  */
 package org.xwiki.skin;
 
+import java.time.Instant;
+
 import org.xwiki.filter.input.InputSource;
+import org.xwiki.stability.Unstable;
 
 /**
  * @param <I> the type of the {@link InputSource}
@@ -56,6 +59,14 @@ public interface Resource<I extends InputSource>
      * @throws Exception when failing to create a {@link InputSource} for the resource
      */
     I getInputSource() throws Exception;
+
+    /**
+     * @return the last modified time of that resource
+     * @throws Exception when failing to get the instance of the resource
+     * @since 15.8RC1
+     */
+    @Unstable
+    Instant getInstant() throws Exception;
 
     /**
      * Create a URL for the resource.

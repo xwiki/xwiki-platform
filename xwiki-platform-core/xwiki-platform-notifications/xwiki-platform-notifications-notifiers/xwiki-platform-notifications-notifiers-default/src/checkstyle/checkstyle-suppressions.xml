@@ -26,4 +26,6 @@
 
 <suppressions>
   <suppress checks="ClassFanOutComplexity" files="UserEventManager.java"/>
+  <suppress checks="ClassFanOutComplexity" files="UserEventDispatcher.java"/>
+  <suppress checks="ClassFanOutComplexity" files="AbstractMimeMessageIterator.java"/>
 </suppressions>

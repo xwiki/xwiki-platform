@@ -22,7 +22,7 @@ define('xwiki-lightbox-messages', {
   keys: [
     'date',
     'author',
-    'toggle.label'
+    'toggler.label'
   ]
 });
 

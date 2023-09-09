@@ -953,6 +953,24 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(19)
+    void largeTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeTable"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 40 pages.
+            assertEquals(40, pdf.getNumberOfPages());
+
+            // Verify the content of the last page.
+            String text = pdf.getTextFromPage(39).replace("\n", " ");
+            // Verify that the text from the last cell is present.
+            assertTrue(text.contains("1000, 10"), "Unexpected content: " + text);
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

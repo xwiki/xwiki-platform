@@ -113,8 +113,8 @@
       $content
       #if ($stringtool.isNotBlank($details))
         <button class="btn btn-xs toggle-notification-event-details" type="submit"
-                aria-label="$services.localization.render('notifications.macro.showEventDetails')"
-                title="$services.localization.render('notifications.macro.showEventDetails')">
+                aria-label="$escapetool.xml($services.localization.render('notifications.macro.showEventDetails'))"
+                title="$escapetool.xml($services.localization.render('notifications.macro.showEventDetails'))">
           <span class="fa fa-ellipsis-h"></span>
         </button>
       #end

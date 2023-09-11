@@ -588,6 +588,12 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   }
 }
 
+@media print {
+  #tourResumeContainer {
+    display: none;
+  }
+}
+
 #bootstrap_tour_close {
   position: absolute;
   top: 3px;

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>application-tour</artifactId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
   </parent>
   <artifactId>application-tour-ui</artifactId>
   <packaging>xar</packaging>
@@ -43,7 +43,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-tour.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-tour.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-tour</url>
-    <tag>application-tour-1.4</tag>
+    <tag>HEAD</tag>
   </scm>
   <dependencies>
     <dependency>

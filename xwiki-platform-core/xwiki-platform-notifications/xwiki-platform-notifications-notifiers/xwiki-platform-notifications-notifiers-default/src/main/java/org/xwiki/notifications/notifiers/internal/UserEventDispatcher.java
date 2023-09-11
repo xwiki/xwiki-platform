@@ -117,8 +117,6 @@ public class UserEventDispatcher
     @Inject
     private Logger logger;
 
-    private CompletableFuture<?> lastSave;
-
     private Set<String> getSupportedEventTypes() throws EventStreamException
     {
         List<RecordableEventDescriptor> descriptorList =
@@ -169,14 +167,12 @@ public class UserEventDispatcher
                 Iterable<Event> it = () -> result.stream().iterator();
                 for (Event event : it) {
                     try {
-                        prefilterEvent(event, types);
-                        if (this.lastSave != null) {
-                            this.lastSave.join();
-                        }
-
+                        CompletableFuture<?> completableFuture = prefilterEvent(event, types);
+                        completableFuture.join();
                     } catch (Exception e) {
                         this.logger.warn("Failed to pre filter event with id [{}]: {}", event.getId(),
                             ExceptionUtils.getRootCauseMessage(e));
+                        // Remember the failed event to not query it again
                         failedEvents.add(event.getId());
                     }
                 }
@@ -184,13 +180,13 @@ public class UserEventDispatcher
         } while (true);
     }
 
-    private void prefilterEvent(Event event, Set<String> types) throws EventStreamException
+    private CompletableFuture<?> prefilterEvent(Event event, Set<String> types) throws EventStreamException
     {
         if (types.contains(event.getType())) {
-            dispatch(event);
+            return dispatch(event);
         } else {
             // Remember this event does not need to be pre-filtered
-            this.lastSave = this.events.prefilterEvent(event);
+            return this.events.prefilterEvent(event);
         }
     }
 
@@ -201,7 +197,7 @@ public class UserEventDispatcher
      * @param event the event to associate with the user
      * @throws EventStreamException when failing to pre filter the event
      */
-    private void dispatch(Event event) throws EventStreamException
+    private CompletableFuture<?> dispatch(Event event) throws EventStreamException
     {
         // Keeping the same ExecutionContext forever can lead to memory leak and cache problems since
         // most of the code expect it to be short lived
@@ -212,15 +208,16 @@ public class UserEventDispatcher
         }
 
         try {
-            dispatchInContext(event);
+            return dispatchInContext(event);
         } finally {
             // Get rid of current context
             this.ecm.popContext();
         }
     }
 
-    private void dispatchInContext(Event event)
+    private CompletableFuture<?> dispatchInContext(Event event)
     {
+        CompletableFuture<?> result = new CompletableFuture<>();
         WikiReference eventWiki = event.getWiki();
 
         if (CollectionUtils.isNotEmpty(event.getTarget())) {
@@ -249,31 +246,35 @@ public class UserEventDispatcher
             }
 
             // Remember we are done pre filtering this event
-            this.lastSave = this.events.prefilterEvent(event);
+            result = this.events.prefilterEvent(event);
         } else {
             // Try to find users listening to this event
 
             // Associated event with event's wiki users
-            dispatch(event, this.userCache.getUsers(eventWiki, true));
+            result = dispatch(event, this.userCache.getUsers(eventWiki, true));
 
             // Also take into account global users (main wiki users) if the event is on a subwiki
             if (!this.wikiManager.isMainWiki(eventWiki.getName())) {
-                dispatch(event, this.userCache.getUsers(new WikiReference(this.wikiManager.getMainWikiId()), true));
+                List<DocumentReference> userList =
+                    this.userCache.getUsers(new WikiReference(this.wikiManager.getMainWikiId()), true);
+                result = dispatch(event, userList);
             }
         }
+        return result;
     }
 
-    private void dispatch(Event event, DocumentReference user, boolean mailEnabled)
+    private CompletableFuture<?> dispatch(Event event, DocumentReference user, boolean mailEnabled)
     {
         // Get the entity id
         String entityId = this.entityReferenceSerializer.serialize(user);
+        CompletableFuture<?> result = new CompletableFuture<>();
 
         // Make sure the event is not already pre filtered
         // Make sure the user asked to be alerted about this event
         if (!isStatusPrefiltered(event, entityId)
             && this.userEventManager.isListening(event, user, NotificationFormat.ALERT)) {
             // Associate the event with the user
-            saveEventStatus(event, entityId);
+            result = saveEventStatus(event, entityId);
         }
 
         // Make sure the notification module is allowed to send mails
@@ -282,8 +283,10 @@ public class UserEventDispatcher
         if (mailEnabled && !isMailPrefiltered(event, entityId)
             && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
             // Associate the event with the user
-            saveMailEntityEvent(event, entityId);
+            result = saveMailEntityEvent(event, entityId);
         }
+
+        return result;
     }
 
     private boolean isStatusPrefiltered(Event event, String entityId)
@@ -317,7 +320,7 @@ public class UserEventDispatcher
         }
     }
 
-    private void dispatch(Event event, List<DocumentReference> users)
+    private CompletableFuture<?> dispatch(Event event, List<DocumentReference> users)
     {
         boolean mailEnabled = this.notificationConfiguration.areEmailsEnabled();
 
@@ -326,16 +329,16 @@ public class UserEventDispatcher
         }
 
         // Remember we are done pre filtering this event
-        this.lastSave = this.events.prefilterEvent(event);
+        return this.events.prefilterEvent(event);
     }
 
-    private void saveEventStatus(Event event, String entityId)
+    private CompletableFuture<?> saveEventStatus(Event event, String entityId)
     {
-        this.lastSave = this.events.saveEventStatus(new DefaultEventStatus(event, entityId, false));
+        return this.events.saveEventStatus(new DefaultEventStatus(event, entityId, false));
     }
 
-    private void saveMailEntityEvent(Event event, String entityId)
+    private CompletableFuture<?> saveMailEntityEvent(Event event, String entityId)
     {
-        this.lastSave = this.events.saveMailEntityEvent(new DefaultEntityEvent(event, entityId));
+        return this.events.saveMailEntityEvent(new DefaultEntityEvent(event, entityId));
     }
 }

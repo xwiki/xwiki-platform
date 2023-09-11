@@ -19,7 +19,6 @@
  */
 package org.xwiki.eventstream.query;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
@@ -57,10 +56,7 @@ public class MailEntityQueryCondition extends AbstractEntityQueryCondition
         }
 
         if (obj instanceof MailEntityQueryCondition) {
-            EqualsBuilder builder = new EqualsBuilder();
-
-            builder.appendSuper(super.equals(obj));
-            return builder.build();
+            return super.equals(obj);
         }
 
         return false;

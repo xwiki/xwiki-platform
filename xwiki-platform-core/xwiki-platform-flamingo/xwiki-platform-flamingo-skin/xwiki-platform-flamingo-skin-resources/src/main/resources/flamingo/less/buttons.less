@@ -21,12 +21,12 @@
 .btn {
   &-default {
     .btn-background(lighten(@btn-default-bg, 5%));
-    .btn-border(darken(@btn-default-bg, 5%));
+    .btn-border(darken(@btn-default-bg, 10%));
 
     &:hover, 
     &:focus {
-      .btn-background(@btn-default-bg);
-      .btn-border(@btn-default-bg);
+      .btn-background(lighten(@btn-default-bg, 5%));
+      .btn-border(darken(@btn-default-bg, 20%));
     }
   }
 
@@ -140,12 +140,12 @@ input.button, .buttonwrapper button, .buttonwrapper a {
 
 .buttonwrapper input.secondary, .buttonwrapper button.secondary, .buttonwrapper a.secondary, a.secondary {
   .btn-background(lighten(@btn-default-bg, 5%));
-  .btn-border(@btn-default-bg);
+  .btn-border(darken(@btn-default-bg, 10%));
 
   &:hover, 
   &:focus {
-    .btn-background(@btn-default-bg);
-    .btn-border(@btn-default-bg);
+    .btn-background(lighten(@btn-default-bg, 5%));
+    .btn-border(darken(@btn-default-bg, 20%));
   }
 }
 

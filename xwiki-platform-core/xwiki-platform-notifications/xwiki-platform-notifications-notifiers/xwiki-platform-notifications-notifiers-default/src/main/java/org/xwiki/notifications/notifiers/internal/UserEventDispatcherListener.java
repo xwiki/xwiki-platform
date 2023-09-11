@@ -48,7 +48,7 @@ public class UserEventDispatcherListener extends AbstractEventListener
     public static final String NAME = "org.xwiki.notifications.notifiers.internal.UserEventDispatcherListener";
 
     @Inject
-    private UserEventDispatcher dispatcher;
+    private UserEventDispatcherScheduler scheduler;
 
     @Inject
     private NotificationConfiguration notificationConfiguration;
@@ -73,10 +73,10 @@ public class UserEventDispatcherListener extends AbstractEventListener
                 // Find out the users to associate with the event
                 if (!this.remoteState.isRemoteState()) {
                     // Make sure to wakeup dispatcher
-                    this.dispatcher.onEvent((org.xwiki.eventstream.Event) source);
+                    this.scheduler.onEvent((org.xwiki.eventstream.Event) source);
                 }
             } else if (event instanceof ApplicationReadyEvent) {
-                this.dispatcher.initialize();
+                this.scheduler.initialize();
             }
         }
     }

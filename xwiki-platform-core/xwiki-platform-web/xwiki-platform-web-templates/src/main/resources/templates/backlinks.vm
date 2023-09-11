@@ -28,7 +28,7 @@
 #if($request.xpage == 'backlinks')
   #template("startpage.vm")
     <div class="main layoutsubsection">
-      ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+      ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
       <main id="mainContentArea">
         <div class="xcontent">
 #end

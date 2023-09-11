@@ -102,7 +102,7 @@
       #end
     #end
     <div class="clearfloats"></div>
-  </main>
-  </div>
+  </main>## mainContentArea
+  </div>## main
   #template("endpage.vm")
 #end

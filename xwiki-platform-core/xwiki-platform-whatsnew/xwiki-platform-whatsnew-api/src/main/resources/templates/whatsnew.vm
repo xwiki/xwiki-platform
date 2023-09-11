@@ -38,7 +38,7 @@
       </div>
     </div>
     #try()
-    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
     <main id="mainContentArea" class="xwiki-whatsnew-container">
       #set ($newsSource = $services.whatsnew.configuredNewsSource)
       ## TODO: For now, show all categories until we implement support for either Admin UI selection of categories

@@ -26,7 +26,7 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
     #error($services.localization.render('core.rename.nonexistingDocument'))
   </main>## mainContentArea
@@ -35,7 +35,7 @@
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.export.pdf.options.title')</h1></div>
     <form id="pdfExportOptions" class="xform half" action="$escapetool.xml($doc.getURL('export'))">

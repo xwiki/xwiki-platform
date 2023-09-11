@@ -28,7 +28,7 @@
 #definePasswordFields($fields, 'xwikipassword', 'xwikipassword2', $passwordOptions)
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
-  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
   #set($userObject = $doc.getObject('XWiki.XWikiUsers'))
   #if($userObject)
@@ -123,6 +123,6 @@
     #xwikimessageboxstart($services.localization.render('platform.core.noticeMessageType') $services.localization.render('platform.core.profile.passwd.notaUser'))
     #xwikimessageboxend()
   #end
-  </main>
+  </main>## mainContentArea
 </div>
 #template("endpage.vm")

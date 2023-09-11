@@ -24,7 +24,7 @@
 $response.setStatus(409)
 #template("startpage.vm")
 <div class="main layoutsubsection">
-## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea">
 #if($xwiki.exists("XWiki.DocumentAlreadyExist"))
     $xwiki.includeForm("XWiki.DocumentAlreadyExist",false)

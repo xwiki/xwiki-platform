@@ -37,7 +37,7 @@
 #else
   #template("startpage.vm")
   <div class="main">
-    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
     <main id="mainContentArea">
       #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
       #set($titleToDisplay = $services.localization.render('core.restore.title', [$title]))

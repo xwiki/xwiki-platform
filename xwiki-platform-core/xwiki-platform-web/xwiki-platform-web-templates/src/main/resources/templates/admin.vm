@@ -74,7 +74,7 @@
 ##  Content (if empty wiki display Import)
 ##-----------------------------------------
 <div class="main layoutsubsection">
-## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea">
 #set ($force = $!request.get('force'))
 #if (!$hasAdmin)

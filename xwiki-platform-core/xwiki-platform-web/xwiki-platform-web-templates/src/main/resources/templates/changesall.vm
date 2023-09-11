@@ -23,6 +23,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea">
 #set ($type= "$!{escapetool.xml($request.get('type'))}")
 #if ($type == '')

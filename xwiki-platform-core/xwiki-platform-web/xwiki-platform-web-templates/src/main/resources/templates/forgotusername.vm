@@ -36,7 +36,7 @@
     </div> ## xwikimessage
 #end
 <div class="main layoutsubsection">
-  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
   <main id="mainContentArea">
       #set($email = "$!request.get('e')")
       #if($email == '' || !$services.csrf.isTokenValid($request.form_token))

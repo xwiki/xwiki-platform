@@ -36,7 +36,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-## Set as an HTML main for better DOM tree semantics to facilitate navigation with inclusive techs.
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea">
 <form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>

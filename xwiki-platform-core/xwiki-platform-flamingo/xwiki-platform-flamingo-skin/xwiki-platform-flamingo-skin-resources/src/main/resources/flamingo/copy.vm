@@ -310,6 +310,7 @@
   #template('refactoring_macros.vm')
   <div class="main layoutsubsection">
     #template("hierarchy.vm")
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
     <main id="mainContentArea">
       #if ("$!request.copyId" != '')
         ## Display the copy status
@@ -320,7 +321,7 @@
       #else
         #handleCopyRequest
       #end
-    </main>
-  </div>## mainContentArea
+    </main>## mainContentArea
+  </div>## main
   #template('endpage.vm')
 #end

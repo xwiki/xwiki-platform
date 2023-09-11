@@ -22,9 +22,10 @@
 ###
 ### Get the app
 ###
-#set ($app  = "$!event.events.get(0).application")
-#if ($app == 'xwiki')
-  #set ($app = $services.localization.render('core.events.appName'))
+#set ($eventDescriptor = $services.eventstream.getDescriptorForEventType($event.type, $xcontext.isMainWiki()))
+#set ($applicationName = $services.localization.render($eventDescriptor.applicationName))
+#if ("$!applicationName" == '')
+  #set ($applicationName = $eventDescriptor.applicationName)
 #end
 ###
 ### Get the doc
@@ -34,7 +35,7 @@
 ### Display
 ###
 <p>
-  <strong>$escapetool.xml($app): [$escapetool.xml($event.type)]</strong>
+  <strong>$escapetool.xml($applicationName)</strong>
   #if ($document)
     <a href="$escapetool.xml($document.getExternalURL())">$document.getRenderedTitle('html/5.0')</a>
   #end

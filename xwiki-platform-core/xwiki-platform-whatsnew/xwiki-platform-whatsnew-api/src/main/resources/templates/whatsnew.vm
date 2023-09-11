@@ -27,7 +27,7 @@
   #template("hierarchy.vm")
   #set($titleToDisplay = $services.localization.render('platform.whatsnew.title'))
   ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
-  <div id="mainContentArea">
+  <main id="mainContentArea">
     ## Do not display the content menu or the "last modified by" since the page is not about the current document and
     ## it would be weird to display actions or info about the current doc's content.
     <div class="xcontent">
@@ -39,8 +39,8 @@
           <div id="document-title"><h1>$titleToDisplay</h1></div>
         </div>
       </div>
-      <div class="xwiki-whatsnew-container">
       #try()
+      <div class="xwiki-whatsnew-container">
         #set ($newsSource = $services.whatsnew.configuredNewsSource)
         ## TODO: For now, show all categories until we implement support for either Admin UI selection of categories
         ## or we decide to automatically show categories based on whether the current user is a simple or advanced user,
@@ -85,5 +85,5 @@
       <div class="clearfloats"></div>
     </div> ## xcontent
   </main>## mainContentArea
-</div>## main
+</main>## main
 #template("endpage.vm")

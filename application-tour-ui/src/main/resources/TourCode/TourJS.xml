@@ -168,17 +168,24 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   /**
    * Add a resume button to start the tour again when it has been closed
    */
-  var createResumeButton = function (tour, createPopover) {
+  var createResumeButton = function (tour, showPopover) {
     // Create a container when the button will be displayed. This container will also contains the "popover", so the "popover" stay near the button when the page is resized.
     // (see http://getbootstrap.com/javascript/#popovers-options 'container')
-    var buttonContainer = $('&lt;div id="tourResumeContainer" style="position: fixed; bottom: 0; right: 0; z-index: 2000; width: 300px; text-align: right;"&gt;&lt;/div&gt;').appendTo($(document.body));
+    var buttonContainer = $('&lt;div id="tourResumeContainer"&gt;&lt;/div&gt;').appendTo($(document.body));
+    // Create the popover
+    var popover = $('&lt;div class="popover-content"&gt;#tr("tour.popover.show.hint")&lt;/div&gt;').appendTo(buttonContainer);
     // Create the button that will start the tour again
     var button = $('&lt;button id="tourResume" class="btn btn-default btn-xs"&gt;$services.icon.renderHTML("info") #tr("tour.popover.show")&lt;/button&gt;').appendTo(buttonContainer);
-    buttonContainer.hide();
-    buttonContainer.fadeIn();
+
+    if (showPopover) {
+      buttonContainer.addClass('opened');
+      popover.attr('open','open');
+    }
+
     button.on('click', function() {
-      if (createPopover) {
-        button.popover('destroy');
+      if (showPopover) {
+        popover.removeAttr('open');
+        buttonContainer.removeClass('opened');
       }
 
       if (window.localStorage.getItem(tour._options.name + '_current_step') != tour._options.steps.length - 1) {
@@ -191,24 +198,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       } else {
         tour.restart();
       }
-      button.remove();
+      buttonContainer.removeClass('opened');
     });
-    var popoverContent = "#tr('tour.popover.show.hint')";
-    if (createPopover) {
-      // Add a popover to introduce that button
-      button.popover({
-        animation: true,
-        content: popoverContent,
-        placement: 'top',
-        container: '#tourResumeContainer'
-      });
-      // Show it
-      button.popover('show');
-      // Hide it after 7 seconds
-      setTimeout(function() {
-        button.popover('destroy');
-      }, 7000);
-    }
   }
 
   /**
@@ -217,21 +208,21 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   var getTemplate = function (index, step) {
     var idPrefix = 'bootstrap_tour';
     var template = '&lt;div class="popover tour" style="min-width: 300px;"&gt;\n'
-                 + ' &lt;a class="btn btn-xs btn-default" id="'+idPrefix+'_close"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/a&gt;\n'
+                 + ' &lt;a class="btn btn-xs btn-default" href="#" id="'+idPrefix+'_close" aria-label="#tr("tour.popover.quit")" title="#tr("tour.popover.quit")"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/a&gt;\n'
                  + '  &lt;div class="arrow"&gt;&lt;/div&gt;\n'
-                 + '  &lt;h3 class="popover-title"&gt;&lt;/h3&gt;\n'
+                 + '  &lt;h2 class="popover-title"&gt;&lt;/h2&gt;\n'
                  + '  &lt;div class="popover-content"&gt;&lt;/div&gt;\n'
                  + '  &lt;div class="popover-navigation row"&gt;\n'
                  + '    &lt;div class="col-xs-6 text-left"&gt;\n';
     if (step.prev &gt; -1) {
-      template  += '      &lt;a class="btn btn-default btn-sm" id="'+idPrefix+'_prev"&gt;#tr("tour.popover.previous")&lt;/a&gt;\n';
+      template  += '      &lt;a class="btn btn-default btn-sm" href="#" id="'+idPrefix+'_prev"&gt;#tr("tour.popover.previous")&lt;/a&gt;\n';
     }
     template    += '    &lt;/div&gt;\n'
                  + '    &lt;div class="col-xs-6 text-right"&gt;\n';
     if (step.next &gt; -1) {
-      template  += '      &lt;a class="btn btn-primary btn-sm" id="'+idPrefix+'_next"&gt;#tr("tour.popover.next")&lt;/a&gt;\n';
+      template  += '      &lt;a class="btn btn-primary btn-sm" href="#" id="'+idPrefix+'_next"&gt;#tr("tour.popover.next")&lt;/a&gt;\n';
     } else {
-      template  += '      &lt;a class="btn btn-success btn-sm" id="'+idPrefix+'_end"&gt;#tr("tour.popover.end")&lt;/a&gt;\n'
+      template  += '      &lt;a class="btn btn-success btn-sm" href="#" id="'+idPrefix+'_end"&gt;#tr("tour.popover.end")&lt;/a&gt;\n'
     }
     template    += '    &lt;/div&gt;\n'
                  + '  &lt;/div&gt;'
@@ -249,16 +240,91 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       var prevButtonSelector = '#' + idPrefix + '_prev';
       var nextButtonSelector = '#' + idPrefix + '_next';
 
-      $(closeButtonSelector).on('click', function () { tour.end() });
-      $(endButtonSelector).on('click', function () { tour.end() });
-      $(prevButtonSelector).on('click', function () { tour.prev() });
-      $(nextButtonSelector).on('click', function () { tour.next() });
+    $(closeButtonSelector)
+      .on('click', function (event) {
+        tour.end();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        if (event.which === 32 || event.which === 13) {
+          tour.end();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      })
+      .on('focusout', function (event) {
+        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.contains(event.relatedTarget)) {
+          $(nextButtonSelector + ', ' + endButtonSelector).focus();
+        }
+      });
 
-      $(closeButtonSelector).css('position','absolute');
-      $(closeButtonSelector).css('top','3px');
-      $(closeButtonSelector).css('right','5px');
-      // Avoid having the close button on top of the title
-      $('.tour .popover-title').css('padding-right',  $(closeButtonSelector).outerWidth() + 10 + 'px');
+    $(endButtonSelector)
+      .on('click', function (event) {
+        tour.end();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        // Activate the anchor/button when space or enter are pressed down
+        if (event.which === 32 || event.which === 13) {
+          tour.end();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      });
+
+    $(prevButtonSelector)
+      .on('click', function (event) {
+        tour.prev();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        // Activate the anchor/button when space or enter are pressed down
+        if (event.which === 32 || event.which === 13) {
+          tour.prev();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      })
+      .on('focusout', function (event) {
+        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.parentNode.parentNode.contains(event.relatedTarget)) {
+          $(nextButtonSelector + ', ' + endButtonSelector).focus();
+        }
+      });
+
+    $(nextButtonSelector)
+      .on('click', function (event) {
+        tour.next();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        // Activate the anchor/button when space or enter are pressed down
+        if (event.which === 32 || event.which === 13) {
+          tour.next();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      });
+
+    // Wrap around in tab order when the popover is opened, and focus the 'Next' button when the tour step is opened.
+    $(nextButtonSelector + ', ' + endButtonSelector)
+      .on('focusout', function (event) {
+        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.parentNode.parentNode.contains(event.relatedTarget)) {
+          $(closeButtonSelector).focus();
+        }
+      })
+      .focus();
+
+    // Avoid having the close button on top of the title
+    $('.tour .popover-title').css('padding-right',  $(closeButtonSelector).outerWidth() + 10 + 'px');
+    $('.tour').on('keydown', function (event) {
+      // Exit the tour if the escape key is pressed down.
+      if (event.which === 27) {
+        tour.end();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        $('.tour').off('keydown');
+      }
+    });
   }
 
   /**
@@ -277,9 +343,25 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       var tour     = new Tour({
         name    : tourName,
         storage : window.localStorage,
-        onEnd   : function() { createResumeButton(tour, true) },
+        onEnd   : function() {
+          let buttonContainer = $('#tourResumeContainer');
+          if (buttonContainer.length === 0) {
+            createResumeButton(tour, true);
+          } else {
+            buttonContainer.addClass('opened');
+            // Show the popover
+            let popover = buttonContainer.find('.popover-content').first();
+            popover.attr('open','open');
+            // Hide it after 7 seconds
+            setTimeout(function() {
+              buttonContainer.removeClass('opened');
+              popover.removeAttr('open');
+            }, 7000);
+          }
+        },
         onShown : onShown,
         orphan  : false,
+        container: "#contentcontainer",
         template: getTemplate
       });
 
@@ -348,6 +430,176 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     </property>
     <property>
       <name>Definition of a Bootstrap Tour module</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+<object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>TourCode.TourJS</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4457314f-90d1-4678-af4c-399211bc3362</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#tourResumeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-content: stretch;
+  gap: 1em;
+
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 2000;
+
+  &amp; &gt; #tourResume {
+    width: fit-content;
+  }
+
+  &amp; &gt; .popover-content {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out, visibility 0s 0.2s;
+    position: relative;
+    max-width: 276px;
+    padding: 1px;
+    line-break: auto;
+    text-align: left;
+    padding: 0.5em;
+    background-color: @dropdown-bg;
+    border: solid 0.2em @dropdown-border;
+    border-radius: 1em 1em 0 1em;
+    width: 100%;
+
+    &amp;::after {
+      position: absolute;
+      right: 0em;
+      content: '';
+      bottom: -1em;
+      width: 0;
+      height: 0;
+      border-left: 1em solid transparent;
+      border-right: 1em solid transparent;
+      border-top: 1em solid @dropdown-bg;
+      clear: both;
+    }
+  }
+}
+
+#tourResumeContainer.opened {
+  &amp; &gt; .popover-content {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+  }
+}
+
+#bootstrap_tour_close {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+}
+</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
     </property>
     <property>
       <parse>1</parse>

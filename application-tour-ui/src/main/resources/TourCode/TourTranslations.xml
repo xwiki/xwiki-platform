@@ -65,6 +65,7 @@ tour.livetable.targetClass=Target Class
 tour.popover.previous=« Prev
 tour.popover.next=Next »
 tour.popover.end=End tour
+tour.popover.quit=Quit tour
 tour.popover.show=Show tour
 tour.popover.show.hint=You can restart the tour by clicking this button at anytime
 

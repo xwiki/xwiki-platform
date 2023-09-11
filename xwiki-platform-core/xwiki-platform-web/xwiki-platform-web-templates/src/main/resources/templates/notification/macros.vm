@@ -101,6 +101,12 @@
       #end
     </div>
     <div class="col-xs-9 notification-content">
+      <button class="notification-event-read-button btn btn-xs hidden"
+              aria-label="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
+              title="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
+              disabled="disabled">
+        <span class="fa fa-check"></span>
+      </button>
       $content
       #if ($stringtool.isNotBlank($details))
         <button class="btn btn-xs toggle-notification-event-details" type="submit"

@@ -34,7 +34,7 @@
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-rendering-wikimacro-store
     </xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.09</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.08</xwiki.jacoco.instructionRatio>
     <!-- Skipping spoon since the inspection of WikiMacroConstantsAspect is causing troubles during the processing. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>

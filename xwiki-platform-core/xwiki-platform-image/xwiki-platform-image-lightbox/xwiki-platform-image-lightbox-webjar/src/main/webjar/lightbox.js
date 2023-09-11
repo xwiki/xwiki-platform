@@ -239,6 +239,56 @@ define('xwiki-lightbox', [
         $('.popover .copyImageId').parent().removeClass('hidden');
       }
     });
+    // We add the sr-only buttons to expand the lightbox
+    let toggler = $(JSON.parse($('#lightbox-config').text()).togglerTemplate);
+    lightboxImages.each(function() {
+      let lightboxToggle = toggler.clone();
+      lightboxToggle.get(0)
+        .addEventListener('focus', (e) => {lightboxToggle.get(0).classList.remove('sr-only');});
+      lightboxToggle.get(0)
+        .addEventListener('focusout', (e) => {lightboxToggle.get(0).classList.add('sr-only');});
+
+      lightboxToggle.get(0).addEventListener('click', (e) => {
+        clearTimeout(showTimeout);
+        popoverContainer.data('target', this);
+        let offsetX = e.pageX;
+        let offsetY = e.pageY;
+        if (offsetX === 0 && offsetY === 0) {
+          // When the click is triggered from keyboard,
+          // we display the lightbox menu popover from the toggler.
+          let offset = lightboxToggle.offset();
+          offsetX = offset.left;
+          offsetY = offset.top;
+        }
+        popoverContainer.css({left: offsetX, top: offsetY});
+        popoverContainer.popover('show');
+        $('.openLightbox').focus();
+        /* The lightbox actions popover (bootstrap modal) is generated at the end of the DOM tree.
+          Navigating with the keyboard to its end makes the focus cursor leave the document,
+          and it's not possible to force it back where we want it.
+          Since this position in the DOM is different to its visual position and this behavior is unexpected,
+          we want to prevent this behavior.
+          In order to do so, we introduce a hidden element that will shortly receive focus
+          (instead of the focus leaving to the browser tabs for example)
+          before focus can be moved back to its expected position.
+          This does not create a focus trap since this element and the lightbox can only be
+          accessed from and leaving to a specific context.
+          Moving the popover to its proper place in the DOM involves UI changes that would need
+          a complete overhaul of the popover element, making it a worse alternative. */
+        popoverContainer.append($("<div id='popoverKeyboardEscaper' class='sr-only' tabindex='0'>"));
+        // Make sure the popover can be exited with basic keyboard navigation.
+        let focusLeavingPopover = function (event) {
+          if (!popoverContainer.children().get(0).contains(event.relatedTarget)) {
+            popoverContainer.get(0).removeEventListener('focusout', focusLeavingPopover);
+            lightboxToggle.focus();
+            popoverContainer.popover('hide');
+            $('#popoverKeyboardEscaper').remove();
+          }
+        };
+        popoverContainer.get(0).addEventListener('focusout', focusLeavingPopover);
+      });
+      lightboxToggle.insertAfter(this);
+    });
     lightboxImages.on('mouseenter', function(e) {
       clearTimeout(hideTimeout);
       popoverContainer.data('target', e.target);

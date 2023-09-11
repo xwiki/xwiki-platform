@@ -120,6 +120,12 @@ a.secondary{
   .btn-default;
 }
 
+// Size ===================================================================
+.btn-xs {
+  min-height: @target-size-minimum;
+  min-width: @target-size-minimum;
+}
+
 // Gradients & Mapping ====================================================
 /* These rules need to be applied after since they overwrite the mapping. They cover the usage before Bootstrap adoption. */
 
@@ -185,4 +191,14 @@ input.button, .buttonwrapper button, .buttonwrapper a {
     color: @navbar-default-link-hover-color;
     background-color: @navbar-default-link-hover-bg;
   }
+}
+
+// Buttons groups ==================================================
+/* Manually overrides the default border round rules of the btn-group blocks in case of hidden input following the last
+   visible button.
+   The :not selectors are here to have a rule weight for this rule higher than the one making the intermediate buttons 
+   without rounded corners. */
+.btn-group > .btn-group-last:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: @border-radius-base;
+  border-bottom-right-radius: @border-radius-base;
 }

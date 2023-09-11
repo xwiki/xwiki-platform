@@ -20,18 +20,19 @@
 package org.xwiki.index.internal.migration;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.internal.migration.AbstractDocumentsMigration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -81,17 +82,22 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected List<String> selectDocuments() throws DataMigrationException
+    protected List<DocumentReference> selectDocuments() throws DataMigrationException
     {
-        List<String> documents;
+        List<DocumentReference> documents;
         XWikiContext context = getXWikiContext();
         XWiki wiki = getXWikiContext().getWiki();
         if (context.getWiki().hasBacklinks(context)) {
             try {
-                documents = wiki.getStore().getQueryManager()
-                    .createQuery("SELECT doc.fullName FROM XWikiDocument doc", Query.HQL)
+                documents = wiki.getStore()
+                    .getQueryManager()
+                    .createQuery("SELECT doc.fullName, doc.language FROM XWikiDocument doc", Query.HQL)
                     .setWiki(context.getWikiId())
-                    .execute();
+                    .<Object[]>execute()
+                    .stream()
+                    .flatMap(
+                        array -> resolveDocumentReference(String.valueOf(array[0]), String.valueOf(array[1])).stream())
+                    .collect(Collectors.toList());
             } catch (QueryException e) {
                 throw new DataMigrationException(
                     String.format("Failed retrieve the list of all the documents for wiki [%s].", wiki.getName()), e);
@@ -103,13 +109,13 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected void logBeforeQueuingTask(XWikiDocument document)
+    protected void logBeforeQueuingTask(DocumentReference documentReference)
     {
         // No logs here as it would be too verbose (all documents of the wiki are queued).
     }
 
     @Override
-    protected void logBeforeQueuingTasks(List<XWikiDocument> documents)
+    protected void logBeforeQueuingTasks(List<DocumentReference> documents)
     {
         XWikiContext context = getXWikiContext();
         if (context.getWiki().hasBacklinks(context)) {

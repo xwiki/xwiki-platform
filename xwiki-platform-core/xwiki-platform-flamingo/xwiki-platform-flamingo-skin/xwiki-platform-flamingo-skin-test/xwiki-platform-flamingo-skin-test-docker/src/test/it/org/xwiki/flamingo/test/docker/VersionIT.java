@@ -19,6 +19,8 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -26,17 +28,21 @@ import org.openqa.selenium.By;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -320,5 +326,323 @@ class VersionIT
         Page page = (Page) setup.rest().get(testReference);
         assertEquals("1.1", page.getVersion());
         assertEquals("1.1", page.getContent());
+    }
+
+    /**
+     * Scenario:
+     *   * Create a user RollbackTestUser
+     *   * Create a page, allow RollbackTestUser script right on it, and then deny it
+     *   * Login with RollbackTestUser and try to rollback the page to the version where the right was allowed
+     *   * Check that the page still has the right xobject set to deny
+     */
+    @Test
+    @Order(7)
+    void testRollbackDontMessUpRights(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        setup.rest().delete(testReference);
+        String rollbackTestUser = "RollbackTestUser";
+        setup.rest().delete(new DocumentReference("xwiki", "XWiki", rollbackTestUser));
+        setup.createUser(rollbackTestUser, rollbackTestUser, "");
+        setup.createPage(testReference, "Test Rollback Page");
+
+        setup.setRights(testReference, "", "XWiki." + rollbackTestUser, "script", true);
+
+        // We don't use setRights twice as it would create another object and we want to edit the existing one.
+        setup.gotoPage(testReference, "edit", "editor=object");
+        ObjectEditPage objectEditPage = new ObjectEditPage();
+        List<ObjectEditPane> rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiRights", true);
+        assertEquals(1, rightObjects.size());
+        ObjectEditPane objectEditPane = rightObjects.get(0);
+        assertEquals("XWiki." + rollbackTestUser, objectEditPane.getFieldValue(objectEditPane.byPropertyName("users")));
+        assertEquals("script", objectEditPane.getFieldValue(objectEditPane.byPropertyName("levels")));
+        assertEquals("1", objectEditPane.getFieldValue(objectEditPane.byPropertyName("allow")));
+        objectEditPane.setFieldValue(objectEditPane.byPropertyName("allow"), "0");
+        // We want a minor version
+        objectEditPage.clickSaveAndContinue();
+        setup.gotoPage(testReference);
+
+        setup.login(rollbackTestUser, rollbackTestUser);
+
+        // check that the right is as expected
+        setup.gotoPage(testReference, "edit", "editor=object");
+        objectEditPage = new ObjectEditPage();
+        rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiRights", true);
+        assertEquals(1, rightObjects.size());
+        objectEditPane = rightObjects.get(0);
+        assertEquals("XWiki." + rollbackTestUser, objectEditPane.getFieldValue(objectEditPane.byPropertyName("users")));
+        assertEquals("script", objectEditPane.getFieldValue(objectEditPane.byPropertyName("levels")));
+        assertEquals("0", objectEditPane.getFieldValue(objectEditPane.byPropertyName("allow")));
+
+        ViewPage viewPage = objectEditPage.clickCancel();
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        historyPane = historyPane.showMinorEdits();
+
+        // Check that the history contains what we're expecting
+        assertEquals(3, historyPane.getNumberOfVersions());
+        assertEquals("2.2", historyPane.getCurrentVersion());
+        assertTrue(historyPane.hasVersion("2.1"));
+
+        viewPage = historyPane.rollbackToVersion("2.1");
+        historyPane = viewPage.openHistoryDocExtraPane();
+        historyPane = historyPane.showMinorEdits();
+
+        // Check that the history contains what we're expecting
+        assertEquals(4, historyPane.getNumberOfVersions());
+
+        assertEquals("3.1", historyPane.getCurrentVersion());
+        assertEquals("Rollback to version 2.1", historyPane.getCurrentVersionComment());
+        assertTrue(historyPane.hasVersion("2.2"));
+        assertTrue(historyPane.hasVersion("2.1"));
+
+        // check that the right is still the same
+        setup.gotoPage(testReference, "edit", "editor=object");
+        objectEditPage = new ObjectEditPage();
+        rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiRights", true);
+        assertEquals(1, rightObjects.size());
+        objectEditPane = rightObjects.get(0);
+        assertEquals("XWiki." + rollbackTestUser, objectEditPane.getFieldValue(objectEditPane.byPropertyName("users")));
+        assertEquals("script", objectEditPane.getFieldValue(objectEditPane.byPropertyName("levels")));
+        assertEquals("0", objectEditPane.getFieldValue(objectEditPane.byPropertyName("allow")));
+
+        objectEditPage.clickCancel();
+    }
+
+    /**
+     * Scenario:
+     *   * Create a user DeleteVersionTestUser
+     *   * Give DeleteVersionTestUser Admin right with a dedicated xobject in XWiki.XWikiPreferences
+     *   * Give DeleteVersionTestUser PR right with a dedicated xobject in XWiki.XWikiPreferences
+     *   * Edit the xobject to deny PR right to DeleteVersionTestUser
+     *   * Login with DeleteVersionTestUser and delete last version of XWiki.XWikiPreferences
+     *   * Check that the version has been deleted but the PR right is still denied
+     */
+    @Test
+    @Order(8)
+    void testDeleteVersionDontMessUpRights(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String deleteVersionTestUser = "DeleteVersionTestUser";
+        setup.rest().delete(new DocumentReference("xwiki", "XWiki", deleteVersionTestUser));
+        setup.createUser(deleteVersionTestUser, deleteVersionTestUser, "");
+
+        setup.setGlobalRights("", deleteVersionTestUser, "admin", true);
+
+        DocumentReference xwikiPreferences = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
+        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+        HistoryPane historyPane = new HistoryPane();
+        historyPane = historyPane.showMinorEdits();
+        // store the current version as it will be our basis for next steps
+        String latestVersionBeforeChanges = historyPane.getCurrentVersion();
+        int numberOfVersions = historyPane.getNumberOfVersions();
+
+        // We just create a new major version in the history
+        setup.gotoPage(xwikiPreferences, "edit", "editor=wiki");
+        WikiEditPage wikiEditPage = new WikiEditPage();
+        wikiEditPage.clickSaveAndView();
+
+        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+        historyPane = new HistoryPane();
+        // Version where we start our changes
+        String startChangesVersion = historyPane.getCurrentVersion();
+
+        String currentMajor = startChangesVersion.split("\\.")[0];
+
+        setup.setGlobalRights("", deleteVersionTestUser, "programming", true);
+        currentMajor = String.valueOf(Integer.parseInt(currentMajor) + 1);
+
+        // We don't use setRights twice as it would create another object and we want to edit the existing one.
+        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+        ObjectEditPage objectEditPage = new ObjectEditPage();
+        List<ObjectEditPane> rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+        ObjectEditPane rightObject = rightObjects.get(rightObjects.size() - 1);
+        rightObject.displayObject();
+        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+        assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+        rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
+        // We want a minor version
+        objectEditPage.clickSaveAndContinue();
+
+        setup.gotoPage(xwikiPreferences);
+
+        setup.login(deleteVersionTestUser, deleteVersionTestUser);
+
+        // first check that the right is properly denied in the objects
+        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+        objectEditPage = new ObjectEditPage();
+        rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+        rightObject = rightObjects.get(rightObjects.size() - 1);
+        rightObject.displayObject();
+        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+        assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+        historyPane = new HistoryPane();
+        historyPane = historyPane.showMinorEdits();
+        assertEquals(numberOfVersions + 3, historyPane.getNumberOfVersions());
+        assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
+        assertTrue(historyPane.hasVersion(currentMajor + ".1"));
+
+        try {
+            historyPane = historyPane.deleteVersion(historyPane.getCurrentVersion());
+            historyPane = historyPane.showMinorEdits();
+            assertEquals(numberOfVersions + 2, historyPane.getNumberOfVersions());
+            assertEquals(currentMajor + ".1", historyPane.getCurrentVersion());
+
+            // Check that the page remained with rights unchanged
+            setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+            objectEditPage = new ObjectEditPage();
+            rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+            rightObject = rightObjects.get(rightObjects.size() - 1);
+            rightObject.displayObject();
+            assertEquals(deleteVersionTestUser,
+                rightObject.getFieldValue(rightObject.byPropertyName("users")));
+            assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+            assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+            objectEditPage.clickCancel();
+        } finally {
+            // Put back the page in the state it was before our changes
+            setup.loginAsSuperAdmin();
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            historyPane = historyPane.showMinorEdits();
+            historyPane.rollbackToVersion(latestVersionBeforeChanges);
+        }
+    }
+
+    /**
+     * Scenario:
+     *   * Same as above but using DeleteVersionTestUserCancelEvent as user to trigger the
+     *   {@link org.xwiki.test.CustomUserUpdatedDocumentEventListener} which should cancel immediately the change
+     *   * Expectation here is that the reset is not performed at all
+     */
+    @Test
+    @Order(9)
+    void testDeleteVersionDontMessUpRightsWithCancellingEvent(TestUtils setup)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String deleteVersionTestUser = "DeleteVersionTestUserCancelEvent";
+        setup.rest().delete(new DocumentReference("xwiki", "XWiki", deleteVersionTestUser));
+        setup.createUser(deleteVersionTestUser, deleteVersionTestUser, "");
+
+        setup.setGlobalRights("", deleteVersionTestUser, "admin", true);
+
+        DocumentReference xwikiPreferences = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
+        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+        HistoryPane historyPane = new HistoryPane();
+        historyPane = historyPane.showMinorEdits();
+        // store the current version as it will be our basis for next steps
+        String latestVersionBeforeChanges = historyPane.getCurrentVersion();
+        int numberOfVersions = historyPane.getNumberOfVersions();
+
+        // We just create a new major version in the history
+        setup.gotoPage(xwikiPreferences, "edit", "editor=wiki");
+        WikiEditPage wikiEditPage = new WikiEditPage();
+        wikiEditPage.clickSaveAndView();
+
+        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+        historyPane = new HistoryPane();
+        // Version where we start our changes
+        String startChangesVersion = historyPane.getCurrentVersion();
+
+        String currentMajor = startChangesVersion.split("\\.")[0];
+
+        setup.setGlobalRights("", deleteVersionTestUser, "programming", true);
+        currentMajor = String.valueOf(Integer.parseInt(currentMajor) + 1);
+
+        // We don't use setRights twice as it would create another object and we want to edit the existing one.
+        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+        ObjectEditPage objectEditPage = new ObjectEditPage();
+        List<ObjectEditPane> rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+        ObjectEditPane rightObject = rightObjects.get(rightObjects.size() - 1);
+        rightObject.displayObject();
+        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+        assertEquals("1", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+        rightObject.setFieldValue(rightObject.byPropertyName("allow"), "0");
+        // We want a minor version
+        objectEditPage.clickSaveAndContinue();
+
+        setup.gotoPage(xwikiPreferences);
+
+        setup.login(deleteVersionTestUser, deleteVersionTestUser);
+
+        // first check that the right is properly denied in the objects
+        setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+        objectEditPage = new ObjectEditPage();
+        rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+        rightObject = rightObjects.get(rightObjects.size() - 1);
+        rightObject.displayObject();
+        assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+        assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+        assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+
+        setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+        historyPane = new HistoryPane();
+        historyPane = historyPane.showMinorEdits();
+        assertEquals(numberOfVersions + 3, historyPane.getNumberOfVersions());
+        assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
+        assertTrue(historyPane.hasVersion(currentMajor + ".1"));
+
+        try {
+            historyPane.deleteVersion(historyPane.getCurrentVersion());
+
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            historyPane = historyPane.showMinorEdits();
+
+            // here the history shouldn't have changed because of the CustomUserUpdatedDocumentEventListener
+            // that should have cancel the event
+            assertEquals(numberOfVersions + 3, historyPane.getNumberOfVersions());
+            assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
+
+            // Check that the page remained with rights unchanged
+            setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+            objectEditPage = new ObjectEditPage();
+            rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+            rightObject = rightObjects.get(rightObjects.size() - 1);
+            rightObject.displayObject();
+            assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+            assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+            assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+            objectEditPage.clickCancel();
+
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            historyPane = historyPane.showMinorEdits();
+
+            // Check that deleting another version still works
+            historyPane = historyPane.deleteVersion(currentMajor + ".1");
+            historyPane = historyPane.showMinorEdits();
+
+            assertEquals(numberOfVersions + 2, historyPane.getNumberOfVersions());
+            assertEquals(currentMajor + ".2", historyPane.getCurrentVersion());
+            assertFalse(historyPane.hasVersion(currentMajor + ".1"));
+
+            // Check that the page remained with rights unchanged
+            setup.gotoPage(xwikiPreferences, "edit", "editor=object");
+            objectEditPage = new ObjectEditPage();
+            rightObjects = objectEditPage.getObjectsOfClass("XWiki.XWikiGlobalRights", false);
+            rightObject = rightObjects.get(rightObjects.size() - 1);
+            rightObject.displayObject();
+            assertEquals(deleteVersionTestUser, rightObject.getFieldValue(rightObject.byPropertyName("users")));
+            assertEquals("programming", rightObject.getFieldValue(rightObject.byPropertyName("levels")));
+            assertEquals("0", rightObject.getFieldValue(rightObject.byPropertyName("allow")));
+            objectEditPage.clickCancel();
+        } finally {
+            // Put back the page in the state it was before our changes
+            setup.loginAsSuperAdmin();
+            setup.gotoPage(xwikiPreferences, "view", "viewer=history");
+            historyPane = new HistoryPane();
+            historyPane = historyPane.showMinorEdits();
+            historyPane.rollbackToVersion(latestVersionBeforeChanges);
+        }
     }
 }

@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
@@ -42,15 +43,13 @@ import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.macro.toc.TocBlockFilter;
 import org.xwiki.rendering.internal.macro.toc.TocTreeBuilder;
 import org.xwiki.rendering.internal.macro.toc.TreeParameters;
 import org.xwiki.rendering.internal.macro.toc.TreeParametersBuilder;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
+import org.xwiki.rendering.macro.toc.TocTreeBuilderFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -80,20 +79,11 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    /**
-     * A parser that knows how to parse plain text; this is used to transform link labels into plain text.
-     */
-    @Inject
-    @Named("plain/1.0")
-    private Parser plainTextParser;
-
-    /**
-     * Generate link label.
-     */
-    @Inject
-    private LinkLabelGenerator linkLabelGenerator;
-
     private TocTreeBuilder tocTreeBuilder;
+
+    @Inject
+    @Named("pdf")
+    private TocTreeBuilderFactory tocTreeBuilderFactory;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -110,7 +100,11 @@ public class PDFTocMacro extends AbstractMacro<PDFTocMacroParameters>
     {
         super.initialize();
 
-        this.tocTreeBuilder = new PDFTocTreeBuilder(new TocBlockFilter(this.plainTextParser, this.linkLabelGenerator));
+        try {
+            this.tocTreeBuilder = this.tocTreeBuilderFactory.build();
+        } catch (ComponentLookupException e) {
+            throw new InitializationException(String.format("Failed to initialize [%s]", TocTreeBuilder.class), e);
+        }
     }
 
     @Override

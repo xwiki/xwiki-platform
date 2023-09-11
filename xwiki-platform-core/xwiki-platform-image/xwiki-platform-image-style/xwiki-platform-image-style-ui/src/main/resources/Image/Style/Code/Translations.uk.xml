@@ -82,5 +82,7 @@ Image.Style.Code.ImageStyleClass_type=Тип
 Image.Style.Code.ImageStyleClass_type_hint=Тип стилю зображення (використовується як CSS клас).
 Image.Style.Code.ConfigurationClass_defaultStyle=Стиль за умовчанням
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Стиль зображення за умовчанням для цієї вікі.
+### Missing: Image.Style.Code.ConfigurationClass_forceDefaultStyle=Force Default Style
+### Missing: Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=When checked, the constraints of the default style are forced in the image configuration, and users are forced to choose a style.
 </content>
 </xwikidoc>

@@ -106,18 +106,7 @@
 #end
 
 #macro(displayNotificationDescription $event)
-  #if ($event.users.size() == 1)
-    <div>
-      $services.localization.render("notifications.events.${event.type}.description.by.1user", ["#displayEmailNotificationEventUsers($event.users, true, false)"])
-    </div>
-  #else
-    <div>
-      $services.localization.render("notifications.events.${event.type}.description.by.users", [$event.users.size()])
-    </div>
-    <div>
-      #displayEmailNotificationEventUsers($event.users, true, true)
-    </div>
-  #end
+  #displayCompositeEventDescription($event)
 #end
 
 

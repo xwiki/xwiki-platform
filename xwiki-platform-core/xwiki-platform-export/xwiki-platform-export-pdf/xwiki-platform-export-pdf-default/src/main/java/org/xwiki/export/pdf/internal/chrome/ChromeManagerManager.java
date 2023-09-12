@@ -19,8 +19,12 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -52,6 +57,8 @@ import com.github.dockerjava.api.model.HostConfig;
 public class ChromeManagerManager implements Disposable
 {
     private static final String BRIDGE_NETWORK = "bridge";
+
+    private static String chromeSecureComputingProfile;
 
     @Inject
     private Logger logger;
@@ -164,17 +171,48 @@ public class ChromeManagerManager implements Disposable
                 }
 
                 HostConfig hostConfig = containerManager.getHostConfig(network, remoteDebuggingPort);
+                // Set the secure computing profile in order to be able to run Chrome in sandbox mode.
+                // See https://github.com/Zenika/alpine-chrome/tree/master#-the-best-with-seccomp
+                hostConfig =
+                    hostConfig.withSecurityOpts(Collections.singletonList("seccomp=" + getSecureComputingProfile()));
+
+                // FIXME: We allow connections from any origins when not using the bridge network (i.e. when XWiki is
+                // also running inside a Docker container) because we don't know the IP address of the Chrome Docker
+                // container before it is created.
+                String chromeRemoteAllowOrigins = "*";
                 if (BRIDGE_NETWORK.equals(network)) {
                     // The extra host is needed in order for the created container to be able to access the XWiki
                     // instance running on the same machine as the Docker daemon.
                     hostConfig =
                         hostConfig.withExtraHosts(this.configuration.getXWikiURI().getHost() + ":host-gateway");
+                    // Allow only localhost connections to the Chrome remote debugging service when using the bridge
+                    // network (the Chrome Docker container exposes the remote debugging port on the Docker host).
+                    chromeRemoteAllowOrigins = "http://localhost:" + remoteDebuggingPort;
                 }
 
-                this.containerId = containerManager.createContainer(imageName, containerName,
-                    Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                        "--remote-debugging-port=" + remoteDebuggingPort),
-                    hostConfig);
+                // The default flags set by the zenika/alpine-chrome image are causing lots of
+                // net::ERR_INSUFFICIENT_RESOURCES errors that break the PDF export. See
+                // https://github.com/Zenika/alpine-chrome/issues/222 . We prefer to set the flags ourselves through the
+                // parameters (see below).
+                List<String> envVars = Arrays.asList("CHROMIUM_FLAGS=\"\"");
+
+                List<String> parameters = Arrays.asList(
+                    // We don't know the IP address of the docker container at this point.
+                    "--remote-debugging-address=0.0.0.0",
+                    // Use the configured remote debugging port.
+                    "--remote-debugging-port=" + remoteDebuggingPort,
+                    // Older versions of Chrome (e.g. 102) worked fine without this but it seems newer versions require
+                    // us to specify explicitly how the remote debugging service can be accessed.
+                    "--remote-allow-origins=" + chromeRemoteAllowOrigins,
+                    // This seems to fix the net::ERR_INSUFFICIENT_RESOURCES error. Strangely, it doesn't have the same
+                    // effect if I put it in the CHROMIUM_FLAGS (environment variable).
+                    "--disable-dev-shm-usage",
+                    // This is only useful if you want to inspect the headless Chrome using chrome://inspect/#devices
+                    // (without this the headless Chrome is detected but I can't open a new tab).
+                    "about:blank");
+
+                this.containerId =
+                    containerManager.createContainer(imageName, containerName, parameters, envVars, hostConfig);
                 this.isContainerCreator = true;
                 containerManager.startContainer(this.containerId);
             }
@@ -197,6 +235,20 @@ public class ChromeManagerManager implements Disposable
         } catch (Exception e) {
             throw new RuntimeException("Failed to prepare the Docker container for the PDF export.", e);
         }
+    }
+
+    /**
+     * @return the secure computing profile file for running the Chrome Docker container (in sandbox mode)
+     * @throws IOException if the secure computing profile can't be read
+     * @see <a href="https://docs.docker.com/engine/security/seccomp/">Seccomp security profiles for Docker</a>
+     */
+    private static String getSecureComputingProfile() throws IOException
+    {
+        if (chromeSecureComputingProfile == null) {
+            chromeSecureComputingProfile = IOUtils
+                .toString(ChromeManagerManager.class.getResourceAsStream("/chrome.json"), StandardCharsets.UTF_8);
+        }
+        return chromeSecureComputingProfile;
     }
 
     private void connectChromeService(String host, int remoteDebuggingPort)

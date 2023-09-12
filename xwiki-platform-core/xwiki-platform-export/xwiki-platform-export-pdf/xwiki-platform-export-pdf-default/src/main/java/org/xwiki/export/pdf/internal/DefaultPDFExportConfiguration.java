@@ -64,9 +64,9 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     @Override
     public String getChromeDockerImage()
     {
-        // Chrome fails to load web pages and crashes due to net::ERR_INSUFFICIENT_RESOURCES when using the latest
-        // version of the zenika/alpine-chrome image. See https://github.com/Zenika/alpine-chrome/issues/222
-        return getProperty("chromeDockerImage", "zenika/alpine-chrome:102");
+        // We use a fixed version of Chrome, instead of latest, for which we know the tests are passing (reproducible
+        // builds), because Chrome changes often lead to changes in the PDF export output.
+        return getProperty("chromeDockerImage", "zenika/alpine-chrome:115");
     }
 
     @Override

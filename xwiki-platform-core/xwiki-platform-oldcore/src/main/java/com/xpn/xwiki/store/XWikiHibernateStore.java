@@ -1909,13 +1909,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             Session session = getSession(context);
 
-            Query<Long> query = session
-                .createQuery("select attach.id from XWikiAttachment as attach where attach.id = :id", Long.class);
+            Query<Object[]> query = session.createQuery(
+                "select attach.contentStore, attach.archiveStore from XWikiAttachment as attach where attach.id = :id",
+                Object[].class);
             query.setParameter("id", attachment.getId());
-            boolean exist = query.uniqueResult() != null;
+            Object[] existingAttachment = query.uniqueResult();
+            boolean exist = existingAttachment != null;
 
             boolean saveContent;
             if (exist) {
+                // Make sure the attachment content and archive stores stay the same
+                attachment.setContentStore((String) existingAttachment[0]);
+                attachment.setArchiveStore((String) existingAttachment[1]);
+
                 // Don't update the history if the attachment was actually not supposed to exist
                 // Don't update the attachment version if document metadata dirty is forced false (any modification to
                 // the attachment automatically set document metadata dirty to true)

@@ -157,10 +157,11 @@ public class ContainerManager implements Initializable
      * @param imageName the image to use for the new container
      * @param containerName the name to associate with the created container
      * @param parameters the parameters to specify when creating the container
+     * @param envVars the environment variables to set when creating the container
      * @param hostConfig the host configuration
      * @return the id of the created container
      */
-    public String createContainer(String imageName, String containerName, List<String> parameters,
+    public String createContainer(String imageName, String containerName, List<String> parameters, List<String> envVars,
         HostConfig hostConfig)
     {
         this.logger.debug("Creating a Docker container with name [{}] using image [{}] and having parameters [{}].",
@@ -170,7 +171,7 @@ public class ContainerManager implements Initializable
             List<ExposedPort> exposedPorts =
                 hostConfig.getPortBindings().getBindings().keySet().stream().collect(Collectors.toList());
             CreateContainerResponse container = createContainerCmd.withName(containerName).withLabels(DEFAULT_LABELS)
-                .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
+                .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).withEnv(envVars).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
             return container.getId();
         }

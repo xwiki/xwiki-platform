@@ -239,40 +239,31 @@ $xwiki.getPlainUserName($user)##
   #set ($baseTranslationPrefix = "${compositeEvent.type}")
   #set ($fallbackTranslationPrefix = "notifications.events.${compositeEvent.type}")
   #set ($fallbackTranslationSuffix = "description")
-  #set ($fallbackTranslation = "#getNotificationTranslation($baseTranslationPrefix,$fallbackTranslationSuffix,$fallbackTranslationPrefix,[])")
   #set ($descriptionTranslation = $NULL)
   #if ($compositeEvent.users.size() == 1)
     #set ($translationSuffix = "description.by.1user")
+    #set ($translationKeys = [
+      "${baseTranslationPrefix}.${translationSuffix}",
+      "${fallbackTranslationPrefix}.${translationSuffix}",
+      "${baseTranslationPrefix}.${fallbackTranslationSuffix}",
+      "${fallbackTranslationPrefix}.${fallbackTranslationSuffix}"
+    ])
     #set ($translationParameters = ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
-    #set ($descriptionTranslation = "#getNotificationTranslation($baseTranslationPrefix,$translationSuffix,$fallbackTranslationPrefix,$translationParameters)")
-    #if ("$!descriptionTranslation" != '')
-      $descriptionTranslation
-    #else
-      $fallbackTranslation
-    #end
+    $services.localization.render($translationKeys,$translationParameters)
   #else
   <div>
     #set ($translationSuffix = "description.by.users")
     #set ($translationParameters = [$compositeEvent.users.size()])
-    #set ($descriptionTranslation = "#getNotificationTranslation($baseTranslationPrefix,$translationSuffix,$fallbackTranslationPrefix,$translationParameters)")
-    #if ("$!descriptionTranslation" != '')
-      $descriptionTranslation
-    #else
-      $fallbackTranslation
-    #end
+    #set ($translationKeys = [
+      "${baseTranslationPrefix}.${translationSuffix}",
+      "${fallbackTranslationPrefix}.${translationSuffix}",
+      "${baseTranslationPrefix}.${fallbackTranslationSuffix}",
+      "${fallbackTranslationPrefix}.${fallbackTranslationSuffix}"
+    ])
+    $services.localization.render($translationKeys,$translationParameters)
   </div>
   <div>
     #displayNotificationEventUsers($compositeEvent.users, true, true)
   </div>
   #end
-#end
-
-#macro(getNotificationTranslation $prefix $suffix $fallbackPrefix $parameters)
-  #set ($translationResult = $NULL)
-  #set ($translationKey = "${prefix}.${suffix}")
-  #set ($translationResult = $services.localization.render($translationKey, $parameters))
-  #if ("$translationResult" == "$translationKey")
-    #set ($translationResult = $services.localization.render("${fallbackPrefix}.${suffix}", $parameters))
-  #end
-  $translationResult
 #end

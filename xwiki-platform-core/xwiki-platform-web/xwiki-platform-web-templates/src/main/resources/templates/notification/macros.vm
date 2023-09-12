@@ -114,7 +114,7 @@
               aria-label="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
               title="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
               disabled="disabled">
-        <span class="fa fa-check"></span>
+        $services.icon.renderHTML('check')
       </button>
       $content
       #if ($stringtool.isNotBlank($details))

@@ -20,10 +20,8 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
 
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
@@ -48,8 +46,6 @@ public abstract class AbstractResourceSkin extends AbstractSkin
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractResourceSkin.class);
 
     private Configuration properties;
-
-    private FileTime filetime;
 
     /**
      * Default constructor.
@@ -136,14 +132,6 @@ public abstract class AbstractResourceSkin extends AbstractSkin
 
                 this.properties = new BaseConfiguration();
             }
-        } else {
-            try {
-                Path resourcePath = Paths.get(getResourceURL(getPropertiesPath()).toURI());
-                FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
-            } catch (Exception e) {
-                
-            }
-
         }
 
         return this.properties;

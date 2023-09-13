@@ -262,10 +262,6 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         protected abstract T getContentInternal(String content) throws Exception;
 
-        /**
-         * @return the instant the cache content of that template was last modified or null if it's unknown
-         * @since 15.8RC1
-         */
         @Override
         public Instant getInstant()
         {

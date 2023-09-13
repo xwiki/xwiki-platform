@@ -61,8 +61,8 @@ public interface Resource<I extends InputSource>
     I getInputSource() throws Exception;
 
     /**
-     * @return the last modified time of that resource
-     * @throws Exception when failing to get the instance of the resource
+     * @return the instant that resource was last modified or null if it's unknown
+     * @throws Exception when failing to get the instant of the resource
      * @since 15.8RC1
      */
     @Unstable

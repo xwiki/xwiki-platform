@@ -31,6 +31,8 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
@@ -51,6 +53,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public abstract class AbstractSkinResource extends AbstractResource<InputSource>
 {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinResource.class);
+
     protected Environment environment;
 
     protected Provider<XWikiContext> xcontextProvider;
@@ -94,10 +98,16 @@ public abstract class AbstractSkinResource extends AbstractResource<InputSource>
     public Instant getInstant() throws Exception
     {
         URL resourceUrl = this.environment.getResource(getPath());
-        Path resourcePath = Paths.get(resourceUrl.toURI());
-        FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+        try {
+            Path resourcePath = Paths.get(resourceUrl.toURI());
+            FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
 
-        return lastModifiedTime.toInstant();
+            return lastModifiedTime.toInstant();
+        } catch (Exception e) {
+            LOGGER.debug("Failed to get the date for resource [{}]", resourceUrl, e);
+        }
+
+        return null;
     }
 
     @Override

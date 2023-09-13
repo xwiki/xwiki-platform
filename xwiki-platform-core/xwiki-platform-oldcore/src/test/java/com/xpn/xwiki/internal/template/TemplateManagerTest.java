@@ -61,7 +61,9 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -80,6 +82,8 @@ class TemplateManagerTest
     private Environment environmentMock;
 
     private VelocityManager velocityManagerMock;
+
+    private VelocityEngine velocityEngineMock;
 
     @InjectMockComponents
     private DefaultTemplateManager templateManager;
@@ -110,7 +114,8 @@ class TemplateManagerTest
     @BeforeEach
     void before() throws Exception
     {
-        when(this.velocityManagerMock.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
+        this.velocityEngineMock = mock();
+        when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
 
         when(this.environmentMock.getResource("/templates/")).thenReturn(new URL("file://templates/"));
@@ -125,19 +130,29 @@ class TemplateManagerTest
 
     private void mockVelocity(String source, String result) throws XWikiVelocityException
     {
-        when(this.velocityManagerMock.evaluate(any(Writer.class), any(), argThat(new StringReaderMatcher(source))))
-            .then(new Answer<Boolean>()
+        final org.apache.velocity.Template template = mock();
+
+        when(this.velocityEngineMock.compile(any(), argThat(new StringReaderMatcher(source)))).then(new Answer<org.apache.velocity.Template>()
+        {
+            @Override
+            public org.apache.velocity.Template answer(InvocationOnMock invocation) throws Throwable
             {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    Writer writer = (Writer) invocation.getArguments()[0];
+                return template;
+            }
+        });
 
-                    writer.write(result);
+        doAnswer(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                Writer writer = (Writer) invocation.getArguments()[1];
 
-                    return Boolean.TRUE;
-                }
-            });
+                writer.write(result);
+
+                return Boolean.TRUE;
+            }
+        }).when(this.velocityEngineMock).evaluate(any(), any(), any(), same(template));
     }
 
     @Test

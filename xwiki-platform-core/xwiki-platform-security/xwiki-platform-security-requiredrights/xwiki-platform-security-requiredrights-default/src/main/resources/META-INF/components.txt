@@ -1,2 +1,10 @@
 org.xwiki.platform.security.requiredrights.internal.XWikiDocumentRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsScriptService
+org.xwiki.platform.security.requiredrights.internal.DefaultMacroBlockRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.DefaultObjectRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.DocumentTitleRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.StringVelocityRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.VelocityMacroBlockRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.XDOMRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.RequiredRightObjectRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.ScriptMacroAnalyzer

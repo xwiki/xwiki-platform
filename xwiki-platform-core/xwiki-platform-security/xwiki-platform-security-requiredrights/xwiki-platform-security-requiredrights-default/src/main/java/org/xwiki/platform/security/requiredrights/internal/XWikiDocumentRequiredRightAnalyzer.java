@@ -26,20 +26,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import static org.slf4j.event.Level.WARN;
-import static org.xwiki.model.EntityType.DOCUMENT;
-import static org.xwiki.security.authorization.Right.SCRIPT;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * @version $Id$
@@ -59,30 +55,54 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     private AuthorExecutor authorExecutor;
 
     @Inject
-    private ContextualAuthorizationManager contextualAuthorizationManager;
+    private DocumentContextExecutor documentContextExecutor;
 
     @Inject
-    private DocumentContextExecutor documentContextExecutor;
+    @Named(DocumentTitleRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<String> documentTitleRequiredRightAnalyzer;
+
+    @Inject
+    @Named(XDOMRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
+
+    @Inject
+    @Named(DefaultObjectRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
 
     @Override
     public List<RequiredRightAnalysisResult> analyze(XWikiDocument document) throws RequiredRightsException
     {
         // Analyze the content
         try {
-            return this.documentContextExecutor.call(() -> this.authorExecutor.call(() -> {
+            return this.documentContextExecutor.call(() ->
+            {
                 List<RequiredRightAnalysisResult> result = new ArrayList<>();
-                // Analyze the title
-                if (StringUtils.containsAny(document.getTitle(), "#", "$")
-                    && !this.contextualAuthorizationManager.hasAccess(SCRIPT))
-                {
-                    // TODO: introduce a build, with a check that all the mandatory field are 
-                    result.add(new RequiredRightAnalysisResult(document.getDocumentReference(), ID,
-                        "security.requiredrights.title", List.of(document.getTitle()), SCRIPT, DOCUMENT).setLevel(
-                        WARN));
-                }
+
+                this.authorExecutor.call(() -> {
+                    // Analyze the title
+                    result.addAll(this.documentTitleRequiredRightAnalyzer.analyze(document.getTitle()));
+
+                    // Analyze the content
+                    result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));
+
+                    result.forEach(r -> r.setEntityReference(document.getDocumentReference()));
+
+                    return null;
+                }, document.getContentAuthorReference(), document.getDocumentReference());
+
+                // Analyze the objects. Make sure the context author is the object's author.
+                this.authorExecutor.call(() -> {
+                    for (List<BaseObject> baseObjects : document.getXObjects().values()) {
+                        for (BaseObject object : baseObjects) {
+                            result.addAll(this.objectRequiredRightAnalyzer.analyze(object));
+                        }
+                    }
+
+                    return null;
+                }, document.getAuthorReference(), document.getDocumentReference());
 
                 return result;
-            }, document.getContentAuthorReference(), document.getDocumentReference()), document);
+            }, document);
         } catch (Exception e) {
             throw new RequiredRightsException("Error...", e);
         }

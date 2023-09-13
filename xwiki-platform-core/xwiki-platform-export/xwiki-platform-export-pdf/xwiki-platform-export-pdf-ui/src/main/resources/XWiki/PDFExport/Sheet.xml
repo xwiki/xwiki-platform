@@ -365,6 +365,14 @@ define('paged-polyfill-patched', [
    * Make sure the table rows are complete before determining the overflow otherwise the table layout is different than
    * in view mode. See XWIKI-21043 (The last lines of text from a print page are not always visible when they are inside
    * a table cell that is split between print pages).
+   *
+   * TODO: Remove this code when the following issues get fixed:
+   * &lt;ul&gt;
+   *   &lt;li&gt;&lt;a href="https://github.com/pagedjs/pagedjs/issues/157"&gt;#157: The last line of text from a print page is
+   *     sometimes not fully visible&lt;/a&gt;&lt;/li&gt;
+   *   &lt;li&gt;&lt;a href="https://github.com/pagedjs/pagedjs/issues/154"&gt;#154: Text gets truncated at the end of the page when
+   *     a long table is split&lt;/a&gt;&lt;/li&gt;
+   * &lt;/ul&gt;
    */
   class FixTableLayout extends Paged.Handler {
     constructor(chunker, polisher, caller) {
@@ -496,7 +504,35 @@ define('paged-polyfill-patched', [
 
         }
 
-        return offset;
+        // The returned value is used by findOverflow to set the start of the range used to delete the excess content
+        // (that overflows the current print page). The problem is that findOverflow doesn't set the range start if
+        // '!offset' which is obviously true when offset is 0. The workaround is to return instead the '0' string which
+        // will pass the check, and then get converted automatically back to 0 by JavaScript when calling
+        // range.setStart().
+        return offset === 0 ? '0' : offset;
+      };
+    }
+  }
+
+  // The maxChars setting determines when to start looking for the overflow point. It it's too low it triggers too many
+  // break point computations (which lead to a reflow and repain operation after adding each DOM node to a print page).
+  // The maxChars setting should normally be set as the average char count for the last 4 print pages. In practice,
+  // maxChars is set only once, based on the first print page, which can have very few chars if it's a cover page.
+  //
+  // TODO: Remove this code when https://github.com/pagedjs/pagedjs/issues/159 (maxChars is set only once, based on the
+  // first print page, and then never updated) gets fixed.
+  class FixMaxChars extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforePageLayout(page) {
+      const originalLayout = page.layout;
+      page.layout = function(contents, breakToken, maxChars) {
+        if (maxChars) {
+          this.settings.maxChars = maxChars;
+        }
+        return originalLayout.apply(this, arguments);
       };
     }
   }
@@ -504,7 +540,8 @@ define('paged-polyfill-patched', [
   Paged.registerHandlers(
     ShowInvisibleRowsOnPageBreaks,
     FixFloatingImages,
-    FixTableLayout
+    FixTableLayout,
+    FixMaxChars
   );
 
   return PagedPolyfill;
@@ -748,9 +785,19 @@ require([
         const computedCellWidth = this.clientWidth;
         const rowWidth = this.parentNode.clientWidth;
         const relativeCellWidth = Math.floor(computedCellWidth / rowWidth * 10000) / 100;
-        $(this).removeAttr('width').css({width: relativeCellWidth + '%'});
+        // We update the width at the end, after computing all relative cell widths, in order to trigger a single reflow
+        // and repaint operation, which is an expensive opration. Otherwise we would trigger one reflow and repaint for
+        // each table cell (because setting the width invalidates the clientWidth cache), which would slow the page
+        // load, eventually triggering the page ready timeout.
+        // See  https://dev.to/gopal1996/understanding-reflow-and-repaint-in-the-browser-1jbg
+        $(this).attr('data-xwiki-pdf-export-relative-width', relativeCellWidth + '%');
       }
     });
+
+    // Update the cell widths to be relative (triggering a single reflow and repaint).
+    $('[data-xwiki-pdf-export-relative-width]').each(function() {
+      $(this).css({width: $(this).attr('data-xwiki-pdf-export-relative-width')});
+    }).removeAttr('width data-xwiki-pdf-export-relative-width');
 
     // Remove any width set on the table itself. This width is most probably the result of a table resize performed from
     // the WYSIWYG editor. But since the XWiki skin is making tables use the full available width by default (width:

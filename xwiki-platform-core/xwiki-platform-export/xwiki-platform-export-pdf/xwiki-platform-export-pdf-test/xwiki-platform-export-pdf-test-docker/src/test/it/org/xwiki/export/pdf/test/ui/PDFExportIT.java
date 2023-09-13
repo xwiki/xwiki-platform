@@ -953,6 +953,50 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(19)
+    void largeTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeTable"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(39, pdf.getNumberOfPages());
+
+            // Verify the content of the last page.
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
+            // Verify that the text from the last cell is present.
+            assertTrue(text.contains("1000, 10"), "Unexpected content: " + text);
+        }
+    }
+
+    /**
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-21295">Some large documents may be exported only partially now
+     *      with the new PDF Export</a>
+     */
+    @Test
+    @Order(20)
+    void largeExcelImport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeExcelImport"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(55, pdf.getNumberOfPages());
+
+            // Verify the content of the last page.
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
+            // Verify that the text from the last table row is present.
+            assertTrue(text.contains("Reuters US Online Report - Technology end"), "Unexpected content: " + text);
+            assertTrue(text.contains("with a special focus on the US.end"), "Unexpected content: " + text);
+            assertTrue(text.contains("English end"), "Unexpected content: " + text);
+            assertTrue(text.contains("Pictures and graphics end"), "Unexpected content: " + text);
+            assertTrue(text.contains("delivered via the internet end"), "Unexpected content: " + text);
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

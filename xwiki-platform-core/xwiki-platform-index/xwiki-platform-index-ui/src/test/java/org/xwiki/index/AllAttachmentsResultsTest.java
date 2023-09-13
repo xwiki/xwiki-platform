@@ -77,7 +77,7 @@ import static org.mockito.Mockito.when;
  * Tests of the AllAttachmentsResults.xml document.
  *
  * @version $Id$
- * @since 14.3RC1
+ * @since 15.8RC1
  */
 @XWikiSyntax20ComponentList
 @ComponentList({

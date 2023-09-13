@@ -207,7 +207,7 @@ class AllAttachmentsResultsTest extends PageTest
         renderPage();
 
         verify(this.queryService).hql("where attachment.date >= :attachment_date_start "
-            + "and attachment.date < :attachment_date_end "
+            + "and attachment.date <= :attachment_date_end "
             + "order by lower(attachment.filename) asc, attachment.filename asc");
         verify(this.query).bindValue("attachment_date_start", this.dateTool.toDate(1607295600000L));
         verify(this.query).bindValue("attachment_date_end", this.dateTool.toDate(1632347999999L));
@@ -222,7 +222,7 @@ class AllAttachmentsResultsTest extends PageTest
         renderPage();
 
         verify(this.queryService).hql("where attachment.date >= :attachment_date_start "
-            + "and attachment.date < :attachment_date_end "
+            + "and attachment.date <= :attachment_date_end "
             + "order by lower(attachment.filename) asc, attachment.filename asc");
         verify(this.query).bindValue("attachment_date_start",
             this.dateTool.toDate("iso_tz", "2021-09-22T00:00:00+02:00"));
@@ -247,7 +247,8 @@ class AllAttachmentsResultsTest extends PageTest
     private void assertMimeType(Map<String, Object> row, String expectedMimeType)
     {
         assertEquals(expectedMimeType,
-            Jsoup.parse((String) row.get("mimeType")).getElementsByClass("mime").get(0).attr("data-type"));
+            Jsoup.parse((String) row.get("mimeType")).getElementsByClass("attachmentMimeType").get(0)
+                .attr("data-type"));
     }
 
     private void assertFullName(String fullNameContent, String expectedText, String expectedFirst,

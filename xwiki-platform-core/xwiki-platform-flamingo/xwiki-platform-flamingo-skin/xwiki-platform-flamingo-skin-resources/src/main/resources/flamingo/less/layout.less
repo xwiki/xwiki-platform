@@ -226,11 +226,6 @@
   background-color: @xwiki-page-content-bg;
 }
 
-#contentcolumn .main {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
 #xwikieditor .main {
   background-color: @xwiki-page-content-bg;
   box-shadow: 0 1px 2px @input-border;
@@ -254,7 +249,7 @@
   padding-bottom: (@grid-gutter-width / 2);
 }
 
-#mainContentArea > .xcontent {
+#mainContentArea .xcontent {
   margin-top: (@line-height-computed / 2);
 }
 
@@ -295,7 +290,12 @@
   }
 }
 
-#mainContentArea,
+.main {
+  background-color: @xwiki-page-content-bg;
+  box-shadow: 0 1px 2px @xwiki-border-color;
+  padding: @line-height-computed @grid-gutter-width;
+}
+
 #xdocFooter,
 #docextrapanes {
   background-color: @xwiki-page-content-bg;

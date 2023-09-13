@@ -36,7 +36,8 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 <form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
 #if("$!request.srid" != '')
@@ -98,7 +99,7 @@
 </dl>
 #xwikimessageboxend()
 </form>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")
 #end

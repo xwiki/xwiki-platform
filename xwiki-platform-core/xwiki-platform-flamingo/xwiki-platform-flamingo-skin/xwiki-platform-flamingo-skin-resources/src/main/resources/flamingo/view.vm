@@ -37,7 +37,6 @@
   #end
 
   <div class="main">
-  <div id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')
     #template("contentview.vm")
@@ -45,7 +44,6 @@
     #template("${viewer}.vm")
   #end
   <div class="clearfloats"></div>
-  </div>## mainContentArea
   #if($viewer == 'content')
     #if ($displayContentFooter)
       <div id="xdocFooter">

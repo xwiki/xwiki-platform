@@ -66,7 +66,10 @@ public interface Resource<I extends InputSource>
      * @since 15.8RC1
      */
     @Unstable
-    Instant getInstant() throws Exception;
+    default Instant getInstant() throws Exception
+    {
+        return null;
+    }
 
     /**
      * Create a URL for the resource.

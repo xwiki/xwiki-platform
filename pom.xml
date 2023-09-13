@@ -28,7 +28,7 @@
     <version>8.4-11</version>
   </parent>
   <artifactId>application-tour</artifactId>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.4</version>
   <packaging>pom</packaging>
   <name>Tour Application - Parent POM</name>
   <description>Let users create tour guides for any page</description>
@@ -54,7 +54,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-tour.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-tour.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-tour/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>application-tour-1.4</tag>
   </scm>
   <modules>
     <module>application-tour-ui</module>

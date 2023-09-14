@@ -33,7 +33,11 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
+
+import com.xpn.xwiki.internal.template.InternalTemplateManager.DefaultTemplateContent;
 
 /**
  * Execute Velocity template content.
@@ -92,7 +96,15 @@ public class VelocityTemplateEvaluator
             "Evaluate content of template with id [{}]", template.getId());
 
         try {
-            this.velocityManager.evaluate(writer, namespace, new StringReader(content.getContent()));
+            VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
+            org.apache.velocity.Template velocityTemplate = getVelocityTemplate(velocityEngine, template, content);
+
+            if (velocityTemplate != null) {
+                velocityEngine.evaluate(this.velocityManager.getVelocityContext(), writer, namespace, velocityTemplate);
+            } else {
+                velocityEngine.evaluate(this.velocityManager.getVelocityContext(), writer, namespace,
+                    new StringReader(content.getContent()));
+            }
         } finally {
             // Get rid of temporary rendering context
             if (renderingContextPushed) {
@@ -101,5 +113,24 @@ public class VelocityTemplateEvaluator
 
             this.progress.endStep(template);
         }
+    }
+
+    private org.apache.velocity.Template getVelocityTemplate(VelocityEngine velocityEngine, Template template,
+        TemplateContent content) throws XWikiVelocityException
+    {
+        if (content instanceof DefaultTemplateContent) {
+            DefaultTemplateContent templateContent = (DefaultTemplateContent) content;
+
+            // Check if the content already been compiled
+            if (!(templateContent.compiledContent instanceof org.apache.velocity.Template)) {
+                // Compile the Velocity
+                templateContent.compiledContent =
+                    velocityEngine.compile(template.getId(), new StringReader(content.getContent()));
+            }
+
+            return (org.apache.velocity.Template) templateContent.compiledContent;
+        }
+
+        return null;
     }
 }

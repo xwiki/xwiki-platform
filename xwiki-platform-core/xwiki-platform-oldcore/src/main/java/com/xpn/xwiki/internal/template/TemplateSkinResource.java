@@ -19,21 +19,17 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import java.io.InputStream;
-
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.environment.Environment;
 
-import com.xpn.xwiki.internal.skin.AbstractSkinResource;
+import com.xpn.xwiki.internal.skin.EnvironmentSkinResource;
 
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class TemplateSkinResource extends AbstractSkinResource
+public class TemplateSkinResource extends EnvironmentSkinResource
 {
-    private final Environment environment;
-
     /**
      * Default constructor.
      *
@@ -43,8 +39,7 @@ public class TemplateSkinResource extends AbstractSkinResource
      */
     public TemplateSkinResource(String path, String resourceName, Environment environment)
     {
-        super(path, resourceName, null, null, null);
-        this.environment = environment;
+        super(path, resourceName, null, environment, null, null);
     }
 
     @Override
@@ -52,11 +47,5 @@ public class TemplateSkinResource extends AbstractSkinResource
     {
         // Does not make any sense in this case
         throw new NotImplementedException("Method not implemented");
-    }
-
-    @Override
-    public InputStream getResourceAsStream(String path)
-    {
-        return this.environment.getResourceAsStream(path);
     }
 }

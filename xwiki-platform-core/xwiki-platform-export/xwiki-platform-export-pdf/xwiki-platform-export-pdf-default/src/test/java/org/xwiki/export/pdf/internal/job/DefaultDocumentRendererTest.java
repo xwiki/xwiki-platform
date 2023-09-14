@@ -19,6 +19,14 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +46,8 @@ import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -53,14 +63,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultDocumentRenderer}.
@@ -89,6 +91,9 @@ class DefaultDocumentRendererTest
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @MockComponent
+    private DocumentMetadataExtractor metadataExtractor;
 
     @Mock
     private BlockRenderer html5Renderer;
@@ -150,20 +155,31 @@ class DefaultDocumentRendererTest
             }
         }).when(this.html5Renderer).render(same(xdom), any(WikiPrinter.class));
 
-        DocumentRenderingResult result = this.documentRenderer.render(documentReference, false);
+        DocumentRendererParameters rendererParameters = new DocumentRendererParameters();
+        DocumentRenderingResult result = this.documentRenderer.render(documentReference, rendererParameters);
         assertEquals(documentReference, result.getDocumentReference());
         assertEquals(1, xdom.getChildren().size());
         assertSame(xdom, result.getXDOM());
         assertEquals("some content", result.getHTML());
         assertEquals(Collections.singletonMap("Hheading", "Hheading"), result.getIdMap());
 
-        // Now render with title.
-        result = this.documentRenderer.render(documentReference, true);
+        // Now render with title and metadata.
+        ObjectPropertyReference metadataReference =
+            new ObjectPropertyReference("metadata", new ObjectReference("XWiki.PDFExport.TemplateClass[0]",
+                new DocumentReference("test", "Some", "PDFTemplate")));
+        rendererParameters = rendererParameters.withTitle(true).withMetadataReference(metadataReference);
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("data-foo", "bar");
+        metadata.put("data-xwiki-rendering-protected", "true");
+        when(this.metadataExtractor.getMetadata(translatedDocument, metadataReference)).thenReturn(metadata);
+        result = this.documentRenderer.render(documentReference, rendererParameters);
         assertEquals(2, xdom.getChildren().size());
         HeaderBlock title = (HeaderBlock) xdom.getChildren().get(0);
         assertEquals(HeaderLevel.LEVEL1, title.getLevel());
         assertEquals("Htest:Some.Page", title.getId());
         assertEquals("test:Some.Page", title.getParameter("data-xwiki-document-reference"));
+        assertEquals("bar", title.getParameter("data-foo"));
+        assertEquals("true", title.getParameter("data-xwiki-rendering-protected"));
         assertEquals("title", ((WordBlock) title.getChildren().get(0)).getWord());
 
         Map<String, String> expectedIdMap = new HashMap<>();
@@ -177,7 +193,8 @@ class DefaultDocumentRendererTest
     {
         when(this.xcontext.getDoc()).thenReturn(this.document);
 
-        this.documentRenderer.render(this.documentReference, false);
+        DocumentRendererParameters rendererParameters = new DocumentRendererParameters();
+        this.documentRenderer.render(this.documentReference, rendererParameters);
 
         verify(this.documentDisplayer).display(same(this.document), any(DocumentDisplayerParameters.class));
     }

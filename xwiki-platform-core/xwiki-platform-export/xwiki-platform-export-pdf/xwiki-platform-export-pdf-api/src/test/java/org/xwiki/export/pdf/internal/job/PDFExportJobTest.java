@@ -19,6 +19,17 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
@@ -38,6 +49,8 @@ import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
@@ -47,17 +60,6 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link PDFExportJob}.
@@ -105,6 +107,8 @@ class PDFExportJobTest
 
     private DocumentReference bobReference = new DocumentReference("test", "Users", "Bob");
 
+    private DocumentRendererParameters rendererParameters = new DocumentRendererParameters().withTitle(true);
+
     @BeforeEach
     void configure() throws Exception
     {
@@ -129,8 +133,10 @@ class PDFExportJobTest
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, this.firstPageReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, this.secondPageReference)).thenReturn(true);
 
-        when(this.documentRenderer.render(this.firstPageReference, true)).thenReturn(this.firstPageRendering);
-        when(this.documentRenderer.render(this.secondPageReference, true)).thenReturn(this.secondPageRendering);
+        when(this.documentRenderer.render(this.firstPageReference, this.rendererParameters))
+            .thenReturn(this.firstPageRendering);
+        when(this.documentRenderer.render(this.secondPageReference, this.rendererParameters))
+            .thenReturn(this.secondPageRendering);
     }
 
     @Test
@@ -172,13 +178,35 @@ class PDFExportJobTest
         PDFExportJobStatus jobStatus = this.pdfExportJob.getStatus();
         assertNull(jobStatus.getPDFFileReference());
 
-        TemporaryResourceReference pdfFileReference = jobStatus.getPDFFileReference();
-        verify(this.temporaryResourceStore, never()).createTemporaryFile(eq(pdfFileReference), any(InputStream.class));
+        verify(this.temporaryResourceStore, never()).createTemporaryFile(any(TemporaryResourceReference.class),
+            any(InputStream.class));
 
         List<DocumentRenderingResult> renderingResults = jobStatus.getDocumentRenderingResults();
         assertEquals(2, renderingResults.size());
         assertSame(this.firstPageRendering, renderingResults.get(0));
         assertSame(this.secondPageRendering, renderingResults.get(1));
+    }
+
+    @Test
+    void runWithTemplateSpecified() throws Exception {
+        DocumentReference templateReference = new DocumentReference("test", "Some", "Template");
+        when(this.authorization.hasAccess(Right.VIEW, this.aliceReference, templateReference)).thenReturn(true);
+        when(this.authorization.hasAccess(Right.VIEW, this.bobReference, templateReference)).thenReturn(true);
+        this.request.setTemplate(templateReference);
+        this.request.setDocuments(Collections.singletonList(this.firstPageReference));
+
+        this.rendererParameters.withTitle(false).withMetadataReference(new ObjectPropertyReference("metadata",
+            new ObjectReference("XWiki.PDFExport.TemplateClass[0]", templateReference)));
+        when(this.documentRenderer.render(this.firstPageReference, this.rendererParameters))
+            .thenReturn(this.firstPageRendering);
+
+        this.pdfExportJob.initialize(this.request);
+        this.pdfExportJob.runInternal();
+
+        PDFExportJobStatus jobStatus = this.pdfExportJob.getStatus();
+        List<DocumentRenderingResult> renderingResults = jobStatus.getDocumentRenderingResults();
+        assertEquals(1, renderingResults.size());
+        assertSame(this.firstPageRendering, renderingResults.get(0));
     }
 
     @Test
@@ -199,7 +227,7 @@ class PDFExportJobTest
     {
         DocumentRenderingResult largeResult = new DocumentRenderingResult(this.secondPageReference,
             new XDOM(Collections.singletonList(new WordBlock("second"))), StringUtils.repeat('x', 1000));
-        when(this.documentRenderer.render(this.secondPageReference, true)).thenReturn(largeResult);
+        when(this.documentRenderer.render(this.secondPageReference, this.rendererParameters)).thenReturn(largeResult);
 
         this.pdfExportJob.initialize(this.request);
         try {
@@ -218,7 +246,8 @@ class PDFExportJobTest
     {
         DocumentRenderingResult largeResult = new DocumentRenderingResult(this.secondPageReference,
             new XDOM(Collections.singletonList(new WordBlock("second"))), StringUtils.repeat('x', 1000));
-        when(this.documentRenderer.render(this.secondPageReference, false)).thenReturn(largeResult);
+        when(this.documentRenderer.render(this.secondPageReference, this.rendererParameters.withTitle(false)))
+            .thenReturn(largeResult);
 
         // Single page export.
         this.request.setDocuments(Collections.singletonList(this.secondPageReference));
@@ -236,7 +265,7 @@ class PDFExportJobTest
         when(this.configuration.getMaxContentSize()).thenReturn(0);
         DocumentRenderingResult largeResult = new DocumentRenderingResult(this.secondPageReference,
                 new XDOM(Collections.singletonList(new WordBlock("second"))), StringUtils.repeat('x', 1000));
-        when(this.documentRenderer.render(this.secondPageReference, true)).thenReturn(largeResult);
+        when(this.documentRenderer.render(this.secondPageReference, this.rendererParameters)).thenReturn(largeResult);
 
         this.pdfExportJob.initialize(this.request);
         this.pdfExportJob.runInternal();

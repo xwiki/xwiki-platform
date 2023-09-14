@@ -50,7 +50,10 @@ if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
   // Only execute if the "XWiki/xwiki-platform/<current branch>" job's last execution date is later than this current
   // job's last execution date. In other words, don't re-run the environment tests if there's been no source code
   // changes. This helps save agent build time and is better for global warming (less energy used)!
-  def times = compareCurrentLastBuildTimeWithOtherJob("XWiki/xwiki-platform/${env.BRANCH_NAME ?: 'master'}")
+  def regularJobName = "XWiki/xwiki-platform/${env.BRANCH_NAME ?: 'master'}"
+  echoXWiki "Checking if there was a build of ${regularJobName}..."
+  def times = compareCurrentLastBuildTimeWithOtherJob(regularJobName)
+  echoXWiki "There was ${times} builds of ${regularJobName} since this job's last build"
   if (times && times > 0) {
     buildDocker(params.type)
   } else if (!times) {

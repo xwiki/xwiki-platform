@@ -32,53 +32,27 @@
   ##
   ## Check if the document is protected and ask for confirmation if it is.
   ##
-  #set ($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference,
-    $tdoc.documentReferenceWithLocale))
-  #if ($protectionLevel.name() == 'DENY')
-    ## We cannot force the edit.
-    #set ($editConfirmation = {
-      'title': $services.localization.render('error'),
-      'message': "#documentProtectedMessage($protectionLevel)",
-      'reject': $services.localization.render('cancel')
-    })
-  #elseif ($protectionLevel.name() != 'NONE' && !$editForced)
-    #set ($editConfirmation = {
-      'title': $services.localization.render('warning'),
-      'message': "#documentProtectedMessage($protectionLevel)",
-      'reject': $services.localization.render('cancel'),
-      'confirm': $services.localization.render('forcelock')
-    })
-  ##
-  ## Check if the document is being edited by another user and ask for confirmation if it is.
-  ##
-  #elseif ($tdoc.getLocked() && !$editForced)
-    #define ($message)
-      #set ($lockingUser = "#displayUser($tdoc.lockingUser {'useInlineHTML': true})")
-      <p class="xwikimessage">
-        $escapetool.xml($services.localization.render('doclockedby')) ${lockingUser.trim()}.
-      </p>
+  #set ($checkResult = $services.editConfirmation.check($editForced))
+  
+  #if (!$checkResult.messages.isEmpty())
+    #set ($editConfirmation = {})
+    
+    #if ($checkResult.isError())
+      #set ($titleKey = 'error')
+    #else
+      #set ($titleKey = 'warning')
     #end
-    #set ($editConfirmation = {
-      'title': $services.localization.render('warning'),
-      'message': "$message",
-      'reject': $services.localization.render('cancel'),
-      'confirm': $services.localization.render('forcelock')
-    })
+    #set ($discard = $editConfirmation.put('title', $services.localization.render($titleKey)))
+    #define ($message)
+      #foreach ($block in $checkResult.messages)
+        $services.rendering.render($block, 'html/5.0')
+      #end
+    #end
+    #set ($discard = $editConfirmation.put('message', "$message"))
+    #set ($discard = $editConfirmation.put('reject', $services.localization.render('cancel')))
+    #if (!$checkResult.isError())
+      #set ($discard = $editConfirmation.put('confirm', $services.localization.render('forcelock')))
+    #end
   #end
 #end
 
-#macro (documentProtectedMessage $protectionLevel)
-  #set ($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
-  <p class="xwikimessage">
-    $escapetool.xml($services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
-  </p>
-  <ul>
-    #foreach ($extension in $extensions)
-      <li>$escapetool.xml($extension.name) ($escapetool.xml($extension.id.version))</li>
-    #end
-  </ul>
-  <p>
-    $escapetool.xml($services.localization.render(
-      "extension.xar.edit${protectionLevel.name().toLowerCase()}.explanation"))
-  </p>
-#end

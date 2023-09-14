@@ -20,28 +20,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.PDFExport.Template" locale="">
-  <web>XWiki.PDFExport</web>
-  <name>Template</name>
+<xwikidoc version="1.5" reference="PDFExportIT.CustomTemplate" locale="">
+  <web>PDFExportIT</web>
+  <name>CustomTemplate</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>WebHome</parent>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>$services.localization.render('export.pdf.templates.default')</title>
+  <title>CustomTemplate</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content/>
   <object>
-    <name>XWiki.PDFExport.Template</name>
+    <name>PDFExportIT.CustomTemplate</name>
     <number>0</number>
     <className>XWiki.PDFExport.TemplateClass</className>
-    <guid>554564b2-c912-4fd8-a418-1f3d658c43f8</guid>
+    <guid>f32175df-7be1-4ec5-98a8-9dbfec1db66d</guid>
     <class>
       <name>XWiki.PDFExport.TemplateClass</name>
       <customClass/>
@@ -153,9 +153,16 @@
 {{/velocity}}</cover>
     </property>
     <property>
-      <footer>{{html clean="false"}}
-&lt;span class="pdf-page-number"&gt;&lt;/span&gt; / &lt;span class="pdf-page-count"&gt;&lt;/span&gt;
-{{/html}}</footer>
+      <footer>{{velocity}}
+{{html clean="false"}}
+#if ("$!request.jobId" != '' &amp;&amp; $services.job.getJobStatus($request.jobId.split('/')).request.isWithTitle())
+  &lt;div&gt;Tags: &lt;span class="pdf-chapter-tags"&gt;&lt;/span&gt;&lt;/div&gt;
+#end
+&lt;div&gt;
+  &lt;span class="pdf-page-number"&gt;&lt;/span&gt; / &lt;span class="pdf-page-count"&gt;&lt;/span&gt;
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</footer>
     </property>
     <property>
       <header>{{velocity}}
@@ -170,7 +177,11 @@
 {{/velocity}}</header>
     </property>
     <property>
-      <metadata/>
+      <metadata>{{velocity output="false"}}
+$metadata.putAll({
+  'data-tags': $stringtool.join($sourceDocument.getTagList(), ', ')
+})
+{{/velocity}}</metadata>
     </property>
     <property>
       <toc>(% id="Hcore.pdf.tableOfContents" %)
@@ -186,10 +197,10 @@
     </property>
   </object>
   <object>
-    <name>XWiki.PDFExport.Template</name>
+    <name>PDFExportIT.CustomTemplate</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
-    <guid>3a4b3605-50e3-417f-9366-42762b3eb6df</guid>
+    <guid>b43075a5-128d-4a66-b10b-d7bd3b773bbe</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -325,6 +336,25 @@
   }
 
   /**
+   * Footer
+   */
+  .pagedjs_margin-content .pdf-footer {
+    display: flex !important;
+  }
+  .pdf-footer &gt; div {
+    flex-grow: 1;
+  }
+  .pdf-footer &gt; div:first-child {
+    text-align: left;
+  }
+  .pdf-footer &gt; div:last-child {
+    text-align: right;
+  }
+  .pdf-chapter-tags:before {
+    content: string(chapter-tags);
+  }
+
+  /**
    * Content
    */
   /* Marks the beginning of a new XWiki document. */
@@ -332,6 +362,7 @@
     /* Distinguish document titles from the rest of the level 1 headings that may appear in the document content. */
     font-weight: bolder;
     string-set: chapter-name content(text);
+    string-set: chapter-tags attr(data-tags);
 
     /* Start each XWiki document on a new print page. */
     &amp; ~ h1[data-xwiki-document-reference] {

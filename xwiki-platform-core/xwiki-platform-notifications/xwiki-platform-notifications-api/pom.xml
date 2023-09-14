@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - API</name>
   <description>Handle notifications</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.50</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications API</xwiki.extension.name>
     <!-- Skipping revapi since xwiki-platform-legacy-notifications-api wraps this module and runs checks on it -->

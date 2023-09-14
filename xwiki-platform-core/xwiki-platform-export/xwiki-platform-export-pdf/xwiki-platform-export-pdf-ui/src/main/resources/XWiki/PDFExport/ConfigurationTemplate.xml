@@ -62,7 +62,7 @@
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
-        <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.-]+</validationRegExp>
+        <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.\-]*</validationRegExp>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </chromeDockerContainerName>
       <chromeDockerImage>
@@ -118,7 +118,7 @@
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
-        <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.-]+</validationRegExp>
+        <validationRegExp>[a-zA-Z0-9][a-zA-Z0-9_.\-]*</validationRegExp>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </dockerNetwork>
       <maxContentSize>

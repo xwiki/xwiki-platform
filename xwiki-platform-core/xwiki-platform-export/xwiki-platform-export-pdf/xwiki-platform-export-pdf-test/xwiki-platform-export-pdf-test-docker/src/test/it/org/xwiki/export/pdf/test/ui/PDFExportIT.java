@@ -19,6 +19,10 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -51,10 +56,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for PDF export.
@@ -105,6 +106,7 @@ class PDFExportIT
 
         // Make sure we start with the default settings.
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
+        adminSection.getTemplatesInput().sendKeys("custom").waitForSuggestions().selectByVisibleText("CustomTemplate");
         adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
 
         if (!testConfiguration.getServletEngine().isOutsideDocker()) {
@@ -994,6 +996,43 @@ class PDFExportIT
             assertTrue(text.contains("English end"), "Unexpected content: " + text);
             assertTrue(text.contains("Pictures and graphics end"), "Unexpected content: " + text);
             assertTrue(text.contains("delivered via the internet end"), "Unexpected content: " + text);
+        }
+    }
+
+    @Test
+    @Order(21)
+    void customTemplateWithMetadata(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child page in the export because we want to verify the metadata which is included only in
+        // multi-page exports.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
+        exportTreeModal.export();
+
+        // Use the custom template which displays the page tags in the PDF footer.
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+        exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            // Verify the metadata is displayed only twice (only in the footer of the two content pages).
+            assertEquals(2, StringUtils.countMatches(pdf.getText(), "Tags:"));
+
+            // Verify the page corresponding to the parent document.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent\nTags: science, technology 3 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+
+            // Verify the page corresponding to the child document.
+            contentPageText = pdf.getTextFromPage(3);
+            assertTrue(contentPageText.startsWith("Child\nTags: biology, ecology 4 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
         }
     }
 

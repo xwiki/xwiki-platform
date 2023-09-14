@@ -78,7 +78,7 @@
 	          'params': {
 	            'type': 'password',
 	            'size': '60',
-	            'autocomplete': 'off'
+	            'autocomplete': 'current-password'
 	          },
 	          'validate': {
 	            'mandatory': {

@@ -57,7 +57,7 @@ public class UndeletePage extends BasePage
 
     private static final String DELETED_BATCH_ID_PREFIX = "Deleted Batch ID\n";
 
-    @FindBy(xpath = "//div[@id = 'mainContentArea']/div[@class='xcontent']/form//a[@class = 'panel-collapse-carret']")
+    @FindBy(xpath = "//main[@id = 'mainContentArea']/div[@class='xcontent']/form//a[@class = 'panel-collapse-carret']")
     private WebElement panelToggleLink;
 
     @FindBy(xpath = "//div[@id = 'panel-batch']/div[@class = 'row']/div[@class='col-xs-12 col-lg-4']")
@@ -66,10 +66,10 @@ public class UndeletePage extends BasePage
     @FindBy(xpath = "//div[@id = 'panel-batch']/div[@class = 'row']/div[last()]")
     private WebElement deletedBatchId;
 
-    @FindBy(xpath = "//div[@id = 'mainContentArea']/div[@class = 'xcontent']/form/a[text() = 'Cancel']")
+    @FindBy(xpath = "//main[@id = 'mainContentArea']/div[@class = 'xcontent']/form/a[text() = 'Cancel']")
     private WebElement cancelLink;
 
-    @FindBy(xpath = "//div[@id = 'mainContentArea']/div[@class = 'xcontent']/form/button[text() = 'Restore']")
+    @FindBy(xpath = "//main[@id = 'mainContentArea']/div[@class = 'xcontent']/form/button[text() = 'Restore']")
     private WebElement restoreButton;
 
     /**

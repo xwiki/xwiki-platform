@@ -217,6 +217,7 @@ ckeditor.plugin.slash.action.table_cell_delete.name=Zelle löschen
 ckeditor.plugin.slash.action.table_cell_delete.hint=Die aktuelle Tabellenzelle entfernen.
 ckeditor.plugin.slash.action.table_delete.hint=Die aktuelle Tabelle aus dem Inhalt entfernen.
 ckeditor.plugin.slash.placeholder="/" tippen für schnelle Aktionen...
+ckeditor.plugin.slash.dropdown.hint=Wähle das Element, das automatisch vervollständigt werden soll.
 ckeditor.plugin.focusedplaceholder.placeholder.body=Body / Hauptteil
 ckeditor.plugin.focusedplaceholder.placeholder.address=Adresse
 ckeditor.plugin.focusedplaceholder.placeholder.aside=Aside / Nebenbemerkung

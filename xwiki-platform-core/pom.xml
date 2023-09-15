@@ -125,7 +125,17 @@
 
                  Single justification example:
             -->
-            
+            <revapi.differences>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.xwiki.bridge.DocumentModelBridge org.xwiki.bridge.DocumentAccessBridge::getCurrentDocument()</old>
+                  <justification>Remove unstable API that was added by mistake.</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

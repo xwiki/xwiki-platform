@@ -30,8 +30,8 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextInitializer;
 
 /**
- * Puts the rendered document and the metadata map in the script context to be used by the PDF template to indicate the
- * metadata corresponding to the rendered document. This metadata can then be displayed in the PDF header or footer.
+ * Puts the metadata map in the script context to be used by the PDF template to indicate the metadata corresponding to
+ * the current document. This metadata can then be displayed in the PDF header or footer.
  * 
  * @version $Id$
  * @since 14.10.17
@@ -51,11 +51,7 @@ public class DocumentMetadataScriptContextInitializer implements ScriptContextIn
     {
         ExecutionContext executionContext = this.execution.getContext();
         if (executionContext != null
-            && executionContext.hasProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT)
             && executionContext.hasProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_METADATA)) {
-            context.setAttribute("sourceDocument",
-                executionContext.getProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT),
-                ScriptContext.ENGINE_SCOPE);
             context.setAttribute("metadata",
                 executionContext.getProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_METADATA),
                 ScriptContext.ENGINE_SCOPE);

@@ -21,6 +21,7 @@ package org.xwiki.model.validation.edit;
 
 import java.util.Optional;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Singleton
 @Named("documentLock")
+@Priority(2000)
 public class XWikiDocumentLockEditConfirmationChecker implements EditConfirmationChecker
 {
     @Inject
@@ -52,12 +54,12 @@ public class XWikiDocumentLockEditConfirmationChecker implements EditConfirmatio
     private TemplateManager templateManager;
 
     @Override
-    public Optional<EditConfirmationCheckerResult> check(boolean editForced)
+    public Optional<EditConfirmationCheckerResult> check()
     {
         XWikiContext context = this.xcontextProvider.get();
         XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
         Optional<EditConfirmationCheckerResult> result;
-        if (new Document(tdoc, context).getLocked() && !editForced) {
+        if (new Document(tdoc, context).getLocked()) {
             result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), false));
         } else {
             result = Optional.empty();

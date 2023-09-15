@@ -21,6 +21,7 @@ package org.xwiki.extension.xar.script;
 
 import java.util.Optional;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -51,6 +52,7 @@ import static org.xwiki.security.authorization.Right.EDIT;
 @Component
 @Singleton
 @Named("securityLevel")
+@Priority(1000)
 public class SecurityLevelEditConfirmationChecker implements EditConfirmationChecker
 {
     @Inject
@@ -63,7 +65,7 @@ public class SecurityLevelEditConfirmationChecker implements EditConfirmationChe
     private TemplateManager templateManager;
 
     @Override
-    public Optional<EditConfirmationCheckerResult> check(boolean editForced)
+    public Optional<EditConfirmationCheckerResult> check()
     {
         XWikiContext context = this.xcontextProvider.get();
         DocumentReference userReference = context.getUserReference();
@@ -74,7 +76,7 @@ public class SecurityLevelEditConfirmationChecker implements EditConfirmationChe
         Optional<EditConfirmationCheckerResult> result;
         if (protectionLevel == ProtectionLevel.DENY) {
             result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), true));
-        } else if (protectionLevel != ProtectionLevel.NONE && !editForced) {
+        } else if (protectionLevel != ProtectionLevel.NONE) {
             result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), false));
         } else {
             result = Optional.empty();

@@ -22,12 +22,15 @@ package org.xwiki.model.validation.edit;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.validation.edit.EditConfirmationScriptService.CheckResults;
 import org.xwiki.stability.Unstable;
 
 /**
  * Provides the operation that a pre-edit checker must provide. The checks are called by the
- * {@link EditConfirmationScriptService} and aggregated in a {@link CheckResults}.
+ * {@link EditConfirmationScriptService} and aggregated in a {@link EditConfirmationCheckerResults}. The components
+ * implementing this role are called in the order of their priorities. It is advised to define a priority to make the
+ * order of the resulting messages deterministic. The two components provided by {@code xwiki-platform}:
+ * {@code SecurityLevelEditConfirmationChecker} and {@code XWikiDocumentLockEditConfirmationChecker} have respectively
+ * priority {@code 1000} and {@code 2000}.
  *
  * @version $Id$
  * @since 15.9RC1
@@ -39,10 +42,8 @@ public interface EditConfirmationChecker
     /**
      * Checks if edit confirmation is required, or allowed, based on the provided boolean value.
      *
-     * @param editForced a boolean indicating if edit is forced or not. Some checks can be skipped with this is
-     *     {@code true}
      * @return an {@link Optional} containing a {@link EditConfirmationCheckerResult} if the check identified a result
      *     to be displayed to the user, or {@link Optional#empty()} if no result was found
      */
-    Optional<EditConfirmationCheckerResult> check(boolean editForced);
+    Optional<EditConfirmationCheckerResult> check();
 }

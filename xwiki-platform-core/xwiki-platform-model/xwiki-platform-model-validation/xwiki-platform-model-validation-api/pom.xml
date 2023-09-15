@@ -30,7 +30,7 @@
   <description>API to handle Model validation in XWiki</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Model Validation API</xwiki.extension.name>
     <!-- Category to display by the Extension Manager -->

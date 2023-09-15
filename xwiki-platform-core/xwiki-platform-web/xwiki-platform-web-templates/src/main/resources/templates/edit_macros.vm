@@ -32,11 +32,11 @@
   ##
   ## Check if the document is protected and ask for confirmation if it is.
   ##
-  #set ($checkResult = $services.editConfirmation.check($editForced))
-  
-  #if (!$checkResult.messages.isEmpty())
+  #set ($checkResult = $services.editConfirmation.check())
+
+  #if (!$checkResult.errorMessages.isEmpty() || (!$editForced && !$checkResult.warningMessages.isEmpty()))
     #set ($editConfirmation = {})
-    
+
     #if ($checkResult.isError())
       #set ($titleKey = 'error')
     #else
@@ -44,8 +44,24 @@
     #end
     #set ($discard = $editConfirmation.put('title', $services.localization.render($titleKey)))
     #define ($message)
-      #foreach ($block in $checkResult.messages)
-        $services.rendering.render($block, 'html/5.0')
+      #if (!$checkResult.errorMessages.isEmpty())
+      <div class="box errormessage">
+        #foreach ($block in $checkResult.errorMessages)
+          $services.rendering.render($block, 'html/5.0')
+          #if ($foreach.hasNext)
+            <hr/>
+          #end
+        #end
+      #end
+      #if (!$checkResult.warningMessages.isEmpty())
+        <div class="box warningmessage">
+          #foreach ($block in $checkResult.warningMessages)
+            $services.rendering.render($block, 'html/5.0')
+            #if ($foreach.hasNext)
+              <hr/>
+            #end
+          #end
+        </div>
       #end
     #end
     #set ($discard = $editConfirmation.put('message', "$message"))
@@ -55,4 +71,3 @@
     #end
   #end
 #end
-

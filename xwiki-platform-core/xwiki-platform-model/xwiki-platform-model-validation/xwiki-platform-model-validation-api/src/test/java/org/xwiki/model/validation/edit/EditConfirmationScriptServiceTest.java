@@ -20,7 +20,6 @@
 package org.xwiki.model.validation.edit;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -28,13 +27,9 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -47,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static org.xwiki.model.validation.edit.EditConfirmationScriptService.CheckResults;
 
 /**
  * Test of {@link EditConfirmationScriptService}.
@@ -80,17 +74,17 @@ class EditConfirmationScriptServiceTest
     private EditConfirmationChecker editConfirmationCheckerWarn;
 
     @Mock
+    private EditConfirmationChecker editConfirmationCheckerWarn2;
+
+    @Mock
     private EditConfirmationChecker editConfirmationCheckerError;
 
     @BeforeEach
     void setUp()
     {
-        // Only return a warning when edit is not forced 
-        when(this.editConfirmationCheckerWarn.check(false)).thenReturn(Optional.of(WARNING_MESSAGE_1));
-        when(this.editConfirmationCheckerWarn.check(true)).thenReturn(Optional.empty());
-        // Return a warning when edit is not forced, and an error otherwise.
-        when(this.editConfirmationCheckerError.check(false)).thenReturn(Optional.of(WARNING_MESSAGE_2));
-        when(this.editConfirmationCheckerError.check(true)).thenReturn(Optional.of(ERROR_MESSAGE_1));
+        when(this.editConfirmationCheckerWarn.check()).thenReturn(Optional.of(WARNING_MESSAGE_1));
+        when(this.editConfirmationCheckerWarn2.check()).thenReturn(Optional.of(WARNING_MESSAGE_2));
+        when(this.editConfirmationCheckerError.check()).thenReturn(Optional.of(ERROR_MESSAGE_1));
     }
 
     @Test
@@ -98,89 +92,30 @@ class EditConfirmationScriptServiceTest
     {
         when(this.componentManager.<EditConfirmationChecker>getInstanceList(EditConfirmationChecker.class))
             .thenThrow(ComponentLookupException.class);
-        assertEquals(new CheckResults(), this.target.check(null));
+        assertEquals(new EditConfirmationCheckerResults(), this.target.check());
         assertEquals("Failed to resolve the list of "
             + "[interface org.xwiki.model.validation.edit.EditConfirmationChecker]. "
             + "Cause: [ComponentLookupException: ]", this.logCapture.getMessage(0));
         assertEquals(WARN, this.logCapture.getLogEvent(0).getLevel());
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = false)
-    @NullSource
-    void check(Boolean editForced) throws Exception
+    @Test
+    void check() throws Exception
     {
         when(this.componentManager.<EditConfirmationChecker>getInstanceList(EditConfirmationChecker.class))
-            .thenReturn(List.of(this.editConfirmationCheckerWarn, this.editConfirmationCheckerError));
-        CheckResults expected = new CheckResults();
+            .thenReturn(List.of(this.editConfirmationCheckerWarn, this.editConfirmationCheckerWarn2));
+        EditConfirmationCheckerResults expected = new EditConfirmationCheckerResults();
         expected.append(WARNING_MESSAGE_1);
         expected.append(WARNING_MESSAGE_2);
-        assertEquals(expected, this.target.check(editForced));
-    }
-
-    @Test
-    void checkEditForced() throws Exception
-    {
-        when(this.componentManager.<EditConfirmationChecker>getInstanceList(EditConfirmationChecker.class))
-            .thenReturn(List.of(this.editConfirmationCheckerWarn, this.editConfirmationCheckerError));
-        CheckResults expected = new CheckResults();
-        expected.append(ERROR_MESSAGE_1);
-        assertEquals(expected, this.target.check(true));
+        assertEquals(expected, this.target.check());
     }
 
     @Test
     void checkResultsEmpty()
     {
-        CheckResults checkResults = new CheckResults();
-        assertFalse(checkResults.isError());
-        assertEquals(List.of(), checkResults.getMessages());
-    }
-
-    @Test
-    void checkResultsOneWarning()
-    {
-        CheckResults checkResults = new CheckResults();
-        checkResults.append(WARNING_MESSAGE_1);
-        assertFalse(checkResults.isError());
-        assertEquals(List.of(new GroupBlock(List.of(new WordBlock("warning")), Map.of("class", "box warningmessage"))),
-            checkResults.getMessages());
-    }
-
-    @Test
-    void checkResultsOneError()
-    {
-        CheckResults checkResults = new CheckResults();
-        checkResults.append(ERROR_MESSAGE_1);
-        assertTrue(checkResults.isError());
-        assertEquals(List.of(
-            new GroupBlock(List.of(new WordBlock("error")), Map.of("class", "box errormessage"))
-        ), checkResults.getMessages());
-    }
-
-
-    @Test
-    void checkResultsTwoWarning()
-    {
-        CheckResults checkResults = new CheckResults();
-        checkResults.append(WARNING_MESSAGE_1);
-        checkResults.append(WARNING_MESSAGE_2);
-        assertFalse(checkResults.isError());
-        assertEquals(List.of(
-            new GroupBlock(List.of(new WordBlock("warning")), Map.of("class", "box warningmessage")),
-            new GroupBlock(List.of(new WordBlock("warning 2")), Map.of("class", "box warningmessage"))
-        ), checkResults.getMessages());
-    }
-
-    @Test
-    void checkResultsOneWarningOneError()
-    {
-        CheckResults checkResults = new CheckResults();
-        checkResults.append(WARNING_MESSAGE_1);
-        checkResults.append(ERROR_MESSAGE_1);
-        assertTrue(checkResults.isError());
-        assertEquals(List.of(
-            new GroupBlock(List.of(new WordBlock("warning")), Map.of("class", "box warningmessage")),
-            new GroupBlock(List.of(new WordBlock("error")), Map.of("class", "box errormessage"))
-        ), checkResults.getMessages());
+        EditConfirmationCheckerResults editConfirmationCheckerResults = new EditConfirmationCheckerResults();
+        assertFalse(editConfirmationCheckerResults.isError());
+        assertEquals(List.of(), editConfirmationCheckerResults.getErrorMessages());
+        assertEquals(List.of(), editConfirmationCheckerResults.getWarningMessages());
     }
 }

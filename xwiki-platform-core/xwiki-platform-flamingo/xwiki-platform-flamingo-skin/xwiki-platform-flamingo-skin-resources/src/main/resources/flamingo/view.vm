@@ -41,7 +41,10 @@
   #if($viewer == 'content')
     #template("contentview.vm")
   #else
-    #template("${viewer}.vm")
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+    <main id="mainContentArea" class="xcontent">
+      #template("${viewer}.vm")
+    </main>
   #end
   <div class="clearfloats"></div>
   #if($viewer == 'content')

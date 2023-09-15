@@ -274,7 +274,7 @@ class PDFExportIT
         templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: "));
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
-        templateEditPage.setHeader(templateEditPage.getHeader().replace("$esc", "Chapter: $esc"));
+        templateEditPage.setHeader(templateEditPage.getHeader().replaceFirst("<span ", "Chapter: <span "));
         templateEditPage.setFooter(templateEditPage.getFooter().replaceFirst("<span ", "Page <span "));
         templateEditPage.clickSaveAndContinue();
 
@@ -618,10 +618,9 @@ class PDFExportIT
             assertEquals(2, pdf.getNumberOfPages());
 
             String content = pdf.getTextFromPage(1);
-            assertEquals("FormFields\n2 / 2\n" + "Title modified\n"
-                + " Blue  Yellow  Red\n" + "Paris\n" + "Comedy\nDrama\nRomance\n"
-                + "description modified\n" + "Submit\n"
-                + "TITLE\n" + " ENABLED\n" + "COLOR\n" + "CITY\n" + "GENRE\n" + "DESCRIPTION\n", content);
+            assertEquals("FormFields\n2 / 2\n" + "Title modified\n" + " Blue  Yellow  Red\n" + "Paris\n"
+                + "Comedy\nDrama\nRomance\n" + "description modified\n" + "Submit\n" + "TITLE\n" + " ENABLED\n"
+                + "COLOR\n" + "CITY\n" + "GENRE\n" + "DESCRIPTION\n", content);
         }
     }
 
@@ -789,8 +788,8 @@ class PDFExportIT
         throws Exception
     {
         Callable<Void> verifyPDFExport = () -> {
-            ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent",
-                "Child"), "WebHome"));
+            ViewPage viewPage =
+                setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
             PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
             try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
@@ -1001,14 +1000,44 @@ class PDFExportIT
 
     @Test
     @Order(21)
-    void customTemplateWithMetadata(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    void singlePageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+
+        // Check single page export first.
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        exportTreeModal.export();
+
+        // Use the custom template which displays the page tags in the PDF footer.
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+        exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one content page.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the metadata is displayed only once (only in the footer of the content page).
+            assertEquals(1, StringUtils.countMatches(pdf.getText(), "Tags:"));
+
+            // Verify the tags are displayed in the footer of the content page.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent\nTags: science, technology 3 / 3\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(22)
+    void multiPageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+        throws Exception
     {
         ViewPage viewPage =
             setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
 
         ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
-        // Include the child page in the export because we want to verify the metadata which is included only in
-        // multi-page exports.
+        // Include the child page in the export because we want to verify a multi-page export.
         exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
         exportTreeModal.export();
 

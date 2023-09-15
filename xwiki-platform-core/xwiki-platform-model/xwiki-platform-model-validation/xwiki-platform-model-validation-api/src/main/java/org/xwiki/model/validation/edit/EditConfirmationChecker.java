@@ -22,25 +22,27 @@ package org.xwiki.model.validation.edit;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.validation.edit.EditConfirmationScriptService.CheckResults;
 import org.xwiki.stability.Unstable;
 
 /**
- * Provides the operation that an individual checker must provide. The checks are called by by the
- * {@link EditConfirmationScriptService} and aggregated in a {@link EditConfirmationScriptService.CheckResults}.
+ * Provides the operation that a pre-edit checker must provide. The checks are called by the
+ * {@link EditConfirmationScriptService} and aggregated in a {@link CheckResults}.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Role
 @Unstable
 public interface EditConfirmationChecker
 {
     /**
-     * Checks if edit confirmation is required based on the provided boolean value.
+     * Checks if edit confirmation is required, or allowed, based on the provided boolean value.
      *
-     * @param editForced a boolean indicating if edit is forced or not
-     * @return an Optional containing {@link EditConfirmationCheckerResult} if the check identified a result to be
-     *     displayed to the user, or {@link Optional#empty()} if no result was found
+     * @param editForced a boolean indicating if edit is forced or not. Some checks can be skipped with this is
+     *     {@code true}
+     * @return an {@link Optional} containing a {@link EditConfirmationCheckerResult} if the check identified a result
+     *     to be displayed to the user, or {@link Optional#empty()} if no result was found
      */
     Optional<EditConfirmationCheckerResult> check(boolean editForced);
 }

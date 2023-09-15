@@ -27,24 +27,26 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.xar.XarExtensionConfiguration;
 import org.xwiki.extension.xar.internal.security.XarSecurityTool;
 import org.xwiki.extension.xar.security.ProtectionLevel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.xwiki.security.authorization.Right.EDIT;
+
 /**
  * Checks if the configured security level allows for the edition of the current document. This can lead to a strict
- * block to the edition of the document, or to a warning, according to the documentation.
+ * block to the edition of the document, or to a warning, according to the {@link XarExtensionConfiguration}.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Component
 @Singleton
@@ -63,11 +65,11 @@ public class SecurityLevelEditConfirmationChecker implements EditConfirmationChe
     @Override
     public Optional<EditConfirmationCheckerResult> check(boolean editForced)
     {
-        DocumentReference userReference = this.xcontextProvider.get().getUserReference();
-        XWikiDocument tdoc = (XWikiDocument) this.xcontextProvider.get().get("tdoc");
+        XWikiContext context = this.xcontextProvider.get();
+        DocumentReference userReference = context.getUserReference();
+        XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
         DocumentReference documentReference = tdoc.getDocumentReferenceWithLocale();
-        ProtectionLevel protectionLevel =
-            this.securityTool.getProtectionLevel(Right.EDIT, userReference, documentReference);
+        ProtectionLevel protectionLevel = this.securityTool.getProtectionLevel(EDIT, userReference, documentReference);
 
         Optional<EditConfirmationCheckerResult> result;
         if (protectionLevel == ProtectionLevel.DENY) {

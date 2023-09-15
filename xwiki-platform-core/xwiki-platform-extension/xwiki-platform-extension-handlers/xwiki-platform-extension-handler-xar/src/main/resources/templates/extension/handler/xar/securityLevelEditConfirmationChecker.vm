@@ -17,6 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+##
+## Since 15.9RC1
+## The template used by SecurityLevelEditConfirmationChecker, used in case of raised error or warning before 
+## editing a page. 
+##
 #macro (documentProtectedMessage $protectionLevel)
   #set ($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
 <p class="xwikimessage">

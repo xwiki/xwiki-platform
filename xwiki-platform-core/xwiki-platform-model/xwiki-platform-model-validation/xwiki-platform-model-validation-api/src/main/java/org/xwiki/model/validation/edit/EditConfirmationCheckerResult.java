@@ -22,15 +22,17 @@ package org.xwiki.model.validation.edit;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * The result of a {@link EditConfirmationChecker}. It contains a message and a boolean indicate if the result is an
- * error (or a warning otherwise).s
+ * The result of a {@link EditConfirmationChecker}. It contains a message and a boolean indicating if the result is an
+ * error ({@code true}), or a warning ({@code false}).
  *
  * @version $Id$
- * @since 15.8RC1s
+ * @since 15.9RC1
  */
+@Unstable
 public class EditConfirmationCheckerResult
 {
     private final Block message;
@@ -41,7 +43,7 @@ public class EditConfirmationCheckerResult
      * Constructs a new object with the specified message and error status.
      *
      * @param message the message associated with the result
-     * @param isError the error status of the result, erroor when {@code true}, warning otherwise
+     * @param isError the error status of the result, error when {@code true}, warning otherwise
      */
     public EditConfirmationCheckerResult(Block message, boolean isError)
     {

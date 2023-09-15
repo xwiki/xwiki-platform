@@ -37,6 +37,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
@@ -50,6 +51,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Component
 @Singleton
 @Named("editConfirmation")
+@Unstable
 public class EditConfirmationScriptService implements ScriptService
 {
     @Inject

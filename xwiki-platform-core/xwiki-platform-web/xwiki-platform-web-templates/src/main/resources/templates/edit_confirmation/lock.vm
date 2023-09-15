@@ -17,6 +17,10 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+##
+## Since 15.9RC1
+## The template used by XWikiDocumentLockEditConfirmationChecker, used in case of page locked by another user.
+##
 #set ($lockingUser = "#displayUser($tdoc.lockingUser {'useInlineHTML': true})")
 <p class="xwikimessage">
   $escapetool.xml($services.localization.render('doclockedby')) ${lockingUser.trim()}.

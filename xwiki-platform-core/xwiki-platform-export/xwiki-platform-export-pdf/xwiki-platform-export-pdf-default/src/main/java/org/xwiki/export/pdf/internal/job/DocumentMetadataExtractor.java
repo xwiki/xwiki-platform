@@ -35,7 +35,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ObjectPropertyReference;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -54,9 +53,6 @@ public class DocumentMetadataExtractor
 {
     static final String EXECUTION_CONTEXT_PROPERTY_METADATA = DocumentRenderer.class.getName() + ".metadata";
 
-    static final String EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT =
-        DocumentRenderer.class.getName() + ".sourceDocument";
-
     @Inject
     private Logger logger;
 
@@ -67,12 +63,9 @@ public class DocumentMetadataExtractor
     private Execution execution;
 
     /**
-     * Renders the specified metadata property to produce the metadata for the given document. The value of the metadata
-     * property is normally a script that produces the metadata when evaluated. The script can use two special bindings:
-     * <ul>
-     * <li>{@code metadata} - a map that is used to store the metadata</li>
-     * <li>{@code sourceDocument} - the document for which to retrieve the metadata.</li>
-     * </ul>
+     * Renders the specified metadata property in the context of the given document. The value of the metadata property
+     * is normally a script that produces the metadata for the given document when evaluated. The script should specify
+     * the metadata using a special binding named {@code metadata}, which is a {@code Map<String, String>}.
      * 
      * @param sourceDocument the document for which to retrieve the metadata
      * @param metadataReference the reference of the property that holds the script to produce the metadata
@@ -88,23 +81,17 @@ public class DocumentMetadataExtractor
             executionContext.newProperty(EXECUTION_CONTEXT_PROPERTY_METADATA).inherited().nonNull().initial(metadata)
                 .declare();
 
-            executionContext.removeProperty(EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT);
-            XWikiContext xcontext = this.xcontextProvider.get();
-            Document safeSourceDocument = new Document(sourceDocument, xcontext);
-            executionContext.newProperty(EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT).inherited().nonNull()
-                .initial(safeSourceDocument).declare();
-
             try {
+                XWikiContext xcontext = this.xcontextProvider.get();
                 XWikiDocument templateDocument =
                     xcontext.getWiki().getDocument(metadataReference.extractReference(EntityType.DOCUMENT), xcontext);
                 BaseObject templateObject = templateDocument.getXObject(metadataReference.getParent());
-                templateDocument.display(metadataReference.getName(), templateObject, xcontext);
+                sourceDocument.display(metadataReference.getName(), templateObject, xcontext);
             } catch (Exception e) {
                 this.logger.warn("Failed to get the metadata for document [{}] from [{}]. Root cause is [{}].",
                     sourceDocument.getDocumentReference(), metadataReference, ExceptionUtils.getRootCauseMessage(e));
             } finally {
                 executionContext.removeProperty(EXECUTION_CONTEXT_PROPERTY_METADATA);
-                executionContext.removeProperty(EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT);
             }
         }
 

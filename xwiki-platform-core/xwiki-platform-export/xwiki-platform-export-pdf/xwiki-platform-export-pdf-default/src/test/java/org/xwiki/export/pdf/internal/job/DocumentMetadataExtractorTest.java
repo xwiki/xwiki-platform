@@ -46,7 +46,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -128,7 +127,7 @@ class DocumentMetadataExtractorTest
     void getWithException()
     {
         when(this.execution.getContext()).thenReturn(this.executionContext);
-        when(this.templateDocument.display(this.metadataReference.getName(), (BaseObject) null, this.xcontext))
+        when(this.sourceDocument.display(this.metadataReference.getName(), (BaseObject) null, this.xcontext))
             .thenThrow(new RuntimeException("Some error message"));
 
         Map<String, String> metadata = this.extractor.getMetadata(this.sourceDocument, this.metadataReference);
@@ -144,12 +143,8 @@ class DocumentMetadataExtractorTest
     {
         when(this.execution.getContext()).thenReturn(this.executionContext);
         when(this.templateDocument.getXObject(this.metadataReference.getParent())).thenReturn(this.templateObject);
-        when(this.templateDocument.display(this.metadataReference.getName(), this.templateObject, this.xcontext)).thenAnswer(
+        when(this.sourceDocument.display(this.metadataReference.getName(), this.templateObject, this.xcontext)).thenAnswer(
             invocation -> {
-                Document safeSourceDocument = (Document) this.executionContext.getProperty(
-                    DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT);
-                assertTrue(safeSourceDocument.same(this.sourceDocument));
-
                 Map<String, String> metadata = (Map<String, String>) this.executionContext.getProperty(
                     DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_METADATA);
                 metadata.put("data-foo", "bar");
@@ -163,8 +158,6 @@ class DocumentMetadataExtractorTest
         assertEquals("bar", metadata.get("data-foo"));
 
         // Verify that the execution context was properly cleaned up.
-        assertFalse(
-            this.executionContext.hasProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT));
         assertFalse(this.executionContext.hasProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_METADATA));
     }
 }

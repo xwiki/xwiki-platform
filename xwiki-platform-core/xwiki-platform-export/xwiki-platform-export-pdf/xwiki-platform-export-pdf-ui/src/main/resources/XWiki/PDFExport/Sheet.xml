@@ -40,28 +40,23 @@
 #set ($sheetReference = 'XWiki.PDFExport.Sheet')
 #set ($pdfElements = ['cover', 'toc', 'header', 'footer'])
 #set ($pdfExportJobId = $request.jobId.split('/'))
+#if ($pdfExportJobId)
+  #set ($pdfExportJobStatus = $services.job.getJobStatus($pdfExportJobId))
+  #set ($pdfExportJobRequest = $pdfExportJobStatus.request)
+#else
+  #set ($pdfExportJobStatus = $NULL)
+  #set ($pdfExportJobRequest = $NULL)
+#end
 
 #macro (getPDFExportConfigFromRequest $pdfExportConfig)
-  #if ($pdfExportJobId)
-    #set ($pdfExportJobRequest = $services.job.getJobStatus($pdfExportJobId).request)
-    #if ($pdfExportJobRequest)
-      #set ($discard = $pdfExportConfig.putAll({
-        'template': $pdfExportJobRequest.template,
-        'cover': $pdfExportJobRequest.isWithCover(),
-        'toc': $pdfExportJobRequest.isWithToc(),
-        'header': $pdfExportJobRequest.isWithHeader(),
-        'footer': $pdfExportJobRequest.isWithFooter()
-      }))
-    #end
-  #else
-    #if ("$!request.pdftemplate" != '')
-      #set ($pdfExportConfig.template = $request.pdftemplate)
-    #end
-    #foreach ($param in $pdfElements)
-      #if ("$!request.getParameter(""pdf$param"")" != '')
-        #set ($discard = $pdfExportConfig.put($param, $request.getParameter("pdf$param") != '0'))
-      #end
-    #end
+  #if ($pdfExportJobRequest)
+    #set ($discard = $pdfExportConfig.putAll({
+      'template': $pdfExportJobRequest.template,
+      'cover': $pdfExportJobRequest.isWithCover(),
+      'toc': $pdfExportJobRequest.isWithToc(),
+      'header': $pdfExportJobRequest.isWithHeader(),
+      'footer': $pdfExportJobRequest.isWithFooter()
+    }))
   #end
 #end
 
@@ -83,8 +78,8 @@
   #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
   ## Use the specified PDF file name as the title of the HTML page in order to have it suggested as file name when
   ## saving the PDF from the browser's Print Preview dialog.
-  #if ($pdfExportJobId)
-    #set ($title = $services.job.getJobStatus($pdfExportJobId).request.fileName)
+  #if ($pdfExportJobRequest)
+    #set ($title = $pdfExportJobRequest.fileName)
   #end
   ## Output the HTML header but without the garbage from the start of the BODY tag.
   #set ($htmlHeader = "#template('htmlheader.vm')")
@@ -113,10 +108,8 @@
   });
   &lt;/script&gt;
   ## Inject the required skin extensions.
-  #if ($pdfExportJobId)
-    $!services.job.getJobStatus($pdfExportJobId).requiredSkinExtensions
-    #clientSidePDFExportConfiguration()
-  #end
+  $!pdfExportJobStatus.requiredSkinExtensions
+  #clientSidePDFExportConfiguration()
   ## Start the BODY tag.
   $htmlHeader.substring($headTagEnd, $bodyContentStart)
   #set ($pdfTemplateObj = $xwiki.getDocument($pdfExportConfig.template).getObject('XWiki.PDFExport.TemplateClass'))
@@ -140,9 +133,9 @@
 #macro (clientSidePDFExportConfiguration)
   #set ($clientSideConfig = {
     'documents': [],
-    'baseURL': $services.job.getJobStatus($pdfExportJobId).request.baseURL
+    'baseURL': $pdfExportJobRequest.baseURL
   })
-  #foreach ($renderingResult in $services.job.getJobStatus($pdfExportJobId).documentRenderingResults)
+  #foreach ($renderingResult in $pdfExportJobStatus.documentRenderingResults)
     #set ($discard = $clientSideConfig.documents.add({
       'reference': $services.model.serialize($renderingResult.documentReference, 'default'),
       'idMap': $renderingResult.idMap
@@ -157,19 +150,28 @@
 #end
 
 #macro (renderPDFContent)
-  #if ($pdfExportJobId)
-    #set ($renderingResults = $services.job.getJobStatus($pdfExportJobId).documentRenderingResults)
-    #foreach ($renderingResult in $renderingResults)
-      $renderingResult.getHTML()
-    #end
-  #else
-    ## We want to render the current document without applying the sheet specified on the HTTP request (which is this
-    ## page). We basically want to render the current document using its default sheet. For this we need to use a
-    ## different document instance (e.g. a clone) than the one on the context. By setting the comment we force the
-    ## current document to be cloned and thus we end up with a different document instance to render.
-    #set ($discard = $tdoc.setComment(''))
-    $tdoc.renderedContent
+  #if (!$pdfExportJobRequest.isWithTitle())
+    ## The document renderer includes the document metadata in the rendering results only when document titles are
+    ## displayed (because we should have a single metadata on a print page and the document title starts on a new print
+    ## page, but also because the metadata can be used to tweak how the document title is displayed, e.g. to skip or
+    ## reset heading numbering). We may still want to display the metadata for a single page export or for a multipage
+    ## export without titles, but in this case the same metadata is going to be displayed on all print pages, and it
+    ## comes from the target document on which the PDF export was triggered.
+    #outputMetadataFromTargetDocument()
   #end
+  #foreach ($renderingResult in $pdfExportJobStatus.documentRenderingResults)
+    $renderingResult.getHTML()
+  #end
+#end
+
+#macro (outputMetadataFromTargetDocument)
+  #set ($metadata = {
+    'class': 'hidden',
+    'data-xwiki-document-reference': $services.model.serialize($doc.documentReference, 'default')
+  })
+  #set ($discard = $tdoc.display('metadata', $pdfTemplateObj))
+  &lt;h1#foreach ($entry in $metadata.entrySet()) $escapetool.xml($entry.key)="$escapetool.xml($entry.value)"#end
+    &gt;$escapetool.xml($tdoc.plainTitle)&lt;/h1&gt;
 #end
 {{/velocity}}
 

@@ -153,33 +153,22 @@
 {{/velocity}}</cover>
     </property>
     <property>
-      <footer>{{velocity}}
-{{html clean="false"}}
-#if ("$!request.jobId" != '' &amp;&amp; $services.job.getJobStatus($request.jobId.split('/')).request.isWithTitle())
-  &lt;div&gt;Tags: &lt;span class="pdf-chapter-tags"&gt;&lt;/span&gt;&lt;/div&gt;
-#end
+      <footer>{{html clean="false"}}
+&lt;div&gt;Tags: &lt;span class="pdf-chapter-tags"&gt;&lt;/span&gt;&lt;/div&gt;
 &lt;div&gt;
   &lt;span class="pdf-page-number"&gt;&lt;/span&gt; / &lt;span class="pdf-page-count"&gt;&lt;/span&gt;
 &lt;/div&gt;
-{{/html}}
-{{/velocity}}</footer>
+{{/html}}</footer>
     </property>
     <property>
-      <header>{{velocity}}
-{{html clean="false"}}
-#if ("$!request.jobId" != '' &amp;&amp; $services.job.getJobStatus($request.jobId.split('/')).request.isWithTitle())
-  ## The title is extracted from the rendered content.
-  &lt;span class="pdf-chapter-name"&gt;&lt;/span&gt;
-#else
-  $escapetool.xml($tdoc.plainTitle)
-#end
-{{/html}}
-{{/velocity}}</header>
+      <header>{{html clean="false"}}
+&lt;span class="pdf-chapter-name"&gt;&lt;/span&gt;
+{{/html}}</header>
     </property>
     <property>
       <metadata>{{velocity output="false"}}
 $metadata.putAll({
-  'data-tags': $stringtool.join($sourceDocument.getTagList(), ', ')
+  'data-tags': $stringtool.join($doc.getTagList(), ', ')
 })
 {{/velocity}}</metadata>
     </property>
@@ -188,11 +177,7 @@ $metadata.putAll({
 = {{translation key="core.pdf.tableOfContents"/}} =
 
 {{velocity}}
-#if ("$!request.jobId" != '')
-  {{pdftoc jobId="$services.rendering.escape($request.jobId, 'xwiki/2.1')" /}}
-#else
-  {{toc reference="$services.rendering.escape($doc.documentReference, 'xwiki/2.1')" depth="3" /}}
-#end
+{{pdftoc jobId="$!services.rendering.escape($request.jobId, 'xwiki/2.1')" /}}
 {{/velocity}}</toc>
     </property>
   </object>

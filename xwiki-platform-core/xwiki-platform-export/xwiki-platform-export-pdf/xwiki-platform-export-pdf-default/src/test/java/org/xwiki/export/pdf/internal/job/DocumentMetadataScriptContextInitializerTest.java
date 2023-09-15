@@ -72,20 +72,11 @@ class DocumentMetadataScriptContextInitializerTest
         this.initializer.initialize(this.scriptContext);
         verify(this.scriptContext, never()).setAttribute(anyString(), any(), anyInt());
 
-        when(this.executionContext.hasProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT))
-            .thenReturn(true);
-        this.initializer.initialize(this.scriptContext);
-        verify(this.scriptContext, never()).setAttribute(anyString(), any(), anyInt());
-
         when(this.executionContext.hasProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_METADATA))
             .thenReturn(true);
-        when(this.executionContext.getProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_SOURCE_DOCUMENT))
-            .thenReturn(this.sourceDocument);
         when(this.executionContext.getProperty(DocumentMetadataExtractor.EXECUTION_CONTEXT_PROPERTY_METADATA))
             .thenReturn(this.metadata);
         this.initializer.initialize(this.scriptContext);
-        verify(this.scriptContext).setAttribute("sourceDocument", this.sourceDocument, ScriptContext.ENGINE_SCOPE);
         verify(this.scriptContext).setAttribute("metadata", this.metadata, ScriptContext.ENGINE_SCOPE);
-        
     }
 }

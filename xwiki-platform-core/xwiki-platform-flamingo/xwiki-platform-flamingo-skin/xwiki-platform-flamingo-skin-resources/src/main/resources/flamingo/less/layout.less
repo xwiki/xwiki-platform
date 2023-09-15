@@ -224,7 +224,10 @@
 
 #body.main { // Rule for WYSIWYG frame body.main
   background-color: @xwiki-page-content-bg;
-  box-shadow: none;
+}
+#contentcolumn .main {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 #xwikieditor .main {
@@ -291,18 +294,22 @@
   }
 }
 
-.main {
-  background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @xwiki-border-color;
-  padding: @line-height-computed @grid-gutter-width;
-}
-
+#hierarchy_breadcrumb,
+#mainContentArea,
 #xdocFooter,
 #docextrapanes {
   background-color: @xwiki-page-content-bg;
   box-shadow: 0 1px 2px @xwiki-border-color;
   margin: 0 -@grid-gutter-width;
   padding: @line-height-computed @grid-gutter-width;
+}
+
+#mainContentArea {
+  padding-top: 0;
+}
+
+#hierarchy_breadcrumb {
+  padding-bottom: 0;
 }
 
 #docextrapanes {

@@ -36,6 +36,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -297,8 +298,8 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
             try {
                 injectBaseMacros(velocityEngine, skinMacrosTemplate);
             } catch (Exception e) {
-                throw new XWikiVelocityException("Failed to load global macros for engine with key [" + cacheKey + "]",
-                    e);
+                this.logger.warn("Failed to load global macros for engine with key [{}]: {}", cacheKey,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

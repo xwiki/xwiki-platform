@@ -21,6 +21,7 @@
 package org.xwiki.icon.macro;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.environment.Environment;
 import org.xwiki.icon.Icon;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
@@ -62,6 +63,9 @@ public class IntegrationTests implements RenderingTests
     @RenderingTests.Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
+        // Inject a not failing Environment
+        componentManager.registerMockComponent(Environment.class);
+
         // Mock the authorization managers as they try initializing a cache which fails (infinispan is not available
         // in rendering tests).
         ContextualAuthorizationManager authorizationManager =

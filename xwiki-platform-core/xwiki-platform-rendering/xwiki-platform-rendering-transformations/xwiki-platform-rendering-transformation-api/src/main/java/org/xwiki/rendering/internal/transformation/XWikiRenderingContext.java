@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -101,7 +102,7 @@ public class XWikiRenderingContext extends DefaultRenderingContext
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
                 logger.warn("Failed to notify Velocity Macro cache for opening the [{}] namespace. Reason = [{}]",
-                    namespace, e.getMessage());
+                    namespace, ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -116,11 +117,11 @@ public class XWikiRenderingContext extends DefaultRenderingContext
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
                 logger.warn("Failed to notify Velocity Macro cache for closing the [{}] namespace. Reason = [{}]",
-                    namespace, e.getMessage());
+                    namespace, ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
-    
+
     @Override
     public Syntax getTargetSyntax()
     {

@@ -37,19 +37,19 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## keys for the admin section navigation
-### Missing: admin.indexinguser=Indexing User
+admin.indexinguser=Пользователь индексации
 admin.indexinguser.description=Выберите пользователя, от имени которого будет индексироваться содержимое вики.
 
 ## keys use on the admin "indexing user" page itself
 admin.indexinguser.explanation.part1=Индексация работает в фоновом режиме, как правило, без привязки к пользователю. Для страниц, название которых вычисляется по тексту документа "sheet", вычисленное название не будет отображаться, если документ не виден анонимным пользователям. Это особенно актуально, если вики закрыта. В этом случае, например, результаты поиска профилей пользователей будут отображаться не с вычисленным заголовком «Профиль "имя" "фамилия"», а только с именем страницы (обычно «login»).
-### Missing: admin.indexinguser.explanation.part2=To be able to show the same title in the search results it is necessary to provide the indexer with a user who has access to the sheet pages. It is recommended to create a dedicated, locked user account without special rights.
-### Missing: admin.indexinguser.explanation.security.head=Security note:
-### Missing: admin.indexinguser.explanation.security.content=Using an account with more view rights than other users can cause leakage of page titles from pages that these users normally do not see.
-### Missing: admin.indexinguser.explanation.part3=Changes to this setting are applied only to pages indexed after the change; a full reindex is recommended for consistent application of the change.
-### Missing: admin.indexinguser.explanation.mainwikionly=This setting can only be done in the main wiki as the Solr indexer runs from the main wiki.
+admin.indexinguser.explanation.part2=Для того чтобы в результатах поиска отображался один и тот же заголовок, необходимо предоставить индексации пользователя, имеющего доступ к листам страниц. Рекомендуется создать выделенную, заблокированную учетную запись пользователя без специальных прав.
+admin.indexinguser.explanation.security.head=Замечание по безопасности:
+admin.indexinguser.explanation.security.content=Использование учетной записи с более высокими правами просмотра, чем у других пользователей, может привести к утечке заголовков страниц, которые эти пользователи обычно не видят.
+admin.indexinguser.explanation.part3=Изменения этого параметра применяются только к страницам, проиндексированным после изменения; для полного применения изменений рекомендуется провести полную переиндексацию.
+admin.indexinguser.explanation.mainwikionly=Эта настройка может быть выполнена только для основной вики, так как индексация Solr выполняется из основной вики.
 
 ## keys used by the configuration class
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.description=Indexing User
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.hint=The XWiki User Account used to index pages in the background.
+XWiki.SolrSearchAdminIndexingUser_indexer.description=Пользователь индексации
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=Учетная запись пользователя XWiki, используемая для индексирования страниц в фоновом режиме.
 </content>
   </xwikidoc>

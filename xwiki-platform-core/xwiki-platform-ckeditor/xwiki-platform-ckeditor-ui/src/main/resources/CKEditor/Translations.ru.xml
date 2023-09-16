@@ -217,6 +217,7 @@ ckeditor.plugin.slash.action.table_cell_delete.name=Удаление ячейк�
 ckeditor.plugin.slash.action.table_cell_delete.hint=Удаляет текущую ячейку таблицы.
 ckeditor.plugin.slash.action.table_delete.hint=Удаляет текущую таблицу.
 ckeditor.plugin.slash.placeholder=Введите / для быстрых действий...
+ckeditor.plugin.slash.dropdown.hint=Выберите элемент для автозаполнения.
 ckeditor.plugin.focusedplaceholder.placeholder.body=Тело документа
 ckeditor.plugin.focusedplaceholder.placeholder.address=Адрес
 ckeditor.plugin.focusedplaceholder.placeholder.aside=Сторона

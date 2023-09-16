@@ -44,6 +44,7 @@ administration.sectionTitle=Администрирование: {0}
 administration.sectionTitle.page=Администрирование страницы: {0}
 administration.sectionTitle.wiki=Администрирование вики: {0}
 administration.sectionTitle.global=Глобальное администрирование: {0}
+administration.menu.label=Административные разделы.
 administration.menu.search.hint=Искать...
 administration.menu.search.noResults=Ничего не найдено.
 

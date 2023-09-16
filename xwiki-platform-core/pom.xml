@@ -126,13 +126,18 @@
                  Single justification example:
             -->
             <revapi.differences>
+              <justification>Remove unstable API that was added by mistake.</justification>
               <criticality>documented</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.removed</code>
                   <old>method org.xwiki.bridge.DocumentModelBridge org.xwiki.bridge.DocumentAccessBridge::getCurrentDocument()</old>
-                  <justification>Remove unstable API that was added by mistake.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.xwiki.bridge.DocumentModelBridge com.xpn.xwiki.doc.DefaultDocumentAccessBridge::getCurrentDocument()</old>
                 </item>
               </differences>
             </revapi.differences>

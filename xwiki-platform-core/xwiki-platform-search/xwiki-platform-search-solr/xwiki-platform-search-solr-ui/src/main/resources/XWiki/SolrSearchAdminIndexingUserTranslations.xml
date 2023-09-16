@@ -42,11 +42,11 @@ admin.indexinguser.description=Choose a user with whom to index the content of t
 
 ## keys use on the admin "indexing user" page itself
 admin.indexinguser.explanation.part1=The indexer runs as a background job, usually with no user associated with it. For pages whose title are computed by a "sheet" document the computed title will not show up if the sheet is not visible for anonymous users. This is especially the case if the wiki is closed. In that case e.g. search results for user profiles are not shown with their computed title «Profile of "firstname" "lastname"», but just their page name (usually «login»).
-admin.indexinguser.explanation.part2=To be able to show the same title in the search results it is necessary to provide the indexer with a user who has access to the sheet pages. It is recommenced to create a dedicated, locked user account without special rights.
+admin.indexinguser.explanation.part2=To be able to show the same title in the search results it is necessary to provide the indexer with a user who has access to the sheet pages. It is recommended to create a dedicated, locked user account without special rights.
 admin.indexinguser.explanation.security.head=Security note:
 admin.indexinguser.explanation.security.content=Using an account with more view rights than other users can cause leakage of page titles from pages that these users normally do not see.
 
-admin.indexinguser.explanation.part3=Changes to this setting are applied only to pages indexed after the change; a full reindex is recommended for consistent application of the change.  
+admin.indexinguser.explanation.part3=Changes to this setting are applied only to pages indexed after the change; a full reindex is recommended for consistent application of the change.
 
 admin.indexinguser.explanation.mainwikionly=This setting can only be done in the main wiki as the Solr indexer runs from the main wiki.
 

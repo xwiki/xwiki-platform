@@ -61,6 +61,7 @@ import org.xwiki.template.event.TemplateUpdatedEvent;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -312,7 +313,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         try (InputStream stream = this.environment.getResourceAsStream("/templates/macros.vm")) {
             if (stream != null) {
                 try (InputStreamReader reader = new InputStreamReader(stream)) {
-                    org.apache.velocity.Template mainMacros = velocityEngine.compile("", reader);
+                    VelocityTemplate mainMacros = velocityEngine.compile("", reader);
 
                     velocityEngine.addGlobalMacros(mainMacros.getMacros());
                 }
@@ -321,7 +322,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
 
         // Inject skin macros
         if (skinMacrosTemplate != null) {
-            org.apache.velocity.Template skinMacros =
+            VelocityTemplate skinMacros =
                 velocityEngine.compile("", new StringReader(skinMacrosTemplate.getContent().getContent()));
 
             velocityEngine.addGlobalMacros(skinMacros.getMacros());

@@ -55,14 +55,15 @@ import org.xwiki.test.mockito.StringReaderMatcher;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -130,16 +131,17 @@ class TemplateManagerTest
 
     private void mockVelocity(String source, String result) throws XWikiVelocityException
     {
-        final org.apache.velocity.Template template = mock();
+        final VelocityTemplate template = mock();
 
-        when(this.velocityEngineMock.compile(any(), argThat(new StringReaderMatcher(source)))).then(new Answer<org.apache.velocity.Template>()
-        {
-            @Override
-            public org.apache.velocity.Template answer(InvocationOnMock invocation) throws Throwable
+        when(this.velocityEngineMock.compile(any(), argThat(new StringReaderMatcher(source))))
+            .then(new Answer<VelocityTemplate>()
             {
-                return template;
-            }
-        });
+                @Override
+                public VelocityTemplate answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return template;
+                }
+            });
 
         doAnswer(new Answer<Boolean>()
         {

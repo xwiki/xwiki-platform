@@ -35,6 +35,7 @@ import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.internal.template.InternalTemplateManager.DefaultTemplateContent;
@@ -97,7 +98,7 @@ public class VelocityTemplateEvaluator
 
         try {
             VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
-            org.apache.velocity.Template velocityTemplate = getVelocityTemplate(velocityEngine, template, content);
+            VelocityTemplate velocityTemplate = getVelocityTemplate(velocityEngine, template, content);
 
             if (velocityTemplate != null) {
                 velocityEngine.evaluate(this.velocityManager.getVelocityContext(), writer, namespace, velocityTemplate);
@@ -115,20 +116,20 @@ public class VelocityTemplateEvaluator
         }
     }
 
-    private org.apache.velocity.Template getVelocityTemplate(VelocityEngine velocityEngine, Template template,
+    private VelocityTemplate getVelocityTemplate(VelocityEngine velocityEngine, Template template,
         TemplateContent content) throws XWikiVelocityException
     {
         if (content instanceof DefaultTemplateContent) {
             DefaultTemplateContent templateContent = (DefaultTemplateContent) content;
 
             // Check if the content already been compiled
-            if (!(templateContent.compiledContent instanceof org.apache.velocity.Template)) {
+            if (!(templateContent.compiledContent instanceof VelocityTemplate)) {
                 // Compile the Velocity
                 templateContent.compiledContent =
                     velocityEngine.compile(template.getId(), new StringReader(content.getContent()));
             }
 
-            return (org.apache.velocity.Template) templateContent.compiledContent;
+            return (VelocityTemplate) templateContent.compiledContent;
         }
 
         return null;

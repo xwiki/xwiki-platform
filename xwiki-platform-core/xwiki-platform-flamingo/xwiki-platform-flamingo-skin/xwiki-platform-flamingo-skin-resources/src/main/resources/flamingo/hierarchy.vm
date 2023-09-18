@@ -35,7 +35,6 @@
     ##
     #hierarchy($NULL {'id': 'hierarchy',
     'navigation': true,
-    'label': $doc.getPageReference().getName(),
     'limit': 5, 'treeNavigation': true})
   #end
   </nav>

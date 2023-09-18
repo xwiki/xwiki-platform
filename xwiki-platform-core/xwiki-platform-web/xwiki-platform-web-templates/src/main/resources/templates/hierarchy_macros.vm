@@ -149,16 +149,8 @@
       #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
     #end
   #end
-  ## Set as a navigation role because it contains mostly links
-  ## Except if the 'navigation' option is set to false, for special cases where a navigation would clutter
-  ## See discussion on https://forum.xwiki.org/t/ui-accesibility-breadcrumbs-in-the-document-index/12866
-  #if($!options.navigation == true)<nav aria-label=
-    #if("$!options.label" != '')
-      "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label', [$options.label]))"
-    #else
-      "$escapetool.xml($services.localization.render('web.hierarchy.breadcrumb.label.empty'))"
-    #end
-    >
+  #if($!options.navigation == true)
+    <nav aria-label="$escapetool.xml($services.localization.render('web.hierarchy.label'))">
   #end
   <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters>
   <li

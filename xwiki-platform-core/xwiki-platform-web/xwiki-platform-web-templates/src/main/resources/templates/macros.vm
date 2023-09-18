@@ -821,13 +821,13 @@ $fn
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
 <div role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large #{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
-aria-label="$escapetool.xml($services.localization.render('panels.label', [$title]))">
+aria-label="$escapetool.xml($title)">
 <h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
 <div class="xwikipanelcontents">
 #else
 (% role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large#{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
-aria-label="$escapetool.xml($services.localization.render('panels.label', [$title]))"
+aria-label="$escapetool.xml($title)"
 %)(((
 {{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((

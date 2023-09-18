@@ -105,7 +105,7 @@
 <script>
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
-import { mousedownmove } from "../../directives.js";
+import {mousedownmove} from "../../directives.js";
 import XWikiIcon from "../../utilities/XWikiIcon";
 
 export default {
@@ -174,36 +174,49 @@ export default {
       this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
     },
 
-    getNextVisibleProperty (th) {
-      while (th.nextElementSibling) {
-        th = th.nextElementSibling;
-        if (th.style.display !== "none") return th;
-      }
-    },
-
     resizeColumnInit (e) {
-      e.data.leftColumn = e.currentTarget.closest("th");
-      e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
-      e.data.rightColumn = this.getNextVisibleProperty(e.data.leftColumn);
-      e.data.rightColumnBaseWidth = e.data.rightColumn.getBoundingClientRect()?.width;
+      e.data.column = e.currentTarget.closest("th");
+      e.data.columnName = e.data.column.querySelector(".column-name")
+      e.data.columnBaseWidth = e.data.column.getBoundingClientRect()?.width;
+      e.data.columnNameBaseWidth = e.data.columnName.getBoundingClientRect()?.width;
+
+      // Set the width of every column to the current width to prevent jumping during resizing and unset the width of
+      // the table to prevent further scaling.
+      const row = e.data.column.closest("tr");
+      const columns = row.querySelectorAll("th");
+      // First collect all column and column name widths to ensure we capture the current widths before resizing.
+      const columnWidths = [];
+      const columnNameWidths = [];
+      for (const column of columns) {
+        columnWidths.push(column.getBoundingClientRect()?.width);
+        columnNameWidths.push(column.querySelector(".column-name").getBoundingClientRect()?.width);
+      }
+      // Then set the widths.
+      for (let i = 0; i < columns.length; i++) {
+        columns[i].style.width = `${columnWidths[i]}px`;
+        columns[i].querySelector(".column-name").style.width = `${columnNameWidths[i]}px`;
+      }
+      const table = e.data.column.closest("table");
+      table.style.width = "unset";
     },
 
     resizeColumn (e) {
       const offsetX = e.clientX - e.data.clickEvent.clientX;
-      // Resize left column
-      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
-      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
-
-      // Resize right column
-      if (e.data.rightColumn) {
-        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
-        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
-      }
+      // Resize column
+      const columnWidth = e.data.columnBaseWidth + offsetX;
+      e.data.column.style.width = `${columnWidth}px`;
+      // Resize column name as well as the flex container doesn't resize beyond the width of the name which is supposed
+      // to be abbreviated when the column is too small.
+      e.data.columnName.style.width = `${e.data.columnNameBaseWidth + offsetX}px`;
     },
 
     resetColumnSize (e) {
       const th = e.currentTarget.closest("th");
-      th.style.width = "unset";
+      for (const column of th.closest("tr").querySelectorAll("th")) {
+        column.style.removeProperty("width");
+        column.querySelector(".column-name").style.removeProperty("width");
+      }
+      th.closest("table").style.removeProperty("width");
     },
 
   },
@@ -226,6 +239,9 @@ export default {
   justify-content: flex-start;
   align-items: center;
   cursor: pointer;
+  /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
+   when the column has been resized to a smaller width that is prevented by some table cell. */
+  min-width: 100%;
 }
 
 .layout-table .handle {

@@ -67,7 +67,6 @@
     #end
     #set ($discard = $macro.data.add({
       'reference': $reference,
-      'navigation': true,
       'label': $labels.get($foreach.index),
       'url': $url
     }))

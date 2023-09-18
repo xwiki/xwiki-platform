@@ -74,12 +74,15 @@ public class SecurityLevelEditConfirmationChecker implements EditConfirmationChe
         ProtectionLevel protectionLevel = this.securityTool.getProtectionLevel(EDIT, userReference, documentReference);
 
         Optional<EditConfirmationCheckerResult> result;
-        if (protectionLevel == ProtectionLevel.DENY) {
-            result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), true));
-        } else if (protectionLevel != ProtectionLevel.NONE) {
-            result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), false));
-        } else {
-            result = Optional.empty();
+        switch (protectionLevel) {
+            case WARNING:
+                result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), false));
+                break;
+            case DENY:
+                result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), true));
+                break;
+            default:
+                result = Optional.empty();
         }
         return result;
     }

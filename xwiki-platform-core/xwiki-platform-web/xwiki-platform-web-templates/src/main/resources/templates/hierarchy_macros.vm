@@ -345,7 +345,6 @@
     #set ($options = {
       'id': 'hierarchy',
       'navigation': true,
-      'label': $doc.getPageReference().getName(),
       'entities': {
         $doc.documentReference: $tdoc
       }

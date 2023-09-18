@@ -23,5 +23,5 @@
 ##
 #set ($lockingUser = "#displayUser($tdoc.lockingUser {'useInlineHTML': true})")
 <p class="xwikimessage">
-  $escapetool.xml($services.localization.render('doclockedby')) ${lockingUser.trim()}.
+  $escapetool.xml($services.localization.render('platform.core.editConfirmation.lock.lockedBy'), [$lockingUser.trim()])
 </p>

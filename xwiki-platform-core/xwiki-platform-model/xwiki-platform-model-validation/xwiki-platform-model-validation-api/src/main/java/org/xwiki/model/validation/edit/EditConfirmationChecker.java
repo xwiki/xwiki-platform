@@ -28,9 +28,7 @@ import org.xwiki.stability.Unstable;
  * Provides the operation that a pre-edit checker must provide. The checks are called by the
  * {@link EditConfirmationScriptService} and aggregated in a {@link EditConfirmationCheckerResults}. The components
  * implementing this role are called in the order of their priorities. It is advised to define a priority to make the
- * order of the resulting messages deterministic. The two components provided by {@code xwiki-platform}:
- * {@code SecurityLevelEditConfirmationChecker} and {@code XWikiDocumentLockEditConfirmationChecker} have respectively
- * priority {@code 1000} and {@code 2000}.
+ * order of the resulting messages deterministic.
  *
  * @version $Id$
  * @since 15.9RC1

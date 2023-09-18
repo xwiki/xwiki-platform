@@ -288,7 +288,7 @@ public class ViewPage extends BasePage
 
     public String getPageBackgroundColor()
     {
-        return getElementCSSValue(By.className("main"), "background-color");
+        return getElementCSSValue(By.id("mainContentArea"), "background-color");
     }
 
     public String getTitleFontFamily()

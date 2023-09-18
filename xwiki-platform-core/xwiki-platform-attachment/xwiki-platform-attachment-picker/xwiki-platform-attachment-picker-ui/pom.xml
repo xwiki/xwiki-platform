@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-picker</artifactId>
-    <version>14.10.17-SNAPSHOT</version>
+    <version>14.10.17</version>
   </parent>
   <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
   <name>XWiki Platform - Attachment - Picker - UI</name>

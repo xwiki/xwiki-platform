@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tree</artifactId>
-    <version>14.10.17-SNAPSHOT</version>
+    <version>14.10.17</version>
   </parent>
   <artifactId>xwiki-platform-tree-macro</artifactId>
   <name>XWiki Platform - Tree - Macro</name>

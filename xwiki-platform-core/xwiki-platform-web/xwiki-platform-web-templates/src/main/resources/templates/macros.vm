@@ -2730,10 +2730,10 @@ Recursive title display detected!##
     #set ($separators = $field.getProperty('separators').value)
     #if ("$!separators" != '')
       #set ($parameters.separators = $separators)
-    #else
-      #set ($discard = $parameters.putIfAbsent('title',
-        $services.localization.render('core.widgets.suggest.xpropertyPicker.single.title')))
     #end
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.xpropertyPicker.single.title')))
   #end
   #suggestInput($parameters)
 #end

@@ -22,8 +22,9 @@
 ## The template used by SecurityLevelEditConfirmationChecker, used in case of raised error or warning before 
 ## editing a page. 
 ##
-#macro (documentProtectedMessage $protectionLevel)
-  #set ($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
+#set ($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference,
+  $tdoc.documentReferenceWithLocale))
+#set ($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
 <p class="xwikimessage">
   $escapetool.xml($services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
 </p>
@@ -36,7 +37,3 @@
   $escapetool.xml($services.localization.render(
     "extension.xar.edit${protectionLevel.name().toLowerCase()}.explanation"))
 </p>
-#end
-#set ($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference,
-  $tdoc.documentReferenceWithLocale))
-#documentProtectedMessage($protectionLevel)

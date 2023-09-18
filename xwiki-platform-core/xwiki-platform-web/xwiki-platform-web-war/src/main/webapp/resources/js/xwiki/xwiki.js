@@ -1994,21 +1994,21 @@ document.observe("xwiki:dom:loaded", function() {
 })();
 
 /**
- * Initializes the submit-once protection on the current page.
- * Search for all form elements with a .xwiki-submit-once class one the document (or on an updated sub-part of the dom).
- * For each form, once the form is submitted, mark it with the .xwiki-form-submitting class and prevent new submissions.
- * Note that currently we are expecting the form to be submitted without client side validation. It is not advised to
- * add the xwiki-submit-once class on forms with client side validation.
+ * Initializes the submit-once protection on the current page. Search for all form elements with a 'xwiki-submit-once'
+ * class on the document (or on an updated sub-part of the dom). For each form, once the form is submitted, disable all
+ * submit buttons. Note that currently we are expecting the form to be submitted without client side validation. It is
+ * not advised to add the xwiki-submit-once class on forms with client side validation. Also, note that the value of
+ * the disabled buttons will not be sent server side. Therefore, it is not advised to use the 'xwiki-submit-once' class
+ * when this value is required server side.
  *
- *  @since 14.10.17
+ *  @since 14.10.18
  *  @since 15.5.3
- *  @since 15.8RC1
+ *  @since 15.8
  */
 require(['jquery'], ($) => {
   /**
    * Initializes the root element by adding event listeners to all forms with the class 'xwiki-submit-once'.
-   * When a form is submitted, it prevents the submission if it is already being submitted and adds a class to visually
-   * convey that the form was submitted.
+   * When a form is submitted, re-submission is prevented by disabling all submit buttons.
    *
    * @param {Element} rootElement - The root element where the forms are located.
    */
@@ -2020,20 +2020,14 @@ require(['jquery'], ($) => {
         const submittingClass = 'xwiki-form-submitting';
         // Prevent if already submitting.
         if (form.classList.contains(submittingClass)) {
-          // In case of canceled form submission (using the cancel button of the browser), the user will not be able to
-          // submit the form again, but will see the notification below. This should be a good enough hint for the user,
-          // who will manually reload the page.
-          new XWiki.widgets.Notification(
-            "$escapetool.javascript($services.localization.render('platform.web.login.formSubmitted'))", "warning");
           e.preventDefault();
         } else {
           // Add a class to visually convey that the form was submitted. By default, the only visual clue is the cursor
           // change to a "wait" spinning cursor.
           form.classList.add(submittingClass);
-          new XWiki.widgets.Notification(
-            "$escapetool.javascript($services.localization.render('platform.web.login.submittingForm'))", "info");
+          $(form).find('input[type="submit"], button[type="submit"]').prop('disabled', true);
         }
-      })
+      });
     });
   }
 

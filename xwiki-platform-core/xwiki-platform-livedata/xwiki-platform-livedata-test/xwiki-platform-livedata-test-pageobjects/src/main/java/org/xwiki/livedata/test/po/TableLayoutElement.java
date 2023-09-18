@@ -546,7 +546,7 @@ public class TableLayoutElement extends BaseElement
      * Sort by the specified column and wait for the data to load.
      *
      * @param columnLabel the label of the column to sort
-     * @since 15.8RC1
+     * @since 15.9RC1
      */
     public void sortBy(String columnLabel)
     {
@@ -769,7 +769,7 @@ public class TableLayoutElement extends BaseElement
     /**
      * @param columnLabel The label of the column to check for
      * @return If the given column exists
-     * @since 15.8RC1
+     * @since 15.9RC1
      */
     public boolean hasColumn(String columnLabel)
     {

@@ -24,21 +24,39 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroContentParser;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.macro.script.ScriptMacro;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.test.MockitoOldcore;
-import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 /**
  * Unit tests for {@link DefaultMacroBlockRequiredRightAnalyzer}.
@@ -56,8 +74,18 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
     @Named("macro/testmacro")
     private RequiredRightAnalyzer<MacroBlock> mockMacroAnalyzer;
 
-    @InjectMockitoOldcore
-    private MockitoOldcore oldcore;
+    @MockComponent
+    private ScriptMacroAnalyzer scriptMacroAnalyzer;
+
+    @MockComponent
+    private MacroManager macroManager;
+
+    @MockComponent
+    private MacroContentParser macroContentParser;
+
+    @MockComponent
+    @Named(XDOMRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Test
     void analyzeWithCustomAnalyzer() throws Exception
@@ -71,5 +99,77 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
 
         verify(this.mockMacroAnalyzer).analyze(block);
         assertEquals(List.of(mockResult), result);
+    }
+
+    @Test
+    void analyzeWithScriptMacroAnalyzer() throws Exception
+    {
+        String scriptMacroName = "script";
+
+        MacroBlock block = mock();
+        when(block.getId()).thenReturn(scriptMacroName);
+
+        // Create a fake syntax to create the macro id.
+        Syntax syntax = mock();
+        when(this.macroContentParser.getCurrentSyntax(any())).thenReturn(syntax);
+        MacroId macroId = new MacroId(scriptMacroName, syntax);
+
+        // Mock a script macro.
+        Macro<?> scriptMacro = mock(withSettings().extraInterfaces(ScriptMacro.class));
+        // Use doReturn() as Mockito has problems with generics.
+        doReturn(scriptMacro).when(this.macroManager).getMacro(macroId);
+        // Mock the actual analysis.
+        RequiredRightAnalysisResult mockResult = mock();
+        when(this.scriptMacroAnalyzer.analyze(same(block), same(scriptMacro), any())).thenReturn(List.of(mockResult));
+
+        List<RequiredRightAnalysisResult> result = this.analyzer.analyze(block);
+
+        // Ensure that the script macro analyzer was called.
+        verify(this.scriptMacroAnalyzer).analyze(same(block), same(scriptMacro), any());
+        assertEquals(List.of(mockResult), result);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void analyzeContentRecursively(boolean isWikiContent) throws Exception
+    {
+        MacroBlock block = mock();
+        String macroName = "wikimacro";
+        when(block.getId()).thenReturn(macroName);
+        String testContent = "TEST_CONTENT";
+        when(block.getContent()).thenReturn(testContent);
+
+        // Create a fake syntax to create the macro id.
+        Syntax syntax = mock();
+        when(this.macroContentParser.getCurrentSyntax(any())).thenReturn(syntax);
+        MacroId macroId = new MacroId(macroName, syntax);
+
+        // Mock the macro.
+        Macro<?> macro = mock();
+        doReturn(macro).when(this.macroManager).getMacro(macroId);
+        // Mock a macro descriptor that says that the macro content is wiki syntax.
+        MacroDescriptor macroDescriptor = mock();
+        when(macro.getDescriptor()).thenReturn(macroDescriptor);
+        ContentDescriptor contentDescriptor = mock();
+        when(contentDescriptor.getType()).thenReturn(isWikiContent ? Block.LIST_BLOCK_TYPE : String.class);
+        when(macroDescriptor.getContentDescriptor()).thenReturn(contentDescriptor);
+
+        XDOM xdom = mock();
+        when(this.macroContentParser.parse(eq(testContent), any(), eq(false), eq(false))).thenReturn(xdom);
+
+        RequiredRightAnalysisResult mockResult = mock();
+        when(this.xdomRequiredRightAnalyzer.analyze(xdom)).thenReturn(List.of(mockResult));
+
+        List<RequiredRightAnalysisResult> result = this.analyzer.analyze(block);
+
+        if (isWikiContent) {
+            verify(this.macroContentParser).parse(eq(testContent), any(), eq(false), eq(false));
+            verify(this.xdomRequiredRightAnalyzer).analyze(xdom);
+            assertEquals(List.of(mockResult), result);
+        } else {
+            verify(this.macroContentParser, never()).parse(any(), any(), anyBoolean(), anyBoolean());
+            verifyNoInteractions(this.xdomRequiredRightAnalyzer);
+            assertEquals(List.of(), result);
+        }
     }
 }

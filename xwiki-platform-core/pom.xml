@@ -125,8 +125,22 @@
 
                  Single justification example:
             -->
-            
-            
+            <revapi.differences>
+              <justification>Rename the name of AttachmentValidationScriptService from 'attachmentValidation' to 'attachment.validation'</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.attributeValueChanged</code>
+                  <old>class org.xwiki.attachment.validation.AttachmentValidationScriptService</old>
+                  <new>class org.xwiki.attachment.validation.AttachmentValidationScriptService</new>
+                  <annotationType>javax.inject.Named</annotationType>
+                  <attribute>value</attribute>
+                  <oldValue>"attachmentValidation"</oldValue>
+                  <newValue>"attachment.validation"</newValue>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

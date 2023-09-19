@@ -24,7 +24,7 @@
   #######################################################
   ##                   CONTROLLER
   ##
-  ## Call the appropiate breadcrumb depending on the 
+  ## Call the appropiate breadcrumb depending on the
   ## configuration.
   #######################################################
   #if($services.parentchild.isParentChildMechanismEnabled())
@@ -33,8 +33,7 @@
     ##
     ## Default mode: display the hierarchy for the current page
     ##
-    #hierarchy($NULL {'id': 'hierarchy',
-    'limit': 5, 'treeNavigation': true})
+    #hierarchy($NULL {'id': 'hierarchy', 'limit': 5, 'treeNavigation': true})
   #end
   </nav>
 #end

@@ -39,8 +39,8 @@
   <content>{{velocity wiki="false"}}
 #if ($request.documentReference)
 $jsontool.serialize({
-  "allowedMimetypes": $services.attachment.validation.getAllowedMimetypes($request.documentReference),
-  "blockerMimetypes": $services.attachment.validation.getBlockerMimetypes($request.documentReference)
+  "allowedMimetypes": $services.attachmentValidation.getAllowedMimetypes($request.documentReference),
+  "blockerMimetypes": $services.attachmentValidation.getBlockerMimetypes($request.documentReference)
 })
 #end
 {{/velocity}}</content>
@@ -336,8 +336,8 @@ require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-
       <content>{{velocity}}
 {{html clean='false'}}
 &lt;script type='application/json' id='attachment-validation-mimetypes-configuration'&gt;$jsontool.serialize({
-  "allowedMimetypes": $services.attachment.validation.getAllowedMimetypes(),
-  "blockerMimetypes": $services.attachment.validation.getBlockerMimetypes()
+  "allowedMimetypes": $services.attachmentValidation.getAllowedMimetypes(),
+  "blockerMimetypes": $services.attachmentValidation.getBlockerMimetypes()
 }).replace('&lt;', '\u003C').replace('{{/', '\u007B\u007B\u002F')&lt;/script&gt;
 {{/html}}
 {{/velocity}}</content>

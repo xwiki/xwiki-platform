@@ -28,7 +28,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.xwiki.attachment.script.AttachmentScriptService;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -45,20 +44,10 @@ import org.xwiki.stability.Unstable;
  */
 @Component
 @Singleton
-@Named(AttachmentScriptService.ID + "." + AttachmentValidationScriptService.ID)
+@Named("attachmentValidation")
 @Unstable
 public class AttachmentValidationScriptService implements ScriptService
 {
-    /**
-     * This component hint's last segment, the first segment is {@link AttachmentScriptService#ID}.
-     *
-     * @since 15.9RC1
-     * @since 15.5.3
-     * @since 14.10.18
-     */
-    @Unstable
-    public static final String ID = "validation";
-
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManager;

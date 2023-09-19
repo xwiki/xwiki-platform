@@ -39,6 +39,7 @@ import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
@@ -59,10 +60,20 @@ import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.UPDATE_REFE
  */
 @Component
 @Singleton
-@Named("attachment")
+@Named(AttachmentScriptService.ID)
 @Unstable
 public class AttachmentScriptService implements ScriptService
 {
+    /**
+     * This component hint.
+     *
+     * @since 15.9RC1
+     * @since 15.5.5
+     * @since 14.10.18
+     */
+    @Unstable
+    public static final String ID = "attachment";
+
     @Inject
     private AttachmentsManager attachmentsManager;
 
@@ -78,6 +89,9 @@ public class AttachmentScriptService implements ScriptService
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
 
     /**
      * Creates an attachment move request.
@@ -158,5 +172,20 @@ public class AttachmentScriptService implements ScriptService
             throw new AttachmentException(
                 String.format("Failed to get the backlinks for attachment [%s]", attachmentReference), e);
         }
+    }
+
+    /**
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
+     * @since 15.9RC1
+     * @since 15.5.5
+     * @since 14.10.18
+     */
+    @SuppressWarnings("unchecked")
+    @Unstable
+    public <S extends ScriptService> S get(String serviceName)
+    {
+        return (S) this.scriptServiceManager.get(AttachmentScriptService.ID + '.' + serviceName);
     }
 }

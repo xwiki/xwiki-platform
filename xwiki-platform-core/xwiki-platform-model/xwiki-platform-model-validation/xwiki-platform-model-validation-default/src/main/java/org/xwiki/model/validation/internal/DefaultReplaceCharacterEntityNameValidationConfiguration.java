@@ -37,14 +37,14 @@ import org.xwiki.configuration.ConfigurationSource;
  * @version $Id$
  * @since 12.0RC1
  */
-@Component(roles = ReplaceCharacterEntityNameValidationConfiguration.class)
+@Component
 @Singleton
-public class ReplaceCharacterEntityNameValidationConfiguration
+public class DefaultReplaceCharacterEntityNameValidationConfiguration
+    implements ReplaceCharacterEntityNameValidationConfiguration
 {
     protected static final String PROPERTY_KEY_FORBIDDENCHARACTERS = "replaceCharacters.forbiddenCharacters";
 
     protected static final String PROPERTY_KEY_REPLACEMENTCHARACTERS = "replaceCharacters.replacementCharacters";
-
 
     @Inject
     @Named("entitynamevalidation")
@@ -66,12 +66,7 @@ public class ReplaceCharacterEntityNameValidationConfiguration
         return this.configurationSource.getProperty(PROPERTY_KEY_REPLACEMENTCHARACTERS, List.class);
     }
 
-    /**
-     * Create the map of forbidden and replacement characters which aims at being used in
-     * {@link ReplaceCharacterEntityNameValidation#setReplacementCharacters(Map)}.
-     *
-     * @return a replacement map to configure the component.
-     */
+    @Override
     public Map<String, String> getCharacterReplacementMap()
     {
         Map<String, String> result = new HashMap<>();

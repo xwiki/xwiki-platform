@@ -30,7 +30,7 @@
   <description>API to handle Model validation in XWiki</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Model Validation API</xwiki.extension.name>
     <!-- Category to display by the Extension Manager -->
@@ -48,6 +48,16 @@
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -65,6 +65,7 @@ tour.livetable.targetClass=Целевой класс
 tour.popover.previous=« Предыдущий
 tour.popover.next=Следующий »
 tour.popover.end=Конец тура
+tour.popover.quit=Прекратить тур
 tour.popover.show=Показать тур
 tour.popover.show.hint=Вы можете перезапустить тур в любой момент, нажав на эту кнопку
 
@@ -98,5 +99,6 @@ tour.upgrade.successNothing=Нечего обновлять!
 
 # Template
 tour.template.name=Тур
-tour.template.description=Пошаговый тур</content>
+tour.template.description=Пошаговый тур
+</content>
 </xwikidoc>

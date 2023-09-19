@@ -53,7 +53,7 @@ public class AttachmentValidationScriptService implements ScriptService
      * This component hint's last segment, the first segment is {@link AttachmentScriptService#ID}.
      *
      * @since 15.9RC1
-     * @since 15.5.5
+     * @since 15.5.3
      * @since 14.10.18
      */
     @Unstable

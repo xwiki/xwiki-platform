@@ -68,7 +68,7 @@ public class AttachmentScriptService implements ScriptService
      * This component hint.
      *
      * @since 15.9RC1
-     * @since 15.5.5
+     * @since 15.5.3
      * @since 14.10.18
      */
     @Unstable
@@ -179,7 +179,7 @@ public class AttachmentScriptService implements ScriptService
      * @param serviceName the name of the sub {@link ScriptService}
      * @return the {@link ScriptService} or null of none could be found
      * @since 15.9RC1
-     * @since 15.5.5
+     * @since 15.5.3
      * @since 14.10.18
      */
     @SuppressWarnings("unchecked")

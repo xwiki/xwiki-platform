@@ -21,6 +21,8 @@ package org.xwiki.platform.security.requiredrights;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.event.Level;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -204,5 +206,33 @@ public class RequiredRightAnalysisResult
     {
         this.entityType = entityType;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RequiredRightAnalysisResult that = (RequiredRightAnalysisResult) o;
+
+        return new EqualsBuilder().append(getLevel(), that.getLevel())
+            .append(getEntityReference(), that.getEntityReference()).append(getAnalyzerHint(), that.getAnalyzerHint())
+            .append(getMessage(), that.getMessage()).append(getMessageParameters(), that.getMessageParameters())
+            .append(getRequiredRight(), that.getRequiredRight()).append(getEntityType(), that.getEntityType())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37).append(getLevel()).append(getEntityReference()).append(getAnalyzerHint())
+            .append(getMessage()).append(getMessageParameters()).append(getRequiredRight()).append(getEntityType())
+            .toHashCode();
     }
 }

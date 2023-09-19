@@ -37,7 +37,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  * This class provides the script services for handling document edit confirmation.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Component
 @Singleton

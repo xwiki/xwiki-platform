@@ -449,9 +449,7 @@ public class NotificationFilterPreferenceStore
         try {
             return supplier.get();
         } finally {
-            if (wikiReference != null) {
-                context.setWikiReference(currentWiki);
-            }
+            context.setWikiReference(currentWiki);
         }
     }
 

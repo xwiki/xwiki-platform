@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -40,10 +41,15 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  */
 @Component
 @Singleton
-@Named("editConfirmation")
+@Named(ModelValidationScriptService.ID + "." + EditConfirmationScriptService.ID)
 @Unstable
 public class EditConfirmationScriptService implements ScriptService
 {
+    /**
+     * This component hint.
+     */
+    public static final String ID = "edit";
+
     @Inject
     @Named("context")
     private ComponentManager componentManager;

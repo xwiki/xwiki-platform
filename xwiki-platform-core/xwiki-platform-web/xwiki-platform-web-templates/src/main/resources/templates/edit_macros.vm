@@ -32,7 +32,7 @@
   ##
   ## Check if the document is protected and ask for confirmation if it is.
   ##
-  #set ($checkResult = $services.editConfirmation.check())
+  #set ($checkResult = $services.modelvalidation.edit.check())
 
   #if (!$checkResult.errorMessages.isEmpty() || (!$editForced && !$checkResult.warningMessages.isEmpty()))
     #set ($editConfirmation = {})

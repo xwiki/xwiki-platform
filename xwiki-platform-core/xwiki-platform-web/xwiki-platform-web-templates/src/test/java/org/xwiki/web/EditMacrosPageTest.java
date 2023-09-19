@@ -34,6 +34,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.model.validation.edit.EditConfirmationScriptService;
+import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
+import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
@@ -42,6 +44,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
@@ -51,7 +54,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 /**
  * Test the {@code edit_macros.vm} template.
@@ -64,6 +66,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     TemplateMacro.class,
     EditConfirmationScriptService.class,
+    ModelValidationScriptService.class,
     // Start - Required in addition of RenderingScriptServiceComponentList
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class,
@@ -71,6 +74,9 @@ import static org.mockito.Mockito.when;
 })
 class EditMacrosPageTest extends PageTest
 {
+    @MockComponent
+    private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
+
     @Mock
     private HttpSession httpSession;
 

@@ -28,9 +28,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
-import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidation;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -41,10 +41,15 @@ import org.xwiki.security.authorization.Right;
  * @since 12.0RC1
  */
 @Component
-@Named("modelvalidation")
+@Named(ModelValidationScriptService.ID)
 @Singleton
 public class ModelValidationScriptService implements ScriptService
 {
+    /**
+     * The id of this script service.
+     */
+    public static final String ID = "modelvalidation";
+
     @Inject
     private EntityNameValidationManager entityNameValidationManager;
 
@@ -56,6 +61,9 @@ public class ModelValidationScriptService implements ScriptService
 
     @Inject
     private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
 
     /**
      * Return the name strategy manager if the user has programming rights only.
@@ -86,7 +94,7 @@ public class ModelValidationScriptService implements ScriptService
     }
 
     /**
-     * @return the configuration for {@link ReplaceCharacterEntityNameValidation}.
+     * @return the configuration replace character entity name configuration
      */
     public ReplaceCharacterEntityNameValidationConfiguration getReplaceCharacterEntityNameValidationConfiguration()
     {
@@ -107,7 +115,8 @@ public class ModelValidationScriptService implements ScriptService
     public String transformName(String name)
     {
         if (this.entityNameValidationConfiguration.useTransformation()
-            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null) {
+            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null)
+        {
             return this.entityNameValidationManager.getEntityReferenceNameStrategy().transform(name);
         } else {
             return name;
@@ -124,7 +133,8 @@ public class ModelValidationScriptService implements ScriptService
     public EntityReference transformEntityReference(EntityReference sourceEntity)
     {
         if (this.entityNameValidationConfiguration.useTransformation()
-            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null) {
+            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null)
+        {
             return this.entityNameValidationManager.getEntityReferenceNameStrategy().transform(sourceEntity);
         } else {
             return sourceEntity;
@@ -176,7 +186,8 @@ public class ModelValidationScriptService implements ScriptService
     public boolean isValid(String name)
     {
         if (this.entityNameValidationConfiguration.useValidation()
-            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null) {
+            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null)
+        {
             return this.entityNameValidationManager.getEntityReferenceNameStrategy().isValid(name);
         } else {
             return true;
@@ -193,7 +204,8 @@ public class ModelValidationScriptService implements ScriptService
     public boolean isValid(EntityReference sourceEntity)
     {
         if (this.entityNameValidationConfiguration.useValidation()
-            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null) {
+            && this.entityNameValidationManager.getEntityReferenceNameStrategy() != null)
+        {
             return this.entityNameValidationManager.getEntityReferenceNameStrategy().isValid(sourceEntity);
         } else {
             return true;
@@ -203,7 +215,7 @@ public class ModelValidationScriptService implements ScriptService
     /**
      * Validate a name according to the given name strategy.
      *
-      * @param name the name to validate.
+     * @param name the name to validate.
      * @param hint the hint of name strategy to use.
      * @return {@code true} if the name is valid according to the name strategy.
      */
@@ -235,4 +247,16 @@ public class ModelValidationScriptService implements ScriptService
             return true;
         }
     }
+
+    /**
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
+     */
+    @SuppressWarnings("unchecked")
+    public <S extends ScriptService> S get(String serviceName)
+    {
+        return (S) this.scriptServiceManager.get(ID + '.' + serviceName);
+    }
+
 }

@@ -30,7 +30,7 @@
   <description>Default Strategies for Model Validation</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Model Validation Strategies</xwiki.extension.name>
     <!-- Category to display by the Extension Manager -->

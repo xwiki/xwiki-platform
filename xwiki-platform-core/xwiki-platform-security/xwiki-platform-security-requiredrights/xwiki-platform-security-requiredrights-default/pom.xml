@@ -25,6 +25,11 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${platform.version}</version>
       <type>pom</type>

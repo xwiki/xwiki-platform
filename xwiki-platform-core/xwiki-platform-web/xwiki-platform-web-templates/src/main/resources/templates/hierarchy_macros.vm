@@ -126,9 +126,6 @@
  *   excludeSelf: false, // whether the target reference has been excluded from the path
  *   selfIsActive: true, // whether the target reference should be marked as active or not
  *   limit: null // if any, enable the user to click on the ellipsis to expand the breadcrumb dynamically
- *   label: '' // if any, generates a custom label which takes this value as a parameter
- *      ! do not use a complete label here, only a readable name of the target object is expected. !
- *   navigation: false // whether the breadcrumb generate should be considered as a navigation
  * }
  * @param $entityReference (required if $option.limit is not null) the reference to the concerned entity.
  *#
@@ -148,9 +145,6 @@
     #foreach ($option in $options.keySet())
       #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
     #end
-  #end
-  #if($!options.navigation == true)
-    <nav aria-label="$escapetool.xml($services.localization.render('web.hierarchy.label'))">
   #end
   <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters>
   <li
@@ -175,7 +169,7 @@
       #end
       >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
     #end##
-  </li></ol>#if($!options.navigation == true)</nav>#end
+  </li></ol>
 #end
 
 #macro (getTreeNavigation $pathData $index $options)
@@ -336,7 +330,6 @@
     #set ($discard = $path.add($doc.documentReference))
     #set ($options = {
       'id': 'hierarchy',
-      'navigation': true,
       'entities': {
         $doc.documentReference: $tdoc
       }

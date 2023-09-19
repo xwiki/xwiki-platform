@@ -34,7 +34,6 @@
     ## Default mode: display the hierarchy for the current page
     ##
     #hierarchy($NULL {'id': 'hierarchy',
-    'navigation': true,
     'limit': 5, 'treeNavigation': true})
   #end
   </nav>

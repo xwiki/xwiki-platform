@@ -231,18 +231,22 @@ export default {
   /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
    when the column has been resized to a smaller width that is prevented by some table cell. */
   min-width: 100%;
+  position: relative;
 }
 
 .layout-table .handle {
   height: 100%;
   margin-left: -@table-cell-padding;
   padding: 0 @table-cell-padding;
+  color: @text-color;
+  background-color: @xwiki-page-content-bg;
   cursor: pointer; /* IE */
   cursor: grab;
   opacity: 0;
+  position: absolute;
 }
 .layout-table .column-name:hover .handle {
-  opacity: 1;
+  opacity: 0.8;
   transition: opacity 0.2s;
 }
 .layout-table .handle .fa {
@@ -253,7 +257,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 10px;
 }
 
 .layout-table .sort-icon {

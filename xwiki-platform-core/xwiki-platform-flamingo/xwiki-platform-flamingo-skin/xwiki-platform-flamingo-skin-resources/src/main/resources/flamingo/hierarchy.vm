@@ -24,7 +24,7 @@
   #######################################################
   ##                   CONTROLLER
   ##
-## Call the appropiate breadcrumb depending on the 
+  ## Call the appropiate breadcrumb depending on the 
   ## configuration.
   #######################################################
   #if($services.parentchild.isParentChildMechanismEnabled())

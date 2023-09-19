@@ -800,7 +800,7 @@ $fn
 ### @param isLarge True if the panel should be larger (default: false)
 ### @param isHeaderHidden True if the header should be hidden (default: false)
 ###
-#macro(panelheader $title $isLarge $isHeaderHidden)
+#macro(panelheader $title $isLarge $isHeaderHidden $isNavigation)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style the Panels selectively using
 ## CSS.
 ## We want to avoid showing the "WebHome" suffix in the generated class since we're working to remove it from the UI
@@ -819,22 +819,36 @@ $fn
 ## We keep this class for compatibility purpose but the previous one should be used instead.
 #set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.documentReference.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="#if ($isLarge)large #{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
+<div role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large #{end}panel
+expanded $!specialClassAttribute $!deprecatedClassAttribute"
+aria-label="$escapetool.xml($title)">
 <h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
 <div class="xwikipanelcontents">
 #else
-(% class="#if ($isLarge)large #{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
+(% role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large#{end}panel
+expanded $!specialClassAttribute $!deprecatedClassAttribute"
+aria-label="$escapetool.xml($title)"
+%)(((
 {{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
 
-#macro(panelhiddenheader $title)
-#panelheader($title, false, true)
+#macro(largepanelheader $title)
+  #panelheader($title, true, false, false)
 #end
 
-#macro(largepanelheader $title)
-#panelheader($title, true, false)
+#macro(panelhiddenheader $title)
+#panelheader($title, false, true, false)
+#end
+
+## Changes the semantic role of the panel.
+#macro(navigationPanelHeader $title)
+  #panelheader($title, false, false, true)
+#end
+
+#macro(largeNavigationPanelHeader $title)
+  #panelheader($title, true, false, true)
 #end
 
 ###

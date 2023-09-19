@@ -177,7 +177,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('xe.panels.navigation'))
+#navigationPanelHeader($services.localization.render('xe.panels.navigation'))
 ## Escape special characters in macro parameter values.
 #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
 ## Apply the configured page exclusions.

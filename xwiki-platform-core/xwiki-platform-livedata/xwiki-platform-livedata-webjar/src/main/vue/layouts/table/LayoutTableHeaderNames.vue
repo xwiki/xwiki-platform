@@ -185,7 +185,7 @@ export default {
       e.data.leftColumn = th.querySelector(".column-name");
       e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
       e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
-      e.data.rightColumnBaseWidth = e.data.rightColumn.getBoundingClientRect()?.width;
+      e.data.rightColumnBaseWidth = e.data.rightColumn?.getBoundingClientRect()?.width;
     },
 
     resizeColumn (e) {

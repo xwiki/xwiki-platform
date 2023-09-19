@@ -1535,7 +1535,7 @@ $Msz MB##
   <tr class="xwiki-livetable-display-filters">
     #foreach ($column in $columns)
       #set ($columnProperties = $columnsProperties.get($column))
-      ## Note: Even though the column is hidden, we still need a (pottentially hidden) TD to generate valid HTML
+      ## Note: Even though the column is hidden, we still need a (potentially hidden) TD to generate valid HTML
       <td class="xwiki-livetable-display-header-filter #if ("$!columnProperties.type" == 'hidden')hidden#end">
         #if ($columnProperties.type != 'hidden')
           #if ($columnProperties.filterable != false && "$!column" != '_actions')

@@ -186,6 +186,21 @@ export default {
       e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
       e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
       e.data.rightColumnBaseWidth = e.data.rightColumn?.getBoundingClientRect()?.width;
+
+      // Give all column names a fixed width so that relative widths don't change when resizing (in case the current
+      // widths are not the actual column widths).
+      // First, collect all widths, then set them all to avoid that due to the first values being set the other values
+      // change.
+      const widths = [];
+      let columns = th.closest("tr").querySelectorAll(".column-name");
+      // Filter columns that aren't visible to avoid setting a width of zero on them.
+      columns = Array.from(columns).filter(column => column.closest("th").style.display !== "none");
+      for (const column of columns) {
+        widths.push(column.getBoundingClientRect().width);
+      }
+      for (let i = 0; i < columns.length; i++) {
+        columns[i].style.width = `${widths[i]}px`;
+      }
     },
 
     resizeColumn (e) {
@@ -202,9 +217,10 @@ export default {
     },
 
     resetColumnSize (e) {
-      const th = e.currentTarget.closest("th");
-      const column = th.querySelector(".column-name");
-      column.style.width = "unset";
+      // Reset all column sizes as resizing a single column sets sizes for all columns.
+      for (const column of e.currentTarget.closest("tr").querySelectorAll(".column-name")) {
+        column.style.removeProperty("width");
+      }
     },
 
   },

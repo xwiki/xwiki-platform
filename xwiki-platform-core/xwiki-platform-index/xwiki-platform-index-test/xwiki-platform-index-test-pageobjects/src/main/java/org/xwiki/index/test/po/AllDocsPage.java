@@ -34,19 +34,19 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AllDocsPage extends ViewPage
 {
-    @FindBy(xpath = "//li[@id='xwikiindex']/a")
+    @FindBy(xpath = "//a[@id='xwikiindextab']")
     private WebElement indexTab;
 
-    @FindBy(xpath = "//li[@id='xwikitreeview']/a")
+    @FindBy(xpath = "//a[@id='xwikitreeviewtab']")
     private WebElement treeTab;
 
-    @FindBy(xpath = "//li[@id='xwikiattachments']/a")
+    @FindBy(xpath = "//a[@id='xwikiattachmentstab']")
     private WebElement attachmentsTab;
 
-    @FindBy(xpath = "//li[@id='xwikideletedDocs']/a")
+    @FindBy(xpath = "//a[@id='xwikideletedDocstab']")
     private WebElement deletedDocsTab;
 
-    @FindBy(xpath = "//li[@id='xwikideletedAttachments']/a")
+    @FindBy(xpath = "//a[@id='xwikideletedAttachmentstab']")
     private WebElement deletedAttachmentsTab;
 
     @FindBy(xpath = "//div[contains(@class, 'xwikitabpanescontainer')]/div")
@@ -91,12 +91,12 @@ public class AllDocsPage extends ViewPage
 
     public boolean hasDeletedDocsTab()
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedDocs']/a")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(By.xpath("//a[@id='xwikideletedDocstab']")).size() > 0;
     }
 
     public boolean hasDeletedAttachmentsTab()
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedAttachments']/a")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(By.xpath("//a[@id='xwikideletedAttachmentstab']")).size() > 0;
     }
 
     public LiveTableElement clickDeletedDocsTab()

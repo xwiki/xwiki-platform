@@ -400,6 +400,15 @@ public class XWikiCacheStore extends AbstractXWikiStore
 
                     LOGGER.debug("Document [{}] was retrieved from persistent storage", key);
 
+                    // If the exists cache indicated that the document should exist, log an error with a
+                    // stacktrace.
+                    if (cachedoc.isNew() && result != null) {
+                        LOGGER.error("Document [{}] was not found in persistent storage but the exists cache "
+                                + "indicated that it should exist. Unless that document has just been deleted, this "
+                                + "is a bug and should be reported.", key,
+                            new Exception());
+                    }
+
                     if (cachedoc.isNew()) {
                         getPageExistCache().set(key, Boolean.FALSE);
                     } else {

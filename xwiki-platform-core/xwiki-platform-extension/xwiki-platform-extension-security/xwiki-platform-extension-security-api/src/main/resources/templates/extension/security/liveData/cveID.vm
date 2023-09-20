@@ -26,10 +26,10 @@
   #foreach($index in $indexes)
     #set ($cveId = $cveIds.get($index))
     #set ($message = $messages[$index])
-  <a href="$cveLinks[$index]" class="#if ($isSafe)xHint#end">$cveId</a>&nbsp;
-  <span class="#if ($isSafe)xHint#end">($cveCVSS[$index])</span>&nbsp;
+  <a href="$cveLinks[$index]" class="#if ($isSafe)small#end">$cveId</a>
+  <span class="#if ($isSafe)small#end">($cveCVSS[$index])</span>
     #if ("$!message" != '')
-    <button type="button" class="btn btn-default btn-xs #if ($isSafe)xHint#end" data-toggle="modal"
+    <button type="button" class="btn btn-default btn-xs #if ($isSafe)small#end" data-toggle="modal"
             data-target="#$escapetool.xml($cveId)"
             aria-controls="$escapetool.xml($cveId)">
       <span class="sr-only">

@@ -37,7 +37,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
+<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform xwiki-submit-once">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
 #if("$!request.srid" != '')
   <input type="hidden" name="srid" value="$!escapetool.xml($request.srid)"/>

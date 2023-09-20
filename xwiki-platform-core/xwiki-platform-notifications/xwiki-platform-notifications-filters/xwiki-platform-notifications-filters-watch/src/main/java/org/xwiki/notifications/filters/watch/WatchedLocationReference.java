@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.watch;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
 
 /**
  * Reference of a location to watch.
@@ -79,16 +81,30 @@ public class WatchedLocationReference implements WatchedEntityReference
     @Override
     public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        return stateComputer.isLocationWatched(notificationFilterPreferenceManager.getFilterPreferences(userReference),
-                this.entityReference);
+        // FIXME: it doesn't feel correct...
+        // Fix is with introducing a deprecated stateComputer.isWatched
+        return isWatchedWithAllEventTypes(userReference);
     }
 
     @Override
     public boolean isWatchedWithAllEventTypes(DocumentReference userReference) throws NotificationException
     {
-        return stateComputer.isLocationWatchedWithAllEventTypes(
-            notificationFilterPreferenceManager.getFilterPreferences(userReference),
+        return getWatchedStatus(userReference) == WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+    }
+
+    @Override
+    public WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
+    {
+        Collection<NotificationFilterPreference> filterPreferences =
+            notificationFilterPreferenceManager.getFilterPreferences(userReference);
+        WatchedLocationState locationWatched = stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences,
             this.entityReference);
+        return switch (locationWatched.getState()) {
+            case CUSTOM -> WatchedStatus.CUSTOM;
+            case WATCHED -> WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+            case BLOCKED -> WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
+            default -> WatchedStatus.NOT_SET;
+        };
     }
 
     @Override

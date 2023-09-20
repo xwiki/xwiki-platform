@@ -43,18 +43,6 @@ Get the actual notifications.
 ## We use POST since we are sending the reference of the document and we want to avoid special characters in the URL.
 #if ('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'getNotifications' == $request.action)
   #set ($requestedDocumentReference = $services.model.resolveDocument($request.document))
-  #macro (displayCheckedIfWatched $scope)
-    #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($scope))
-    #if ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
-      checked="checked"
-    #elseif ($watchedStatus == 'WATCHED_FOR_SOME_EVENTS_OR_FORMATS')
-      data-indeterminate="true"
-    #end
-  #end
-  #macro (generateNotificationInput $id $reference $label)
-    &lt;label class="sr-only" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
-    &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
-  #end
   {{html clean="false"}} ## we need clean="false" because we want to display the raw content
   #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
     &lt;div class="notifications-header"&gt;
@@ -78,16 +66,6 @@ Get the actual notifications.
           &lt;/p&gt;
         &lt;/div&gt;
       &lt;/div&gt;
-      ##
-      ## Display the 3 toggle buttons
-      ##
-      #if ($services.notification.watch.isEnabled())
-        &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
-          #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
-          #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
-          #generateNotificationInput('notificationWiki' $requestedDocumentReference.wikiReference 'notifications.filters.preferences.label.wiki')
-        &lt;/div&gt;
-      #end
       &lt;div class="notifications-header-uix col-xs-12"&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -1028,8 +1006,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
-    #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
     {{html clean="false"}} ## We need the clean false to avoid getting a supplementary ul element.
     &lt;li class="notification-uix loading"&gt;&lt;/li&gt;
     {{/html}}
@@ -1045,6 +1021,175 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
     <property>
       <parameters>order=20000
 separator=true</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsDisplayerUIX</name>
+    <number>1</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>d3f9034b-18e1-49e9-a7ce-13edd6c19c09</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context>
+        <value>doc.reference</value>
+        <value>icon.theme</value>
+        <value>user</value>
+        <value>wiki</value>
+      </async_context>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+## FIXME: this object should be cached / async once properly finished.
+#set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
+#if ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell')
+  #set ($watchText = 'Followed')
+#elseif ($watchedStatus == 'NOT_SET')
+  #set ($watchIcon = 'fa-bell-o')
+  #set ($watchText = 'Not set')
+#elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell-slash')
+  #set ($watchText = 'Blocked')
+#else
+  #set ($watchIcon = 'fa-bullhorn')
+  #set ($watchText = 'Custom')
+#end
+{{html clean='false'}}
+&lt;div class="btn-group" id="watchButton"&gt;
+  &lt;a href="#" role="button" title="Watch" class="btn btn-default"&gt;
+    &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
+  &lt;/a&gt;
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.menu.content</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.notification.watch</name>
+    </property>
+    <property>
+      <parameters>order=50</parameters>
     </property>
     <property>
       <scope>wiki</scope>

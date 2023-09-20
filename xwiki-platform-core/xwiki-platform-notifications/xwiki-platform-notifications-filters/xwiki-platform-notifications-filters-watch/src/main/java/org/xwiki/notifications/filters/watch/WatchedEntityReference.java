@@ -45,14 +45,17 @@ public interface WatchedEntityReference
         WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
 
         /**
-         * The entity is only watched for a subset of events and/or a subset of formats.
+         * The entity does not have a watched status: by default it means it's not watched, but it's not blocked.
+         * @since 15.9RC1
          */
-        WATCHED_FOR_SOME_EVENTS_OR_FORMATS,
+        NOT_SET,
 
         /**
-         * The entity is not watched.
+         * The entity is blocked for all events and formats.
          */
-        NOT_WATCHED
+        BLOCKED_FOR_ALL_EVENTS_AND_FORMATS,
+
+        CUSTOM
     }
 
     /**
@@ -64,16 +67,7 @@ public interface WatchedEntityReference
      * @since 15.5RC1
      */
     @Unstable
-    default WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
-    {
-        if (isWatchedWithAllEventTypes(userReference)) {
-            return WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
-        } else if (isWatched(userReference)) {
-            return WatchedStatus.WATCHED_FOR_SOME_EVENTS_OR_FORMATS;
-        } else {
-            return WatchedStatus.NOT_WATCHED;
-        }
-    }
+    WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException;
 
     /**
      * @param userReference a user
@@ -81,6 +75,7 @@ public interface WatchedEntityReference
      * @throws NotificationException if an error happens
      * @since 9.9RC1
      */
+    @Deprecated
     boolean isWatched(DocumentReference userReference) throws NotificationException;
 
     /**
@@ -89,6 +84,7 @@ public interface WatchedEntityReference
      * @throws NotificationException if an error happens
      * @since 12.8RC1
      */
+    @Deprecated
     default boolean isWatchedWithAllEventTypes(DocumentReference userReference) throws NotificationException
     {
         return isWatched(userReference);

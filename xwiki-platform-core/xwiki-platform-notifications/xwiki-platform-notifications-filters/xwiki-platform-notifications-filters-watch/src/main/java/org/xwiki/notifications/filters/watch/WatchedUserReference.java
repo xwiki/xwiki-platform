@@ -70,6 +70,20 @@ public class WatchedUserReference implements WatchedEntityReference
     }
 
     @Override
+    public WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
+    {
+        WatchedStatus watchedStatus = WatchedStatus.NOT_SET;
+        if (isWatched(userReference)) {
+            watchedStatus = WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+        } else if (preferencesGetter.isUserExcluded(userId,
+            notificationFilterPreferenceManager.getFilterPreferences(userReference),
+            null)) {
+            watchedStatus = WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
+        }
+        return watchedStatus;
+    }
+
+    @Override
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         return EventUserFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())

@@ -30,27 +30,32 @@ import java.util.Date;
  */
 public class WatchedLocationState
 {
-    private boolean isWatched;
+    public enum WatchedState
+    {
+        WATCHED,
+        BLOCKED,
+        CUSTOM,
+        NOT_SET
+    }
+    private WatchedState state;
 
     private Date startingDate;
 
     /**
      * Construct a WatchedLocationState with no starting date.
-     * @param isWatched either or not the location is watched
      */
-    public WatchedLocationState(boolean isWatched)
+    public WatchedLocationState()
     {
-        this.isWatched = isWatched;
+        this.state = WatchedState.NOT_SET;
     }
 
     /**
      * Construct a WatchedLocationState.
-     * @param isWatched either or not the location is watched
      * @param startingDate since when the location is watched (can be null)
      */
-    public WatchedLocationState(boolean isWatched, Date startingDate)
+    public WatchedLocationState(WatchedState state, Date startingDate)
     {
-        this.isWatched = isWatched;
+        this.state = state;
         if (startingDate != null) {
             this.startingDate = truncateMilliseconds(startingDate);
         }
@@ -62,12 +67,9 @@ public class WatchedLocationState
         return new Date(dateValue * 1000);
     }
 
-    /**
-     * @return either or not the location is watched
-     */
-    public boolean isWatched()
+    public WatchedState getState()
     {
-        return isWatched;
+        return state;
     }
 
     /**

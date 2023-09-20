@@ -40,6 +40,7 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -89,7 +90,8 @@ class WatchedLocationReferenceTest
         when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
             .thenReturn(filterPreferences);
 
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(true);
+        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
+            .thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
         assertTrue(this.watchedLocationReference.isWatched(userReference));
 
         verify(this.notificationFilterPreferenceManager).getFilterPreferences(userReference);
@@ -103,8 +105,8 @@ class WatchedLocationReferenceTest
         when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
             .thenReturn(filterPreferences);
 
-        when(this.stateComputer.isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference))
-            .thenReturn(true);
+        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
+            .thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
         assertTrue(this.watchedLocationReference.isWatchedWithAllEventTypes(userReference));
 
         verify(this.notificationFilterPreferenceManager).getFilterPreferences(userReference);
@@ -246,25 +248,15 @@ class WatchedLocationReferenceTest
         when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
             .thenReturn(filterPreferences);
 
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(false);
-        when(this.stateComputer.isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference))
-            .thenReturn(false);
-        assertEquals(WatchedEntityReference.WatchedStatus.NOT_WATCHED,
+        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
+            .thenReturn(new WatchedLocationState());
+        assertEquals(WatchedEntityReference.WatchedStatus.NOT_SET,
             this.watchedLocationReference.getWatchedStatus(userReference));
 
-        verify(this.stateComputer).isLocationWatched(filterPreferences, this.entityReference);
-        verify(this.stateComputer).isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference);
+        verify(this.stateComputer).isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference);
 
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(true);
-        assertEquals(WatchedEntityReference.WatchedStatus.WATCHED_FOR_SOME_EVENTS_OR_FORMATS,
-            this.watchedLocationReference.getWatchedStatus(userReference));
-
-        when(this.stateComputer.isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference))
-            .thenReturn(true);
-        assertEquals(WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
-            this.watchedLocationReference.getWatchedStatus(userReference));
-
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(false);
+        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
+            .thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
         assertEquals(WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
             this.watchedLocationReference.getWatchedStatus(userReference));
     }

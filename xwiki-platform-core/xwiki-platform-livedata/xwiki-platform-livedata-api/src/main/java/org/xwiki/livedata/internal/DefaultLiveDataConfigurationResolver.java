@@ -130,7 +130,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     private void handleLayouts(Collection<LiveDataLayoutDescriptor> configuredLayouts, LiveDataMeta mergedConfigMeta)
     {
         // Skip this if no layouts are configured explicitly.
-        if (configuredLayouts != null)
+        if (configuredLayouts != null && !configuredLayouts.isEmpty())
         {
             // Only keep the layout matching the ids provided by the higher level configuration, preserving the order.
             mergedConfigMeta.setLayouts(configuredLayouts.stream().map(configLayout -> mergedConfigMeta.getLayouts()

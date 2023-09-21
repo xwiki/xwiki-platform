@@ -110,8 +110,7 @@ public class OsvResponseAnalyzer
     }
 
     /**
-     * Resolve the ID of the provided {@link VulnObject}. First look for an alias starting with "CVE-", and fallback to
-     * the {@link VulnObject} id if none is found.
+     * Resolve the ID of the provided {@link VulnObject} by looking for an alias starting with "CVE-".
      *
      * @param vulnObject the vulnerability object
      * @return an alias starting with "CVE-", or the original ID if no appropriate alias is found

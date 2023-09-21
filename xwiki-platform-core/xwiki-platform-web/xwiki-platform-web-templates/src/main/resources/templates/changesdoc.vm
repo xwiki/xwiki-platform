@@ -47,10 +47,10 @@
   ## Keep the reverse navigation order in case the original document version is greater than the version of the new document
   #if ($origdoc.RCSVersion.isLessOrEqualThan($newdoc.RCSVersion))
     #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev1}")})
-    #set ($previousVersion = ${previousOrigdocVersion})
+    #set ($previousLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change',[$previousOrigdocVersion,$rev1])))
   #else
     #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${previousNewdocVersion}")})
-    #set ($previousVersion = ${rev2})
+    #set ($previousLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change',[$rev2,$previousNewdocVersion])))
   #end
 #end
 ## Display the next change arrow only if there is a next version of the new document and there is no extension version
@@ -58,10 +58,10 @@
   ## Keep the reverse navigation order in case the original document version is greater than the version of the new document
   #if ($origdoc.RCSVersion.isLessOrEqualThan($newdoc.RCSVersion))
     #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${nextNewdocVersion}")})
-    #set ($nextVersion = ${nextNewdocVersion})
+    #set ($nextLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change',[$rev2,$nextNewdocVersion])))
   #else
     #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev1}")})
-    #set ($nextVersion = ${rev1})
+    #set ($nextLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change',[$nextOrigdocVersion,$rev1])))
   #end
 #end
 
@@ -71,7 +71,7 @@
   'previousVersionLink': $previousOrigdocLink,
   'nextVersionLink': $nextOrigdocLink,
   'previousLink': $previousLink,
-  'previousVersion': $previousOrigdocVersion
+  'previousLabel': $previousLabel
 })
 #set ($to = {
   'doc': $newdoc,
@@ -79,7 +79,7 @@
   'previousVersionLink': $previousNewdocLink,
   'nextVersionLink': $nextNewdocLink,
   'nextLink': $nextLink,
-  'nextVersion': $nextVersion
+  'nextLabel': $nextLabel
 })
 #displayDocumentChangesHeader($from $to)
 

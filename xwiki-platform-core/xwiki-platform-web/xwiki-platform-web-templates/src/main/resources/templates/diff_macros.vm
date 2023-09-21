@@ -585,12 +585,12 @@
         <div id='changes-arrows-box'>
           #if ("$!from.previousLink" != '')
             <a href="$from.previousLink" class="btn btn-default changes-arrow-left">
-              $services.icon.renderHTML('left') $escapetool.xml($services.localization.render('core.viewers.diff.change',[$from.previousVersion,$from.version]))
+              $services.icon.renderHTML('left') $from.previousLabel
             </a>
           #end
           #if ("$!to.nextLink" != '')
             <a href="$to.nextLink" class="btn btn-default changes-arrow-right">
-              $escapetool.xml($services.localization.render('core.viewers.diff.change',[$to.version,$to.nextVersion])) $services.icon.renderHTML('right')
+              $to.nextLabel $services.icon.renderHTML('right')
             </a>
           #end
         </div>

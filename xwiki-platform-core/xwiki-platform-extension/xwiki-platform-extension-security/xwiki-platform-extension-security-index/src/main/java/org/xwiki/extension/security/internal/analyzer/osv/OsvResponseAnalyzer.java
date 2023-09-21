@@ -20,14 +20,17 @@
 package org.xwiki.extension.security.internal.analyzer.osv;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -78,17 +81,45 @@ public class OsvResponseAnalyzer
         }
 
         return new ExtensionSecurityAnalysisResult()
-            .setResults(matchingVulns.stream().map(vulnObject -> convert(vulnObject, new DefaultVersion(version)))
-                .collect(Collectors.toList()));
+            .setResults(
+                matchingVulns.stream().flatMap(vulnObject -> convert(vulnObject, new DefaultVersion(version)).stream())
+                    .collect(Collectors.toList()));
     }
 
-    private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject, Version currentVersion)
+    private Optional<SecurityVulnerabilityDescriptor> convert(VulnObject vulnObject, Version currentVersion)
     {
-        return new SecurityVulnerabilityDescriptor()
-            .setId(vulnObject.getId())
-            .setURL(vulnObject.getMainURL())
-            .setSeverityScore(vulnObject.getSeverityCCSV3())
-            .setFixVersion(vulnObject.getMaxFixVersion(currentVersion).orElse(null));
+        // If we are unable to find a CVE, we ignore the vulnerability.
+        return resolveId(vulnObject)
+            .map(id -> new SecurityVulnerabilityDescriptor()
+                .setId(id)
+                .setAliases(resolveAliases(vulnObject, id))
+                .setURL(vulnObject.getMainURL())
+                .setSeverityScore(vulnObject.getSeverityCCSV3())
+                .setFixVersion(vulnObject.getMaxFixVersion(currentVersion).orElse(null)));
+    }
+
+    private Set<String> resolveAliases(VulnObject vulnObject, String id)
+    {
+        Set<String> aliases = new HashSet<>();
+        aliases.add(vulnObject.getId());
+        if (vulnObject.getAliases() != null) {
+            aliases.addAll(vulnObject.getAliases());
+        }
+        aliases.remove(id);
+        return aliases;
+    }
+
+    /**
+     * Resolve the ID of the provided {@link VulnObject}. First look for an alias starting with "CVE-", and fallback to
+     * the {@link VulnObject} id if none is found.
+     *
+     * @param vulnObject the vulnerability object
+     * @return an alias starting with "CVE-", or the original ID if no appropriate alias is found
+     */
+    private Optional<String> resolveId(VulnObject vulnObject)
+    {
+        return Optional.ofNullable(vulnObject.getAliases())
+            .flatMap(aliases -> aliases.stream().filter(it -> StringUtils.startsWith(it, "CVE-")).findFirst());
     }
 
     private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)

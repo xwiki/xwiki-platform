@@ -19,9 +19,6 @@
  */
 package org.xwiki.model.validation.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +31,12 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_FORBIDDENCHARACTERS;
+import static org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_REPLACEMENTCHARACTERS;
 
 @ComponentTest
-public class ReplaceCharacterEntityNameValidationConfigurationTest
+class ReplaceCharacterEntityNameValidationConfigurationTest
 {
     @InjectMockComponents
     private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
@@ -48,74 +46,59 @@ public class ReplaceCharacterEntityNameValidationConfigurationTest
     private ConfigurationSource configurationSource;
 
     @Test
-    public void getCharacterReplacementMap()
+    void getCharacterReplacementMap()
     {
-        assertEquals(Collections.emptyMap(),
+        assertEquals(Map.of(), this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
+
+        when(this.configurationSource.getProperty(PROPERTY_KEY_FORBIDDENCHARACTERS, List.class)).thenReturn(
+            List.of("/"));
+        when(this.configurationSource.getProperty(PROPERTY_KEY_REPLACEMENTCHARACTERS, List.class))
+            .thenReturn(List.of());
+        assertEquals(Map.of("/", ""),
             this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
 
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_FORBIDDENCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Collections.singletonList("/"));
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_REPLACEMENTCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Collections.emptyList());
-        assertEquals(Collections.singletonMap("/", ""),
+        when(configurationSource.getProperty(PROPERTY_KEY_FORBIDDENCHARACTERS, List.class))
+            .thenReturn(List.of("/"));
+        when(configurationSource.getProperty(PROPERTY_KEY_REPLACEMENTCHARACTERS, List.class)).thenReturn(List.of());
+        assertEquals(Map.of("/", ""),
             this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
 
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_FORBIDDENCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("/",".","foo"));
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_REPLACEMENTCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("-","-","bar"));
-        Map<String, String> expectedMap = new HashMap<>();
-        expectedMap.put("/", "-");
-        expectedMap.put(".", "-");
-        expectedMap.put("foo", "bar");
-        assertEquals(expectedMap, this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
+        when(configurationSource.getProperty(PROPERTY_KEY_FORBIDDENCHARACTERS, List.class))
+            .thenReturn(List.of("/", ".", "foo"));
+        when(configurationSource.getProperty(PROPERTY_KEY_REPLACEMENTCHARACTERS, List.class))
+            .thenReturn(List.of("-", "-", "bar"));
+        assertEquals(Map.of(
+            "/", "-",
+            ".", "-",
+            "foo", "bar"
+        ), this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
 
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_FORBIDDENCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("/","\\","","foo"));
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_REPLACEMENTCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("-","-"));
-        expectedMap = new HashMap<>();
-        expectedMap.put("/", "-");
-        expectedMap.put("\\", "-");
-        expectedMap.put("foo", "");
-        assertEquals(expectedMap, this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
+        when(configurationSource.getProperty(PROPERTY_KEY_FORBIDDENCHARACTERS, List.class))
+            .thenReturn(List.of("/", "\\", "", "foo"));
+        when(configurationSource.getProperty(PROPERTY_KEY_REPLACEMENTCHARACTERS, List.class))
+            .thenReturn(List.of("-", "-"));
+        assertEquals(Map.of(
+            "/", "-",
+            "\\", "-",
+            "foo", ""
+        ), this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
 
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_FORBIDDENCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("/","\\","","/"));
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_REPLACEMENTCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("-","-"));
-        expectedMap = new HashMap<>();
-        expectedMap.put("/", "");
-        expectedMap.put("\\", "-");
-        assertEquals(expectedMap, this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
+        when(configurationSource.getProperty(PROPERTY_KEY_FORBIDDENCHARACTERS, List.class))
+            .thenReturn(List.of("/", "\\", "", "/"));
+        when(configurationSource.getProperty(PROPERTY_KEY_REPLACEMENTCHARACTERS, List.class))
+            .thenReturn(List.of("-", "-"));
+        assertEquals(Map.of(
+            "/", "",
+            "\\", "-"
+        ), this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
 
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_FORBIDDENCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("/","\\","","/"));
-        when(configurationSource
-            .getProperty(eq(ReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_REPLACEMENTCHARACTERS),
-                eq(List.class)))
-            .thenReturn(Arrays.asList("-","-"));
-        expectedMap = new HashMap<>();
-        expectedMap.put("/", "");
-        expectedMap.put("\\", "-");
-        assertEquals(expectedMap, this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
+        when(configurationSource.getProperty(PROPERTY_KEY_FORBIDDENCHARACTERS, List.class))
+            .thenReturn(List.of("/", "\\", "", "/"));
+        when(configurationSource.getProperty(PROPERTY_KEY_REPLACEMENTCHARACTERS, List.class))
+            .thenReturn(List.of("-", "-"));
+        assertEquals(Map.of(
+            "/", "",
+            "\\", "-"
+        ), this.replaceCharacterEntityNameValidationConfiguration.getCharacterReplacementMap());
     }
 }

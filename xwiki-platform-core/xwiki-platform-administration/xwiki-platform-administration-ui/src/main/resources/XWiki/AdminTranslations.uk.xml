@@ -44,6 +44,7 @@ administration.sectionTitle=Адміністрування: {0}
 administration.sectionTitle.page=Адміністрування сторінки: {0}
 administration.sectionTitle.wiki=Адміністрування Вікі: {0}
 administration.sectionTitle.global=Глобальне адміністрування: {0}
+administration.menu.label=Розділи адміністрування.
 administration.menu.search.hint=Шукати...
 administration.menu.search.noResults=Немає результатів.
 

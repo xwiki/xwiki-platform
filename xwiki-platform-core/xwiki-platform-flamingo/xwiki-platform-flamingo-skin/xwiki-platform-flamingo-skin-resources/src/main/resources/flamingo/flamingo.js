@@ -40,36 +40,46 @@ require(['jquery', 'bootstrap'], function($) {
         }
       }
     });
-
-    // When the drawer is close, collapse sub items
-    $(body).on('drawer.closed', function() {
-      $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
-    });
-
     // Activate the popover when hovering the Translate button.
     var translateButton = $('#tmTranslate [data-toggle="popover"]');
     translateButton.attr('title', translateButton.attr('data-title')).popover();
   });
 });
 
+/*
+  Handle the behavior of all drawers on the page.
+  In order to create a drawer that is compatible with this script, two elements are necessary:
+  * A drawer toggler button, that will have:
+   ** a reference to the drawer container in its attribute 'aria-control'
+   ** the class 'drawer-toggle'
+  * A drawer container, that will have:
+   ** a unique ID
+   ** the class 'drawer-nav' (mostly for style) 
+   ** the class 'closed' if the drawer is supposed to start in a closed state.
+   ** a label 
+   ** The content to display inside. It's asserted that at least one element in this content can receive focus.
+  For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
+ */
 require(['jquery'], function($) {
-
-  $(function() {
-    let drawerContainer = $('#tmDrawer');
-    let drawerContainerToggler = $('#tmDrawerActivator');
-    let drawerOverlay = $(".drawer-overlay");
+  // The overlay is the same whatever the drawer opened.
+  let drawerOverlay = $(".drawer-overlay");
+  $('.drawer-toggle').each(function(index) {
+    // Setting up the drawer.
+    let drawerContainerToggler = $(this);
+    let drawerId = drawerContainerToggler.attr('aria-controls');
+    let drawerContainer = $('#'+drawerId);
     let focusableElements = drawerContainer.find('button, a, input:not([type="hidden"]), ' +
      'select, textarea, [tabindex]:not([tabindex="-1"])');
 
     // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
     // which prevents us from using them in automated tests. We need something more reliable so we listen to
-    // 'drawer.opened' and 'drawer.closed' events and add our own markers.
-    let openDrawer = () => drawerContainer.trigger('drawer.opened');
-    let closeDrawer = () => drawerContainer.trigger('drawer.closed');
+    // 'drawer1.opened' and 'drawer1.closed' events and add our own markers.
+    let openDrawer = () => drawerContainer.trigger('drawer'+index+'.opened');
+    let closeDrawer = () => drawerContainer.trigger('drawer'+index+'.closed');
     drawerContainerToggler.on('click', openDrawer);
     drawerOverlay.on('click', closeDrawer);
 
-    drawerContainer.on('drawer.opened', function(event) {
+    drawerContainer.on('drawer'+index+'.opened', function(event) {
       drawerContainerToggler
         .attr('aria-expanded', 'true');
       // We update the state of the drawer (using setAttribute since it's faster)
@@ -79,7 +89,7 @@ require(['jquery'], function($) {
       // have no visibility before the class change. We use an interval so that the focus is moved no matter the
       // performance of the client.
       let focusInterval = setInterval( ()=>{
-        if(drawerContainer.hasClass('opened')) {
+        if(drawerContainer.hasClass('opened') && focusableElements.length !== 0) {
           focusableElements.first().trigger('focus');
           clearInterval(focusInterval);
           focusInterval = null;
@@ -93,11 +103,11 @@ require(['jquery'], function($) {
       });
       // The drawer can be closed by setting focus outside of it
       focusableElements.on('focusout', function (event) {
-        if (event.relatedTarget != null && event.relatedTarget.closest("#tmDrawer") == null) {
+        if (event.relatedTarget != null && event.relatedTarget.closest('#'+drawerId) == null) {
           closeDrawer();
         }
       });
-    }).on('drawer.closed', function(event) {
+    }).on('drawer'+index+'.closed', function(event) {
       // We update the state of the drawer
       drawerContainer
         .removeClass('opened')
@@ -106,6 +116,11 @@ require(['jquery'], function($) {
       // We remove the listeners that were created when the drawer opened up
       $("body").off('keydown');
       focusableElements.off('focusout');
+    });
+    
+    // When the drawer is closed, collapse sub items
+    $(body).on('drawer'+index+'.closed', function() {
+      $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
     });
   });
 });

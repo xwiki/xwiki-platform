@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -45,6 +44,7 @@ import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnObj
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
@@ -57,7 +57,6 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Singleton
 public class OsvResponseAnalyzer
 {
-
     @Inject
     private Logger logger;
 
@@ -102,9 +101,7 @@ public class OsvResponseAnalyzer
     {
         Set<String> aliases = new HashSet<>();
         aliases.add(vulnObject.getId());
-        if (vulnObject.getAliases() != null) {
-            aliases.addAll(vulnObject.getAliases());
-        }
+        aliases.addAll(vulnObject.getAliases());
         aliases.remove(id);
         return aliases;
     }
@@ -117,8 +114,10 @@ public class OsvResponseAnalyzer
      */
     private Optional<String> resolveId(VulnObject vulnObject)
     {
-        return Optional.ofNullable(vulnObject.getAliases())
-            .flatMap(aliases -> aliases.stream().filter(it -> StringUtils.startsWith(it, "CVE-")).findFirst());
+        return vulnObject.getAliases()
+            .stream()
+            .filter(it -> startsWith(it, "CVE-"))
+            .findFirst();
     }
 
     private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)

@@ -28,14 +28,12 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -57,6 +55,9 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
     @Inject
     private AuthorizationManager authorizationManager;
 
+    @Inject
+    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+
     @Override
     public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
     {
@@ -64,17 +65,16 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
 
         if (StringUtils.isNotBlank(requiredRight)) {
             Right right = Right.toRight(requiredRight);
-            XWikiDocument document = object.getOwnerDocument();
-            DocumentReference documentReference = document.getDocumentReference();
 
-            // Check the right both for the content and the effective metadata author.
-            if (right != Right.ILLEGAL && !(
-                this.authorizationManager.hasAccess(right, document.getContentAuthorReference(), documentReference)
-                    && this.authorizationManager.hasAccess(right, document.getAuthorReference(), documentReference))
-            )
-            {
-                return List.of(new RequiredRightAnalysisResult(object.getDocumentReference(), ID,
-                    "security.requiredrights.requiredrightobject", List.of(requiredRight), right, EntityType.DOCUMENT));
+            // TODO: in theory this right should be both for the content and the object - should we just indicate it
+            //  twice, also for the content?
+            if (right != Right.ILLEGAL) {
+                return List.of(new RequiredRightAnalysisResult(object.getReference(),
+                    this.translationMessageSupplierProvider.get("security.requiredrights.requiredrightobject",
+                        requiredRight),
+                    () -> null,
+                    List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, true))
+                ));
             }
         }
 

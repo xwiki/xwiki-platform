@@ -20,16 +20,13 @@
 package org.xwiki.platform.security.requiredrights;
 
 import java.util.List;
+import java.util.function.Supplier;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.slf4j.event.Level;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
-
-import static org.slf4j.event.Level.ERROR;
 
 /**
  * Represents the result of a required right analysis. This class provides getters and setters for various properties
@@ -41,60 +38,76 @@ import static org.slf4j.event.Level.ERROR;
 @Unstable
 public class RequiredRightAnalysisResult
 {
-    private Level level = ERROR;
+    /**
+     * Represents a required right for an entity.
+     */
+    public static class RequiredRight
+    {
+        private final Right right;
+
+        private final EntityType entityType;
+
+        private final boolean optional;
+
+        /**
+         * @param right the required right
+         * @param entityType the level at which the right is required (e.g., document, space, wiki)
+         * @param optional whether the right is optional or not, i.e., if the entity also works without the right or not
+         */
+        public RequiredRight(Right right, EntityType entityType, boolean optional)
+        {
+            this.right = right;
+            this.entityType = entityType;
+            this.optional = optional;
+        }
+
+        /**
+         * @return the required right
+         */
+        public Right getRight()
+        {
+            return this.right;
+        }
+
+        /**
+         * @return the level at which the right is required (e.g., document, space, wiki)
+         */
+        public EntityType getEntityType()
+        {
+            return this.entityType;
+        }
+
+        /**
+         * @return whether the right is optional or not, i.e., if the entity also works without the right or not
+         */
+        public boolean isOptional()
+        {
+            return this.optional;
+        }
+    }
 
     private EntityReference entityReference;
 
-    private String analyzerHint;
+    private final Supplier<Block> summaryMessageProvider;
 
-    private String message;
+    private final Supplier<Block> detailedMessageProvider;
 
-    private List<Object> messageParameters;
+    private final List<RequiredRight> requiredRights;
 
-    private Right requiredRight;
-
-    private EntityType entityType;
-
-    public RequiredRightAnalysisResult(EntityReference entityReference, String analyzerHint, String message,
-        List<Object> messageParameters, Right requiredRight, EntityType entityType)
+    /**
+     * @param entityReference the location of the analyzed entity (e.g., a document content, or a field in an XObject)
+     * @param summaryMessageProvider the summary message to display to the user for this required right analysis result
+     * @param detailedMessageProvider the detailed message to display to the user for this required right analysis
+     *     result
+     * @param requiredRights the rights that are required for the analyzed entity
+     */
+    public RequiredRightAnalysisResult(EntityReference entityReference, Supplier<Block> summaryMessageProvider,
+        Supplier<Block> detailedMessageProvider, List<RequiredRight> requiredRights)
     {
         this.entityReference = entityReference;
-        this.analyzerHint = analyzerHint;
-        this.message = message;
-        this.messageParameters = messageParameters;
-        this.requiredRight = requiredRight;
-        this.entityType = entityType;
-    }
-
-    public RequiredRightAnalysisResult(String analyzerHint, String message, List<Object> messageParameters,
-        Right requiredRight, EntityType entityType)
-    {
-        this.analyzerHint = analyzerHint;
-        this.message = message;
-        this.messageParameters = messageParameters;
-        this.requiredRight = requiredRight;
-        this.entityType = entityType;
-    }
-
-    /**
-     * @return the level of the right violation. A value of {@link Level#ERROR} indicates that the right is absolutely
-     *     required, {@link Level#WARN} indicates that the right might be required and behavior might change with it but
-     *     the analyzer is not certain.
-     */
-    public Level getLevel()
-    {
-        return this.level;
-    }
-
-    /**
-     * @param level the level of the right violation.
-     * @see #getLevel()
-     * @return this current object
-     */
-    public RequiredRightAnalysisResult setLevel(Level level)
-    {
-        this.level = level;
-        return this;
+        this.summaryMessageProvider = summaryMessageProvider;
+        this.detailedMessageProvider = detailedMessageProvider;
+        this.requiredRights = requiredRights;
     }
 
     /**
@@ -110,129 +123,33 @@ public class RequiredRightAnalysisResult
      *     XObject)
      * @see #getEntityReference()
      */
-    public RequiredRightAnalysisResult setEntityReference(EntityReference entityReference)
+    public void setEntityReference(EntityReference entityReference)
     {
         this.entityReference = entityReference;
-        return this;
     }
 
     /**
-     * @return the hint of the analyzer that produced this analysis result
+     * @return the summary message to display to the user for this required right analysis result
      */
-    public String getAnalyzerHint()
+    public Block getSummaryMessage()
     {
-        return this.analyzerHint;
+        return this.summaryMessageProvider.get();
     }
 
     /**
-     * @param analyzerHint the hint of the analyzer
-     * @see #getAnalyzerHint()
+     * @return the detailed message to display to the user for this required right analysis result
      */
-    public RequiredRightAnalysisResult setAnalyzerHint(String analyzerHint)
+    public Block getDetailedMessage()
     {
-        this.analyzerHint = analyzerHint;
-        return this;
+        return this.detailedMessageProvider.get();
     }
 
     /**
-     * @return the translation key for the message to display to the user for this required right violation
+     * @return the rights that are required for the analyzed entity
      */
-    public String getMessage()
+    public List<RequiredRight> getRequiredRights()
     {
-        return this.message;
+        return this.requiredRights;
     }
 
-    /**
-     * @param message the translation key for the message
-     * @see #getMessage()
-     */
-    public RequiredRightAnalysisResult setMessage(String message)
-    {
-        this.message = message;
-        return this;
-    }
-
-    /**
-     * @return the parameters for the translation message like the offending content
-     */
-    public List<Object> getMessageParameters()
-    {
-        return this.messageParameters;
-    }
-
-    /**
-     * @param messageParameters the parameters for the message
-     * @see #getMessageParameters()
-     */
-    public RequiredRightAnalysisResult setMessageParameters(List<Object> messageParameters)
-    {
-        this.messageParameters = messageParameters;
-        return this;
-    }
-
-    /**
-     * @return the right that would be required by the entity to fully work according to the analyzer. This may be
-     *     inaccurate in particular if {@link #getLevel()} is not {@link Level#ERROR}.
-     */
-    public Right getRequiredRight()
-    {
-        return this.requiredRight;
-    }
-
-    /**
-     * @param requiredRight the right that would be required by the entity
-     * @see #getRequiredRight()
-     */
-    public RequiredRightAnalysisResult setRequiredRight(Right requiredRight)
-    {
-        this.requiredRight = requiredRight;
-        return this;
-    }
-
-    /**
-     * @return the type of the entity for which the right is required, should be {@link EntityType#DOCUMENT} in most
-     *     cases but can be used to indicate, e.g., wiki admin right using {@link EntityType#WIKI}.
-     */
-    public EntityType getEntityType()
-    {
-        return this.entityType;
-    }
-
-    /**
-     * @param entityType the type of the entity for which the right is required
-     * @see #getEntityType()
-     */
-    public RequiredRightAnalysisResult setEntityType(EntityType entityType)
-    {
-        this.entityType = entityType;
-        return this;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        RequiredRightAnalysisResult that = (RequiredRightAnalysisResult) o;
-
-        return new EqualsBuilder().append(getLevel(), that.getLevel())
-            .append(getEntityReference(), that.getEntityReference()).append(getAnalyzerHint(), that.getAnalyzerHint())
-            .append(getMessage(), that.getMessage()).append(getMessageParameters(), that.getMessageParameters())
-            .append(getRequiredRight(), that.getRequiredRight()).append(getEntityType(), that.getEntityType())
-            .isEquals();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder(17, 37).append(getLevel()).append(getEntityReference()).append(getAnalyzerHint())
-            .append(getMessage()).append(getMessageParameters()).append(getRequiredRight()).append(getEntityType())
-            .toHashCode();
-    }
 }

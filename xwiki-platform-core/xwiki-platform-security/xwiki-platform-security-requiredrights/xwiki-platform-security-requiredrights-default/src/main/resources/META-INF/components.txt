@@ -8,3 +8,4 @@ org.xwiki.platform.security.requiredrights.internal.VelocityMacroBlockRequiredRi
 org.xwiki.platform.security.requiredrights.internal.XDOMRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.RequiredRightObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.ScriptMacroAnalyzer
+org.xwiki.platform.security.requiredrights.internal.TranslationMessageSupplierProvider

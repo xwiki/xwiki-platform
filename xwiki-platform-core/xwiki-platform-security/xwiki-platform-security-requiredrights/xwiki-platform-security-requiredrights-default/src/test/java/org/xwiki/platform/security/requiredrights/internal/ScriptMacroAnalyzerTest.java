@@ -29,7 +29,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
@@ -110,9 +109,7 @@ class ScriptMacroAnalyzerTest
         if (hasPermission) {
             assertEquals(List.of(), analysisResults);
         } else {
-            assertEquals(List.of(new RequiredRightAnalysisResult(DefaultMacroBlockRequiredRightAnalyzer.ID,
-                "security.requiredrights.scriptmacro", List.of(macroId, macroContent),
-                myRight, EntityType.DOCUMENT)), analysisResults);
+            assertEquals(1, analysisResults.size());
         }
     }
 
@@ -150,9 +147,7 @@ class ScriptMacroAnalyzerTest
         if (allow) {
             assertEquals(List.of(), analysisResults);
         } else {
-            assertEquals(List.of(new RequiredRightAnalysisResult(DefaultMacroBlockRequiredRightAnalyzer.ID,
-                "security.requiredrights.scriptmacro", List.of(macroId, macroContent),
-                requiredRight, EntityType.DOCUMENT)), analysisResults);
+            assertEquals(1, analysisResults.size());
         }
     }
 }

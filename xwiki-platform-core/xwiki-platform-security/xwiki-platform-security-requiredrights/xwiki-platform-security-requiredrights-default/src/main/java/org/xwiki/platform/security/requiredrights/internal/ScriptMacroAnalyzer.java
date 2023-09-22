@@ -29,13 +29,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
-import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -59,6 +60,9 @@ public class ScriptMacroAnalyzer
     @Inject
     private ContextualAuthorizationManager authorizationManager;
 
+    @Inject
+    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+
     /**
      * @param macroBlock the macro block to analyze
      * @param macro the macro of the block
@@ -78,34 +82,30 @@ public class ScriptMacroAnalyzer
             MacroPermissionPolicy mpp =
                 this.componentManagerProvider.get()
                     .getInstance(MacroPermissionPolicy.class, macroBlock.getId());
-            if (mpp.hasPermission((ScriptMacroParameters) macroParameters, transformationContext)) {
-                // TODO: generate a warning if the user has script rights but not programming rights?
-                result = List.of();
-            } else {
-                result = generateScriptMacroError(macroBlock, macroBlock.getId(), mpp.getRequiredRight());
-            }
+            result = generateScriptMacroError(macroBlock, macroBlock.getId(), mpp.getRequiredRight());
         } catch (Exception ex) {
             if (macro instanceof PrivilegedScriptMacro) {
-                if (!this.authorizationManager.hasAccess(Right.PROGRAM)) {
-                    result = generateScriptMacroError(macroBlock, macroBlock.getId(), Right.PROGRAM);
-                } else {
-                    result = List.of();
-                }
-            } else if (!this.authorizationManager.hasAccess(Right.SCRIPT)) {
-                result = generateScriptMacroError(macroBlock, macroBlock.getId(), Right.SCRIPT);
+                result = generateScriptMacroError(macroBlock, macroBlock.getId(), Right.PROGRAM);
             } else {
-                // TODO: generate a warning as the user has script rights but not programming rights?
-                result = List.of();
+                result = generateScriptMacroError(macroBlock, macroBlock.getId(), Right.SCRIPT);
             }
         }
         return result;
     }
 
-    private static List<RequiredRightAnalysisResult> generateScriptMacroError(MacroBlock macroBlock, String macroId,
+    private List<RequiredRightAnalysisResult> generateScriptMacroError(MacroBlock macroBlock, String macroId,
         Right right)
     {
-        return List.of(new RequiredRightAnalysisResult(DefaultMacroBlockRequiredRightAnalyzer.ID,
-            "security.requiredrights.scriptmacro", List.of(macroId, macroBlock.getContent()),
-            right, EntityType.DOCUMENT));
+        EntityReference reference = null;
+        if (macroBlock.getRoot() instanceof XDOM) {
+            // TODO: extract the reference from the XDOM metadata.
+        }
+        return List.of(new RequiredRightAnalysisResult(reference,
+            this.translationMessageSupplierProvider.get("security.requiredrights.scriptmacro",
+                macroId),
+            this.translationMessageSupplierProvider.get("security.requiredrights.scriptmacro.description",
+                macroBlock.getContent()),
+            List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
+        ));
     }
 }

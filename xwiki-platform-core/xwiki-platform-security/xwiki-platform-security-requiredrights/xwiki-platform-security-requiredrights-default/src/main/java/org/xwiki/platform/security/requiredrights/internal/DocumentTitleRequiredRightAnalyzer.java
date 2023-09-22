@@ -20,13 +20,11 @@
 package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.event.Level;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
@@ -68,16 +66,6 @@ public class DocumentTitleRequiredRightAnalyzer implements RequiredRightAnalyzer
             result = this.stringVelocityRequiredRightAnalyzer.analyze(title);
         }
 
-        return result.stream()
-            .map(r -> {
-                    r.setAnalyzerHint(DocumentTitleRequiredRightAnalyzer.ID)
-                        .setMessage("security.requiredrights.title");
-                    if (this.contextualAuthorizationManager.hasAccess(Right.SCRIPT)) {
-                        r.setLevel(Level.WARN);
-                        r.setRequiredRight(Right.PROGRAM);
-                    }
-                    return r;
-                }
-            ).collect(Collectors.toList());
+        return result;
     }
 }

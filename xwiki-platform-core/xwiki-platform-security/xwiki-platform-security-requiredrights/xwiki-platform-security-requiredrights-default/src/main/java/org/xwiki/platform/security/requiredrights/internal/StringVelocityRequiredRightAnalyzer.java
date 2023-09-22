@@ -21,6 +21,7 @@ package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -49,14 +50,21 @@ public class StringVelocityRequiredRightAnalyzer implements RequiredRightAnalyze
      */
     public static final String ID = "string/velocity";
 
+    @Inject
+    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+
     @Override
     public List<RequiredRightAnalysisResult> analyze(String object) throws RequiredRightsException
     {
         List<RequiredRightAnalysisResult> result;
 
         if (StringUtils.containsAny(object, "#", "$")) {
-            result = List.of(new RequiredRightAnalysisResult(ID, "security.requiredrights.velocity", List.of(object),
-                Right.SCRIPT, EntityType.DOCUMENT));
+            return List.of(new RequiredRightAnalysisResult(null,
+                this.translationMessageSupplierProvider.get("security.requiredrights.velocity"),
+                this.translationMessageSupplierProvider.get("security.requiredrights.velocity.description",
+                    object),
+                List.of(new RequiredRightAnalysisResult.RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false))
+            ));
         } else {
             result = List.of();
         }

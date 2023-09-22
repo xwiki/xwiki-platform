@@ -163,7 +163,8 @@
       'label' : $services.localization.render('core.register.firstName'),
       'params' : {
         'type' : 'text',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'given-name'
       }
     })
   #set($discard = $fields.add($field))
@@ -174,7 +175,8 @@
       'label' : $services.localization.render('core.register.lastName'),
       'params' : {
         'type' : 'text',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'family-name'
       }
     })
   #set($discard = $fields.add($field))
@@ -186,7 +188,8 @@
       'params' : {
         'type' : 'text',
         'onfocus' : 'prepareName(document.forms.register);',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'username'
       },
       'validate' : {
         'mandatory' : {
@@ -217,7 +220,8 @@
       'label' : $services.localization.render('core.register.email'),
       'params' : {
         'type' : 'text',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'email'
       },
       'validate' : {
         'regex' : {

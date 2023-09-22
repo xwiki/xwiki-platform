@@ -27,13 +27,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.event.Level;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
@@ -44,10 +41,10 @@ import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseStringProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -128,49 +125,51 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         return List.of();
     }
 
-    protected List<RequiredRightAnalysisResult> analyzeTextAreaProperty(BaseObject object, String p,
+    protected List<RequiredRightAnalysisResult> analyzeTextAreaProperty(BaseObject object, String propertyName,
         TextAreaClass textAreaClass) throws RequiredRightsException
     {
         String contentTypeString = textAreaClass.getContentType();
         TextAreaClass.ContentType contentType =
             TextAreaClass.ContentType.getByValue(contentTypeString);
+        PropertyInterface field = object.getField(propertyName);
+
+        List<RequiredRightAnalysisResult> result = List.of();
 
         // No need to analyze restricted properties.
-        if (!textAreaClass.isRestricted()) {
-            // TODO: use LargeStringProperty, see com/xpn/xwiki/doc/XWikiDocument.java:5770
-            String value = object.getStringValue(p);
+        if (!textAreaClass.isRestricted() && field instanceof BaseStringProperty) {
+            String value = ((BaseStringProperty) field).getValue();
 
             switch (contentType) {
                 case VELOCITY_CODE:
-                    return this.stringVelocityRequiredRightAnalyzer.analyze(value);
+                    result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
+                    break;
                 case VELOCITYWIKI:
-                    if (StringUtils.isNotBlank(value)
-                        && !this.contextualAuthorizationManager.hasAccess(Right.PROGRAM))
-                    {
-                        if (this.contextualAuthorizationManager.hasAccess(Right.SCRIPT)) {
-                            return List.of(new RequiredRightAnalysisResult(ID,
-                                "security.requiredrights.velocitywiki", List.of(value),
-                                Right.PROGRAM, EntityType.DOCUMENT).setLevel(Level.WARN));
-                        } else {
-                            return List.of(new RequiredRightAnalysisResult(ID,
-                                "security.requiredrights.velocitywiki", List.of(value),
-                                Right.SCRIPT, EntityType.DOCUMENT));
-                        }
+                    result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
+                    // If there is no Velocity code, we analyze the content as wiki syntax.
+                    if (result.isEmpty()) {
+                        result = analyzeWikiContent(object, value);
                     }
                     break;
                 case WIKI_TEXT:
-                    try {
-                        XDOM parsedContent = this.contentParser.parse(value, object.getOwnerDocument().getSyntax(),
-                            object.getReference());
-                        return this.xdomRequiredRightAnalyzer.analyze(parsedContent);
-                    } catch (ParseException | MissingParserException e) {
-                        throw new RequiredRightsException("Failed to parse content of object property", e);
-                    }
+                    result = analyzeWikiContent(object, value);
+                    break;
                 default:
                     break;
             }
         }
 
-        return List.of();
+        return result;
+    }
+
+    private List<RequiredRightAnalysisResult> analyzeWikiContent(BaseObject object, String value)
+        throws RequiredRightsException
+    {
+        try {
+            XDOM parsedContent = this.contentParser.parse(value, object.getOwnerDocument().getSyntax(),
+                object.getReference());
+            return this.xdomRequiredRightAnalyzer.analyze(parsedContent);
+        } catch (ParseException | MissingParserException e) {
+            throw new RequiredRightsException("Failed to parse content of object property", e);
+        }
     }
 }

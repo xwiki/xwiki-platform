@@ -21,6 +21,7 @@ package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -28,12 +29,19 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ContentParser;
+import org.xwiki.rendering.parser.MissingParserException;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -42,6 +50,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,8 +69,19 @@ class DefaultObjectRequiredRightAnalyzerTest
     @Named("object/XWiki.TestClass")
     private RequiredRightAnalyzer<BaseObject> mockAnalyzer;
 
+    @MockComponent
+    @Named(StringVelocityRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<String> velocityAnalyzer;
+
+    @MockComponent
+    @Named(XDOMRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
+
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @Inject
+    private ContentParser contentParser;
 
     @Test
     void analyzeWithCustomAnalyzer() throws XWikiException, RequiredRightsException
@@ -76,5 +96,65 @@ class DefaultObjectRequiredRightAnalyzerTest
 
         assertEquals(List.of(mockResult), results);
         verify(this.mockAnalyzer).analyze(testObject);
+    }
+
+    @Test
+    void analyzeWithDefaultAnalyzer()
+        throws XWikiException, RequiredRightsException, MissingParserException, ParseException
+    {
+        DocumentReference classReference = new DocumentReference("wiki", "XWiki", "StandardClass");
+        XWikiDocument classDocument = new XWikiDocument(classReference);
+        BaseClass classObject = classDocument.getXClass();
+        String restrictedFieldName = "restricted";
+        classObject.addTextAreaField(restrictedFieldName, "Restricted", 80, 5,
+            TextAreaClass.EditorType.WYSIWYG.toString(), TextAreaClass.ContentType.WIKI_TEXT.toString(), true);
+        String wikiFieldName = "wiki";
+        classObject.addTextAreaField(wikiFieldName, "Wiki", 80, 5, TextAreaClass.EditorType.WYSIWYG.toString(),
+            TextAreaClass.ContentType.WIKI_TEXT.toString(), false);
+        String plainFieldName = "plain";
+        classObject.addTextAreaField(plainFieldName, "Plain", 80, 5, TextAreaClass.EditorType.PURE_TEXT.toString(),
+            TextAreaClass.ContentType.PURE_TEXT.toString(), false);
+        String velocityFieldName = "velocity";
+        classObject.addTextAreaField(velocityFieldName, "Velocity", 80, 5, TextAreaClass.EditorType.TEXT.toString(),
+            TextAreaClass.ContentType.VELOCITY_CODE.toString(), false);
+        String velocityWikiFieldName = "velocityWiki";
+        classObject.addTextAreaField(velocityWikiFieldName, "Velocity Wiki", 80, 5,
+            TextAreaClass.EditorType.TEXT.toString(), TextAreaClass.ContentType.VELOCITYWIKI.toString(), false);
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, this.oldcore.getXWikiContext());
+
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        Syntax testSyntax = mock();
+        testDocument.setSyntax(testSyntax);
+        BaseObject testObject = testDocument.newXObject(classReference, this.oldcore.getXWikiContext());
+        String restrictedContent = "Restricted $velocity {{groovy}}{{/groovy}}";
+        testObject.setLargeStringValue(restrictedFieldName, restrictedContent);
+        String wikiContent = "Wiki $velocity {{groovy}}{{/groovy}}";
+        testObject.setLargeStringValue(wikiFieldName, wikiContent);
+        String plainContent = "Plain $velocity {{groovy}}{{/groovy}}";
+        testObject.setLargeStringValue(plainFieldName, plainContent);
+        String velocityContent = "Velocity $velocity {{groovy}}{{/groovy}}";
+        testObject.setLargeStringValue(velocityFieldName, velocityContent);
+        String velocityWikiContent = "Velocity Wiki $velocity {{groovy}}{{/groovy}}";
+        testObject.setLargeStringValue(velocityWikiFieldName, velocityWikiContent);
+
+        XDOM wikiXDOM = mock();
+        when(this.contentParser.parse(wikiContent, testSyntax, testObject.getReference())).thenReturn(wikiXDOM);
+
+        RequiredRightAnalysisResult wikiResult = mock();
+        when(this.xdomRequiredRightAnalyzer.analyze(wikiXDOM)).thenReturn(List.of(wikiResult));
+
+        RequiredRightAnalysisResult velocityResult = mock();
+        when(this.velocityAnalyzer.analyze(velocityContent)).thenReturn(List.of(velocityResult));
+        RequiredRightAnalysisResult velocityWikiResult = mock();
+        when(this.velocityAnalyzer.analyze(velocityWikiContent)).thenReturn(List.of(velocityWikiResult));
+
+        List<RequiredRightAnalysisResult> results = this.analyzer.analyze(testObject);
+        verify(this.velocityAnalyzer).analyze(velocityContent);
+        verify(this.velocityAnalyzer).analyze(velocityWikiContent);
+        verifyNoMoreInteractions(this.velocityAnalyzer);
+        verify(this.xdomRequiredRightAnalyzer).analyze(wikiXDOM);
+        verifyNoMoreInteractions(this.xdomRequiredRightAnalyzer);
+
+        assertEquals(List.of(wikiResult, velocityResult, velocityWikiResult), results);
     }
 }

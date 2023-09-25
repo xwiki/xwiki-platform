@@ -62,7 +62,7 @@ require(['jquery', 'bootstrap'], function($) {
  */
 require(['jquery'], function($) {
   // The overlay is the same whatever the drawer opened.
-  let drawerOverlay = $(".drawer-overlay");
+  const drawerOverlay = $(".drawer-overlay");
   $('.drawer-toggle').each(function(index) {
     // Setting up the drawer.
     let drawerContainerToggler = $(this);

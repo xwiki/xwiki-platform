@@ -162,20 +162,19 @@ $response.setContentType("application/json")
     #end
   #end ## foreach rights object
   #set($row = {})
-  #set($userFirstName = $user.getValue('first_name'))
-  #set($userLastName = $user.getValue('last_name'))
-  #if($stringtool.isNotBlank($userFirstName) || $stringtool.isNotBlank($userLastName))
-    #set($userDisplayName = "$!{userFirstName} $!{userLastName} (${user.name})")
-  #else
-    #set($userDisplayName = $user.name)
-  #end
+  #set($isLocalUser = ($wikiname == 'local'))
   #set($discard = $row.put("username", $user.documentReference.name))
   #set($discard = $row.put("fullname", $username))
-  #set($discard = $row.put("title"   , $userDisplayName))
+  #set($discard = $row.put("title"   , $user.title))
   #set($discard = $row.put("wikiname", $wikiname))
   #set($discard = $row.put("userurl" , $xwiki.getURL($user.fullName)))
   #set($discard = $row.put("allows"  , $allows.keySet()))
   #set($discard = $row.put("denys"   , $denys.keySet()))
+  #if ($uorg == "users")
+    #set($discard = $row.put("userDisplayer", "#displayUser($user.documentReference, {'displayLink': $isLocalUser})"))
+  #else
+    #set($discard = $row.put("userDisplayer", "#displayGroup($user.documentReference, {'displayLink': $isLocalUser})"))
+  #end
   #if ($uorg == "groups")
     #set($discard = $row.put("isuseringroup", $xwiki.getUser().isUserInGroup($user.fullName)))
   #else

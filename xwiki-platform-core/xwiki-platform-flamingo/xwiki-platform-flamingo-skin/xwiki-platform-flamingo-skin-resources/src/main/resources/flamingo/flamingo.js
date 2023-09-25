@@ -80,8 +80,7 @@ require(['jquery'], function($) {
     drawerOverlay.on('click', closeDrawer);
 
     drawerContainer.on('drawer'+index+'.opened', function(event) {
-      drawerContainerToggler
-        .attr('aria-expanded', 'true');
+      drawerContainerToggler.attr('aria-expanded', 'true');
       // We update the state of the drawer (using setAttribute since it's faster)
       drawerContainer.get(0)
         .setAttribute('class', 'drawer-nav opened');

@@ -31,7 +31,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.xwiki.model.validation.internal.DefaultReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_FORBIDDENCHARACTERS;
 import static org.xwiki.model.validation.internal.DefaultReplaceCharacterEntityNameValidationConfiguration.PROPERTY_KEY_REPLACEMENTCHARACTERS;

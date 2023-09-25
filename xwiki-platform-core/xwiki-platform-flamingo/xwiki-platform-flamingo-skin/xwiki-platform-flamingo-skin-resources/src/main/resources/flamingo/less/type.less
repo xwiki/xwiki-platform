@@ -66,9 +66,9 @@
 @font-size-h5: ~"max(@{min-h5-font-size}, min(@{max-h5-font-size}, calc(@{min-h5-font-size} + (@{max-h5-font-size-no} - @{min-h5-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
 
 // H6
-@min-h6-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, -1)));
+@min-h6-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, -1)));
 @min-h6-font-size-no: unit(@min-h6-font-size);
-@max-h6-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, -1)));
+@max-h6-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, -1)));
 @max-h6-font-size-no: unit(@max-h6-font-size);
 @font-size-h6: ~"max(@{min-h6-font-size}, min(@{max-h6-font-size}, calc(@{min-h6-font-size} + (@{max-h6-font-size-no} - @{min-h6-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
 

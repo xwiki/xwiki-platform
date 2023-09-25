@@ -125,17 +125,7 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Class moved from xwiki-platform-model-validation-default to xwiki-platform-model-validation-api</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.model.validation.script.ModelValidationScriptService</old>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

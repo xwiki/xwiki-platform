@@ -15,29 +15,82 @@
 
 // Headings ===============================================================
 
-// Headings are using Modular Scale (i.e. there is an harmonious
-// relationship between values in the scale).
-// We are using http://www.modularscale.com/?1&em&1.125&web&table
-//
-// In addition, we ensure headings are always taller than regular text,
-// which seems more logical even if it does not follow the W3C
-// recommendations.
-//
-@font-size-h1: ceil((@font-size-base * 2.027));
-@font-size-h2: ceil((@font-size-base * 1.802));
-@font-size-h3: ceil((@font-size-base * 1.602));
-@font-size-h4: ceil((@font-size-base * 1.424));
-@font-size-h5: ceil((@font-size-base * 1.266));
-@font-size-h6: ceil((@font-size-base * 1.125));
 
-@font-size-document-title: ceil((@font-size-base * 2.42)); // ~34px
+// Since 15.9RC1: Defines the ratio between two headings levels (e.g., h1 is @font-size-headings-scale times larger than
+// h2)?
+@font-size-headings-scale: 1.250;
+@font-size-headings-scale-min: 1.125;
+@min-screen-size: 768px;
+@max-screen-size: 1200px;
+@min-screen-size-no: unit(@min-screen-size);
+@max-screen-size-no: unit(@max-screen-size);
+
+// Headings size is following a scale where each level is X times larger than the lower level.
+// Heading 5 is the same size as the base font size
+// The sizes documented for each level are indicative and correspond to a 1.250 scale and a default font size of 14px. 
+// H1
+@min-h1-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, 4)));
+@min-h1-font-size-no: unit(@min-h1-font-size);
+@max-h1-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, 4)));
+@max-h1-font-size-no: unit(@max-h1-font-size);
+@font-size-h1: ~"max(@{min-h1-font-size}, min(@{max-h1-font-size}, calc(@{min-h1-font-size} + (@{max-h1-font-size-no} - @{min-h1-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
+
+
+
+// H2
+@min-h2-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, 3)));
+@min-h2-font-size-no: unit(@min-h2-font-size);
+@max-h2-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, 3)));
+@max-h2-font-size-no: unit(@max-h2-font-size);
+@font-size-h2: ~"max(@{min-h2-font-size}, min(@{max-h2-font-size}, calc(@{min-h2-font-size} + (@{max-h2-font-size-no} - @{min-h2-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
+
+// H3
+@min-h3-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, 2)));
+@min-h3-font-size-no: unit(@min-h3-font-size);
+@max-h3-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, 2)));
+@max-h3-font-size-no: unit(@max-h3-font-size);
+@font-size-h3: ~"max(@{min-h3-font-size}, min(@{max-h3-font-size}, calc(@{min-h3-font-size} + (@{max-h3-font-size-no} - @{min-h3-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
+
+// H4
+@min-h4-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, 1)));
+@min-h4-font-size-no: unit(@min-h4-font-size);
+@max-h4-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, 1)));
+@max-h4-font-size-no: unit(@max-h4-font-size);
+@font-size-h4: ~"max(@{min-h4-font-size}, min(@{max-h4-font-size}, calc(@{min-h4-font-size} + (@{max-h4-font-size-no} - @{min-h4-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
+
+// H5
+@min-h5-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, 0)));
+@min-h5-font-size-no: unit(@min-h5-font-size);
+@max-h5-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, 0)));
+@max-h5-font-size-no: unit(@max-h5-font-size);
+@font-size-h5: ~"max(@{min-h5-font-size}, min(@{max-h5-font-size}, calc(@{min-h5-font-size} + (@{max-h5-font-size-no} - @{min-h5-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
+
+// H6
+@min-h6-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, -1)));
+@min-h6-font-size-no: unit(@min-h6-font-size);
+@max-h6-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, -1)));
+@max-h6-font-size-no: unit(@max-h6-font-size);
+@font-size-h6: ~"max(@{min-h6-font-size}, min(@{max-h6-font-size}, calc(@{min-h6-font-size} + (@{max-h6-font-size-no} - @{min-h6-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
+
+// The document title is a h1 heading one size higher in the size scale 
+// (e.g., 1.250 larger than the content's h1 headings)
+
+// Document title
+@min-document-title-font-size: ceil((@font-size-base * pow(@font-size-headings-scale-min, 5)));
+@min-document-title-font-size-no: unit(@min-document-title-font-size);
+@max-document-title-font-size: ceil((@font-size-base * pow(@font-size-headings-scale, 5)));
+@max-document-title-font-size-no: unit(@max-document-title-font-size);
+//@font-size-document-title-tmp: calc(~"@{min-document-title-font-size} + (@{max-document-title-font-size-no} - @{min-document-title-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no})"); // Between 35 and 23px according to screen size
+@font-size-document-title: ~"max(@{min-document-title-font-size}, min(@{max-document-title-font-size}, calc(@{min-document-title-font-size} + (@{max-document-title-font-size-no} - @{min-document-title-font-size-no}) * (100vw - @{min-screen-size}) / (@{max-screen-size-no} - @{min-screen-size-no}))))";
+
 #document-title h1 {
   font-size: @font-size-document-title;
   margin-top: 0;
 }
 
 h1.xwikipaneltitle {
-  font-size: ceil((@font-size-base * 1.42)); // ~18px;
+  // Panels headings are the same size as the content's h3 headings.
+  font-size: @font-size-h3;
 }
 
 // Muted Usage ============================================================

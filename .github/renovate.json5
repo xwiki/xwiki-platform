@@ -4,5 +4,11 @@
       "matchDatasources": ["maven"],
       "registryUrls": ["https://nexus.xwiki.org/nexus/content/repositories/public/"]
     }
+  ],
+  [
+    {
+      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:"],
+      "enabled": false
+    }
   ]
 }

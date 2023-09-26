@@ -29,11 +29,15 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
@@ -58,6 +62,10 @@ public class ScriptMacroAnalyzer
 
     @Inject
     private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * @param macroBlock the macro block to analyze
@@ -92,10 +100,8 @@ public class ScriptMacroAnalyzer
     private List<RequiredRightAnalysisResult> generateResult(MacroBlock macroBlock, String macroId,
         Right right)
     {
-        EntityReference reference = null;
-        if (macroBlock.getRoot() instanceof XDOM) {
-            // TODO: extract the reference from the XDOM metadata.
-        }
+        EntityReference reference = extractSourceReference(macroBlock);
+
         return List.of(new RequiredRightAnalysisResult(reference,
             this.translationMessageSupplierProvider.get("security.requiredrights.scriptmacro",
                 macroId, right),
@@ -103,5 +109,28 @@ public class ScriptMacroAnalyzer
                 macroBlock.getContent()),
             List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
         ));
+    }
+
+    private EntityReference extractSourceReference(Block source)
+    {
+        EntityReference result = null;
+        // First try the entity reference metadata.
+        MetaDataBlock metaDataBlock =
+            source.getFirstBlock(new MetadataBlockMatcher(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA),
+                Block.Axes.ANCESTOR);
+
+        if (metaDataBlock != null && metaDataBlock.getMetaData()
+            .getMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA) instanceof EntityReference) {
+            result = (EntityReference) metaDataBlock.getMetaData()
+                .getMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA);
+        } else {
+            metaDataBlock = source.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
+            if (metaDataBlock != null) {
+                result =
+                    this.documentReferenceResolver.resolve(
+                        (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE));
+            }
+        }
+        return result;
     }
 }

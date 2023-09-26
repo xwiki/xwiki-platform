@@ -27,12 +27,16 @@ import javax.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
@@ -40,13 +44,18 @@ import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
+import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -61,6 +70,8 @@ import static org.mockito.Mockito.withSettings;
  * @version $Id$
  */
 @ComponentTest
+@ReferenceComponentList
+@ComponentList({ ContextComponentManagerProvider.class })
 class ScriptMacroAnalyzerTest
 {
     @InjectMockComponents
@@ -73,19 +84,29 @@ class ScriptMacroAnalyzerTest
     private TranslationMessageSupplierProvider translationMessageSupplierProvider;
 
     @MockComponent
-    @Named("context")
-    private ComponentManager contextComponentManager;
+    @Named("myScript")
+    private MacroPermissionPolicy macroPermissionPolicy;
 
     @Test
-    void analyzeWithMacroPermissionPolicy() throws Exception
+    void analyzeWithMacroPermissionPolicy(MockitoComponentManager componentManager) throws Exception
     {
-        MacroBlock macroBlock = mock();
+        // Make sure that the BaseObjectReference constructor works as it needs Utils to have the component manager.
+        Utils.setComponentManager(componentManager);
+
+        // Create the macro block.
         String macroId = "myScript";
-        when(macroBlock.getId()).thenReturn(macroId);
         String macroContent = "#Script";
-        when(macroBlock.getContent()).thenReturn(macroContent);
-        Map<String, String> parameters = mock();
-        when(macroBlock.getParameters()).thenReturn(parameters);
+        Map<String, String> parameters = Map.of("key", "value");
+        MacroBlock macroBlock = new MacroBlock(macroId, parameters, macroContent, false);
+
+        // Create XDOM to get the source reference from.
+        MetaData metaData = new MetaData();
+        new XDOM(List.of(macroBlock), metaData);
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "Class");
+        BaseObjectReference objectReference = new BaseObjectReference(classReference, 1, documentReference);
+        ObjectPropertyReference propertyReference = new ObjectPropertyReference("testProperty", objectReference);
+        metaData.addMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA, propertyReference);
 
         // Mock the descriptor with the parameters bean class.
         Macro<?> macro = mock();
@@ -93,11 +114,8 @@ class ScriptMacroAnalyzerTest
         when(macro.getDescriptor()).thenReturn(macroDescriptor);
         doReturn(ScriptMacroParameters.class).when(macroDescriptor).getParametersBeanClass();
 
-        MacroPermissionPolicy mpp = mock();
-        when(this.contextComponentManager.getInstance(MacroPermissionPolicy.class, macroId)).thenReturn(mpp);
-
         Right myRight = mock();
-        when(mpp.getRequiredRight()).thenReturn(myRight);
+        when(this.macroPermissionPolicy.getRequiredRight()).thenReturn(myRight);
 
         MacroTransformationContext macroTransformationContext = mock();
         List<RequiredRightAnalysisResult> analysisResults =
@@ -108,8 +126,7 @@ class ScriptMacroAnalyzerTest
 
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
-        // TODO: fix to expect a real reference.
-        assertNull(analysisResult.getEntityReference());
+        assertEquals(propertyReference, analysisResult.getEntityReference());
         RequiredRightAnalysisResult.RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
         assertEquals(myRight, requiredRight.getRight());
         assertFalse(requiredRight.isOptional());
@@ -120,14 +137,17 @@ class ScriptMacroAnalyzerTest
     @ValueSource(booleans = { true, false })
     void analyzeWithFallback(boolean isPrivileged) throws ComponentLookupException
     {
-        String macroId = "myScript";
-        when(this.contextComponentManager.getInstance(MacroPermissionPolicy.class, macroId))
-            .thenThrow(new ComponentLookupException("Not found"));
+        String macroId = "fallback";
 
-        MacroBlock macroBlock = mock();
-        when(macroBlock.getId()).thenReturn(macroId);
         String macroContent = "#Script";
-        when(macroBlock.getContent()).thenReturn(macroContent);
+        Map<String, String> parameters = Map.of("key", "value");
+        MacroBlock macroBlock = new MacroBlock(macroId, parameters, macroContent, false);
+
+        // Create XDOM with source metadata set to check that it is resolved.
+        MetaData metaData = new MetaData();
+        new XDOM(List.of(macroBlock), metaData);
+        metaData.addMetaData(MetaData.SOURCE, "xwiki:Space.Page");
+
         MacroDescriptor macroDescriptor = mock(MacroDescriptor.class);
         doReturn(ScriptMacroParameters.class).when(macroDescriptor).getParametersBeanClass();
 
@@ -138,16 +158,13 @@ class ScriptMacroAnalyzerTest
 
         List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(macroBlock, macro, mock());
 
-        // Check that the macro permission policy was looked up.
-        verify(this.contextComponentManager).getInstance(MacroPermissionPolicy.class, macroId);
         // Check that the translation message supplier was called.
         verify(this.translationMessageSupplierProvider)
             .get("security.requiredrights.scriptmacro", macroId, requiredRight);
         // Check that the result is correct.
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
-        // TODO: fix to expect a real reference.
-        assertNull(analysisResult.getEntityReference());
+        assertEquals(new DocumentReference("xwiki", "Space", "Page"), analysisResult.getEntityReference());
         RequiredRightAnalysisResult.RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
         assertFalse(requiredRightResult.isOptional());

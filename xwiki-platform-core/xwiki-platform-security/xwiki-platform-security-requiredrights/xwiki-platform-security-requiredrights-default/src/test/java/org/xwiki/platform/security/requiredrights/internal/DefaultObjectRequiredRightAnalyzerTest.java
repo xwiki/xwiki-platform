@@ -137,8 +137,8 @@ class DefaultObjectRequiredRightAnalyzerTest
         String velocityWikiContent = "Velocity Wiki $velocity {{groovy}}{{/groovy}}";
         testObject.setLargeStringValue(velocityWikiFieldName, velocityWikiContent);
 
-        XDOM wikiXDOM = mock();
-        when(this.contentParser.parse(wikiContent, testSyntax, testObject.getReference())).thenReturn(wikiXDOM);
+        XDOM wikiXDOM = new XDOM(List.of());
+        when(this.contentParser.parse(wikiContent, testSyntax, testObject.getDocumentReference())).thenReturn(wikiXDOM);
 
         RequiredRightAnalysisResult wikiResult = mock();
         when(this.xdomRequiredRightAnalyzer.analyze(wikiXDOM)).thenReturn(List.of(wikiResult));
@@ -154,6 +154,10 @@ class DefaultObjectRequiredRightAnalyzerTest
         verifyNoMoreInteractions(this.velocityAnalyzer);
         verify(this.xdomRequiredRightAnalyzer).analyze(wikiXDOM);
         verifyNoMoreInteractions(this.xdomRequiredRightAnalyzer);
+        assertEquals(testObject.getField(wikiFieldName).getReference(),
+            wikiXDOM.getMetaData().getMetaData().get(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA));
+        verify(velocityResult).setEntityReference(testObject.getField(velocityFieldName).getReference());
+        verify(velocityWikiResult).setEntityReference(testObject.getField(velocityWikiFieldName).getReference());
 
         assertEquals(List.of(wikiResult, velocityResult, velocityWikiResult), results);
     }

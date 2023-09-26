@@ -147,11 +147,11 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
                         result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
                         // If there is no Velocity code, we analyze the content as wiki syntax.
                         if (result.isEmpty()) {
-                            result = analyzeWikiContent(object, value);
+                            result = analyzeWikiContent(object, value, field.getReference());
                         }
                         break;
                     case WIKI_TEXT:
-                        result = analyzeWikiContent(object, value);
+                        result = analyzeWikiContent(object, value, field.getReference());
                         break;
                     default:
                         break;
@@ -159,15 +159,25 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
             }
         }
 
+        // If the entity reference is null, set the reference of the field (e.g., the velocity analyzer has currently
+        // no way to know the reference).
+        result.forEach(analysisResult -> {
+            if (analysisResult.getEntityReference() == null) {
+                analysisResult.setEntityReference(field.getReference());
+            }
+        });
+
         return result;
     }
 
-    private List<RequiredRightAnalysisResult> analyzeWikiContent(BaseObject object, String value)
+    private List<RequiredRightAnalysisResult> analyzeWikiContent(BaseObject object, String value,
+        EntityReference reference)
         throws RequiredRightsException
     {
         try {
             XDOM parsedContent = this.contentParser.parse(value, object.getOwnerDocument().getSyntax(),
-                object.getReference());
+                object.getDocumentReference());
+            parsedContent.getMetaData().addMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA, reference);
             return this.xdomRequiredRightAnalyzer.analyze(parsedContent);
         } catch (ParseException | MissingParserException e) {
             throw new RequiredRightsException("Failed to parse content of object property", e);

@@ -36,6 +36,7 @@ import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -113,8 +114,13 @@ public class DefaultMacroBlockRequiredRightAnalyzer implements RequiredRightAnal
                 result = this.scriptMacroAnalyzer.analyze(macroBlock, macro, transformationContext);
             } else if (macro != null && this.shouldMacroContentBeParsed(macro)) {
                 try {
+                    // Keep whatever metadata was present on the XDOM.
+                    MetaData metaData = null;
+                    if (macroBlock.getRoot() instanceof XDOM) {
+                        metaData = new MetaData(((XDOM) macroBlock.getRoot()).getMetaData().getMetaData());
+                    }
                     XDOM xdom = this.macroContentParser
-                        .parse(macroBlock.getContent(), transformationContext, false, macroBlock.isInline());
+                        .parse(macroBlock.getContent(), transformationContext, false, metaData, macroBlock.isInline());
                     result = this.xdomRequiredRightAnalyzer.analyze(xdom);
                 } catch (MacroExecutionException e1) {
                     // TODO: should we really throw an exception here? Or just log a warning or add an analysis

@@ -52,6 +52,11 @@ public class XDOMRequiredRightAnalyzer implements RequiredRightAnalyzer<XDOM>
      */
     public static final String ID = "xdom";
 
+    /**
+     * The identifier of the metadata property that contains the source entity reference.
+     */
+    public static final String ENTITY_REFERENCE_METADATA = "entityReference";
+
     /** Provider for the default macro block analyzer to avoid a cyclic dependency. */
     @Inject
     @Named(DefaultMacroBlockRequiredRightAnalyzer.ID)

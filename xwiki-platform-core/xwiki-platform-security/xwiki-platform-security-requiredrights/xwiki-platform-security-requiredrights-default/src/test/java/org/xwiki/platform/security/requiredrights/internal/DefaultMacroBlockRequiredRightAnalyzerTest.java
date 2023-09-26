@@ -20,6 +20,7 @@
 package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
@@ -31,6 +32,7 @@ import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroId;
@@ -133,11 +135,15 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
     @ValueSource(booleans = { true, false })
     void analyzeContentRecursively(boolean isWikiContent) throws Exception
     {
-        MacroBlock block = mock();
         String macroName = "wikimacro";
-        when(block.getId()).thenReturn(macroName);
         String testContent = "TEST_CONTENT";
-        when(block.getContent()).thenReturn(testContent);
+        Map<String, String> parameters = Map.of("key", "parameter");
+        MacroBlock block = new MacroBlock(macroName, parameters, testContent, false);
+
+        // Create an XDOM block that acts as root.
+        MetaData metaDataOuter = new MetaData();
+        metaDataOuter.addMetaData(MetaData.SOURCE, "xwiki:Space.Page");
+        new XDOM(List.of(block), metaDataOuter);
 
         // Create a fake syntax to create the macro id.
         Syntax syntax = mock();
@@ -155,7 +161,9 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
         when(macroDescriptor.getContentDescriptor()).thenReturn(contentDescriptor);
 
         XDOM xdom = mock();
-        when(this.macroContentParser.parse(eq(testContent), any(), eq(false), eq(false))).thenReturn(xdom);
+        when(xdom.getMetaData()).thenReturn(metaDataOuter);
+        when(this.macroContentParser.parse(eq(testContent), any(), eq(false), eq(metaDataOuter), eq(false)))
+            .thenReturn(xdom);
 
         RequiredRightAnalysisResult mockResult = mock();
         when(this.xdomRequiredRightAnalyzer.analyze(xdom)).thenReturn(List.of(mockResult));
@@ -163,7 +171,7 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
         List<RequiredRightAnalysisResult> result = this.analyzer.analyze(block);
 
         if (isWikiContent) {
-            verify(this.macroContentParser).parse(eq(testContent), any(), eq(false), eq(false));
+            verify(this.macroContentParser).parse(eq(testContent), any(), eq(false), eq(metaDataOuter), eq(false));
             verify(this.xdomRequiredRightAnalyzer).analyze(xdom);
             assertEquals(List.of(mockResult), result);
         } else {

@@ -37,7 +37,7 @@
     <module>xwiki-platform-ckeditor-webjar</module>
   </modules>
   <properties>
-    <ckeditor.version>4.21.0</ckeditor.version>
+    <ckeditor.version>4.22.1</ckeditor.version>
   </properties>
   <profiles>
     <profile>

@@ -1422,6 +1422,17 @@
             </extensionOverrides>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.xwiki.contrib</groupId>
+          <artifactId>jshint-maven-plugin</artifactId>
+          <!-- Lock down plugin version for build reproducibility -->
+          <version>1.7.1</version>
+          <configuration>
+            <globals>require,define</globals>
+            <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
+            <options>esversion:11,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,camelcase,maxlen:120</options>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

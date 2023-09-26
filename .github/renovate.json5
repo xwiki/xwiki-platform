@@ -1,26 +1,22 @@
 {
-  // Indicate the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
   "packageRules": [
+    // Indicate the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
     {
       "matchDatasources": ["maven"],
       "registryUrls": ["https://nexus.xwiki.org/nexus/content/repositories/public/"]
-    }
-  ],
+    },
 
-  // There is no point trying to find updates for commons, rendering and platform dependencies
-  [
+    // There is no point trying to find updates for commons, rendering and platform dependencies
     {
       "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:"],
       "enabled": false
-    }
-  ],
+    },
 
-  // We don't want to know about major updates of Jetty
-  [
+    // We don't want to know about major updates of Jetty
     {
       "matchPackagePrefixes": ["org.eclipse.jetty"],
       "matchUpdateTypes": ["major"],
       "enabled": false
     }
-  ],
+  ]
 }

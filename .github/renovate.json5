@@ -15,11 +15,16 @@
       "enabled": false
     },
 
-    // We don't want to know about major updates of Jetty
+    // We have to stay on Jetty Client 9 for now
     {
       "matchPackagePrefixes": ["org.eclipse.jetty"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
+      "allowedVersions": "/^9\..*$/"
+    },
+
+    // But we can use Jetty Server 10
+    {
+      "matchPackageNames": ["org.eclipse.jetty:jetty-server"],
+      "allowedVersions": "/^10\..*$/"
     }
   ]
 }

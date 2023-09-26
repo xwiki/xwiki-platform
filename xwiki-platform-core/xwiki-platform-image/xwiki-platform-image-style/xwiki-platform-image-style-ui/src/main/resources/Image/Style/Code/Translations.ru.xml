@@ -52,6 +52,7 @@ image.style.administration.liveData.type.hint=Тип стиля изображе
 image.style.administation.newImageStyle.label=Новый стиль изображений
 image.style.administation.newImageStyle.hint=Идентификатор нового стиля изображений.
 image.style.administation.newImageStyle.placeHolder=Идентификатор
+image.style.administation.newImageStyle.normalizedTitle=Новый стиль изображения, в соответствии с соглашениями об именовании, имеет вид [{0}].
 Image.Style.Code.ImageStyleClass_adjustableAlignment=Настраиваемое выравнивание
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Если галочка установлена, пользователь может настраивать выравнивание изображения.
 Image.Style.Code.ImageStyleClass_adjustableBorder=Настраиваемая рамка

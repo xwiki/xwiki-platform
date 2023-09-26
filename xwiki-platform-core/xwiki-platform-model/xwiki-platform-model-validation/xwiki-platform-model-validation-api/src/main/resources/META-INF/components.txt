@@ -1,0 +1,2 @@
+org.xwiki.model.validation.edit.EditConfirmationScriptService
+org.xwiki.model.validation.script.ModelValidationScriptService

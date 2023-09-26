@@ -85,7 +85,11 @@
 #macro(displayNotificationLeftCell $event)
   #set ($eventDescriptor = $services.eventstream.getDescriptorForEventType($event.type, $xcontext.isMainWiki()))
   ## TODO: Display the event icon (but without Font Awesome because it does not work on most email client)
-  <strong>$!escapetool.xml($eventDescriptor.applicationName)</strong>
+  #set ($applicationName = $services.localization.render($eventDescriptor.applicationName))
+  #if ("$!applicationName" == '')
+    #set ($applicationName = $eventDescriptor.applicationName)
+  #end
+  <strong>$!escapetool.xml($applicationName)</strong>
 #end
 
 #macro(displayNotificationPage $event)
@@ -102,18 +106,7 @@
 #end
 
 #macro(displayNotificationDescription $event)
-  #if ($event.users.size() == 1)
-    <div>
-      $services.localization.render("notifications.events.${event.type}.description.by.1user", ["#displayEmailNotificationEventUsers($event.users, true, false)"])
-    </div>
-  #else
-    <div>
-      $services.localization.render("notifications.events.${event.type}.description.by.users", [$event.users.size()])
-    </div>
-    <div>
-      #displayEmailNotificationEventUsers($event.users, true, true)
-    </div>
-  #end
+  #displayCompositeEventDescription($event)
 #end
 
 

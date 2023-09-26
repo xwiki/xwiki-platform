@@ -24,6 +24,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.xwiki.cache.internal.DefaultCacheControl;
 import org.xwiki.classloader.internal.DefaultClassLoaderManager;
 import org.xwiki.classloader.internal.ExtendedURLStreamHandlerFactory;
 import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
@@ -303,7 +304,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     InternalTemplateManager.class,
     TemplateContext.class,
     VelocityTemplateEvaluator.class,
-    TemplateAsyncRenderer.class
+    TemplateAsyncRenderer.class,
+    DefaultCacheControl.class
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList

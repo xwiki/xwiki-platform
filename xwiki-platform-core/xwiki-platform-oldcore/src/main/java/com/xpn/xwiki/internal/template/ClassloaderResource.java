@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.template;
 
 import java.net.URL;
+import java.time.Instant;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.filter.input.DefaultURLInputSource;
@@ -40,6 +41,13 @@ public class ClassloaderResource extends AbstractInputSourceResource<URLInputSou
     public ClassloaderResource(URL url, String resourceName)
     {
         super(url.toExternalForm(), resourceName, null, new DefaultURLInputSource(url));
+    }
+
+    @Override
+    public Instant getInstant() throws Exception
+    {
+        // TODO: return the date of the package file holding the resource
+        return null;
     }
 
     @Override

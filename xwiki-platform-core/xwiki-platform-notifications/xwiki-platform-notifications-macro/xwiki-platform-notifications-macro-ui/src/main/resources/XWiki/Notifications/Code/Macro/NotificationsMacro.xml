@@ -400,12 +400,11 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       notif.attr('data-eventtype', entry.type);
       // Put the content
       notif.append(entry.html);
-      // Create the "read" button
-      var readButton = $('&lt;button&gt;');
+      // Enable the "read" button
+      var readButton = notif.find('.notification-event-read-button');
       if (!entry.read &amp;&amp; self.displayReadStatus) {
-        notif.addClass('notification-event-unread');
-        // Add the "mark as read" button
-        notif.find('.notification-content').prepend(readButton);
+        readButton.prop('disabled', false);
+        readButton.removeClass('hidden');
       }
       if (entry.exception) {
         var exceptionBox = $('&lt;div&gt;').addClass('box errormessage');
@@ -420,13 +419,6 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       self.insertElementInMacroContainer(notif);
       // Add the "mark as read" button if the notif is not already read
       if (!entry.read) {
-        // Style the read button
-        readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-        // Insert the cross icon and an accessible label
-        var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
-        readButton.attr('aria-label', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
-        readButton.attr('title', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
-        readButton.append(readButtonIcon);
         // On click
         readButton.on('click', function() {
           var notif = $(this).parents('div.notification-event');
@@ -595,18 +587,11 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       if (!entry.data('augmented')) {
         // Ensure to not call twice this method.
         entry.data('augmented', true);
-        // Create the "read" button
-        var readButton = $('&lt;button&gt;');
         if (entry.hasClass("notification-event-unread") &amp;&amp; self.displayReadStatus) {
-          // Add the "mark as read" button
-          entry.find('.notification-content').prepend(readButton);
-          // Style the read button
-          readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-          // Insert the cross icon and an accessible label
-          var readButtonIcon = $("$escapetool.javascript($services.icon.renderHTML('check'))");
-          readButton.attr('aria-label', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
-          readButton.attr('title', "$escapetool.javascript($services.localization.render('notifications.macro.markEventAsRead'))");
-          readButton.append(readButtonIcon);
+          // Enable the "read" button
+          var readButton = entry.find('.notification-event-read-button');
+          readButton.prop('disabled', false);
+          readButton.removeClass('hidden');
           // On click
           readButton.on('click', function() {
             var notif = $(this).parents('div.notification-event');

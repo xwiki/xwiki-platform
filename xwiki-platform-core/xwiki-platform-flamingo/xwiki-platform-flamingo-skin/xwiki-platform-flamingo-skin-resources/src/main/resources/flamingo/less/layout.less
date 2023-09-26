@@ -254,10 +254,6 @@
   padding-bottom: (@grid-gutter-width / 2);
 }
 
-#mainContentArea > .xcontent {
-  margin-top: (@line-height-computed / 2);
-}
-
 #xwikicontent {
   overflow: auto;
 }
@@ -295,6 +291,7 @@
   }
 }
 
+#hierarchy_breadcrumb,
 #mainContentArea,
 #xdocFooter,
 #docextrapanes {
@@ -302,6 +299,23 @@
   box-shadow: 0 1px 2px @xwiki-border-color;
   margin: 0 -@grid-gutter-width;
   padding: @line-height-computed @grid-gutter-width;
+}
+
+#hierarchy_breadcrumb {
+  padding-bottom: 0;
+
+  .breadcrumb {
+    margin-bottom: 0;
+  }
+}
+
+/* Protect against nesting of the breadcrumb inside #mainContentArea, e.g., in AdminSheet and other containers that
+already take care of padding and shadow. */
+#mainContentArea #hierarchy_breadcrumb, #xwikieditor #hierarchy_breadcrumb {
+  padding-bottom: @line-height-computed;
+  /* Padding and shadow is already in the #mainContentArea element */
+  padding-top: 0;
+  box-shadow: none;
 }
 
 #docextrapanes {

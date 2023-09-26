@@ -19,8 +19,9 @@
 ## ---------------------------------------------------------------------------
 #template("startpage.vm")
 <div class="main layoutsubsection">
-  <div id="mainContentArea">
-    #template('hierarchy.vm')
+  #template('hierarchy.vm')
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     ## ---------------------------------------------------------------------------------------------------------
     ## Since this template can be used for creating a Page or a Space, compute its title based on the passed
     ## "tocreate" parameter which can be either "page" or "space". If no "tocreate" parameter is passed then we
@@ -36,6 +37,6 @@
       #displayDocumentTitle($stepTitle)
       #template("createinline.vm")
     </div>## xcontent
-  </div>## mainContentArea
+  </main>## mainContentArea
 </div>## main
 #template("endpage.vm")

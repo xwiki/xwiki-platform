@@ -19,6 +19,10 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -51,10 +56,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for PDF export.
@@ -105,6 +106,7 @@ class PDFExportIT
 
         // Make sure we start with the default settings.
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
+        adminSection.getTemplatesInput().sendKeys("custom").waitForSuggestions().selectByVisibleText("CustomTemplate");
         adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
 
         if (!testConfiguration.getServletEngine().isOutsideDocker()) {
@@ -272,7 +274,7 @@ class PDFExportIT
         templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: "));
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
-        templateEditPage.setHeader(templateEditPage.getHeader().replace("$esc", "Chapter: $esc"));
+        templateEditPage.setHeader(templateEditPage.getHeader().replaceFirst("<span ", "Chapter: <span "));
         templateEditPage.setFooter(templateEditPage.getFooter().replaceFirst("<span ", "Page <span "));
         templateEditPage.clickSaveAndContinue();
 
@@ -616,10 +618,9 @@ class PDFExportIT
             assertEquals(2, pdf.getNumberOfPages());
 
             String content = pdf.getTextFromPage(1);
-            assertEquals("FormFields\n2 / 2\n" + "Title modified\n"
-                + " Blue  Yellow  Red\n" + "Paris\n" + "Comedy\nDrama\nRomance\n"
-                + "description modified\n" + "Submit\n"
-                + "TITLE\n" + " ENABLED\n" + "COLOR\n" + "CITY\n" + "GENRE\n" + "DESCRIPTION\n", content);
+            assertEquals("FormFields\n2 / 2\n" + "Title modified\n" + " Blue  Yellow  Red\n" + "Paris\n"
+                + "Comedy\nDrama\nRomance\n" + "description modified\n" + "Submit\n" + "TITLE\n" + " ENABLED\n"
+                + "COLOR\n" + "CITY\n" + "GENRE\n" + "DESCRIPTION\n", content);
         }
     }
 
@@ -787,8 +788,8 @@ class PDFExportIT
         throws Exception
     {
         Callable<Void> verifyPDFExport = () -> {
-            ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent",
-                "Child"), "WebHome"));
+            ViewPage viewPage =
+                setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
             PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
             try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
@@ -950,6 +951,117 @@ class PDFExportIT
                 + thirdPageContent.substring(0, 40);
             fragment = fragment.replace("\n", " ");
             assertTrue(expectedContent.contains(fragment), "Missing content: " + fragment);
+        }
+    }
+
+    @Test
+    @Order(19)
+    void largeTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeTable"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(39, pdf.getNumberOfPages());
+
+            // Verify the content of the last page.
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
+            // Verify that the text from the last cell is present.
+            assertTrue(text.contains("1000, 10"), "Unexpected content: " + text);
+        }
+    }
+
+    /**
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-21295">Some large documents may be exported only partially now
+     *      with the new PDF Export</a>
+     */
+    @Test
+    @Order(20)
+    void largeExcelImport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeExcelImport"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(55, pdf.getNumberOfPages());
+
+            // Verify the content of the last page.
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
+            // Verify that the text from the last table row is present.
+            assertTrue(text.contains("Reuters US Online Report - Technology end"), "Unexpected content: " + text);
+            assertTrue(text.contains("with a special focus on the US.end"), "Unexpected content: " + text);
+            assertTrue(text.contains("English end"), "Unexpected content: " + text);
+            assertTrue(text.contains("Pictures and graphics end"), "Unexpected content: " + text);
+            assertTrue(text.contains("delivered via the internet end"), "Unexpected content: " + text);
+        }
+    }
+
+    @Test
+    @Order(21)
+    void singlePageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+
+        // Check single page export first.
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        exportTreeModal.export();
+
+        // Use the custom template which displays the page tags in the PDF footer.
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+        exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one content page.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the metadata is displayed only once (only in the footer of the content page).
+            assertEquals(1, StringUtils.countMatches(pdf.getText(), "Tags:"));
+
+            // Verify the tags are displayed in the footer of the content page.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent\nTags: science, technology 3 / 3\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(22)
+    void multiPageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child page in the export because we want to verify a multi-page export.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
+        exportTreeModal.export();
+
+        // Use the custom template which displays the page tags in the PDF footer.
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+        exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            // Verify the metadata is displayed only twice (only in the footer of the two content pages).
+            assertEquals(2, StringUtils.countMatches(pdf.getText(), "Tags:"));
+
+            // Verify the page corresponding to the parent document.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent\nTags: science, technology 3 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+
+            // Verify the page corresponding to the child document.
+            contentPageText = pdf.getTextFromPage(3);
+            assertTrue(contentPageText.startsWith("Child\nTags: biology, ecology 4 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
         }
     }
 

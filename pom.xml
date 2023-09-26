@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>15.8-SNAPSHOT</version>
+    <version>15.9-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>15.8-SNAPSHOT</version>
+  <version>15.9-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -56,8 +56,11 @@
     <tika.version>2.9.0</tika.version>
     <pdfbox.version>2.0.29</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.version>9.4.52.v20230823</jetty.version>
-    <netty.version>4.1.97.Final</netty.version>
+    <!-- We are stuck at version 9.x until we upgrade to a version of SolrJ which use a more recent version (or something else) -->
+    <jetty.client.version>9.4.52.v20230823</jetty.client.version>
+    <jetty.server.version>10.0.16</jetty.server.version>
+    <jetty.version>${jetty.client.version}</jetty.version>
+    <netty.version>4.1.98.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.3</dockerJava.version>
     <cvssCalculator.version>1.4.1</cvssCalculator.version>
@@ -70,7 +73,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.5.5</libreoffice.version>
+    <libreoffice.version>7.5.6</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -168,7 +171,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.23.1</version>
+        <version>4.23.2</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -690,7 +693,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.3.11</version>
+        <version>1.3.12</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -700,7 +703,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.14</version>
+        <version>2.2.15</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -710,7 +713,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.17</version>
+        <version>3.1.18</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -722,7 +725,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>4.1</version>
+        <version>4.2</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -742,7 +745,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>4.2</version>
+        <version>4.2.1</version>
       </dependency>
 
       <!-- Restlet -->
@@ -852,7 +855,7 @@
         <version>1.6.14</version>
       </dependency>
 
-      <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->
+      <!-- Jetty client libraries -->
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-alpn-client</artifactId>
@@ -901,12 +904,6 @@
       <dependency>
         <groupId>org.eclipse.jetty.http2</groupId>
         <artifactId>http2-http-client-transport</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <!-- Same for for some reusable Jetty server libraries -->
-      <dependency>
-        <groupId>org.eclipse.jetty.http2</groupId>
-        <artifactId>jetty-websocket</artifactId>
         <version>${jetty.version}</version>
       </dependency>
 
@@ -1090,7 +1087,7 @@
       <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
-        <version>1.1.10.3</version>
+        <version>1.1.10.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
@@ -1420,6 +1417,17 @@
                 <features>com.google.javascript:closure-compiler</features>
               </extensionOverride>
             </extensionOverrides>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.xwiki.contrib</groupId>
+          <artifactId>jshint-maven-plugin</artifactId>
+          <!-- Lock down plugin version for build reproducibility -->
+          <version>1.7.1</version>
+          <configuration>
+            <globals>require,define</globals>
+            <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
+            <options>esversion:11,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,camelcase,maxlen:120</options>
           </configuration>
         </plugin>
       </plugins>

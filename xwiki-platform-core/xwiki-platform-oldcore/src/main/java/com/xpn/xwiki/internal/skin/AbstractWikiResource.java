@@ -77,14 +77,6 @@ public abstract class AbstractWikiResource<R extends EntityReference, I extends 
     }
 
     @Override
-    public I getInputSource() throws Exception
-    {
-        return getInputSourceInternal(getDocument());
-    }
-
-    protected abstract I getInputSourceInternal(XWikiDocument document) throws Exception;
-
-    @Override
     public String getURL(boolean forceSkinAction) throws Exception
     {
         return getURL(getDocument());

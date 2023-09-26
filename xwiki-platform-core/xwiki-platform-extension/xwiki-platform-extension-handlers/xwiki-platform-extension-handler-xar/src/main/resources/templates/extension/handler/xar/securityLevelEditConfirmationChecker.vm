@@ -17,11 +17,23 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-###
-### Include some macros
-###
-#template('notification/email/macros.vm')
-###
-### Display the event
-###
-#displayNotificationSkeleton("<strong>$services.localization.render('mentions.event.mention.type')</strong>", "#displayNotificationRightCell($event)")
+##
+## Since 15.9RC1
+## The template used by SecurityLevelEditConfirmationChecker, used in case of raised error or warning before 
+## editing a page. 
+##
+#set ($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference,
+  $tdoc.documentReferenceWithLocale))
+#set ($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
+<p class="xwikimessage">
+  $escapetool.xml($services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
+</p>
+<ul>
+  #foreach ($extension in $extensions)
+    <li>$escapetool.xml($extension.name) ($escapetool.xml($extension.id.version))</li>
+  #end
+</ul>
+<p>
+  $escapetool.xml($services.localization.render(
+    "extension.xar.edit${protectionLevel.name().toLowerCase()}.explanation"))
+</p>

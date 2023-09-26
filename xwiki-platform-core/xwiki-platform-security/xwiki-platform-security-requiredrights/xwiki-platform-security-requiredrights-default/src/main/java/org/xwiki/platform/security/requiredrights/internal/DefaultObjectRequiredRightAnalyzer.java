@@ -92,6 +92,9 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
     @Override
     public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
     {
+        if (object == null) {
+            return List.of();
+        }
         EntityReference xClassReference = object.getRelativeXClassReference();
         String className = this.compactEntityReferenceSerializer.serialize(xClassReference);
 
@@ -139,22 +142,24 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         if (!textAreaClass.isRestricted() && field instanceof BaseStringProperty) {
             String value = ((BaseStringProperty) field).getValue();
 
-            switch (contentType) {
-                case VELOCITY_CODE:
-                    result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
-                    break;
-                case VELOCITYWIKI:
-                    result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
-                    // If there is no Velocity code, we analyze the content as wiki syntax.
-                    if (result.isEmpty()) {
+            if (contentType != null) {
+                switch (contentType) {
+                    case VELOCITY_CODE:
+                        result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
+                        break;
+                    case VELOCITYWIKI:
+                        result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
+                        // If there is no Velocity code, we analyze the content as wiki syntax.
+                        if (result.isEmpty()) {
+                            result = analyzeWikiContent(object, value);
+                        }
+                        break;
+                    case WIKI_TEXT:
                         result = analyzeWikiContent(object, value);
-                    }
-                    break;
-                case WIKI_TEXT:
-                    result = analyzeWikiContent(object, value);
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

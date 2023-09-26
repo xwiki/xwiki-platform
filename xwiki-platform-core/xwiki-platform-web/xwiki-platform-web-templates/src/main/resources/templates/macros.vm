@@ -241,10 +241,8 @@ $xwiki.getUserName("xwiki:${username}")
  *   showAlias: false, // whether to show the user alias or not
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
- *   displayLink: true // whether to wrap the user name in a link to the user profile
+ *   displayLink: true // @since 15.9 ; whether to wrap the user name in a link to the user profile
  * }
- *
- * @since 15.9
  *#
 #macro (displayUser $arg $options)
   #if ($stringtool.isEmpty($arg))
@@ -343,10 +341,8 @@ $xwiki.getUserName("xwiki:${username}")
  *   showAlias: false, // whether to show the group alias or not
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the group or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
- *   displayLink: true // whether to wrap the group name in a link to the group profile
+ *   displayLink: true // @since 15.9 ; whether to wrap the group name in a link to the group profile
  * }
- *
- * @since 15.9
  *#
 #macro (displayGroup $arg $options)
   #displayUser($arg $options)

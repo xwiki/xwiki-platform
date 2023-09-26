@@ -24,11 +24,12 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
@@ -38,13 +39,14 @@ import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -68,15 +70,14 @@ class ScriptMacroAnalyzerTest
     private BeanManager beanManager;
 
     @MockComponent
-    private ContextualAuthorizationManager authorizationManager;
+    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
 
     @MockComponent
     @Named("context")
     private ComponentManager contextComponentManager;
 
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void analyzeWithMacroPermissionPolicy(boolean hasPermission) throws Exception
+    @Test
+    void analyzeWithMacroPermissionPolicy() throws Exception
     {
         MacroBlock macroBlock = mock();
         String macroId = "myScript";
@@ -95,7 +96,6 @@ class ScriptMacroAnalyzerTest
         MacroPermissionPolicy mpp = mock();
         when(this.contextComponentManager.getInstance(MacroPermissionPolicy.class, macroId)).thenReturn(mpp);
 
-        when(mpp.hasPermission(any(), any())).thenReturn(hasPermission);
         Right myRight = mock();
         when(mpp.getRequiredRight()).thenReturn(myRight);
 
@@ -104,31 +104,25 @@ class ScriptMacroAnalyzerTest
             this.analyzer.analyze(macroBlock, macro, macroTransformationContext);
 
         verify(this.beanManager).populate(any(ScriptMacroParameters.class), eq(parameters));
-        verify(mpp).hasPermission(any(ScriptMacroParameters.class), eq(macroTransformationContext));
+        verify(this.translationMessageSupplierProvider).get("security.requiredrights.scriptmacro", macroId, myRight);
 
-        if (hasPermission) {
-            assertEquals(List.of(), analysisResults);
-        } else {
-            assertEquals(1, analysisResults.size());
-        }
+        assertEquals(1, analysisResults.size());
+        RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
+        // TODO: fix to expect a real reference.
+        assertNull(analysisResult.getEntityReference());
+        RequiredRightAnalysisResult.RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
+        assertEquals(myRight, requiredRight.getRight());
+        assertFalse(requiredRight.isOptional());
+        assertEquals(EntityType.DOCUMENT, requiredRight.getEntityType());
     }
 
     @ParameterizedTest
-    @CsvSource({
-        "true, true, true, true",
-        "true, false, true, false",
-        "false, true, true, true",
-        "false, false, true, true",
-        "false, false, false, false"
-    })
-    void analyzeWithFallback(boolean isPrivileged, boolean hasProgrammingRight, boolean hasScriptRight, boolean allow)
-        throws ComponentLookupException
+    @ValueSource(booleans = { true, false })
+    void analyzeWithFallback(boolean isPrivileged) throws ComponentLookupException
     {
         String macroId = "myScript";
         when(this.contextComponentManager.getInstance(MacroPermissionPolicy.class, macroId))
             .thenThrow(new ComponentLookupException("Not found"));
-        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(hasProgrammingRight);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(hasScriptRight);
 
         MacroBlock macroBlock = mock();
         when(macroBlock.getId()).thenReturn(macroId);
@@ -144,10 +138,19 @@ class ScriptMacroAnalyzerTest
 
         List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(macroBlock, macro, mock());
 
-        if (allow) {
-            assertEquals(List.of(), analysisResults);
-        } else {
-            assertEquals(1, analysisResults.size());
-        }
+        // Check that the macro permission policy was looked up.
+        verify(this.contextComponentManager).getInstance(MacroPermissionPolicy.class, macroId);
+        // Check that the translation message supplier was called.
+        verify(this.translationMessageSupplierProvider)
+            .get("security.requiredrights.scriptmacro", macroId, requiredRight);
+        // Check that the result is correct.
+        assertEquals(1, analysisResults.size());
+        RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
+        // TODO: fix to expect a real reference.
+        assertNull(analysisResult.getEntityReference());
+        RequiredRightAnalysisResult.RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
+        assertEquals(requiredRight, requiredRightResult.getRight());
+        assertFalse(requiredRightResult.isOptional());
+        assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
     }
 }

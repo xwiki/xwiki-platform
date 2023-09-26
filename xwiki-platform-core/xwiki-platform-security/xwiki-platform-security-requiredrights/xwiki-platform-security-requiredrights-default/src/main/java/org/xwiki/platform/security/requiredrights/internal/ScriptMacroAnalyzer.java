@@ -102,7 +102,7 @@ public class ScriptMacroAnalyzer
         }
         return List.of(new RequiredRightAnalysisResult(reference,
             this.translationMessageSupplierProvider.get("security.requiredrights.scriptmacro",
-                macroId),
+                macroId, right),
             this.translationMessageSupplierProvider.get("security.requiredrights.scriptmacro.description",
                 macroBlock.getContent()),
             List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))

@@ -63,7 +63,7 @@
     <netty.version>4.1.98.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.3</dockerJava.version>
-    <cvssCalculator.version>1.4.1</cvssCalculator.version>
+    <cvssCalculator.version>1.4.2</cvssCalculator.version>
     <solr.version>8.11.2</solr.version>
 
     <!-- Versions of other software we need in our functional tests -->

@@ -39,8 +39,9 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
      * Go to the extension vulnerabilities section of the administration.
      *
      * @return the corresponding page object
+     * @since 15.5
      */
-    public static ExtensionVulnerabilitiesAdminPage getToExtensionVulnerabilitiesAdmin()
+    public static ExtensionVulnerabilitiesAdminPage goToExtensionVulnerabilitiesAdmin()
     {
         getUtil().gotoPage(new LocalDocumentReference("XWiki", "XWikiPreferences"), "admin", Map.of(
             "editor", "globaladmin",

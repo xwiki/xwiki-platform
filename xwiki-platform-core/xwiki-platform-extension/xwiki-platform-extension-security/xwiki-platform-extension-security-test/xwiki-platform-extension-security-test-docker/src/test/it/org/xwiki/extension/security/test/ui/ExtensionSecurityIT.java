@@ -41,7 +41,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.Matchers.hasItem;
-import static org.xwiki.extension.security.test.po.ExtensionVulnerabilitiesAdminPage.getToExtensionVulnerabilitiesAdmin;
+import static org.xwiki.extension.security.test.po.ExtensionVulnerabilitiesAdminPage.goToExtensionVulnerabilitiesAdmin;
 
 /**
  * Overall Extension Security UI tests.
@@ -58,13 +58,13 @@ class ExtensionSecurityIT
         setup.loginAsSuperAdmin();
         String internalRestURL = createSecurityVulnerabilitiesSource(setup, testReference);
 
-        getToExtensionVulnerabilitiesAdmin()
+        goToExtensionVulnerabilitiesAdmin()
             .setScanURL(internalRestURL)
             .saveConfig();
 
         ExtensionAdministrationPage.gotoPage().startIndex();
 
-        LiveDataElement liveData = getToExtensionVulnerabilitiesAdmin().getLiveData();
+        LiveDataElement liveData = goToExtensionVulnerabilitiesAdmin().getLiveData();
 
         // Wait for a row to be present in the Live Data (meaning that the indexation is done).
         TableLayoutElement tableLayout = liveData.getTableLayout();

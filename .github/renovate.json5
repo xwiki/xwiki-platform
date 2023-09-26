@@ -1,0 +1,8 @@
+{
+  "packageRules": [
+    {
+      "matchDatasources": ["maven"],
+      "registryUrls": ["https://nexus.xwiki.org/nexus/content/repositories/public/"]
+    }
+  ]
+}

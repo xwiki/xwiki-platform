@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -79,14 +80,16 @@ public class AllDocsPage extends ViewPage
         return new DocumentTreeElement(this.treeElement).waitForIt();
     }
 
-    public LiveTableElement clickAttachmentsTab()
+    /**
+     * Load the all attachments tab.
+     *
+     * @return The live data element of the all attachments tab
+     */
+    public LiveDataElement clickAttachmentsTab()
     {
         this.attachmentsTab.click();
 
-        LiveTableElement lt = new LiveTableElement("allattachments");
-        lt.waitUntilReady();
-
-        return lt;
+        return new LiveDataElement("allattachments");
     }
 
     public boolean hasDeletedDocsTab()

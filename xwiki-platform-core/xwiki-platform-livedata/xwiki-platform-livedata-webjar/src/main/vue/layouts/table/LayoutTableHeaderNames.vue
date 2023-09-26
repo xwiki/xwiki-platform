@@ -57,45 +57,49 @@
       v-show="logic.isPropertyVisible(property.id)"
     >
       <!-- Wrapper for the column header -->
-      <div
-        class="column-name"
-        @click="sort(property)"
-      >
+      <div class="column-name">
         <!--
           Specify the handle to drag properties.
           Use the stop propagation modifier on click event
           to prevent sorting the column unintentionally.
         -->
-        <div
-          role="presentation"
+        <button
           class="handle"
           :title="$t('livedata.action.reorder.hint')"
           @click.stop
         >
           <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
-        </div>
+        </button>
         <!-- Property Name -->
-        <span class="property-name">{{ property.name }}</span>
-        <!--
-          Sort icon
-          Only show the icon for the first-level sort property
-        -->
-        <XWikiIcon
-          v-if="logic.isPropertySortable(property.id)"
-          :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
-          :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
+        <button 
+          class="property-name"
+          @click="sort(property)"
+        >
+          {{ property.name }}
+          <!--
+            Sort icon
+            Only show the icon for the first-level sort property
+          -->
+          <XWikiIcon
+            v-if="logic.isPropertySortable(property.id)"
+            :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
+            :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
+        </button>
+        
       </div>
       <!--
         Resize handle
         Use the stop propagation modifier on click event
         to prevent sorting the column unintentionally.
       -->
-      <div role="presentation" class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
+      <button class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
         v-mousedownmove="resizeColumnInit"
         @mousedownmove="resizeColumn"
+        @keydown.left="resizeColumnLeft"
+        @keydown.right="resizeColumnRight"
         @click.stop
         @dblclick="resetColumnSize"
-      ></div>
+      ></button>
     </th>
 
   </XWikiDraggable>
@@ -217,6 +221,32 @@ export default {
       }
     },
 
+    resizeColumnLeft (e) {
+      const offsetX = - 10;
+      // Resize left column
+      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
+      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
+
+      // Resize right column
+      if (e.data.rightColumn) {
+        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
+        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
+      }
+    },
+
+    resizeColumnRight (e) {
+      const offsetX = 10;
+      // Resize left column
+      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
+      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
+
+      // Resize right column
+      if (e.data.rightColumn) {
+        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
+        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
+      }
+    },
+
     resetColumnSize (e) {
       // Reset all column sizes as resizing a single column sets sizes for all columns.
       for (const column of e.currentTarget.closest("tr").querySelectorAll(".column-name")) {
@@ -254,6 +284,7 @@ export default {
   height: 100%;
   margin-left: -@table-cell-padding;
   padding: 0 @table-cell-padding;
+  border: 0;
   color: @text-color;
   background-color: @xwiki-page-content-bg;
   cursor: pointer; /* IE */
@@ -261,6 +292,14 @@ export default {
   opacity: 0;
   position: absolute;
 }
+
+.layout-table .property-name {
+    background: transparent;
+    border: 0;
+    width: 100%;
+    text-align: left;
+}
+
 .layout-table .column-name:hover .handle {
   opacity: 0.8;
   transition: opacity 0.2s;
@@ -296,6 +335,7 @@ export default {
   right: 0px;
   top: 0px;
   bottom: 0px;
+  border: 0;
   transform: translateX(50%);
   width: 10px;
   background-color: transparent;

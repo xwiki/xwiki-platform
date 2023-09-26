@@ -171,9 +171,11 @@ $response.setContentType("application/json")
   #set($discard = $row.put("allows"  , $allows.keySet()))
   #set($discard = $row.put("denys"   , $denys.keySet()))
   #if ($uorg == "users")
-    #set($discard = $row.put("userDisplayer", "#displayUser($user.documentReference, {'displayLink': $isLocalUser})"))
+    #set($discard = $row.put("userDisplayer",
+      "#displayUser($user.documentReference, {'displayLink': $isLocalUser, 'showAlias': true})"))
   #else
-    #set($discard = $row.put("userDisplayer", "#displayGroup($user.documentReference, {'displayLink': $isLocalUser})"))
+    #set($discard = $row.put("userDisplayer",
+      "#displayGroup($user.documentReference, {'displayLink': $isLocalUser, 'showAlias': true})"))
   #end
   #if ($uorg == "groups")
     #set($discard = $row.put("isuseringroup", $xwiki.getUser().isUserInGroup($user.fullName)))

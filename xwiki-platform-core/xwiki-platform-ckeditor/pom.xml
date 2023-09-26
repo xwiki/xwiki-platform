@@ -38,7 +38,7 @@
     <module>xwiki-platform-ckeditor-webjar</module>
   </modules>
   <properties>
-    <ckeditor.version>4.21.0</ckeditor.version>
+    <ckeditor.version>4.22.1</ckeditor.version>
 
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor4-${ckeditor.version}</ckeditor.path>

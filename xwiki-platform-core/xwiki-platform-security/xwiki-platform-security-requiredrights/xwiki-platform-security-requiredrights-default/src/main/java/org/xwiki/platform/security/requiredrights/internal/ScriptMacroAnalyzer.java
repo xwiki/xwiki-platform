@@ -38,7 +38,6 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -56,9 +55,6 @@ public class ScriptMacroAnalyzer
 
     @Inject
     private BeanManager beanManager;
-
-    @Inject
-    private ContextualAuthorizationManager authorizationManager;
 
     @Inject
     private TranslationMessageSupplierProvider translationMessageSupplierProvider;
@@ -82,18 +78,18 @@ public class ScriptMacroAnalyzer
             MacroPermissionPolicy mpp =
                 this.componentManagerProvider.get()
                     .getInstance(MacroPermissionPolicy.class, macroBlock.getId());
-            result = generateScriptMacroError(macroBlock, macroBlock.getId(), mpp.getRequiredRight());
+            result = generateResult(macroBlock, macroBlock.getId(), mpp.getRequiredRight());
         } catch (Exception ex) {
             if (macro instanceof PrivilegedScriptMacro) {
-                result = generateScriptMacroError(macroBlock, macroBlock.getId(), Right.PROGRAM);
+                result = generateResult(macroBlock, macroBlock.getId(), Right.PROGRAM);
             } else {
-                result = generateScriptMacroError(macroBlock, macroBlock.getId(), Right.SCRIPT);
+                result = generateResult(macroBlock, macroBlock.getId(), Right.SCRIPT);
             }
         }
         return result;
     }
 
-    private List<RequiredRightAnalysisResult> generateScriptMacroError(MacroBlock macroBlock, String macroId,
+    private List<RequiredRightAnalysisResult> generateResult(MacroBlock macroBlock, String macroId,
         Right right)
     {
         EntityReference reference = null;

@@ -32,7 +32,6 @@ import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.security.authorization.AuthorExecutor;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -50,9 +49,6 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
      * The id of this component.
      */
     public static final String ID = "document";
-
-    @Inject
-    private AuthorExecutor authorExecutor;
 
     @Inject
     private DocumentContextExecutor documentContextExecutor;
@@ -77,29 +73,19 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
             return this.documentContextExecutor.call(() ->
             {
                 List<RequiredRightAnalysisResult> result = new ArrayList<>();
+                // Analyze the title
+                result.addAll(this.documentTitleRequiredRightAnalyzer.analyze(document.getTitle()));
 
-                this.authorExecutor.call(() -> {
-                    // Analyze the title
-                    result.addAll(this.documentTitleRequiredRightAnalyzer.analyze(document.getTitle()));
+                // Analyze the content
+                result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));
 
-                    // Analyze the content
-                    result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));
+                result.forEach(r -> r.setEntityReference(document.getDocumentReference()));
 
-                    result.forEach(r -> r.setEntityReference(document.getDocumentReference()));
-
-                    return null;
-                }, document.getContentAuthorReference(), document.getDocumentReference());
-
-                // Analyze the objects. Make sure the context author is the object's author.
-                this.authorExecutor.call(() -> {
-                    for (List<BaseObject> baseObjects : document.getXObjects().values()) {
-                        for (BaseObject object : baseObjects) {
-                            result.addAll(this.objectRequiredRightAnalyzer.analyze(object));
-                        }
+                for (List<BaseObject> baseObjects : document.getXObjects().values()) {
+                    for (BaseObject object : baseObjects) {
+                        result.addAll(this.objectRequiredRightAnalyzer.analyze(object));
                     }
-
-                    return null;
-                }, document.getAuthorReference(), document.getDocumentReference());
+                }
 
                 return result;
             }, document);

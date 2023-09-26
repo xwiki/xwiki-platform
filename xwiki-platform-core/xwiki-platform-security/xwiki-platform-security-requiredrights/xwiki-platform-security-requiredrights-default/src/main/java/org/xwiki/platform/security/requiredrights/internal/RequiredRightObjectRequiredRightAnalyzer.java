@@ -31,7 +31,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.objects.BaseObject;
@@ -53,9 +52,6 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
     public static final String ID = "object/XWiki.RequiredRightClass";
 
     @Inject
-    private AuthorizationManager authorizationManager;
-
-    @Inject
     private TranslationMessageSupplierProvider translationMessageSupplierProvider;
 
     @Override
@@ -66,15 +62,22 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
         if (StringUtils.isNotBlank(requiredRight)) {
             Right right = Right.toRight(requiredRight);
 
-            // TODO: in theory this right should be both for the content and the object - should we just indicate it
-            //  twice, also for the content?
             if (right != Right.ILLEGAL) {
-                return List.of(new RequiredRightAnalysisResult(object.getReference(),
-                    this.translationMessageSupplierProvider.get("security.requiredrights.requiredrightobject",
-                        requiredRight),
-                    () -> null,
-                    List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, true))
-                ));
+                return List.of(
+                    new RequiredRightAnalysisResult(object.getReference(),
+                        this.translationMessageSupplierProvider.get("security.requiredrights.requiredrightobject",
+                            requiredRight),
+                        () -> null,
+                        List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
+                    ),
+                    new RequiredRightAnalysisResult(object.getDocumentReference(),
+                        this.translationMessageSupplierProvider.get(
+                            "security.requiredrights.requiredrightobjectcontent",
+                            requiredRight),
+                        () -> null,
+                        List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
+                    )
+                );
             }
         }
 

@@ -28,7 +28,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
@@ -53,9 +52,6 @@ public class XDOMRequiredRightAnalyzer implements RequiredRightAnalyzer<XDOM>
      */
     public static final String ID = "xdom";
 
-    @Inject
-    private Provider<ComponentManager> componentManagerProvider;
-
     /** Provider for the default macro block analyzer to avoid a cyclic dependency. */
     @Inject
     @Named(DefaultMacroBlockRequiredRightAnalyzer.ID)
@@ -70,7 +66,7 @@ public class XDOMRequiredRightAnalyzer implements RequiredRightAnalyzer<XDOM>
         List<RequiredRightAnalysisResult> result = new ArrayList<>();
         RequiredRightAnalyzer<MacroBlock> analyzer = this.defaultMacroBlockRequiredRightAnalyzer.get();
 
-        // For each macro, find a corresponding analyzer. If there is none, use the default macro block analyzer.
+        // Analyze each macro block.
         for (MacroBlock macroBlock : macroBlocks) {
             result.addAll(analyzer.analyze(macroBlock));
         }

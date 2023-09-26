@@ -40,7 +40,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -82,9 +81,6 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
 
     @Inject
     private Provider<XWikiContext> contextProvider;
-
-    @Inject
-    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Inject
     private ContentParser contentParser;

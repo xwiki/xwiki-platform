@@ -25,6 +25,18 @@
     {
       "matchPackageNames": ["org.eclipse.jetty:jetty-server"],
       "allowedVersions": "/^10\..*$/"
+    },
+
+    // Remove when upgrading to Solr 9
+    {
+      "matchPackagePrefixes": ["org.apache.solr"],
+      "allowedVersions": "/^8\..*$/"
+    },
+
+    // Various dependencies we cannot update yet because of the move to jakarta package
+    {
+      "matchPackagePrefixes": ["org.hibernate:hibernate-"],
+      "allowedVersions": "/^5\..*$/"
     }
   ]
 }

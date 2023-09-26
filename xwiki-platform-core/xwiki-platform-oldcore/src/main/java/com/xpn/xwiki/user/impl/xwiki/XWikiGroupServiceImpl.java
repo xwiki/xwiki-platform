@@ -495,6 +495,17 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     where.append(" and lower(" + fieldPrefix + ".value) like ?" + parameterValues.size());
 
                     fieldMap.put(fieldName, fieldPrefix);
+                } else if (user && matchFields.length == 1 && fieldName.equals("name")) {
+                    // In case we are only looking to mach on the document name, we should also take care of
+                    // filtering on the first name or the last name of the user.
+                    parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    from.append(", StringProperty firstName, StringProperty lastName");
+                    where.append(
+                        "and obj.id = firstName.id.id and firstName.id.name = 'first_name' "
+                      + "and obj.id = lastName.id.id and lastName.id.name = 'last_name' "
+                      + String.format("and (lower(doc.name) like ?%s or lower(firstName.value) like ?%s or "
+                            + "lower(lastName.value) like ?%s)",
+                            parameterValues.size(), parameterValues.size(), parameterValues.size()));
                 } else {
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
                     // We do not support OR filters by default, however this may be useful in the case where users or

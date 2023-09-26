@@ -442,15 +442,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
   } else {
     username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('rightsmanager.username'))");
   }
-  var title = (row.title || row.username);
-  if (row.wikiname == "local") {
-    var a = document.createElement('a');
-    a.href = userurl;
-    a.appendChild(document.createTextNode(title));
-    username.appendChild( a );
-  } else {
-    username.appendChild(document.createTextNode(title));
-  }
+  username.innerHTML = row.userDisplayer;
 
   // We directly retrieve the right names from the livetable headers.
   var rightsNames = [];

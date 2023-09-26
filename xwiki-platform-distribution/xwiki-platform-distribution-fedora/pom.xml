@@ -51,7 +51,7 @@
     </fedora.description>
 
     <rpm.ant.path>target/rpms</rpm.ant.path>
-    <redline.plugin.version>1.2.5</redline.plugin.version>
+    <redline.plugin.version>1.2.10</redline.plugin.version>
 
     <war.path>${project.build.directory}/war</war.path>
 

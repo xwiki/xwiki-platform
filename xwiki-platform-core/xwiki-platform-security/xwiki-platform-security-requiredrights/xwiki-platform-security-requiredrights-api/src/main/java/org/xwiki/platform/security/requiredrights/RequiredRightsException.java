@@ -19,34 +19,25 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
+import org.xwiki.stability.Unstable;
+
 /**
+ * Exception raised by the required rights operations.
+ *
  * @version $Id$
- * @since x.y.z
+ * @since 15.9RC1
  */
+@Unstable
 public class RequiredRightsException extends Exception
 {
-    public RequiredRightsException()
-    {
-    }
-    
-    public RequiredRightsException(String message)
-    {
-        super(message);
-    }
-
+    /**
+     * Constructs a new RequiredRightsException with the specified detail message and cause.
+     *
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method)
+     */
     public RequiredRightsException(String message, Throwable cause)
     {
         super(message, cause);
-    }
-
-    public RequiredRightsException(Throwable cause)
-    {
-        super(cause);
-    }
-
-    public RequiredRightsException(String message, Throwable cause, boolean enableSuppression,
-        boolean writableStackTrace)
-    {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

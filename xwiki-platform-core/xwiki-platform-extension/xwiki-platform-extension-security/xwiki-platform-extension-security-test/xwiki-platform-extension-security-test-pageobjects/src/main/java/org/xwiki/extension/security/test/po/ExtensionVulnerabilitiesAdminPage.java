@@ -19,7 +19,9 @@
  */
 package org.xwiki.extension.security.test.po;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -93,5 +95,26 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
     public LiveDataElement getLiveData()
     {
         return new LiveDataElement("extension-vulnerabilities-list");
+    }
+
+    /**
+     * @return the list of CVE IDs to review (i.e., that have not been reviewed as safe)
+     * @since 15.9RC1
+     */
+    public List<String> getCveIDsToReview()
+    {
+        return getLiveData()
+            // Set the pagination to a large number of entries, assuming we will not have more than 100 extensions 
+            // with known vulnerabilities at the same time.
+            .setPagination(100)
+            .getTableLayout()
+            .getAllCells("CVE IDs")
+            .stream()
+            .flatMap(cell -> getDriver().findElementsWithoutWaiting(cell, By.cssSelector(".html-wrapper > a"))
+                .stream()
+                // Exclude links with class "small" as they correspond to already reviewed CVEs. 
+                .filter(element -> !element.getAttribute("class").contains("small")))
+            .map(WebElement::getText)
+            .collect(Collectors.toList());
     }
 }

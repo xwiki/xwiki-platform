@@ -624,6 +624,19 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Return the list of {@link WebElement} of a column by its label.
+     *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
+     * @return the list of {@link WebElement} of the request column
+     * @since 15.9RC1
+     */
+    public List<WebElement> getAllCells(String columnLabel)
+    {
+        int columnNumber = findColumnIndex(columnLabel);
+        return getRoot().findElements(By.cssSelector(String.format("tbody tr td:nth-child(%d)", columnNumber)));
+    }
+
+    /**
      * Get the 1-based row index of an element, relative to the number of currently displayed rows.
      *
      * @param by the selector of the searched element

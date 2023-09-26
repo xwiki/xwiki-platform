@@ -448,6 +448,12 @@
         <browser>*custom ${browserPath}</browser>
       </properties>
     </profile>
+    <profile>
+      <id>security</id>
+      <modules>
+        <module>xwiki-platform-distribution-flavor-test-security</module>
+      </modules>
+    </profile>
   </profiles>
   <modules>
     <module>xwiki-platform-distribution-flavor-test-misc</module>

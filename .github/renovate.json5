@@ -7,15 +7,15 @@
     }
   ],
 
-  // There is no point trying to find update for commons and rendering dependencies
+  // There is no point trying to find updates for commons, rendering and platform dependencies
   [
     {
-      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:"],
+      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:"],
       "enabled": false
     }
   ],
 
-  // We don't want to know about major upgrades of Jetty
+  // We don't want to know about major updates of Jetty
   [
     {
       "matchPackagePrefixes": ["org.eclipse.jetty"],

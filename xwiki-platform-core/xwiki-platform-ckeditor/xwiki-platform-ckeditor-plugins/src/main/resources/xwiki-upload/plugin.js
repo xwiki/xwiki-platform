@@ -133,7 +133,7 @@
   const getFileType = function(fileOrData) {
     if (typeof fileOrData === 'string') {
       // The file is specified as a Data URI. Extract the content type.
-      const contentType = fileOrData.match(base64HeaderRegExp)?.[1] || '';
+      const contentType = (fileOrData.match(base64HeaderRegExp) || [])[1] || '';
       // TODO: Better have a mapping between content types and file extensions, but for images (which is the most common
       // use case of pasting files as data URI in HTML) this solution is acceptable.
       return contentType.split('/').slice(1).join('/');

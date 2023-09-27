@@ -60,13 +60,13 @@
       <div class="column-name">
         <!--
           Specify the handle to drag properties.
-          Use the stop propagation modifier on click event
-          to prevent sorting the column unintentionally.
         -->
         <button
           class="handle"
           :title="$t('livedata.action.reorder.hint')"
-          @click.stop
+          @click="toggleDragNDrop"
+          @keydown.left="keyboardDragNDropLeft"
+          @keydown.right="keyboardDragNDropRight"
         >
           <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
         </button>
@@ -88,16 +88,13 @@
         
       </div>
       <!--
-        Resize handle
-        Use the stop propagation modifier on click event
-        to prevent sorting the column unintentionally.
+        Specify the handle to resize properties
       -->
       <button class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
         v-mousedownmove="resizeColumnInit"
         @mousedownmove="resizeColumn"
         @keydown.left="resizeColumnLeft"
         @keydown.right="resizeColumnRight"
-        @click.stop
         @dblclick="resetColumnSize"
       ></button>
     </th>
@@ -172,8 +169,8 @@ export default {
         so that it matches the true property order
         When selection is disabled (and the select-entry-all component hidden)
         we don't need to readjust the offset of the indexes
-        as Vue handily creates a html comment where the component shoud be
-        So that it does not messes up with indexes
+        as Vue handily creates a html comment where the component should be
+        So that it does not mess up with indexes
       */
       this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
     },
@@ -182,6 +179,22 @@ export default {
       while (th.nextElementSibling) {
         th = th.nextElementSibling;
         if (th.style.display !== "none") return th;
+      }
+    },
+
+    toggleDragNDrop () {
+      this.logic.toggleDragNDrop();
+    },
+    
+    keyboardDragNDropRight () {
+      if (this.logic.dragNDrop) {
+        this.logic.reorderProperty(1,2);
+      }
+    },
+
+    keyboardDragNDropLeft () {
+      if (this.logic.dragNDrop) {
+        this.logic.reorderProperty(2,1);
       }
     },
 
@@ -223,27 +236,33 @@ export default {
 
     resizeColumnLeft (e) {
       const offsetX = - 10;
+      const th = e.currentTarget.closest("th");
       // Resize left column
-      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
-      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
+      const leftColumn = th.querySelector(".column-name");
+      const leftColumnWidth = leftColumn.getBoundingClientRect()?.width + offsetX;
+      leftColumn.style.width = `${leftColumnWidth}px`;
 
       // Resize right column
       if (e.data.rightColumn) {
-        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
-        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
+        const rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
+        const rightColumnWidth = rightColumn.getBoundingClientRect()?.width - offsetX;
+        rightColumn.style.width = `${rightColumnWidth}px`;
       }
     },
 
     resizeColumnRight (e) {
       const offsetX = 10;
+      const th = e.currentTarget.closest("th");
       // Resize left column
-      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
-      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
+      const leftColumn = th.querySelector(".column-name");
+      const leftColumnWidth = leftColumn.getBoundingClientRect()?.width + offsetX;
+      leftColumn.style.width = `${leftColumnWidth}px`;
 
       // Resize right column
       if (e.data.rightColumn) {
-        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
-        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
+        const rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
+        const rightColumnWidth = rightColumn.getBoundingClientRect()?.width - offsetX;
+        rightColumn.style.width = `${rightColumnWidth}px`;
       }
     },
 

@@ -48,7 +48,9 @@ import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_FROM_ENVIRONMENT;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_REVIEWED_SAFE;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.CVE_ID;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
 
 /**
@@ -85,8 +87,7 @@ class ExtensionSecuritySolrClientTest
 
         SolrQuery params = new SolrQuery();
         params.addFilterQuery(String.format("%s:{0 TO 10]", SECURITY_MAX_CVSS));
-        params.addFilterQuery(String.format("(%s:[* TO *] OR %s:false)", FIELD_INSTALLED_NAMESPACES,
-            IS_INSTALLED_EXTENSION));
+        params.addFilterQuery(getNamespaceFilterQuery());
         params.addFilterQuery(String.format("%s:false", IS_REVIEWED_SAFE));
         verify(this.extensionIndexStore)
             .search(ArgumentMatchers.<SolrQuery>argThat(
@@ -96,12 +97,7 @@ class ExtensionSecuritySolrClientTest
     @Test
     void solrQuery() throws Exception
     {
-        doAnswer(invocationOnMock -> {
-            SolrQuery solrQuery = invocationOnMock.getArgument(1);
-            solrQuery.setFilterQueries("");
-            solrQuery.setSort("fake", SolrQuery.ORDER.asc);
-            return null;
-        }).when(this.extensionIndexStore).createSolrQuery(any(), any());
+        mockExtensionIndexStore();
 
         LiveDataQuery liveDataQuery = new LiveDataQuery();
         liveDataQuery.setLimit(10);
@@ -114,8 +110,7 @@ class ExtensionSecuritySolrClientTest
         SolrQuery params = new SolrQuery();
         params.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
         params.addFilterQuery(IS_FROM_ENVIRONMENT + ":false");
-        params.addFilterQuery(String.format("(%s:[* TO *] OR %s:false)", FIELD_INSTALLED_NAMESPACES,
-            IS_INSTALLED_EXTENSION));
+        params.addFilterQuery(getNamespaceFilterQuery());
 
         verify(this.extensionIndexStore)
             .search(AdditionalMatchers.<SolrQuery>and(
@@ -129,12 +124,7 @@ class ExtensionSecuritySolrClientTest
     @Test
     void solrQueryIsFromEnvironment() throws Exception
     {
-        doAnswer(invocationOnMock -> {
-            SolrQuery solrQuery = invocationOnMock.getArgument(1);
-            solrQuery.setFilterQueries("");
-            solrQuery.setSort("fake", SolrQuery.ORDER.asc);
-            return null;
-        }).when(this.extensionIndexStore).createSolrQuery(any(), any());
+        mockExtensionIndexStore();
 
         LiveDataQuery liveDataQuery = new LiveDataQuery();
         liveDataQuery.setLimit(10);
@@ -149,15 +139,61 @@ class ExtensionSecuritySolrClientTest
         SolrQuery params = new SolrQuery();
         params.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
         params.addFilterQuery(IS_FROM_ENVIRONMENT + ":true");
-        params.addFilterQuery(String.format("(%s:[* TO *] OR %s:false)", FIELD_INSTALLED_NAMESPACES,
-            IS_INSTALLED_EXTENSION));
+        params.addFilterQuery(getNamespaceFilterQuery());
 
         verify(this.extensionIndexStore)
             .search(AdditionalMatchers.<SolrQuery>and(
-                argThat(t -> Arrays.stream(t.getFilterQueries()).sorted().collect(Collectors.toList())
-                    .equals(Arrays.stream(params.getFilterQueries()).sorted().collect(
-                        Collectors.toList()))),
+                argThat(t -> sameArraysNoOrder(t.getFilterQueries(), params.getFilterQueries())),
                 argThat(t -> Objects.equals(t.getSorts(), params.getSorts())))
             );
+    }
+
+    private static String getNamespaceFilterQuery()
+    {
+        return String.format("(%s:[* TO *] OR %s:false)", FIELD_INSTALLED_NAMESPACES,
+            IS_INSTALLED_EXTENSION);
+    }
+
+    @Test
+    void filterByCVEId() throws Exception
+    {
+        mockExtensionIndexStore();
+
+        when(this.solrUtils.toFilterQueryString(any())).thenAnswer(it -> it.getArgument(0));
+
+        LiveDataQuery liveDataQuery = new LiveDataQuery();
+        liveDataQuery.initialize();
+        liveDataQuery.setFilters(List.of(new LiveDataQuery.Filter(CVE_ID, "match", "test")));
+        this.solrClient.solrQuery(liveDataQuery);
+
+        SolrQuery expectedSolrQuery = new SolrQuery();
+        expectedSolrQuery.addFilterQuery(String.format("%s:*test*", SECURITY_CVE_ID));
+        expectedSolrQuery.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
+        expectedSolrQuery.addFilterQuery(getNamespaceFilterQuery());
+        expectedSolrQuery.addFilterQuery(IS_FROM_ENVIRONMENT + ":false");
+
+        verify(this.extensionIndexStore).search(argThat((SolrQuery solrQuery) ->
+        {
+            String[] filterQueries = solrQuery.getFilterQueries();
+            String[] filterQueries1 = expectedSolrQuery.getFilterQueries();
+            return sameArraysNoOrder(filterQueries, filterQueries1);
+        }));
+    }
+
+    private void mockExtensionIndexStore()
+    {
+        doAnswer(invocationOnMock -> {
+            SolrQuery solrQuery = invocationOnMock.getArgument(1);
+            solrQuery.setFilterQueries("");
+            solrQuery.setSort("fake", SolrQuery.ORDER.asc);
+            return null;
+        }).when(this.extensionIndexStore).createSolrQuery(any(), any());
+    }
+
+    private static boolean sameArraysNoOrder(String[] a1, String[] a2)
+    {
+        return Arrays.stream(a1).sorted().collect(Collectors.toList())
+            .equals(Arrays.stream(a2).sorted().collect(
+                Collectors.toList()));
     }
 }

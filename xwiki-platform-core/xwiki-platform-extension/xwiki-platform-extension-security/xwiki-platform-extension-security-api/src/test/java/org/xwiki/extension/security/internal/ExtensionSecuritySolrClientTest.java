@@ -22,6 +22,7 @@ package org.xwiki.extension.security.internal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -37,13 +38,16 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.CVE_ID;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
 
 /**
@@ -89,12 +93,7 @@ class ExtensionSecuritySolrClientTest
     @Test
     void solrQuery() throws Exception
     {
-        doAnswer(invocationOnMock -> {
-            SolrQuery solrQuery = invocationOnMock.getArgument(1);
-            solrQuery.setFilterQueries("");
-            solrQuery.setSort("fake", SolrQuery.ORDER.asc);
-            return null;
-        }).when(this.extensionIndexStore).createSolrQuery(any(), any());
+        mockExtensionIndexStore();
 
         LiveDataQuery liveDataQuery = new LiveDataQuery();
         liveDataQuery.setLimit(10);
@@ -112,5 +111,46 @@ class ExtensionSecuritySolrClientTest
                 argThat(t -> Arrays.equals(t.getFilterQueries(), params.getFilterQueries())),
                 argThat(t -> Objects.equals(t.getSorts(), params.getSorts())))
             );
+    }
+
+    @Test
+    void filterByCVEId() throws Exception
+    {
+        mockExtensionIndexStore();
+
+        when(this.solrUtils.toFilterQueryString(any())).thenAnswer(it -> it.getArgument(0));
+
+        LiveDataQuery liveDataQuery = new LiveDataQuery();
+        liveDataQuery.initialize();
+        liveDataQuery.setFilters(List.of(new LiveDataQuery.Filter(CVE_ID, "match", "test")));
+        this.solrClient.solrQuery(liveDataQuery);
+
+        SolrQuery expectedSolrQuery = new SolrQuery();
+        expectedSolrQuery.addFilterQuery(String.format("%s:*test*", SECURITY_CVE_ID));
+        expectedSolrQuery.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
+        expectedSolrQuery.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
+
+        verify(this.extensionIndexStore).search(argThat((SolrQuery solrQuery) ->
+        {
+            String[] filterQueries = solrQuery.getFilterQueries();
+            String[] filterQueries1 = expectedSolrQuery.getFilterQueries();
+            return sameArraysNoOrder(filterQueries, filterQueries1);
+        }));
+    }
+
+    private void mockExtensionIndexStore()
+    {
+        doAnswer(invocationOnMock -> {
+            SolrQuery solrQuery = invocationOnMock.getArgument(1);
+            solrQuery.setFilterQueries("");
+            solrQuery.setSort("fake", SolrQuery.ORDER.asc);
+            return null;
+        }).when(this.extensionIndexStore).createSolrQuery(any(), any());
+    }
+
+    private static boolean sameArraysNoOrder(String[] a1, String[] a2)
+    {
+        return Arrays.stream(a1).sorted().collect(Collectors.toList())
+            .equals(Arrays.stream(a2).sorted().collect(Collectors.toList()));
     }
 }

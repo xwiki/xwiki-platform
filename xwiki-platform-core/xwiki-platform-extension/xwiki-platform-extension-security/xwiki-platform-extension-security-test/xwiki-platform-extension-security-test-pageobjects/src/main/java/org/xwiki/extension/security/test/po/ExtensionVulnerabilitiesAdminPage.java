@@ -99,6 +99,8 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
 
     /**
      * @return the page object for the live data of the page
+     * @since 15.9RC1
+     * @since 15.5.3
      */
     public LiveDataElement getEnvironmentLiveData()
     {
@@ -108,6 +110,7 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
     /**
      * @return the list of CVE IDs to review (i.e., that have not been reviewed as safe)
      * @since 15.9RC1
+     * @since 15.5.3
      */
     public List<String> getCveIDsToReview()
     {

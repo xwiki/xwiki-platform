@@ -129,6 +129,8 @@ public class LiveDataElement extends BaseElement
      *
      * @param paginationNumber the new pagination number (e.g., 15 or 100), this must be a known pagination
      * @return the current page object
+     * @since 15.9RC1
+     * @since 15.5.3
      */
     public LiveDataElement setPagination(int paginationNumber)
     {

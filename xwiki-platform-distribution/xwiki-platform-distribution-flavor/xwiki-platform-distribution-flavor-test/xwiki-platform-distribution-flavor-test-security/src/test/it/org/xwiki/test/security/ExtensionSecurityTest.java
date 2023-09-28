@@ -38,6 +38,7 @@ import static org.xwiki.extension.security.test.po.ExtensionVulnerabilitiesAdmin
  *
  * @version $Id$
  * @since 15.9RC1
+ * @since 15.5.3
  */
 public class ExtensionSecurityTest extends AbstractTest
 {

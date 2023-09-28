@@ -29,6 +29,7 @@ import org.xwiki.test.ui.TestUtils;
  *
  * @version $Id$
  * @since 15.9RC1
+ * @since 15.5.3
  */
 @RunWith(PageObjectSuite.class)
 public class AllTests

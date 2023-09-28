@@ -629,6 +629,7 @@ public class TableLayoutElement extends BaseElement
      * @param columnLabel the label of the column to get, for instance {@code "Title"}
      * @return the list of {@link WebElement} of the request column
      * @since 15.9RC1
+     * @since 15.5.3
      */
     public List<WebElement> getAllCells(String columnLabel)
     {

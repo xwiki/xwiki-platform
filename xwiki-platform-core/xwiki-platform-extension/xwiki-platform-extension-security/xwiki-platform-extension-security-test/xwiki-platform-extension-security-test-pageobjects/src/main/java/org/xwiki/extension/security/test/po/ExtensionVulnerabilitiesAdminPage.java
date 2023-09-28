@@ -98,12 +98,33 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
     }
 
     /**
+     * @return the page object for the live data of the page
+     */
+    public LiveDataElement getEnvironmentLiveData()
+    {
+        return new LiveDataElement("environment-vulnerabilities-list");
+    }
+
+    /**
      * @return the list of CVE IDs to review (i.e., that have not been reviewed as safe)
      * @since 15.9RC1
      */
     public List<String> getCveIDsToReview()
     {
-        return getLiveData()
+        List<String> listExtensionCVEs = getCVEsFromLiveData(getLiveData());
+
+        // Switch to the environment tab
+        getDriver().findElementWithoutWaiting(By.cssSelector("[href='#environment-vulnerabilities']")).click();
+        
+        List<String> listEnvironmentCVEs = getCVEsFromLiveData(getEnvironmentLiveData());
+        listExtensionCVEs.addAll(listEnvironmentCVEs);
+
+        return listExtensionCVEs;
+    }
+
+    private List<String> getCVEsFromLiveData(LiveDataElement liveData)
+    {
+        return liveData
             // Set the pagination to a large number of entries, assuming we will not have more than 100 extensions 
             // with known vulnerabilities at the same time.
             .setPagination(100)

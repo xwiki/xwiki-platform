@@ -371,7 +371,7 @@ define('xwiki-ckeditor', [
   // We have to overwrite both appendChild and insertBefore because depending on the presence of the BASE element
   // RequireJS uses one or the other.
   ckeditor.on('instanceReady', ({editor}) =&gt; {
-    if (editor.document !== document) {
+    if (editor.document.$ !== document) {
       // This editor instance is using a separate DOM document for editing which means it's a standalone editor.
       const initialHead = editor.document.$.head;
       const originalAppendChild = initialHead.appendChild;

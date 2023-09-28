@@ -246,7 +246,8 @@ define('xwiki-attachment-picker',
         if (result.mimetype && mimeType.startsWith("image/")) {
           preview = $('<img />')
             .prop('loading', 'lazy')
-            .prop('src', `${downloadURL}?width=150&height=150`)
+            // Preserve the aspect ratio of the image while resizing to a 150x150px box
+            .prop('src', `${downloadURL}?width=150&height=150&keepAspectRatio=true`)
             .prop('alt', filename);
         } else {
           const icon = attachmentsIcon.getIcon({

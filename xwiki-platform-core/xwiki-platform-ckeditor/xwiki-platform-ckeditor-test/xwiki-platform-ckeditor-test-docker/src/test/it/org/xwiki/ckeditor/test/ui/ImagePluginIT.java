@@ -62,9 +62,15 @@ class ImagePluginIT
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
     {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference);
+        DocumentReference configurationReference = getConfigurationReference(setup);
+        setup.deletePage(configurationReference);
+        DocumentReference imageStylesReference =
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code"), "ImageStyles");
+        setup.deletePage(imageStylesReference, true);
         // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
         createAndLoginStandardUser(setup);
-        setup.deletePage(testReference);
     }
 
     @Test
@@ -542,12 +548,12 @@ class ImagePluginIT
     }
 
     @Test
+    @Order(16)
     void forceDefaultStyle(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
         // Change the configuration to have a default style and force it.
-        DocumentReference configurationReference =
-            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code"), "Configuration");
+        DocumentReference configurationReference = getConfigurationReference(setup);
         setup.updateObject(configurationReference, "Image.Style.Code.ConfigurationClass", 0,
             "defaultStyle", "bordered",
             "forceDefaultStyle", "1");
@@ -583,6 +589,58 @@ class ImagePluginIT
         assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(17)
+    void updateImageStyleSeveralTimes(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // Create the image style as an admin.
+        createBorderedStyle(setup);
+
+        // Then test the image styles on the image dialog as a standard user.
+        createAndLoginStandardUser(setup);
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = newPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        ImageDialogSelectModal imageDialogSelectModal = editor.getToolBar().insertImage();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        ImageDialogStandardEditForm imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
+        imageDialogStandardEditForm.setImageStyle("Bordered");
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+
+        wysiwygEditPage = savedPage.editWYSIWYG();
+        editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.getToolBar().editImage();
+
+        imageDialogEditModal.switchToStandardTab().setImageStyle("---");
+        imageDialogEditModal.clickInsert();
+
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        imageDialogEditModal = editor.getToolBar().editImage();
+        imageDialogEditModal.switchToStandardTab().setImageStyle("Bordered");
+        imageDialogEditModal.clickInsert();
+
+        savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+    }
+
     private ViewPage uploadAttachment(TestUtils setup, TestReference testReference, String attachmentName)
         throws Exception
     {
@@ -607,5 +665,10 @@ class ImagePluginIT
         typeProperty.setValue("bordered");
         styleObject.withProperties(borderedProperty, typeProperty);
         setup.rest().add(styleObject);
+    }
+
+    private static DocumentReference getConfigurationReference(TestUtils setup)
+    {
+        return new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code"), "Configuration");
     }
 }

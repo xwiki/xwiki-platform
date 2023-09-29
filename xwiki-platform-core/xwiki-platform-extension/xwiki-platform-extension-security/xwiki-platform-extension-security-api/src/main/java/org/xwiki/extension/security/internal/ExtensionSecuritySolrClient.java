@@ -70,6 +70,14 @@ public class ExtensionSecuritySolrClient
         CVE_ID, SECURITY_CVE_ID
     );
 
+    /**
+     * Mapping between the solr properties and their corresponding types. When missing, the type is implicitly
+     * {@link String}. This mapping is used to convert parameters according to their types.
+     */
+    private static final Map<String, Class<?>> SOLR_PROPERTY_TO_TYPE = Map.of(
+        SECURITY_MAX_CVSS, Double.class
+    );
+
     @Inject
     private ExtensionIndexStore extensionIndexStore;
 
@@ -123,7 +131,8 @@ public class ExtensionSecuritySolrClient
         for (LiveDataQuery.Filter filter : liveDataQuery.getFilters()) {
             String field = mapPropertyToField(filter.getProperty());
             for (LiveDataQuery.Constraint constraint : filter.getConstraints()) {
-                String filterQueryString = this.solrUtils.toFilterQueryString(constraint.getValue());
+                String filterQueryString = this.solrUtils.toFilterQueryString(constraint.getValue(),
+                    SOLR_PROPERTY_TO_TYPE.getOrDefault(field, String.class));
                 if (StringUtils.isEmpty(filterQueryString)) {
                     continue;
                 }

@@ -28,6 +28,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentMatchers;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
@@ -39,6 +41,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -49,6 +52,7 @@ import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializ
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.CVE_ID;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
 
 /**
  * Test of {@link ExtensionSecuritySolrClient}.
@@ -87,7 +91,7 @@ class ExtensionSecuritySolrClientTest
         params.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
         verify(this.extensionIndexStore)
             .search(ArgumentMatchers.<SolrQuery>argThat(
-                t -> Arrays.equals(t.getFilterQueries(), params.getFilterQueries())));
+                t -> sameArraysNoOrder(t.getFilterQueries(), params.getFilterQueries())));
     }
 
     @Test
@@ -100,15 +104,16 @@ class ExtensionSecuritySolrClientTest
         liveDataQuery.setOffset(0L);
         liveDataQuery.setSort(List.of());
         liveDataQuery.setFilters(List.of(new LiveDataQuery.Filter(FIX_VERSION, "match", "15.5")));
+        liveDataQuery.setSource(new LiveDataQuery.Source());
         this.solrClient.solrQuery(liveDataQuery);
 
         SolrQuery params = new SolrQuery();
-        params.addFilterQuery("security_maxCVSS:{0 TO 10]");
+        params.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
         params.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
 
         verify(this.extensionIndexStore)
             .search(AdditionalMatchers.<SolrQuery>and(
-                argThat(t -> Arrays.equals(t.getFilterQueries(), params.getFilterQueries())),
+                argThat(t -> sameArraysNoOrder(t.getFilterQueries(), params.getFilterQueries())),
                 argThat(t -> Objects.equals(t.getSorts(), params.getSorts())))
             );
     }
@@ -118,7 +123,7 @@ class ExtensionSecuritySolrClientTest
     {
         mockExtensionIndexStore();
 
-        when(this.solrUtils.toFilterQueryString(any())).thenAnswer(it -> it.getArgument(0));
+        when(this.solrUtils.toFilterQueryString(any(), eq(String.class))).thenAnswer(it -> it.getArgument(0));
 
         LiveDataQuery liveDataQuery = new LiveDataQuery();
         liveDataQuery.initialize();
@@ -131,11 +136,38 @@ class ExtensionSecuritySolrClientTest
         expectedSolrQuery.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
 
         verify(this.extensionIndexStore).search(argThat((SolrQuery solrQuery) ->
-        {
-            String[] filterQueries = solrQuery.getFilterQueries();
-            String[] filterQueries1 = expectedSolrQuery.getFilterQueries();
-            return sameArraysNoOrder(filterQueries, filterQueries1);
-        }));
+            sameArraysNoOrder(solrQuery.getFilterQueries(), expectedSolrQuery.getFilterQueries())));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "6.3,6.3",
+        "abcd,0.0",
+    })
+    void filterByMaxCVSS(String value, String convertedValue) throws Exception
+    {
+        mockExtensionIndexStore();
+
+        when(this.solrUtils.toFilterQueryString(any(), eq(Double.class))).thenAnswer(it -> {
+            try {
+                return String.valueOf(Double.parseDouble(it.getArgument(0)));
+            } catch (NumberFormatException e) {
+                return "0.0";
+            }
+        });
+
+        LiveDataQuery liveDataQuery = new LiveDataQuery();
+        liveDataQuery.initialize();
+        liveDataQuery.setFilters(List.of(new LiveDataQuery.Filter(MAX_CVSS, "contains", value)));
+        this.solrClient.solrQuery(liveDataQuery);
+
+        SolrQuery expectedSolrQuery = new SolrQuery();
+        expectedSolrQuery.addFilterQuery(String.format("%s:[%s TO 10]", SECURITY_MAX_CVSS, convertedValue));
+        expectedSolrQuery.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
+        expectedSolrQuery.addFilterQuery(FIELD_INSTALLED_NAMESPACES + ":[* TO *]");
+
+        verify(this.extensionIndexStore).search(argThat((SolrQuery solrQuery) ->
+            sameArraysNoOrder(solrQuery.getFilterQueries(), expectedSolrQuery.getFilterQueries())));
     }
 
     private void mockExtensionIndexStore()
@@ -150,7 +182,8 @@ class ExtensionSecuritySolrClientTest
 
     private static boolean sameArraysNoOrder(String[] a1, String[] a2)
     {
-        return Arrays.stream(a1).sorted().collect(Collectors.toList())
-            .equals(Arrays.stream(a2).sorted().collect(Collectors.toList()));
+        List<String> sl1 = Arrays.stream(a1).sorted().collect(Collectors.toList());
+        List<String> sl2 = Arrays.stream(a2).sorted().collect(Collectors.toList());
+        return Objects.equals(sl1, sl2);
     }
 }

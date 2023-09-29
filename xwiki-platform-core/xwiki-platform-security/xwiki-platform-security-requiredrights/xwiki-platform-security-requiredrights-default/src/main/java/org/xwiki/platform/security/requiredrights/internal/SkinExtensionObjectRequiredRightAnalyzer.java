@@ -60,10 +60,10 @@ public class SkinExtensionObjectRequiredRightAnalyzer implements RequiredRightAn
         String translationKey;
         if (isAlways) {
             right = Right.PROGRAM;
-            translationKey = "security.requiredrights.globalskinextension";
+            translationKey = "security.requiredrights.object.skinExtension.always";
         } else {
             right = Right.SCRIPT;
-            translationKey = "security.requiredrights.skinextension";
+            translationKey = "security.requiredrights.object.skinExtension";
         }
 
         return List.of(new RequiredRightAnalysisResult(

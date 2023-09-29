@@ -66,6 +66,9 @@ public class ScriptMacroAnalyzer
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @Inject
+    private MacroDisplayerProvider macroDisplayerProvider;
+
     /**
      * @param macroBlock the macro block to analyze
      * @param macro the macro of the block
@@ -98,11 +101,16 @@ public class ScriptMacroAnalyzer
     {
         EntityReference reference = extractSourceReference(macroBlock);
 
+        String messageKey;
+        if (right == Right.PROGRAM) {
+            messageKey = "security.requiredrights.macro.script.program";
+        } else {
+            messageKey = "security.requiredrights.macro.script.script";
+        }
+
         return List.of(new RequiredRightAnalysisResult(reference,
-            this.translationMessageSupplierProvider.get("security.requiredrights.scriptmacro",
-                macroId, right),
-            this.translationMessageSupplierProvider.get("security.requiredrights.scriptmacro.description",
-                macroBlock.getContent()),
+            this.translationMessageSupplierProvider.get(messageKey, macroId),
+            this.macroDisplayerProvider.get(macroBlock),
             List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
         ));
     }

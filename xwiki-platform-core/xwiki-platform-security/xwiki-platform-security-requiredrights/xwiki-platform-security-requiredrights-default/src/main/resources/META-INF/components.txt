@@ -10,3 +10,4 @@ org.xwiki.platform.security.requiredrights.internal.ScriptMacroAnalyzer
 org.xwiki.platform.security.requiredrights.internal.TranslationMessageSupplierProvider
 org.xwiki.platform.security.requiredrights.internal.SkinExtensionObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.XObjectDisplayerProvider
+org.xwiki.platform.security.requiredrights.internal.MacroDisplayerProvider

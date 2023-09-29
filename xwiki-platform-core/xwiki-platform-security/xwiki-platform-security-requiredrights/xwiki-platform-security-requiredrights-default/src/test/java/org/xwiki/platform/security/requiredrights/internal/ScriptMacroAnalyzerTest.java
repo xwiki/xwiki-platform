@@ -122,7 +122,7 @@ class ScriptMacroAnalyzerTest
             this.analyzer.analyze(macroBlock, macro);
 
         verify(this.beanManager).populate(any(ScriptMacroParameters.class), eq(parameters));
-        verify(this.translationMessageSupplierProvider).get("security.requiredrights.scriptmacro", macroId, myRight);
+        verify(this.translationMessageSupplierProvider).get("security.requiredrights.macro.script.script", macroId);
 
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
@@ -160,7 +160,7 @@ class ScriptMacroAnalyzerTest
 
         // Check that the translation message supplier was called.
         verify(this.translationMessageSupplierProvider)
-            .get("security.requiredrights.scriptmacro", macroId, requiredRight);
+            .get("security.requiredrights.macro.script." + (isPrivileged ? "program" : "script"), macroId);
         // Check that the result is correct.
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);

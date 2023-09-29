@@ -23,16 +23,20 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -54,27 +58,38 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
     @Inject
     private TranslationMessageSupplierProvider translationMessageSupplierProvider;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     @Override
     public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
     {
-        String requiredRight = object.getStringValue("level");
+        String propertyName = "level";
+        String requiredRight = object.getStringValue(propertyName);
 
         if (StringUtils.isNotBlank(requiredRight)) {
             Right right = Right.toRight(requiredRight);
 
             if (right != Right.ILLEGAL) {
+                // Display the property to get the right name in the current language.
+                String rightHTML = object.displayView(propertyName, this.contextProvider.get());
+                String rightView = StringEscapeUtils.unescapeXml(rightHTML);
                 return List.of(
                     new RequiredRightAnalysisResult(object.getReference(),
-                        this.translationMessageSupplierProvider.get("security.requiredrights.requiredrightobject",
-                            requiredRight),
-                        () -> null,
+                        this.translationMessageSupplierProvider.get("security.requiredrights.object.requiredRight",
+                            rightView),
+                        CompositeBlock::new,
                         List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
                     ),
+                    // TODO: we should use the localized document reference here but we don't have it as the object
+                    //  doesn't belong to the document.
+                    //  On the other hand, it seems like a super unlikely case to have a localized document with a
+                    //  required rights object.
                     new RequiredRightAnalysisResult(object.getDocumentReference(),
                         this.translationMessageSupplierProvider.get(
-                            "security.requiredrights.requiredrightobjectcontent",
-                            requiredRight),
-                        () -> null,
+                            "security.requiredrights.object.requiredRight.content",
+                            rightView),
+                        CompositeBlock::new,
                         List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
                     )
                 );

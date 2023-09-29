@@ -31,6 +31,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -60,9 +61,8 @@ public class StringVelocityRequiredRightAnalyzer implements RequiredRightAnalyze
 
         if (StringUtils.containsAny(object, "#", "$")) {
             return List.of(new RequiredRightAnalysisResult(null,
-                this.translationMessageSupplierProvider.get("security.requiredrights.velocity"),
-                this.translationMessageSupplierProvider.get("security.requiredrights.velocity.description",
-                    object),
+                this.translationMessageSupplierProvider.get("security.requiredrights.velocity", object),
+                CompositeBlock::new,
                 List.of(new RequiredRightAnalysisResult.RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false))
             ));
         } else {

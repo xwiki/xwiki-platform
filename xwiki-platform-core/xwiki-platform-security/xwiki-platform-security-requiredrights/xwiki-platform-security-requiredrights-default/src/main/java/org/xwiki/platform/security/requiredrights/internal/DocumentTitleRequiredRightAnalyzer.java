@@ -20,6 +20,7 @@
 package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,9 +51,18 @@ public class DocumentTitleRequiredRightAnalyzer implements RequiredRightAnalyzer
     @Named(StringVelocityRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<String> stringVelocityRequiredRightAnalyzer;
 
+    @Inject
+    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+
     @Override
     public List<RequiredRightAnalysisResult> analyze(String title) throws RequiredRightsException
     {
-        return this.stringVelocityRequiredRightAnalyzer.analyze(title);
+        return this.stringVelocityRequiredRightAnalyzer.analyze(title).stream()
+            .map(result -> new RequiredRightAnalysisResult(result.getEntityReference(),
+                this.translationMessageSupplierProvider.get("document.title"),
+                this.translationMessageSupplierProvider.get("document.title.description",
+                    title),
+                result.getRequiredRights()))
+            .collect(Collectors.toList());
     }
 }

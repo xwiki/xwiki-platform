@@ -122,12 +122,12 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
         doReturn(scriptMacro).when(this.macroManager).getMacro(macroId);
         // Mock the actual analysis.
         RequiredRightAnalysisResult mockResult = mock();
-        when(this.scriptMacroAnalyzer.analyze(same(block), same(scriptMacro), any())).thenReturn(List.of(mockResult));
+        when(this.scriptMacroAnalyzer.analyze(same(block), same(scriptMacro))).thenReturn(List.of(mockResult));
 
         List<RequiredRightAnalysisResult> result = this.analyzer.analyze(block);
 
         // Ensure that the script macro analyzer was called.
-        verify(this.scriptMacroAnalyzer).analyze(same(block), same(scriptMacro), any());
+        verify(this.scriptMacroAnalyzer).analyze(same(block), same(scriptMacro));
         assertEquals(List.of(mockResult), result);
     }
 

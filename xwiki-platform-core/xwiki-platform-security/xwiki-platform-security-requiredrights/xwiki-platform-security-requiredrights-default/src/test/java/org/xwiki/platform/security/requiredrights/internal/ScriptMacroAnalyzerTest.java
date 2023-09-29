@@ -119,7 +119,7 @@ class ScriptMacroAnalyzerTest
 
         MacroTransformationContext macroTransformationContext = mock();
         List<RequiredRightAnalysisResult> analysisResults =
-            this.analyzer.analyze(macroBlock, macro, macroTransformationContext);
+            this.analyzer.analyze(macroBlock, macro);
 
         verify(this.beanManager).populate(any(ScriptMacroParameters.class), eq(parameters));
         verify(this.translationMessageSupplierProvider).get("security.requiredrights.scriptmacro", macroId, myRight);
@@ -156,7 +156,7 @@ class ScriptMacroAnalyzerTest
 
         Right requiredRight = isPrivileged ? Right.PROGRAM : Right.SCRIPT;
 
-        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(macroBlock, macro, mock());
+        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(macroBlock, macro);
 
         // Check that the translation message supplier was called.
         verify(this.translationMessageSupplierProvider)

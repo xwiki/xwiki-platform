@@ -41,7 +41,6 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -70,11 +69,9 @@ public class ScriptMacroAnalyzer
     /**
      * @param macroBlock the macro block to analyze
      * @param macro the macro of the block
-     * @param transformationContext the transformation context for the macro
      * @return the required rights for the macro
      */
-    public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock, Macro<?> macro,
-        MacroTransformationContext transformationContext)
+    public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock, Macro<?> macro)
     {
         List<RequiredRightAnalysisResult> result;
 
@@ -84,8 +81,7 @@ public class ScriptMacroAnalyzer
             this.beanManager.populate(macroParameters, macroBlock.getParameters());
 
             MacroPermissionPolicy mpp =
-                this.componentManagerProvider.get()
-                    .getInstance(MacroPermissionPolicy.class, macroBlock.getId());
+                this.componentManagerProvider.get().getInstance(MacroPermissionPolicy.class, macroBlock.getId());
             result = generateResult(macroBlock, macroBlock.getId(), mpp.getRequiredRight());
         } catch (Exception ex) {
             if (macro instanceof PrivilegedScriptMacro) {
@@ -114,7 +110,7 @@ public class ScriptMacroAnalyzer
     private EntityReference extractSourceReference(Block source)
     {
         EntityReference result = null;
-        // First try the entity reference metadata.
+        // First, try the entity reference metadata.
         MetaDataBlock metaDataBlock =
             source.getFirstBlock(new MetadataBlockMatcher(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA),
                 Block.Axes.ANCESTOR);

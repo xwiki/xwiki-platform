@@ -111,7 +111,7 @@ public class DefaultMacroBlockRequiredRightAnalyzer implements RequiredRightAnal
             }
 
             if (macro instanceof ScriptMacro) {
-                result = this.scriptMacroAnalyzer.analyze(macroBlock, macro, transformationContext);
+                result = this.scriptMacroAnalyzer.analyze(macroBlock, macro);
             } else if (macro != null && this.shouldMacroContentBeParsed(macro)) {
                 try {
                     // Keep whatever metadata was present on the XDOM.

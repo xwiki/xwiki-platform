@@ -20,8 +20,8 @@
 package org.xwiki.extension.index.internal.listener;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,18 +32,22 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer;
 import org.xwiki.extension.index.internal.ExtensionIndexSolrUtil;
 import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
+
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
+import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
 /**
  * Cleanup the extension index of entries related to artifacts that are not available anymore (e.g., upgrade or manual
@@ -55,14 +59,14 @@ import org.xwiki.search.solr.SolrUtils;
  */
 @Component
 @Singleton
-@Named("ExtensionIndexApplicationStartedListener")
-public class ExtensionIndexApplicationStartedListener implements EventListener
+@Named("ExtensionIndexCleanupListener")
+public class ExtensionIndexCleanupListener implements EventListener
 {
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
     @Inject
-    private LocalExtensionRepository localExtensionRepository;
+    private InstalledExtensionRepository installedExtensionRepository;
 
     @Inject
     private Solr solr;
@@ -73,10 +77,13 @@ public class ExtensionIndexApplicationStartedListener implements EventListener
     @Inject
     private ExtensionIndexSolrUtil extensionIndexSolrUtil;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public String getName()
     {
-        return "ExtensionIndexApplicationStartedListener";
+        return "ExtensionIndexCleanupListener";
     }
 
     @Override
@@ -88,34 +95,42 @@ public class ExtensionIndexApplicationStartedListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        Thread thread = new Thread(this::proceed);
+        thread.setPriority(thread.getPriority() - 2);
+        thread.start();
+    }
+
+    private void proceed()
+    {
         try {
             SolrClient client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);
-            SolrQuery solrQuery = new SolrQuery();
+            SolrQuery solrQuery = new SolrQuery()
+                // Only return the id and the installed extensions fields as they are the only fields we are interested
+                // in.
+                .setFields(SOLR_FIELD_ID, IS_INSTALLED_EXTENSION);
             int batchSize = 1000;
             QueryResponse search = client.query(solrQuery.setRows(batchSize).setStart(0));
-            List<String> idsToRemove = new ArrayList<>();
+
             while (!search.getResults().isEmpty()) {
                 for (SolrDocument doc : search.getResults()) {
                     String id = this.solrUtils.getId(doc);
                     ExtensionId extensionId = this.extensionIndexSolrUtil.fromSolrId(id);
-                    if (!this.coreExtensionRepository.exists(extensionId) && !this.localExtensionRepository.exists(
-                        extensionId))
+                    boolean isCoreExtension = Objects.equals(doc.getFieldValue(IS_INSTALLED_EXTENSION), false);
+                    if ((isCoreExtension && !this.coreExtensionRepository.exists(extensionId))
+                        || (!isCoreExtension && !this.installedExtensionRepository.exists(extensionId)))
                     {
-                        idsToRemove.add(id);
+                        client.deleteById(id);
                     }
                 }
                 search = client.query(solrQuery.setStart(solrQuery.getStart() + batchSize));
             }
 
-            client.deleteById(idsToRemove);
             client.commit();
         } catch (SolrException e) {
-            throw new RuntimeException(String.format("Failed to get the solr client for the [%s] index.",
-                ExtensionIndexSolrCoreInitializer.NAME), e);
-        } catch (SolrServerException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            this.logger.error("Failed to get a solr client for the [{}] index.",
+                ExtensionIndexSolrCoreInitializer.NAME, e);
+        } catch (SolrServerException | IOException e) {
+            this.logger.error("Failed to perform a solr query.", e);
         }
     }
 }

@@ -22,6 +22,7 @@ package org.xwiki.extension.index.internal.listener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiPredicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,6 +47,7 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 
+import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
@@ -107,19 +109,22 @@ public class ExtensionIndexCleanupListener implements EventListener
         try {
             SolrClient client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);
             SolrQuery solrQuery = new SolrQuery()
-                // Only return the id and the installed extensions fields as they are the only fields we are interested
-                // in.
-                .setFields(SOLR_FIELD_ID, IS_INSTALLED_EXTENSION);
+                .setFields(SOLR_FIELD_ID, IS_INSTALLED_EXTENSION, FIELD_INSTALLED_NAMESPACES);
             int batchSize = 1000;
             QueryResponse search = client.query(solrQuery.setRows(batchSize).setStart(0));
 
+            // Compute lazily of a non-core extension can be removed (i.e., it has at least one namespace but can't 
+            // be found in the installed extensions repository).
+            BiPredicate<SolrDocument, ExtensionId> canDeleteNotCore = (doc, extensionId) ->
+                doc.getFieldValue(FIELD_INSTALLED_NAMESPACES) != null
+                    && !this.installedExtensionRepository.exists(extensionId);
             while (!search.getResults().isEmpty()) {
                 for (SolrDocument doc : search.getResults()) {
                     String id = this.solrUtils.getId(doc);
                     ExtensionId extensionId = this.extensionIndexSolrUtil.fromSolrId(id);
                     boolean isCoreExtension = Objects.equals(doc.getFieldValue(IS_INSTALLED_EXTENSION), false);
                     if ((isCoreExtension && !this.coreExtensionRepository.exists(extensionId))
-                        || (!isCoreExtension && !this.installedExtensionRepository.exists(extensionId)))
+                        || (!isCoreExtension && canDeleteNotCore.test(doc, extensionId)))
                     {
                         client.deleteById(id);
                     }

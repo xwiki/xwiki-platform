@@ -55,7 +55,6 @@ import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
  *
  * @version $Id$
  * @since 15.9RC1
- * @since 15.5.3
  */
 @Component
 @Singleton
@@ -100,7 +99,10 @@ public class ExtensionIndexCleanupListener implements EventListener
         thread.start();
     }
 
-    private void proceed()
+    /**
+     * This method is package-protected for testing purpose. It is not advised to use it outside of the current class.
+     */
+    void proceed()
     {
         try {
             SolrClient client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);

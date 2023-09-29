@@ -74,14 +74,13 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
             // wiki macros etc.
             return this.documentContextExecutor.call(() ->
             {
-                List<RequiredRightAnalysisResult> result = new ArrayList<>();
                 // Analyze the title
-                result.addAll(this.documentTitleRequiredRightAnalyzer.analyze(document.getTitle()));
+                List<RequiredRightAnalysisResult> result =
+                    new ArrayList<>(this.documentTitleRequiredRightAnalyzer.analyze(document.getTitle()));
+                result.forEach(r -> r.setEntityReference(document.getDocumentReferenceWithLocale()));
 
                 // Analyze the content
                 result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));
-
-                result.forEach(r -> r.setEntityReference(document.getDocumentReference()));
 
                 for (List<BaseObject> baseObjects : document.getXObjects().values()) {
                     for (BaseObject object : baseObjects) {

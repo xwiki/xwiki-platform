@@ -201,6 +201,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private final Map<Long, ReentrantLock> documentSavingLockMap = Collections.synchronizedMap(new ReferenceMap<>());
 
     /**
+     * Same mechanism used for saving spaces.
+     */
+    private final Map<Long, ReentrantLock> spaceSavingLockMap = Collections.synchronizedMap(new ReferenceMap<>());
+
+    /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
      *
@@ -782,12 +787,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private void insertXWikiSpace(XWikiSpace space, Session session)
     {
-        // Insert the space
-        session.save(space);
+        Lock lock = this.spaceSavingLockMap.computeIfAbsent(space.getId(), id -> new ReentrantLock(true));
+        lock.lock();
+        try {
+            // Insert the space
+            session.save(space);
 
-        // Update parent space
-        if (space.getSpaceReference().getParent() instanceof SpaceReference) {
-            maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(), session);
+            // Update parent space
+            if (space.getSpaceReference().getParent() instanceof SpaceReference) {
+                maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(), session);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

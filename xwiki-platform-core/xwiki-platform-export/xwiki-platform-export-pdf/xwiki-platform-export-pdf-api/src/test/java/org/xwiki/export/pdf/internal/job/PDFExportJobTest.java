@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -91,6 +90,9 @@ class PDFExportJobTest
     @MockComponent
     private PDFExportConfiguration configuration;
 
+    @MockComponent
+    private PrintPreviewURLBuilder printPreviewURLBuilder;
+
     private DocumentReference firstPageReference = new DocumentReference("test", "First", "Page");
 
     private DocumentRenderingResult firstPageRendering = new DocumentRenderingResult(this.firstPageReference,
@@ -150,9 +152,10 @@ class PDFExportJobTest
     {
         when(this.requiredSkinExtensionsRecorder.stop()).thenReturn("required skin extensions");
 
-        InputStream pdfContent = mock(InputStream.class);
         URL printPreviewURL = new URL("http://www.xwiki.org");
-        this.request.getContext().put("request.url", printPreviewURL);
+        when(this.printPreviewURLBuilder.getPrintPreviewURL(this.request)).thenReturn(printPreviewURL);
+
+        InputStream pdfContent = mock(InputStream.class);
         when(this.pdfPrinter.print(printPreviewURL)).thenReturn(pdfContent);
 
         this.request.setServerSide(true);
@@ -188,7 +191,8 @@ class PDFExportJobTest
     }
 
     @Test
-    void runWithTemplateSpecified() throws Exception {
+    void runWithTemplateSpecified() throws Exception
+    {
         DocumentReference templateReference = new DocumentReference("test", "Some", "Template");
         when(this.authorization.hasAccess(Right.VIEW, this.aliceReference, templateReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, templateReference)).thenReturn(true);

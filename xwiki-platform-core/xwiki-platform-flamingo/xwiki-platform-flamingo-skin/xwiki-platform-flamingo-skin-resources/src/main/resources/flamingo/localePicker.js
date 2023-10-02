@@ -83,6 +83,9 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
     if (settings.allowEmpty) {
       $('<option></option>').attr('value', '').text('None').appendTo(select);
     }
+    if (settings.label) {
+      select.attr('aria-label', settings.label);
+    }
     select.append(locales.map(function(locale) {
       var index = selectedLocales.indexOf(locale.code);
       if (index >= 0) {

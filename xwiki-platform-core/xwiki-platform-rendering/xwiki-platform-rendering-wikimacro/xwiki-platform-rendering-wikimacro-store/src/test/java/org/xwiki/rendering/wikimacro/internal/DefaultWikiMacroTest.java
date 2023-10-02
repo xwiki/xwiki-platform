@@ -52,6 +52,7 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -83,6 +84,9 @@ class DefaultWikiMacroTest
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
+
+    @InjectMockComponents
+    private DefaultWikiMacro wikiMacro;
 
     /**
      * Dummy document reference of the document which contains the wiki macro.
@@ -169,7 +173,7 @@ class DefaultWikiMacroTest
         this.wikiMacroDocument.setSyntax(syntax);
         this.wikiMacroObject.setLargeStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, macroContent);
 
-        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(this.wikiMacroObject, descriptor, this.componentManager);
+        this.wikiMacro.initialize(this.wikiMacroObject, descriptor);
 
         this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
     }
@@ -614,7 +618,8 @@ class DefaultWikiMacroTest
             .build();
         this.wikiMacroDocument.setSyntax(Syntax.XWIKI_2_0);
         this.wikiMacroObject.setLargeStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "{{wikimacrocontent/}}");
-        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(this.wikiMacroObject, descriptor, this.componentManager);
+        this.wikiMacro.initialize(this.wikiMacroObject, descriptor);
+
         this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
 
         Converter converter = this.componentManager.getInstance(Converter.class);

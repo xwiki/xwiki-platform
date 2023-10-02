@@ -21,13 +21,16 @@ package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.Type;
 
-import org.xwiki.component.manager.ComponentLookupException;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.Transformation;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -40,39 +43,45 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public abstract class AbstractAsyncContentBaseObjectWikiComponent extends AbstractAsyncBaseObjectWikiComponent
 {
-    protected final ContentParser parser;
+    @Inject
+    protected ContentParser parser;
 
-    protected final XDOM xdom;
+    @Inject
+    protected ComponentManager componentManager;
 
-    protected final Syntax syntax;
+    @Inject
+    protected BlockAsyncRendererExecutor executor;
 
-    protected final ComponentManager componentManager;
+    @Inject
+    @Named("macro")
+    protected Transformation macroTransformation;
 
-    protected final BlockAsyncRendererExecutor executor;
+    protected XDOM xdom;
+
+    protected Syntax syntax;
 
     /**
      * @param baseObject the object containing ui extension setup
      * @param roleType the role Type implemented
      * @param roleHint the role hint for this role implementation
-     * @param componentManager The XWiki content manager
-     * @throws ComponentLookupException If module dependencies are missing
-     * @throws WikiComponentException When failing to parse content
+     * @throws WikiComponentException when failing to parse content
+     * @since 15.9-rc-1
      */
-    public AbstractAsyncContentBaseObjectWikiComponent(BaseObject baseObject, Type roleType, String roleHint,
-        ComponentManager componentManager) throws ComponentLookupException, WikiComponentException
+    @Override
+    protected void initialize(BaseObject baseObject, Type roleType, String roleHint) throws WikiComponentException
     {
-        super(baseObject, roleType, roleHint);
-
-        this.componentManager = componentManager;
-        this.executor = componentManager.getInstance(BlockAsyncRendererExecutor.class);
+        super.initialize(baseObject, roleType, roleHint);
 
         XWikiDocument ownerDocument = baseObject.getOwnerDocument();
 
-        this.parser = componentManager.getInstance(ContentParser.class);
-
         this.syntax = ownerDocument.getSyntax();
         String content = baseObject.getStringValue(getContentPropertyName());
-        this.xdom = this.parser.parse(content, syntax, ownerDocument.getDocumentReference());
+
+        // Parse the content
+        this.xdom = this.parser.parse(content, this.syntax, ownerDocument.getDocumentReference());
+
+        // Prepare the content
+        this.macroTransformation.prepare(this.xdom);
     }
 
     /**

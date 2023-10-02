@@ -71,7 +71,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      */
     private static final String CONTENT_DESCRIPTION = "the velocity script to execute";
 
-    private static final String MACRO_ANNOTATION = "velocity.template";
+    private static final String MACRO_ATTRIBUTE = "velocity.template";
 
     private static final MetadataBlockMatcher METADATA_SOURCE_MARCHER = new MetadataBlockMatcher(MetaData.SOURCE);
 
@@ -117,14 +117,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
         try {
             VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
-            VelocityMacroFilter filter = getFilter(parameters);
-
-            String cleanedContent = content;
-
-            // Execute pre filter
-            if (filter != null) {
-                cleanedContent = filter.before(cleanedContent, velocityContext);
-            }
+            VelocityMacroFilter filter = getFilter(parameters.getFilter());
 
             StringWriter writer = new StringWriter();
 
@@ -137,11 +130,22 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
 
             // Execute Velocity context
             VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
-            VelocityTemplate template =
-                (VelocityTemplate) context.getCurrentMacroBlock().getAttribute(MACRO_ANNOTATION);
-            if (template != null) {
+            VelocityTemplate template = (VelocityTemplate) context.getCurrentMacroBlock().getAttribute(MACRO_ATTRIBUTE);
+            if (template != null && (filter == null || filter.isPreparationSupported())) {
+                // Execute pre filter
+                if (filter != null) {
+                    filter.before(template, velocityContext);
+                }
+
                 velocityEngine.evaluate(velocityContext, writer, key, template);
             } else {
+                String cleanedContent = content;
+
+                // Execute pre filter
+                if (filter != null) {
+                    cleanedContent = filter.before(cleanedContent, velocityContext);
+                }
+
                 velocityEngine.evaluate(velocityContext, writer, key, new StringReader(cleanedContent));
             }
             result = writer.toString();
@@ -160,46 +164,52 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     @Override
     public void prepare(MacroBlock macroBlock) throws MacroPreparationException
     {
-        // Get the macro block source, it will be indicated in Velocity errors
-        MetaDataBlock metadataBlock = macroBlock.getFirstBlock(METADATA_SOURCE_MARCHER, Axes.ANCESTOR);
-        String sourceName = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
-        if (sourceName == null) {
-            sourceName = "Unknown velocity MacroBlok";
-        }
+        // Pre filter the velocity content
+        VelocityMacroFilter filter = getFilter(macroBlock.getParameter("filter"));
 
-        // Compile the Velocity content
-        VelocityTemplate template;
-        try {
-            template = this.velocityManager.compile(sourceName, new StringReader(macroBlock.getContent()));
-        } catch (XWikiVelocityException e) {
-            throw new MacroPreparationException("Failed to compile the Velocity script", e);
-        }
+        if (filter == null || filter.isPreparationSupported()) {
+            // Get the macro block source, it will be indicated in Velocity errors
+            MetaDataBlock metadataBlock = macroBlock.getFirstBlock(METADATA_SOURCE_MARCHER, Axes.ANCESTOR);
+            String sourceName = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+            if (sourceName == null) {
+                sourceName = "Unknown velocity MacroBlok";
+            }
 
-        // Cache the compiled Velocity and associated it wit the velocity engine key to be extra safe
-        macroBlock.setAttribute(MACRO_ANNOTATION, template);
+            // Compile the Velocity content
+            VelocityTemplate template;
+            try {
+                String preparedContent = macroBlock.getContent();
+
+                // Execute pre filter
+                if (filter != null) {
+                    preparedContent = filter.prepare(preparedContent);
+                }
+
+                template = this.velocityManager.compile(sourceName, new StringReader(preparedContent));
+            } catch (XWikiVelocityException e) {
+                throw new MacroPreparationException("Failed to compile the Velocity script", e);
+            }
+
+            // Cache the compiled Velocity and associated it wit the velocity engine key to be extra safe
+            macroBlock.setAttribute(MACRO_ATTRIBUTE, template);
+        }
     }
 
     /**
-     * @param parameters the velocity macros parameters
+     * @param filterName the name of the filter to apply
      * @return the velocity content filter
-     * @since 2.0M1
      */
-    private VelocityMacroFilter getFilter(VelocityMacroParameters parameters)
+    private VelocityMacroFilter getFilter(String filterName)
     {
-        String filterName = parameters.getFilter();
-
-        if (StringUtils.isEmpty(filterName)) {
-            filterName = this.configuration.getFilter();
-
-            if (StringUtils.isEmpty(filterName)) {
-                filterName = null;
-            }
+        String finalFilter = filterName;
+        if (StringUtils.isEmpty(finalFilter)) {
+            finalFilter = this.configuration.getFilter();
         }
 
         VelocityMacroFilter filter = null;
-        if (filterName != null) {
+        if (StringUtils.isNotEmpty(finalFilter)) {
             try {
-                filter = getComponentManager().getInstance(VelocityMacroFilter.class, filterName);
+                filter = getComponentManager().getInstance(VelocityMacroFilter.class, finalFilter);
             } catch (ComponentLookupException e) {
                 this.logger.error("Can't find velocity macro filter", e);
             }

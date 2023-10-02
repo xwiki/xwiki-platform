@@ -17,23 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.velocity.filter;
+package org.xwiki.rendering.internal.macro.velocity;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.macro.velocity.AbstractNoContextVelocityMacroFilter;
+import org.apache.velocity.VelocityContext;
+import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
+import org.xwiki.velocity.VelocityTemplate;
 
 /**
- * Do nothing.
+ * A helper for filters which don't manipulate the context.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 15.9-rc-1
  */
-@Component
-@Named("none")
-@Singleton
-public class NoneVelocityMacroFilter extends AbstractNoContextVelocityMacroFilter
+public abstract class AbstractNoContextVelocityMacroFilter implements VelocityMacroFilter
 {
+    @Override
+    public boolean isPreparationSupported()
+    {
+        return true;
+    }
+
+    @Override
+    public String before(String content, VelocityContext velocityContext)
+    {
+        return prepare(content);
+    }
+
+    @Override
+    public void before(VelocityTemplate content, VelocityContext velocityContext)
+    {
+        // Do nothing
+    }
+
+    @Override
+    public String after(String content, VelocityContext velocityContext)
+    {
+        return content;
+    }
 }

@@ -42,7 +42,6 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 
-import static com.xpn.xwiki.web.ViewAction.VIEW_ACTION;
 import static java.util.Map.entry;
 import static java.util.Map.ofEntries;
 import static java.util.stream.Collectors.joining;
@@ -141,8 +140,6 @@ public class SolrToLiveDataEntryMapper
         // If the extension does not have a name and version indexed, we fall back to an extensionId parsing.
         // Note: this is not supposed to happen in practice.
         ExtensionId extensionId = this.extensionIndexStore.getExtensionId(solrDoc);
-        List<BasicNameValuePair> parameters =
-            buildExtensionURLParameters(extensionId.getId(), extensionId.getVersion().getValue());
         if (solrDoc.get(FieldUtils.NAME) != null) {
             extensionName = this.solrUtils.get(FieldUtils.NAME, solrDoc);
         } else {
@@ -150,19 +147,9 @@ public class SolrToLiveDataEntryMapper
             String[] versionId = this.solrUtils.getId(solrDoc).split("/");
             extensionName = versionId[0];
         }
-        String url = this.documentAccessBridge.getDocumentURL(new LocalDocumentReference("XWiki", "Extensions"),
-            VIEW_ACTION, URLEncodedUtils.format(parameters, Charset.defaultCharset()), null);
+        String url = getExtensionManagerLink(extensionId);
 
         return String.format("<a href='%s'>%s</a>", escapeXml(url), escapeXml(String.valueOf(extensionName)));
-    }
-
-    private static List<BasicNameValuePair> buildExtensionURLParameters(String extensionId, String extensionVersion)
-    {
-        return List.of(
-            new BasicNameValuePair("section", "XWiki.Extensions"),
-            new BasicNameValuePair("extensionId", extensionId),
-            new BasicNameValuePair("extensionVersion", extensionVersion)
-        );
     }
 
     private String buildWikis(SolrDocument doc)
@@ -176,5 +163,22 @@ public class SolrToLiveDataEntryMapper
             .map(it -> it.replaceFirst("wiki:", ""))
             .filter(it -> !Objects.equals(it, "{root}"))
             .collect(joining(", "));
+    }
+
+    /**
+     * Returns the link to the extension manager for a given extension.
+     *
+     * @param extensionId the ID of the extension
+     * @return the link to the extension in the extension manager
+     */
+    private String getExtensionManagerLink(ExtensionId extensionId)
+    {
+        List<BasicNameValuePair> parameters = List.of(
+            new BasicNameValuePair("section", "XWiki.Extensions"),
+            new BasicNameValuePair("extensionId", extensionId.getId()),
+            new BasicNameValuePair("extensionVersion", extensionId.getVersion().getValue())
+        );
+        return this.documentAccessBridge.getDocumentURL(new LocalDocumentReference("XWiki", "XWikiPreferences"),
+            "admin", URLEncodedUtils.format(parameters, Charset.defaultCharset()), null);
     }
 }

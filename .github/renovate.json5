@@ -20,6 +20,7 @@
  {
   // We want all suggestions right away
   "prHourlyLimit" : 0,
+  "prConcurrentLimit" : 0,
 
   // Skip Eclipse M2E special setup "dependency"
   "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],

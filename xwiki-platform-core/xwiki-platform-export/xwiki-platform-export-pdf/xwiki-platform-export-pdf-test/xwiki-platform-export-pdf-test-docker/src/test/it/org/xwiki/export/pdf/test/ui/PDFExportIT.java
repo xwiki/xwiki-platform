@@ -1065,6 +1065,37 @@ class PDFExportIT
         }
     }
 
+    @Test
+    @Order(23)
+    void exportPageWithCustomSheetApplied(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"), "view",
+            "sheet=PDFExportIT.Sheet");
+        ViewPage viewPage = new ViewPage();
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child page in the export because we want to verify that the custom sheet (specified in the query
+        // string) is applied only to the current page (on which the export action is triggered).
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
+        exportTreeModal.export();
+
+        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            // Verify the page corresponding to the parent document.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertEquals("Title: Parent\n3 / 4\nTitle: Parent\nContent:\nChapter 1\n"
+                + "Content of first chapter. Current user is xwiki:XWiki.John.\nLink to child page.\nloaded!\n",
+                contentPageText);
+
+            // Verify the page corresponding to the child document.
+            contentPageText = pdf.getTextFromPage(3);
+            assertEquals("Child\n4 / 4\nChild\nSection 1\nContent of first section.\n", contentPageText);
+        }
+    }
+
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception
     {
         return new URL(String.format("http://%s:%d", testConfiguration.getServletEngine().getIP(),

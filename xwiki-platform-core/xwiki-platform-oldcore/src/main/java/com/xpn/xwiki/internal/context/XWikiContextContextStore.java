@@ -602,6 +602,10 @@ public class XWikiContextContextStore extends AbstractContextStore
 
         // TODO: customize the document with what's in the contextStore if any
 
-        xcontext.setDoc(document);
+        // Put a cloned document in the context so that it's not confused with the document coming from the document
+        // cache. The same is done by XWiki#prepareDocuments(). This ensures for instance that the sheet specified in
+        // the execution context is applied only to the context document and not to the document retrieved from the
+        // cache.
+        xcontext.setDoc(document.clone());
     }
 }

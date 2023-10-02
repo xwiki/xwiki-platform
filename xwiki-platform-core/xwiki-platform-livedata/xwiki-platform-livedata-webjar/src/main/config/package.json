@@ -19,7 +19,7 @@
     "u-node": "0.0.2",
     "vuedraggable": "2.24.3",
     "vue-tippy": "4.16.0",
-    "vue2-touch-events": "3.2.2",
+    "vue2-touch-events": "3.2.3",
     "dompurify": "3.0.6"
   },
   "devDependencies": {

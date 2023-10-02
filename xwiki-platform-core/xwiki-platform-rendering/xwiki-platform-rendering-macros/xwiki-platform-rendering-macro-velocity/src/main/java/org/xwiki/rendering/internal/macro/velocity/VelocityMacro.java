@@ -31,14 +31,22 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractScriptMacro;
 import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
 import org.xwiki.rendering.macro.velocity.VelocityMacroParameters;
 import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
@@ -62,6 +70,10 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      * The description of the macro content.
      */
     private static final String CONTENT_DESCRIPTION = "the velocity script to execute";
+
+    private static final String MACRO_ANNOTATION = "velocity.template";
+
+    private static final MetadataBlockMatcher METADATA_SOURCE_MARCHER = new MetadataBlockMatcher(MetaData.SOURCE);
 
     /**
      * Used to get the Velocity Engine and Velocity Context to use to evaluate the passed Velocity script.
@@ -103,7 +115,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
         String result = "";
 
         try {
-            VelocityContext velocityContext = this.velocityManager.getCurrentVelocityContext();
+            VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
             VelocityMacroFilter filter = getFilter(parameters);
 
@@ -124,7 +136,14 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             }
 
             // Execute Velocity context
-            this.velocityManager.evaluate(writer, key, new StringReader(cleanedContent));
+            VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
+            VelocityTemplate template =
+                (VelocityTemplate) context.getCurrentMacroBlock().getAttribute(MACRO_ANNOTATION);
+            if (template != null) {
+                velocityEngine.evaluate(velocityContext, writer, key, template);
+            } else {
+                velocityEngine.evaluate(velocityContext, writer, key, new StringReader(cleanedContent));
+            }
             result = writer.toString();
 
             // Execute post filter
@@ -136,6 +155,28 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
         }
 
         return result;
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        // Get the macro block source, it will be indicated in Velocity errors
+        MetaDataBlock metadataBlock = macroBlock.getFirstBlock(METADATA_SOURCE_MARCHER, Axes.ANCESTOR);
+        String sourceName = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+        if (sourceName == null) {
+            sourceName = "Unknown velocity MacroBlok";
+        }
+
+        // Compile the Velocity content
+        VelocityTemplate template;
+        try {
+            template = this.velocityManager.compile(sourceName, new StringReader(macroBlock.getContent()));
+        } catch (XWikiVelocityException e) {
+            throw new MacroPreparationException("Failed to compile the Velocity script", e);
+        }
+
+        // Cache the compiled Velocity and associated it wit the velocity engine key to be extra safe
+        macroBlock.setAttribute(MACRO_ANNOTATION, template);
     }
 
     /**

@@ -19,6 +19,16 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
@@ -50,16 +60,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 /**
  * Unit tests for {@link PDFExportJob}.
  * 
@@ -89,6 +89,9 @@ class PDFExportJobTest
 
     @MockComponent
     private PDFExportConfiguration configuration;
+
+    @MockComponent
+    private PrintPreviewURLBuilder printPreviewURLBuilder;
 
     private DocumentReference firstPageReference = new DocumentReference("test", "First", "Page");
 
@@ -149,9 +152,10 @@ class PDFExportJobTest
     {
         when(this.requiredSkinExtensionsRecorder.stop()).thenReturn("required skin extensions");
 
-        InputStream pdfContent = mock(InputStream.class);
         URL printPreviewURL = new URL("http://www.xwiki.org");
-        this.request.getContext().put("request.url", printPreviewURL);
+        when(this.printPreviewURLBuilder.getPrintPreviewURL(this.request)).thenReturn(printPreviewURL);
+
+        InputStream pdfContent = mock(InputStream.class);
         when(this.pdfPrinter.print(printPreviewURL)).thenReturn(pdfContent);
 
         this.request.setServerSide(true);
@@ -187,7 +191,8 @@ class PDFExportJobTest
     }
 
     @Test
-    void runWithTemplateSpecified() throws Exception {
+    void runWithTemplateSpecified() throws Exception
+    {
         DocumentReference templateReference = new DocumentReference("test", "Some", "Template");
         when(this.authorization.hasAccess(Right.VIEW, this.aliceReference, templateReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, this.bobReference, templateReference)).thenReturn(true);

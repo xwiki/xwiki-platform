@@ -99,6 +99,13 @@ def builds = [
       mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
+  'Flavor Test - Security' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Security',
+      pom: 'xwiki-platform-distribution-flavor-test-security/pom.xml',
+      mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
+    )
+  },
   'TestRelease': {
     build(
       name: 'TestRelease',

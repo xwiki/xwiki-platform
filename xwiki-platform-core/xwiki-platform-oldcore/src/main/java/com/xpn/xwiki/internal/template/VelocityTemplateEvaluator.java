@@ -97,9 +97,9 @@ public class VelocityTemplateEvaluator
             "Evaluate content of template with id [{}]", template.getId());
 
         try {
-            VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
-            VelocityTemplate velocityTemplate = getVelocityTemplate(velocityEngine, template, content);
+            VelocityTemplate velocityTemplate = getVelocityTemplate(template, content);
 
+            VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
             if (velocityTemplate != null) {
                 velocityEngine.evaluate(this.velocityManager.getVelocityContext(), writer, namespace, velocityTemplate);
             } else {
@@ -116,8 +116,8 @@ public class VelocityTemplateEvaluator
         }
     }
 
-    private VelocityTemplate getVelocityTemplate(VelocityEngine velocityEngine, Template template,
-        TemplateContent content) throws XWikiVelocityException
+    private VelocityTemplate getVelocityTemplate(Template template, TemplateContent content)
+        throws XWikiVelocityException
     {
         if (content instanceof DefaultTemplateContent) {
             DefaultTemplateContent templateContent = (DefaultTemplateContent) content;
@@ -126,7 +126,7 @@ public class VelocityTemplateEvaluator
             if (!(templateContent.compiledContent instanceof VelocityTemplate)) {
                 // Compile the Velocity
                 templateContent.compiledContent =
-                    velocityEngine.compile(template.getId(), new StringReader(content.getContent()));
+                    this.velocityManager.compile(template.getId(), new StringReader(content.getContent()));
             }
 
             return (VelocityTemplate) templateContent.compiledContent;

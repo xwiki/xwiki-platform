@@ -71,6 +71,11 @@
       "matchPackageNames": ["@vue/test-utils"],
       // @vue/test-utils 1.x targets Vue 2. @vue/test-utils 2.x targets Vue 3.
       "allowedVersions": "/^1\..*$/"
+    },
+    {
+      "matchPackageNames": ["vue-i18n"],
+      // vue-i18n 8.x targets Vue 2. vue-i18n 9.x targets Vue 3.
+      "allowedVersions": "/^8\..*$/"
     }
   ]
 }

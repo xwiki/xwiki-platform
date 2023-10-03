@@ -43,7 +43,6 @@
       "matchPackagePrefixes": ["org.eclipse.jetty"],
       "allowedVersions": "/^9\..*$/"
     },
-
     // But we can use Jetty Server 10
     {
       "matchPackageNames": ["org.eclipse.jetty:jetty-server"],
@@ -61,7 +60,11 @@
       "matchPackagePrefixes": ["org.hibernate:hibernate-"],
       "allowedVersions": "/^5\..*$/"
     },
-    
+    {
+      "matchPackagePrefixes": ["org.simplejavamail:simple-java-mail"],
+      "allowedVersions": "/^6\..*$/"
+    },
+
     // We currently support Vue 2.
     {
       "matchPackageNames": ["vue", "org.webjars.npm:vue"],

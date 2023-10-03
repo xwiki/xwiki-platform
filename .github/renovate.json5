@@ -66,6 +66,11 @@
     {
       "matchPackageNames": ["vue"],
       "allowedVersions": "/^2\..*$/"
+    },
+    {
+      "matchPackageNames": ["@vue/test-utils"],
+      // @vue/test-utils 1.x targets Vue 2. @vue/test-utils 2.x targets Vue 3.
+      "allowedVersions": "/^1\..*$/"
     }
   ]
 }

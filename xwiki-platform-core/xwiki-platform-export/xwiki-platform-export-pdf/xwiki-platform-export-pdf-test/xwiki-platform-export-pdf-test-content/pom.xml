@@ -75,6 +75,12 @@
       <artifactId>xwiki-platform-rendering-macro-code</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to test the PDF export of the office macro. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-office-macro</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- JavaScript dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>

@@ -27,8 +27,10 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
@@ -55,6 +57,8 @@ import org.xwiki.rendering.util.ParserUtils;
  * @version $Id$
  * @since 15.9RC1
  */
+@Component(roles = MacroDisplayerProvider.class)
+@Singleton
 public class MacroDisplayerProvider
 {
     @Inject

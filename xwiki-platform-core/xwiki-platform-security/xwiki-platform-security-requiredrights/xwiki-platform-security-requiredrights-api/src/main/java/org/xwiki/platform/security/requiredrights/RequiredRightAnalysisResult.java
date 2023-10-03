@@ -27,6 +27,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represents the result of a required right analysis. This class provides getters and setters for various properties
@@ -152,4 +153,14 @@ public class RequiredRightAnalysisResult
         return this.requiredRights;
     }
 
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("entityReference", this.getEntityReference())
+            .append("summaryMessageProvider", this.getSummaryMessage())
+            .append("detailedMessageProvider", this.getDetailedMessage())
+            .append("requiredRights", this.getRequiredRights())
+            .toString();
+    }
 }

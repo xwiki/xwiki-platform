@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.security.requiredrights.internal;
+package org.xwiki.platform.security.requiredrights;
 
 import java.util.List;
 
@@ -26,11 +26,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
-import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
-import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.platform.security.requiredrights.internal.XWikiDocumentRequiredRightAnalyzer;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -40,11 +39,12 @@ import com.xpn.xwiki.util.Programming;
  * Gives access to the analysis of the required rights for a document.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Component
 @Singleton
 @Named(SecurityScriptService.ROLEHINT + "." + RequiredRightsScriptService.ID)
+@Unstable
 public class RequiredRightsScriptService implements ScriptService
 {
     /**

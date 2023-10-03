@@ -76,6 +76,11 @@
       "matchPackageNames": ["vue-i18n"],
       // vue-i18n 8.x targets Vue 2. vue-i18n 9.x targets Vue 3.
       "allowedVersions": "/^8\..*$/"
+    },
+    {
+      "matchPackageNames": ["vue-tippy"],
+      // vue-tippy 4.x targets Vue 2. vue-tippy 9.x targets Vue 3.
+      "allowedVersions": "/^4\..*$/"
     }
   ]
 }

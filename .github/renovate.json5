@@ -64,6 +64,10 @@
       "matchPackagePrefixes": ["org.simplejavamail:simple-java-mail"],
       "allowedVersions": "/^6\..*$/"
     },
+    {
+      "matchPackagePrefixes": ["com.icegreen:greenmail-junit5"],
+      "allowedVersions": "/^1\..*$/"
+    },
 
     // We currently support Vue 2.
     {

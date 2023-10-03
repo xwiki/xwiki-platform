@@ -60,6 +60,12 @@
     {
       "matchPackagePrefixes": ["org.hibernate:hibernate-"],
       "allowedVersions": "/^5\..*$/"
+    },
+    
+    // We currently support Vue 2.
+    {
+      "matchPackageNames": ["vue"],
+      "allowedVersions": "/^2\..*$/"
     }
   ]
 }

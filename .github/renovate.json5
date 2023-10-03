@@ -73,7 +73,7 @@
       "allowedVersions": "/^1\..*$/"
     },
     {
-      "matchPackageNames": ["vue-i18n"],
+      "matchPackageNames": ["vue-i18n", "org.webjars.npm:vue-i18n"],
       // vue-i18n 8.x targets Vue 2. vue-i18n 9.x targets Vue 3.
       "allowedVersions": "/^8\..*$/"
     },

@@ -122,7 +122,7 @@
     <dependency>
       <groupId>org.simplejavamail</groupId>
       <artifactId>simple-java-mail</artifactId>
-      <version>4.4.5</version>
+      <version>8.2.0</version>
       <exclusions>
         <exclusion>
           <groupId>com.sun.mail</groupId>

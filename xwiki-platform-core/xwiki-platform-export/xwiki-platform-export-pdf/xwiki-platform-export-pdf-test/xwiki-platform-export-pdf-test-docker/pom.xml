@@ -53,6 +53,14 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- Needed to connect to the Office server in order to test the PDF export of the Office Viewer macro. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-office-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- The JavaScript code needs to display localized messages and for this it needs to fetch them through REST so we
       need an implementation of the localization REST API. -->
     <dependency>
@@ -71,6 +79,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-export-pdf-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used to connect to the Office server in order to test the export of the Office macro. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-office-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

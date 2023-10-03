@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.Network;
+import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
@@ -49,6 +50,7 @@ import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -71,7 +73,13 @@ import org.xwiki.test.ui.po.ViewPage;
         // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
         "org.python:jython-slim"
     },
-    resolveExtraJARs = true
+    resolveExtraJARs = true,
+    // We need the Office server because we want to be able to test how the Office macro is exported to PDF.
+    office = true,
+    properties = {
+        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference)
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.OfficeImporterAdmin"
+    }
 )
 @ExtendWith(PDFExportExecutionCondition.class)
 class PDFExportIT
@@ -1093,6 +1101,46 @@ class PDFExportIT
             // Verify the page corresponding to the child document.
             contentPageText = pdf.getTextFromPage(3);
             assertEquals("Child\n4 / 4\nChild\nSection 1\nContent of first section.\n", contentPageText);
+        }
+    }
+
+    @Test
+    @Order(24)
+    void officeMacro(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        // Connect the wiki to the office server if it is not already done.
+        setup.loginAsSuperAdmin();
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Content", "Office Server");
+        OfficeServerAdministrationSectionPage officeServerAdministrationSectionPage =
+            new OfficeServerAdministrationSectionPage();
+        if (!"Connected".equals(officeServerAdministrationSectionPage.getServerState())) {
+            officeServerAdministrationSectionPage.startServer();
+        }
+
+        setup.login("John", "pass");
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "OfficeMacro"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one content page.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the text from the content page.
+            assertEquals("OfficeMacro\n3 / 3\nThis is a word with image\n", pdf.getTextFromPage(2));
+
+            // Verify that the images are present.
+            List<PDFImage> images = pdf.getImagesFromPage(2);
+            // The first image is the presentation (ppt) slide. The second image is from the word document.
+            assertEquals(2, images.size());
+
+            // The presenation slide.
+            assertEquals(800, images.get(0).getRawWidth());
+            assertEquals(449, images.get(0).getRawHeight());
+
+            // The image from the word document.
+            assertEquals(81, images.get(1).getRawWidth());
+            assertEquals(81, images.get(1).getRawHeight());
         }
     }
 

@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -124,6 +125,10 @@ public class RequestInitializer
         Cookie[] cookies = (Cookie[]) contextStore.get(XWikiContextContextStore.PROP_REQUEST_COOKIES);
         String remoteAddr = (String) contextStore.get(XWikiContextContextStore.PROP_REQUEST_REMOTE_ADDR);
 
+        SerializableHttpSessionWrapper sessionWrapper =
+            (SerializableHttpSessionWrapper) contextStore.get(XWikiContextContextStore.PROP_REQUEST_SESSION);
+        HttpSession session = sessionWrapper != null ? sessionWrapper.getSession() : null;
+
         boolean daemon;
 
         String contextPath = null;
@@ -146,6 +151,9 @@ public class RequestInitializer
                 if (remoteAddr == null) {
                     remoteAddr = request.getRemoteAddr();
                 }
+                if (session == null) {
+                    session = request.getSession();
+                }
             }
 
             // We don't want to take into account the context request URL when generating URLs
@@ -162,7 +170,7 @@ public class RequestInitializer
         if (url != null) {
             XWikiServletRequestStub stubRequest = new XWikiServletRequestStub.Builder().setRequestURL(url)
                 .setContextPath(contextPath).setRequestParameters(parameters).setHeaders(headers).setCookies(cookies)
-                .setRemoteAddr(remoteAddr).build();
+                .setRemoteAddr(remoteAddr).setHttpSession(session).build();
             // Indicate that the URL should be taken into account when generating a URL.
             stubRequest.setDaemon(daemon);
             restoreRequest(url, stubRequest, xcontext);

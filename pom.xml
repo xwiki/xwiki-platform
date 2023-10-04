@@ -1192,7 +1192,8 @@
                   ch.qos.reload4j:reload4j,
 
                   <!-- Does not make sense to have both at the same time -->
-                  org.slf4j:slf4j-log4j12
+                  org.slf4j:slf4j-log4j12,
+                  org.slf4j:slf4j-reload4j
                 </features>
               </extensionOverride>
               <extensionOverride>

@@ -246,7 +246,7 @@
 #end
 
 #macro (getHierarchyPathData_url $reference)
-  ## Extract the closed parent of type OBJECT (can be self), and if found use it to generate a link directly
+  ## Extract the closest parent of type OBJECT (can be self), and if found use it to generate a link directly
   ## to the object. We extract the reference so that entity reference with an OBJECT parent (e.g., an OBJECT_PROPERTY)
   ## also generate a link to their object. 
   #set ($objectReference = $!reference.extractFirstReference('OBJECT'))

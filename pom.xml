@@ -171,17 +171,12 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.23.2</version>
+        <version>4.24.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-          </exclusion>
-          <!-- Not the right id -->
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

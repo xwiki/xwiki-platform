@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>TourCode</web>
+  <name>TourSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+{{html wiki="true"}}
+#set ($discard = $doc.use('TourCode.TourClass'))
+#set ($isEditing = $xcontext.action == 'edit')
+(% class="xform" %)
+(((
+  ## Mark tour as hidden
+  &lt;input type="hidden" name="xhidden" id="xhidden" value="1"&gt;
+  ; &lt;label #if($isEditing)for="TourCode.TourClass_0_description"#end&gt;$escapetool.xml($doc.displayPrettyName('description', false, false))&lt;/label&gt;
+  : $doc.display('description')
+  #if ($isEditing)
+    ; &lt;label for="TourCode.TourClass_0_isActive"&gt;$doc.display('isActive')$escapetool.xml($doc.displayPrettyName('isActive', false, false))&lt;/label&gt;
+  #else
+    ; &lt;label&gt;$escapetool.xml($doc.displayPrettyName('isActive', false, false))&lt;/label&gt;
+    : $doc.display('isActive')
+  #end
+  ; &lt;label #if($isEditing)for="TourCode.TourClass_0_targetPage"#end&gt;$escapetool.xml($doc.displayPrettyName('targetPage', false, false))&lt;/label&gt;
+  : $doc.display('targetPage')
+  ; &lt;label #if($isEditing)for="TourCode.TourClass_0_targetClass"#end&gt;$escapetool.xml($doc.displayPrettyName('targetClass', false, false))&lt;/label&gt;
+  : $doc.display('targetClass')
+
+## Display tour's steps
+&lt;dl&gt;
+  &lt;dt&gt;
+    &lt;label&gt;$services.localization.render('tour.steps')&lt;/label&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    #set($pageMode = $xcontext.action)
+    {{include reference="TourCode.StepsListing"/}}
+  &lt;/dd&gt;
+&lt;/dl&gt;
+
+)))
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

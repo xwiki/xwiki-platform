@@ -23,7 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
@@ -38,6 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.syntax.Syntax.PLAIN_1_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 import static org.xwiki.security.authorization.Right.EDIT;
 import static org.xwiki.security.authorization.Right.VIEW;
 
@@ -47,7 +47,7 @@ import static org.xwiki.security.authorization.Right.VIEW;
  * @version $Id$
  * @since 15.9RC1
  * @since 15.5.4
- * @since 14.10.18
+ * @since 14.10.19
  */
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
@@ -69,7 +69,7 @@ class HierarchyMacrosPageTest extends PageTest
     void getHierarchyPathData_urlObjectProperty() throws Exception
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Test", "Page"), this.context);
-        document.setSyntax(Syntax.XWIKI_2_1);
+        document.setSyntax(XWIKI_2_1);
         document.setContent("{{template name='hierarchy_macros.vm' output='false'/}}\n"
             + "{{velocity}}\n"
             + "#set ($entityReference = $services.model."
@@ -86,7 +86,7 @@ class HierarchyMacrosPageTest extends PageTest
     void getHierarchyPathData_urlObject() throws Exception
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Test", "Page"), this.context);
-        document.setSyntax(Syntax.XWIKI_2_1);
+        document.setSyntax(XWIKI_2_1);
         document.setContent("{{template name='hierarchy_macros.vm' output='false'/}}\n"
             + "{{velocity}}\n"
             + "#set ($entityReference = $services.model."
@@ -103,7 +103,7 @@ class HierarchyMacrosPageTest extends PageTest
     void getHierarchyPathData_urlDocument() throws Exception
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Test", "Page"), this.context);
-        document.setSyntax(Syntax.XWIKI_2_1);
+        document.setSyntax(XWIKI_2_1);
         document.setContent("{{template name='hierarchy_macros.vm' output='false'/}}\n"
             + "{{velocity}}\n"
             + "#set ($entityReference = $services.model.resolveDocument('xwiki:Tour.WebHome'))\n"

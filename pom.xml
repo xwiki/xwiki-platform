@@ -1098,9 +1098,14 @@
         <artifactId>hadoop-auth</artifactId>
         <version>${hadoop.version}</version>
         <exclusions>
+          <!-- We use SLF4J in XWiki -->
           <exclusion>
             <groupId>ch.qos.reload4j</groupId>
             <artifactId>reload4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-reload4j</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

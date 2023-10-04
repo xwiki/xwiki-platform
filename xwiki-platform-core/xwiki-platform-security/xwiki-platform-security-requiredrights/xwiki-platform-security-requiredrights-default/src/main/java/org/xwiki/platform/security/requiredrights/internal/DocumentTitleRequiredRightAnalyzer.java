@@ -59,8 +59,8 @@ public class DocumentTitleRequiredRightAnalyzer implements RequiredRightAnalyzer
     {
         return this.stringVelocityRequiredRightAnalyzer.analyze(title).stream()
             .map(result -> new RequiredRightAnalysisResult(result.getEntityReference(),
-                this.translationMessageSupplierProvider.get("document.title"),
-                this.translationMessageSupplierProvider.get("document.title.description",
+                this.translationMessageSupplierProvider.get("security.requiredrights.title"),
+                this.translationMessageSupplierProvider.get("security.requiredrights.title.description",
                     title),
                 result.getRequiredRights()))
             .collect(Collectors.toList());

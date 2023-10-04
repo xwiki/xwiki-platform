@@ -54,14 +54,6 @@ import com.xpn.xwiki.objects.BaseObject;
 public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentBuilder, WikiUIExtensionConstants
 {
     /**
-     * Used to transform the reference to the UI Extension XClass to a string usable in a query.
-     * {@see #searchDocumentReferences()}
-     */
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiSerializer;
-
-    /**
      * Used to generate a role hint for UI extensions based on their object reference.
      */
     @Inject

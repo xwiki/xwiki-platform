@@ -27,6 +27,10 @@
     &:focus {
       .btn-background(lighten(@btn-default-bg, 5%));
       .btn-border(darken(@btn-default-bg, 20%));
+      
+      // Make sure the buttons have a proper focus highlight, 
+      // despite changes from some bootstrap classes such as 'dropdown-toggle'.
+      outline: revert;
     }
   }
 

@@ -22,6 +22,7 @@ package org.xwiki.platform.security.requiredrights.internal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -86,7 +87,7 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
             if (analysisResults.isEmpty()) {
                 return Optional.empty();
             }
-            var map = new HashMap<EntityReference, List<RequiredRightAnalysisResult>>();
+            Map<EntityReference, List<RequiredRightAnalysisResult>> map = new HashMap<>();
             for (RequiredRightAnalysisResult requiredRightAnalysisResult : analysisResults) {
                 EntityReference entityReference = requiredRightAnalysisResult.getEntityReference();
                 if (map.containsKey(entityReference)) {

@@ -20,46 +20,88 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.SolrSearchAdminIndexingUserTranslations" locale="">
-  <web>XWiki</web>
-  <name>SolrSearchAdminIndexingUserTranslations</name>
+<xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.SolrSearchAdminIndexingUser</parent>
+  <parent>TourCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Solr Search Admin Indexing User Translations</title>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>## keys for the admin section navigation
-admin.indexinguser=Indexing User
-admin.indexinguser.description=Choose a user with whom to index the content of the wiki.
+  <content># App name
+tour.app.name=Tour
 
-## keys use on the admin "indexing user" page itself
-admin.indexinguser.explanation.part1=The indexer runs as a background job, usually with no user associated with it. For pages whose title are computed by a "sheet" document the computed title will not show up if the sheet is not visible for anonymous users. This is especially the case if the wiki is closed. In that case e.g. search results for user profiles are not shown with their computed title «Profile of "firstname" "lastname"», but just their page name (usually «login»).
-admin.indexinguser.explanation.part2=To be able to show the same title in the search results it is necessary to provide the indexer with a user who has access to the sheet pages. It is recommended to create a dedicated, locked user account without special rights.
-admin.indexinguser.explanation.security.head=Security note:
-admin.indexinguser.explanation.security.content=Using an account with more view rights than other users can cause leakage of page titles from pages that these users normally do not see.
+# Class fields
+TourCode.TourClass_description=Description
+TourCode.TourClass_isActive=Active
+TourCode.TourClass_targetPage=Target Page
 
-admin.indexinguser.explanation.part3=Changes to this setting are applied only to pages indexed after the change; a full reindex is recommended for consistent application of the change.
+# Live table generic keys
+tour.livetable.doc.title=Tour name
+tour.livetable._actions=Actions
+tour.livetable._actions.edit=Edit
+tour.livetable._actions.delete=Delete
+tour.livetable._actions.launch=Launch
+tour.livetable.emptyvalue=-
 
-admin.indexinguser.explanation.mainwikionly=This setting can only be done in the main wiki as the Solr indexer runs from the main wiki.
+# Live table specific keys
+tour.livetable.description=Description
+tour.livetable.isActive=Active
+tour.livetable.targetPage=Target Page
+tour.livetable.targetClass=Target Class
 
-## keys used by the configuration class
-XWiki.SolrSearchAdminIndexingUser_indexer.description=Indexing User
-XWiki.SolrSearchAdminIndexingUser_indexer.hint=The XWiki User Account used to index pages in the background.
+# Tour popover
+tour.popover.previous=« Prev
+tour.popover.next=Next »
+tour.popover.end=End tour
+tour.popover.quit=Quit tour
+tour.popover.show=Show tour
+tour.popover.show.hint=You can restart the tour by clicking this button at anytime
 
-</content>
+# Steps
+TourCode.StepClass_order=Order
+TourCode.StepClass_element=Element (CSS selector that identify an element)
+TourCode.StepClass_title=Title
+TourCode.StepClass_content=Content
+TourCode.StepClass_backdrop=Backdrop
+TourCode.StepClass_placement=Placement
+TourCode.StepClass_targetPage=Target Page
+TourCode.StepClass_action=Target Action
+TourCode.StepClass_queryString=Query String
+tour.steps=Steps
+tour.steps.new_step=New step
+tour.steps.add_step=Add step
+tour.steps.edit_step=Edit step
+tour.steps.save_step=Save
+tour.steps.delete_confirm=Are you sure you want to delete the step?
+tour.steps.delete_done=Delete step done!
+tour.steps.deleting=Deleting step...
+tour.steps.yes=Yes
+tour.steps.no=No
+tour.steps.edit=Edit
+tour.steps.delete=Delete
+
+# Upgrade
+tour.upgrade.title=Upgrade
+tour.upgrade.successList=Successfully converted the following pages:
+tour.upgrade.successNothing=You have nothing to upgrade!
+
+# Template
+tour.template.name=Tour
+tour.template.description=Step by step tour</content>
   <object>
-    <name>XWiki.SolrSearchAdminIndexingUserTranslations</name>
+    <name>TourCode.TourTranslations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
-    <guid>ce332185-633a-4aac-b43d-67a75f89b59a</guid>
+    <guid>034af2e6-5cad-41a4-92d9-06048f55749e</guid>
     <class>
       <name>XWiki.TranslationDocumentClass</name>
       <customClass/>
@@ -73,8 +115,6 @@ XWiki.SolrSearchAdminIndexingUser_indexer.hint=The XWiki User Account used to in
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

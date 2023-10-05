@@ -58,5 +58,6 @@ image.lightbox.gallery.title=Галерея зображень
 image.lightbox.nextSlide.title=Наступне зображення
 image.lightbox.prevSlide.title=Попереднє зображення
 image.lightbox.publisher.label=Редактор зображення
+image.lightbox.toggler.label=Відкрити дії зображення
 </content>
-  </xwikidoc>
+</xwikidoc>

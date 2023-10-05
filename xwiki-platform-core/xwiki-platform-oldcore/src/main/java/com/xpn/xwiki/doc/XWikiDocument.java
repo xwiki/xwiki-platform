@@ -7117,7 +7117,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     List<ObjectDiff> dlist;
                     if (newObj == null) {
                         // The object was deleted.
-                        dlist = new BaseObject().getDiff(originalObj, context);
+                        newObj = new BaseObject();
+                        // We want the xclass reference to be set so that it can resolve the xclass properties.
+                        newObj.setXClassReference(originalObj.getXClassReference());
+                        dlist = newObj.getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
                             new ObjectDiff(originalObj.getXClassReference(), originalObj.getNumber(),
                                 originalObj.getGuid(), ObjectDiff.ACTION_OBJECTREMOVED, "", "", "", "");

@@ -308,8 +308,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
             BaseClass bclass = getXClass(context);
-            // if the object was removed current instance doesn't hold any information about the xclass
-            // however the old object will hold the information.
+            // Bulletproofing: in theory the BaseObject is defined with a xclass reference allowing to resolve it
+            // however, it's possible that the reference is not set, in which case we might still find the info
+            // in the old object.
             if (bclass == null) {
                 bclass = oldObject.getXClass(context);
             }

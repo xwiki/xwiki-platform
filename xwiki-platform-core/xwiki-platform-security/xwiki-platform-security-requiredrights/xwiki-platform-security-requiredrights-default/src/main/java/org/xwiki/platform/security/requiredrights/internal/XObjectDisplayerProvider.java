@@ -188,8 +188,10 @@ public class XObjectDisplayerProvider
             valueBlock = new DefinitionDescriptionBlock(List.of(new RawBlock(nameHintValue.getValue(),
                 Syntax.HTML_5_0)));
         } else {
-            valueBlock = new DefinitionDescriptionBlock(
-                List.of(getStringBlock(nameHintValue.getValue(), parserUtils)));
+            valueBlock = new DefinitionDescriptionBlock(List.of(new GroupBlock(
+                List.of(getStringBlock(nameHintValue.getValue(), parserUtils)),
+                Map.of(CLASS_ATTRIBUTE, "code box"))
+            ));
         }
 
         return Stream.of(nameBlock, valueBlock);

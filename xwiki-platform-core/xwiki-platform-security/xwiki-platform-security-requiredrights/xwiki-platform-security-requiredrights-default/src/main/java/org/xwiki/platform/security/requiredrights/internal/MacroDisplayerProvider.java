@@ -38,6 +38,7 @@ import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.DefinitionDescriptionBlock;
 import org.xwiki.rendering.block.DefinitionListBlock;
 import org.xwiki.rendering.block.DefinitionTermBlock;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.MacroContentParser;
@@ -49,7 +50,6 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Provider that produces a displayer for a macro.
@@ -110,15 +110,15 @@ public class MacroDisplayerProvider
                 fallbackName = parameterName;
             }
 
-            String translationKey = translationKeyPrefix + "." + parameterName + ".name";
+            String translationKey = translationKeyPrefix + ".parameter." + parameterName + ".name";
             Block parameterNameBlock = maybeTranslate(translationKey, fallbackName);
-            Block parameterValueBlock = getStringBlock(parameterValue, new ParserUtils());
+            Block parameterValueBlock = getCodeBlock(parameterValue);
             properties.add(new DefinitionTermBlock(List.of(parameterNameBlock)));
             properties.add(new DefinitionDescriptionBlock(List.of(parameterValueBlock)));
         }
 
         Block contentName = maybeTranslate("rendering.macroContent", "Content");
-        Block contentValue = getStringBlock(macroBlock.getContent(), new ParserUtils());
+        Block contentValue = getCodeBlock(macroBlock.getContent());
         properties.add(new DefinitionTermBlock(List.of(contentName)));
         properties.add(new DefinitionDescriptionBlock(List.of(contentValue)));
 
@@ -136,12 +136,14 @@ public class MacroDisplayerProvider
         }
     }
 
-    private Block getStringBlock(String value, ParserUtils parserUtils)
+    private Block getCodeBlock(String value)
     {
         if (StringUtils.isNotBlank(value)) {
             try {
-                return parserUtils.convertToInline(this.plainParser.parse(new StringReader(value)),
-                    false);
+                return new GroupBlock(
+                    List.of(this.plainParser.parse(new StringReader(value))),
+                    Map.of("class", "code box")
+                );
             } catch (ParseException e) {
                 // Ignore, shouldn't happen
             }

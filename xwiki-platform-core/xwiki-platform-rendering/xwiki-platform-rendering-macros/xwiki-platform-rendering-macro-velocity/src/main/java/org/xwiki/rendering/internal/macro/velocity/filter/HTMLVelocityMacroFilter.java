@@ -110,7 +110,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
     {
         before(velocityContext);
 
-        return clean(content);
+        return prepare(content);
     }
 
     @Override

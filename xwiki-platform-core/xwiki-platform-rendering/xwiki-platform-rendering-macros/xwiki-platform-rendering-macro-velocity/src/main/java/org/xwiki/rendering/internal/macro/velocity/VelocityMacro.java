@@ -31,6 +31,7 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -62,6 +63,13 @@ import org.xwiki.velocity.XWikiVelocityException;
 public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
 {
     /**
+     * The name of the {@link Block} attribute used to store the compiled Velocity template.
+     * 
+     * @since 15.9-rc-1
+     */
+    public static final String MACRO_ATTRIBUTE = "velocity.template";
+
+    /**
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Executes a Velocity script.";
@@ -70,8 +78,6 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      * The description of the macro content.
      */
     private static final String CONTENT_DESCRIPTION = "the velocity script to execute";
-
-    private static final String MACRO_ATTRIBUTE = "velocity.template";
 
     private static final MetadataBlockMatcher METADATA_SOURCE_MARCHER = new MetadataBlockMatcher(MetaData.SOURCE);
 
@@ -168,11 +174,15 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
         VelocityMacroFilter filter = getFilter(macroBlock.getParameter("filter"));
 
         if (filter == null || filter.isPreparationSupported()) {
+            String sourceName = "Unknown velocity MacroBlok";
+
             // Get the macro block source, it will be indicated in Velocity errors
             MetaDataBlock metadataBlock = macroBlock.getFirstBlock(METADATA_SOURCE_MARCHER, Axes.ANCESTOR);
-            String sourceName = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
-            if (sourceName == null) {
-                sourceName = "Unknown velocity MacroBlok";
+            if (metadataBlock != null) {
+                String metadataSource = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+                if (metadataSource != null) {
+                    sourceName = metadataSource;
+                }
             }
 
             // Compile the Velocity content

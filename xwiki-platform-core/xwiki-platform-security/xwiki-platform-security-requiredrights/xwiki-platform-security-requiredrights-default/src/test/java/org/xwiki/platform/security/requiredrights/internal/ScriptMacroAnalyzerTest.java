@@ -114,7 +114,7 @@ class ScriptMacroAnalyzerTest
         doReturn(ScriptMacroParameters.class).when(macroDescriptor).getParametersBeanClass();
 
         Right myRight = mock();
-        when(this.macroPermissionPolicy.getRequiredRight()).thenReturn(myRight);
+        when(this.macroPermissionPolicy.getRequiredRight(any(ScriptMacroParameters.class))).thenReturn(myRight);
 
         List<RequiredRightAnalysisResult> analysisResults =
             this.analyzer.analyze(macroBlock, macro);

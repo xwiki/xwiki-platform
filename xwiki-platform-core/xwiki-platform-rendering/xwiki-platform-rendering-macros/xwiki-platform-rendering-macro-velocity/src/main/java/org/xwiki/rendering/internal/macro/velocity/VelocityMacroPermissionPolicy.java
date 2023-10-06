@@ -50,7 +50,7 @@ public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermission
     }
 
     @Override
-    public Right getRequiredRight()
+    public Right getRequiredRight(ScriptMacroParameters parameters)
     {
         return Right.SCRIPT;
     }

@@ -46,11 +46,12 @@ public interface MacroPermissionPolicy
     /**
      * Retrieves the required permission level for executing the script macro.
      *
+     * @param parameters the executing macro parameters
      * @return the required permission level
      * @since 15.8RC1
      */
     @Unstable
-    default Right getRequiredRight()
+    default Right getRequiredRight(ScriptMacroParameters parameters)
     {
         return Right.PROGRAM;
     }

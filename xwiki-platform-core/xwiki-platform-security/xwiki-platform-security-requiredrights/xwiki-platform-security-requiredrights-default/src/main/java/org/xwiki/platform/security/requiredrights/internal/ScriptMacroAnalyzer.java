@@ -41,6 +41,7 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
+import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -76,24 +77,25 @@ public class ScriptMacroAnalyzer
      */
     public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock, Macro<?> macro)
     {
-        List<RequiredRightAnalysisResult> result;
+        Right requiredRight = Right.PROGRAM;
 
         try {
             Object macroParameters =
                 macro.getDescriptor().getParametersBeanClass().getDeclaredConstructor().newInstance();
             this.beanManager.populate(macroParameters, macroBlock.getParameters());
 
-            MacroPermissionPolicy mpp =
-                this.componentManagerProvider.get().getInstance(MacroPermissionPolicy.class, macroBlock.getId());
-            result = generateResult(macroBlock, macroBlock.getId(), mpp.getRequiredRight());
+            if (macroParameters instanceof ScriptMacroParameters) {
+                MacroPermissionPolicy mpp =
+                    this.componentManagerProvider.get().getInstance(MacroPermissionPolicy.class, macroBlock.getId());
+                requiredRight = mpp.getRequiredRight((ScriptMacroParameters) macroParameters);
+            }
         } catch (Exception ex) {
-            if (macro instanceof PrivilegedScriptMacro) {
-                result = generateResult(macroBlock, macroBlock.getId(), Right.PROGRAM);
-            } else {
-                result = generateResult(macroBlock, macroBlock.getId(), Right.SCRIPT);
+            if (!(macro instanceof PrivilegedScriptMacro)) {
+                requiredRight = Right.SCRIPT;
             }
         }
-        return result;
+
+        return generateResult(macroBlock, macroBlock.getId(), requiredRight);
     }
 
     private List<RequiredRightAnalysisResult> generateResult(MacroBlock macroBlock, String macroId,

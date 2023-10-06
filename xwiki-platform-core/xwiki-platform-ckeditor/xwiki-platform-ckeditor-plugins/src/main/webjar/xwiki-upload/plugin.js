@@ -83,8 +83,7 @@
       editor.uploadRepository.create = function (file, name) {
         // Update the filename only when the file is pasted, otherwise use the provided filename.
         if (duringPaste) {
-          // The extension is everything after the first '.'.
-          const extension = file.name.split('.').slice(1).join('.');
+          const extension = getFileType(file);
           const timestamp = Date.now();
           const min = 100;
           const max = 999;
@@ -129,6 +128,23 @@
       };
     }
   });
+
+  const base64HeaderRegExp = /^data:(\S*?);base64,/;
+  const getFileType = function(fileOrData) {
+    if (typeof fileOrData === 'string') {
+      // The file is specified as a Data URI. Extract the content type.
+      const contentType = fileOrData.match(base64HeaderRegExp)?.[1] || '';
+      // TODO: Better have a mapping between content types and file extensions, but for images (which is the most common
+      // use case of pasting files as data URI in HTML) this solution is acceptable.
+      return contentType.split('/').slice(1).join('/');
+    } else if (typeof fileOrData.name === 'string') {
+      // Extract the file name extension (everything after the first '.').
+      return fileOrData.name.split('.').slice(1).join('.');
+    } else {
+      console.debug('Unexpected file: ', fileOrData);
+      return '';
+    }
+  };
 
   var serializeAttributes = function(attributes) {
     var pairs = [];

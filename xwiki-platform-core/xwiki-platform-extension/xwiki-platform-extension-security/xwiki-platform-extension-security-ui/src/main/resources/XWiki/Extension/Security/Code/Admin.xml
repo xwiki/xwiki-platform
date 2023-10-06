@@ -98,10 +98,10 @@
       #else
         $escapetool.xml($services.localization.render('extension.security.indexed.on', [$xwiki.formatDate($indexJobStatus.startDate)]))
       #end
+&lt;/div&gt;
     #else
       &lt;div class="box warningmessage"&gt;$escapetool.xml($services.localization.render('extension.security.indexed.nojob'))&lt;/div&gt;
     #end
-  &lt;/div&gt;
   {{/html}}
 #end
 {{/velocity}}

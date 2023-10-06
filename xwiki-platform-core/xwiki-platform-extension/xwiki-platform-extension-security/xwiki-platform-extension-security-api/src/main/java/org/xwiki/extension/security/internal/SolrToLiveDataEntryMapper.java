@@ -53,7 +53,6 @@ import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.template.TemplateManager;
 
-import static com.xpn.xwiki.web.ViewAction.VIEW_ACTION;
 import static java.util.Map.entry;
 import static java.util.Map.ofEntries;
 import static java.util.stream.Collectors.joining;
@@ -311,7 +310,7 @@ public class SolrToLiveDataEntryMapper
             new BasicNameValuePair(SolrToLiveDataEntryMapper.EXTENSION_ID, extensionId.getId()),
             new BasicNameValuePair(EXTENSION_VERSION, extensionId.getVersion().getValue())
         );
-        return this.documentAccessBridge.getDocumentURL(new LocalDocumentReference("XWiki", "Extensions"),
-            VIEW_ACTION, URLEncodedUtils.format(parameters, Charset.defaultCharset()), null);
+        return this.documentAccessBridge.getDocumentURL(new LocalDocumentReference("XWiki", "XWikiPreferences"),
+            "admin", URLEncodedUtils.format(parameters, Charset.defaultCharset()), null);
     }
 }

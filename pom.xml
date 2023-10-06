@@ -60,20 +60,20 @@
     <jetty.client.version>9.4.52.v20230823</jetty.client.version>
     <jetty.server.version>10.0.16</jetty.server.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.98.Final</netty.version>
+    <netty.version>4.1.99.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.3</dockerJava.version>
-    <cvssCalculator.version>1.4.1</cvssCalculator.version>
+    <cvssCalculator.version>1.4.2</cvssCalculator.version>
     <solr.version>8.11.2</solr.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.18.3</testcontainers.version>
+    <testcontainers.version>1.19.1</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.5.6</libreoffice.version>
+    <libreoffice.version>7.5.7</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -171,17 +171,12 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.23.2</version>
+        <version>4.24.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-          </exclusion>
-          <!-- Not the right id -->
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -368,7 +363,7 @@
         <version>${tika.version}</version>
       </dependency>
 
-      <!-- Rome is used in the feed api module and in Tika -->
+      <!-- Rome 1.x is used only in the feed api module -->
       <dependency>
         <groupId>rome</groupId>
         <artifactId>rome</artifactId>
@@ -845,7 +840,7 @@
       <dependency>
         <groupId>com.google.re2j</groupId>
         <artifactId>re2j</artifactId>
-        <version>1.4</version>
+        <version>1.7</version>
       </dependency>
 
       <!-- Mails -->
@@ -964,13 +959,6 @@
         <version>${netty.version}</version>
       </dependency>
 
-      <!-- Jetbrain's annotations are used by several dependencies -->
-      <dependency>
-        <groupId>org.jetbrains</groupId>
-        <artifactId>annotations</artifactId>
-        <version>19.0.0</version>
-      </dependency>
-
       <!-- Fast Diff -->
       <dependency>
         <groupId>org.webjars.npm</groupId>
@@ -1077,6 +1065,10 @@
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>*</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
           <!-- We use slf4j in XWiki -->
           <exclusion>
             <groupId>org.apache.logging.log4j</groupId>
@@ -1087,44 +1079,7 @@
       <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
-        <version>1.1.10.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.calcite.avatica</groupId>
-        <artifactId>avatica-core</artifactId>
-        <version>1.23.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-annotations</artifactId>
-        <version>3.2.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-auth</artifactId>
-        <version>3.2.4</version>
-        <exclusions>
-          <exclusion>
-            <groupId>ch.qos.reload4j</groupId>
-            <artifactId>reload4j</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-common</artifactId>
-        <version>3.2.4</version>
-        <exclusions>
-          <exclusion>
-            <groupId>ch.qos.reload4j</groupId>
-            <artifactId>reload4j</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-hdfs-client</artifactId>
-        <version>3.2.4</version>
+        <version>1.1.10.5</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
@@ -1135,6 +1090,11 @@
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
         <version>1.35.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.calcite.avatica</groupId>
+        <artifactId>avatica-core</artifactId>
+        <version>1.23.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1237,7 +1197,8 @@
                   ch.qos.reload4j:reload4j,
 
                   <!-- Does not make sense to have both at the same time -->
-                  org.slf4j:slf4j-log4j12
+                  org.slf4j:slf4j-log4j12,
+                  org.slf4j:slf4j-reload4j
                 </features>
               </extensionOverride>
               <extensionOverride>

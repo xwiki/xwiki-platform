@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,21 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="PDFExportIT.Parent.Terminal" locale="">
-  <web>PDFExportIT.Parent</web>
-  <name>Terminal</name>
-  <language/>
-  <defaultLanguage>en</defaultLanguage>
-  <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <parent>PDFExportIT.Parent.WebHome</parent>
-  <author>xwiki:XWiki.Admin</author>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <version>1.1</version>
-  <title>Terminal</title>
-  <comment/>
-  <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
-  <content>Content of terminal page.</content>
-</xwikidoc>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-tour-test</artifactId>
+    <version>15.9-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-tour-test-pageobjects</artifactId>
+  <name>XWiki Platform - Tour - Tests - Page Objects</name>
+  <description>Page Objects for Tour Application - Tests</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+</project>

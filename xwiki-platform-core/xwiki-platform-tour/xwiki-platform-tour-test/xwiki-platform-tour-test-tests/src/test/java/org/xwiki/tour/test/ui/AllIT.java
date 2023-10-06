@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,25 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.tour.test.ui;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-distribution-fedora</artifactId>
-    <version>15.9-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-distribution-fedora-common</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Distribution - Fedora - Common</name>
-  <description>XWiki common package</description>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-</project>
+import org.junit.runner.RunWith;
+import org.xwiki.test.ui.PageObjectSuite;
+
+/**
+ * Runs all functional tests found in the classpath.
+ *
+ * @version $Id$
+ */
+@RunWith(PageObjectSuite.class)
+public class AllIT
+{
+
+}

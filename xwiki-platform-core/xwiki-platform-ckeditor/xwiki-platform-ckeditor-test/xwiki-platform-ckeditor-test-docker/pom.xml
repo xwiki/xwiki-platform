@@ -77,6 +77,20 @@
       <artifactId>xwiki-platform-extension-index</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <!-- We need this for the WYSIWYG editor administration section where CKEditor injects its configuration pane. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- We need this to test how the Children Macro is displayed in edit mode. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-macro</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

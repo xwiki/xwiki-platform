@@ -1,0 +1,87 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>TourCode</web>
+  <name>Macros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>TourCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output='false'}}
+#*
+ * Sort a list of XWiki objects using a property as comparator.
+ *
+ * @param inputObjects the list of XWiki objects to sort.
+ * @param propertyName the name of the XWiki object property to sort the inputObjects by. Multiple values for the same
+ * property are allowed.
+ * @param outputObjects the list where to append the sorted objects. This list must not be null and should be empty
+ * before calling the macro.
+ *#
+#macro (sortXWikiObjectsList $inputObjects $propertyName $outputObjects)
+  #set ($objectsMap = {})
+  #foreach ($object in $inputObjects)
+    #set ($key = $object.getValue($propertyName))
+    #set ($sameKeyObjects = $objectsMap.get($key))
+    #if (!$sameKeyObjects)
+      #set ($sameKeyObjects = [])
+      #set ($discard = $objectsMap.put($key, $sameKeyObjects))
+    #end
+    #set ($discard = $sameKeyObjects.add($object))
+  #end
+  #foreach ($key in $properSortTool.sort($objectsMap.keySet()))
+    #set ($sameKeyObjects = $objectsMap.get($key))
+    #foreach ($sameKeyObject in $sameKeyObjects)
+      #set ($discard = $outputObjects.add($sameKeyObject))
+    #end
+  #end
+#end
+
+#macro (defineSortTool $sortToolVariable)
+  #set ($checkedExtension = "org.xwiki.commons:xwiki-commons-velocity")
+  ## Because of an API collision, $collectionstool has been replaced by $collectiontool in XCOMMONS-1861
+  #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.1-SNAPSHOT") &gt;= 0)
+    #setVariable ($sortToolVariable, $collectiontool)
+  ## With the upgrade of Velocity $sorttool has been replaced by $collectionstool (XCOMMONS-1296)
+  #elseif ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.0-SNAPSHOT") &gt;= 0)
+    #setVariable ($sortToolVariable, $collectionstool)
+  ## Old API for sorting was $sorttool
+  #else
+    #setVariable ($sortToolVariable, $sorttool)
+  #end
+#end
+
+#defineSortTool("$properSortTool")
+{{/velocity}}</content>
+</xwikidoc>

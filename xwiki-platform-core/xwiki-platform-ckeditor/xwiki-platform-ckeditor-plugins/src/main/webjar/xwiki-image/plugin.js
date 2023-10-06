@@ -55,7 +55,7 @@
     require(['imageWizard'], function(imageWizard) {
       imageWizard({
         editor: editor,
-        imageData: widget.data,
+        imageData: Object.assign({}, widget.data),
         isInsert: isInsert,
         setImageData: setImageData
       }).done(function(data) {

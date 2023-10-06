@@ -77,7 +77,8 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
     private RequiredRightAnalyzer<MacroBlock> mockMacroAnalyzer;
 
     @MockComponent
-    private ScriptMacroAnalyzer scriptMacroAnalyzer;
+    @Named(ScriptMacroAnalyzer.ID)
+    private RequiredRightAnalyzer<MacroBlock> scriptMacroAnalyzer;
 
     @MockComponent
     private MacroManager macroManager;
@@ -106,7 +107,7 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
     @Test
     void analyzeWithScriptMacroAnalyzer() throws Exception
     {
-        String scriptMacroName = "script";
+        String scriptMacroName = "myScript";
 
         MacroBlock block = mock();
         when(block.getId()).thenReturn(scriptMacroName);
@@ -122,12 +123,12 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
         doReturn(scriptMacro).when(this.macroManager).getMacro(macroId);
         // Mock the actual analysis.
         RequiredRightAnalysisResult mockResult = mock();
-        when(this.scriptMacroAnalyzer.analyze(same(block), same(scriptMacro))).thenReturn(List.of(mockResult));
+        when(this.scriptMacroAnalyzer.analyze(same(block))).thenReturn(List.of(mockResult));
 
         List<RequiredRightAnalysisResult> result = this.analyzer.analyze(block);
 
         // Ensure that the script macro analyzer was called.
-        verify(this.scriptMacroAnalyzer).analyze(same(block), same(scriptMacro));
+        verify(this.scriptMacroAnalyzer).analyze(same(block));
         assertEquals(List.of(mockResult), result);
     }
 

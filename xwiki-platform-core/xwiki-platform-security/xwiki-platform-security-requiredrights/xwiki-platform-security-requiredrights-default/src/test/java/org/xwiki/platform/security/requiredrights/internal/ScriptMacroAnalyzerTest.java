@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -38,10 +37,15 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroContentParser;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroLookupException;
+import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -83,6 +87,12 @@ class ScriptMacroAnalyzerTest
     private TranslationMessageSupplierProvider translationMessageSupplierProvider;
 
     @MockComponent
+    private MacroManager macroManager;
+
+    @MockComponent
+    private MacroContentParser macroContentParser;
+
+    @MockComponent
     @Named("myScript")
     private MacroPermissionPolicy macroPermissionPolicy;
 
@@ -93,10 +103,10 @@ class ScriptMacroAnalyzerTest
         Utils.setComponentManager(componentManager);
 
         // Create the macro block.
-        String macroId = "myScript";
+        String macroName = "myScript";
         String macroContent = "#Script";
         Map<String, String> parameters = Map.of("key", "value");
-        MacroBlock macroBlock = new MacroBlock(macroId, parameters, macroContent, false);
+        MacroBlock macroBlock = new MacroBlock(macroName, parameters, macroContent, false);
 
         // Create XDOM to get the source reference from.
         MetaData metaData = new MetaData();
@@ -112,15 +122,15 @@ class ScriptMacroAnalyzerTest
         MacroDescriptor macroDescriptor = mock(MacroDescriptor.class);
         when(macro.getDescriptor()).thenReturn(macroDescriptor);
         doReturn(ScriptMacroParameters.class).when(macroDescriptor).getParametersBeanClass();
+        registerMockMacro(macroName, macro);
 
         Right myRight = mock();
         when(this.macroPermissionPolicy.getRequiredRight(any(ScriptMacroParameters.class))).thenReturn(myRight);
 
-        List<RequiredRightAnalysisResult> analysisResults =
-            this.analyzer.analyze(macroBlock, macro);
+        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(macroBlock);
 
         verify(this.beanManager).populate(any(ScriptMacroParameters.class), eq(parameters));
-        verify(this.translationMessageSupplierProvider).get("security.requiredrights.macro.script.script", macroId);
+        verify(this.translationMessageSupplierProvider).get("security.requiredrights.macro.script.script", macroName);
 
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
@@ -133,7 +143,7 @@ class ScriptMacroAnalyzerTest
 
     @ParameterizedTest
     @ValueSource(booleans = { true, false })
-    void analyzeWithFallback(boolean isPrivileged) throws ComponentLookupException
+    void analyzeWithFallback(boolean isPrivileged) throws MacroLookupException
     {
         String macroId = "fallback";
 
@@ -151,10 +161,11 @@ class ScriptMacroAnalyzerTest
 
         Macro<?> macro = isPrivileged ? mock(withSettings().extraInterfaces(PrivilegedScriptMacro.class)) : mock();
         when(macro.getDescriptor()).thenReturn(macroDescriptor);
+        registerMockMacro(macroId, macro);
 
         Right requiredRight = isPrivileged ? Right.PROGRAM : Right.SCRIPT;
 
-        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(macroBlock, macro);
+        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(macroBlock);
 
         // Check that the translation message supplier was called.
         verify(this.translationMessageSupplierProvider)
@@ -167,5 +178,15 @@ class ScriptMacroAnalyzerTest
         assertEquals(requiredRight, requiredRightResult.getRight());
         assertFalse(requiredRightResult.isOptional());
         assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+    }
+
+    private void registerMockMacro(String macroName, Macro<?> macro) throws MacroLookupException
+    {
+        // Create a fake syntax to create the macro id.
+        Syntax syntax = mock();
+        when(this.macroContentParser.getCurrentSyntax(any())).thenReturn(syntax);
+        MacroId macroId = new MacroId(macroName, syntax);
+        // Use doReturn() as Mockito has problems with generics.
+        doReturn(macro).when(this.macroManager).getMacro(macroId);
     }
 }

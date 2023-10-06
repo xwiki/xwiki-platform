@@ -29,15 +29,10 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
@@ -49,10 +44,16 @@ import org.xwiki.security.authorization.Right;
  *
  * @version $Id$
  */
-@Component(roles = ScriptMacroAnalyzer.class)
+@Component
 @Singleton
-public class ScriptMacroAnalyzer
+@Named(ScriptMacroAnalyzer.ID)
+public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
 {
+    /**
+     * The id of this analyzer.
+     */
+    public static final String ID = "macro/script";
+
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
@@ -64,20 +65,17 @@ public class ScriptMacroAnalyzer
     private TranslationMessageSupplierProvider translationMessageSupplierProvider;
 
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
     private MacroDisplayerProvider macroDisplayerProvider;
 
     /**
      * @param macroBlock the macro block to analyze
-     * @param macro the macro of the block
      * @return the required rights for the macro
      */
-    public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock, Macro<?> macro)
+    @Override
+    public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock)
     {
         Right requiredRight = Right.PROGRAM;
+        Macro<?> macro = getMacro(macroBlock, getTransformationContext(macroBlock));
 
         try {
             Object macroParameters =
@@ -98,8 +96,7 @@ public class ScriptMacroAnalyzer
         return generateResult(macroBlock, macroBlock.getId(), requiredRight);
     }
 
-    private List<RequiredRightAnalysisResult> generateResult(MacroBlock macroBlock, String macroId,
-        Right right)
+    private List<RequiredRightAnalysisResult> generateResult(MacroBlock macroBlock, String macroId, Right right)
     {
         EntityReference reference = extractSourceReference(macroBlock);
 
@@ -115,30 +112,5 @@ public class ScriptMacroAnalyzer
             this.macroDisplayerProvider.get(macroBlock),
             List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
         ));
-    }
-
-    private EntityReference extractSourceReference(Block source)
-    {
-        EntityReference result = null;
-        // First, try the entity reference metadata.
-        MetaDataBlock metaDataBlock =
-            source.getFirstBlock(new MetadataBlockMatcher(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA),
-                Block.Axes.ANCESTOR);
-
-        if (metaDataBlock != null && metaDataBlock.getMetaData()
-            .getMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA) instanceof EntityReference) {
-            result = (EntityReference) metaDataBlock.getMetaData()
-                .getMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA);
-        } else {
-            metaDataBlock = source.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
-            if (metaDataBlock != null) {
-                // FIXME: the local is lost here as the metadata source does not keep the locale when serializing the 
-                // entity reference
-                result =
-                    this.documentReferenceResolver.resolve(
-                        (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE));
-            }
-        }
-        return result;
     }
 }

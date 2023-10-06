@@ -145,7 +145,7 @@ public class XWikiDocumentTest
             this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);
         this.xWikiStoreInterface = this.componentManager.registerMockComponent(XWikiStoreInterface.class);
         this.velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
-        VelocityEngine mockVelocityEngine = this.componentManager.registerMockComponent(VelocityEngine.class);
+        VelocityEngine mockVelocityEngine = mock();
         this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
 
         when(velocityManager.getVelocityEngine()).thenReturn(mockVelocityEngine);

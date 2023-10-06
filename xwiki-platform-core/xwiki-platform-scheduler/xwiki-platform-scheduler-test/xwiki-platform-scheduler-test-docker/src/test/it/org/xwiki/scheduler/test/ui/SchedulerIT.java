@@ -70,11 +70,11 @@ class SchedulerIT
         // because we want to remain on the same page in case of a test failure so that our TestDebugger rule can
         // collect accurate information about the failure. It's not a problem if the job remains scheduled because it
         // does nothing. Other tests should not rely on the number of scheduler jobs though.
-        setup.deletePage("Scheduler", "SchedulerTestJob");
+        setup.deletePage("Scheduler", "Scheduler]]TestJob");
 
         // Create Job
         SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
-        schedulerHomePage.setJobName("SchedulerTestJob");
+        schedulerHomePage.setJobName("Scheduler]]TestJob");
         SchedulerEditPage schedulerEdit = schedulerHomePage.clickAdd();
 
         String jobName = "Tester problem";
@@ -107,7 +107,7 @@ class SchedulerIT
         assertFalse(setup.getDriver().hasElementWithoutWaiting(By.linkText(jobName)));
         // Note: since the page doesn't exist, we need to disable the space redirect feature so that we end up on the
         // terminal page that was removed.
-        setup.gotoPage("Scheduler", "SchedulerTestJob", "view", "spaceRedirect=false");
+        setup.gotoPage("Scheduler", "Scheduler]]TestJob", "view", "spaceRedirect=false");
         setup.getDriver().findElement(By.linkText("Restore")).click();
         schedulerPage = new SchedulerPage();
         schedulerPage.backToHome();

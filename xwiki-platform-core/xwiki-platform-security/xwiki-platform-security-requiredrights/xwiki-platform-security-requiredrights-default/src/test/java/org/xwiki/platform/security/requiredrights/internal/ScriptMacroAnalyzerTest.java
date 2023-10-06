@@ -42,7 +42,6 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -117,7 +116,6 @@ class ScriptMacroAnalyzerTest
         Right myRight = mock();
         when(this.macroPermissionPolicy.getRequiredRight()).thenReturn(myRight);
 
-        MacroTransformationContext macroTransformationContext = mock();
         List<RequiredRightAnalysisResult> analysisResults =
             this.analyzer.analyze(macroBlock, macro);
 

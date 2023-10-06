@@ -61,11 +61,6 @@ ckeditor.plugin.link.anchor=Anchor
 ckeditor.plugin.link.queryString=Query String
 ckeditor.plugin.link.defaultLabel=type the link label
 ckeditor.plugin.link.openInNewTab=Open Link in New Tab
-ckeditor.plugin.link.upload=Upload Attachment
-ckeditor.plugin.link.uploadHint=Link to a newly uploaded attachment.
-ckeditor.plugin.link.uploadProgress=Uploading {0}...
-ckeditor.plugin.link.uploadSuccess=Successfully uploaded {0}
-ckeditor.plugin.link.uploadError=Failed to upload {0}
 
 ckeditor.plugin.list.listType.none=None
 
@@ -118,9 +113,6 @@ ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
 ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
 ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
 ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
-
-ckeditor.plugin.icon.iconsFetchFailed=Failed to retrieve the icon list.
-ckeditor.plugin.icon.iconThemesFetchFailed=Failed to retrieve the available icon themes.
 
 ckeditor.plugin.image.imageEditor.standardTab.title=Standard
 ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced

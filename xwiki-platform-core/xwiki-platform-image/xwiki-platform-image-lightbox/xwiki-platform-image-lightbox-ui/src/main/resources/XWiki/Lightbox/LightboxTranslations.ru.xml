@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Lightbox.LightboxTranslations" locale="uk">
+<xwikidoc version="1.4" reference="XWiki.Lightbox.LightboxTranslations" locale="ru">
   <web>XWiki.Lightbox</web>
   <name>LightboxTranslations</name>
-  <language>uk</language>
+  <language>ru</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
@@ -37,25 +37,25 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content># Admin section
-admin.lightbox=Lightbox
-admin.lightbox.description=Налаштувати галерею lightbox зображень
-XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=Увімкнути lightbox
-XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Увімкніть можливість відкривати вміст зображень в lightbox.
+admin.lightbox=Галерея изображений
+admin.lightbox.description=Настройка галереи изображений
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=Задействование галереи изображений
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Включена возможность открывать изображения в виде галереи изображений.
 
 # Gallery template
 image.lightbox.autoPlay.title=Слайд-шоу
-image.lightbox.caption.label=Підпис
-image.lightbox.imageId.title=ID зображення
-image.lightbox.imageId.copy.title=Копіювати id зображення
-image.lightbox.imageId.copy.copied=Скопійовано в буфер обміну
-image.lightbox.imageId.permalink=Постійне посилання
+image.lightbox.caption.label=Надпись
+image.lightbox.imageId.title=Идентификатор изображения
+image.lightbox.imageId.copy.title=Копировать идентификатор изображения
+image.lightbox.imageId.copy.copied=Скопировано в буфер обмена
+image.lightbox.imageId.permalink=Постоянная ссылка
 image.lightbox.date.label=Дата
-image.lightbox.download.title=Скачати
-### Missing: image.lightbox.escape.title=Escape
-image.lightbox.fileName.label=Ім'я файлу
-image.lightbox.fullscreen.title=Повноекранний
-image.lightbox.gallery.title=Галерея зображень
-image.lightbox.nextSlide.title=Наступне зображення
-image.lightbox.prevSlide.title=Попереднє зображення
+image.lightbox.download.title=Скачать
+image.lightbox.escape.title=Уйти
+image.lightbox.fileName.label=Имя файла
+image.lightbox.fullscreen.title=Полный экран
+image.lightbox.gallery.title=Галерея изображений
+image.lightbox.nextSlide.title=Следующее изображение
+image.lightbox.prevSlide.title=Предыдущее изображение
 </content>
-</xwikidoc>
+  </xwikidoc>

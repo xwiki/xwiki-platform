@@ -56,7 +56,5 @@ image.lightbox.fileName.label=Dateiname
 image.lightbox.fullscreen.title=Vollbild
 image.lightbox.gallery.title=Bildergalerie
 image.lightbox.nextSlide.title=Nächstes Bild
-image.lightbox.prevSlide.title=Vorheriges Bild
-image.lightbox.publisher.label=Bildverlag
-</content>
-  </xwikidoc>
+image.lightbox.prevSlide.title=Vorheriges Bild</content>
+</xwikidoc>

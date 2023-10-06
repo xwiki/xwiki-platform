@@ -43,13 +43,6 @@ public abstract class AbstractAsyncBaseObjectWikiComponent extends AbstractBaseO
 
     protected Set<String> contextEntries;
 
-    /**
-     * @param baseObject the object containing the component definition
-     * @param roleType the role Type implemented
-     * @param roleHint the role hint for this role implementation
-     * @throws WikiComponentException when failing to initialize
-     * @since 15.9-rc-1
-     */
     @Override
     protected void initialize(BaseObject baseObject, Type roleType, String roleHint) throws WikiComponentException
     {

@@ -19,7 +19,11 @@
  */
 package org.xwiki.test.security;
 
+import java.util.List;
+
 import org.junit.runner.RunWith;
+import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.XWikiExecutorSuite;
 import org.xwiki.test.ui.PageObjectSuite;
 import org.xwiki.test.ui.PersistentTestContext;
 import org.xwiki.test.ui.TestUtils;
@@ -34,6 +38,21 @@ import org.xwiki.test.ui.TestUtils;
 @RunWith(PageObjectSuite.class)
 public class AllTests
 {
+    @XWikiExecutorSuite.PreStart
+    public void preStart(List<XWikiExecutor> executors) throws Exception
+    {
+        // We need to have access to the maven repositories to be able to installed the 
+        // xwiki-platform-extension-security-ui extension at runtime (from the local repository, or from the remote
+        // final and snapshot repositories).
+        XWikiExecutor executor = executors.get(0);
+        executor.loadXWikiPropertiesConfiguration().setProperty("extension.repositories", List.of(
+            "maven-local:maven:file://${sys:user.home}/.m2/repository",
+            "maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots",
+            "maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public"
+        ));
+        executor.saveXWikiProperties();
+    }
+
     @PageObjectSuite.PostStart
     public void postStart(PersistentTestContext context)
     {

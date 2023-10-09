@@ -353,9 +353,7 @@ public class MockitoOldcore
 
         // Make sure a "xwikicfg" ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT)) {
-            this.xwikicfgConfigurationSource = new MockConfigurationSource();
-            getMocker().registerComponent(MockConfigurationSource.getDescriptor(XWikiCfgConfigurationSource.ROLEHINT),
-                this.xwikicfgConfigurationSource);
+            registerMockXWikiCfg();
         }
         // Make sure a "wiki" ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class, "wiki")) {
@@ -1347,6 +1345,18 @@ public class MockitoOldcore
     public MemoryConfigurationSource getConfigurationSource()
     {
         return this.configurationSource;
+    }
+
+    /**
+     * @since 15.9-rc-1
+     */
+    public MemoryConfigurationSource registerMockXWikiCfg()
+    {
+        this.xwikicfgConfigurationSource = new MockConfigurationSource();
+        getMocker().registerComponent(MockConfigurationSource.getDescriptor(XWikiCfgConfigurationSource.ROLEHINT),
+            this.xwikicfgConfigurationSource);
+
+        return this.xwikicfgConfigurationSource;
     }
 
     /**

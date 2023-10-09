@@ -1,0 +1,41 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+ {
+  // We want all suggestions right away
+  "prHourlyLimit" : 0,
+  "prConcurrentLimit" : 0,
+
+  // Skip Eclipse M2E special setup "dependency"
+  "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],
+
+  "packageRules": [
+    // Indicate the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
+    {
+      "matchDatasources": ["maven"],
+      "registryUrls": ["https://nexus.xwiki.org/nexus/content/repositories/public/"]
+    },
+
+    // There is always a more recent version of contrib parent or commons/rendering/platform and we don't want to upgrade just for that
+    {
+      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:", "org.xwiki.contrib:parent-"],
+      "enabled": false
+    }
+  ]
+}

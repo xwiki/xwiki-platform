@@ -219,9 +219,9 @@
       <type>xar</type>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.contrib.templates</groupId>
-      <artifactId>application-templates-ui</artifactId>
-      <version>1.0.9</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-template-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>

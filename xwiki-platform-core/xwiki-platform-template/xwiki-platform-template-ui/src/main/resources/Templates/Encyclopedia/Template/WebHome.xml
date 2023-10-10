@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Templates.Encyclopedia.Template.WebHome" locale="">
+<xwikidoc version="1.5" reference="Templates.Encyclopedia.Template.WebHome" locale="">
   <web>Templates.Encyclopedia.Template</web>
   <name>WebHome</name>
   <language/>
@@ -36,10 +36,26 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>(% class="row" %)
+  <content>(% class="floatinginfobox" %)
 (((
-(% class="col-xs-12 col-sm-8" %)
-(((
+{{box}}
+= Falabella =
+
+[[image:Templates.Encyclopedia.Template.WebHome@image.jpg]]
+
+|=Morphology|Miniature horse
+|=Region|[[Argentina&gt;&gt;Main.WebHome]]
+|=Price|1200 €
+|=Image|[[Credits&gt;&gt;https://commons.wikimedia.org/wiki/File:FalabellaFestivo.jpg]]
+{{/box}}
+
+{{box}}
+**Contents**
+
+{{toc/}}
+{{/box}}
+)))
+
 (% class="jumbotron" %)
 (((
 (% class="container" %)
@@ -78,32 +94,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 = References =
+
 * [[XWiki&gt;&gt;http://www.xwiki.org]]
-* [[XWiki Extensions&gt;&gt;http://www.xwiki.org]]
-
-)))
-
-(% class="col-xs-12 col-sm-4" %)
-(((
-(% class="box" %)
-(((
-= Falabella =
-[[image:Templates.Encyclopedia.Template.WebHome@image.jpg||style="width: 100%"]]
-|=Morphology|Miniature horse
-|=Region|[[Argentina&gt;&gt;Main.WebHome]]
-|=Price|1200 €
-|=Image|[[Credits&gt;&gt;https://commons.wikimedia.org/wiki/File:FalabellaFestivo.jpg]]
-)))
-
-(% class="box" %)
-(((
-**Contents**
-
-{{toc /}}
-
-)))
-)))
-)))</content>
+* [[XWiki Extensions&gt;&gt;http://www.xwiki.org]]</content>
   <attachment>
     <filename>image.jpg</filename>
     <mimetype>image/jpeg</mimetype>

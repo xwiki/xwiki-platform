@@ -59,9 +59,16 @@ div.suggestItems .hide-button {
 // Messages ===================================================================
 
 /* Used by: Toc, Box Macros */
-.floatinginfobox {
-  float: right;
-  margin: @padding-base-vertical 0 @padding-base-vertical @padding-base-horizontal;
+@media (min-width: @screen-sm-min) {
+  .floatinginfobox {
+    float: right;
+    margin: 0 0 @grid-gutter-width @grid-gutter-width;
+
+    & + .jumbotron {
+      // The jumbotron's background color shouldn't overflow below the floating box.
+      overflow-x: auto;
+    }
+  }
 }
 
 // AllDocs Tree ===============================================================

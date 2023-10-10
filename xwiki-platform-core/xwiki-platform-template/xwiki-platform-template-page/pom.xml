@@ -24,15 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-template</artifactId>
     <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-template</artifactId>
-  <name>XWiki Platform - Template - Parent POM</name>
+  <artifactId>xwiki-platform-template-page</artifactId>
+  <name>XWiki Platform - Template - Page - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Template - Parent POM</description>
+  <description>XWiki Platform - Template - Page - Parent POM</description>
   <modules>
-    <module>xwiki-platform-template-api</module>
-    <module>xwiki-platform-template-page</module>
+    <module>xwiki-platform-template-page-content</module>
+    <module>xwiki-platform-template-page-provider</module>
   </modules>
 </project>

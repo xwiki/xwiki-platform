@@ -22,16 +22,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-template</artifactId>
+    <artifactId>xwiki-platform-template-page</artifactId>
     <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-template-ui</artifactId>
+  <artifactId>xwiki-platform-template-page-content</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Template - UI</name>
-  <description>A collection of content templates</description>
+  <name>XWiki Platform - Template - Page - Content</name>
+  <description>A collection of wiki page templates</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Templates Application</xwiki.extension.name>
+    <xwiki.extension.name>Default Page Templates</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
       org.xwiki.contrib.templates:application-templates-ui
@@ -40,12 +40,30 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
+    <!-- The page templates are defined using the Page Template Provider module. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-template-page-provider</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We need to translate the template name and description displayed on the Create Page dialog. -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-localization-source-wiki</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- The home page displays the child templates using the document tree macro. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-index-tree-macro</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The Encyclopedia template is using the box macro to display information on the side of the page. -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-box</artifactId>

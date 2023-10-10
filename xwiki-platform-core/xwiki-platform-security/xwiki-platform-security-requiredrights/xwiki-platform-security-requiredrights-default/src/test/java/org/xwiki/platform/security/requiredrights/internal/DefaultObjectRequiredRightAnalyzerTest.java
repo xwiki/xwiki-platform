@@ -70,10 +70,6 @@ class DefaultObjectRequiredRightAnalyzerTest
     private RequiredRightAnalyzer<BaseObject> mockAnalyzer;
 
     @MockComponent
-    @Named(StringVelocityRequiredRightAnalyzer.ID)
-    private RequiredRightAnalyzer<String> velocityAnalyzer;
-
-    @MockComponent
     @Named(XDOMRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
@@ -143,22 +139,14 @@ class DefaultObjectRequiredRightAnalyzerTest
         RequiredRightAnalysisResult wikiResult = mock();
         when(this.xdomRequiredRightAnalyzer.analyze(wikiXDOM)).thenReturn(List.of(wikiResult));
 
-        RequiredRightAnalysisResult velocityResult = mock();
-        when(this.velocityAnalyzer.analyze(velocityContent)).thenReturn(List.of(velocityResult));
-        RequiredRightAnalysisResult velocityWikiResult = mock();
-        when(this.velocityAnalyzer.analyze(velocityWikiContent)).thenReturn(List.of(velocityWikiResult));
-
         List<RequiredRightAnalysisResult> results = this.analyzer.analyze(testObject);
-        verify(this.velocityAnalyzer).analyze(velocityContent);
-        verify(this.velocityAnalyzer).analyze(velocityWikiContent);
-        verifyNoMoreInteractions(this.velocityAnalyzer);
         verify(this.xdomRequiredRightAnalyzer).analyze(wikiXDOM);
         verifyNoMoreInteractions(this.xdomRequiredRightAnalyzer);
         assertEquals(testObject.getField(wikiFieldName).getReference(),
             wikiXDOM.getMetaData().getMetaData().get(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA));
-        verify(velocityResult).setEntityReference(testObject.getField(velocityFieldName).getReference());
-        verify(velocityWikiResult).setEntityReference(testObject.getField(velocityWikiFieldName).getReference());
 
-        assertEquals(List.of(wikiResult, velocityResult, velocityWikiResult), results);
+        assertEquals(wikiResult, results.get(0));
+        assertEquals(testObject.getField(velocityFieldName).getReference(), results.get(1).getEntityReference());
+        assertEquals(testObject.getField(velocityWikiFieldName).getReference(), results.get(2).getEntityReference());
     }
 }

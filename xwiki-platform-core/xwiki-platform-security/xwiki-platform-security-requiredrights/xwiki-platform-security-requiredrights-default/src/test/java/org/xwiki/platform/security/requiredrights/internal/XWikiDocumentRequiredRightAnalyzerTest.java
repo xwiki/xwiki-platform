@@ -49,18 +49,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class XWikiDocumentRequiredRightAnalyzerTest
+class XWikiDocumentRequiredRightAnalyzerTest
 {
-
     @InjectMockComponents
     private XWikiDocumentRequiredRightAnalyzer analyzer;
 
     @MockComponent
     private DocumentContextExecutor documentContextExecutor;
-
-    @MockComponent
-    @Named(DocumentTitleRequiredRightAnalyzer.ID)
-    private RequiredRightAnalyzer<String> documentTitleRequiredRightAnalyzer;
 
     @MockComponent
     @Named(XDOMRequiredRightAnalyzer.ID)
@@ -85,9 +80,6 @@ public class XWikiDocumentRequiredRightAnalyzerTest
         BaseObject object = mock();
         when(document.getXObjects()).thenReturn(Map.of(mock(), List.of(object)));
 
-        RequiredRightAnalysisResult titleResult = mock();
-        when(this.documentTitleRequiredRightAnalyzer.analyze("title")).thenReturn(List.of(titleResult));
-
         XDOM xdom = mock();
         when(document.getXDOM()).thenReturn(xdom);
         RequiredRightAnalysisResult xdomResult = mock();
@@ -96,6 +88,6 @@ public class XWikiDocumentRequiredRightAnalyzerTest
         RequiredRightAnalysisResult objectResult = mock();
         when(this.objectRequiredRightAnalyzer.analyze(object)).thenReturn(List.of(objectResult));
 
-        assertEquals(List.of(titleResult, xdomResult, objectResult), this.analyzer.analyze(document));
+        assertEquals(List.of(xdomResult, objectResult), this.analyzer.analyze(document));
     }
 }

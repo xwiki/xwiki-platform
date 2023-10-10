@@ -28,10 +28,12 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -54,8 +56,7 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     private DocumentContextExecutor documentContextExecutor;
 
     @Inject
-    @Named(DocumentTitleRequiredRightAnalyzer.ID)
-    private RequiredRightAnalyzer<String> documentTitleRequiredRightAnalyzer;
+    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
 
     @Inject
     @Named(XDOMRequiredRightAnalyzer.ID)
@@ -74,10 +75,21 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
             // wiki macros etc.
             return this.documentContextExecutor.call(() ->
             {
+                List<RequiredRightAnalysisResult> result = new ArrayList<>();
+
                 // Analyze the title
-                List<RequiredRightAnalysisResult> result =
-                    new ArrayList<>(this.documentTitleRequiredRightAnalyzer.analyze(document.getTitle()));
-                result.forEach(r -> r.setEntityReference(document.getDocumentReferenceWithLocale()));
+                if (VelocityUtil.containsVelocityScript(document.getTitle())) {
+                    result.add(new RequiredRightAnalysisResult(
+                        document.getDocumentReferenceWithLocale(),
+                        this.translationMessageSupplierProvider.get("security.requiredrights.title"),
+                        this.translationMessageSupplierProvider.get("security.requiredrights.title.description",
+                            document.getTitle()),
+                        List.of(
+                            new RequiredRightAnalysisResult.RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true),
+                            new RequiredRightAnalysisResult.RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
+                        )
+                    ));
+                }
 
                 // Analyze the content
                 result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));

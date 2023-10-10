@@ -2,8 +2,6 @@ org.xwiki.platform.security.requiredrights.internal.XWikiDocumentRequiredRightAn
 org.xwiki.platform.security.requiredrights.RequiredRightsScriptService
 org.xwiki.platform.security.requiredrights.internal.DefaultMacroBlockRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.DefaultObjectRequiredRightAnalyzer
-org.xwiki.platform.security.requiredrights.internal.DocumentTitleRequiredRightAnalyzer
-org.xwiki.platform.security.requiredrights.internal.StringVelocityRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.XDOMRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.RequiredRightObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.ScriptMacroAnalyzer
@@ -12,3 +10,4 @@ org.xwiki.platform.security.requiredrights.internal.SkinExtensionObjectRequiredR
 org.xwiki.platform.security.requiredrights.internal.XObjectDisplayerProvider
 org.xwiki.platform.security.requiredrights.internal.MacroDisplayerProvider
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsEditConfirmationChecker
+org.xwiki.platform.security.requiredrights.internal.StringBlockSupplierProvider

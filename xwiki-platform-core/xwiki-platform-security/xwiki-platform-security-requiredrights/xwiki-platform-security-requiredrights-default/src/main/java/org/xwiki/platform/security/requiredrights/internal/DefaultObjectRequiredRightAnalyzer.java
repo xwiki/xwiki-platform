@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -69,12 +71,14 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @Inject
-    @Named(StringVelocityRequiredRightAnalyzer.ID)
-    private RequiredRightAnalyzer<String> stringVelocityRequiredRightAnalyzer;
-
-    @Inject
     @Named(XDOMRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
+
+    @Inject
+    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+
+    @Inject
+    private StringBlockSupplierProvider stringBlockSupplierProvider;
 
     @Inject
     private Provider<ComponentManager> componentManagerProvider;
@@ -141,12 +145,14 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
             if (contentType != null) {
                 switch (contentType) {
                     case VELOCITY_CODE:
-                        result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
+                        result = analyzeVelocityScriptValue(value, field.getReference(),
+                            "security.requiredrights.object.velocityCodeTextArea");
                         break;
                     case VELOCITYWIKI:
-                        result = this.stringVelocityRequiredRightAnalyzer.analyze(value);
-                        // If there is no Velocity code, we analyze the content as wiki syntax.
+                        result = analyzeVelocityScriptValue(value, field.getReference(),
+                            "security.requiredrights.object.velocityWikiTextArea");
                         if (result.isEmpty()) {
+                            // If there is no Velocity code, we analyze the content as wiki syntax.
                             result = analyzeWikiContent(object, value, field.getReference());
                         }
                         break;
@@ -159,13 +165,24 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
             }
         }
 
-        // If the entity reference is null, set the reference of the field (e.g., the velocity analyzer has currently
-        // no way to know the reference).
-        result.forEach(analysisResult -> {
-            if (analysisResult.getEntityReference() == null) {
-                analysisResult.setEntityReference(field.getReference());
-            }
-        });
+        return result;
+    }
+
+    private List<RequiredRightAnalysisResult> analyzeVelocityScriptValue(String value, EntityReference reference,
+        String translationMessage)
+    {
+        List<RequiredRightAnalysisResult> result;
+        if (VelocityUtil.containsVelocityScript(value)) {
+            result = List.of(new RequiredRightAnalysisResult(reference,
+                this.translationMessageSupplierProvider.get(translationMessage),
+                this.stringBlockSupplierProvider.get(value),
+                List.of(
+                    new RequiredRightAnalysisResult.RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false),
+                    new RequiredRightAnalysisResult.RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
+                )));
+        } else {
+            result = List.of();
+        }
 
         return result;
     }

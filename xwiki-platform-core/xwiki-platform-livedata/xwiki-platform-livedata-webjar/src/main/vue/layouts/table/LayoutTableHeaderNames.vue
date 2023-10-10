@@ -65,8 +65,8 @@
           class="handle"
           :title="$t('livedata.action.reorder.hint')"
           @click="toggleDragNDrop"
-          @keydown.left="keyboardDragNDropLeft"
-          @keydown.right="keyboardDragNDropRight"
+          @keydown.left="keyboardDragNDropLeft($event)"
+          @keydown.right="keyboardDragNDropRight($event)"
         >
           <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
         </button>
@@ -186,15 +186,22 @@ export default {
       this.logic.toggleDragNDrop();
     },
     
-    keyboardDragNDropRight () {
+    keyboardDragNDropRight (e) {
       if (this.logic.dragNDrop) {
-        this.logic.reorderProperty(1,2);
+        let oldIndex = e.currentTarget.index ;
+        let columns = e.currentTarget.closest("tr").querySelectorAll(".column-name");
+        let newIndex = Math.min(oldIndex + 1, columns.length - 1);
+        console.log(String(oldIndex) + "->" + String(newIndex));
+        this.logic.reorderProperty(oldIndex,newIndex);
       }
     },
 
-    keyboardDragNDropLeft () {
+    keyboardDragNDropLeft (e) {
       if (this.logic.dragNDrop) {
-        this.logic.reorderProperty(2,1);
+        let oldIndex = e.currentTarget.index;
+        let newIndex = Math.max(oldIndex - 1, 0);
+        console.log(String(oldIndex) + "->" + String(newIndex));
+        this.logic.reorderProperty(oldIndex,newIndex);
       }
     },
 

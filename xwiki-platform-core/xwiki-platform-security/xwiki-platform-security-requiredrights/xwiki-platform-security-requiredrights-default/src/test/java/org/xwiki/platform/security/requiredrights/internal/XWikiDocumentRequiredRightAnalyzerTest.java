@@ -1,0 +1,101 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.platform.security.requiredrights.internal;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
+import org.xwiki.bridge.internal.DocumentContextExecutor;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
+import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit tests for {@link XWikiDocumentRequiredRightAnalyzer}.
+ * 
+ * @version $Id$
+ */
+@ComponentTest
+public class XWikiDocumentRequiredRightAnalyzerTest
+{
+
+    @InjectMockComponents
+    private XWikiDocumentRequiredRightAnalyzer analyzer;
+
+    @MockComponent
+    private DocumentContextExecutor documentContextExecutor;
+
+    @MockComponent
+    @Named(DocumentTitleRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<String> documentTitleRequiredRightAnalyzer;
+
+    @MockComponent
+    @Named(XDOMRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
+
+    @MockComponent
+    @Named(DefaultObjectRequiredRightAnalyzer.ID)
+    private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
+
+    @Test
+    void analyze() throws Exception
+    {
+        when(this.documentContextExecutor.call(any(), any())).thenAnswer(invocation -> {
+            Callable<List<RequiredRightAnalysisResult>> callable = invocation.getArgument(0);
+            return callable.call();
+        });
+
+        XWikiDocument document = mock();
+        when(document.getTitle()).thenReturn("title");
+        DocumentReference mockDocumentReference = mock();
+        when(document.getDocumentReferenceWithLocale()).thenReturn(mockDocumentReference);
+        BaseObject object = mock();
+        when(document.getXObjects()).thenReturn(Map.of(mock(), List.of(object)));
+
+        RequiredRightAnalysisResult titleResult = mock();
+        when(this.documentTitleRequiredRightAnalyzer.analyze("title")).thenReturn(List.of(titleResult));
+
+        XDOM xdom = mock();
+        when(document.getXDOM()).thenReturn(xdom);
+        RequiredRightAnalysisResult xdomResult = mock();
+        when(this.xdomRequiredRightAnalyzer.analyze(xdom)).thenReturn(List.of(xdomResult));
+
+        RequiredRightAnalysisResult objectResult = mock();
+        when(this.objectRequiredRightAnalyzer.analyze(object)).thenReturn(List.of(objectResult));
+
+        assertEquals(List.of(titleResult, xdomResult, objectResult), this.analyzer.analyze(document));
+    }
+}

@@ -40,7 +40,6 @@ import org.xwiki.rendering.block.DefinitionListBlock;
 import org.xwiki.rendering.block.DefinitionTermBlock;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -50,6 +49,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Provider that produces a displayer for a macro.
@@ -76,6 +76,8 @@ public class MacroDisplayerProvider
 
     @Inject
     private MacroContentParser macroContentParser;
+
+    private final ParserUtils parserUtils = new ParserUtils();
 
     /**
      * @param macroBlock the macro block to display
@@ -132,18 +134,24 @@ public class MacroDisplayerProvider
         if (translation != null) {
             return translation.render();
         } else {
-            return new WordBlock(fallback);
+            return parseInline(fallback);
         }
     }
 
     private Block getCodeBlock(String value)
     {
         if (StringUtils.isNotBlank(value)) {
+            return new GroupBlock(List.of(parseInline(value)), Map.of("class", "code box"));
+        } else {
+            return new CompositeBlock();
+        }
+    }
+
+    private Block parseInline(String value)
+    {
+        if (StringUtils.isNotBlank(value)) {
             try {
-                return new GroupBlock(
-                    List.of(this.plainParser.parse(new StringReader(value))),
-                    Map.of("class", "code box")
-                );
+                return this.parserUtils.convertToInline(this.plainParser.parse(new StringReader(value)), false);
             } catch (ParseException e) {
                 // Ignore, shouldn't happen
             }

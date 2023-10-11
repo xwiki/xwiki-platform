@@ -384,7 +384,7 @@
   h6 a {
     color: @text-color;
   }
-  a:hover, a:focus {
+  :not(.noitems) a:hover, :not(.noitems) a:focus {
     text-decoration: none;
   }
   ul.noitems {

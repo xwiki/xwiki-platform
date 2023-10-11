@@ -192,6 +192,7 @@ help.videos.videoCard5.topic2=Learn how to use your application
 help.videos.videoCard6.title=Add / Remove Extensions
 help.videos.videoCard6.topic1=Discover how to add/remove extensions using the Extension Manager
 help.videos.videoCard6.topic2=Discover the XWiki Administration UI
+help.videos.hint=The video in this card is an alternative to the documentation behind those links:
 help.videos.watch=Watch
 
 ## Example Macro

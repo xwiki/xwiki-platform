@@ -30,7 +30,7 @@ import org.apache.velocity.VelocityContext;
  * @since 8.3M1
  * @deprecated use {@link org.xwiki.velocity.ScriptVelocityContext} instead
  */
-@Deprecated(since = "15.9-rc-1")
+@Deprecated(since = "15.9RC1")
 public class ScriptVelocityContext extends org.xwiki.velocity.ScriptVelocityContext
 {
     /**

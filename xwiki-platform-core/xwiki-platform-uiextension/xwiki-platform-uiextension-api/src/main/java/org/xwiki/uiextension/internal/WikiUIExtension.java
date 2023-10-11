@@ -101,7 +101,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
      * @param id the id of the extension
      * @param extensionPointId ID of the extension point this extension is designed for
      * @throws WikiComponentException when failing to parse content
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     public void initialize(BaseObject baseObject, String roleHint, String id, String extensionPointId)
         throws WikiComponentException

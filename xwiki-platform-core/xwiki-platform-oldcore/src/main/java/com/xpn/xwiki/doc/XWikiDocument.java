@@ -310,14 +310,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * The name of the key in the {@link XWikiContext} which contains the current content document.
      * 
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     public static final String CKEY_CDOC = "cdoc";
 
     /**
      * The name of the key in the {@link XWikiContext} which contains the current translation document.
      * 
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     public static final String CKEY_TDOC = "tdoc";
 

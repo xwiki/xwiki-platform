@@ -1348,7 +1348,7 @@ public class MockitoOldcore
     }
 
     /**
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     public MemoryConfigurationSource registerMockXWikiCfg()
     {

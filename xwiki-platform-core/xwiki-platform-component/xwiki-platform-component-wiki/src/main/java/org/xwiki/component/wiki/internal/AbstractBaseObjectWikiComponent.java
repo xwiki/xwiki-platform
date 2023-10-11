@@ -73,7 +73,7 @@ public abstract class AbstractBaseObjectWikiComponent implements WikiComponent
      * @param roleType the role Type implemented
      * @param roleHint the role hint for this role implementation
      * @throws WikiComponentException when failing to initialize
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     protected void initialize(BaseObject baseObject, Type roleType, String roleHint) throws WikiComponentException
     {

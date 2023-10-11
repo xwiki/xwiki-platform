@@ -27,7 +27,7 @@ import org.xwiki.velocity.VelocityTemplate;
  * A helper for filters which don't manipulate the context.
  * 
  * @version $Id$
- * @since 15.9-rc-1
+ * @since 15.9RC1
  */
 public abstract class AbstractNoContextVelocityMacroFilter implements VelocityMacroFilter
 {

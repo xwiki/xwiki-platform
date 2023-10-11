@@ -64,7 +64,7 @@ import com.xpn.xwiki.api.DeprecatedContext;
  * different {@link VelocityEngine} depending on the context skin macros.vm.
  *
  * @version $Id$
- * @since 15.9-rc-1
+ * @since 15.9RC1
  */
 @Component
 @Singleton

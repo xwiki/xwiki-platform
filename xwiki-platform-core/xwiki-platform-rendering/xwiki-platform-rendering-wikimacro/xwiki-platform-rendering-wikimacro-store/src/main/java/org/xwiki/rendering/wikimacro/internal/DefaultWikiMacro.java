@@ -70,7 +70,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
      * @param baseObject the object containing the component definition
      * @param descriptor the {@link MacroDescriptor} describing this macro.
      * @throws WikiComponentException when failing to parse the content
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     void initialize(BaseObject baseObject, MacroDescriptor descriptor) throws WikiComponentException
     {

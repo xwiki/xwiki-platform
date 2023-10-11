@@ -68,7 +68,7 @@ public class PanelWikiUIExtension extends AbstractWikiUIExtension implements Blo
      * @param baseObject the object containing panel setup
      * @param id the ID of this UI extension
      * @throws WikiComponentException When failing to parse content
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     public void initialize(BaseObject baseObject, String id) throws WikiComponentException
     {

@@ -44,7 +44,7 @@ public interface VelocityMacroFilter
 
     /**
      * @return true of the filter support preparation
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     default boolean isPreparationSupported()
     {
@@ -57,7 +57,7 @@ public interface VelocityMacroFilter
      * @param content the velocity script
      * @param velocityContext the velocity context. this method can inject here bindings usable in the script like
      *            <code>$somebinding</code>.
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     default void before(VelocityTemplate content, VelocityContext velocityContext)
     {
@@ -67,7 +67,7 @@ public interface VelocityMacroFilter
     /**
      * @param content the velocity script
      * @return the modified content
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     default String prepare(String content)
     {

@@ -65,7 +65,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     /**
      * The name of the {@link Block} attribute used to store the compiled Velocity template.
      * 
-     * @since 15.9-rc-1
+     * @since 15.9RC1
      */
     public static final String MACRO_ATTRIBUTE = "velocity.template";
 

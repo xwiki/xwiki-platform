@@ -177,7 +177,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             String sourceName = "Unknown velocity MacroBlock";
 
             // Get the macro block source, it will be indicated in Velocity errors
-            MetaDataBlock metadataBlock = macroBlock.getFirstBlock(METADATA_SOURCE_MARCHER, Axes.ANCESTOR);
+            MetaDataBlock metadataBlock = macroBlock.getFirstBlock(METADATA_SOURCE_MATCHER, Axes.ANCESTOR);
             if (metadataBlock != null) {
                 String metadataSource = (String) metadataBlock.getMetaData().getMetaData(MetaData.SOURCE);
                 if (metadataSource != null) {

@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * The page with tour elements.
  * 
  * @version $Id$
- * @since 15.9-rc-1
+ * @since 15.9RC1
  */
 public class PageWithTour extends ViewPage
 {

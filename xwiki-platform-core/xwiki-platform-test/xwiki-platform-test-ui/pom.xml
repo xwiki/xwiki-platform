@@ -51,15 +51,6 @@
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
     </dependency>
-    <!-- Use Java 11+'s bundled HTTP Client instead of AsyncHttpClient.
-         See https://github.com/SeleniumHQ/selenium/issues/9528#issuecomment-1282482248 and
-         https://www.selenium.dev/blog/2022/using-java11-httpclient/
-         To be removed once https://github.com/SeleniumHQ/selenium/issues/9528 is fixed -->
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-http-jdk-client</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
     <!-- Used to download/install/setup the gecko driver for Selenium for the FF browser -->
     <dependency>
       <groupId>io.github.bonigarcia</groupId>

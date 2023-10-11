@@ -146,7 +146,7 @@
       &lt;ul&gt;
         #foreach ($topic in $data.topics)
           &lt;li&gt;
-            &lt;a href="$topic.url"&gt;
+            &lt;a href="$escapetool.html($topic.url)"&gt;
               $topic.label
             &lt;/a&gt;
           &lt;/li&gt;

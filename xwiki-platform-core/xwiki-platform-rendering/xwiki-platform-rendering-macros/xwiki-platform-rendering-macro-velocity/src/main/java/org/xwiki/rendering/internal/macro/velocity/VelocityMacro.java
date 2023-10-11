@@ -174,7 +174,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
         VelocityMacroFilter filter = getFilter(macroBlock.getParameter("filter"));
 
         if (filter == null || filter.isPreparationSupported()) {
-            String sourceName = "Unknown velocity MacroBlok";
+            String sourceName = "Unknown velocity MacroBlock";
 
             // Get the macro block source, it will be indicated in Velocity errors
             MetaDataBlock metadataBlock = macroBlock.getFirstBlock(METADATA_SOURCE_MARCHER, Axes.ANCESTOR);

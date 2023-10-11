@@ -109,6 +109,8 @@ LiveValidation.prototype = {
     }, optionsObj || {});
 	var node = this.options.insertAfterWhatNode || this.element;
     this.options.insertAfterWhatNode = $(node);
+    this.messageHolder = this.createMessageSpan();
+    this.insertMessageHolder(this.messageHolder);
     Object.extend(this, this.options); // copy the options to the actual object
     // add to form if it has been provided
     if(this.form){
@@ -368,23 +370,22 @@ LiveValidation.prototype = {
    */
    
   /**
-   *	makes a span containg the passed or failed message
+   *	makes a span to contain the passed or failed message
    *
    *    @return {HTMLSpanObject} - a span element with the message in it
    */
   createMessageSpan: function(){
     var span = document.createElement('span');
-    var textNode = document.createTextNode(this.message);
-    span.appendChild(textNode);
+    span.setAttribute('aria-live', 'assertive');
     return span;
   },
     
   /**
-   *  inserts the element containing the message in place of the element that already exists (if it does)
+   *  inserts the element to contain the message in place of the element that already exists (if it does)
    *
    *  @param elementToInsert {HTMLElementObject} - an element node to insert
    */
-  insertMessage: function(elementToInsert){
+  insertMessageHolder: function(elementToInsert){
     this.removeMessage();
     if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMesssage has been set to false or empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
@@ -398,6 +399,14 @@ LiveValidation.prototype = {
         parent.appendChild(elementToInsert);
       }
     }
+  },
+  
+  /**
+   *  inserts the message in its container of the message that already exists (if it does)
+   */
+  insertMessage: function() {
+    var textNode = document.createTextNode(this.message);
+    this.messageHolder.appendChild(textNode);
   },
     
   /**

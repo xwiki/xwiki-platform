@@ -43,12 +43,12 @@
   'title': $services.localization.render('help.videos.videoCard1.title'),
   'topics': [
     {
-      'url':'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/',
-      'label':"$services.localization.render('help.videos.videoCard1.topic1')"
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/',
+      'label': "$services.localization.render('help.videos.videoCard1.topic1')"
     },
     {
-      'url':'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/Navigate/',
-      'label':"$services.localization.render('help.videos.videoCard1.topic2')"
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/Navigate/',
+      'label': "$services.localization.render('help.videos.videoCard1.topic2')"
     }
   ],
   'url': 'https://www.youtube.com/embed/p5g6aDGOqWY',
@@ -111,8 +111,8 @@
       'label': "$services.localization.render('help.videos.videoCard5.topic1')"
     },
     {
-      'url':'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/FAQTutorial/FAQTutorialAWM#HCreatingnewFAQentries',
-      'label':"$services.localization.render('help.videos.videoCard5.topic2')"
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/FAQTutorial/FAQTutorialAWM#HCreatingnewFAQentries',
+      'label': "$services.localization.render('help.videos.videoCard5.topic2')"
     }
   ],
   'url': 'https://www.youtube.com/embed/Pv4jPCaU99g',
@@ -121,12 +121,12 @@
   'title': $services.localization.render('help.videos.videoCard6.title'),
   'topics': [
     {
-      'url':'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/CreatingExtensions/#HInstallinganExtension',
-      'label':"$services.localization.render('help.videos.videoCard6.topic1')"
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/CreatingExtensions/#HInstallinganExtension',
+      'label': "$services.localization.render('help.videos.videoCard6.topic1')"
     },
     {
-      'url':'https://extensions.xwiki.org/xwiki/bin/view/Extension/Administration%20Application#HDescription',
-      'label':"$services.localization.render('help.videos.videoCard6.topic2')"
+      'url': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Administration%20Application#HDescription',
+      'label': "$services.localization.render('help.videos.videoCard6.topic2')"
     }
   ],
   'url': 'https://www.youtube.com/embed/Q4NHu6J5pX4',

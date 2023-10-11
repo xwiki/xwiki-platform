@@ -107,7 +107,7 @@
   'title': $services.localization.render('help.videos.videoCard5.title'),
   'topics': [
     {
-      'url': $xwiki.getURL('Help.Applications.WebHome'),
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/CreatingABasicApp',
       'label': $services.localization.render('help.videos.videoCard5.topic1')
     },
     {

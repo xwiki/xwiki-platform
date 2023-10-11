@@ -79,7 +79,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      */
     private static final String CONTENT_DESCRIPTION = "the velocity script to execute";
 
-    private static final MetadataBlockMatcher METADATA_SOURCE_MARCHER = new MetadataBlockMatcher(MetaData.SOURCE);
+    private static final MetadataBlockMatcher METADATA_SOURCE_MATCHER = new MetadataBlockMatcher(MetaData.SOURCE);
 
     /**
      * Used to get the Velocity Engine and Velocity Context to use to evaluate the passed Velocity script.

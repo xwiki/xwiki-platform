@@ -275,3 +275,4 @@ org.xwiki.security.authservice.internal.AuthServiceConfigurationInvalidator
 org.xwiki.security.authservice.internal.AuthServiceManager
 org.xwiki.security.authservice.internal.StandardXWikiAuthServiceComponent
 org.xwiki.security.authservice.script.AuthServiceScriptService
+org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker

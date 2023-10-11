@@ -251,7 +251,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                         + "in the cache.",
                     entry.getUserReference(), entry, wiki));
             }
-            if (!parent2.isUser()) {
+            // If the user is the guest user, don't throw an exception as the guest user isn't stored as user.
+            if (!parent2.isUser() && entry.getUserReference().getOriginalReference() != null) {
                 throw new ParentEntryEvictedException(String.format(
                     "The second parent [%s] for the entry [%s] with wiki [%s] is not a user entry.",
                     parent2, entry, wiki));

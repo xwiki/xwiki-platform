@@ -23,11 +23,12 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 #xwikimessageboxstart($services.localization.render('resetversions') $services.localization.render('resetversionsdone'))
 $!message
 #xwikimessageboxend()
 <div class="clearfloats"></div>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")

@@ -27,6 +27,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -121,6 +122,21 @@ public class LiveDataElement extends BaseElement
     public String getId()
     {
         return this.id;
+    }
+
+    /**
+     * Change the pagination number of the current live data.
+     *
+     * @param paginationNumber the new pagination number (e.g., 15 or 100), this must be a known pagination
+     * @return the current page object
+     * @since 15.9RC1
+     * @since 15.5.3
+     */
+    public LiveDataElement setPagination(int paginationNumber)
+    {
+        WebElement element = getRootElement().findElement(By.cssSelector(".pagination-page-size select"));
+        new Select(element).selectByValue(Integer.toString(paginationNumber));
+        return this;
     }
 
     private void waitUntilReady()

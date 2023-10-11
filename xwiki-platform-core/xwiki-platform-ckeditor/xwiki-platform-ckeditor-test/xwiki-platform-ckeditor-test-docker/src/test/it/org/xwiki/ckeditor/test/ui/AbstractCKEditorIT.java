@@ -19,6 +19,10 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.repository.test.SolrTestUtils;
@@ -29,9 +33,6 @@ import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Base class for CKEditor integration tests.
@@ -46,18 +47,20 @@ public abstract class AbstractCKEditorIT
 
     protected RichTextAreaElement textArea;
 
-    void edit(TestUtils setup, TestReference testReference)
+    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference)
     {
-        edit(setup, testReference, true);
+        return edit(setup, testReference, true);
     }
-    
-    void edit(TestUtils setup, TestReference testReference, boolean startFresh) {
+
+    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference, boolean startFresh)
+    {
         if (startFresh) {
             setup.deletePage(testReference, true);
         }
-        WYSIWYGEditPage.gotoPage(testReference);
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
         this.editor = new CKEditor("content").waitToLoad();
         this.textArea = this.editor.getRichTextArea();
+        return editPage;
     }
 
     protected void createAndLoginStandardUser(TestUtils setup)
@@ -70,6 +73,7 @@ public abstract class AbstractCKEditorIT
         editor.getToolBar().toggleSourceMode();
         assertEquals(expected, editor.getSourceTextArea().getAttribute("value"));
         editor.getToolBar().toggleSourceMode();
+        this.textArea = this.editor.getRichTextArea();
     }
 
     protected void assertSourceContains(String expectedSource)
@@ -78,6 +82,17 @@ public abstract class AbstractCKEditorIT
         String actualSource = editor.getSourceTextArea().getAttribute("value");
         assertTrue(actualSource.contains(expectedSource), "Unexpected source: " + actualSource);
         editor.getToolBar().toggleSourceMode();
+        this.textArea = this.editor.getRichTextArea();
+    }
+
+    protected void setSource(String source)
+    {
+        editor.getToolBar().toggleSourceMode();
+        WebElement sourceTextArea = editor.getSourceTextArea();
+        sourceTextArea.clear();
+        sourceTextArea.sendKeys(source);
+        editor.getToolBar().toggleSourceMode();
+        this.textArea = this.editor.getRichTextArea();
     }
 
     protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)

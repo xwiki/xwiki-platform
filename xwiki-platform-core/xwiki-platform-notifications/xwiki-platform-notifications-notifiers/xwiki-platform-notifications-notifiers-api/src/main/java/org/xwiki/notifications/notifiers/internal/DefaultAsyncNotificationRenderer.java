@@ -35,7 +35,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
-import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
@@ -69,9 +68,6 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
 
     @Inject
     private EntityReferenceSerializer<String> documentReferenceSerializer;
-
-    @Inject
-    private GroupingEventManager groupingEventManager;
 
     @Inject
     @Named("AsyncNotificationRenderer")

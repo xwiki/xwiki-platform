@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.8-SNAPSHOT</version>
+    <version>15.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,8 +125,17 @@
 
                  Single justification example:
             -->
-            
-            
+            <revapi.differences>
+              <justification>Class moved from xwiki-platform-model-validation-default to xwiki-platform-model-validation-api</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.model.validation.script.ModelValidationScriptService</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -215,6 +224,7 @@
     <module>xwiki-platform-template</module>
     <module>xwiki-platform-test</module>
     <module>xwiki-platform-tika</module>
+    <module>xwiki-platform-tour</module>
     <module>xwiki-platform-tree</module>
     <module>xwiki-platform-user</module>
     <module>xwiki-platform-uiextension</module>

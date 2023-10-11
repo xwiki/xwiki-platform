@@ -38,7 +38,13 @@ import org.xwiki.test.docker.junit5.UITest;
         // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
         "org.python:jython-slim"
     },
-    resolveExtraJARs = true
+    resolveExtraJARs = true,
+    // We need the Office server because we want to be able to test how the Office macro is exported to PDF.
+    office = true,
+    properties = {
+        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference)
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.OfficeImporterAdmin"
+    }
 )
 @ExtendWith(PDFExportExecutionCondition.class)
 class AllIT

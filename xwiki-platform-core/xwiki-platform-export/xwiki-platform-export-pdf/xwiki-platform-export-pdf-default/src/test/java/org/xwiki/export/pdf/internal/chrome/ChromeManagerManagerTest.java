@@ -19,8 +19,18 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -34,14 +44,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.dockerjava.api.model.HostConfig;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ChromeManagerManager}.
@@ -80,11 +82,15 @@ class ChromeManagerManagerTest
 
         mockNetwork("bridge");
 
+        List<String> envVars = Collections.singletonList("CHROMIUM_FLAGS=\"\"");
+        List<String> parameters = Arrays.asList("--remote-debugging-address=0.0.0.0",
+            "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort(),
+            "--remote-allow-origins=http://localhost:" + this.configuration.getChromeRemoteDebuggingPort(),
+            "--disable-dev-shm-usage", "about:blank");
+
         when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
-            this.configuration.getChromeDockerContainerName(),
-            Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort()),
-            this.hostConfig)).thenReturn(this.containerId);
+            this.configuration.getChromeDockerContainerName(), parameters, envVars, this.hostConfig))
+            .thenReturn(this.containerId);
     }
 
     private void mockNetwork(String networkIdOrName)
@@ -95,6 +101,7 @@ class ChromeManagerManagerTest
         this.hostConfig = mock(HostConfig.class);
         when(this.containerManager.getHostConfig(networkIdOrName, this.configuration.getChromeRemoteDebuggingPort()))
             .thenReturn(this.hostConfig);
+        when(this.hostConfig.withSecurityOpts(any(List.class))).thenReturn(this.hostConfig);
         when(this.hostConfig.withExtraHosts("xwiki-host:host-gateway"))
             .thenReturn(this.hostConfig);
     }

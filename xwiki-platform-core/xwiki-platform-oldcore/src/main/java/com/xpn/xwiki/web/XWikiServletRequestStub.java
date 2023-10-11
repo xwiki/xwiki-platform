@@ -84,6 +84,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
         private String remoteAddr;
 
+        private HttpSession httpSession;
+
         /**
          * Default constructor.
          */
@@ -152,6 +154,17 @@ public class XWikiServletRequestStub implements XWikiRequest
         }
 
         /**
+         * @param httpSession the http session to initialize the {@link XWikiServletRequestStub} instance with
+         * @return the current builder
+         * @since 15.9RC1
+         */
+        public Builder setHttpSession(HttpSession httpSession)
+        {
+            this.httpSession = httpSession;
+            return this;
+        }
+
+        /**
          * @return the built {@link XWikiServletRequestStub} instance
          */
         public XWikiServletRequestStub build()
@@ -192,6 +205,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private boolean daemon = true;
 
+    private HttpSession httpSession;
+
     public XWikiServletRequestStub()
     {
     }
@@ -218,6 +233,7 @@ public class XWikiServletRequestStub implements XWikiRequest
         this.headers = cloneHeaders(builder.headers);
         this.cookies = clone(builder.cookies);
         this.remoteAddr = builder.remoteAddr;
+        this.httpSession = builder.httpSession;
     }
 
     /**
@@ -548,7 +564,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public HttpSession getSession(boolean b)
     {
-        return null;
+        return this.httpSession;
     }
 
     @Override
@@ -560,7 +576,18 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public HttpSession getSession()
     {
-        return null;
+        return this.httpSession;
+    }
+
+    /**
+     * Sets the HttpSession object for the current user session.
+     *
+     * @param httpSession the {@link HttpSession} object to be set
+     * @since 15.9RC1
+     */
+    public void setSession(HttpSession httpSession)
+    {
+        this.httpSession = httpSession;
     }
 
     @Override

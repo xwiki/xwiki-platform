@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import java.time.Instant;
+
 import javax.inject.Provider;
 
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
@@ -44,11 +46,19 @@ public class AttachmentWikiResource extends AbstractWikiResource<AttachmentRefer
     }
 
     @Override
-    protected InputStreamInputSource getInputSourceInternal(XWikiDocument document) throws Exception
+    public InputStreamInputSource getInputSource() throws Exception
     {
-        XWikiAttachment attachment = document.getAttachment(this.reference.getName());
+        XWikiAttachment attachment = getDocument().getAttachment(this.reference.getName());
 
         return new DefaultInputStreamInputSource(attachment.getContentInputStream(this.xcontextProvider.get()), true);
+    }
+
+    @Override
+    public Instant getInstant() throws Exception
+    {
+        XWikiAttachment attachment = getDocument().getAttachment(this.reference.getName());
+
+        return attachment.getDate().toInstant();
     }
 
     @Override

@@ -21,8 +21,7 @@ define('xwiki-lightbox-messages', {
   prefix: 'core.viewers.attachments.',
   keys: [
     'date',
-    'author',
-    'toggle.label'
+    'author'
   ]
 });
 

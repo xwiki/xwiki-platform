@@ -163,7 +163,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     {
         WikiReference entityWiki =
             (WikiReference) entry.getReference().getOriginalReference().extractReference(EntityType.WIKI);
-        WikiReference userWiki = entry.getUserReference().getOriginalReference().getWikiReference();
+        WikiReference userWiki = entry.getUserReference().getWikiReference().getOriginalWikiReference();
         if (!Objects.equals(entityWiki, userWiki)) {
             if (entry.getUserReference().isGlobal()) {
                 securityCache.add(entry, factory.newEntityReference(entityWiki));
@@ -934,5 +934,53 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
                 Collections.singleton(groupSecurityReference)));
         assertEquals("The parent [Rules for Document wiki:XWiki.group] is not a group entry.",
             exception.getMessage());
+    }
+
+    @Test
+    void testAcceptsMainWikiAsUserParent() throws Exception
+    {
+        // Insert the main wiki entry into the cache, but not as user.
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
+
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("xwiki", "XWiki"))));
+        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "page1");
+        SecurityReference documentSecurityReference = newEntityReference(documentReference);
+        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference));
+
+        // Create an access entry with the user
+        UserSecurityReference userSecurityReference = newUserReference(null);
+        SecurityAccessEntry entry = mockSecurityAccessEntry(documentSecurityReference, userSecurityReference);
+
+        // Try to add the access entry to the cache
+        AddAccessEntry(entry);
+
+        // Check that the entry was added
+        assertSame(entry, this.securityCache.get(userSecurityReference, documentSecurityReference));
+    }
+
+    @Test
+    void testAcceptsMainWikiShadowAsUserParent() throws Exception
+    {
+        // Insert the main wiki entry into the cache, but not as user.
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
+        SecurityReference subWikiReference = newEntityReference(new WikiReference("wiki"));
+        this.securityCache.add(mockSecurityRuleEntry(subWikiReference));
+        // Insert the shadow entry for the subwiki
+        this.securityCache.add(mockSecurityShadowEntry(newUserReference(null), subWikiReference), null);
+        UserSecurityReference userSecurityReference = newUserReference(null);
+
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))));
+        DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "page1");
+        SecurityReference documentSecurityReference = newEntityReference(documentReference);
+        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference));
+
+        // Create an access entry with the user
+        SecurityAccessEntry entry = mockSecurityAccessEntry(documentSecurityReference, userSecurityReference);
+
+        // Try to add the access entry to the cache
+        AddAccessEntry(entry);
+
+        // Check that the entry was added
+        assertSame(entry, this.securityCache.get(userSecurityReference, documentSecurityReference));
     }
 }

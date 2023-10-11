@@ -56,7 +56,8 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     private DocumentContextExecutor documentContextExecutor;
 
     @Inject
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @Inject
     @Named(XDOMRequiredRightAnalyzer.ID)

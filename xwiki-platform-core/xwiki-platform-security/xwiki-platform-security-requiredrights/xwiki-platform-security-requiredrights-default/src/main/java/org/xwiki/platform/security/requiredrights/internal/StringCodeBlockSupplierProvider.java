@@ -19,49 +19,27 @@
  */
 package org.xwiki.platform.security.requiredrights.internal;
 
-import java.io.StringReader;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 
 /**
  * Provides a way to easily construct a supplier that just displays the given string.
  *
  * @version $Id$
  */
-@Component(roles = StringBlockSupplierProvider.class)
+@Component
 @Singleton
-public class StringBlockSupplierProvider
+@Named("stringCode")
+public class StringCodeBlockSupplierProvider extends AbstractBlockSupplierProvider<String>
 {
-    @Inject
-    @Named("plain/1.0")
-    private Parser parser;
-
-    /**
-     * @param string the string to display
-     * @return a supplier that returns a block that displays the given string
-     */
-    public Supplier<Block> get(String string)
+    @Override
+    public Supplier<Block> get(String string, Object... parameters)
     {
-        return () -> {
-            if (StringUtils.isNotBlank(string)) {
-                try {
-                    return this.parser.parse(new StringReader(string));
-                } catch (ParseException e) {
-                    // Ignore
-                }
-            }
-
-            return new CompositeBlock();
-        };
+        return () -> getCodeBlock(string);
     }
 }

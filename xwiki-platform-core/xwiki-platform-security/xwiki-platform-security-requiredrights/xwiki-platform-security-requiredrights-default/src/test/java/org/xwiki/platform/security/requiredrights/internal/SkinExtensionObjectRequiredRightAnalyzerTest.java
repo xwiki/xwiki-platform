@@ -21,6 +21,8 @@ package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.xwiki.model.EntityType;
@@ -50,10 +52,11 @@ import static org.mockito.Mockito.when;
 class SkinExtensionObjectRequiredRightAnalyzerTest
 {
     @MockComponent
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @MockComponent
-    private XObjectDisplayerProvider xObjectDisplayerProvider;
+    private BlockSupplierProvider<BaseObject> xObjectDisplayerProvider;
 
     @InjectMockComponents
     private SkinExtensionObjectRequiredRightAnalyzer analyzer;

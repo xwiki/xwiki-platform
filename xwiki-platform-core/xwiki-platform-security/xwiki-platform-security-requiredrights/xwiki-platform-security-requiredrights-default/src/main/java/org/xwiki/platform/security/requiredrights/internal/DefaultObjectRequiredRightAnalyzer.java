@@ -75,10 +75,12 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Inject
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @Inject
-    private StringBlockSupplierProvider stringBlockSupplierProvider;
+    @Named("stringCode")
+    private BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
 
     @Inject
     private Provider<ComponentManager> componentManagerProvider;
@@ -175,7 +177,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         if (VelocityUtil.containsVelocityScript(value)) {
             result = List.of(new RequiredRightAnalysisResult(reference,
                 this.translationMessageSupplierProvider.get(translationMessage),
-                this.stringBlockSupplierProvider.get(value),
+                this.stringCodeBlockSupplierProvider.get(value),
                 List.of(
                     new RequiredRightAnalysisResult.RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false),
                     new RequiredRightAnalysisResult.RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)

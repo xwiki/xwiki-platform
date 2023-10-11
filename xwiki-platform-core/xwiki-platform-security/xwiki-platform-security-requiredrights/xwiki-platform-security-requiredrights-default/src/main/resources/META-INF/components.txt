@@ -10,4 +10,4 @@ org.xwiki.platform.security.requiredrights.internal.SkinExtensionObjectRequiredR
 org.xwiki.platform.security.requiredrights.internal.XObjectDisplayerProvider
 org.xwiki.platform.security.requiredrights.internal.MacroDisplayerProvider
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsEditConfirmationChecker
-org.xwiki.platform.security.requiredrights.internal.StringBlockSupplierProvider
+org.xwiki.platform.security.requiredrights.internal.StringCodeBlockSupplierProvider

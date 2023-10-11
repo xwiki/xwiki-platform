@@ -36,6 +36,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -75,7 +76,6 @@ class XObjectDisplayerProviderTest
     {
         // Create a mock object with an XClass that has a TextArea property and a String property
         BaseObject object = mock();
-        
         BaseClass xClass = mock();
         when(object.getXClass(any())).thenReturn(xClass);
 
@@ -83,6 +83,8 @@ class XObjectDisplayerProviderTest
         when(textAreaProperty.getTranslatedPrettyName(any())).thenReturn("Text Area");
         String textAreaName = "textAreaName";
         when(textAreaProperty.getName()).thenReturn(textAreaName);
+        String textAreaHint = "textAreaHint";
+        when(textAreaProperty.getHint()).thenReturn(textAreaHint);
         when(object.getStringValue(textAreaName)).thenReturn("textAreaValue");
 
         StringClass stringProperty = mock();
@@ -99,33 +101,29 @@ class XObjectDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(block, printer);
 
-        List<String> lines = List.of(
-            "beginDefinitionList",
-            "beginDefinitionTerm",
-            "onWord [Text]",
-            "onSpace",
-            "onWord [Area]",
-            "beginFormat [NONE] [[class]=[xHint]]",
-            "endFormat [NONE] [[class]=[xHint]]",
-            "endDefinitionTerm",
-            "beginDefinitionDescription",
-            "beginGroup [[class]=[code box]]",
-            "onWord [textAreaValue]",
-            "endGroup [[class]=[code box]]",
-            "endDefinitionDescription",
-            "beginDefinitionTerm",
-            "onWord [String]",
-            "beginFormat [NONE] [[class]=[xHint]]",
-            "endFormat [NONE] [[class]=[xHint]]",
-            "endDefinitionTerm",
-            "beginDefinitionDescription",
-            "onRawText [displayedStringValue] [html/5.0]",
-            "endDefinitionDescription",
-            "endDefinitionList",
-            ""
-        );
+        String expected = "beginDefinitionList\n"
+            + "beginDefinitionTerm\n"
+            + "onWord [Text]\n"
+            + "onSpace\n"
+            + "onWord [Area]\n"
+            + "beginFormat [NONE] [[class]=[xHint]]\n"
+            + "onWord [textAreaHint]\n"
+            + "endFormat [NONE] [[class]=[xHint]]\n"
+            + "endDefinitionTerm\n"
+            + "beginDefinitionDescription\n"
+            + "beginGroup [[class]=[code box]]\n"
+            + "onWord [textAreaValue]\n"
+            + "endGroup [[class]=[code box]]\n"
+            + "endDefinitionDescription\n"
+            + "beginDefinitionTerm\n"
+            + "onWord [String]\n"
+            + "endDefinitionTerm\n"
+            + "beginDefinitionDescription\n"
+            + "onRawText [displayedStringValue] [html/5.0]\n"
+            + "endDefinitionDescription\n"
+            + "endDefinitionList\n";
 
-        assertEquals(String.join("\n", lines), printer.toString());
+        assertEquals(expected, printer.toString());
     }
 
     @Test
@@ -146,26 +144,21 @@ class XObjectDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(block, printer);
 
-        List<String> lines = List.of(
-            "beginDefinitionList",
-            "endDefinitionList",
-            "beginGroup [[class]=[box warningmessage deprecatedProperties]]",
-            "beginDefinitionList",
-            "beginDefinitionTerm",
-            "onWord [deprecatedName]",
-            "beginFormat [NONE] [[class]=[xHint]]",
-            "endFormat [NONE] [[class]=[xHint]]",
-            "endDefinitionTerm",
-            "beginDefinitionDescription",
-            "beginGroup [[class]=[code box]]",
-            "onWord [deprecatedValue]",
-            "endGroup [[class]=[code box]]",
-            "endDefinitionDescription",
-            "endDefinitionList",
-            "endGroup [[class]=[box warningmessage deprecatedProperties]]",
-            ""
-        );
+        String expected = "beginDefinitionList\n"
+            + "endDefinitionList\n"
+            + "beginGroup [[class]=[box warningmessage deprecatedProperties]]\n"
+            + "beginDefinitionList\n"
+            + "beginDefinitionTerm\n"
+            + "onWord [deprecatedName]\n"
+            + "endDefinitionTerm\n"
+            + "beginDefinitionDescription\n"
+            + "beginGroup [[class]=[code box]]\n"
+            + "onWord [deprecatedValue]\n"
+            + "endGroup [[class]=[code box]]\n"
+            + "endDefinitionDescription\n"
+            + "endDefinitionList\n"
+            + "endGroup [[class]=[box warningmessage deprecatedProperties]]\n";
 
-        assertEquals(String.join("\n", lines), printer.toString());
+        assertEquals(expected, printer.toString());
     }
 }

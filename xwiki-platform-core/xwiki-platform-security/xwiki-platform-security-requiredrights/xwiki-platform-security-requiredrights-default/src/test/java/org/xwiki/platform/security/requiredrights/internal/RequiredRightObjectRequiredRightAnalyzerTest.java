@@ -21,6 +21,8 @@ package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,7 +55,8 @@ class RequiredRightObjectRequiredRightAnalyzerTest
     protected static final String LEVEL = "level";
 
     @MockComponent
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @InjectMockComponents
     private RequiredRightObjectRequiredRightAnalyzer analyzer;

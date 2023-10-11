@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -45,10 +46,11 @@ import com.xpn.xwiki.objects.BaseObject;
 public class SkinExtensionObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
     @Inject
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @Inject
-    private XObjectDisplayerProvider xObjectDisplayerProvider;
+    private BlockSupplierProvider<BaseObject> xObjectDisplayerProvider;
 
     @Override
     public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException

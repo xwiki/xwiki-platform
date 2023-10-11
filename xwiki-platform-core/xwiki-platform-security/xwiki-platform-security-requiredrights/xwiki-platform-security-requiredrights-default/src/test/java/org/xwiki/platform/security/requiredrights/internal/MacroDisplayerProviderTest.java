@@ -28,10 +28,8 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
 import org.xwiki.rendering.internal.parser.plain.PlainTextStreamParser;
 import org.xwiki.rendering.internal.renderer.event.EventBlockRenderer;
@@ -42,6 +40,7 @@ import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -108,9 +107,13 @@ class MacroDisplayerProviderTest
         MacroDescriptor macroDescriptor = mock();
         ParameterDescriptor existingParameterDescriptor = mock();
         when(existingParameterDescriptor.getName()).thenReturn("Name from Macro Descriptor");
+        when(existingParameterDescriptor.getDescription()).thenReturn("Parameter description from Macro Descriptor");
         when(macroDescriptor.getParameterDescriptorMap()).thenReturn(
             Map.of(existingName, existingParameterDescriptor)
         );
+        ContentDescriptor contentDescriptor = mock();
+        when(contentDescriptor.getDescription()).thenReturn("Content description from Macro Descriptor");
+        when(macroDescriptor.getContentDescriptor()).thenReturn(contentDescriptor);
         Macro<?> macro = mock();
         when(macro.getDescriptor()).thenReturn(macroDescriptor);
 
@@ -141,6 +144,17 @@ class MacroDisplayerProviderTest
             + "onWord [Macro]\n"
             + "onSpace\n"
             + "onWord [Descriptor]\n"
+            + "beginFormat [NONE] [[class]=[xHint]]\n"
+            + "onWord [Parameter]\n"
+            + "onSpace\n"
+            + "onWord [description]\n"
+            + "onSpace\n"
+            + "onWord [from]\n"
+            + "onSpace\n"
+            + "onWord [Macro]\n"
+            + "onSpace\n"
+            + "onWord [Descriptor]\n"
+            + "endFormat [NONE] [[class]=[xHint]]\n"
             + "endDefinitionTerm\n"
             + "beginDefinitionDescription\n"
             + "beginGroup [[class]=[code box]]\n"
@@ -157,6 +171,17 @@ class MacroDisplayerProviderTest
             + "endDefinitionDescription\n"
             + "beginDefinitionTerm\n"
             + "onWord [Content]\n"
+            + "beginFormat [NONE] [[class]=[xHint]]\n"
+            + "onWord [Content]\n"
+            + "onSpace\n"
+            + "onWord [description]\n"
+            + "onSpace\n"
+            + "onWord [from]\n"
+            + "onSpace\n"
+            + "onWord [Macro]\n"
+            + "onSpace\n"
+            + "onWord [Descriptor]\n"
+            + "endFormat [NONE] [[class]=[xHint]]\n"
             + "endDefinitionTerm\n"
             + "beginDefinitionDescription\n"
             + "beginGroup [[class]=[code box]]\n"
@@ -222,13 +247,13 @@ class MacroDisplayerProviderTest
 
         when(this.macroManager.getMacro(any())).thenThrow(new MacroLookupException(""));
 
-        Translation parameterTranslation = mock();
-        when(parameterTranslation.render()).thenReturn(new WordBlock("TranslatedParameter"));
-        when(this.localizationManager.getTranslation("rendering.macro.testMacro.parameter.parameterName.name"))
-            .thenReturn(parameterTranslation);
-        Translation contentTranslation = mock();
-        when(contentTranslation.render()).thenReturn(new WordBlock("TranslatedContent"));
-        when(this.localizationManager.getTranslation("rendering.macroContent")).thenReturn(contentTranslation);
+        when(this.localizationManager.getTranslationPlain("rendering.macro.testMacro.parameter.parameterName.name"))
+            .thenReturn("TranslatedParameter");
+        when(this.localizationManager.getTranslationPlain("rendering.macro.testMacro.parameter.parameterName.description"))
+            .thenReturn("Translated parameter description.");
+        when(this.localizationManager.getTranslationPlain("rendering.macroContent")).thenReturn("TranslatedContent");
+        when(this.localizationManager.getTranslationPlain("rendering.macro.testMacro.content.description"))
+            .thenReturn("Translated content description.");
 
         Block resultBlock = this.provider.get(macroBlock).get();
 
@@ -238,6 +263,14 @@ class MacroDisplayerProviderTest
         String expectedOutput = "beginDefinitionList\n"
             + "beginDefinitionTerm\n"
             + "onWord [TranslatedParameter]\n"
+            + "beginFormat [NONE] [[class]=[xHint]]\n"
+            + "onWord [Translated]\n"
+            + "onSpace\n"
+            + "onWord [parameter]\n"
+            + "onSpace\n"
+            + "onWord [description]\n"
+            + "onSpecialSymbol [.]\n"
+            + "endFormat [NONE] [[class]=[xHint]]\n"
             + "endDefinitionTerm\n"
             + "beginDefinitionDescription\n"
             + "beginGroup [[class]=[code box]]\n"
@@ -246,6 +279,14 @@ class MacroDisplayerProviderTest
             + "endDefinitionDescription\n"
             + "beginDefinitionTerm\n"
             + "onWord [TranslatedContent]\n"
+            + "beginFormat [NONE] [[class]=[xHint]]\n"
+            + "onWord [Translated]\n"
+            + "onSpace\n"
+            + "onWord [content]\n"
+            + "onSpace\n"
+            + "onWord [description]\n"
+            + "onSpecialSymbol [.]\n"
+            + "endFormat [NONE] [[class]=[xHint]]\n"
             + "endDefinitionTerm\n"
             + "beginDefinitionDescription\n"
             + "beginGroup [[class]=[code box]]\n"

@@ -84,7 +84,8 @@ class ScriptMacroAnalyzerTest
     private BeanManager beanManager;
 
     @MockComponent
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @MockComponent
     private MacroManager macroManager;

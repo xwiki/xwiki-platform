@@ -62,10 +62,11 @@ public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
     private BeanManager beanManager;
 
     @Inject
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @Inject
-    private MacroDisplayerProvider macroDisplayerProvider;
+    private BlockSupplierProvider<MacroBlock> macroDisplayerProvider;
 
     /**
      * @param macroBlock the macro block to analyze

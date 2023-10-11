@@ -56,7 +56,8 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
     public static final String ID = "object/XWiki.RequiredRightClass";
 
     @Inject
-    private TranslationMessageSupplierProvider translationMessageSupplierProvider;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationBlockProvider;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -76,8 +77,7 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
                 String rightView = StringEscapeUtils.unescapeXml(rightHTML);
                 return List.of(
                     new RequiredRightAnalysisResult(object.getReference(),
-                        this.translationMessageSupplierProvider.get("security.requiredrights.object.requiredRight",
-                            rightView),
+                        this.translationBlockProvider.get("security.requiredrights.object.requiredRight", rightView),
                         CompositeBlock::new,
                         List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
                     ),
@@ -86,7 +86,7 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
                     //  On the other hand, it seems like a super unlikely case to have a localized document with a
                     //  required rights object.
                     new RequiredRightAnalysisResult(object.getDocumentReference(),
-                        this.translationMessageSupplierProvider.get(
+                        this.translationBlockProvider.get(
                             "security.requiredrights.object.requiredRight.content",
                             rightView),
                         CompositeBlock::new,

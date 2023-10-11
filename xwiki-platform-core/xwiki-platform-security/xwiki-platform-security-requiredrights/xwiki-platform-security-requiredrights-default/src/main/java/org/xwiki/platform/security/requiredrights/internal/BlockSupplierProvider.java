@@ -21,39 +21,24 @@ package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.localization.Translation;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
 
 /**
- * Provides a way to easily construct a supplier using a translation message.
+ * Provides a block supplier for a given object and (optionally) parameters.
  *
+ * @param <T> the type of the object
  * @version $Id$
- * @since 15.9RC1
  */
-@Component
-@Singleton
-@Named("translation")
-public class TranslationMessageSupplierProvider extends AbstractBlockSupplierProvider<String>
+@Role
+public interface BlockSupplierProvider<T>
 {
-    @Inject
-    private ContextualLocalizationManager contextualLocalizationManager;
-
-    @Override
-    public Supplier<Block> get(String translationMessage, Object... parameters)
-    {
-        return () -> {
-            Translation translation = this.contextualLocalizationManager.getTranslation(translationMessage);
-            if (translation != null) {
-                return translation.render(parameters);
-            } else {
-                return getStringBlock(translationMessage);
-            }
-        };
-    }
+    /**
+     * Get a block supplier for the given object and (optionally) parameters.
+     *
+     * @param object the object to get a block supplier for
+     * @param parameters optional parameters for the object
+     * @return a block supplier
+     */
+    Supplier<Block> get(T object, Object... parameters);
 }

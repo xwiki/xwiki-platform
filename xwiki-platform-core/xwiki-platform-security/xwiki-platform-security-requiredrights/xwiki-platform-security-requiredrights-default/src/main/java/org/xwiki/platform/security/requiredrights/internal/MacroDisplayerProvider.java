@@ -19,37 +19,27 @@
  */
 package org.xwiki.platform.security.requiredrights.internal;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.block.DefinitionDescriptionBlock;
-import org.xwiki.rendering.block.DefinitionListBlock;
-import org.xwiki.rendering.block.DefinitionTermBlock;
-import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Provider that produces a displayer for a macro.
@@ -57,16 +47,12 @@ import org.xwiki.rendering.util.ParserUtils;
  * @version $Id$
  * @since 15.9RC1
  */
-@Component(roles = MacroDisplayerProvider.class)
+@Component
 @Singleton
-public class MacroDisplayerProvider
+public class MacroDisplayerProvider extends AbstractBlockSupplierProvider<MacroBlock>
 {
     @Inject
     private ContextualLocalizationManager localizationManager;
-
-    @Inject
-    @Named("plain/1.0")
-    private Parser plainParser;
 
     @Inject
     private MacroManager macroManager;
@@ -77,86 +63,81 @@ public class MacroDisplayerProvider
     @Inject
     private MacroContentParser macroContentParser;
 
-    private final ParserUtils parserUtils = new ParserUtils();
-
-    /**
-     * @param macroBlock the macro block to display
-     * @return a supplier that displays the macro block
-     */
-    public Supplier<Block> get(MacroBlock macroBlock)
+    @Override
+    public Supplier<Block> get(MacroBlock macroBlock, Object... parameters)
     {
         String macroId = macroBlock.getId();
         String translationKeyPrefix = "rendering.macro." + macroId;
 
-        // Generated structure: dl > dt > parameter name, dd > parameter value
-        List<Block> properties = new ArrayList<>();
-
         Map<String, ParameterDescriptor> parameterDescriptors = Map.of();
+        ContentDescriptor contentDescriptor = null;
         try {
             MacroId macroIdWithSyntax = new MacroId(macroId,
                 this.macroContentParser.getCurrentSyntax(getTransformationContext(macroBlock)));
-            parameterDescriptors =
-                this.macroManager.getMacro(macroIdWithSyntax).getDescriptor().getParameterDescriptorMap();
+            MacroDescriptor macroDescriptor = this.macroManager.getMacro(macroIdWithSyntax).getDescriptor();
+            parameterDescriptors = macroDescriptor.getParameterDescriptorMap();
+            contentDescriptor = macroDescriptor.getContentDescriptor();
         } catch (MacroLookupException e) {
             // Ignore, just work without the macro descriptor.
         }
+
+        List<PropertyDisplay> properties = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : macroBlock.getParameters().entrySet()) {
             String parameterName = entry.getKey();
             String parameterValue = entry.getValue();
 
-            String fallbackName;
-            if (parameterDescriptors.containsKey(parameterName)) {
-                fallbackName = parameterDescriptors.get(parameterName).getName();
-            } else {
-                fallbackName = parameterName;
-            }
-
-            String translationKey = translationKeyPrefix + ".parameter." + parameterName + ".name";
-            Block parameterNameBlock = maybeTranslate(translationKey, fallbackName);
-            Block parameterValueBlock = getCodeBlock(parameterValue);
-            properties.add(new DefinitionTermBlock(List.of(parameterNameBlock)));
-            properties.add(new DefinitionDescriptionBlock(List.of(parameterValueBlock)));
+            String parameterTranslationKey = translationKeyPrefix + ".parameter." + parameterName;
+            ParameterDescriptor parameterDescriptor = parameterDescriptors.get(parameterName);
+            String displayName = getParameterDisplayName(parameterName, parameterTranslationKey, parameterDescriptor);
+            String description = getParameterDescription(parameterTranslationKey, parameterDescriptor);
+            properties.add(new PropertyDisplay(displayName, description, parameterValue, false));
         }
 
-        Block contentName = maybeTranslate("rendering.macroContent", "Content");
-        Block contentValue = getCodeBlock(macroBlock.getContent());
-        properties.add(new DefinitionTermBlock(List.of(contentName)));
-        properties.add(new DefinitionDescriptionBlock(List.of(contentValue)));
+        String contentLabel = maybeTranslate("rendering.macroContent", "Content");
+        String fallbackContentDescription = contentDescriptor != null ? contentDescriptor.getDescription() : null;
+        String contentDescriptionKey = translationKeyPrefix + ".content.description";
+        String contentDescription = maybeTranslate(contentDescriptionKey, fallbackContentDescription);
+        properties.add(new PropertyDisplay(contentLabel, contentDescription, macroBlock.getContent(), false));
 
-        return () -> new DefinitionListBlock(properties);
+        return () -> renderProperties(properties);
     }
 
-    private Block maybeTranslate(String key, String fallback)
+    private String getParameterDescription(String parameterTranslationKey, ParameterDescriptor parameterDescriptor)
     {
-        Translation translation = this.localizationManager.getTranslation(key);
+        String fallbackDescription;
+        if (parameterDescriptor != null) {
+            fallbackDescription = parameterDescriptor.getDescription();
+        } else {
+            fallbackDescription = null;
+        }
+
+        return maybeTranslate(parameterTranslationKey + ".description", fallbackDescription);
+    }
+
+    private String getParameterDisplayName(String parameterName, String parameterTranslationKey,
+        ParameterDescriptor parameterDescriptor)
+    {
+        String fallbackName;
+
+        if (parameterDescriptor != null) {
+            fallbackName = parameterDescriptor.getName();
+        } else {
+            fallbackName = parameterName;
+        }
+
+        return maybeTranslate(parameterTranslationKey + ".name", fallbackName);
+    }
+
+    private String maybeTranslate(String key, String fallback)
+    {
+        String translation = this.localizationManager.getTranslationPlain(key);
 
         if (translation != null) {
-            return translation.render();
+            return translation;
         } else {
-            return parseInline(fallback);
+            return fallback;
         }
-    }
-
-    private Block getCodeBlock(String value)
-    {
-        if (StringUtils.isNotBlank(value)) {
-            return new GroupBlock(List.of(parseInline(value)), Map.of("class", "code box"));
-        } else {
-            return new CompositeBlock();
-        }
-    }
-
-    private Block parseInline(String value)
-    {
-        if (StringUtils.isNotBlank(value)) {
-            try {
-                return this.parserUtils.convertToInline(this.plainParser.parse(new StringReader(value)), false);
-            } catch (ParseException e) {
-                // Ignore, shouldn't happen
-            }
-        }
-        return new CompositeBlock();
     }
 
     private MacroTransformationContext getTransformationContext(MacroBlock macroBlock)

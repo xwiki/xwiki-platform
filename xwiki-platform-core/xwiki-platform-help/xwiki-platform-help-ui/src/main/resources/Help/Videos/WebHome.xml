@@ -144,10 +144,11 @@
       &lt;/div&gt;
       &lt;ul&gt;
         #foreach ($topic in $data.topics)
-          &lt;li&gt;
-            &lt;a href="$escapetool.html($topic.url)"&gt;
-              $topic.label
-            &lt;/a&gt;
+          &lt;li&gt;#if ($topic.url)
+            &lt;a href="$escapetool.html($topic.url)"&gt;$topic.label&lt;/a&gt;
+          #else 
+            $topic
+          #end
           &lt;/li&gt;
         #end
       &lt;/ul&gt;

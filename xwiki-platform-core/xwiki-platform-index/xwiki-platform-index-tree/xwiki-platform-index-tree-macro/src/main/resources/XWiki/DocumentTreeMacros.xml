@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.DocumentTreeMacros" locale="">
+<xwikidoc version="1.5" reference="XWiki.DocumentTreeMacros" locale="">
   <web>XWiki</web>
   <name>DocumentTreeMacros</name>
   <language/>
@@ -351,6 +351,8 @@
   #end
   #set ($canViewDoc = $services.security.authorization.hasAccess('view', $documentReference))
   #set ($canDeleteDoc = $services.security.authorization.hasAccess('delete', $documentReference))
+  #set ($canAdministerDoc = ($documentReference.name == 'WebHome') &amp;&amp; $services.security.authorization.hasAccess('admin', $documentReference))
+  #set ($adminDocumentReference = $services.model.resolveDocument('WebPreferences', 'default', $documentReference.lastSpaceReference))
   #if ($canViewDoc &amp;&amp; $docTreeConfig.showDocumentTitle)
     ## Display the translated title.
     #set ($translatedDocument = $xwiki.getDocument($documentReference).translatedDocument)
@@ -374,10 +376,17 @@
       'canDelete': $canDeleteDoc,
       'canMove': $canDeleteDoc,
       'canCopy': $canViewDoc,
-      'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL)
+      'canAdminister': $canAdministerDoc,
+      'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL),
+      'deleteURL': $xwiki.getURL($documentReference, 'delete', $NULL),
+      'copyURL': $xwiki.getURL($documentReference, 'view', 'xpage=copy'),
+      'moveURL': $xwiki.getURL($documentReference, 'view', 'xpage=rename'),
+      'editURL': $xwiki.getURL($documentReference, 'edit', $NULL),
+      'administerURL': $xwiki.getURL($adminDocumentReference, 'admin', $NULL)
     },
     'a_attr': {
-      'href': $xwiki.getURL($documentReference)
+      'href': $xwiki.getURL($documentReference),
+      'title': $label
     }
   }))
 #end
@@ -878,41 +887,65 @@
 #macro (addDocumentContextMenu $contextMenuByNodeType)
   #set ($contextMenuByNodeType.document = {
     'createDocument': {
-      'label': 'New Page',
+      'label': 'New child page',
       'icon': 'fa fa-file-o',
       'action': 'openLink',
       'parameters': {
         'urlProperty': 'createDocumentURL'
       }
     },
-    'openLink': {
+    'edit': {
+      'label': 'Edit',
       'separator_before': true,
-      'label': 'Go to Page',
-      'icon': 'fa fa-external-link'
+      'icon': 'fa fa-pencil',
+      'action': 'openLink',
+      'parameters': {
+        'urlProperty': 'editURL'
+      }
     },
-    'refresh': {
-      'label': 'Refresh',
-      'icon': 'fa fa-refresh'
-    },
-    'cut': {
-      'separator_before': true,
-      'label': 'Cut',
-      'icon': 'fa fa-scissors'
+    'changeTitle': {
+      'label': 'Change title',
+      'icon': 'fa fa-edit'
     },
     'copy': {
       'label': 'Copy',
-      'icon': 'fa fa-files-o'
+      'icon': 'fa fa-files-o',
+      'action': 'openLink',
+      'parameters': {
+        'urlProperty': 'copyURL'
+      }
     },
-    'paste': {
-      'label': 'Paste',
-      'icon': 'fa fa-clipboard'
+    'move': {
+      'label': 'Move',
+      'icon': 'fa fa-arrow-right',
+      'action': 'openLink',
+      'parameters': {
+        'urlProperty': 'moveURL'
+      }
     },
     'remove': {
-      'separator_before': true,
       'label': 'Delete',
       'icon': 'fa fa-trash-o',
+      'action': 'openLink',
       'parameters': {
-        'confirmationMessage': 'Are you sure you want to move this document to the recycle bin? All child documents will become orphan as a result.'
+        'urlProperty': 'deleteURL'
+      }
+    },
+    'copyReference': {
+      'label': 'Copy reference',
+      'separator_before': true,
+      'icon': 'fa fa-paste',
+      'action': 'copyToClipboard',
+      'parameters': {
+        'successMessage': 'The reference has been copied to clipboard.'
+      }
+    },
+    'administer': {
+      'label': 'Administer',
+      'icon': 'fa fa-wrench',
+      'action': 'openLink',
+      'parameters': {
+        'urlProperty': 'administerURL'
       }
     }
   })

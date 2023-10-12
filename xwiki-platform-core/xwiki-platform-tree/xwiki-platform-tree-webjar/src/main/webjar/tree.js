@@ -443,7 +443,8 @@ define([
       },
       plugins: [],
       contextmenu: {
-        items: getContextMenuItems
+        items: getContextMenuItems,
+        select_node: element.hasClass('jstree-no-links')
       },
       dnd: {
         is_draggable: areDraggable
@@ -686,8 +687,40 @@ define([
     // Enable/Disable context menu items before the context menu is shown.
     //
 
+    }).on('xtree.contextMenu.copyToClipboard', function(event, data) {
+      var tree = $.jstree.reference(data.reference);
+      var node = tree.get_node(data.reference);
+      var copyValue = function (value) {
+        var tempNode = $('<input class="clipboard-tempelement" type="text">');
+        $('body').append(tempNode);
+        tempNode.val(value);
+        // We need to display the node so that the copy to clipboard is working but we don't want
+        // users to see it so we just put it to an absurd position. 
+        tempNode.css('position', 'absolute');
+        tempNode.css('left', '-10000px');
+        tempNode.select();
+        document.execCommand("copy");
+        tempNode.remove();
+        if (XWiki.widgets.Notification !== 'undefined') {
+          var successMessage = (data.parameters.successMessage) ? data.parameters.successMessage :
+          'Copied to clipboard';
+          new XWiki.widgets.Notification(successMessage, 'info');
+        }
+      };
+      if (data.parameters.dataToCopy) {
+        copyValue(node.data[data.parameters.dataToCopy]);
+      } else {
+        copyValue(node.data.id);
+      }
     }).on('xtree.openContextMenu', function(event, data) {
       var selectedNodes = data.tree.get_selected(true);
+
+      for (const [key, value] of Object.entries(data.menu)) {
+        var allowingPropertyName = "can" + key[0].toUpperCase() + key.substr(1);
+        value._disabled = (data.node.data && data.node.data[allowingPropertyName] != undefined &&
+          !data.node.data[allowingPropertyName]);
+      }
+
       if (data.menu.copy) {
         data.menu.copy._disabled = !canCopyNodes(selectedNodes);
       }
@@ -703,7 +736,6 @@ define([
       if (data.menu.remove) {
         data.menu.remove._disabled = !canRemoveNodes(selectedNodes);
       }
-
     }).on('changed.jstree', function(event, data) {
       if (data.instance.settings.xwiki && typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
         var fieldName = data.instance.settings.xwiki.fieldName;

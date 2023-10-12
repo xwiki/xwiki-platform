@@ -61,12 +61,6 @@
     padding-left: @narrow-icon-width;
   }
 
-  .jstree-node,
-  .jstree-anchor {
-    /* Allow the label to be split on multiple lines. */
-    white-space: normal;
-  }
-
   .jstree-anchor {
     /* The node label can be split on multiple lines. */
     height: auto;
@@ -157,4 +151,66 @@ body.modal-open > .jstree-xwiki-contextmenu {
     customized to show a page picker that opens a Bootstrap modal with the XWiki page tree). When the tree is displayed
     in a modal we want the context menu to be displayed on top of the modal. */
   z-index: 10051;
+}
+
+/*
+ * Node Actions
+ */
+.jstree-xwiki .jstree-node {
+  /* We want the node label to span the full width of the node (minus the open/close/leaf icon) */
+  display: flex;
+  /* We have to wrap because we want the child nodes to be displayed below the node label. */
+  flex-wrap: wrap;
+  /* Because we position the node actions absolute, in the top right corner of the node.  */
+  position: relative;
+}
+
+.jstree-xwiki .jstree-anchor {
+  /* Extend to take the available width. */
+  flex: auto;
+  /* But leave space for the open/close/leaf icon on the left. */
+  width: calc(100% - 24px);
+  /* Limit the length of the node label. */
+  /* TODO: Try the 'core.themes.ellipsis' configuration option instead. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jstree-xwiki .jstree-anchor.jstree-hovered {
+  /* Make room for the node actions, which are displayed when the node is hovered. */
+  padding-right: 27px;
+}
+
+.jstree-xwiki .jstree-open > .jstree-children {
+  /* Make sure the child nodes are displayed below the node label (since the node has flex display). */
+  width: 100%;
+}
+
+.jstree-xwiki .jstree-node-actions {
+  /* Display the node actions on the top right corner of the node. */
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  line-height: 24px;
+}
+
+.jstree-xwiki .jstree-node-actions button {
+  /* Use the background color of the hovered node. */
+  background-color: transparent;
+  /* Border-less buttons are trendy. */
+  border: 0;
+  /* We need rounded corners for when the button is hovered / focused. */
+  border-radius: 4px;
+  color: #333;
+  margin: 0;
+  /* This matches the 'large' tree theme variant, that uses 32px height for the node label.  */
+  padding: 6px 8px;
+  line-height: 14px;
+  height: 26px;
+}
+
+/* Highligh the hovered / focused node action. */
+.jstree-xwiki .jstree-node-actions button:hover,
+.jstree-xwiki .jstree-node-actions button:focus {
+  background-color: #ddd;
 }

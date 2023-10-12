@@ -68,6 +68,152 @@
   <object>
     <name>XWiki.DocumentTree</name>
     <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>4e6d4e29-10f8-4c90-b595-79d3b131d219</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+  $('.xtree').on('ready.jstree', function () {
+    $(this).off('move_node.jstree');
+    $(this).on('move_node.jstree', function (event, data) {
+      var currentId = data.node.id;
+      var oldParent = data.old_parent;
+      var newParent = data.parent;
+      
+      var currentReference = XWiki.Model.resolve(currentId);
+      var isTerminal = currentReference.name != 'WebHome';
+      var pageName;
+      if (isTerminal) {
+        pageName = currentReference.name;
+      } else {
+        pageName = currentReference.parent.name;
+      }
+      var wikiName, spaceName;
+      if (newParent != '#') {
+        var newParentReference = XWiki.Model.resolve(newParent);
+        wikiName = newParentReference.getRoot().name;
+        spaceName = newParentReference.parent.toString().split(':')[1];
+      } else {
+        wikiName = currentReference.getRoot().name;
+        spaceName = '';
+      }
+      
+      // This is ugly but we need a host to manipulate the javascript URL API... 
+      var originalMoveURL = new URL("http://fakehost" + data.node.data['moveURL']);
+      var urlData = {
+        'xpage': 'rename',
+        'step': '2',
+        'form_token': xm.form_token,
+        'deep': true,
+        'updateLinks': true,
+        'newWikiName': wikiName,
+        'newSpaceName': spaceName,
+        'newPageName': pageName
+      };
+      var urlParams = new URLSearchParams(originalMoveURL);
+      for (const [key, value] of Object.entries(urlData)) {
+        urlParams.set(key, value);
+      }
+      var newURL = originalMoveURL.pathname + '?' + urlParams.toString();
+      window.location.href = newURL;
+    })
+  });
+});</code>
+    </property>
+    <property>
+      <name>Handle move of documents with drag&amp;drop</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentTree</name>
+    <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>7369a327-ae4a-4ea0-a99d-02187ca2d32e</guid>
     <class>
@@ -280,6 +426,7 @@
       <code>{{template name="documentTree_macros.vm" /}}
 
 {{velocity}}
+#set ($discard = $xwiki.jsx.use('XWiki.DocumentTree'))
 #set ($options = {})
 #foreach ($parameterName in $xcontext.macro.params.parameterNames)
   #set ($discard = $options.put($parameterName, $xcontext.macro.params.get($parameterName)))

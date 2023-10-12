@@ -75,7 +75,6 @@
   #if ($noLinks)
     #set ($discard = $classes.add('jstree-no-links'))
   #end
-  #set ($discard = $attributes.put('class', $stringtool.join($classes, ' ')))
   #set ($discard = $attributes.put('data-responsive', true))
   #if ("$!macro.options.reference" != '')
     #set ($resourceParams = {})
@@ -115,6 +114,10 @@
   #set ($discard = $attributes.put('data-dragAndDrop', $dragAndDrop))
   #set ($contextMenu = $macro.options.contextMenu == 'true')
   #set ($discard = $attributes.put('data-contextMenu', $contextMenu))
+  #if ($contextMenu)
+    ## The height of the node label needs to accomodate the node action buttons (one of which opens the context menu).
+    #set ($discard = $classes.add('jstree-xwiki-large'))
+  #end
   #set ($icons = $macro.options.icons == 'true')
   #set ($discard = $attributes.put('data-icons', $icons))
   #set ($edges = $macro.options.edges == 'true')
@@ -128,6 +131,7 @@
   #if ($macro.options.config)
     #set ($discard = $attributes.put('data-config', $jsontool.serialize($macro.options.config)))
   #end
+  #set ($discard = $attributes.put('class', $stringtool.join($classes, ' ')))
 #end
 
 #macro (prepareTreeOptions $options)

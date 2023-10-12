@@ -17,52 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.render;
+package org.xwiki.internal.velocity;
 
 import org.apache.velocity.VelocityContext;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.internal.script.XWikiScriptContextInitializer;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.logging.internal.DefaultLoggerConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.internal.DefaultScriptContextManager;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.velocity.VelocityManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.velocity.internal.DefaultVelocityConfiguration;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * Validate {@link DefaultVelocityManager}.
+ * Validate {@link XWikiVelocityManager}.
  * 
  * @version $Id$
  */
-@ComponentList(value = { DefaultScriptContextManager.class, XWikiScriptContextInitializer.class,
-DefaultVelocityConfiguration.class, DefaultLoggerConfiguration.class })
-public class DefaultVelocityManagerTest
+@ComponentList(value = {DefaultScriptContextManager.class, XWikiScriptContextInitializer.class,
+    DefaultVelocityConfiguration.class, DefaultLoggerConfiguration.class})
+@OldcoreTest
+public class XWikiVelocityManagerTest
 {
-    public MockitoComponentMockingRule<VelocityManager> mocker =
-        new MockitoComponentMockingRule<VelocityManager>(DefaultVelocityManager.class);
+    @MockComponent
+    private ContextualLocalizationManager localizationManager;
 
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(this.mocker);
+    @InjectMockComponents
+    private XWikiVelocityManager velocityManager;
 
-    @Before
-    public void before() throws Exception
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @BeforeEach
+    public void beforeEach() throws ComponentLookupException
     {
-        this.mocker.registerMockComponent(ContextualLocalizationManager.class);
-
         this.oldcore.getExecutionContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
             new VelocityContext());
     }
@@ -70,9 +74,9 @@ public class DefaultVelocityManagerTest
     // Tests
 
     @Test
-    public void getVelocityContext() throws ComponentLookupException
+    public void getVelocityContext()
     {
-        VelocityContext context = this.mocker.getComponentUnderTest().getVelocityContext();
+        VelocityContext context = velocityManager.getVelocityContext();
 
         assertNull(context.get("doc"));
         assertNull(context.get("sdoc"));
@@ -83,7 +87,7 @@ public class DefaultVelocityManagerTest
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument(docReference));
         this.oldcore.getXWikiContext().put("sdoc", new XWikiDocument(sdocReference));
 
-        context = this.mocker.getComponentUnderTest().getVelocityContext();
+        context = this.velocityManager.getVelocityContext();
 
         Document doc = (Document) context.get("doc");
         assertNotNull(doc);
@@ -92,7 +96,7 @@ public class DefaultVelocityManagerTest
         assertNotNull(sdoc);
 
         // Instances are kept the same when the documents in the context don't change
-        context = this.mocker.getComponentUnderTest().getVelocityContext();
+        context = this.velocityManager.getVelocityContext();
         assertSame(doc, context.get("doc"));
         assertSame(sdoc, context.get("sdoc"));
 
@@ -102,7 +106,7 @@ public class DefaultVelocityManagerTest
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument(docReference));
         this.oldcore.getXWikiContext().put("sdoc", new XWikiDocument(sdocReference));
 
-        context = this.mocker.getComponentUnderTest().getVelocityContext();
+        context = this.velocityManager.getVelocityContext();
         assertNotNull(context.get("doc"));
         assertNotSame(doc, context.get("doc"));
         assertNotNull(context.get("sdoc"));

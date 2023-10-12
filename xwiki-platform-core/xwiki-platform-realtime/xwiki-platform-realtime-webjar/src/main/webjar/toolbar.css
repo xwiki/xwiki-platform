@@ -17,7 +17,7 @@ div.rt-toolbar {
 }
 
 .rt-toolbar .rt-user-avatar, .rt-toolbar .rt-user-fake-avatar {
-  border-radius: 4px;
+  border-radius: 7px;
   margin: 2px 3px 2px 6px;
   vertical-align: top;
 }

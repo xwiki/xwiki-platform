@@ -315,7 +315,7 @@ ul.innerMenu {
   margin-left: -1px;
 }
 .innerMenu li a {
-  border-radius: 5px 5px 0 0 / 3px 3px 0 0;
+  border-radius: 7px 7px 0 0 / 5px 5px 0 0;
   border-top: 3px solid $theme.borderColor;
   display: inline-block;
   margin: 2px 2em 0 0;
@@ -324,7 +324,7 @@ ul.innerMenu {
   top: 0px;
 }
 .innerMenu li a:hover {
-  border-radius: 5px 5px 0 0;
+  border-radius: 8px 8px 0 0;
   border-top: 5px solid $theme.borderColor;
   margin-top: 0px;
 }
@@ -333,7 +333,7 @@ ul.innerMenu {
   border: 0 none;
   border-top: 5px solid $theme.panelCollapsedBackgroundColor;
   margin-top: 0;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 8px 8px;
   box-shadow: 3px;
 }
 .innerMenu li a.current:after {

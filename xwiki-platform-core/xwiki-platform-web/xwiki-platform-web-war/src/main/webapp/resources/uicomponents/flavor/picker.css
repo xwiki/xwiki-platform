@@ -7,7 +7,7 @@
 
 .xwiki-flavor-picker-results-container {
   border: 1px solid $theme.borderColor;
-  border-radius: 4px;
+  border-radius: 7px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
   padding: 5px;
   overflow-x: hidden;

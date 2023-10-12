@@ -61,7 +61,7 @@
     #set ($nextLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$rev2, $nextNewdocVersion])))
   #else
     #set ($nextLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${nextOrigdocVersion}&rev2=${rev1}")})
-    #set ($nextLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change',[$nextOrigdocVersion,$rev1])))
+    #set ($nextLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$nextOrigdocVersion, $rev1])))
   #end
 #end
 

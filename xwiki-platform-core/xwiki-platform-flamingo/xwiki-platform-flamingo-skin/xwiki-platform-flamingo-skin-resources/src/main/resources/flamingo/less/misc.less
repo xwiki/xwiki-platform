@@ -368,20 +368,21 @@ dl.export-tree-legend dt + dd {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  column-gap: 5vw;
+  row-gap: 1vh;
 }
 
 .changes-info-box {
   flex: 1;
-  padding: 0 (@main-padding / 2);
-}
-
-.changes-info-box, .changes-info-comment {
+  padding: (@main-padding / 4) (@main-padding / 2);
+  background-color: @xwiki-background-secondary-color;
+  border-radius: @border-radius-large;
   text-align: center;
 }
 
 .changes-info-title {
   .h3;
+  margin-top: 0;
 }
 
 .changes-version {

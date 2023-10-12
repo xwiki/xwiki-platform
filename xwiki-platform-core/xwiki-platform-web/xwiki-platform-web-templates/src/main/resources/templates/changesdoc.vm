@@ -24,7 +24,7 @@
 
 #if ("$!previousOrigdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${previousOrigdocVersion}&rev2=${rev2}")})
-  #set ($changesTitle = $services.localization.render('core.viewers.diff.previousVersion.origin',[${previousOrigdocVersion}]))
+  #set ($changesTitle = $services.localization.render('core.viewers.diff.previousVersion.origin', [${previousOrigdocVersion}]))
   #set ($previousOrigdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('left')</a>")
 #end
 #if ("$!nextOrigdocVersion" != '')

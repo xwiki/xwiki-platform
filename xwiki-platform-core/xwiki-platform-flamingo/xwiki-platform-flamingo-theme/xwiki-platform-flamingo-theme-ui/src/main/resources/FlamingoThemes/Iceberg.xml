@@ -986,6 +986,9 @@
 
 /* Headings */
 @headings-font-weight: 600;
+
+/* Font */
+@import (css) "@{open-sans-font-path}";
   
 /* Other */
 @well-bg: @body-bg;

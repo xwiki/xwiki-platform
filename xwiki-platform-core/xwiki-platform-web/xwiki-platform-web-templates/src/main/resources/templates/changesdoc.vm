@@ -39,7 +39,7 @@
 #end
 #if ("$!nextNewdocVersion" != '')
   #set ($changesLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev1}&rev2=${nextNewdocVersion}")})
-  #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion.target',[${nextNewdocVersion}]))
+  #set ($changesTitle = $services.localization.render('core.viewers.diff.nextVersion.target', [${nextNewdocVersion}]))
   #set ($nextNewdocLink = "<a class='btn btn-default changes-arrow' href='$changesLink' title='$changesTitle'>$services.icon.renderHTML('right')</a>")
 #end
 ## Display the previous change arrow only if there is a previous version of the original document and there is no extension version

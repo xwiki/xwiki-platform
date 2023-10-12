@@ -101,7 +101,7 @@ class XObjectDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(block, printer);
 
-        String expected = "beginDefinitionList\n"
+        String expected = "beginDefinitionList [[class]=[xform]]\n"
             + "beginDefinitionTerm\n"
             + "onWord [Text]\n"
             + "onSpace\n"
@@ -121,7 +121,7 @@ class XObjectDisplayerProviderTest
             + "beginDefinitionDescription\n"
             + "onRawText [displayedStringValue] [html/5.0]\n"
             + "endDefinitionDescription\n"
-            + "endDefinitionList\n";
+            + "endDefinitionList [[class]=[xform]]\n";
 
         assertEquals(expected, printer.toString());
     }
@@ -144,10 +144,10 @@ class XObjectDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(block, printer);
 
-        String expected = "beginDefinitionList\n"
-            + "endDefinitionList\n"
+        String expected = "beginDefinitionList [[class]=[xform]]\n"
+            + "endDefinitionList [[class]=[xform]]\n"
             + "beginGroup [[class]=[box warningmessage deprecatedProperties]]\n"
-            + "beginDefinitionList\n"
+            + "beginDefinitionList [[class]=[xform]]\n"
             + "beginDefinitionTerm\n"
             + "onWord [deprecatedName]\n"
             + "endDefinitionTerm\n"
@@ -156,7 +156,7 @@ class XObjectDisplayerProviderTest
             + "onWord [deprecatedValue]\n"
             + "endGroup [[class]=[code box]]\n"
             + "endDefinitionDescription\n"
-            + "endDefinitionList\n"
+            + "endDefinitionList [[class]=[xform]]\n"
             + "endGroup [[class]=[box warningmessage deprecatedProperties]]\n";
 
         assertEquals(expected, printer.toString());

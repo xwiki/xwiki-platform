@@ -135,7 +135,7 @@ class MacroDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(resultBlock, printer);
 
-        String expectedOutput = "beginDefinitionList\n"
+        String expectedOutput = "beginDefinitionList [[class]=[xform]]\n"
             + "beginDefinitionTerm\n"
             + "onWord [Name]\n"
             + "onSpace\n"
@@ -189,7 +189,7 @@ class MacroDisplayerProviderTest
             + "onWord [TestMacro]\n"
             + "endGroup [[class]=[code box]]\n"
             + "endDefinitionDescription\n"
-            + "endDefinitionList\n";
+            + "endDefinitionList [[class]=[xform]]\n";
         assertEquals(expectedOutput, printer.toString());
     }
 
@@ -211,7 +211,7 @@ class MacroDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(resultBlock, printer);
 
-        String expectedOutput = "beginDefinitionList\n"
+        String expectedOutput = "beginDefinitionList [[class]=[xform]]\n"
             + "beginDefinitionTerm\n"
             + "onWord [parameterName]\n"
             + "endDefinitionTerm\n"
@@ -229,7 +229,7 @@ class MacroDisplayerProviderTest
             + "onWord [TestMacro]\n"
             + "endGroup [[class]=[code box]]\n"
             + "endDefinitionDescription\n"
-            + "endDefinitionList\n";
+            + "endDefinitionList [[class]=[xform]]\n";
 
         assertEquals(expectedOutput, printer.toString());
     }
@@ -260,7 +260,7 @@ class MacroDisplayerProviderTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.eventRenderer.render(resultBlock, printer);
 
-        String expectedOutput = "beginDefinitionList\n"
+        String expectedOutput = "beginDefinitionList [[class]=[xform]]\n"
             + "beginDefinitionTerm\n"
             + "onWord [TranslatedParameter]\n"
             + "beginFormat [NONE] [[class]=[xHint]]\n"
@@ -294,7 +294,7 @@ class MacroDisplayerProviderTest
             + "onWord [TestMacro]\n"
             + "endGroup [[class]=[code box]]\n"
             + "endDefinitionDescription\n"
-            + "endDefinitionList\n";
+            + "endDefinitionList [[class]=[xform]]\n";
 
         assertEquals(expectedOutput, printer.toString());
     }

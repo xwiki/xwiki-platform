@@ -64,7 +64,8 @@ public abstract class AbstractBlockSupplierProvider<T> implements BlockSupplierP
         List<Block> propertyBlocks = propertyNamesHintsValues.stream()
             .flatMap(this::renderProperty)
             .collect(Collectors.toList());
-        return new DefinitionListBlock(propertyBlocks);
+        // Add the xform class such that hints work.
+        return new DefinitionListBlock(propertyBlocks, Map.of(CLASS_ATTRIBUTE, "xform"));
     }
 
     protected Block getCodeBlock(String value)

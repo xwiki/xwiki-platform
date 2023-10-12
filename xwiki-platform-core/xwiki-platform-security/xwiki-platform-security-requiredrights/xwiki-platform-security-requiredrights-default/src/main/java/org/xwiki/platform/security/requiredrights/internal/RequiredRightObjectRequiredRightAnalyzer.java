@@ -33,7 +33,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
@@ -60,6 +59,9 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
     private BlockSupplierProvider<String> translationBlockProvider;
 
     @Inject
+    private BlockSupplierProvider<BaseObject> xObjectDisplayerProvider;
+
+    @Inject
     private Provider<XWikiContext> contextProvider;
 
     @Override
@@ -78,7 +80,7 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
                 return List.of(
                     new RequiredRightAnalysisResult(object.getReference(),
                         this.translationBlockProvider.get("security.requiredrights.object.requiredRight", rightView),
-                        CompositeBlock::new,
+                        this.xObjectDisplayerProvider.get(object),
                         List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
                     ),
                     // TODO: we should use the localized document reference here but we don't have it as the object
@@ -89,7 +91,7 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
                         this.translationBlockProvider.get(
                             "security.requiredrights.object.requiredRight.content",
                             rightView),
-                        CompositeBlock::new,
+                        this.xObjectDisplayerProvider.get(object),
                         List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
                     )
                 );

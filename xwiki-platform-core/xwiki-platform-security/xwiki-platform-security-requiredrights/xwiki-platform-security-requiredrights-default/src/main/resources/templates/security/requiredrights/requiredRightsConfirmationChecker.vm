@@ -18,10 +18,14 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ##!source.syntax=xwiki/2.1
-{{template name='hierarchy_macros.vm' output='false'/}}{{velocity}}
+{{velocity output='false'}}
+#template("display_macros.vm")
+#template("hierarchy_macros.vm")
 #set ($counter = 0)
-#if (!$analysis.isEmpty())
+#initRequiredSkinExtensions()
 #set ($discard = $xwiki.ssx.use('XWiki.Security.RequiredRights.Code.RequiredRightsResultStyle'))
+{{/velocity}}{{velocity}}
+#if (!$analysis.isEmpty())##
 (% id='requiredRightsResults' class='box' %)(((
   {{translation key='security.requiredrights.confirmationChecker.explanations'/}}
 
@@ -59,4 +63,7 @@
   #end
   )))
 #end
+{{/velocity}}{{velocity output='false'}}
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 {{/velocity}}

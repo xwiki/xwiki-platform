@@ -575,6 +575,14 @@
         $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($targetDoc.date)])
       #end
     </div> ## changes-info-content
+    <div class="changes-info-comment">
+      $escapetool.xml($services.localization.render('core.viewers.diff.editComment'))
+      #if ("$targetDoc.comment" == '')
+        $escapetool.xml($services.localization.render('core.viewers.diff.noEditComment'))
+      #else
+        $escapetool.xml($targetDoc.comment)
+      #end
+    </div> ## changes-info-comment
   #end
 #end
 
@@ -602,14 +610,6 @@
         #displayDocumentVersionInfo($to.doc $to.version $to.previousVersionLink $to.nextVersionLink 'core.viewers.diff.to')
       </div> ## changes-info-box-to
     </div> ## changes-info-boxes
-    <div id="changes-info-comment">
-      $escapetool.xml($services.localization.render('core.viewers.diff.editComment'))
-      #if ("$!to.doc.comment" == '')
-        $escapetool.xml($services.localization.render('core.viewers.diff.noEditComment'))
-      #else
-        $escapetool.xml($to.doc.comment)
-      #end
-    </div> ## changes-info-comment
   </div> ## changes-info
 #end
 

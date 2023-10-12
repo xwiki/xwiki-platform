@@ -49,6 +49,7 @@ import static javax.script.ScriptContext.GLOBAL_SCOPE;
 
 /**
  * Check for the presence of required rights results for the current document before editing it.
+ *
  * @version $Id$
  * @since 15.9RC1
  */
@@ -60,6 +61,9 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
     @Inject
     @Named(XWikiDocumentRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XWikiDocument> analyzer;
+
+    @Inject
+    private RequiredRightsAddedFilter requiredRightsAddedFilter;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -82,8 +86,13 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
         if (!this.authorization.hasAccess(Right.EDIT, tdoc.getDocumentReferenceWithLocale())) {
             return Optional.empty();
         }
+        if (tdoc.isNew()) {
+            return Optional.empty();
+        }
         try {
-            List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(tdoc);
+            List<RequiredRightAnalysisResult> analysisResults =
+                this.requiredRightsAddedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
+
             if (analysisResults.isEmpty()) {
                 return Optional.empty();
             }

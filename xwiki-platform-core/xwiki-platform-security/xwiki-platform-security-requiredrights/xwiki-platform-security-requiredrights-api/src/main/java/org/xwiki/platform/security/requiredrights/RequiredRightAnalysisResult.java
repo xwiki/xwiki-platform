@@ -85,6 +85,16 @@ public class RequiredRightAnalysisResult
         {
             return this.optional;
         }
+
+        @Override
+        public String toString()
+        {
+            return new XWikiToStringBuilder(this)
+                .append("right", getRight())
+                .append("entityType", getEntityType())
+                .append("optional", isOptional())
+                .toString();
+        }
     }
 
     private EntityReference entityReference;

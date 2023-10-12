@@ -18,20 +18,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-security</artifactId>
+    <artifactId>xwiki-platform-security-requiredrights</artifactId>
     <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-security-requiredrights</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Security - Required Rights - Parent POM</name>
-  <description>Parent POM for the Required Rights</description>
-  <modules>
-    <module>xwiki-platform-security-requiredrights-api</module>
-    <module>xwiki-platform-security-requiredrights-default</module>
-    <module>xwiki-platform-security-requiredrights-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-security-requiredrights-ui</artifactId>
+  <name>XWiki Platform - Security - Required Rights - UI</name>
+  <description>Application to analyze documents for required rights</description>
+  <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Application Required Rights</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>application</xwiki.extension.category>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
 </project>

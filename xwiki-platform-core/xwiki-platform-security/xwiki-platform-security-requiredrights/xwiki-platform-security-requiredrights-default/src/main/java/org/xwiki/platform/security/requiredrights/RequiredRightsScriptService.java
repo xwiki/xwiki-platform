@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.platform.security.requiredrights.internal.RequiredRightsAddedFilter;
 import org.xwiki.platform.security.requiredrights.internal.XWikiDocumentRequiredRightAnalyzer;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.script.SecurityScriptService;
@@ -56,6 +57,9 @@ public class RequiredRightsScriptService implements ScriptService
     @Named(XWikiDocumentRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XWikiDocument> analyzer;
 
+    @Inject
+    private RequiredRightsAddedFilter requiredRightsAddedFilter;
+
     /**
      * Analyze if the given document's authors have all rights that are required by the document's content.
      *
@@ -66,6 +70,15 @@ public class RequiredRightsScriptService implements ScriptService
     @Programming
     public List<RequiredRightAnalysisResult> analyze(Document document) throws RequiredRightsException
     {
-        return this.analyzer.analyze(document.getDocument());
+        if (document == null) {
+            return List.of();
+        }
+
+        if (document.isNew()) {
+            return List.of();
+        }
+
+        return this.requiredRightsAddedFilter.filter(document.getDocument().getAuthors(),
+            this.analyzer.analyze(document.getDocument()));
     }
 }

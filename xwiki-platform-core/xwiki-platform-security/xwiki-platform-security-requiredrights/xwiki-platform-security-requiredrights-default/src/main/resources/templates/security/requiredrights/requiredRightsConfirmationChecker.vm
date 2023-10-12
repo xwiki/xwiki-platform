@@ -21,13 +21,15 @@
 {{template name='hierarchy_macros.vm' output='false'/}}{{velocity}}
 #set ($counter = 0)
 #if (!$analysis.isEmpty())
-If you edit and save the current page, this will lead to the following issues.
+#set ($discard = $xwiki.ssx.use('XWiki.Security.RequiredRights.Code.RequiredRightsResultStyle'))
+(% id='requiredRightsResults' class='box' %)(((
+  {{translation key='security.requiredrights.confirmationChecker.explanations'/}}
 
   #foreach ($entry in $analysis.entrySet())
 
 {{html wiki='false'}}
   #hierarchy($entry.key)
-    #foreach($res in $entry.value)
+  #foreach($res in $entry.value)
   <div class="panel-group" id="required-rights-result-list" role="tablist" aria-multiselectable="true">
     <div class="panel panel-default">
       <div class="panel-heading" role="tab" id="heading${counter}">
@@ -36,8 +38,10 @@ If you edit and save the current page, this will lead to the following issues.
              data-toggle="collapse"
              data-parent="#required-rights-result-list" 
              href="#collapse${counter}"
-             aria-expanded="true"
+             aria-expanded="false"
              aria-controls="collapse${counter}">
+            <span class="icon-collapsed">$services.icon.renderHTML('caret-right')</span>
+            <span class="icon-expanded">$services.icon.renderHTML('caret-down')</span>
             $services.rendering.render($res.summaryMessage, 'html/5.0')
           </a>
         </h4>
@@ -53,5 +57,6 @@ If you edit and save the current page, this will lead to the following issues.
     #end
   {{/html}}
   #end
+  )))
 #end
 {{/velocity}}

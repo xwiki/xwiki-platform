@@ -50,7 +50,7 @@
     #set ($previousLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$previousOrigdocVersion,$rev1])))
   #else
     #set ($previousLink = ${xwiki.getURL($tdoc, 'view', "viewer=changes&rev1=${rev2}&rev2=${previousNewdocVersion}")})
-    #set ($previousLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change',[$rev2,$previousNewdocVersion])))
+    #set ($previousLabel = $escapetool.xml($services.localization.render('core.viewers.diff.change', [$rev2, $previousNewdocVersion])))
   #end
 #end
 ## Display the next change arrow only if there is a next version of the new document and there is no extension version

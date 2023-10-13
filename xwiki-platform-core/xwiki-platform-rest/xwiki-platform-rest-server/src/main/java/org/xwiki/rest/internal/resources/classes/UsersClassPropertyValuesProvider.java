@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
@@ -34,6 +35,10 @@ import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.rest.model.jaxb.PropertyValues;
+import org.xwiki.user.UserConfiguration;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.user.WikiUserManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -60,6 +65,16 @@ public class UsersClassPropertyValuesProvider extends AbstractUsersAndGroupsClas
 
     @Inject
     private QueryBuilder<UsersClass> allowedValuesQueryBuilder;
+
+    @Inject
+    private UserConfiguration userConfiguration;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @Inject
+    private UserPropertiesResolver userPropertiesResolver;
 
     @Override
     protected Class<UsersClass> getPropertyType()
@@ -130,5 +145,21 @@ public class UsersClassPropertyValuesProvider extends AbstractUsersAndGroupsClas
         }
 
         return label;
+    }
+
+    @Override
+    protected String getHint(DocumentReference userReference)
+    {
+        String userQualifierProperty = this.userConfiguration.getUserQualifierProperty();
+        if (StringUtils.isEmpty(userQualifierProperty)) {
+            return super.getHint(userReference);
+        } else {
+            return getUserProperties(userReference).getProperty(userQualifierProperty);
+        }
+    }
+
+    private UserProperties getUserProperties(DocumentReference userReference, Object... parameters)
+    {
+        return this.userPropertiesResolver.resolve(this.userReferenceResolver.resolve(userReference), parameters);
     }
 }

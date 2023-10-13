@@ -102,7 +102,7 @@ require(['jquery'], function($) {
       });
       // The drawer can be closed by setting focus outside of it
       focusableElements.on('focusout', function (event) {
-        if (event.relatedTarget != null && event.relatedTarget.closest('#'+drawerId) == null) {
+        if (event.relatedTarget != null && event.relatedTarget.closest('#' + $.escapeSelector(drawerId)) == null) {
           closeDrawer();
         }
       });

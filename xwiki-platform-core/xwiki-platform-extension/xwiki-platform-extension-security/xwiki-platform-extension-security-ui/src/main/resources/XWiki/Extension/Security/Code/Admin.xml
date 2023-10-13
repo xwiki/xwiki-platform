@@ -40,6 +40,11 @@
 
 {{velocity}}
 #if($services.security.authorization.hasAccess('admin') &amp;&amp; $services.extension.index.security.isSecurityScanEnabled())
+
+{{warning}}
+  {{translation key="extension.security.experimental.warning" /}}
+{{/warning}}
+
 {{warning}}
 {{translation key="extension.security.admin.generalWarning"/}}
 {{/warning}}

@@ -32,6 +32,17 @@
   <packaging>pom</packaging>
   <description>Security oriented functional tests of the default Flavor.</description>
   <dependencies>
+    <!-- Provided dependencies -->
+    <!-- xwiki-platform-extension-security-ui is installed using rest during the test execution as it is not 
+         bundled by default. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-security-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <type>xar</type>
+    </dependency>
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-security-test-pageobjects</artifactId>
@@ -41,6 +52,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-rest</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

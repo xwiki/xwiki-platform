@@ -18,14 +18,6 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# Maven
-target
-target-eclipse
-
-# Gradle
-build
-.gradle
-
 # IntelliJ IDEA
 *.iml
 *.ipr
@@ -53,12 +45,36 @@ nbproject
 # Visual Studio Code
 .vscode
 
-# Gradle Enterprise
-.mvn/.gradle-enterprise
-
 # Misc
 *.log.*
 *.log
 .sonar-ide.properties
 .clover
 *~
+
+# Logs
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

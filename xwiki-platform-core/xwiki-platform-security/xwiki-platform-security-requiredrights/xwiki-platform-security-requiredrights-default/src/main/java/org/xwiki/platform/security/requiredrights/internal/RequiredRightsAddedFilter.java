@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -70,15 +71,18 @@ public class RequiredRightsAddedFilter
     public List<RequiredRightAnalysisResult> filter(DocumentAuthors authors,
         List<RequiredRightAnalysisResult> resultList)
     {
+        if (resultList == null || resultList.isEmpty()) {
+            return List.of();
+        }
         DocumentReference userReference = this.contextProvider.get().getUserReference();
         DocumentReference contentAuthorReference = this.userReferenceSerializer.serialize(authors.getContentAuthor());
         DocumentReference effectiveMetadataAuthorReference =
             this.userReferenceSerializer.serialize(authors.getEffectiveMetadataAuthor());
         return resultList.stream().filter(analysis -> {
-            var analyzedEntityReference = analysis.getEntityReference();
+            EntityReference analyzedEntityReference = analysis.getEntityReference();
             return analysis.getRequiredRights().stream().allMatch(requiredRight -> {
-                var right = requiredRight.getRight();
-                var entityType = requiredRight.getEntityType();
+                Right right = requiredRight.getRight();
+                EntityType entityType = requiredRight.getEntityType();
                 EntityReference extractedEntityReference = analyzedEntityReference.extractReference(entityType);
                 DocumentReference authorReference;
                 if (analyzedEntityReference.getType() == EntityType.OBJECT

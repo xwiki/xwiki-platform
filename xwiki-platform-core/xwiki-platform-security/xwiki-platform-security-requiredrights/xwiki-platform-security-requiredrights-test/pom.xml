@@ -18,27 +18,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-security</artifactId>
+    <artifactId>xwiki-platform-security-requiredrights</artifactId>
     <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-security-requiredrights</artifactId>
+  <artifactId>xwiki-platform-security-requiredrights-test</artifactId>
+  <name>XWiki Platform - Security - Required Rights - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Security - Required Rights - Parent POM</name>
-  <description>Parent POM for the Required Rights</description>
+  <description>XWiki Platform - Security - Required Rights - Tests - Parent POM</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-security-requiredrights-api</module>
-    <module>xwiki-platform-security-requiredrights-default</module>
-    <module>xwiki-platform-security-requiredrights-ui</module>
+    <module>xwiki-platform-security-requiredrights-test-pageobjects</module>
   </modules>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>xwiki-platform-security-requiredrights-test</module>
+        <module>xwiki-platform-security-requiredrights-test-docker</module>
       </modules>
     </profile>
   </profiles>

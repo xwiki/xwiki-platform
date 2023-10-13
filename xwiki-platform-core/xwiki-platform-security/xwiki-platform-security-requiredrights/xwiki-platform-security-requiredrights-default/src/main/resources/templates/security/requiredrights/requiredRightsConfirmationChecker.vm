@@ -34,13 +34,13 @@
 {{html wiki='false'}}
   #hierarchy($entry.key)
   #foreach($res in $entry.value)
-  <div class="panel-group" id="required-rights-result-list" role="tablist" aria-multiselectable="true">
+  <div class="panel-group" id="required-rights-result-list${counter}" role="tablist" aria-multiselectable="true">
     <div class="panel panel-default">
       <div class="panel-heading" role="tab" id="heading${counter}">
         <h4 class="panel-title">
           <a role="button"
              data-toggle="collapse"
-             data-parent="#required-rights-result-list" 
+             data-parent="#required-rights-result-list${counter}" 
              href="#collapse${counter}"
              aria-expanded="false"
              aria-controls="collapse${counter}">

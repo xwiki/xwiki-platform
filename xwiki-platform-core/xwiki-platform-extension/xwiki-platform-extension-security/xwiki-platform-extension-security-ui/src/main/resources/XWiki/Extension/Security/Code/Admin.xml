@@ -42,6 +42,10 @@
 #if($services.security.authorization.hasAccess('admin') &amp;&amp; $services.extension.index.security.isSecurityScanEnabled())
 #set($discard = $xwiki.ssx.use("XWiki.Extension.Security.Code.Admin"))
 
+{{warning}}
+  {{translation key="extension.security.experimental.warning" /}}
+{{/warning}}
+
 {{html clean='false' wiki='true'}}
 &lt;ul class="nav nav-tabs" role="tablist"&gt;
   &lt;li role="presentation" class="active"&gt;&lt;a href="#extension-vulnerabilities" aria-controls="extension-vulnerabilities" role="tab" data-toggle="tab"&gt;Extension Vulnerabilities&lt;/a&gt;&lt;/li&gt;

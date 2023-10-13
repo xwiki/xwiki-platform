@@ -66,7 +66,7 @@ td.diff-line.diff-line-decision span.diff-decision {
 td.diff-line-meta {
   background-color: $theme.backgroundSecondaryColor;
   color: $theme.textSecondaryColor;
-  padding: .4em .5em;
+  padding: .8em .5em;
 }
 
 .diff-line del {

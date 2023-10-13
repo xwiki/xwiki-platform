@@ -79,7 +79,7 @@ require(['jquery'], function($) {
     drawerContainerToggler.on('click', openDrawer);
     drawerOverlay.on('click', closeDrawer);
 
-    drawerContainer.on('drawer'+index+'.opened', function(event) {
+    drawerContainer.on('drawer' + index + '.opened', function(event) {
       drawerContainerToggler.attr('aria-expanded', 'true');
       // We update the state of the drawer (using setAttribute since it's faster)
       drawerContainer.get(0)

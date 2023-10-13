@@ -67,7 +67,7 @@ require(['jquery'], function($) {
     // Setting up the drawer.
     let drawerContainerToggler = $(this);
     let drawerId = drawerContainerToggler.attr('aria-controls');
-    let drawerContainer = $('#'+drawerId);
+    let drawerContainer = $(document.getElementById(drawerId));
     let focusableElements = drawerContainer.find('button, a, input:not([type="hidden"]), ' +
      'select, textarea, [tabindex]:not([tabindex="-1"])');
 

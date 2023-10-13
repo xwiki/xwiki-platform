@@ -219,7 +219,7 @@ a[data-linktype="create"] {
 }
 a[data-linktype="create"]::after {
   background-color: #08C;
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
   content: "?";
   display: inline-block;

@@ -303,9 +303,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public static final int HAS_CLASS = 4;
 
     /**
-     * The name of the key in the XWikiContext which contains the document used to check for programming rights.
+     * The name of the key in the {@link XWikiContext} which contains the document used to check for programming rights.
      */
     public static final String CKEY_SDOC = "sdoc";
+
+    /**
+     * The name of the key in the {@link XWikiContext} which contains the current content document.
+     * 
+     * @since 15.9RC1
+     */
+    public static final String CKEY_CDOC = "cdoc";
+
+    /**
+     * The name of the key in the {@link XWikiContext} which contains the current translation document.
+     * 
+     * @since 15.9RC1
+     */
+    public static final String CKEY_TDOC = "tdoc";
 
     /**
      * Separator string between database name and space name.
@@ -7558,7 +7572,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         String language = "";
-        XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+        XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
         String realLang = tdoc.getRealLanguage(context);
         if ((xwiki.isMultiLingual(context) == true) && (!realLang.equals(""))) {
             language = realLang;
@@ -8810,8 +8824,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());
 
-        backup.put("cdoc", context.get("cdoc"));
-        backup.put("tdoc", context.get("tdoc"));
+        backup.put(CKEY_CDOC, context.get(CKEY_CDOC));
+        backup.put(CKEY_TDOC, context.get(CKEY_TDOC));
 
         // Backup the secure document
         backup.put(CKEY_SDOC, context.get(CKEY_SDOC));
@@ -8837,8 +8851,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Restore the current document on the XWiki Context.
         context.setDoc((XWikiDocument) backup.get("doc"));
 
-        context.put("cdoc", backup.get("cdoc"));
-        context.put("tdoc", backup.get("tdoc"));
+        context.put(CKEY_CDOC, backup.get(CKEY_CDOC));
+        context.put(CKEY_TDOC, backup.get(CKEY_TDOC));
 
         // Restore the secure document
         context.put(CKEY_SDOC, backup.get(CKEY_SDOC));
@@ -8847,8 +8861,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setAsContextDoc(XWikiContext context)
     {
         context.setDoc(this);
-        context.remove("cdoc");
-        context.remove("tdoc");
+        context.remove(CKEY_CDOC);
+        context.remove(CKEY_TDOC);
 
         // Get rid of secure document (so that it fallback on context document)
         context.remove(CKEY_SDOC);

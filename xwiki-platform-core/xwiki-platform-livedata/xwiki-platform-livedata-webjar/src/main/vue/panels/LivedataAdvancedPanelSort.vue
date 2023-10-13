@@ -210,7 +210,7 @@ export default {
   visibility: hidden;
   margin-left: 5px;
   padding: 6px 10px;
-  border-radius: 3px;
+  border-radius: @border-radius-small;
   color: currentColor;
 }
 .livedata-advanced-panel-sort .sort-entry:hover .delete-sort {

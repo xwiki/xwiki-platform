@@ -177,6 +177,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
         // macro for a given syntax only.
         MacroId id = new MacroId(macroId);
+        //@formatter:off
         MacroDescriptor macroDescriptor = new WikiMacroDescriptor.Builder()
             .id(id)
             .name(macroName)
@@ -187,9 +188,12 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
             .contentDescriptor(contentDescriptor)
             .parameterDescriptors(parameterDescriptors)
             .build();
+        //@formatter:on
 
         // Create & return the macro.
-        return new DefaultWikiMacro(macroDefinition, macroDescriptor, this.componentManager);
+        DefaultWikiMacro wikiMacro = this.componentManager.getInstance(DefaultWikiMacro.class);
+        wikiMacro.initialize(macroDefinition, macroDescriptor);
+        return wikiMacro;
     }
 
     private ContentDescriptor getContentDescriptor(BaseObject macroDefinition, DocumentReference documentReference)
@@ -298,8 +302,8 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
                             ReflectionUtils.unserializeType(type, Thread.currentThread().getContextClassLoader());
                     } catch (ClassNotFoundException e) {
                         this.logger.error(
-                            "Error while unserializing macro parameter type [{}]. The default type will be used.",
-                            type, e);
+                            "Error while unserializing macro parameter type [{}]. The default type will be used.", type,
+                            e);
                         parameterType = DefaultParameterDescriptor.DEFAULT_PARAMETER_TYPE;
                     }
                 }

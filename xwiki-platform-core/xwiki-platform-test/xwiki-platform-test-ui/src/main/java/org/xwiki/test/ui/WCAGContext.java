@@ -76,8 +76,7 @@ public class WCAGContext
             entry("aria-meter-name", true),
             entry("aria-progressbar-name", true),
             entry("aria-required-attr", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("aria-required-children", false),
+            entry("aria-required-children", true),
             entry("aria-required-parent", true),
             entry("aria-roledescription", true),
             entry("aria-roles", true),

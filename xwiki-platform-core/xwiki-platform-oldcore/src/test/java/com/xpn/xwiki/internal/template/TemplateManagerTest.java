@@ -133,7 +133,7 @@ class TemplateManagerTest
     {
         final VelocityTemplate template = mock();
 
-        when(this.velocityEngineMock.compile(any(), argThat(new StringReaderMatcher(source))))
+        when(this.velocityManagerMock.compile(any(), argThat(new StringReaderMatcher(source))))
             .then(new Answer<VelocityTemplate>()
             {
                 @Override

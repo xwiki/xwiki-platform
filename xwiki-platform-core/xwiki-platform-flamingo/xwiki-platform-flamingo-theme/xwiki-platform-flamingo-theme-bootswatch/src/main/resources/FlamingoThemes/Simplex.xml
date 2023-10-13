@@ -1951,6 +1951,9 @@ label {
 // Customization for the drawer
 @xwiki-drawer-menu-item-hover-color: @dropdown-link-hover-color;
 @xwiki-drawer-menu-item-hover-bg:    @dropdown-link-hover-bg;
+        
+/* Font */
+@import (css) "@{open-sans-font-path}";
 </lessCode>
     </property>
     <property>

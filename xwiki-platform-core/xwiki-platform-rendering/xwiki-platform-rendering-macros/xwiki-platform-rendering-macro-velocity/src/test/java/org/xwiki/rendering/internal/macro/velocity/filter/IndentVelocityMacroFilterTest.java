@@ -19,42 +19,44 @@
  */
 package org.xwiki.rendering.internal.macro.velocity.filter;
 
-import org.junit.Assert;
-
 import org.apache.velocity.VelocityContext;
-import org.junit.Test;
-import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Validate the behavior of {@link HTMLVelocityMacroFilter}.
+ * Validate the behavior of {@link IndentVelocityMacroFilter}.
  * 
  * @version $Id$
  */
-public class IndentVelocityMacroFilterTest extends AbstractComponentTestCase
+@ComponentTest
+class IndentVelocityMacroFilterTest
 {
-    private VelocityMacroFilter filter;
+    @InjectMockComponents
+    private IndentVelocityMacroFilter filter;
 
-    private VelocityContext context;
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        this.filter = getComponentManager().getInstance(VelocityMacroFilter.class, "indent");
-        this.context = new VelocityContext();
-    }
+    private VelocityContext context = new VelocityContext();
 
     public void assertFilter(String expected, String input)
     {
-        Assert.assertEquals(expected, this.filter.before(input, this.context));
+        assertEquals(expected, this.filter.before(input, this.context));
     }
 
     @Test
-    public void testFilter()
+    void testFilter()
     {
         assertFilter("", " ");
         assertFilter("\n", "  \n  ");
         assertFilter("", " \t");
         assertFilter("#if (true)\nsome text\n#end", "#if (true)\n  some text\n#end");
+    }
+
+    @Test
+    void isPreparationSupported()
+    {
+        assertTrue(this.filter.isPreparationSupported());
     }
 }

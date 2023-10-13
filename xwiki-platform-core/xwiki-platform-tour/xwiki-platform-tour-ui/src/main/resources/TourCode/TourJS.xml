@@ -176,12 +176,14 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
 
     if (showPopover) {
       buttonContainer.addClass('opened');
+      button.removeAttr('hidden');
       popover.attr('open','open');
     }
 
     button.on('click', function() {
       if (showPopover) {
         popover.removeAttr('open');
+        button.attr('hidden', true);
         buttonContainer.removeClass('opened');
       }
 
@@ -195,6 +197,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       } else {
         tour.restart();
       }
+      button.attr('hidden', true);
       buttonContainer.removeClass('opened');
     });
   }
@@ -346,6 +349,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
             createResumeButton(tour, true);
           } else {
             buttonContainer.addClass('opened');
+            let button = $('#tourResume');
+            button.removeAttr('hidden');
             // Show the popover
             let popover = buttonContainer.find('.popover-content').first();
             popover.attr('open','open');
@@ -545,6 +550,9 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
 
   &amp; &gt; #tourResume {
     width: fit-content;
+    &amp;[hidden] {
+      display: none;
+    }
   }
 
   &amp; &gt; .popover-content {

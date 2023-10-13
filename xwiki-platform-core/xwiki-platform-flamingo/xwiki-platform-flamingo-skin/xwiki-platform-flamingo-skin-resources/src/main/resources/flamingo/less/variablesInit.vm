@@ -270,6 +270,10 @@
 ## Fix font path
 @icon-font-path:                      "$services.webjars.url('bootstrap', 'fonts')/";
 
+## Compute the open sans webjar path using velocity here as it is not possible in the theme configurations.
+## Since 15.9RC1
+@open-sans-font-path:                  "$services.webjars.url('org.webjars.bower:open-sans', 'css/open-sans.min.css')";
+
 ##
 ## XWiki variables: LESS variables specific to XWiki
 ##

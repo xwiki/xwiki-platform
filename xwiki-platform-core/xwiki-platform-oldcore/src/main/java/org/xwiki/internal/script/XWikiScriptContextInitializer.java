@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.render;
+package org.xwiki.internal.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +36,7 @@ import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.ScriptXWikiServletRequest;
 
 /**
  * Inject in the {@link ScriptContext} the XWiki context and the {@link XWiki} instance for backward compatibility.
@@ -49,6 +50,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class XWikiScriptContextInitializer implements ScriptContextInitializer
 {
+    private static final String CKEY_UTIL = "util";
+
     @Inject
     private Logger logger;
 
@@ -63,9 +66,9 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        if (scriptContext.getAttribute("util") == null) {
+        if (scriptContext.getAttribute(CKEY_UTIL) == null) {
             // Put the Util API in the Script context.
-            scriptContext.setAttribute("util", new com.xpn.xwiki.api.Util(xcontext.getWiki(), xcontext),
+            scriptContext.setAttribute(CKEY_UTIL, new com.xpn.xwiki.api.Util(xcontext.getWiki(), xcontext),
                 ScriptContext.ENGINE_SCOPE);
 
             // We put the com.xpn.xwiki.api.XWiki object into the context and not the com.xpn.xwiki.XWiki one which is
@@ -90,7 +93,7 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
         if (doc != null) {
             docAPI = setDocument(scriptContext, "doc", doc, xcontext);
 
-            XWikiDocument tdoc = (XWikiDocument) xcontext.get("tdoc");
+            XWikiDocument tdoc = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_TDOC);
             if (tdoc == null) {
                 try {
                     tdoc = doc.getTranslatedDocument(xcontext);
@@ -100,26 +103,26 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
                     tdoc = doc;
                 }
             }
-            Document tdocAPI = setDocument(scriptContext, "tdoc", tdoc, xcontext);
+            Document tdocAPI = setDocument(scriptContext, XWikiDocument.CKEY_TDOC, tdoc, xcontext);
 
-            XWikiDocument cdoc = (XWikiDocument) xcontext.get("cdoc");
+            XWikiDocument cdoc = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_CDOC);
             if (cdoc == null) {
                 Document cdocAPI = tdocAPI;
                 if (cdocAPI == null) {
                     cdocAPI = docAPI;
                 }
-                scriptContext.setAttribute("cdoc", cdocAPI, ScriptContext.ENGINE_SCOPE);
+                scriptContext.setAttribute(XWikiDocument.CKEY_CDOC, cdocAPI, ScriptContext.ENGINE_SCOPE);
             } else {
-                setDocument(scriptContext, "cdoc", cdoc, xcontext);
+                setDocument(scriptContext, XWikiDocument.CKEY_CDOC, cdoc, xcontext);
             }
         }
 
         // Current secure document
-        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
+        XWikiDocument sdoc = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
         if (sdoc == null) {
-            scriptContext.setAttribute("sdoc", docAPI, ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute(XWikiDocument.CKEY_SDOC, docAPI, ScriptContext.ENGINE_SCOPE);
         } else {
-            setDocument(scriptContext, "sdoc", sdoc, xcontext);
+            setDocument(scriptContext, XWikiDocument.CKEY_SDOC, sdoc, xcontext);
         }
 
         // Miscellaneous

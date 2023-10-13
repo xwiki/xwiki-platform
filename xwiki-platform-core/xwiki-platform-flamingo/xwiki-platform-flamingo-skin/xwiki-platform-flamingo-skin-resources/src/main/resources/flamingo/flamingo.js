@@ -116,7 +116,7 @@ require(['jquery'], function($) {
     });
     
     // When the drawer is closed, collapse sub items
-    $(body).on('drawer'+index+'.closed', function() {
+    $(body).on('drawer' + index + '.closed', function() {
       $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
     });
   });

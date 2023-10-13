@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -84,10 +85,16 @@ class VelocityMacroTest
     @InjectMockComponents
     private VelocityMacro macro;
 
+    private VelocityTemplate getVelocityTemplate(Block block) throws IllegalAccessException
+    {
+        return (VelocityTemplate) FieldUtils.readField(block.getAttribute(VelocityMacro.MACRO_ATTRIBUTE),
+            "velocityTemplate", true);
+    }
+
     @Test
     void evaluatePreparedAndFiltered() throws XWikiVelocityException, MacroExecutionException, MacroPreparationException
     {
-        MacroBlock block = new MacroBlock("velocity", Map.of(), "content", false);
+        MacroBlock block = new MacroBlock("velocity", Map.of("filter", "filter"), "content", false);
 
         VelocityTemplate template1 = mock();
         when(this.velocityManager.compile(any(), any())).thenReturn(template1);
@@ -124,12 +131,12 @@ class VelocityMacroTest
     }
 
     @Test
-    void prepare() throws MacroPreparationException, XWikiVelocityException
+    void prepare() throws MacroPreparationException, XWikiVelocityException, IllegalAccessException
     {
         MacroBlock block = new MacroBlock("velocity", Map.of(), "content", true);
 
         VelocityTemplate template1 = mock();
-        when(this.velocityManager.compile(eq("Unknown velocity MacroBlok"), any())).thenReturn(template1);
+        when(this.velocityManager.compile(eq("Unknown velocity MacroBlock"), any())).thenReturn(template1);
         VelocityTemplate template2 = mock();
         when(this.velocityManager.compile(eq("reference"), any())).thenReturn(template2);
 
@@ -137,13 +144,13 @@ class VelocityMacroTest
 
         this.macro.prepare(block);
 
-        assertSame(template1, block.getAttribute(VelocityMacro.MACRO_ATTRIBUTE));
+        assertSame(template1, getVelocityTemplate(block));
 
         MetaDataBlock metadataBlock = new MetaDataBlock(List.of(block));
         metadataBlock.getMetaData().addMetaData(MetaData.SOURCE, "reference");
 
         this.macro.prepare(block);
 
-        assertSame(template2, block.getAttribute(VelocityMacro.MACRO_ATTRIBUTE));
+        assertSame(template2, getVelocityTemplate(block));
     }
 }

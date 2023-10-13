@@ -82,6 +82,26 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     private static final MetadataBlockMatcher METADATA_SOURCE_MATCHER = new MetadataBlockMatcher(MetaData.SOURCE);
 
     /**
+     * Hide the Velocity template behind an unmodifiable object in case the macro block attribute would be exposed
+     * publicly.
+     * 
+     * @version $Id$
+     * @since 15.9RC1
+     */
+    private class ProtectedVelocityTemplate
+    {
+        private final VelocityTemplate velocityTemplate;
+
+        private final VelocityMacroFilter filter;
+
+        ProtectedVelocityTemplate(VelocityTemplate velocityTemplate, VelocityMacroFilter filter)
+        {
+            this.velocityTemplate = velocityTemplate;
+            this.filter = filter;
+        }
+    }
+
+    /**
      * Used to get the Velocity Engine and Velocity Context to use to evaluate the passed Velocity script.
      */
     @Inject
@@ -136,8 +156,10 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
 
             // Execute Velocity context
             VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
-            VelocityTemplate template = (VelocityTemplate) context.getCurrentMacroBlock().getAttribute(MACRO_ATTRIBUTE);
-            if (template != null && (filter == null || filter.isPreparationSupported())) {
+            ProtectedVelocityTemplate protectedTemplate =
+                (ProtectedVelocityTemplate) context.getCurrentMacroBlock().getAttribute(MACRO_ATTRIBUTE);
+            if (protectedTemplate != null && filter == protectedTemplate.filter) {
+                VelocityTemplate template = protectedTemplate.velocityTemplate;
                 // Execute pre filter
                 if (filter != null) {
                     filter.before(template, velocityContext);
@@ -201,7 +223,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             }
 
             // Cache the compiled Velocity and associated it wit the velocity engine key to be extra safe
-            macroBlock.setAttribute(MACRO_ATTRIBUTE, template);
+            macroBlock.setAttribute(MACRO_ATTRIBUTE, new ProtectedVelocityTemplate(template, filter));
         }
     }
 

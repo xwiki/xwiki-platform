@@ -106,7 +106,7 @@ require(['jquery'], function($) {
           closeDrawer();
         }
       });
-    }).on('drawer'+index+'.closed', function(event) {
+    }).on('drawer' + index + '.closed', function(event) {
       // We update the state of the drawer
       drawerContainer
         .removeClass('opened')

@@ -28,12 +28,12 @@ pipeline {
             steps {
                 sh 'npm install' 
             }
-        },
+        }
         stage('Unit Tests') { 
             steps {
                 sh 'npm run test:unit' 
             }
-        },
+        }
         stage('End to End Tests') { 
             steps {
                 sh 'npm run test:e2e:dev' 

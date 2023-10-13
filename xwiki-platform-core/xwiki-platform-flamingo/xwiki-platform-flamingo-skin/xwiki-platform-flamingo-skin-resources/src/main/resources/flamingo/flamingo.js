@@ -83,17 +83,16 @@ require(['jquery'], function($) {
       drawerContainerToggler.attr('aria-expanded', 'true');
       // We update the state of the drawer (using setAttribute since it's faster)
       drawerContainer.get(0).setAttribute('open','open');
-      // We need to set a timeout for the class update to finish properly before trying to focus an element that would
-      // have no visibility before the class change. We use an interval so that the focus is moved no matter the
-      // performance of the client.
-      function focusFirstItem() {
-        if (drawerContainer.get(0).hasAttribute('open') && focusableElements.length !== 0) {
-          focusableElements.first().trigger('focus');
-          clearInterval(focusInterval);
-          focusInterval = null;
+      function focusDrawer() {
+        if (drawerContainer.get(0).hasAttribute('open')) {
+          drawerContainer.trigger('focus');
         }
       };
-      let focusInterval = setInterval(() => focusFirstItem(), 50);
+      function focusLastItem() {
+        if (drawerContainer.get(0).hasAttribute('open') && focusableElements.length !== 0) {
+          focusableElements.last().trigger('focus');
+        }
+      };
       // The drawer can be closed by pressing the ESC key.
       $("body").on('keydown.drawerClose', function (event) {
         if (event.key === 'Escape') {
@@ -101,9 +100,14 @@ require(['jquery'], function($) {
         }
       });
       // The focus is set back to the start by setting focus outside of it
-      focusableElements.on('focusout.drawerClose', function (event) {
+      focusableElements.on('blur.drawerClose', function (event) {
         if (event.relatedTarget != null && event.relatedTarget.closest('#' + $.escapeSelector(drawerId)) == null) {
-          focusFirstItem();
+          focusDrawer();
+        }
+      });
+      drawerContainer.on('blur.drawerClose', function (event) {
+        if (event.relatedTarget != null && event.relatedTarget.closest('#' + $.escapeSelector(drawerId)) == null) {
+          focusLastItem();
         }
       });
     }).on('drawer' + index + '.closed', function(event) {
@@ -112,7 +116,8 @@ require(['jquery'], function($) {
       drawerContainerToggler.attr('aria-expanded', 'false');
       // We remove the listeners that were created when the drawer opened up
       $("body").off('keydown.drawerClose');
-      focusableElements.off('focusout.drawerClose');
+      focusableElements.off('blur.drawerClose');
+      drawerContainer.off('blur.drawerClose');
     });
     
     // When the drawer is closed, collapse sub items

@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  *
  * @param <T> the type of the analyzed object
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Unstable
 @Role

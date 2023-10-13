@@ -31,6 +31,7 @@ import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
@@ -136,7 +137,7 @@ class ScriptMacroAnalyzerTest
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
         assertEquals(propertyReference, analysisResult.getEntityReference());
-        RequiredRightAnalysisResult.RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
+        RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
         assertEquals(myRight, requiredRight.getRight());
         assertFalse(requiredRight.isOptional());
         assertEquals(EntityType.DOCUMENT, requiredRight.getEntityType());
@@ -175,7 +176,7 @@ class ScriptMacroAnalyzerTest
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
         assertEquals(new DocumentReference("xwiki", "Space", "Page"), analysisResult.getEntityReference());
-        RequiredRightAnalysisResult.RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
+        RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
         assertFalse(requiredRightResult.isOptional());
         assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());

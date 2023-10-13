@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
@@ -81,7 +82,7 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
                     new RequiredRightAnalysisResult(object.getReference(),
                         this.translationBlockProvider.get("security.requiredrights.object.requiredRight", rightView),
                         this.xObjectDisplayerProvider.get(object),
-                        List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
+                        List.of(new RequiredRight(right, EntityType.DOCUMENT, false))
                     ),
                     // TODO: we should use the localized document reference here but we don't have it as the object
                     //  doesn't belong to the document.
@@ -92,7 +93,7 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
                             "security.requiredrights.object.requiredRight.content",
                             rightView),
                         this.xObjectDisplayerProvider.get(object),
-                        List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
+                        List.of(new RequiredRight(right, EntityType.DOCUMENT, false))
                     )
                 );
             }

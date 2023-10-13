@@ -27,6 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.security.authorization.Right;
@@ -85,7 +86,7 @@ class SkinExtensionObjectRequiredRightAnalyzerTest
 
         verify(this.xObjectDisplayerProvider).get(object);
         assertEquals(1, analysisResult.getRequiredRights().size());
-        RequiredRightAnalysisResult.RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
+        RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
         assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
         assertFalse(requiredRightResult.isOptional());

@@ -34,6 +34,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
@@ -179,8 +180,8 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
                 this.translationMessageSupplierProvider.get(translationMessage),
                 this.stringCodeBlockSupplierProvider.get(value),
                 List.of(
-                    new RequiredRightAnalysisResult.RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false),
-                    new RequiredRightAnalysisResult.RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
+                    new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false),
+                    new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
                 )));
         } else {
             result = List.of();

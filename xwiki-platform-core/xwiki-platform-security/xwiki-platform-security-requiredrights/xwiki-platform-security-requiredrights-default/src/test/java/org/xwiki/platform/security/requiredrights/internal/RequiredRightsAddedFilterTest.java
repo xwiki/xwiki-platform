@@ -34,7 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
-import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult.RequiredRight;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;

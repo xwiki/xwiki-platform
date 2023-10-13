@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
@@ -86,8 +87,8 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
                         this.translationMessageSupplierProvider.get("security.requiredrights.title.description",
                             document.getTitle()),
                         List.of(
-                            new RequiredRightAnalysisResult.RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true),
-                            new RequiredRightAnalysisResult.RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
+                            new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true),
+                            new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
                         )
                     ));
                 }

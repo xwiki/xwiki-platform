@@ -22,10 +22,8 @@ package org.xwiki.platform.security.requiredrights;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
@@ -34,69 +32,11 @@ import org.xwiki.text.XWikiToStringBuilder;
  * related to the analysis result.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Unstable
 public class RequiredRightAnalysisResult
 {
-    /**
-     * Represents a required right for an entity.
-     */
-    public static class RequiredRight
-    {
-        private final Right right;
-
-        private final EntityType entityType;
-
-        private final boolean optional;
-
-        /**
-         * @param right the required right
-         * @param entityType the level at which the right is required (e.g., document, space, wiki)
-         * @param optional whether the right is optional or not, i.e., if the entity also works without the right or not
-         */
-        public RequiredRight(Right right, EntityType entityType, boolean optional)
-        {
-            this.right = right;
-            this.entityType = entityType;
-            this.optional = optional;
-        }
-
-        /**
-         * @return the required right
-         */
-        public Right getRight()
-        {
-            return this.right;
-        }
-
-        /**
-         * @return the level at which the right is required (e.g., document, space, wiki)
-         */
-        public EntityType getEntityType()
-        {
-            return this.entityType;
-        }
-
-        /**
-         * @return whether the right is optional or not, i.e., if the entity also works without the right or not
-         */
-        public boolean isOptional()
-        {
-            return this.optional;
-        }
-
-        @Override
-        public String toString()
-        {
-            return new XWikiToStringBuilder(this)
-                .append("right", getRight())
-                .append("entityType", getEntityType())
-                .append("optional", isOptional())
-                .toString();
-        }
-    }
-
     private EntityReference entityReference;
 
     private final Supplier<Block> summaryMessageProvider;

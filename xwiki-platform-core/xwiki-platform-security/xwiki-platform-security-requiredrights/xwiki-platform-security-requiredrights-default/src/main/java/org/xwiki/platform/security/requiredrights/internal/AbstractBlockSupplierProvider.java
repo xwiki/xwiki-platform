@@ -48,6 +48,7 @@ import org.xwiki.rendering.util.ParserUtils;
  *
  * @param <T> the type of the object
  * @version $Id$
+ * @since 15.9RC1
  */
 public abstract class AbstractBlockSupplierProvider<T> implements BlockSupplierProvider<T>
 {

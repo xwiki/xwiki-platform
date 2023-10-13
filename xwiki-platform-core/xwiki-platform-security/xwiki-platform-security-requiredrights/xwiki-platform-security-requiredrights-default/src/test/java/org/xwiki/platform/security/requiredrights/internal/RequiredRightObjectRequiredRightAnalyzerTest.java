@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -83,7 +84,7 @@ class RequiredRightObjectRequiredRightAnalyzerTest
             .get("security.requiredrights.object.requiredRight.content", viewDisplay);
         for (RequiredRightAnalysisResult analysisResult : result) {
             assertEquals(1, analysisResult.getRequiredRights().size());
-            RequiredRightAnalysisResult.RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
+            RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
             assertEquals(Right.PROGRAM, requiredRight.getRight());
             assertEquals(EntityType.DOCUMENT, requiredRight.getEntityType());
             assertFalse(requiredRight.isOptional());

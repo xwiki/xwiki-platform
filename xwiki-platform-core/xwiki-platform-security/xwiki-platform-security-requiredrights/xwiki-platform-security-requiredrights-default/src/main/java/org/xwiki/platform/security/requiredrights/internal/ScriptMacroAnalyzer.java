@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
@@ -111,7 +112,7 @@ public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
         return List.of(new RequiredRightAnalysisResult(reference,
             this.translationMessageSupplierProvider.get(messageKey, macroId),
             this.macroDisplayerProvider.get(macroBlock),
-            List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
+            List.of(new RequiredRight(right, EntityType.DOCUMENT, false))
         ));
     }
 }

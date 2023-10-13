@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
@@ -72,7 +73,7 @@ public class SkinExtensionObjectRequiredRightAnalyzer implements RequiredRightAn
             object.getReference(),
             this.translationMessageSupplierProvider.get(translationKey),
             this.xObjectDisplayerProvider.get(object),
-            List.of(new RequiredRightAnalysisResult.RequiredRight(right, EntityType.DOCUMENT, false))
+            List.of(new RequiredRight(right, EntityType.DOCUMENT, false))
         ));
     }
 }

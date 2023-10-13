@@ -82,35 +82,33 @@ require(['jquery'], function($) {
     drawerContainer.on('drawer' + index + '.opened', function(event) {
       drawerContainerToggler.attr('aria-expanded', 'true');
       // We update the state of the drawer (using setAttribute since it's faster)
-      drawerContainer.get(0)
-        .setAttribute('class', 'drawer-nav opened');
+      drawerContainer.get(0).setAttribute('open','open');
       // We need to set a timeout for the class update to finish properly before trying to focus an element that would
       // have no visibility before the class change. We use an interval so that the focus is moved no matter the
       // performance of the client.
-      let focusInterval = setInterval(() => {
-        if (drawerContainer.hasClass('opened') && focusableElements.length !== 0) {
+      function focusFirstItem() {
+        if (drawerContainer.get(0).hasAttribute('open') && focusableElements.length !== 0) {
           focusableElements.first().trigger('focus');
           clearInterval(focusInterval);
           focusInterval = null;
         }
-      }, 50);
+      };
+      let focusInterval = setInterval(() => focusFirstItem(), 50);
       // The drawer can be closed by pressing the ESC key.
       $("body").on('keydown.drawerClose', function (event) {
         if (event.key === 'Escape') {
           closeDrawer();
         }
       });
-      // The drawer can be closed by setting focus outside of it
+      // The focus is set back to the start by setting focus outside of it
       focusableElements.on('focusout.drawerClose', function (event) {
         if (event.relatedTarget != null && event.relatedTarget.closest('#' + $.escapeSelector(drawerId)) == null) {
-          closeDrawer();
+          focusFirstItem();
         }
       });
     }).on('drawer' + index + '.closed', function(event) {
       // We update the state of the drawer
-      drawerContainer
-        .removeClass('opened')
-        .addClass('closed');
+      drawerContainer.removeAttr('open');
       drawerContainerToggler.attr('aria-expanded', 'false');
       // We remove the listeners that were created when the drawer opened up
       $("body").off('keydown.drawerClose');

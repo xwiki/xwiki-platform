@@ -27,24 +27,31 @@
 
 
 #tmDrawer.drawer-nav {
+  display: block;
+  z-index: 5300;
   background-color: @xwiki-drawer-bg;
   width: @xwiki-drawer-width;
-  z-index: 5200;
   position: fixed;
   top: 0;
+  right: 0;
   overflow: hidden;
   height: 100vh;
-  right: -@xwiki-drawer-width;
-  transition: right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), visibility .6s;
-  &.closed {
+  margin-right: -@xwiki-drawer-width;
+  transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), visibility .6s;
+  padding: 0;
+  border: 0;
+  
+  &:not([open]) {
     // We use visibility here to avoid breaking the animations.
     visibility: hidden;
   }
-  &.opened {
-    right: 0;
+  
+  &[open] {
+    margin-right: 0;
   }
 
   & + .drawer-overlay {
+    z-index: 5200;
     position: fixed;
     display: none;
     top: 0;
@@ -55,13 +62,12 @@
     background-color: #fff - @xwiki-page-content-bg;
   }
 
-  &.opened + .drawer-overlay {
+  &[open] + .drawer-overlay {
     display: block;
   }
 
   & .drawer-menu {
     position: relative;
-    z-index: 5300;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -186,11 +192,6 @@
 .drawer-menuseparator {
   border-top: 1px solid @xwiki-drawer-menu-item-seperator-color;
   margin: 12px 0;
-}
-
-//Make the drawer invisible to any reader when it's closed off.
-.drawer-close .drawer-menu {
-  display: none;
 }
 
 // Special styling for login/logout/register =============================

@@ -21,7 +21,7 @@
 ##
 ## Display the drawer
 ##
-<nav class="drawer-nav closed" id="tmDrawer"
+<dialog class="drawer-nav" id="tmDrawer"
 aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.label'))">
   <ul class="drawer-menu">
     ##
@@ -99,7 +99,7 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
       $globalPart
     #end
   </ul>
-</nav>
+</dialog>
 <span role='presentation' class='drawer-overlay'></span>
 #**
  * Display the UI extensions.

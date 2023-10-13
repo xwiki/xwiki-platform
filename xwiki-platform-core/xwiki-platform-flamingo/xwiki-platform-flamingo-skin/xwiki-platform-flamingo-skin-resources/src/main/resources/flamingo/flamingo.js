@@ -95,13 +95,13 @@ require(['jquery'], function($) {
         }
       }, 50);
       // The drawer can be closed by pressing the ESC key.
-      $("body").on('keydown', function (event) {
+      $("body").on('keydown.drawerClose', function (event) {
         if (event.key === 'Escape') {
           closeDrawer();
         }
       });
       // The drawer can be closed by setting focus outside of it
-      focusableElements.on('focusout', function (event) {
+      focusableElements.on('focusout.drawerClose', function (event) {
         if (event.relatedTarget != null && event.relatedTarget.closest('#' + $.escapeSelector(drawerId)) == null) {
           closeDrawer();
         }
@@ -113,8 +113,8 @@ require(['jquery'], function($) {
         .addClass('closed');
       drawerContainerToggler.attr('aria-expanded', 'false');
       // We remove the listeners that were created when the drawer opened up
-      $("body").off('keydown');
-      focusableElements.off('focusout');
+      $("body").off('keydown.drawerClose');
+      focusableElements.off('focusout.drawerClose');
     });
     
     // When the drawer is closed, collapse sub items

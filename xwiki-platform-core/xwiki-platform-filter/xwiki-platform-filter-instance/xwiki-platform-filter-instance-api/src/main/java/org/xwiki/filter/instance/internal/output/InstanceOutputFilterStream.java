@@ -64,7 +64,7 @@ public class InstanceOutputFilterStream extends AbstractBeanOutputFilterStream<I
             factories = this.componentManager.get().getInstanceList(OutputInstanceFilterStreamFactory.class);
         } catch (ComponentLookupException e) {
             throw new FilterException(
-                "Failed to get regsitered instance of OutputInstanceFilterStreamFactory components", e);
+                "Failed to get registered instances of OutputInstanceFilterStreamFactory components", e);
         }
 
         Object[] filters = new Object[factories.size()];

@@ -87,7 +87,7 @@ require(['jquery'], function($) {
       // We need to set a timeout for the class update to finish properly before trying to focus an element that would
       // have no visibility before the class change. We use an interval so that the focus is moved no matter the
       // performance of the client.
-      let focusInterval = setInterval(()=>{
+      let focusInterval = setInterval(() => {
         if (drawerContainer.hasClass('opened') && focusableElements.length !== 0) {
           focusableElements.first().trigger('focus');
           clearInterval(focusInterval);

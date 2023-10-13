@@ -45,11 +45,8 @@ public class AllTests
         // xwiki-platform-extension-security-ui extension at runtime (from the local repository, or from the remote
         // final and snapshot repositories).
         XWikiExecutor executor = executors.get(0);
-        executor.loadXWikiPropertiesConfiguration().setProperty("extension.repositories", List.of(
-            "maven-local:maven:file://${sys:user.home}/.m2/repository",
-            "maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots",
-            "maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public"
-        ));
+        executor.loadXWikiPropertiesConfiguration().setProperty("extension.repositories",
+            List.of("maven-local:maven:file://${sys:user.home}/.m2/repository"));
         executor.saveXWikiProperties();
     }
 

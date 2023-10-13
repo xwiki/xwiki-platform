@@ -31,7 +31,6 @@ import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.extension.RestExtensionInstaller;
@@ -39,6 +38,8 @@ import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getComponentManager;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getTestConfiguration;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getXWikiURL;
 
 /**
@@ -59,8 +60,6 @@ public class ExtensionInstaller
 
     private final ExtensionContext context;
 
-    private ComponentManager componentManager;
-
     private ArtifactResolver artifactResolver;
 
     private MavenResolver mavenResolver;
@@ -68,6 +67,8 @@ public class ExtensionInstaller
     private TestConfiguration testConfiguration;
 
     private MavenTimestampVersionConverter mavenVersionConverter;
+
+    private RestExtensionInstaller restExtensionInstaller;
 
     /**
      * Initialize the Component Manager which is later needed to perform the REST calls.
@@ -79,13 +80,11 @@ public class ExtensionInstaller
     public ExtensionInstaller(ExtensionContext context, ArtifactResolver artifactResolver, MavenResolver mavenResolver)
     {
         this.context = context;
-
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
-        this.testConfiguration = DockerTestUtils.getTestConfiguration(context);
-        this.componentManager = DockerTestUtils.getComponentManager(context);
-
+        this.testConfiguration = getTestConfiguration(context);
         this.mavenVersionConverter = new MavenTimestampVersionConverter();
+        this.restExtensionInstaller = new RestExtensionInstaller(getComponentManager(context), this.mavenResolver);
     }
 
     /**
@@ -210,8 +209,7 @@ public class ExtensionInstaller
     public void installExtensions(Collection<ExtensionId> extensions, UsernamePasswordCredentials credentials,
         String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
-        new RestExtensionInstaller(this.componentManager, this.mavenResolver)
-            .installExtensions(getXWikiURL(this.context), extensions, credentials, installUserReference, namespaces,
-                failOnExist);
+        this.restExtensionInstaller.installExtensions(getXWikiURL(this.context), extensions, credentials,
+            installUserReference, namespaces, failOnExist);
     }
 }

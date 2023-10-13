@@ -74,7 +74,7 @@ require(['jquery'], function($) {
     // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
     // which prevents us from using them in automated tests. We need something more reliable so we listen to
     // 'drawer1.opened' and 'drawer1.closed' events and add our own markers.
-    let openDrawer = () => drawerContainer.trigger('drawer'+index+'.opened');
+    let openDrawer = () => drawerContainer.trigger('drawer' + index + '.opened');
     let closeDrawer = () => drawerContainer.trigger('drawer'+index+'.closed');
     drawerContainerToggler.on('click', openDrawer);
     drawerOverlay.on('click', closeDrawer);

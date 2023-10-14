@@ -110,10 +110,21 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
 
   // Actions
 
+  var _propURLGet = function _propURLGet(propertyData, urlType) {
+    var ref = XWiki.Model.resolve(propertyData, XWiki.EntityType.OBJECT_PROPERTY);
+    if (ref) {
+      var doc = new XWiki.Document(ref.extractReference(XWiki.EntityType.DOCUMENT));
+      if (doc) {
+         return doc.getURL(urlType);
+      }
+    }
+    return XWiki.currentDocument.getURL(urlType);
+  }
+
   var edit = function(editableProperty) {
     // Disable the edit action while we load the editor.
     var editIcon = editableProperty.find('.editableProperty-edit').addClass('disabled');
-    return Promise.resolve($.get(XWiki.currentDocument.getURL('get'), {
+    return Promise.resolve($.get(_propURLGet(editableProperty.data('property'), 'get'), {
       xpage: 'display',
       mode: 'edit',
       property: editableProperty.data('property'),
@@ -168,7 +179,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     data.push({name: 'ajax', value: true});
     data.push({name: 'objectPolicy', value: editableProperty.data('objectPolicy')});
     // Make the request to save the property.
-    return Promise.resolve($.post(XWiki.currentDocument.getURL('save'), data)).then(() => {
+    return Promise.resolve($.post(_propURLGet(editableProperty.data('property'), 'save'), data)).then(() => {
       editor.trigger('xwiki:document:saved');
       notification.replace(new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.done'],
         'done'));
@@ -185,7 +196,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   };
 
   var view = function(editableProperty) {
-    return Promise.resolve($.get(XWiki.currentDocument.getURL('get'), {
+    return Promise.resolve($.get(_propURLGet(editableProperty.data('property'), 'get'), {
       xpage: 'display',
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),

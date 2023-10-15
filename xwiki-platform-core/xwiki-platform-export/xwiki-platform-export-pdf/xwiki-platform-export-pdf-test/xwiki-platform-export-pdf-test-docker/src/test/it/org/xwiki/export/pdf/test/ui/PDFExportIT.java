@@ -77,8 +77,10 @@ import org.xwiki.test.ui.po.ViewPage;
     // We need the Office server because we want to be able to test how the Office macro is exported to PDF.
     office = true,
     properties = {
-        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference)
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.OfficeImporterAdmin"
+        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference).
+        // Enabling debug logs also requires PR.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
+            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)"
     }
 )
 @ExtendWith(PDFExportExecutionCondition.class)

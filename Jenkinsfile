@@ -20,23 +20,24 @@
 pipeline {
     agent {
         docker {
-            image 'node:18.18.1-alpine3.18' 
+            image 'node:18.18.1-alpine3.18'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
     stages {
-        stage('Build') { 
+        stage('Build') {
             steps {
-                sh 'npm install' 
+                sh 'npm install'
             }
         }
-        stage('Unit Tests') { 
+        stage('Unit Tests') {
             steps {
-                sh 'npm run test:unit' 
+                sh 'npm run test:unit'
             }
         }
-        stage('End to End Tests') { 
+        stage('End to End Tests') {
             steps {
-                sh 'npm run test:e2e:dev' 
+                sh 'npm run test:e2e:dev'
             }
         }
     }

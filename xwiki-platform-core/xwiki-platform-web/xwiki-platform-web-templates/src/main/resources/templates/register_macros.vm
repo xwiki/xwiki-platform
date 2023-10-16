@@ -156,7 +156,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         #end
         />
         ## We append the livevalidation message holder
-        #if ($field.validate.mandatory)
+        #if ($field.validate)
           <span class='message-holder #if($field.error)LV_validation_message LV_invalid#end' aria-live='polite'>$!field.error</span>
         #end
         </dd>

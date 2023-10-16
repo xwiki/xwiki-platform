@@ -89,7 +89,7 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
     if (settings.hint === true) {
       let hint = select.parents('dd').prev().children('.xHint');
       let hintId = input.attr('id') + '_select_hint';
-      hint.attr('id',hintId);
+      hint.attr('id', hintId);
       select.attr('aria-describedby', hintId);
     }
     select.append(locales.map(function(locale) {

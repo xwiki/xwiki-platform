@@ -17,9 +17,6 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## Defines what server generated error messages should look like
-## The error message when a field is entered incorrectly
-#set ($failureMessageParams = {'class': 'LV_validation_message LV_invalid'})
 ## 'LV_validation_message LV_invalid' depends on this:
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
 ##
@@ -158,12 +155,9 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #end
         #end
         />
-        #if ($field.error)
-          <span ##
-          #foreach ($entry in $failureMessageParams.entrySet())
-            $entry.key="$entry.value" ##
-          #end
-          >$field.error</span>
+        ## We append the livevalidation message holder
+        #if ($field.validate.mandatory)
+          <span class='message-holder #if($field.error)LV_validation_message LV_invalid#end' aria-live='polite'>$!field.error</span>
         #end
         </dd>
       #end

@@ -64,9 +64,10 @@
         <button
           class="handle"
           :title="$t('livedata.action.reorder.hint')"
-          @click="toggleDragNDrop"
+          @click="toggleDragNDrop()"
           @keydown.left="keyboardDragNDropLeft($event)"
           @keydown.right="keyboardDragNDropRight($event)"
+          @blur="resetDragNDrop()"
         >
           <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
         </button>
@@ -165,7 +166,7 @@ export default {
       /*
         As the draggable plugin is taking in account every child it has for d&d
         and there is the select-entry-all component as first child
-        we need to substract 1 to the indexes that the draggable plugin handles
+        we need to substract 1 to the index es that the draggable plugin handles
         so that it matches the true property order
         When selection is disabled (and the select-entry-all component hidden)
         we don't need to readjust the offset of the indexes
@@ -186,22 +187,39 @@ export default {
       this.logic.toggleDragNDrop();
     },
     
+    resetDragNDrop () {
+        this.logic.dragNDrop = false;
+    },
+    
     keyboardDragNDropRight (e) {
       if (this.logic.dragNDrop) {
-        let oldIndex = e.currentTarget.index ;
-        let columns = e.currentTarget.closest("tr").querySelectorAll(".column-name");
-        let newIndex = Math.min(oldIndex + 1, columns.length - 1);
-        console.log(String(oldIndex) + "->" + String(newIndex));
-        this.logic.reorderProperty(oldIndex,newIndex);
+        let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
+        let oldIndex = Array.from(handles).indexOf(e.currentTarget);
+        let newIndex = oldIndex + 1;
+        if (newIndex < handles.length) {
+            this.logic.reorderProperty(oldIndex, newIndex);
+        } else {
+            this.logic.reorderProperty(oldIndex, 0);
+        }
+        this.$nextTick(() => {
+            handles[oldIndex].focus();
+        });
       }
     },
 
     keyboardDragNDropLeft (e) {
       if (this.logic.dragNDrop) {
-        let oldIndex = e.currentTarget.index;
-        let newIndex = Math.max(oldIndex - 1, 0);
-        console.log(String(oldIndex) + "->" + String(newIndex));
-        this.logic.reorderProperty(oldIndex,newIndex);
+        let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
+        let oldIndex = Array.from(handles).indexOf(e.currentTarget);
+        let newIndex = oldIndex - 1;
+        if (newIndex > -1) {
+            this.logic.reorderProperty(oldIndex, newIndex);
+        } else {
+            this.logic.reorderProperty(oldIndex, handles.length - 1);
+        }
+        this.$nextTick(() => {
+            handles[oldIndex].focus();
+        });
       }
     },
 
@@ -349,7 +367,7 @@ export default {
   background-color: @xwiki-page-content-bg;
   cursor: pointer; /* IE */
   cursor: grab;
-  opacity: 0;
+  opacity: 0.1;
   position: absolute;
 }
 
@@ -360,7 +378,8 @@ export default {
     text-align: left;
 }
 
-.layout-table .column-name:hover .handle {
+.layout-table .column-name:hover .handle,
+.layout-table .column-name:focus-within .handle {
   opacity: 0.8;
   transition: opacity 0.2s;
 }
@@ -382,7 +401,8 @@ export default {
 .layout-table .sort-icon.sorted {
   opacity: 1;
 }
-.layout-table .column-name:hover .sort-icon:not(.sorted) {
+.layout-table .column-name:hover .sort-icon:not(.sorted),
+.layout-table .column-name:focus-within .sort-icon:not(.sorted) {
   opacity: 0.5;
 }
 
@@ -403,7 +423,7 @@ export default {
   user-select: none;
   z-index: 100;
 
-  &:hover {
+  &:hover, &:focus {
     background-color: @breadcrumb-bg;
   }
 }

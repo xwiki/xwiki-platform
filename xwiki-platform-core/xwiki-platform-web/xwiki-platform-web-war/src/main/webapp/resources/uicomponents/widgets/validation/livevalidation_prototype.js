@@ -61,13 +61,13 @@ LiveValidation.prototype = {
    *                            beforeValid {Function}  - function to execute directly before the onValid function is executed
    *													  (DEFAULT: function(){})
    *							onValid {Function} 		- function to execute when field passes validation
-   *													  (DEFAULT: function(){ this.insertMessage(this.createMessageSpan()s); this.addFieldClass(); } )
+   *													  (DEFAULT: this.insertMessage)
    *                            afterValid {Function}   - function to execute directly after the onValid function is executed
    *													  (DEFAULT: function(){})
    *                            beforeInvalid {Function} - function to execute directly before the onInvalid function is executed
    *													  (DEFAULT: function(){})	
    *							onInvalid {Function} 	- function to execute when field fails validation
-   *													  (DEFAULT: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); })
+   *													  (DEFAULT: this.insertMessage)
    *                            aterInvalid {Function}  - function to execute directly after the onInvalid function is executed
    *													  (DEFAULT: function(){})
    *                            afterValidation {Function} - function to execute directly after validation is performed
@@ -367,17 +367,6 @@ LiveValidation.prototype = {
    * you must either impliment your own functions to do whatever you want, or call some of these from them if you 
    * want to keep some of the functionality
    */
-   
-  /**
-   *	makes a span to contain the passed or failed message
-   *
-   *    @return {HTMLSpanObject} - a span element with the message in it
-   */
-  createMessageSpan: function(){
-    var span = document.createElement('span');
-    span.setAttribute('aria-live', 'assertive');
-    return span;
-  },
   
   /**
    *  inserts the message in its container of the message that already exists (if it does)

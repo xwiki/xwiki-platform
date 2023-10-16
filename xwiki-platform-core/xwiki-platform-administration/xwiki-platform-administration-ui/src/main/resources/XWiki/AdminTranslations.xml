@@ -102,7 +102,6 @@ XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by
 # Localization Section
 XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
 XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
-administration.localization.localepicker.languages.label=Pick the languages that will be available in the interface.
 XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
 XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
 XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates

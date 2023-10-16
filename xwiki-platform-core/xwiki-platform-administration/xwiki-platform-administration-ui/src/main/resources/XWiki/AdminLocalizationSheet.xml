@@ -395,9 +395,9 @@
     </property>
     <property>
       <code>define('xwiki-administration-localization', {
-  prefix: 'administration.localization.',
+  prefix: 'XWiki.',
   keys: [
-    'localepicker.languages.label'
+    'XWikiPreferences_languages'
   ]
 });
 /**
@@ -416,7 +416,8 @@ require(['jquery', 'xwiki-l10n!xwiki-administration-localization', 'xwiki-locale
   $('input[name="XWiki.XWikiPreferences_0_languages"]').localePicker({
     allowEmpty: false,
     multiple: true,
-    label: l10n.get('localepicker.languages.label')
+    label: l10n.get('XWikiPreferences_languages'),
+    hint: true
   });
 
   $('input[name="XWiki.XWikiPreferences_0_default_language"]').localePicker({

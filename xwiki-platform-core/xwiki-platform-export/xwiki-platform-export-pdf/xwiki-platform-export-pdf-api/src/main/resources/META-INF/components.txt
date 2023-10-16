@@ -1,5 +1,6 @@
 org.xwiki.export.pdf.internal.job.PDFExportJob
 org.xwiki.export.pdf.internal.job.PDFExportJobInitializer
+org.xwiki.export.pdf.internal.job.PrintPreviewURLBuilder
 org.xwiki.export.pdf.internal.macro.PDFTocMacro
 org.xwiki.export.pdf.internal.macro.PdfTocTreeBuilderFactory
 org.xwiki.export.pdf.internal.script.SafePDFExportConfigurationProvider

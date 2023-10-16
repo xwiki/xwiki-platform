@@ -1,3 +1,4 @@
+org.xwiki.rendering.wikimacro.internal.DefaultWikiMacro
 org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory
 org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroInitializer
 org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroRenderer

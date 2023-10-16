@@ -1,0 +1,107 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>TourCode</web>
+  <name>AjaxActions</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>TourCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="TourCode.Macros"/}}
+
+{{velocity}}
+#set ($action = $request.action)
+#set ($tourName = $request.tourName)
+#if ("$!tourName" != '')
+  #set ($tourDoc = $xwiki.getDocument($tourName))
+  #if ($action == 'editStep')
+    ## Save step
+    #set ($nbSteps       = $request.nbSteps)
+    #set ($stepOrder     = $request.stepOrder)
+    #set ($prevStepOrder = $nbSteps)
+    #set ($stepID = $numbertool.toNumber($request.stepID).intValue())
+    #set ($isNewStep = true)
+    #if ("$!stepID" != '') ## Edit
+      #set ($stepObj = $tourDoc.getObject('TourCode.StepClass', $stepID))
+      #if ($stepObj)
+        #set ($isNewStep = false)
+        #set ($prevStepOrder = $stepObj.getValue('order'))
+      #end
+    #end
+    #if ($isNewStep)
+      ## New step
+      #set ($stepObj = $tourDoc.newObject('TourCode.StepClass'))
+    #end
+    #set ($discard = $stepObj.set('element', $request.element))
+    #set ($discard = $stepObj.set('title', $request.title))
+    #set ($discard = $stepObj.set('placement', $request.placement))
+    #set ($discard = $stepObj.set('targetPage', $request.targetPage))
+    #set ($discard = $stepObj.set('action', $request.targetAction))
+    #set ($discard = $stepObj.set('queryString', $request.get('queryString')))
+    #set ($discard = $stepObj.set('backdrop', $request.backdrop))
+    #set ($discard = $stepObj.set('content', $request.content))
+    #set ($discard = $stepObj.set('reflex', $request.reflex))
+    #if ($prevStepOrder != $stepOrder)
+      ## Update the step objects
+      #set ($stepObj2 = $tourDoc.getObject('TourCode.StepClass', 'order', "$stepOrder"))
+      #if ("$!stepObj2" != '')
+        #set ($discard = $stepObj2.set('order', $prevStepOrder))
+      #end
+      #set ($discard = $stepObj.set('order', $stepOrder))
+    #else
+      #if ($isNewStep)
+        #set ($discard = $stepObj.set('order', $nbSteps))
+      #end
+    #end
+  #elseif ($action == 'deleteStep')
+    #set ($stepID = $numbertool.toNumber($request.stepID).intValue())
+    #set ($stepObj = $tourDoc.getObject('TourCode.StepClass', $stepID))
+    #if ($stepObj)
+      #set ($discard = $tourDoc.removeObject($stepObj))
+      ## Update other steps order
+      #set ($steps = $tourDoc.getObjects('TourCode.StepClass'))
+      #set ($sortedSteps = [])
+      #sortXWikiObjectsList($steps, 'order', $sortedSteps)
+      #foreach ($step in $sortedSteps)
+        #set ($discard = $step.set('order', $foreach.index))
+      #end
+    #end
+  #end
+  #set ($discard = $tourDoc.save())
+  #set ($pageMode = 'edit')
+  {{include reference="TourCode.StepsListing"/}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

@@ -44,9 +44,11 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.velocity.VelocityEngine;
@@ -67,7 +69,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
-public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
+@ComponentList(WikiUIExtension.class)
+class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 {
     @MockComponent
     private JobProgressManager jobProgressManager;
@@ -135,7 +138,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     }
 
     @Test
-    public void buildGlobalComponentsWithoutPR()
+    void buildGlobalComponentsWithoutPR()
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "global");
         Throwable exception = assertThrows(WikiComponentException.class, () -> {
@@ -145,7 +148,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     }
 
     @Test
-    public void buildWikiLevelComponentsWithoutAdminRights()
+    void buildWikiLevelComponentsWithoutAdminRights()
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "wiki");
         Throwable exception = assertThrows(WikiComponentException.class, () -> {
@@ -156,7 +159,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     }
 
     @Test
-    public void buildComponents(ComponentManager componentManager) throws Exception
+    void buildComponents(ComponentManager componentManager) throws Exception
     {
         BaseObject extensionObject = createExtensionObject("name", "extensionPointId", "content",
             "key=value=foo\nkey2=value2\nempty=\n\n=invalid", "user");

@@ -91,6 +91,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     @Inject
     private PDFExportConfiguration configuration;
 
+    @Inject
+    private PrintPreviewURLBuilder printPreviewURLBuilder;
+
     @Override
     public String getType()
     {
@@ -210,7 +213,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
 
     private void saveAsPDF() throws IOException
     {
-        URL printPreviewURL = (URL) this.request.getContext().get("request.url");
+        URL printPreviewURL = this.printPreviewURLBuilder.getPrintPreviewURL(this.request);
         try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
             if (!this.status.isCanceled()) {
                 this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);

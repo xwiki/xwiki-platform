@@ -845,7 +845,7 @@ aria-label="$escapetool.xml($title)"
 #end
 
 #macro(largepanelheader $title)
-  #panelheader($title, true, false, false)
+#panelheader($title, true, false, false)
 #end
 
 #macro(panelhiddenheader $title)
@@ -854,11 +854,11 @@ aria-label="$escapetool.xml($title)"
 
 ## Changes the semantic role of the panel.
 #macro(navigationPanelHeader $title)
-  #panelheader($title, false, false, true)
+#panelheader($title, false, false, true)
 #end
 
 #macro(largeNavigationPanelHeader $title)
-  #panelheader($title, true, false, true)
+#panelheader($title, true, false, true)
 #end
 
 ###

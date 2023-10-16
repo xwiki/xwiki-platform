@@ -28,8 +28,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.simplejavamail.api.email.Email;
 import org.simplejavamail.converter.EmailConverter;
-import org.simplejavamail.email.Email;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
@@ -185,13 +185,13 @@ public class NotificationsEmailsIT
         assertEquals(1, email.getRecipients().size());
         assertEquals(USER_EMAIL, email.getRecipients().get(0).getAddress());
 
-        assertNotNull(email.getText());
-        assertNotNull(email.getTextHTML());
+        assertNotNull(email.getPlainText());
+        assertNotNull(email.getHTMLText());
         assertNotNull(email.getAttachments());
         assertFalse(email.getAttachments().isEmpty());
 
         // Events inside an email comes in random order, so we just verify that all the expected content is there
-        String plainTextContent = prepareMail(email.getText());
+        String plainTextContent = prepareMail(email.getPlainText());
         String expectedContent;
         expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail1.txt")));
         assertTrue(plainTextContent.contains(expectedContent),

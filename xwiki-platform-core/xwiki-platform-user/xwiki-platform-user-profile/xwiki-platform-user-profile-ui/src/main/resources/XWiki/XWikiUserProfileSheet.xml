@@ -396,7 +396,7 @@
 
 .activity-follow .follow, .activity-follow .following {
   background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.png')") no-repeat;
-  border-radius: 4px;
+  border-radius: 7px;
   color: $theme.menuAddEntryLinkColor !important;
   display: inline-block;
   font-size: 83.3%;

@@ -264,6 +264,10 @@
   #document-title h1 {
     word-wrap: break-word;
   }
+  #document-title-input {
+    // Override the fixed height as the content is a large heading that would otherwise overflow.
+    height: auto;
+  }
   .document-menu, .document-info {
     margin-top: @line-height-computed;
   }

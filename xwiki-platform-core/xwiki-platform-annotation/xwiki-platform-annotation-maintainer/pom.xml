@@ -75,7 +75,7 @@
     <dependency>
       <groupId>org.incava</groupId>
       <artifactId>java-diff</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.2</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

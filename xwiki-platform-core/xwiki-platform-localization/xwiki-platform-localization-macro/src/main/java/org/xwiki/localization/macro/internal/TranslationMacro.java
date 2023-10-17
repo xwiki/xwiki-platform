@@ -37,9 +37,11 @@ import org.xwiki.localization.macro.TranslationMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -150,6 +152,12 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
         }
 
         return blocks;
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        this.macroContentParser.prepareContentWiki(macroBlock);
     }
 
     @Override

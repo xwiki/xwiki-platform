@@ -331,16 +331,13 @@ export default {
 }
 
 .layout-table .property-name {
-    background: transparent;
-    border: 0;
-    width: 100%;
-    text-align: left;
-}
-
-.layout-table .property-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: left;
 }
 
 .layout-table .sort-icon {

@@ -308,6 +308,12 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
             BaseClass bclass = getXClass(context);
+            // Bulletproofing: in theory the BaseObject is defined with a xclass reference allowing to resolve it
+            // however, it's possible that the reference is not set, in which case we might still find the info
+            // in the old object.
+            if (bclass == null) {
+                bclass = oldObject.getXClass(context);
+            }
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : pclass.getClassType();
 

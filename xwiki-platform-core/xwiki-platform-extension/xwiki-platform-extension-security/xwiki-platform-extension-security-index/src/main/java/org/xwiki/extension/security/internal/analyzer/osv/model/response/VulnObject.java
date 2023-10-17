@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.security.internal.analyzer.osv.model.response;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -43,6 +44,8 @@ public class VulnObject
     private List<VulnReferenceObject> references;
 
     private List<SeverityObject> severity;
+
+    private List<String> aliases;
 
     /**
      * @return the affected field
@@ -154,6 +157,27 @@ public class VulnObject
             .min(Comparator.naturalOrder());
     }
 
+    /**
+     * @return the list of aliases associated with this vulnerability
+     */
+    public List<String> getAliases()
+    {
+        if (this.aliases == null) {
+            this.aliases = new ArrayList<>();
+        }
+        return this.aliases;
+    }
+
+    /**
+     * Sets the list of aliases associated with this vulnerability.
+     *
+     * @param aliases the list of aliases to be set
+     */
+    public void setAliases(List<String> aliases)
+    {
+        this.aliases = aliases;
+    }
+
     @Override
     public String toString()
     {
@@ -162,6 +186,7 @@ public class VulnObject
             .append("id", getId())
             .append("references", getReferences())
             .append("severity", getSeverity())
+            .append("aliases", getAliases())
             .toString();
     }
 }

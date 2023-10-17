@@ -83,6 +83,15 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
     if (settings.allowEmpty) {
       $('<option></option>').attr('value', '').text('None').appendTo(select);
     }
+    if (settings.label) {
+      select.attr('aria-label', settings.label);
+    }
+    if (settings.hint === true) {
+      let hint = select.parents('dd').prev().children('.xHint');
+      let hintId = input.attr('id') + '_select_hint';
+      hint.attr('id', hintId);
+      select.attr('aria-describedby', hintId);
+    }
     select.append(locales.map(function(locale) {
       var index = selectedLocales.indexOf(locale.code);
       if (index >= 0) {

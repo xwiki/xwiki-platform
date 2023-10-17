@@ -136,6 +136,35 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Was never meant to be public</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.render.XWikiScriptContextInitializer</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.render.DefaultVelocityManager</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>False positive</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.render.ScriptVelocityContext</old>
+                  <new>class com.xpn.xwiki.render.ScriptVelocityContext</new>
+                  <superClass>org.xwiki.velocity.ScriptVelocityContext</superClass>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

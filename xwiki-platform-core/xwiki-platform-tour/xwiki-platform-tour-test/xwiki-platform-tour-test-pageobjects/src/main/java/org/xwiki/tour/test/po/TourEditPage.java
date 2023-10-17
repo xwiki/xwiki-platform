@@ -26,7 +26,7 @@ import org.xwiki.test.ui.po.editor.EditPage;
 
 /**
  * @version $Id$
- * @since 15.9-rc-1
+ * @since 15.9RC1
  */
 public class TourEditPage extends EditPage
 {

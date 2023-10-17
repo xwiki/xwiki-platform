@@ -22,11 +22,15 @@ package org.xwiki.rendering.wikimacro.internal;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
+import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -60,6 +64,7 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
  */
 @OldcoreTest
 @ReferenceComponentList
+@ComponentList(DefaultWikiMacro.class)
 class DefaultWikiMacroFactoryAspectTest
 {
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
@@ -75,6 +80,10 @@ class DefaultWikiMacroFactoryAspectTest
 
     @MockComponent
     private ContentParser contentParser;
+
+    @MockComponent
+    @Named("macro")
+    protected Transformation macroTransformation;
 
     private BaseObject macroObject;
 

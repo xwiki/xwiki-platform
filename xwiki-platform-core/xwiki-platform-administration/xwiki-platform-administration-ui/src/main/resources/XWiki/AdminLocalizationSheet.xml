@@ -394,7 +394,13 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/**
+      <code>define('xwiki-administration-localization', {
+  prefix: 'XWiki.',
+  keys: [
+    'XWikiPreferences_languages'
+  ]
+});
+/**
  * Replace the simple text input field for supported locales by a nicer select widget with all available locales
  * ready to be selected.
  *
@@ -404,12 +410,14 @@
  *
  * We also enable the improved select widget on the "timezone" field to make the user able to filter the choices.
  */
-require(['jquery', 'xwiki-locale-picker'], function($) {
+require(['jquery', 'xwiki-l10n!xwiki-administration-localization', 'xwiki-locale-picker'], function($, l10n) {
   'use strict';
 
   $('input[name="XWiki.XWikiPreferences_0_languages"]').localePicker({
     allowEmpty: false,
-    multiple: true
+    multiple: true,
+    label: l10n.get('XWikiPreferences_languages'),
+    hint: true
   });
 
   $('input[name="XWiki.XWikiPreferences_0_default_language"]').localePicker({

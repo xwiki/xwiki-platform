@@ -34,9 +34,11 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.cache.CacheMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -170,5 +172,11 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
         }
 
         return contentCache;
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        this.contentParser.prepareContentWiki(macroBlock);
     }
 }

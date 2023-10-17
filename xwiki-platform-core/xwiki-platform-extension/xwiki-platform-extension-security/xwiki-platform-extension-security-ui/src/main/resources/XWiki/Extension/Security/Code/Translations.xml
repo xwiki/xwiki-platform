@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>extension.security.admin.title=Security Vulnerabilities
 extension.security.indexed.started=Index started on {0}.
-extension.security.indexed.on=Indexed on {0}. Any extension installed after this date, or security vulnerabilities released after this date won't appear. New security scans are performed periodically.
+extension.security.indexed.on=Indexed on {0}. Any extension installed after this date, or security vulnerabilities released after this date won''t appear. New security scans are performed periodically.
 extension.security.indexed.nojob=Could not find any previous indexation processing.
 extension.security.admin.generalWarning=Please note that this security scan does not include all installed extensions. Extensions that can't be updated through the Extension Manager are currently not included.
 extension.security.admin.configuration.title=Configuration

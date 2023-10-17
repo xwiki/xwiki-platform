@@ -287,7 +287,7 @@ class WikiUIExtensionParametersTest
 
     private BaseObject constructMockUIXObject(String parameters)
     {
-        BaseObject result = mock();
+        BaseObject result = mock(BaseObject.class);
 
         when(result.getStringValue(WikiUIExtensionConstants.ID_PROPERTY)).thenReturn("id");
         when(result.getStringValue(WikiUIExtensionConstants.PARAMETERS_PROPERTY)).thenReturn(parameters);

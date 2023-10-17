@@ -36,6 +36,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_ADVICE;
@@ -83,7 +85,7 @@ class SolrToLiveDataEntryMapperTest
             "wiki:xwiki",
             "{root}",
             "wiki:s1"));
-        when(this.l10n.getTranslationPlain("translation.key")).thenReturn("Translation Value");
+        when(this.l10n.getTranslationPlain(eq("translation.key"), any())).thenReturn("Translation Value");
         assertEquals(Map.of(
             "extensionId","org.test:ext/7.5",
             "cveID", "",

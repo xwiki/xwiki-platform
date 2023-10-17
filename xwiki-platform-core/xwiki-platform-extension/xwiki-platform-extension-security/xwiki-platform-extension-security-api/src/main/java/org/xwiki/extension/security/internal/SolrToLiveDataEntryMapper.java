@@ -71,6 +71,8 @@ import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLi
 @Singleton
 public class SolrToLiveDataEntryMapper
 {
+    private static final String LINK_TEMPLATE = "<a href='%s'>%s</a>";
+
     @Inject
     private SolrUtils solrUtils;
 
@@ -116,7 +118,10 @@ public class SolrToLiveDataEntryMapper
 
     private String buildAdvice(SolrDocument doc)
     {
-        return this.l10n.getTranslationPlain(this.solrUtils.get(SECURITY_ADVICE, doc));
+        String extensionManagerLink = getExtensionManagerLink(this.extensionIndexStore.getExtensionId(doc));
+        return this.l10n.getTranslationPlain(this.solrUtils.get(SECURITY_ADVICE, doc),
+            String.format(LINK_TEMPLATE, escapeXml(extensionManagerLink),
+                escapeXml(this.l10n.getTranslationPlain("extension.security.analysis.advice.upgradeFromEM.0"))));
     }
 
     private String buildFixVersion(SolrDocument doc)
@@ -149,7 +154,7 @@ public class SolrToLiveDataEntryMapper
         }
         String url = getExtensionManagerLink(extensionId);
 
-        return String.format("<a href='%s'>%s</a>", escapeXml(url), escapeXml(String.valueOf(extensionName)));
+        return String.format(LINK_TEMPLATE, escapeXml(url), escapeXml(String.valueOf(extensionName)));
     }
 
     private String buildWikis(SolrDocument doc)

@@ -94,9 +94,10 @@
         <button class="resize-handle btn btn-xs btn-default" :title="$t('livedata.action.resizeColumn.hint')"
           v-mousedownmove="resizeColumnInit"
           @mousedownmove="resizeColumn"
-          @keydown.left="resizeColumnLeft"
-          @keydown.right="resizeColumnRight"
+          @keydown.left="resizeColumnKeyboard($event, -10)"
+          @keydown.right="resizeColumnKeyboard($event, 10)"
           @dblclick="resetColumnSize"
+          @keydown.esc="resetColumnSize"
         >
           <XWikiIcon :icon-descriptor="{name: 'arrow_out'}"/>
         </button>
@@ -169,7 +170,7 @@ export default {
       /*
         As the draggable plugin is taking in account every child it has for d&d
         and there is the select-entry-all component as first child
-        we need to substract 1 to the index es that the draggable plugin handles
+        we need to substract 1 to the indexes that the draggable plugin handles
         so that it matches the true property order
         When selection is disabled (and the select-entry-all component hidden)
         we don't need to readjust the offset of the indexes
@@ -250,7 +251,7 @@ export default {
       }
     },
 
-    resizeColumnLeft (e) {
+    resizeColumnKeyboard (e, amount) {
       const th = e.currentTarget.closest("th");
       let leftColumn = th.querySelector(".column-name");
       let leftColumnBaseWidth = leftColumn.getBoundingClientRect()?.width;
@@ -271,7 +272,7 @@ export default {
       for (let i = 0; i < columns.length; i++) {
         columns[i].style.width = `${widths[i]}px`;
       }
-      const offsetX = - 10;
+      const offsetX = amount;
       // Resize left column
       const leftColumnWidth = leftColumnBaseWidth + offsetX;
       leftColumn.style.width = `${leftColumnWidth}px`;
@@ -282,40 +283,7 @@ export default {
         rightColumn.style.width = `${rightColumnWidth}px`;
       }
     },
-
-    resizeColumnRight (e) {
-      const th = e.currentTarget.closest("th");
-      let leftColumn = th.querySelector(".column-name");
-      let leftColumnBaseWidth = leftColumn.getBoundingClientRect()?.width;
-      let rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
-      let rightColumnBaseWidth = rightColumn?.getBoundingClientRect()?.width;
-
-      // Give all column names a fixed width so that relative widths don't change when resizing (in case the current
-      // widths are not the actual column widths).
-      // First, collect all widths, then set them all to avoid that due to the first values being set the other values
-      // change.
-      const widths = [];
-      let columns = th.closest("tr").querySelectorAll(".column-name");
-      // Filter columns that aren't visible to avoid setting a width of zero on them.
-      columns = Array.from(columns).filter(column => column.closest("th").style.display !== "none");
-      for (const column of columns) {
-        widths.push(column.getBoundingClientRect().width);
-      }
-      for (let i = 0; i < columns.length; i++) {
-        columns[i].style.width = `${widths[i]}px`;
-      }
-      const offsetX = 10;
-      // Resize left column
-      const leftColumnWidth = leftColumnBaseWidth + offsetX;
-      leftColumn.style.width = `${leftColumnWidth}px`;
-
-      // Resize right column
-      if (rightColumn) {
-        const rightColumnWidth = rightColumnBaseWidth - offsetX;
-        rightColumn.style.width = `${rightColumnWidth}px`;
-      }
-    },
-
+    
     resetColumnSize (e) {
       // Reset all column sizes as resizing a single column sets sizes for all columns.
       for (const column of e.currentTarget.closest("tr").querySelectorAll(".column-name")) {

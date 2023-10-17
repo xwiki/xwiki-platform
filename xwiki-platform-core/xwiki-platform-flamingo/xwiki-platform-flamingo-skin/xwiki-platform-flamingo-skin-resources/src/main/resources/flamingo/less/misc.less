@@ -520,13 +520,3 @@ a.html-diff-context-toggle {
 .xwiki-select-option-selected {
   background-color: @nav-link-hover-bg;
 }
-
-// Underline the links in nodes that use the mixin text-muted.
-// This allows to keep a difference between anchors and regular text in those nodes where the
-// contrast between anchors and regular text is too low.
-.text-muted {
-  color: @text-muted;
-  & > a {
-    text-decoration: underline;
-  }
-}

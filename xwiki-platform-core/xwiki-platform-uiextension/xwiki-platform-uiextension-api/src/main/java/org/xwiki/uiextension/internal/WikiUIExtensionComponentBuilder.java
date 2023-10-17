@@ -136,12 +136,9 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
                 String.format("Failed to initialize Panel UI extension [%s]", baseObject.getReference()), e);
         }
 
-        String rawParameters = baseObject.getStringValue(PARAMETERS_PROPERTY);
-
         // It would be nice to have PER_LOOKUP components for UIX parameters but without constructor injection it's
         // safer to use a POJO and pass the Component Manager to it.
-        WikiUIExtensionParameters parameters =
-            new WikiUIExtensionParameters(id, rawParameters, this.wikiComponentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(baseObject, this.wikiComponentManager);
         extension.setParameters(parameters);
         extension.setScope(scope);
 

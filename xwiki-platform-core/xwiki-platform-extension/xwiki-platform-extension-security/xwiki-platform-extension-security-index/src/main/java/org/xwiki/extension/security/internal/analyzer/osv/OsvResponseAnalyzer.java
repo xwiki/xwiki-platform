@@ -87,7 +87,6 @@ public class OsvResponseAnalyzer
 
     private Optional<SecurityVulnerabilityDescriptor> convert(VulnObject vulnObject, Version currentVersion)
     {
-        // If we are unable to find a CVE, we ignore the vulnerability.
         return resolveId(vulnObject)
             .map(id -> new SecurityVulnerabilityDescriptor()
                 .setId(id)
@@ -114,10 +113,15 @@ public class OsvResponseAnalyzer
      */
     private Optional<String> resolveId(VulnObject vulnObject)
     {
-        return vulnObject.getAliases()
+        Optional<String> first = vulnObject.getAliases()
             .stream()
             .filter(it -> startsWith(it, "CVE-"))
             .findFirst();
+        if (first.isEmpty()) {
+            // We fall back to the first id if no CVE id is found.
+            first = vulnObject.getAliases().stream().findFirst();
+        }
+        return first;
     }
 
     private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)

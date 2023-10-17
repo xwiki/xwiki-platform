@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.xwiki.component.wiki.WikiComponentException;
+
 import com.xpn.xwiki.internal.mandatory.AbstractAsyncClassDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -35,20 +37,16 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public abstract class AbstractAsyncBaseObjectWikiComponent extends AbstractBaseObjectWikiComponent
 {
-    protected final boolean asyncAllowed;
+    protected boolean asyncAllowed;
 
-    protected final boolean cacheAllowed;
+    protected boolean cacheAllowed;
 
-    protected final Set<String> contextEntries;
+    protected Set<String> contextEntries;
 
-    /**
-     * @param baseObject the object containing the component definition
-     * @param roleType the role Type implemented
-     * @param roleHint the role hint for this role implementation
-     */
-    public AbstractAsyncBaseObjectWikiComponent(BaseObject baseObject, Type roleType, String roleHint)
+    @Override
+    protected void initialize(BaseObject baseObject, Type roleType, String roleHint) throws WikiComponentException
     {
-        super(baseObject, roleType, roleHint);
+        super.initialize(baseObject, roleType, roleHint);
 
         this.asyncAllowed =
             baseObject.getIntValue(AbstractAsyncClassDocumentInitializer.XPROPERTY_ASYNC_ENABLED, 0) == 1;

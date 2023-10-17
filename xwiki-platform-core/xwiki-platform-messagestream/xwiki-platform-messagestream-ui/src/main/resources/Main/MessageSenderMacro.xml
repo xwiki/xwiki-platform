@@ -378,7 +378,7 @@ return XWiki;
 
 /* User's avatar */
 .messagestream .activitySnapshot .avatar {
-  border-radius: 4px;
+  border-radius: 7px;
   box-shadow: 0 0 2px 1px rgba(128,128,128,0.6);
 }
 

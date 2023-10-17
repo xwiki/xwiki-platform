@@ -407,7 +407,7 @@ table.livetable {
 
 /* Round the infomessage border and change the padding to uniformize the messages style with Live Data. */
 .xwiki-livetable-container div div.infomessage {
-  border-radius: 4px;
+  border-radius: 7px;
   padding: 0.1em 1em;
 }
 /* </Decoration> */

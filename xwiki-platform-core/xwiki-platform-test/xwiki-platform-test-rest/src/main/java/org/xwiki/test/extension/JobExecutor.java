@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.docker.internal.junit5;
+package org.xwiki.test.extension;
 
 import java.io.StringWriter;
 
@@ -31,10 +31,11 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.restlet.data.MediaType;
 import org.xwiki.job.JobException;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
+
+import static org.restlet.data.MediaType.APPLICATION_XML;
 
 /**
  * Execute a Job to call the XWiki REST endpoint to install extensions.
@@ -87,13 +88,13 @@ public class JobExecutor
         throws Exception
     {
         PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        putMethod.addRequestHeader("Accept", APPLICATION_XML.toString());
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
         RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML.toString(), "UTF-8");
+            new StringRequestEntity(writer.toString(), APPLICATION_XML.toString(), "UTF-8");
         putMethod.setRequestEntity(entity);
 
         httpClient.executeMethod(putMethod);

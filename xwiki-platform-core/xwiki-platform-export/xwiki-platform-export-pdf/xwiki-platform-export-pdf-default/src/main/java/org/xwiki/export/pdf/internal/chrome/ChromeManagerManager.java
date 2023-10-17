@@ -21,6 +21,7 @@ package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -147,17 +148,34 @@ public class ChromeManagerManager implements Disposable
 
     private void connect()
     {
+        // Try running Chrome headless in sandbox mode in a Docker container. This is not supported on all environments
+        // (e.g. when XWiki runs in a Virtual Machine) which is why we retry below without the sandbox mode.
+        connect(true);
+    }
+
+    private void connect(boolean inSandboxMode)
+    {
         String chromeHost = this.configuration.getChromeHost();
-        if (StringUtils.isBlank(chromeHost)) {
+        boolean shouldUseDocker = StringUtils.isBlank(chromeHost);
+        if (shouldUseDocker) {
             chromeHost = prepareChromeDockerContainer(this.configuration.getChromeDockerImage(),
                 this.configuration.getChromeDockerContainerName(), this.configuration.getDockerNetwork(),
-                this.configuration.getChromeRemoteDebuggingPort());
+                this.configuration.getChromeRemoteDebuggingPort(), inSandboxMode);
         }
-        connectChromeService(chromeHost, this.configuration.getChromeRemoteDebuggingPort());
+        try {
+            connectChromeService(chromeHost, this.configuration.getChromeRemoteDebuggingPort());
+        } catch (Exception e) {
+            if (inSandboxMode && shouldUseDocker) {
+                // Try again to run Chrome headless in a Docker container but this time without sandbox mode.
+                connect(false);
+            } else {
+                throw e;
+            }
+        }
     }
 
     private String prepareChromeDockerContainer(String imageName, String containerName, String network,
-        int remoteDebuggingPort)
+        int remoteDebuggingPort, boolean inSandboxMode)
     {
         this.logger.debug("Preparing the Docker container running the headless Chrome web browser.");
         ContainerManager containerManager = this.containerManagerProvider.get();
@@ -196,7 +214,7 @@ public class ChromeManagerManager implements Disposable
                 // parameters (see below).
                 List<String> envVars = Arrays.asList("CHROMIUM_FLAGS=\"\"");
 
-                List<String> parameters = Arrays.asList(
+                List<String> parameters = new ArrayList<>(Arrays.asList(
                     // We don't know the IP address of the docker container at this point.
                     "--remote-debugging-address=0.0.0.0",
                     // Use the configured remote debugging port.
@@ -209,7 +227,15 @@ public class ChromeManagerManager implements Disposable
                     "--disable-dev-shm-usage",
                     // This is only useful if you want to inspect the headless Chrome using chrome://inspect/#devices
                     // (without this the headless Chrome is detected but I can't open a new tab).
-                    "about:blank");
+                    "about:blank"));
+
+                if (inSandboxMode) {
+                    this.logger.debug("Starting Chrome headless in sandbox mode.");
+                } else {
+                    // Disable the sandbox mode.
+                    this.logger.warn("Starting Chrome headless with sandbox mode disabled.");
+                    parameters.add(0, "--no-sandbox");
+                }
 
                 this.containerId =
                     containerManager.createContainer(imageName, containerName, parameters, envVars, hostConfig);

@@ -28,8 +28,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.container.AbstractContainerMacro;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -86,6 +88,12 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
         MacroTransformationContext context) throws MacroExecutionException
     {
         return this.contentParser.parse(content, context, false, false).getChildren();
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        this.contentParser.prepareContentWiki(macroBlock);
     }
 
     @Override

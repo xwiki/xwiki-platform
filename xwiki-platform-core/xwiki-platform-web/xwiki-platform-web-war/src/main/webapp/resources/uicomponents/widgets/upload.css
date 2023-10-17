@@ -54,7 +54,7 @@
 }
 .progress-info .progress, .progress-info .progress-container {
   height: 6px;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 .progress-info .progress {
   background-color: $theme.notificationSuccessColor;
@@ -63,7 +63,7 @@
 }
 .progress-info .progress-container {
   border: 1px solid $theme.notificationSuccessColor;
-  border-radius: 4px;
+  border-radius: 7px;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   box-shadow: 0 0 5px rgba(0,0,0,.2), inset 0 0 5px rgba(0,0,0,.2);

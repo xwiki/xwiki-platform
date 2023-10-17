@@ -24,9 +24,8 @@ import java.util.regex.Pattern;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
+import org.xwiki.rendering.internal.macro.velocity.AbstractNoContextVelocityMacroFilter;
 
 /**
  * Remove first spaces and tabs of each line to support indentation.
@@ -37,7 +36,7 @@ import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 @Component
 @Named("indent")
 @Singleton
-public class IndentVelocityMacroFilter implements VelocityMacroFilter
+public class IndentVelocityMacroFilter extends AbstractNoContextVelocityMacroFilter
 {
     /**
      * Match indentation spaces.
@@ -45,14 +44,8 @@ public class IndentVelocityMacroFilter implements VelocityMacroFilter
     private static final Pattern INDENT_PATTERN = Pattern.compile("^[ \t]++", Pattern.MULTILINE);
 
     @Override
-    public String before(String content, VelocityContext velocityContect)
+    public String prepare(String content)
     {
         return INDENT_PATTERN.matcher(content).replaceAll("");
-    }
-
-    @Override
-    public String after(String content, VelocityContext velocityContect)
-    {
-        return content;
     }
 }

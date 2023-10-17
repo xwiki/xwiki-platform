@@ -56,6 +56,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -220,8 +221,9 @@ class XWikiDocumentTest
     @Test
     void testGetxWikiClass()
     {
-        this.document.getxWikiClass();
-        ((PropertyClass)this.baseObject.getxWikiClass(this.oldcore.getXWikiContext()).get("string")).getxWikiClass(this.oldcore.getXWikiContext());
+        assertNotNull(this.document.getxWikiClass());
+        assertNotNull(((PropertyClass) this.baseObject.getxWikiClass(this.oldcore.getXWikiContext()).get("string"))
+            .getxWikiClass(this.oldcore.getXWikiContext()));
     }
 
     @Test

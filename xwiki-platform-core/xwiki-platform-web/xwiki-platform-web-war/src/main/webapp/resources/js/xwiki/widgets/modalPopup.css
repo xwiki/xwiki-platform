@@ -47,15 +47,7 @@
 }
 .xdialog-close {
   float: right;
-  cursor: pointer;
-  width: .8em;
-  margin-right: .4em;
-  height: 1.4em;
-  text-align : center;
-  font-weight: bold;
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.4em;
-  color: $theme.panelTextColor;
+  margin-right: .8em;
 }
 .xdialog-title .xdialog-close {
   font-size: 1.25em;

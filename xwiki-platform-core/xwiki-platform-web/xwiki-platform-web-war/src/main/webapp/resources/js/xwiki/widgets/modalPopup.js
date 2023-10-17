@@ -79,7 +79,7 @@ widgets.ModalPopup = Class.create({
     }
     // Add the close button
     if (this.options.displayCloseButton) {
-      var closeButton = new Element('div', {'class': 'xdialog-close', 'title': 'Close'}).update("&#215;");
+      var closeButton = new Element('button', {'class': 'btn btn-default xdialog-close', 'title': 'Close'}).update("&#215;");
       closeButton.observe("click", this.closeDialog.bindAsEventListener(this));
       if (this.options.title) {
         title.insert({bottom: closeButton});

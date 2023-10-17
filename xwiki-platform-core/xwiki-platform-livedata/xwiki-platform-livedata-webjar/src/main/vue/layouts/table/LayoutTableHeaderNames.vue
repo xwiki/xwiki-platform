@@ -54,6 +54,7 @@
       class="draggable-item"
       v-for="property in properties"
       :key="property.id"
+      :title="property.description"
       v-show="logic.isPropertyVisible(property.id)"
     >
       <!-- Wrapper for the column header -->

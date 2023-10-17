@@ -59,22 +59,10 @@
     >
       <!-- Wrapper for the column header -->
       <div class="column-name">
-        <!--
-          Specify the handle to drag properties.
-        -->
-        <button
-          class="handle"
-          :title="$t('livedata.action.reorder.hint')"
-          @click="toggleDragNDrop()"
-          @keydown.left="keyboardDragNDropLeft($event)"
-          @keydown.right="keyboardDragNDropRight($event)"
-          @blur="resetDragNDrop()"
-        >
-          <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
-        </button>
         <!-- Property Name -->
         <button 
           class="property-name"
+          :title="$t('livedata.action.sort.hint')"
           @click="sort(property)"
         >
           {{ property.name }}
@@ -88,17 +76,31 @@
             :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
         </button>
         
+        <!--
+          Specify the handle to drag properties.
+        -->
+        <button
+          class="handle btn btn-xs btn-default"
+          :title="$t('livedata.action.reorder.hint')"
+          @keydown.left="keyboardDragNDropLeft($event)"
+          @keydown.right="keyboardDragNDropRight($event)"
+        >
+          <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
+        </button>
+
+        <!--
+          Specify the handle to resize properties
+        -->
+        <button class="resize-handle btn btn-xs btn-default" :title="$t('livedata.action.resizeColumn.hint')"
+          v-mousedownmove="resizeColumnInit"
+          @mousedownmove="resizeColumn"
+          @keydown.left="resizeColumnLeft"
+          @keydown.right="resizeColumnRight"
+          @dblclick="resetColumnSize"
+        >
+          <XWikiIcon :icon-descriptor="{name: 'arrow_out'}"/>
+        </button>
       </div>
-      <!--
-        Specify the handle to resize properties
-      -->
-      <button class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
-        v-mousedownmove="resizeColumnInit"
-        @mousedownmove="resizeColumn"
-        @keydown.left="resizeColumnLeft"
-        @keydown.right="resizeColumnRight"
-        @dblclick="resetColumnSize"
-      ></button>
     </th>
 
   </XWikiDraggable>
@@ -183,45 +185,33 @@ export default {
         if (th.style.display !== "none") return th;
       }
     },
-
-    toggleDragNDrop () {
-      this.logic.toggleDragNDrop();
-    },
-    
-    resetDragNDrop () {
-        this.logic.dragNDrop = false;
-    },
     
     keyboardDragNDropRight (e) {
-      if (this.logic.dragNDrop) {
-        let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
-        let oldIndex = Array.from(handles).indexOf(e.currentTarget);
-        let newIndex = oldIndex + 1;
-        if (newIndex < handles.length) {
-            this.logic.reorderProperty(oldIndex, newIndex);
-        } else {
-            this.logic.reorderProperty(oldIndex, 0);
-        }
-        this.$nextTick(() => {
-            handles[oldIndex].focus();
-        });
+      let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
+      let oldIndex = Array.from(handles).indexOf(e.currentTarget);
+      let newIndex = oldIndex + 1;
+      if (newIndex < handles.length) {
+          this.logic.reorderProperty(oldIndex, newIndex);
+      } else {
+          this.logic.reorderProperty(oldIndex, 0);
       }
+      this.$nextTick(() => {
+          handles[oldIndex].focus();
+      });
     },
 
     keyboardDragNDropLeft (e) {
-      if (this.logic.dragNDrop) {
-        let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
-        let oldIndex = Array.from(handles).indexOf(e.currentTarget);
-        let newIndex = oldIndex - 1;
-        if (newIndex > -1) {
-            this.logic.reorderProperty(oldIndex, newIndex);
-        } else {
-            this.logic.reorderProperty(oldIndex, handles.length - 1);
-        }
-        this.$nextTick(() => {
-            handles[oldIndex].focus();
-        });
+      let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
+      let oldIndex = Array.from(handles).indexOf(e.currentTarget);
+      let newIndex = oldIndex - 1;
+      if (newIndex > -1) {
+          this.logic.reorderProperty(oldIndex, newIndex);
+      } else {
+          this.logic.reorderProperty(oldIndex, handles.length - 1);
       }
+      this.$nextTick(() => {
+          handles[oldIndex].focus();
+      });
     },
 
     resizeColumnInit (e) {
@@ -345,31 +335,31 @@ export default {
   display: table-cell;
   min-width: 4rem;
   overflow: hidden;
+  padding: 8px 2px 8px 2px;
 }
 
 .layout-table .column-name {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
   cursor: pointer;
-  /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
-   when the column has been resized to a smaller width that is prevented by some table cell. */
-  min-width: 100%;
-  position: relative;
+  display: flex;
+}
+
+.layout-table .handle, .layout-table .resize-handle {
+  padding: 0;
+  opacity: 1;
+  width: @target-size-minimum;
+  height: @target-size-minimum;
+  user-select: none;
 }
 
 .layout-table .handle {
-  height: 100%;
-  margin-left: -@table-cell-padding;
-  padding: 0 @table-cell-padding;
-  border: 0;
-  color: @text-color;
-  background-color: @xwiki-page-content-bg;
-  cursor: pointer; /* IE */
-  cursor: grab;
-  opacity: 0.1;
-  position: absolute;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.layout-table .resize-handle {
+    cursor: ew-resize;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
 }
 
 .layout-table .property-name {
@@ -377,15 +367,6 @@ export default {
     border: 0;
     width: 100%;
     text-align: left;
-}
-
-.layout-table .column-name:hover .handle,
-.layout-table .column-name:focus-within .handle {
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-.layout-table .handle .fa {
-  vertical-align: middle;
 }
 
 .layout-table .property-name {
@@ -411,34 +392,11 @@ export default {
   position: relative;
 }
 
-.layout-table .resize-handle {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-  border: 0;
-  transform: translateX(50%);
-  width: 10px;
-  background-color: transparent;
-  cursor: ew-resize;
-  user-select: none;
-  z-index: 100;
-
-  &:hover, &:focus {
-    background-color: @breadcrumb-bg;
-  }
-}
-
 /* Responsive mode */
 @media screen and (max-width: @screen-xs-max) {
   .layout-table th.draggable-item {
     /* Overwrite the draggable-item display in order to show the property names (table header) as a column. */
     display: block;
-
-    .handle {
-      /* Always show the drag handler because hover is not available on mobile. */
-      opacity: 1;
-    }
 
     /* Trim long property names. */
     .property-name {

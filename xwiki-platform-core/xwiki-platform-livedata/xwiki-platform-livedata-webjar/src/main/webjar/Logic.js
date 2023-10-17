@@ -140,9 +140,6 @@ define('xwiki-livedata', [
     // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
     const placeholderElement = document.createElement('div');
     this.element.appendChild(placeholderElement);
-    
-    // Handle the dragAndDrop keyboard interaction state
-    this.dragNDrop = false;
 
     // create Vuejs instance
     const vue = new Vue({
@@ -899,13 +896,6 @@ define('xwiki-livedata', [
     setPropertyVisible (propertyId, visible) {
       const propertyDescriptor = this.getPropertyDescriptor(propertyId);
       propertyDescriptor.visible = visible;
-    },
-
-    /**
-     * Toggle drag and drop controls for the property.
-     */
-    toggleDragNDrop () {
-      this.dragNDrop = !this.dragNDrop;
     },
 
 

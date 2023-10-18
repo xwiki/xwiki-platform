@@ -33,8 +33,8 @@ import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
+import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -52,13 +52,13 @@ import static org.xwiki.model.EntityType.WIKI;
 import static org.xwiki.security.authorization.Right.SCRIPT;
 
 /**
- * Test of {@link RequiredRightsAddedFilter}.
+ * Test of {@link RequiredRightsChangedFilter}.
  *
  * @version $Id$
  * @since 15.9RC1
  */
 @ComponentTest
-class RequiredRightsAddedFilterTest
+class RequiredRightsChangedFilterTest
 {
     private static final DocumentReference CURRENT_USER_REFERENCE =
         new DocumentReference("xwiki", "XWiki", "CurrentUser");
@@ -70,7 +70,7 @@ class RequiredRightsAddedFilterTest
         new DocumentReference("xwiki", "XWiki", "EffectiveMetadataAuthor");
 
     @InjectMockComponents
-    private RequiredRightsAddedFilter filter;
+    private RequiredRightsChangedFilter filter;
 
     @MockComponent
     private AuthorizationManager authorizationManager;
@@ -110,13 +110,13 @@ class RequiredRightsAddedFilterTest
     @Test
     void filterNoResults()
     {
-        assertEquals(List.of(), this.filter.filter(this.documentAuthors, List.of()));
+        assertEquals(new RequiredRightsChangedResult(), this.filter.filter(this.documentAuthors, List.of()));
     }
 
     @Test
     void filterNullResults()
     {
-        assertEquals(List.of(), this.filter.filter(this.documentAuthors, null));
+        assertEquals(new RequiredRightsChangedResult(), this.filter.filter(this.documentAuthors, null));
     }
 
     @Test
@@ -126,12 +126,16 @@ class RequiredRightsAddedFilterTest
         ObjectReference objectReference = new ObjectReference("XWiki.XObj", documentReference);
         WikiReference wikiReference = documentReference.getWikiReference();
         when(this.authorizationManager.hasAccess(SCRIPT, CURRENT_USER_REFERENCE, wikiReference)).thenReturn(true);
-        when(this.authorizationManager.hasAccess(SCRIPT, EFFECTIVE_METADATA_REFERENCE, wikiReference)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(SCRIPT, EFFECTIVE_METADATA_REFERENCE, wikiReference)).thenReturn(
+            false);
 
         List<RequiredRight> requiredRights = List.of(new RequiredRight(SCRIPT, WIKI, false));
-        List<RequiredRightAnalysisResult> resultList =
-            List.of(new RequiredRightAnalysisResult(objectReference, () -> null, () -> null, requiredRights));
-        assertEquals(resultList, this.filter.filter(this.documentAuthors, resultList));
+        RequiredRightAnalysisResult requiredRightAnalysisResult =
+            new RequiredRightAnalysisResult(objectReference, () -> null, () -> null, requiredRights);
+        List<RequiredRightAnalysisResult> resultList = List.of(requiredRightAnalysisResult);
+        RequiredRightsChangedResult expected = new RequiredRightsChangedResult();
+        expected.addToAdded(requiredRightAnalysisResult);
+        assertEquals(expected, this.filter.filter(this.documentAuthors, resultList));
     }
 
     @Test
@@ -142,9 +146,12 @@ class RequiredRightsAddedFilterTest
         when(this.authorizationManager.hasAccess(SCRIPT, CONTENT_AUTHOR_REFERENCE, entityReference)).thenReturn(true);
 
         List<RequiredRight> requiredRights = List.of(new RequiredRight(SCRIPT, DOCUMENT, false));
-        List<RequiredRightAnalysisResult> resultList =
-            List.of(new RequiredRightAnalysisResult(entityReference, () -> null, () -> null, requiredRights));
-        assertEquals(resultList, this.filter.filter(this.documentAuthors, resultList));
+        RequiredRightAnalysisResult requiredRightAnalysisResult =
+            new RequiredRightAnalysisResult(entityReference, () -> null, () -> null, requiredRights);
+        List<RequiredRightAnalysisResult> resultList = List.of(requiredRightAnalysisResult);
+        RequiredRightsChangedResult expected = new RequiredRightsChangedResult();
+        expected.addToRemoved(requiredRightAnalysisResult);
+        assertEquals(expected, this.filter.filter(this.documentAuthors, resultList));
     }
 
     @ParameterizedTest
@@ -163,7 +170,7 @@ class RequiredRightsAddedFilterTest
         List<RequiredRight> requiredRights = List.of(new RequiredRight(SCRIPT, DOCUMENT, false));
         List<RequiredRightAnalysisResult> resultList =
             List.of(new RequiredRightAnalysisResult(entityReference, () -> null, () -> null, requiredRights));
-        assertEquals(List.of(), this.filter.filter(this.documentAuthors, resultList));
+        assertEquals(new RequiredRightsChangedResult(), this.filter.filter(this.documentAuthors, resultList));
     }
 
     @Test
@@ -175,7 +182,7 @@ class RequiredRightsAddedFilterTest
         List<RequiredRight> requiredRights = List.of(new RequiredRight(SCRIPT, DOCUMENT, false));
         List<RequiredRightAnalysisResult> resultList =
             List.of(new RequiredRightAnalysisResult(entityReference, () -> null, () -> null, requiredRights));
-        assertEquals(List.of(), this.filter.filter(this.documentAuthors, resultList));
+        assertEquals(new RequiredRightsChangedResult(), this.filter.filter(this.documentAuthors, resultList));
         // No need to check the rights are the author is the current user
         verifyNoInteractions(this.authorizationManager);
     }

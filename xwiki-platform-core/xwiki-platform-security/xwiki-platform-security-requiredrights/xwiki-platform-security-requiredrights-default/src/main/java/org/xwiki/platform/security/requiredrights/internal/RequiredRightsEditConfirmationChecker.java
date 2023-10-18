@@ -19,10 +19,6 @@
  */
 package org.xwiki.platform.security.requiredrights.internal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -31,10 +27,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
-import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.script.ScriptContextManager;
@@ -63,7 +57,7 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
     private RequiredRightAnalyzer<XWikiDocument> analyzer;
 
     @Inject
-    private RequiredRightsAddedFilter requiredRightsAddedFilter;
+    private RequiredRightsChangedFilter requiredRightsChangedFilter;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -80,7 +74,6 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
     @Override
     public Optional<EditConfirmationCheckerResult> check()
     {
-
         XWikiContext context = this.xcontextProvider.get();
         XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
         if (!this.authorization.hasAccess(Right.EDIT, tdoc.getDocumentReferenceWithLocale())) {
@@ -90,22 +83,10 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
             return Optional.empty();
         }
         try {
-            List<RequiredRightAnalysisResult> analysisResults =
-                this.requiredRightsAddedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
-
-            if (analysisResults.isEmpty()) {
-                return Optional.empty();
-            }
-            Map<EntityReference, List<RequiredRightAnalysisResult>> map = new HashMap<>();
-            for (RequiredRightAnalysisResult requiredRightAnalysisResult : analysisResults) {
-                EntityReference entityReference = requiredRightAnalysisResult.getEntityReference();
-                if (map.containsKey(entityReference)) {
-                    map.get(entityReference).add(requiredRightAnalysisResult);
-                } else {
-                    map.put(entityReference, new ArrayList<>(List.of(requiredRightAnalysisResult)));
-                }
-            }
-            this.scriptContextManager.getCurrentScriptContext().setAttribute("analysis", map, GLOBAL_SCOPE);
+            RequiredRightsChangedResult analysisResults =
+                this.requiredRightsChangedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
+            this.scriptContextManager.getCurrentScriptContext()
+                .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
             return Optional.of(new EditConfirmationCheckerResult(
                 this.templateManager.executeNoException("security/requiredrights/requiredRightsConfirmationChecker.vm",
                     false), false));

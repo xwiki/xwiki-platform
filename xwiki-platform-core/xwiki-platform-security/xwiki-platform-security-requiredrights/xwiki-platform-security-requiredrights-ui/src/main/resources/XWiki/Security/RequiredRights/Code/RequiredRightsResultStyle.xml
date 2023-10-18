@@ -147,8 +147,17 @@
   background-color: @xwiki-page-content-bg;
   color: @text-color;
   text-align: initial;
+  
+  .panel-heading {
+    padding: 0.7em;
+  }
+  
+  .panel-group {
+    margin-bottom: 0.5em;
+  }
 
   .panel-title {
+    font-size: @font-size-base;
     a .fa {
       width: 0.5em;
     }

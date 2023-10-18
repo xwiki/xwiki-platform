@@ -21,26 +21,33 @@
 {{velocity output='false'}}
 #template("display_macros.vm")
 #template("hierarchy_macros.vm")
-#set ($counter = 0)
-#initRequiredSkinExtensions()
-#set ($discard = $xwiki.ssx.use('XWiki.Security.RequiredRights.Code.RequiredRightsResultStyle'))
-{{/velocity}}{{velocity}}
-#if (!$analysis.isEmpty())##
-(% id='requiredRightsResults' class='box' %)(((
-  {{translation key='security.requiredrights.confirmationChecker.explanations'/}}
-
+#macro (displayResults $analysis)
   #foreach ($entry in $analysis.entrySet())
 
-{{html wiki='false'}}
-  #hierarchy($entry.key)
-  #foreach($res in $entry.value)
-  <div class="panel-group" id="required-rights-result-list${counter}" role="tablist" aria-multiselectable="true">
-    <div class="panel panel-default">
-      <div class="panel-heading" role="tab" id="heading${counter}">
-        <h4 class="panel-title">
+  {{html wiki='false'}}
+    #set ($entityReference = $entry.key)
+    #define($elementUrl)
+      #getHierarchyPathData_url($entityReference)
+    #end
+    #if ($entityReference.type == 'DOCUMENT')
+      #set ($translatedDocument = $xwiki.getDocument($entityReference).translatedDocument)
+      #set ($entityLabel = $translatedDocument.plainTitle)
+    #else
+      #set ($entityLabel = $entityReference.name)
+    #end
+    <h3>
+      <a href="$escapetool.xml($elementUrl)">
+        $escapetool.xml($entityLabel)
+      </a>
+    </h3>
+    #foreach($res in $entry.value)
+    <div class="panel-group" id="required-rights-result-list${counter}" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading${counter}">
+        <span class="panel-title">
           <a role="button"
              data-toggle="collapse"
-             data-parent="#required-rights-result-list${counter}" 
+             data-parent="#required-rights-result-list${counter}"
              href="#collapse${counter}"
              aria-expanded="false"
              aria-controls="collapse${counter}">
@@ -48,18 +55,36 @@
             <span class="icon-expanded">$services.icon.renderHTML('caret-down')</span>
             $services.rendering.render($res.summaryMessage, 'html/5.0')
           </a>
-        </h4>
-      </div>
-      <div id="collapse${counter}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading${counter}">
-        <div class="panel-body">
-          $services.rendering.render($res.detailedMessage, 'html/5.0')
+        </span>
+        </div>
+        <div id="collapse${counter}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading${counter}">
+          <div class="panel-body">
+            $services.rendering.render($res.detailedMessage, 'html/5.0')
+          </div>
         </div>
       </div>
     </div>
-  </div>
       #set ($counter = $counter + 1)
     #end
   {{/html}}
+  #end
+#end
+#set ($counter = 0)
+#initRequiredSkinExtensions()
+#set ($discard = $xwiki.ssx.use('XWiki.Security.RequiredRights.Code.RequiredRightsResultStyle'))
+{{/velocity}}{{velocity}}
+#if ($analysisResults.hasAdded() || $analysisResults.hasRemoved())##
+(% id='requiredRightsResults' class='box' %)(((
+  ((({{translation key='security.requiredrights.confirmationChecker.explanations'/}})))
+  #if ($analysisResults.hasAdded())
+    \\
+    ((({{translation key='security.requiredrights.confirmationChecker.explanations.addedRights'/}})))
+    #displayResults($analysisResults.getAddedAsMap())
+  #end
+  #if($analysisResults.hasRemoved())
+    \\
+    ((({{translation key='security.requiredrights.confirmationChecker.explanations.removedRights'/}})))
+    #displayResults($analysisResults.getRemovedAsMap())
   #end
   )))
 #end

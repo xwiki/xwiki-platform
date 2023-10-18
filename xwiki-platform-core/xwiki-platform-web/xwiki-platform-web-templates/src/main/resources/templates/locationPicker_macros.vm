@@ -48,6 +48,8 @@
       <dd>
         <input type="text" id="$escapetool.xml($!{options.id})Title" name="$escapetool.xml($titleField.name)" value="$!escapedValue"
           class="location-title-field" placeholder="$!escapetool.xml($services.localization.render($titleField.placeholder))" />
+        ## Container for live validation  
+        <span class="message-holder" aria-live='polite'></span>
       </dd>
     #elseif ($titleField)
       <dt class="hidden"></dt>
@@ -74,6 +76,8 @@
         #hierarchy($options.parent.reference $options)
         #locationPickerActions($options)
       </div>
+      ## Container for live validation  
+      <span class="message-holder" aria-live='polite'></span>
       ##
       ## ---------------------------------------------------------------------------------------------------------
       ## Location advanced edit

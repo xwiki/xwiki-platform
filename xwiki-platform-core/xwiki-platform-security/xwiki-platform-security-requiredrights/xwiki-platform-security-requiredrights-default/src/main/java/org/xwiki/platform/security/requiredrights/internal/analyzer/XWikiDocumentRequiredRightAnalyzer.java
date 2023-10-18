@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.security.requiredrights.internal;
+package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +33,8 @@ import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.platform.security.requiredrights.internal.BlockSupplierProvider;
+import org.xwiki.platform.security.requiredrights.internal.VelocityUtil;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.security.authorization.Right;
 

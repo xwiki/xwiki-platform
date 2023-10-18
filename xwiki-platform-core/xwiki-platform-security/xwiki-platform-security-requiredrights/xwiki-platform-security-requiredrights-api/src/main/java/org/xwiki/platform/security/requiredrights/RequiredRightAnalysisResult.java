@@ -37,7 +37,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 @Unstable
 public class RequiredRightAnalysisResult
 {
-    private EntityReference entityReference;
+    private final EntityReference entityReference;
 
     private final Supplier<Block> summaryMessageProvider;
 
@@ -46,8 +46,10 @@ public class RequiredRightAnalysisResult
     private final List<RequiredRight> requiredRights;
 
     /**
-     * @param entityReference the location of the analyzed entity (e.g., a document content, or a field in an XObject)
-     * @param summaryMessageProvider the summary message to display to the user for this required right analysis result
+     * @param entityReference the location of the analyzed entity (e.g., a document content, or a field in an
+     *     XObject)
+     * @param summaryMessageProvider the summary message to display to the user for this required right analysis
+     *     result
      * @param detailedMessageProvider the detailed message to display to the user for this required right analysis
      *     result
      * @param requiredRights the rights that are required for the analyzed entity
@@ -67,16 +69,6 @@ public class RequiredRightAnalysisResult
     public EntityReference getEntityReference()
     {
         return this.entityReference;
-    }
-
-    /**
-     * @param entityReference the location of the analyzed entity (e.g., a document content, or a field in an
-     *     XObject)
-     * @see #getEntityReference()
-     */
-    public void setEntityReference(EntityReference entityReference)
-    {
-        this.entityReference = entityReference;
     }
 
     /**

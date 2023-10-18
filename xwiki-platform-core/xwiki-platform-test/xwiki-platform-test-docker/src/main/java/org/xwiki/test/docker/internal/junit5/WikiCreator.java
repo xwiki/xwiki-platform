@@ -37,6 +37,7 @@ import org.xwiki.platform.wiki.creationjob.internal.WikiCreationJob;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.test.docker.junit5.DockerTestException;
+import org.xwiki.test.extension.JobExecutor;
 
 /**
  * Create a sub wiki.

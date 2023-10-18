@@ -984,6 +984,12 @@
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
 
+/* Headings */
+@headings-font-weight: 600;
+
+/* Font */
+@import (css) "@{open-sans-font-path}";
+  
 /* Other */
 @well-bg: @body-bg;
 
@@ -1036,7 +1042,7 @@
       <table-border-color/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#222222</text-color>
     </property>
     <property>
       <xwiki-page-content-bg/>

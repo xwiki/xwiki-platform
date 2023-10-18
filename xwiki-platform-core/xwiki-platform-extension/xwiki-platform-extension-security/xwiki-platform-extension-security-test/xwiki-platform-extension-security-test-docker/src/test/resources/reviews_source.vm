@@ -21,7 +21,7 @@
 ## answer static content with some reviews.
 #set ($map = {
   "reviewsMap": {
-    "GHSA-4v38-964c-xjmw" : [
+    "CVE-2023-29510" : [
       {
         "emitter": "XWiki Development Team",
         "explanation": "expl",
@@ -33,7 +33,7 @@
         "result": "UNSAFE"
       }
     ],
-    "GHSA-9j36-3cp4-rh4j" : [
+    "CVE-2023-29514" : [
       {
         "emitter": "XWiki Development Team",
         "explanation": "expl 3",

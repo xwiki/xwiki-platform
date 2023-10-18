@@ -17,40 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.render;
+package org.xwiki.internal.velocity;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
-import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.script.ScriptContextManager;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
@@ -58,27 +49,26 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.template.event.TemplateDeletedEvent;
 import org.xwiki.template.event.TemplateEvent;
 import org.xwiki.template.event.TemplateUpdatedEvent;
+import org.xwiki.velocity.ScriptVelocityContext;
 import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.XWikiVelocityException;
-import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
+import org.xwiki.velocity.internal.DefaultVelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.DeprecatedContext;
 
 /**
- * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to
- * populate the Velocity Context with XWiki objects that are located in the Core (such as the XWiki object for example)
- * and since the Core needs to call the Velocity module this would cause a circular dependency.
+ * Override {@link DefaultVelocityManager} to add XWiki platform specific things and especially deliver and cache a
+ * different {@link VelocityEngine} depending on the context skin macros.vm.
  *
  * @version $Id$
- * @since 1.5M1
+ * @since 15.9RC1
  */
 @Component
 @Singleton
-public class DefaultVelocityManager implements VelocityManager, Initializable
+public class XWikiVelocityManager extends DefaultVelocityManager implements Initializable
 {
     private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
 
@@ -86,28 +76,10 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         Arrays.<Event>asList(new TemplateUpdatedEvent(), new TemplateDeletedEvent());
 
     /**
-     * Used to access the current {@link org.xwiki.context.ExecutionContext}.
-     */
-    @Inject
-    private Execution execution;
-
-    /**
      * Used to access the current {@link XWikiContext}.
      */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-
-    /**
-     * Used to get the current script context.
-     */
-    @Inject
-    private ScriptContextManager scriptContextManager;
-
-    @Inject
-    private LoggerConfiguration loggerConfiguration;
-
-    @Inject
-    private VelocityFactory velocityFactory;
 
     /**
      * Accessing it trough {@link Provider} since {@link TemplateManager} depends on {@link VelocityManager}.
@@ -122,22 +94,18 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     private ObservationManager observation;
 
     @Inject
-    private AuthorExecutor authorExecutor;
-
-    @Inject
     private Environment environment;
 
     @Inject
     private Logger logger;
 
-    /**
-     * Binding that should stay on Velocity side only.
-     */
-    private final Set<String> reservedBindings = new HashSet<>();
+    private Map<String, VelocityEngine> velocityEngines = new ConcurrentHashMap<>();
 
     @Override
     public void initialize() throws InitializationException
     {
+        super.initialize();
+
         this.observation.addListener(new EventListener()
         {
             @Override
@@ -146,14 +114,14 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                 if (event instanceof TemplateEvent) {
                     TemplateEvent templateEvent = (TemplateEvent) event;
 
-                    DefaultVelocityManager.this.velocityFactory.removeVelocityEngine(templateEvent.getId());
+                    velocityEngines.remove(templateEvent.getId());
                 }
             }
 
             @Override
             public String getName()
             {
-                return DefaultVelocityManager.class.getName();
+                return XWikiVelocityManager.class.getName();
             }
 
             @Override
@@ -162,46 +130,12 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                 return EVENTS;
             }
         });
-
-        // Set reserved bindings
-
-        // "context" is a reserved binding in JSR223 world
-        this.reservedBindings.add("context");
-
-        // Macros directive
-        this.reservedBindings.add("macro");
-        // Foreach directive
-        this.reservedBindings.add("foreach");
-        // Evaluate directive
-        this.reservedBindings.add("evaluate");
-        // TryCatch directive
-        this.reservedBindings.add("exception");
-        this.reservedBindings.add("try");
-        // Default directive
-        this.reservedBindings.add("define");
-        // The name of the context variable used for the template-level scope
-        this.reservedBindings.add("template");
     }
 
     @Override
-    public VelocityContext getVelocityContext()
+    protected ScriptVelocityContext getScriptVelocityContext()
     {
-        ScriptVelocityContext velocityContext;
-
-        // Make sure the velocity context support ScriptContext synchronization
-        VelocityContext currentVelocityContext = getCurrentVelocityContext();
-        if (currentVelocityContext instanceof ScriptVelocityContext) {
-            velocityContext = (ScriptVelocityContext) currentVelocityContext;
-        } else {
-            velocityContext = new ScriptVelocityContext(currentVelocityContext,
-                this.loggerConfiguration.isDeprecatedLogEnabled(), this.reservedBindings);
-            this.execution.getContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
-                velocityContext);
-        }
-
-        // Synchronize with ScriptContext
-        ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
-        velocityContext.setScriptContext(scriptContext);
+        ScriptVelocityContext velocityContext = super.getScriptVelocityContext();
 
         // Velocity specific bindings
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -209,15 +143,6 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         velocityContext.put("context", new DeprecatedContext(xcontext));
 
         return velocityContext;
-    }
-
-    @Override
-    public VelocityContext getCurrentVelocityContext()
-    {
-        // The Velocity Context is set in VelocityExecutionContextInitializer, when the XWiki Request is initialized
-        // so we are guaranteed it is defined when this method is called.
-        return (VelocityContext) this.execution.getContext()
-            .getProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
     }
 
     private Template getVelocityEngineMacrosTemplate()
@@ -280,7 +205,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         String cacheKey = skinMacrosTemplate != null ? skinMacrosTemplate.getId() : "default";
 
         // Get the Velocity Engine to use
-        VelocityEngine velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
+        VelocityEngine velocityEngine = this.velocityEngines.get(cacheKey);
         if (velocityEngine == null) {
             velocityEngine = createVelocityEngine(cacheKey, skinMacrosTemplate);
         }
@@ -291,17 +216,20 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     private synchronized VelocityEngine createVelocityEngine(String cacheKey, Template skinMacrosTemplate)
         throws XWikiVelocityException
     {
-        VelocityEngine velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
+        VelocityEngine velocityEngine = this.velocityEngines.get(cacheKey);
         if (velocityEngine == null) {
-            velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, null);
+            velocityEngine = createVelocityEngine();
 
-            // Add default macros to the engine
+            // Add default global macros to the engine
             try {
                 injectBaseMacros(velocityEngine, skinMacrosTemplate);
             } catch (Exception e) {
                 this.logger.warn("Failed to load global macros for engine with key [{}]: {}", cacheKey,
                     ExceptionUtils.getRootCauseMessage(e));
             }
+
+            // Cache the VelocityEngine
+            this.velocityEngines.put(cacheKey, velocityEngine);
         }
 
         return velocityEngine;
@@ -313,7 +241,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
         try (InputStream stream = this.environment.getResourceAsStream("/templates/macros.vm")) {
             if (stream != null) {
                 try (InputStreamReader reader = new InputStreamReader(stream)) {
-                    VelocityTemplate mainMacros = velocityEngine.compile("", reader);
+                    VelocityTemplate mainMacros = compile("", reader);
 
                     velocityEngine.addGlobalMacros(mainMacros.getMacros());
                 }
@@ -322,20 +250,9 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
 
         // Inject skin macros
         if (skinMacrosTemplate != null) {
-            VelocityTemplate skinMacros =
-                velocityEngine.compile("", new StringReader(skinMacrosTemplate.getContent().getContent()));
+            VelocityTemplate skinMacros = compile("", new StringReader(skinMacrosTemplate.getContent().getContent()));
 
             velocityEngine.addGlobalMacros(skinMacros.getMacros());
         }
-    }
-
-    @Override
-    public boolean evaluate(Writer out, String templateName, Reader source) throws XWikiVelocityException
-    {
-        // Get up to date Velocity context
-        VelocityContext velocityContext = getVelocityContext();
-
-        // Execute Velocity context
-        return getVelocityEngine().evaluate(velocityContext, out, templateName, source);
     }
 }

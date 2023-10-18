@@ -962,8 +962,8 @@ require(['jquery'], function($) {
 }
 
 .admin-menu .panel-heading.collapsed {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .admin-menu a.panel-heading {
@@ -985,8 +985,8 @@ require(['jquery'], function($) {
 }
 
 .admin-menu .panel-collapse &gt; .list-group:last-child .list-group-item.last {
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .admin-menu .panel.noitems &gt; .panel-heading {

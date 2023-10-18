@@ -136,7 +136,7 @@
 #macro (helpVideoCard $data)
   &lt;div class="videoCard"&gt;
     &lt;iframe src="$data.url" allowfullscreen title="$escapetool.xml($data.title)" 
-        aria-description="$escapetool.html($services.localization.render('help.videos.hint'))" &gt;
+        aria-description="$escapetool.xml($services.localization.render('help.videos.hint'))" &gt;
     &lt;/iframe&gt;
     &lt;div class="videoCard-body"&gt;
       &lt;div class="videoCard-title"&gt;
@@ -145,9 +145,9 @@
       &lt;ul&gt;
         #foreach ($topic in $data.topics)
           &lt;li&gt;#if ($topic.url)
-            &lt;a href="$escapetool.html($topic.url)"&gt;$topic.label&lt;/a&gt;
-          #else 
-            $topic
+            &lt;a href="$escapetool.xml($topic.url)"&gt;$escapetool.xml($topic.label)&lt;/a&gt;
+          #else
+            $escapetool.xml($topic)
           #end
           &lt;/li&gt;
         #end

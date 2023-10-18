@@ -165,6 +165,32 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Unstable code</justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult::isFromEnvironment()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult::isInstalledExtension()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult::setFromEnvironment(boolean)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult::setInstalledExtension(boolean)</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

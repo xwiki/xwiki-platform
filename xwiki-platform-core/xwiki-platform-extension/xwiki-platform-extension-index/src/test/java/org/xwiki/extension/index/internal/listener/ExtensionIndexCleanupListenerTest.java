@@ -46,7 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_CORE_EXTENSION;
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
 /**
@@ -96,18 +96,18 @@ class ExtensionIndexCleanupListenerTest
 
         SolrDocument coreExtensionToRemove = new SolrDocument(Map.of(
             SOLR_FIELD_ID, "coreExtension1",
-            IS_INSTALLED_EXTENSION, false
+            IS_CORE_EXTENSION, true
         ));
         SolrDocument coreExtensionToKeep = new SolrDocument(Map.of(
             SOLR_FIELD_ID, "coreExtension2",
-            IS_INSTALLED_EXTENSION, false
+            IS_CORE_EXTENSION, true
         ));
         SolrDocument installedExtensionToKeep = new SolrDocument(Map.of(
             SOLR_FIELD_ID, "installedExtension1"
         ));
         SolrDocument installedExtensionToRemove = new SolrDocument(Map.of(
             SOLR_FIELD_ID, "installedExtension2",
-            IS_INSTALLED_EXTENSION, false
+            IS_CORE_EXTENSION, true
         ));
         QueryResponse responseBatch1 = mock(QueryResponse.class);
         SolrDocumentList documentList1 = new SolrDocumentList();

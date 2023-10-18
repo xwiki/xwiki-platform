@@ -83,10 +83,9 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_SAFE_EXPLANATIONS;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_FROM_ENVIRONMENT;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_CORE_EXTENSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_REVIEWED_SAFE;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_SAFE_EXPLANATIONS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_ADVICE;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_COUNT;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_CVSS;
@@ -338,10 +337,7 @@ public class ExtensionIndexStore implements Initializable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_ADVICE, result.getAdvice(), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_COUNT,
             result.getSecurityVulnerabilities().size(), doc);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_FROM_ENVIRONMENT, result.isFromEnvironment(),
-            doc);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_INSTALLED_EXTENSION,
-            result.isInstalledExtension(), doc);
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_CORE_EXTENSION, result.isCoreExtension(), doc);
         List<Boolean> safeMapping = result.getSecurityVulnerabilities()
             .stream()
             .map(SecurityVulnerabilityDescriptor::isSafe)

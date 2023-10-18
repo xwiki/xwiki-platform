@@ -22,12 +22,12 @@ package org.xwiki.extension.index.internal.listener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiPredicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -48,7 +48,7 @@ import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_CORE_EXTENSION;
 import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
 
 /**
@@ -109,24 +109,21 @@ public class ExtensionIndexCleanupListener implements EventListener
         try {
             SolrClient client = this.solr.getClient(ExtensionIndexSolrCoreInitializer.NAME);
             SolrQuery solrQuery = new SolrQuery()
-                .setFields(SOLR_FIELD_ID, IS_INSTALLED_EXTENSION, FIELD_INSTALLED_NAMESPACES);
+                .setFields(SOLR_FIELD_ID, IS_CORE_EXTENSION, FIELD_INSTALLED_NAMESPACES);
             int batchSize = 1000;
             QueryResponse search = client.query(solrQuery.setRows(batchSize).setStart(0));
 
-            // Compute lazily of a non-core extension can be removed (i.e., it has at least one namespace but can't 
-            // be found in the installed extensions repository).
-            BiPredicate<SolrDocument, ExtensionId> canDeleteNotCore = (doc, extensionId) ->
-                doc.getFieldValue(FIELD_INSTALLED_NAMESPACES) != null
-                    && !this.installedExtensionRepository.exists(extensionId);
             while (!search.getResults().isEmpty()) {
                 for (SolrDocument doc : search.getResults()) {
                     String id = this.solrUtils.getId(doc);
                     ExtensionId extensionId = this.extensionIndexSolrUtil.fromSolrId(id);
-                    boolean isCoreExtension = Objects.equals(doc.getFieldValue(IS_INSTALLED_EXTENSION), false);
-                    if ((isCoreExtension && !this.coreExtensionRepository.exists(extensionId))
-                        || (!isCoreExtension && canDeleteNotCore.test(doc, extensionId)))
+                    // Search for extensions that can be found in the index, but that are not found in the extension 
+                    // stores. 
+                    if (cleanCoreExtension(doc, extensionId)
+                        || cleanInstalledExtension(doc, extensionId))
                     {
                         client.deleteById(id);
+                        this.logger.info("Remove outdated extension [{}] from the solr index", id);
                     }
                 }
                 search = client.query(solrQuery.setStart(solrQuery.getStart() + batchSize));
@@ -139,5 +136,21 @@ public class ExtensionIndexCleanupListener implements EventListener
         } catch (SolrServerException | IOException e) {
             this.logger.error("Failed to perform a solr query.", e);
         }
+    }
+
+    private boolean cleanCoreExtension(SolrDocument doc, ExtensionId extensionId)
+    {
+        // Return true if the extension is indexed as a core extension, but cannot be found in the core extensions 
+        // store 
+        boolean isCoreExtension = Objects.equals(doc.getFieldValue(IS_CORE_EXTENSION), true);
+        return isCoreExtension && !this.coreExtensionRepository.exists(extensionId);
+    }
+
+    private boolean cleanInstalledExtension(SolrDocument doc, ExtensionId extensionId)
+    {
+        // Return true if the extension is installed (i.e., it's indexed as present in at least one namespace), but 
+        // cannot be found in the installed extension repository.
+        boolean isInstalled = CollectionUtils.isNotEmpty(doc.getFieldValues(FIELD_INSTALLED_NAMESPACES));
+        return isInstalled && !this.installedExtensionRepository.exists(extensionId);
     }
 }

@@ -2107,7 +2107,7 @@ input[type="checkbox"],
     margin-top: -2px;
     margin-right: 5px;
     border: 2px solid @gray;
-    border-radius: 3px;
+    border-radius: 2px;
     .transition(240ms);
   }
 
@@ -2363,7 +2363,7 @@ input[type="checkbox"],
 
 .panel {
   border: none;
-  border-radius: 3px;
+  border-radius: 2px;
   .box-shadow(0 1px 4px rgba(0,0,0,.3));
 
   &amp;-heading {
@@ -2400,14 +2400,14 @@ input[type="checkbox"],
 div.main {
   .box-shadow(0 1px 4px rgba(0,0,0,.3));
   border: medium none;
-  border-radius: 3px;
+  border-radius: 2px;
   margin-top: 20px;
 }
 
 .panel-width-Small div.panel.Applications{
   .box-shadow(0 1px 4px rgba(0,0,0,.3));
   border: medium none;
-  border-radius: 3px;
+  border-radius: 2px;
   margin-top: 5px;
 }</lessCode>
     </property>

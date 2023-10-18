@@ -828,7 +828,7 @@ a.cke_button.cke_button__insert &gt; span.cke_button_icon.cke_button__insert_ico
  */
 ul.cke_autocomplete_panel {
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 7px;
+  border-radius: @border-radius-base;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   font: inherit;
   padding: 5px 0;
@@ -880,7 +880,7 @@ ul.cke_autocomplete_panel {
   width: 14px;
 }
 .ckeditor-autocomplete-item-icon-wrapper img {
-  border-radius: 5px;
+  border-radius: @border-radius-small;
   max-height: 14px;
   max-width: 14px;
   vertical-align: text-top;
@@ -899,7 +899,7 @@ ul.cke_autocomplete_panel {
   justify-content: center;
 }
 .ckeditor-autocomplete-item-preview-wrapper img {
-  border-radius: 5px;
+  border-radius: @border-radius-small;
   max-height: 64px;
   max-width: 64px;
   vertical-align: text-top;

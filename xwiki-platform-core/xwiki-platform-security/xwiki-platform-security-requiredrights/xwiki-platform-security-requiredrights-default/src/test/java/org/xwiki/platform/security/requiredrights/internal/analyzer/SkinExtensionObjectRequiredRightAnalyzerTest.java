@@ -90,6 +90,6 @@ class SkinExtensionObjectRequiredRightAnalyzerTest
         RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
         assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
-        assertFalse(requiredRightResult.isOptional());
+        assertFalse(requiredRightResult.isManualReviewNeeded());
     }
 }

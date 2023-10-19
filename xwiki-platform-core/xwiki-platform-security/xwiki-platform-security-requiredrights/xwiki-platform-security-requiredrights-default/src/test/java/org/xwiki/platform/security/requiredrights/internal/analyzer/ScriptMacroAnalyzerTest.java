@@ -140,7 +140,7 @@ class ScriptMacroAnalyzerTest
         assertEquals(propertyReference, analysisResult.getEntityReference());
         RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
         assertEquals(myRight, requiredRight.getRight());
-        assertFalse(requiredRight.isOptional());
+        assertFalse(requiredRight.isManualReviewNeeded());
         assertEquals(EntityType.DOCUMENT, requiredRight.getEntityType());
     }
 
@@ -179,7 +179,7 @@ class ScriptMacroAnalyzerTest
         assertEquals(new DocumentReference("xwiki", "Space", "Page"), analysisResult.getEntityReference());
         RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
-        assertFalse(requiredRightResult.isOptional());
+        assertFalse(requiredRightResult.isManualReviewNeeded());
         assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
     }
 

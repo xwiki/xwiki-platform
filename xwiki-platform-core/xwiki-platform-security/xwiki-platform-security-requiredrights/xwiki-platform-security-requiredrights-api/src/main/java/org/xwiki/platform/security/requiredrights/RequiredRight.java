@@ -25,8 +25,8 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Represents a required right for an entity, composed of a {@link Right}, an {@link EntityType} and a boolean optional
- * field.
+ * Represents a required right for an entity, composed of a {@link Right}, an {@link EntityType} and a boolean
+ * manualReviewNeeded field.
  *
  * @version $Id$
  * @since 15.9RC1
@@ -38,19 +38,18 @@ public class RequiredRight
 
     private final EntityType entityType;
 
-    private final boolean optional;
+    private final boolean manualReviewNeeded;
 
     /**
      * @param right the required right
      * @param entityType the level at which the right is required (e.g., document, space, wiki)
-     * @param optional whether the right is optional or not, i.e., if the entity also works without the right or
-     *     not
+     * @param manualReviewNeeded whether a manual review is needed to confirm if the right is required or not
      */
-    public RequiredRight(Right right, EntityType entityType, boolean optional)
+    public RequiredRight(Right right, EntityType entityType, boolean manualReviewNeeded)
     {
         this.right = right;
         this.entityType = entityType;
-        this.optional = optional;
+        this.manualReviewNeeded = manualReviewNeeded;
     }
 
     /**
@@ -70,11 +69,14 @@ public class RequiredRight
     }
 
     /**
-     * @return whether the right is optional or not, i.e., if the entity also works without the right or not
+     * @return whether a manual review is needed to confirm if the right is required or not.
+     * This could be the case, e.g., when a title contains # or $ characters,
+     * which are used in Velocity scripts but could also occur in a title without scripts.
+     * Similarly, it is impossible to reliably determine automatically if a script needs programming right or not.
      */
-    public boolean isOptional()
+    public boolean isManualReviewNeeded()
     {
-        return this.optional;
+        return this.manualReviewNeeded;
     }
 
     @Override
@@ -83,7 +85,7 @@ public class RequiredRight
         return new XWikiToStringBuilder(this)
             .append("right", getRight())
             .append("entityType", getEntityType())
-            .append("optional", isOptional())
+            .append("manualReviewNeeded", isManualReviewNeeded())
             .toString();
     }
 }

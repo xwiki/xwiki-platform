@@ -88,7 +88,7 @@ class RequiredRightObjectRequiredRightAnalyzerTest
             RequiredRight requiredRight = analysisResult.getRequiredRights().get(0);
             assertEquals(Right.PROGRAM, requiredRight.getRight());
             assertEquals(EntityType.DOCUMENT, requiredRight.getEntityType());
-            assertFalse(requiredRight.isOptional());
+            assertFalse(requiredRight.isManualReviewNeeded());
         }
         assertEquals(objectReference, result.get(0).getEntityReference());
         assertEquals(documentReference, result.get(1).getEntityReference());

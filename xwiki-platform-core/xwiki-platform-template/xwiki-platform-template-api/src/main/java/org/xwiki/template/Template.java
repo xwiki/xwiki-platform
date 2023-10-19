@@ -40,7 +40,7 @@ public interface Template
     String getPath();
 
     /**
-     * @return the instant the cache content of that template was last modified or null if it's unknown
+     * @return the instant the cached content of that template was last modified or null if it's unknown
      * @since 15.8RC1
      */
     default Instant getInstant()

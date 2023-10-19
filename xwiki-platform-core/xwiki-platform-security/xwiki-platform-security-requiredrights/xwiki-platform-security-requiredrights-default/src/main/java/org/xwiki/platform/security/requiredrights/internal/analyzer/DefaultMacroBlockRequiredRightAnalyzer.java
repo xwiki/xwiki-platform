@@ -45,7 +45,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * Default analyzer for macro blocks. Recurses into the macro content if it is wiki syntax.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Component
 @Singleton

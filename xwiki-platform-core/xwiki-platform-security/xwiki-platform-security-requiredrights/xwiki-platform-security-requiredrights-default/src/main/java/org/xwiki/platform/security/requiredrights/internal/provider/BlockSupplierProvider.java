@@ -29,6 +29,7 @@ import org.xwiki.rendering.block.Block;
  *
  * @param <T> the type of the object
  * @version $Id$
+ * @since 15.9RC1
  */
 @Role
 public interface BlockSupplierProvider<T>

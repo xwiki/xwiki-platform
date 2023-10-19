@@ -74,7 +74,7 @@
 #set ($discard = $xwiki.ssx.use('XWiki.Security.RequiredRights.Code.RequiredRightsResultStyle'))
 {{/velocity}}{{velocity}}
 #if ($analysisResults.hasAdded() || $analysisResults.hasRemoved())##
-(% id='requiredRightsResults' class='box' %)(((
+(% id='requiredRightsResults' %)(((
   ((({{translation key='security.requiredrights.confirmationChecker.explanations'/}})))
   #if ($analysisResults.hasAdded())
     \\

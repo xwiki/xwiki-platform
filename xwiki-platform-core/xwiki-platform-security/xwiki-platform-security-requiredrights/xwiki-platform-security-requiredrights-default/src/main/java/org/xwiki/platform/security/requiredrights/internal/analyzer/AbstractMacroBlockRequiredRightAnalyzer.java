@@ -162,7 +162,7 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer implements Require
         } else {
             metaDataBlock = source.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
             if (metaDataBlock != null) {
-                // FIXME: the local is lost here as the metadata source does not keep the locale when serializing the
+                // FIXME: the locale is lost here as the metadata source does not keep the locale when serializing the
                 // entity reference
                 result =
                     this.documentReferenceResolver.resolve(

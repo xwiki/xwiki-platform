@@ -40,6 +40,7 @@ import org.xwiki.template.TemplateManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static com.xpn.xwiki.doc.XWikiDocument.CKEY_TDOC;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
 
 /**
@@ -76,8 +77,8 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
     public Optional<EditConfirmationCheckerResult> check()
     {
         XWikiContext context = this.xcontextProvider.get();
-        XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
-        if (!this.authorization.hasAccess(Right.EDIT, tdoc.getDocumentReferenceWithLocale())) {
+        XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
+        if (!this.authorization.hasAccess(Right.EDIT, tdoc.getDocumentReference())) {
             return Optional.empty();
         }
         if (tdoc.isNew()) {
@@ -86,11 +87,14 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
         try {
             RequiredRightsChangedResult analysisResults =
                 this.requiredRightsChangedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
+            if (!analysisResults.hasAdded() && !analysisResults.hasRemoved()) {
+                return Optional.empty();
+            }
             this.scriptContextManager.getCurrentScriptContext()
                 .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
             return Optional.of(new EditConfirmationCheckerResult(
-                this.templateManager.executeNoException("security/requiredrights/requiredRightsConfirmationChecker.vm",
-                    false), false));
+                this.templateManager.executeNoException("security/requiredrights/requiredRightsConfirmationChecker.vm"),
+                false));
         } catch (RequiredRightsException e) {
             throw new RuntimeException(e);
         }

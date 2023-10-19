@@ -32,6 +32,9 @@ import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.platform.security.requiredrights.internal.analyzer.XWikiDocumentRequiredRightAnalyzer;
+import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration;
+import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -42,6 +45,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static com.xpn.xwiki.doc.XWikiDocument.CKEY_TDOC;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
+import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.DENY;
+import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.NONE;
 
 /**
  * Check for the presence of required rights results for the current document before editing it.
@@ -73,30 +78,47 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
     @Inject
     private ScriptContextManager scriptContextManager;
 
+    @Inject
+    private RequiredRightsConfiguration requiredRightsConfiguration;
+
     @Override
     public Optional<EditConfirmationCheckerResult> check()
     {
-        XWikiContext context = this.xcontextProvider.get();
-        XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
-        if (!this.authorization.hasAccess(Right.EDIT, tdoc.getDocumentReference())) {
-            return Optional.empty();
-        }
-        if (tdoc.isNew()) {
-            return Optional.empty();
-        }
-        try {
-            RequiredRightsChangedResult analysisResults =
-                this.requiredRightsChangedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
-            if (!analysisResults.hasAdded() && !analysisResults.hasRemoved()) {
-                return Optional.empty();
+        Optional<EditConfirmationCheckerResult> checkResult;
+        RequiredRightDocumentProtection documentProtection = this.requiredRightsConfiguration.getDocumentProtection();
+        // Do nothing if the protection is deactivated.
+        if (documentProtection == NONE) {
+            checkResult = Optional.empty();
+        } else {
+            XWikiContext context = this.xcontextProvider.get();
+            XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
+            // Do nothing if the current user does not have edit rights, or if the document is new.
+            if (!this.authorization.hasAccess(Right.EDIT, tdoc.getDocumentReference()) || tdoc.isNew()) {
+                checkResult = Optional.empty();
+            } else {
+                boolean isError = documentProtection == DENY;
+                try {
+                    RequiredRightsChangedResult analysisResults =
+                        this.requiredRightsChangedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
+                    // Do nothing if the analysis does not produce results relevant for the current user.
+                    if (!analysisResults.hasAdded() && !analysisResults.hasRemoved()) {
+                        checkResult = Optional.empty();
+                    } else {
+                        this.scriptContextManager.getCurrentScriptContext()
+                            .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
+                        XDOM message = this.templateManager
+                            .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");
+                        checkResult = Optional.of(new EditConfirmationCheckerResult(message, isError));
+                    }
+                } catch (RequiredRightsException e) {
+                    this.scriptContextManager.getCurrentScriptContext().setAttribute("exception", e, GLOBAL_SCOPE);
+                    // Display an error message in case of exception.
+                    XDOM message = this.templateManager
+                        .executeNoException("security/requiredrights/requiredRightsEditConfirmationCheckerError.vm");
+                    checkResult = Optional.of(new EditConfirmationCheckerResult(message, isError));
+                }
             }
-            this.scriptContextManager.getCurrentScriptContext()
-                .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
-            return Optional.of(new EditConfirmationCheckerResult(
-                this.templateManager.executeNoException("security/requiredrights/requiredRightsConfirmationChecker.vm"),
-                false));
-        } catch (RequiredRightsException e) {
-            throw new RuntimeException(e);
         }
+        return checkResult;
     }
 }

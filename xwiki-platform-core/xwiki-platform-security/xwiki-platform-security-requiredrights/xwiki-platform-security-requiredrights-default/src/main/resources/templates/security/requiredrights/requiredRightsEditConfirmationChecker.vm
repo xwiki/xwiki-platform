@@ -17,6 +17,8 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+## Since 15.9RC1
+## Present a summary of the required rights raised for the current user when trying to edit a document
 ##!source.syntax=xwiki/2.1
 {{velocity output='false'}}
 #template("display_macros.vm")

@@ -9,5 +9,6 @@ org.xwiki.platform.security.requiredrights.internal.provider.TranslationMessageS
 org.xwiki.platform.security.requiredrights.internal.provider.XObjectDisplayerProvider
 org.xwiki.platform.security.requiredrights.internal.provider.MacroDisplayerProvider
 org.xwiki.platform.security.requiredrights.internal.provider.StringCodeBlockSupplierProvider
+org.xwiki.platform.security.requiredrights.internal.configuration.DefaultRequiredRightsConfiguration
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsEditConfirmationChecker
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsChangedFilter

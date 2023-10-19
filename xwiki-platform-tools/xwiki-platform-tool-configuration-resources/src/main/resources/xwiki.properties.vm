@@ -851,6 +851,16 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# send the emails, so it's possible to perform the migration and send the emails only later if needed.
 # security.migration.R140600000XWIKI19869.sendSecurityEmail = true
 
+#-# [Since 15.9RC1]
+#-# Indicates how documents are protected by required rights.
+#-#
+#-# The possible choices are:
+#-# * none: no required rights check
+#-# * warning (the default): a warning is presented to the user when trying to edit a document with required rights 
+#-#                          issues
+#-# * deny = an error is presented to the user when trying to edit a document with required rights issues
+# security.requiredRights.protection=warning
+
 #-------------------------------------------------------------------------------------
 # URL
 #-------------------------------------------------------------------------------------

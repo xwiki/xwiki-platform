@@ -59,7 +59,7 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
      */
     public void toggleDetailedMessage(int index)
     {
-        getResults().get(index).click();
+        getResults().get(index).findElement(By.className("panel-title")).click();
     }
 
     /**

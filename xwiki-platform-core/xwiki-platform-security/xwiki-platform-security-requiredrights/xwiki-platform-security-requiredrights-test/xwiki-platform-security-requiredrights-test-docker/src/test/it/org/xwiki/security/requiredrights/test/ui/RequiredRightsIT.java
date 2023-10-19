@@ -34,12 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 15.9RC1
  */
 @UITest(properties = {
-    "xwikiPropertiesAdditionalProperties=security.requiredRights.protection=none"
+    "xwikiPropertiesAdditionalProperties=security.requiredRights.protection=warning",
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
 class RequiredRightsIT
 {
     @Test
-    void test(TestUtils setup, TestReference testReference)
+    void checkTitleWithVelocityCode(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
 

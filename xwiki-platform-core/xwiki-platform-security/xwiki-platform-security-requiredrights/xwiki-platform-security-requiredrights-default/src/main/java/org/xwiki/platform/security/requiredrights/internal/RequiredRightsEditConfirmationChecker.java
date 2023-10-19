@@ -37,7 +37,6 @@ import org.xwiki.platform.security.requiredrights.internal.configuration.Require
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -47,6 +46,7 @@ import static com.xpn.xwiki.doc.XWikiDocument.CKEY_TDOC;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
 import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.DENY;
 import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.NONE;
+import static org.xwiki.security.authorization.Right.EDIT;
 
 /**
  * Check for the presence of required rights results for the current document before editing it.
@@ -93,7 +93,7 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
             XWikiContext context = this.xcontextProvider.get();
             XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
             // Do nothing if the current user does not have edit rights, or if the document is new.
-            if (!this.authorization.hasAccess(Right.EDIT, tdoc.getDocumentReference()) || tdoc.isNew()) {
+            if (!this.authorization.hasAccess(EDIT, tdoc.getDocumentReference()) || tdoc.isNew()) {
                 checkResult = Optional.empty();
             } else {
                 boolean isError = documentProtection == DENY;

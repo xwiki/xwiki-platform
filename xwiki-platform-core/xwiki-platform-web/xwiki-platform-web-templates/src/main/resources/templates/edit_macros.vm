@@ -46,31 +46,40 @@
     #define ($message)
       <p>
         #if ($checkResult.isError())
-          #set ($messageKey = 'platform.core.editConfirmation.errors')
+          <div class="box errormessage">
+            #set ($messageKey = 'platform.core.editConfirmation.errors')
+            $escapetool.xml($services.localization.render($messageKey))
+          </div>
         #else
-          #set ($messageKey = 'platform.core.editConfirmation.warnings')
+          <div class="box warningmessage">
+            #set ($messageKey = 'platform.core.editConfirmation.warnings')
+            $escapetool.xml($services.localization.render($messageKey))
+          </div>
         #end
-        $escapetool.xml($services.localization.render($messageKey))
       </p>
       #if (!$checkResult.errorMessages.isEmpty())
-      <div class="box errormessage">
         #foreach ($block in $checkResult.errorMessages)
           $services.rendering.render($block, 'html/5.0')
           #if ($foreach.hasNext)
             <hr/>
           #end
         #end
-      </div>
       #end
       #if (!$checkResult.warningMessages.isEmpty())
-      <div class="box warningmessage">
+        ## If we display warnings, in addition to the errors, a warning block is presented before the warnings list.
+        #if ($checkResult.isError())
+          <hr/>
+          <div class="box warningmessage">
+            #set ($messageKey = 'platform.core.editConfirmation.additionalWarnings')
+            $escapetool.xml($services.localization.render($messageKey))
+          </div>
+        #end
         #foreach ($block in $checkResult.warningMessages)
           $services.rendering.render($block, 'html/5.0')
           #if ($foreach.hasNext)
             <hr/>
           #end
         #end
-      </div>
       #end
     #end
     #set ($discard = $editConfirmation.put('message', "$message"))

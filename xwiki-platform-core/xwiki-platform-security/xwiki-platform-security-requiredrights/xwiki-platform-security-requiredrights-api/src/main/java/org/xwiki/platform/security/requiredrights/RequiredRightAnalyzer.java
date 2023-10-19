@@ -26,6 +26,12 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Analyze an object for required rights and returns a list of the missing required right.
+ * <p>To check rights on a whole document, use the {@code RequiredRightAnalyzer<Document>}.
+ * <p>To implement an analyzer for a macro or an XObject, implement {@code RequiredRightAnalyzer<MacroBlock>} or
+ * {@code RequiredRightAnalyzer<BaseObject>}, respectively, with a hint that corresponds to the macro id or class
+ * name. Each analyzer is responsible for recursively analyzing the contents of the object, like nested macros in the
+ * content of a macro or in a property of an XObject. The {@code RequiredRightAnalyzer<XDOM>} can be used for this
+ * purpose.
  *
  * @param <T> the type of the analyzed object
  * @version $Id$

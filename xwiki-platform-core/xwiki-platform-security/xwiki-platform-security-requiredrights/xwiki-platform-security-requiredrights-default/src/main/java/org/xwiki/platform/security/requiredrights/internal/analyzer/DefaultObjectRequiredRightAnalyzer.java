@@ -31,7 +31,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
@@ -44,7 +43,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -174,10 +172,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
             result = List.of(new RequiredRightAnalysisResult(reference,
                 this.translationMessageSupplierProvider.get(translationMessage),
                 this.stringCodeBlockSupplierProvider.get(value),
-                List.of(
-                    new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false),
-                    new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
-                )));
+                RequiredRight.SCRIPT_OR_MAYBE_PROGRAM));
         } else {
             result = List.of();
         }

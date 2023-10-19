@@ -19,6 +19,10 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
+import java.util.List;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
@@ -34,6 +38,31 @@ import org.xwiki.text.XWikiToStringBuilder;
 @Unstable
 public class RequiredRight
 {
+    /**
+     * Programming right required.
+     */
+    public static final RequiredRight PROGRAM = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, false);
+
+    /**
+     * Programming right might be required, but a manual review is needed to confirm if the right is required.
+     */
+    public static final RequiredRight MAYBE_PROGRAM = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true);
+
+    /**
+     * Script right required.
+     */
+    public static final RequiredRight SCRIPT = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, false);
+
+    /**
+     * Script right might be required, but a manual review is needed to confirm if the right is required.
+     */
+    public static final RequiredRight MAYBE_SCRIPT = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true);
+
+    /**
+     * Script right is required, programming right might be required.
+     */
+    public static final List<RequiredRight> SCRIPT_OR_MAYBE_PROGRAM = List.of(SCRIPT, MAYBE_PROGRAM);
+
     private final Right right;
 
     private final EntityType entityType;
@@ -87,5 +116,35 @@ public class RequiredRight
             .append("entityType", getEntityType())
             .append("manualReviewNeeded", isManualReviewNeeded())
             .toString();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RequiredRight that = (RequiredRight) o;
+
+        return new EqualsBuilder()
+            .append(isManualReviewNeeded(), that.isManualReviewNeeded())
+            .append(getRight(), that.getRight())
+            .append(getEntityType(), that.getEntityType())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(getRight())
+            .append(getEntityType())
+            .append(isManualReviewNeeded())
+            .toHashCode();
     }
 }

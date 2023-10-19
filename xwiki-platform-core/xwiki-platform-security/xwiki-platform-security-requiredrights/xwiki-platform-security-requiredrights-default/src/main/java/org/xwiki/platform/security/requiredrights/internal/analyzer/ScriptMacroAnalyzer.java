@@ -104,16 +104,21 @@ public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
         EntityReference reference = extractSourceReference(macroBlock);
 
         String messageKey;
+        List<RequiredRight> requiredRights;
         if (right == Right.PROGRAM) {
             messageKey = "security.requiredrights.macro.script.program";
+            requiredRights = List.of(RequiredRight.PROGRAM);
         } else {
             messageKey = "security.requiredrights.macro.script.script";
+            // Scripts macros could always use APIs that require programming right but this is impossible to check
+            // reliably so manual review is required.
+            requiredRights = List.of(new RequiredRight(right, EntityType.DOCUMENT, false), RequiredRight.MAYBE_PROGRAM);
         }
 
         return List.of(new RequiredRightAnalysisResult(reference,
             this.translationMessageSupplierProvider.get(messageKey, macroId),
             this.macroDisplayerProvider.get(macroBlock),
-            List.of(new RequiredRight(right, EntityType.DOCUMENT, false))
-        ));
+            requiredRights)
+        );
     }
 }

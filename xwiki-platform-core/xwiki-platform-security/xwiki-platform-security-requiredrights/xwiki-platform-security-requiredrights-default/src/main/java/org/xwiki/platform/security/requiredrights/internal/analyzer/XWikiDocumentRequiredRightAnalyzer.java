@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
@@ -36,7 +35,6 @@ import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.platform.security.requiredrights.internal.VelocityUtil;
 import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -80,10 +78,7 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
                         this.translationMessageSupplierProvider.get("security.requiredrights.title"),
                         this.translationMessageSupplierProvider.get("security.requiredrights.title.description",
                             document.getTitle()),
-                        List.of(
-                            new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true),
-                            new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true)
-                        )
+                        List.of(RequiredRight.MAYBE_SCRIPT, RequiredRight.MAYBE_PROGRAM)
                     ));
                 }
 

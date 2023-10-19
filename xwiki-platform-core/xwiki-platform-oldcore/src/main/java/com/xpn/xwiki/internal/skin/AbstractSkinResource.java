@@ -41,6 +41,7 @@ import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -97,17 +98,7 @@ public abstract class AbstractSkinResource extends AbstractResource<InputSource>
     @Override
     public Instant getInstant() throws Exception
     {
-        URL resourceUrl = this.environment.getResource(getPath());
-        try {
-            Path resourcePath = Paths.get(resourceUrl.toURI());
-            FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
-
-            return lastModifiedTime.toInstant();
-        } catch (Exception e) {
-            LOGGER.debug("Failed to get the date for resource [{}]", resourceUrl, e);
-        }
-
-        return null;
+        return InternalTemplateManager.getResourceInstant(this.environment, getPath());
     }
 
     @Override

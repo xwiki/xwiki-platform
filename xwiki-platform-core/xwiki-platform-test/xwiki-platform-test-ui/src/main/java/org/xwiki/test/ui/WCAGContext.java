@@ -214,7 +214,7 @@ public class WCAGContext
 
         private int numberOfChecks(List<Rule> violations)
         {
-            return violations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
+            return (violations == null) ? 0 : violations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
         }
 
         String getFailReport()

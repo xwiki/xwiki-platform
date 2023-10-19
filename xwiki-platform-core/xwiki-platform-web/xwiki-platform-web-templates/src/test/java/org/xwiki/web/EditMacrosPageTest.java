@@ -19,6 +19,7 @@
  */
 package org.xwiki.web;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ import org.xwiki.model.validation.edit.EditConfirmationScriptService;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
+import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
@@ -53,7 +55,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test the {@code edit_macros.vm} template.
@@ -115,16 +116,17 @@ class EditMacrosPageTest extends PageTest
         this.context.setDoc(document);
         this.componentManager.registerComponent(EditConfirmationChecker.class, "testChecker",
             (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new WordBlock("Warning"), false)));
+                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Warning")),
+                    Map.of("id", "warning1")),
+                    false)));
         document.getRenderedContent(this.context);
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("warning", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("platform.core.editConfirmation.warnings", message.selectFirst("p").text());
-        assertEquals("Warning", message.selectFirst(".box").text());
-        assertTrue(message.selectFirst(".box").hasClass("warningmessage"));
+        assertEquals("platform.core.editConfirmation.warnings", message.selectFirst(".warningmessage").text());
+        assertEquals("Warning", message.selectFirst("#warning1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertEquals("forcelock", editConfirmation.get("confirm"));
     }
@@ -140,26 +142,33 @@ class EditMacrosPageTest extends PageTest
         this.context.setDoc(document);
         this.componentManager.registerComponent(EditConfirmationChecker.class, "warningChecker1",
             (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new WordBlock("Warning 1"), false)));
+                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Warning 1")),
+                    Map.of("id", "warning1")),
+                    false)));
         this.componentManager.registerComponent(EditConfirmationChecker.class, "warningChecker2",
             (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new WordBlock("Warning 2"), false)));
+                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Warning 2")),
+                    Map.of("id", "warning2")),
+                    false)));
         this.componentManager.registerComponent(EditConfirmationChecker.class, "errorChecker1",
             (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new WordBlock("Error 1"), true)));
+                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Error 1")),
+                    Map.of("id", "error1")),
+                    true)));
         this.componentManager.registerComponent(EditConfirmationChecker.class, "errorChecker2",
             (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new WordBlock("Error 2"), true)));
+                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Error 2")),
+                    Map.of("id", "error2")),
+                    true)));
         document.getRenderedContent(this.context);
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("platform.core.editConfirmation.errors", message.selectFirst("p").text());
-        assertEquals("Error 1 Error 2", message.selectFirst(".box.errormessage").text());
-        assertEquals("Warning 1 Warning 2", message.selectFirst(".box.warningmessage").text());
-        assertTrue(message.selectFirst(".box").hasClass("errormessage"));
+        // This test is not to test the structure, but to verify the order in which the text are displayed.
+        assertEquals("platform.core.editConfirmation.errors Error 1 Error 2 platform.core.editConfirmation"
+            + ".additionalWarnings Warning 1 Warning 2", message.text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertNull(editConfirmation.get("confirm"));
     }
@@ -195,7 +204,8 @@ class EditMacrosPageTest extends PageTest
         this.context.setDoc(document);
         this.componentManager.registerComponent(EditConfirmationChecker.class, "errorChecker",
             (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new WordBlock("Error"), true)));
+                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Error")),
+                    Map.of("id", "error1")), true)));
         this.request.put("force", "true");
 
         document.getRenderedContent(this.context);
@@ -204,9 +214,8 @@ class EditMacrosPageTest extends PageTest
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("platform.core.editConfirmation.errors", message.selectFirst("p").text());
-        assertEquals("Error", message.selectFirst(".box").text());
-        assertTrue(message.selectFirst(".box").hasClass("errormessage"));
+        assertEquals("platform.core.editConfirmation.errors", message.selectFirst(".errormessage").text());
+        assertEquals("Error", message.selectFirst("#error1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertNull(editConfirmation.get("confirm"));
     }

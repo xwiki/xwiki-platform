@@ -240,9 +240,9 @@ public class CompareVersionsTest extends AbstractTest
         // Version summary.
         String today = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
         assertTrue(changesPane.getFromVersionSummary().startsWith(
-            "From version 1.1 >\nedited by Administrator\non " + today));
+            "From version 1.1\nedited by Administrator\non " + today));
         assertTrue(changesPane.getToVersionSummary().startsWith(
-            "To version < " + currentVersion + "\nedited by Alice\non " + today));
+            "To version " + currentVersion + "\nedited by Alice\non " + today));
         assertEquals("Change comment: Deleted object", changesPane.getChangeComment());
 
         RawChanges rawChanges = changesPane.getRawChanges();

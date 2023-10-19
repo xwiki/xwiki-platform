@@ -73,7 +73,7 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
     private DefaultMacroBlockRequiredRightAnalyzer analyzer;
 
     @MockComponent
-    @Named("macro/testmacro")
+    @Named("testmacro")
     private RequiredRightAnalyzer<MacroBlock> mockMacroAnalyzer;
 
     @MockComponent
@@ -87,7 +87,6 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
     private MacroContentParser macroContentParser;
 
     @MockComponent
-    @Named(XDOMRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Test

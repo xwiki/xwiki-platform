@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 15.9RC1
  */
-@Component(hints = { "object/XWiki.JavaScriptExtension", "object/XWiki.StyleSheetExtension" })
+@Component(hints = { "XWiki.JavaScriptExtension", "XWiki.StyleSheetExtension" })
 @Singleton
 public class SkinExtensionObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {

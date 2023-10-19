@@ -22,8 +22,6 @@ package org.xwiki.platform.security.requiredrights.internal.analyzer;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
@@ -47,7 +45,6 @@ import static org.mockito.Mockito.when;
 class XDOMRequiredRightAnalyzerTest
 {
     @MockComponent
-    @Named(DefaultMacroBlockRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<MacroBlock> defaultMacroBlockRequiredRightAnalyzer;
 
     @InjectMockComponents

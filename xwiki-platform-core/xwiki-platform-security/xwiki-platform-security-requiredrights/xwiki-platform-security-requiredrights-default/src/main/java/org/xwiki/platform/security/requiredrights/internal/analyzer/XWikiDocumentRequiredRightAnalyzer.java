@@ -47,14 +47,8 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component
 @Singleton
-@Named(XWikiDocumentRequiredRightAnalyzer.ID)
 public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer<XWikiDocument>
 {
-    /**
-     * The id of this component.
-     */
-    public static final String ID = "document";
-
     @Inject
     private DocumentContextExecutor documentContextExecutor;
 
@@ -63,11 +57,9 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @Inject
-    @Named(XDOMRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Inject
-    @Named(DefaultObjectRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
 
     @Override

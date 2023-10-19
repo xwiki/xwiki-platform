@@ -54,7 +54,7 @@ public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
     /**
      * The id of this analyzer.
      */
-    public static final String ID = "macro/script";
+    public static final String ID = "script";
 
     @Inject
     @Named("context")

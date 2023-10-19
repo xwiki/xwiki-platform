@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -44,14 +43,8 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
  */
 @Component
 @Singleton
-@Named(XDOMRequiredRightAnalyzer.ID)
 public class XDOMRequiredRightAnalyzer implements RequiredRightAnalyzer<XDOM>
 {
-    /**
-     * The id of this analyzer.
-     */
-    public static final String ID = "xdom";
-
     /**
      * The identifier of the metadata property that contains the source entity reference.
      */
@@ -59,7 +52,6 @@ public class XDOMRequiredRightAnalyzer implements RequiredRightAnalyzer<XDOM>
 
     /** Provider for the default macro block analyzer to avoid a cyclic dependency. */
     @Inject
-    @Named(DefaultMacroBlockRequiredRightAnalyzer.ID)
     private Provider<RequiredRightAnalyzer<MacroBlock>> defaultMacroBlockRequiredRightAnalyzer;
 
     @Override

@@ -66,11 +66,10 @@ class DefaultObjectRequiredRightAnalyzerTest
     private DefaultObjectRequiredRightAnalyzer analyzer;
 
     @MockComponent
-    @Named("object/XWiki.TestClass")
+    @Named("XWiki.TestClass")
     private RequiredRightAnalyzer<BaseObject> mockAnalyzer;
 
     @MockComponent
-    @Named(XDOMRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @InjectMockitoOldcore

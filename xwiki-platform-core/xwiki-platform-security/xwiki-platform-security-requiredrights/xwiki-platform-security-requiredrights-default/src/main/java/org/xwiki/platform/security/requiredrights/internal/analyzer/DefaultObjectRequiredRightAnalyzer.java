@@ -61,20 +61,13 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
  */
 @Component
 @Singleton
-@Named(DefaultObjectRequiredRightAnalyzer.ID)
 public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
-    /**
-     * The id of this analyzer.
-     */
-    public static final String ID = "object";
-
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @Inject
-    @Named(XDOMRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Inject
@@ -106,7 +99,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         try {
             RequiredRightAnalyzer<BaseObject> analyzer =
                 this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,
-                    RequiredRightAnalyzer.class, BaseObject.class), "object/" + className);
+                    RequiredRightAnalyzer.class, BaseObject.class), className);
             return analyzer.analyze(object);
         } catch (ComponentLookupException e) {
             // No analyzer found for this class, so we just check all properties.

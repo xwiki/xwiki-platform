@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.model.reference.DocumentReference;
@@ -58,11 +56,9 @@ class XWikiDocumentRequiredRightAnalyzerTest
     private DocumentContextExecutor documentContextExecutor;
 
     @MockComponent
-    @Named(XDOMRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @MockComponent
-    @Named(DefaultObjectRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
 
     @Test

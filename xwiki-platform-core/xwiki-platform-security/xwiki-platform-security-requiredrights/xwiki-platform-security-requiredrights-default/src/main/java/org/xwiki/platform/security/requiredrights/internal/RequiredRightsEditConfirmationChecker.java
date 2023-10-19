@@ -60,7 +60,6 @@ import static org.xwiki.security.authorization.Right.EDIT;
 public class RequiredRightsEditConfirmationChecker implements EditConfirmationChecker
 {
     @Inject
-    @Named(XWikiDocumentRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XWikiDocument> analyzer;
 
     @Inject

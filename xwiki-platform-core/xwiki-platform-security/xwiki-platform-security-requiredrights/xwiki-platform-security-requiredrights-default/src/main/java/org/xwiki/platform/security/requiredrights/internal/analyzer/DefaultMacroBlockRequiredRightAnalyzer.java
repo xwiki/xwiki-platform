@@ -49,14 +49,8 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  */
 @Component
 @Singleton
-@Named(DefaultMacroBlockRequiredRightAnalyzer.ID)
 public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
 {
-    /**
-     * The id of this analyzer.
-     */
-    public static final String ID = "macro";
-
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
@@ -75,7 +69,7 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
             RequiredRightAnalyzer<MacroBlock> specificAnalyzer =
                 this.componentManagerProvider.get().getInstance(
                     new DefaultParameterizedType(null, RequiredRightAnalyzer.class, MacroBlock.class),
-                    "macro/" + macroBlock.getId()
+                    macroBlock.getId()
                 );
             result = specificAnalyzer.analyze(macroBlock);
         } catch (ComponentLookupException e) {

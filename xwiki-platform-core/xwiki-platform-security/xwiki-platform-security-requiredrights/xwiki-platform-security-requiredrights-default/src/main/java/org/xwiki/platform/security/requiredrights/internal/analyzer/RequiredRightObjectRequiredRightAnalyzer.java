@@ -54,7 +54,7 @@ public class RequiredRightObjectRequiredRightAnalyzer implements RequiredRightAn
     /**
      * The id of this analyzer.
      */
-    public static final String ID = "object/XWiki.RequiredRightClass";
+    public static final String ID = "XWiki.RequiredRightClass";
 
     @Inject
     @Named("translation")

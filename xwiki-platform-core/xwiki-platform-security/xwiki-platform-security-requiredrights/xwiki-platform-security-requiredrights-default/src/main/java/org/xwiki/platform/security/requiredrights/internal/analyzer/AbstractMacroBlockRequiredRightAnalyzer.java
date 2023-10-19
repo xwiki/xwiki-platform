@@ -54,7 +54,6 @@ import org.xwiki.rendering.transformation.RenderingContext;
 public abstract class AbstractMacroBlockRequiredRightAnalyzer implements RequiredRightAnalyzer<MacroBlock>
 {
     @Inject
-    @Named(XDOMRequiredRightAnalyzer.ID)
     protected RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Inject

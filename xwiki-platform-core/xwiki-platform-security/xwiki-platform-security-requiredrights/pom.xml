@@ -32,7 +32,6 @@
   <modules>
     <module>xwiki-platform-security-requiredrights-api</module>
     <module>xwiki-platform-security-requiredrights-default</module>
-    <module>xwiki-platform-security-requiredrights-ui</module>
   </modules>
   <profiles>
     <profile>

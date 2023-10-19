@@ -33,7 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 15.9RC1
  */
-@UITest
+@UITest(properties = {
+    "xwikiPropertiesAdditionalProperties=security.requiredRights.protection=none"
+})
 class RequiredRightsIT
 {
     @Test

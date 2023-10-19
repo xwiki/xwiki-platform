@@ -44,7 +44,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Analyzer that checks if the document has the rights indicated in the RequiredRights object.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Component
 @Singleton

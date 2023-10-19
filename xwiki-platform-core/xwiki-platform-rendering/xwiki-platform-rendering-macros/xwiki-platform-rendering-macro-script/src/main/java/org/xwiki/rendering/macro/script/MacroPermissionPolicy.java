@@ -48,7 +48,7 @@ public interface MacroPermissionPolicy
      *
      * @param parameters the executing macro parameters
      * @return the required permission level
-     * @since 15.8RC1
+     * @since 15.9RC1
      */
     @Unstable
     default Right getRequiredRight(ScriptMacroParameters parameters)

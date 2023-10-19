@@ -39,7 +39,7 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
  * Analyzer that checks if an XDOM contains macros that require more rights than the current author has.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Component
 @Singleton

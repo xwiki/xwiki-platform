@@ -38,8 +38,8 @@ import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.platform.security.requiredrights.internal.VelocityUtil;
+import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
@@ -57,7 +57,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
  * Analyzer that checks if an XObject would need more rights than it currently has.
  *
  * @version $Id$
- * @since 15.8RC1
+ * @since 15.9RC1
  */
 @Component
 @Singleton

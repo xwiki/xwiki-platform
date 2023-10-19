@@ -60,9 +60,14 @@ import static org.xwiki.search.solr.AbstractSolrCoreInitializer.SOLR_FIELD_ID;
  */
 @Component
 @Singleton
-@Named("ExtensionIndexCleanupListener")
+@Named(ExtensionIndexCleanupListener.ID)
 public class ExtensionIndexCleanupListener implements EventListener
 {
+    /**
+     * The hint of this component.
+     */
+    public static final String ID = "ExtensionIndexCleanupListener";
+
     @Inject
     private CoreExtensionRepository coreExtensionRepository;
 
@@ -84,7 +89,7 @@ public class ExtensionIndexCleanupListener implements EventListener
     @Override
     public String getName()
     {
-        return "ExtensionIndexCleanupListener";
+        return ID;
     }
 
     @Override
@@ -97,6 +102,7 @@ public class ExtensionIndexCleanupListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         Thread thread = new Thread(this::proceed);
+        thread.setName(ID);
         thread.setPriority(thread.getPriority() - 2);
         thread.start();
     }

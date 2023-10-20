@@ -135,7 +135,7 @@
 
 #macro (helpVideoCard $data)
   &lt;div class="videoCard"&gt;
-    &lt;iframe src="$data.url" allowfullscreen title="$escapetool.xml($data.title)" 
+    &lt;iframe src="$data.url" allowfullscreen title="$escapetool.xml($data.title)" role='application'
         aria-describedby="video_hint_$foreach.index" &gt;
     &lt;/iframe&gt;
     &lt;span id="video_hint_$foreach.index" class="sr-only"&gt;

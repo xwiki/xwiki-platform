@@ -43,7 +43,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static com.xpn.xwiki.doc.XWikiDocument.CKEY_TDOC;
 import static javax.script.ScriptContext.GLOBAL_SCOPE;
-import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.DENY;
 import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.NONE;
 import static org.xwiki.security.authorization.Right.EDIT;
 
@@ -94,7 +93,6 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
             if (!this.authorization.hasAccess(EDIT, tdoc.getDocumentReference()) || tdoc.isNew()) {
                 checkResult = Optional.empty();
             } else {
-                boolean isError = documentProtection == DENY;
                 try {
                     RequiredRightsChangedResult analysisResults =
                         this.requiredRightsChangedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
@@ -106,14 +104,14 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
                             .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
                         XDOM message = this.templateManager
                             .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");
-                        checkResult = Optional.of(new EditConfirmationCheckerResult(message, isError));
+                        checkResult = Optional.of(new EditConfirmationCheckerResult(message, false));
                     }
                 } catch (RequiredRightsException e) {
                     this.scriptContextManager.getCurrentScriptContext().setAttribute("exception", e, GLOBAL_SCOPE);
                     // Display an error message in case of exception.
                     XDOM message = this.templateManager
                         .executeNoException("security/requiredrights/requiredRightsEditConfirmationCheckerError.vm");
-                    checkResult = Optional.of(new EditConfirmationCheckerResult(message, isError));
+                    checkResult = Optional.of(new EditConfirmationCheckerResult(message, false));
                 }
             }
         }

@@ -21,16 +21,12 @@ package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,7 +35,6 @@ import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration;
-import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -60,7 +55,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.DENY;
 import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.NONE;
 import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.WARNING;
 
@@ -160,43 +154,25 @@ class RequiredRightsEditConfirmationCheckerTest
         assertEquals(Optional.empty(), this.editConfirmationChecker.check());
     }
 
-    public static Stream<Arguments> checkAnalyzerErrorSource()
+    @Test
+    void checkAnalyzerError() throws Exception
     {
-        return Stream.of(
-            Arguments.of(WARNING, false),
-            Arguments.of(DENY, true)
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("checkAnalyzerErrorSource")
-    void checkAnalyzerError(RequiredRightDocumentProtection documentProtection, boolean isError) throws Exception
-    {
-        when(this.requiredRightsConfiguration.getDocumentProtection()).thenReturn(documentProtection);
+        when(this.requiredRightsConfiguration.getDocumentProtection()).thenReturn(WARNING);
         when(this.analyzer.analyze(this.tdoc)).thenThrow(new RequiredRightsException("error message", null));
-        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, isError)),
+        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, false)),
             this.editConfirmationChecker.check());
         verify(this.templateManager)
             .executeNoException("security/requiredrights/requiredRightsEditConfirmationCheckerError.vm");
     }
 
-    public static Stream<Arguments> checkSource()
+    @Test
+    void check()
     {
-        return Stream.of(
-            Arguments.of(WARNING, false),
-            Arguments.of(DENY, true)
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("checkSource")
-    void check(RequiredRightDocumentProtection documentProtection, boolean isError) throws Exception
-    {
-        when(this.requiredRightsConfiguration.getDocumentProtection()).thenReturn(documentProtection);
+        when(this.requiredRightsConfiguration.getDocumentProtection()).thenReturn(WARNING);
         RequiredRightsChangedResult result = new RequiredRightsChangedResult();
         result.addToAdded(mock(RequiredRightAnalysisResult.class));
         when(this.requiredRightsChangedFilter.filter(any(), any())).thenReturn(result);
-        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, isError)),
+        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, false)),
             this.editConfirmationChecker.check());
         verify(this.templateManager)
             .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");

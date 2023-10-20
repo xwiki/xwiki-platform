@@ -44,11 +44,7 @@ public interface RequiredRightsConfiguration
         /**
          * The required rights are activated and raise a warning message when trying to edit a document.
          */
-        WARNING,
-        /**
-         * The required rights are activated and raise an error message when trying to edit a document.
-         */
-        DENY
+        WARNING
     }
 
     /**

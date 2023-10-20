@@ -102,6 +102,9 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
                     if (!analysisResults.hasAdded() && !analysisResults.hasRemoved()) {
                         checkResult = Optional.empty();
                     } else {
+                        // We fall back to a warning if the level id DENY but at least one required rights needs a
+                        // manual review, to avoid blocking users.
+                        isError = isError && !analysisResults.containsManualReviewsNeeded();
                         this.scriptContextManager.getCurrentScriptContext()
                             .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
                         XDOM message = this.templateManager

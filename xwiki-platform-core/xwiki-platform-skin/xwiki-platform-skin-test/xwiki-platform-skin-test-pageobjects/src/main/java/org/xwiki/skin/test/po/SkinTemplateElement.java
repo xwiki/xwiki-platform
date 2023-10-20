@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,32 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.skin.test.po;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>15.9-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-skin</artifactId>
-  <name>XWiki Platform - Skin - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Skin - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-skin-api</module>
-    <module>xwiki-platform-skin-skinx</module>
-    <module>xwiki-platform-skin-ui</module>
-    <module>xwiki-platform-skin-test</module>
-  </modules>
-</project>
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.BaseElement;
+
+/**
+ * A specific template of the wiki skin.
+ * 
+ * @version $Id$
+ * @since 15.9RC1
+ */
+public class SkinTemplateElement extends BaseElement
+{
+    private final WebElement rootElement;
+
+    public SkinTemplateElement(WebElement rootElement)
+    {
+        this.rootElement = rootElement;
+    }
+
+    public void setContent(String content)
+    {
+        WebElement contentElement = getDriver().findElementWithoutWaiting(this.rootElement, By.tagName("textarea"));
+        contentElement.clear();
+        contentElement.sendKeys(content);
+    }
+}

@@ -24,17 +24,28 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-skin</artifactId>
     <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-skin</artifactId>
-  <name>XWiki Platform - Skin - Parent POM</name>
+  <artifactId>xwiki-platform-skin-test</artifactId>
+  <name>XWiki Platform - Skin - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Skin - Parent POM</description>
+  <description>Tests for the Skin Application</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-skin-api</module>
-    <module>xwiki-platform-skin-skinx</module>
-    <module>xwiki-platform-skin-ui</module>
-    <module>xwiki-platform-skin-test</module>
+    <module>xwiki-platform-skin-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-skin-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

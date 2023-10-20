@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,24 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.skin.test.ui;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>15.9-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-skin</artifactId>
-  <name>XWiki Platform - Skin - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Skin - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-skin-api</module>
-    <module>xwiki-platform-skin-skinx</module>
-    <module>xwiki-platform-skin-ui</module>
-    <module>xwiki-platform-skin-test</module>
-  </modules>
-</project>
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
+
+/**
+ * All UI tests for the skins.
+ *
+ * @version $Id$
+ */
+@UITest
+public class AllIT
+{
+    @Nested
+    @DisplayName("Wiki page based skins management")
+    class NestedWikiSkinIT extends WikiSkinIT
+    {
+    }
+}

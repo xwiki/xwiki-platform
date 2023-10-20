@@ -37,12 +37,12 @@ import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.platform.security.requiredrights.internal.VelocityUtil;
 import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -84,6 +84,9 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
 
     @Inject
     private ContentParser contentParser;
+
+    @Inject
+    private VelocityDetector velocityDetector;
 
     @Override
     public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
@@ -168,7 +171,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         String translationMessage)
     {
         List<RequiredRightAnalysisResult> result;
-        if (VelocityUtil.containsVelocityScript(value)) {
+        if (this.velocityDetector.containsVelocityScript(value)) {
             result = List.of(new RequiredRightAnalysisResult(reference,
                 this.translationMessageSupplierProvider.get(translationMessage),
                 this.stringCodeBlockSupplierProvider.get(value),

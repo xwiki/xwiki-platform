@@ -26,12 +26,14 @@ import java.util.concurrent.Callable;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -61,6 +63,9 @@ class XWikiDocumentRequiredRightAnalyzerTest
     @MockComponent
     private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
 
+    @MockComponent
+    private VelocityDetector velocityDetector;
+
     @Test
     void analyze() throws Exception
     {
@@ -85,5 +90,34 @@ class XWikiDocumentRequiredRightAnalyzerTest
         when(this.objectRequiredRightAnalyzer.analyze(object)).thenReturn(List.of(objectResult));
 
         assertEquals(List.of(xdomResult, objectResult), this.analyzer.analyze(document));
+    }
+
+    @Test
+    void analyzeTitle() throws Exception
+    {
+        when(this.documentContextExecutor.call(any(), any())).thenAnswer(invocation -> {
+            Callable<List<RequiredRightAnalysisResult>> callable = invocation.getArgument(0);
+            return callable.call();
+        });
+
+        XWikiDocument document = mock();
+        String title = "#set($foo = 'bar')";
+        when(document.getTitle()).thenReturn(title);
+        DocumentReference mockDocumentReference = mock();
+        when(document.getDocumentReferenceWithLocale()).thenReturn(mockDocumentReference);
+        when(document.getXObjects()).thenReturn(Map.of());
+
+        XDOM xdom = mock();
+        when(document.getXDOM()).thenReturn(xdom);
+        when(this.xdomRequiredRightAnalyzer.analyze(xdom)).thenReturn(List.of());
+
+        when(this.velocityDetector.containsVelocityScript(title)).thenReturn(true);
+
+        List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(document);
+        assertEquals(1, analysisResults.size());
+        RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
+        assertEquals(mockDocumentReference, analysisResult.getEntityReference());
+        assertEquals(List.of(RequiredRight.MAYBE_SCRIPT, RequiredRight.MAYBE_PROGRAM),
+            analysisResult.getRequiredRights());
     }
 }

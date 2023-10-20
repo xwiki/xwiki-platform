@@ -32,9 +32,9 @@ import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.platform.security.requiredrights.internal.VelocityUtil;
 import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -60,6 +60,9 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     @Inject
     private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
 
+    @Inject
+    private VelocityDetector velocityDetector;
+
     @Override
     public List<RequiredRightAnalysisResult> analyze(XWikiDocument document) throws RequiredRightsException
     {
@@ -72,7 +75,7 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
                 List<RequiredRightAnalysisResult> result = new ArrayList<>();
 
                 // Analyze the title
-                if (VelocityUtil.containsVelocityScript(document.getTitle())) {
+                if (this.velocityDetector.containsVelocityScript(document.getTitle())) {
                     result.add(new RequiredRightAnalysisResult(
                         document.getDocumentReferenceWithLocale(),
                         this.translationMessageSupplierProvider.get("security.requiredrights.title"),

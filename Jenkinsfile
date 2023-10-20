@@ -19,7 +19,7 @@
  */
 pipeline {
     agent {
-        dockerfile true
+        dockerContainer 'node:18.18.1-alpine3.18'
     }
     stages {
         stage('Build') {

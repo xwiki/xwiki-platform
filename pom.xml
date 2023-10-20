@@ -65,6 +65,7 @@
     <dockerJava.version>3.3.3</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
     <solr.version>8.11.2</solr.version>
+    <zookeeper.version>3.9.1</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.19.1</testcontainers.version>
@@ -1095,6 +1096,23 @@
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
         <version>1.23.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper</artifactId>
+        <version>${zookeeper.version}</version>
+        <exclusions>
+          <!-- Workaround https://issues.apache.org/jira/browse/ZOOKEEPER-4763 -->
+          <exclusion>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper-jute</artifactId>
+        <version>${zookeeper.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

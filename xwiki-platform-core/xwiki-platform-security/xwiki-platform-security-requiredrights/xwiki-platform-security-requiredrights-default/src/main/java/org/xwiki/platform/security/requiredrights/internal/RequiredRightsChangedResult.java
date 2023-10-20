@@ -23,14 +23,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.text.XWikiToStringBuilder;
 
@@ -107,16 +105,6 @@ public class RequiredRightsChangedResult
     public Map<EntityReference, List<RequiredRightAnalysisResult>> getRemovedAsMap()
     {
         return makeMap(this.removed);
-    }
-
-    /**
-     * @return {@code true} if at least one required right of a result has {@link RequiredRight#isManualReviewNeeded()}
-     *     equals to {@code true}, {@code false} otherwise
-     */
-    public boolean containsManualReviewsNeeded()
-    {
-        return Stream.concat(this.added.stream(), this.removed.stream())
-            .anyMatch(result -> result.getRequiredRights().stream().anyMatch(RequiredRight::isManualReviewNeeded));
     }
 
     private static Map<EntityReference, List<RequiredRightAnalysisResult>> makeMap(

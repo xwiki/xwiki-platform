@@ -17,41 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.velocity;
+package org.xwiki.platform.security.requiredrights.internal.configuration;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.macro.script.AbstractScriptMacroPermissionPolicy;
-import org.xwiki.rendering.macro.script.ScriptMacroParameters;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.configuration.ConfigurationSource;
+
+import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.NONE;
 
 /**
- * Decide if velocity script execution is allowed. Allow execution if one of the following conditions is met:
- * <ul>
- * <li>if the macro transformation context is <strong>not</strong> restricted</li>
- * <li>if the current document has script rights</li>
- * </ul>
+ * Default implementation of {@link RequiredRightsConfiguration}.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 15.9RC1
  */
 @Component
-@Named("velocity")
 @Singleton
-public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermissionPolicy
+public class DefaultRequiredRightsConfiguration implements RequiredRightsConfiguration
 {
-    @Override
-    public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
-    {
-        return !context.getTransformationContext().isRestricted() && getAuthorizationManager().hasAccess(Right.SCRIPT);
-    }
+    private static final String PREFIX = "security.requiredRights.";
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configuration;
 
     @Override
-    public Right getRequiredRight(ScriptMacroParameters parameters)
+    public RequiredRightDocumentProtection getDocumentProtection()
     {
-        return Right.SCRIPT;
+        return this.configuration.getProperty(PREFIX + "protection", NONE);
     }
 }

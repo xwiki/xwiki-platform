@@ -17,41 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.velocity;
+package org.xwiki.platform.security.requiredrights.internal.provider;
+
+import java.util.function.Supplier;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.macro.script.AbstractScriptMacroPermissionPolicy;
-import org.xwiki.rendering.macro.script.ScriptMacroParameters;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.rendering.block.Block;
 
 /**
- * Decide if velocity script execution is allowed. Allow execution if one of the following conditions is met:
- * <ul>
- * <li>if the macro transformation context is <strong>not</strong> restricted</li>
- * <li>if the current document has script rights</li>
- * </ul>
+ * Provides a way to easily construct a supplier that just displays the given string.
  *
  * @version $Id$
- * @since 4.2M1
  */
 @Component
-@Named("velocity")
 @Singleton
-public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermissionPolicy
+@Named("stringCode")
+public class StringCodeBlockSupplierProvider extends AbstractBlockSupplierProvider<String>
 {
     @Override
-    public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
+    public Supplier<Block> get(String string, Object... parameters)
     {
-        return !context.getTransformationContext().isRestricted() && getAuthorizationManager().hasAccess(Right.SCRIPT);
-    }
-
-    @Override
-    public Right getRequiredRight(ScriptMacroParameters parameters)
-    {
-        return Right.SCRIPT;
+        return () -> getCodeBlock(string);
     }
 }

@@ -186,6 +186,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-default</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-like-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>

@@ -17,41 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.velocity;
+package org.xwiki.platform.security.requiredrights.internal.provider;
 
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.macro.script.AbstractScriptMacroPermissionPolicy;
-import org.xwiki.rendering.macro.script.ScriptMacroParameters;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.Translation;
+import org.xwiki.rendering.block.Block;
 
 /**
- * Decide if velocity script execution is allowed. Allow execution if one of the following conditions is met:
- * <ul>
- * <li>if the macro transformation context is <strong>not</strong> restricted</li>
- * <li>if the current document has script rights</li>
- * </ul>
+ * Provides a way to easily construct a supplier using a translation message.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 15.9RC1
  */
 @Component
-@Named("velocity")
 @Singleton
-public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermissionPolicy
+@Named("translation")
+public class TranslationMessageSupplierProvider extends AbstractBlockSupplierProvider<String>
 {
-    @Override
-    public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
-    {
-        return !context.getTransformationContext().isRestricted() && getAuthorizationManager().hasAccess(Right.SCRIPT);
-    }
+    @Inject
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     @Override
-    public Right getRequiredRight(ScriptMacroParameters parameters)
+    public Supplier<Block> get(String translationMessage, Object... parameters)
     {
-        return Right.SCRIPT;
+        return () -> {
+            Translation translation = this.contextualLocalizationManager.getTranslation(translationMessage);
+            if (translation != null) {
+                return translation.render(parameters);
+            } else {
+                return getStringBlock(translationMessage);
+            }
+        };
     }
 }

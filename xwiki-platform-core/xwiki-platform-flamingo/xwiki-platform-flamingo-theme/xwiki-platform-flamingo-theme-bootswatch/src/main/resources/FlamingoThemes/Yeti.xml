@@ -2063,7 +2063,7 @@ input[type="checkbox"] {
 
 .breadcrumb {
   border: 1px solid @table-border-color;
-  border-radius: @border-radius-small;
+  border-radius: 3px;
   font-size: 10px;
   font-weight: 300;
   text-transform: uppercase;
@@ -2094,7 +2094,7 @@ input[type="checkbox"] {
   &gt; li:last-child {
     &gt; a,
     &gt; span {
-      border-radius: @border-radius-small;
+      border-radius: 3px;
     }
   }
 

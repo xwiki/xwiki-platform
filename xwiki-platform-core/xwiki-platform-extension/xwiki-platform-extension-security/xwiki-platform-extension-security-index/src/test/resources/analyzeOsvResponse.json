@@ -20,6 +20,7 @@
         }
       ],
       "id": "VULN_ID",
+      "aliases": ["A1", "CVE-1"],
       "references": [
         {
           "type": "WEB",

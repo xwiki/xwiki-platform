@@ -22,8 +22,8 @@ package org.xwiki.appwithinminutes.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.SortableElement;
 
 /**
  * Represents the static list items editor present on the configuration pane of a static list field.
@@ -53,6 +53,8 @@ public class StaticListItemsEditor extends BaseElement
      */
     private WebElement addButton;
 
+    private final SortableElement sortable;
+
     /**
      * Creates a new instance.
      * 
@@ -61,6 +63,8 @@ public class StaticListItemsEditor extends BaseElement
     public StaticListItemsEditor(WebElement container)
     {
         this.container = container;
+
+        this.sortable = new SortableElement(container);
 
         By xpath = By.xpath(".//*[@class = 'xHint' and . = 'ID']/following-sibling::input[@type = 'text']");
         valueInput = getDriver().findElementWithoutWaiting(container, xpath);
@@ -134,16 +138,7 @@ public class StaticListItemsEditor extends BaseElement
      */
     public void moveBefore(String valueToMove, String beforeValue)
     {
-        WebElement itemToMove = getItem(valueToMove);
-        WebElement itemBefore = getItem(beforeValue);
-
-        Actions actions = getDriver().createActions().clickAndHold(itemToMove);
-
-        // We move the item from the center, so we need to ensure that we actually move it with an offset of half its
-        // width to be sure it's before the other item element.
-        int offsetX = - (itemToMove.getSize().getWidth() / 2);
-        int offsetY = 2;
-        getDriver().moveToTopLeftCornerOfTargetWithOffset(itemBefore, offsetX, offsetY, actions).release().perform();
+        this.sortable.moveBefore(getSelectorForItem(valueToMove), getSelectorForItem(beforeValue));
     }
 
     /**
@@ -152,8 +147,12 @@ public class StaticListItemsEditor extends BaseElement
      */
     public WebElement getItem(String valueOrLabel)
     {
-        By xpath = By.xpath("ul/li/*[@title = '" + valueOrLabel + "' or . = '" + valueOrLabel + "']");
-        return getDriver().findElementWithoutWaiting(container, xpath);
+        return getDriver().findElementWithoutWaiting(this.container, getSelectorForItem(valueOrLabel));
+    }
+
+    private By getSelectorForItem(String valueOrLabel)
+    {
+        return By.xpath("ul/li/*[@title = '" + valueOrLabel + "' or . = '" + valueOrLabel + "']");
     }
 
     /**

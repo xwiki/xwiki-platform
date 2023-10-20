@@ -238,6 +238,8 @@
   ## Make sure the links are dark enough in the tmDrawer
   @navbar-default-link-color:           #727272;
   @navbar-default-color:                #727272;
+  ## Make sure the placeholder are not too light (the default from bootstrap is #999, which does not have enough contrast with a white bg)
+  @input-color-placeholder:             #727272;
   ## Make sure the breadcrumb links are dark enough
   @breadcrumb-active-color:             #707070;
   @breadcrumb-color:                    #707070;
@@ -246,15 +248,20 @@
   ## Make the links a bit darker than the default from bootstrap. Default #337ab7 has sufficient contrast on white
   ## but this updated value allows light grey background to keep enough contrast.
   @brand-primary:                       #2f70a7;
+  ## Make regular text darker so that the contrast with links is high enough to differentiate them easily.
+  @text-color:                          #222222;
   ## Make sure button white text has enough contrast on the whole gradient
   @btn-primary-bg:                      #386da7;
   ## Make sure all kinds of buttons have proper contrast
-  @btn-succes-bg:                       #31754f;
   @btn-danger-bg:                       #ca302c;
-  @btn-success-bg:                      #31754f;
+  @brand-success:                       #077537;
   ## For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
   ## from an orangish yellow to complete brown. Instead, we change the text color to black.
   @btn-warning-color:                   #000;
+  ## The boxes should have enough contrast by default, we make it lighter than bootstrap.
+  @state-danger-bg:                     #f8ecec;
+  @state-success-bg:                    #e5f3df;
+  @state-info-bg:                       #e1f1f9;
 #end
 
 ##############################################
@@ -265,6 +272,10 @@
 
 ## Fix font path
 @icon-font-path:                      "$services.webjars.url('bootstrap', 'fonts')/";
+
+## Compute the open sans webjar path using velocity here as it is not possible in the theme configurations.
+## Since 15.9RC1
+@open-sans-font-path:                  "$services.webjars.url('org.webjars.bower:open-sans', 'css/open-sans.min.css')";
 
 ##
 ## XWiki variables: LESS variables specific to XWiki

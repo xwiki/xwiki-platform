@@ -34,6 +34,13 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  */
 public class PDFExportAdministrationSectionPage extends AdministrationSectionPage
 {
+    /**
+     * The number of seconds to wait for the Chrome Docker container to be ready for use. We need a bigger timeout
+     * because the PDF generator might have to fetch the headless Chrome Docker image, create the container and start it
+     * (on its first initialization, after a configuration change or after a restart).
+     */
+    public static final int CHROME_INIT_TIMEOUT = 60;
+
     private static final String SECTION_ID = "export.pdf";
 
     @FindBy(className = "pdfGeneratorStatus")
@@ -51,8 +58,8 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_dockerNetwork")
     private WebElement dockerNetworkInput;
 
-    @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_xwikiHost")
-    private WebElement xwikiHostInput;
+    @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_xwikiURI")
+    private WebElement xwikiURIInput;
 
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_chromeRemoteDebuggingPort")
     private WebElement chromeRemoteDebuggingPortInput;
@@ -89,13 +96,10 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     public String getGeneratorStatus(boolean wait)
     {
         if (wait) {
-            // Use a bigger timeout (60s) because the PDF generator might have to fetch the headless Chrome Docker
-            // image, create the container and start it (on its first initialization, or after a configuration change).
-            int timeout = 60;
             getDriver().waitUntilCondition(
                 ExpectedConditions.not(
                     ExpectedConditions.attributeContains(this.generatorStatus, "class", "pdfGeneratorStatus-checking")),
-                timeout);
+                CHROME_INIT_TIMEOUT);
         }
         return this.generatorStatus.getText();
     }
@@ -171,22 +175,22 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     }
 
     /**
-     * @return the value of the XWiki host configuration
+     * @return the value of the XWiki URI configuration
      */
-    public String getXWikiHost()
+    public String getXWikiURI()
     {
-        return this.xwikiHostInput.getAttribute("value");
+        return this.xwikiURIInput.getAttribute("value");
     }
 
     /**
-     * Sets the value of the XWiki host configuration
-     * 
-     * @param value the new XWiki host value
+     * Sets the value of the XWiki URI configuration
+     *
+     * @param value the new XWiki URI value
      */
-    public void setXWikiHost(String value)
+    public void setXWikiURI(String value)
     {
-        this.xwikiHostInput.clear();
-        this.xwikiHostInput.sendKeys(value);
+        this.xwikiURIInput.clear();
+        this.xwikiURIInput.sendKeys(value);
     }
 
     /**

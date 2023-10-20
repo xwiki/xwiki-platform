@@ -43,10 +43,10 @@ public interface DocumentRenderer
      * Renders the specified document.
      * 
      * @param documentReference the document to render
-     * @param withTitle {@code true} to render also the document title (before the document content), {@code false}
-     *            otherwise
+     * @param parameters the rendering parameters
      * @return the rendering result
      * @throws Exception if rendering the specified document fails
      */
-    DocumentRenderingResult render(DocumentReference documentReference, boolean withTitle) throws Exception;
+    DocumentRenderingResult render(DocumentReference documentReference, DocumentRendererParameters parameters)
+        throws Exception;
 }

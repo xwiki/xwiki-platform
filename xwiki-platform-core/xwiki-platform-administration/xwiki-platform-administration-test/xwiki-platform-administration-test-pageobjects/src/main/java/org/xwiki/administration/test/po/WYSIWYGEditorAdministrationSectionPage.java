@@ -32,15 +32,28 @@ import org.xwiki.test.ui.po.Select;
  */
 public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectionPage
 {
+    private static final String SECTION_ID = "WYSIWYG";
+
     /**
      * The drop down used to select the default WYSIWYG editor.
      */
     @FindBy(name = "XWiki.EditorBindingClass_0_roleHint")
     private WebElement defaultWYSIWYGEditorSelect;
 
+    /**
+     * Open the WYSIWYG editor administration section.
+     * 
+     * @return the WYSIWYG editor administration section
+     */
+    public static WYSIWYGEditorAdministrationSectionPage gotoPage()
+    {
+        AdministrationSectionPage.gotoPage(SECTION_ID);
+        return new WYSIWYGEditorAdministrationSectionPage();
+    }
+
     public WYSIWYGEditorAdministrationSectionPage()
     {
-        super("WYSIWYG");
+        super(SECTION_ID);
     }
 
     /**

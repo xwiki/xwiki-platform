@@ -43,7 +43,11 @@ import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
  *
  * @version $Id$
  */
-@UITest
+@UITest(properties = {
+    // "$xcontext.context" (used in the test) requires PR
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*PanelIT"
+        + ".verifyTipsContentIsExecutedWithTheRightAuthor.WebHome"
+})
 class TipsPanelIT
 {
     private final static String TIPS_UIXP = "org.xwiki.platform.help.tipsPanel";

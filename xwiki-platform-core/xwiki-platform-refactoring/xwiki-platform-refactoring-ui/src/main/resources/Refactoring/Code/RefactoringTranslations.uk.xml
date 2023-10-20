@@ -1,0 +1,45 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Refactoring.Code.RefactoringTranslations" locale="uk">
+  <web>Refactoring.Code</web>
+  <name>RefactoringTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Refactoring.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>RefactoringTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>refactoring.configuration.delete.heading=Видалити властивості
+admin.delete=Видалити
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=Можна пропустити кошик
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=Якщо встановлено значення "Так", розширені користувачі можуть вибирати, чи хочуть вони надсилати сторінки до кошика чи остаточно видаляти їх під час видалення сторінок. Якщо встановлено значення "Ні", сторінки завжди надсилаються до кошика, якщо той активний, в іншому випадку вони завжди видаляються остаточно. Значення за умовчанням — "Ні".
+refactoring.configuration.delete.emptySection=У цьому розділі нічого не потрібно налаштовувати.
+</content>
+  </xwikidoc>

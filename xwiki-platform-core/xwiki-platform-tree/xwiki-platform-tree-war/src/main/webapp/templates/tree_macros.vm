@@ -44,7 +44,10 @@
   #getTreeAttributes($options $attributes)
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
-  #set ($discard = $xwiki.jsfx.use("uicomponents/widgets/tree#if ($services.debug.minify).min#end.js", true))
+  #set ($discard = $xwiki.jsfx.use("uicomponents/widgets/tree#if ($services.debug.minify).min#end.js", {
+    'forceSkinAction': true,
+    'wysiwyg': true
+  }))
   #if ($attributes.get('data-finder'))
     #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
       'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))

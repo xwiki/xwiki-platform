@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>15.6-SNAPSHOT</version>
+    <version>15.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-ui</artifactId>
   <name>XWiki Platform - Test - UI Tests Framework</name>
@@ -51,20 +51,11 @@
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
     </dependency>
-    <!-- Use Java 11+'s bundled HTTP Client instead of AsyncHttpClient.
-         See https://github.com/SeleniumHQ/selenium/issues/9528#issuecomment-1282482248 and
-         https://www.selenium.dev/blog/2022/using-java11-httpclient/
-         To be removed once https://github.com/SeleniumHQ/selenium/issues/9528 is fixed -->
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-http-jdk-client</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
     <!-- Used to download/install/setup the gecko driver for Selenium for the FF browser -->
     <dependency>
       <groupId>io.github.bonigarcia</groupId>
       <artifactId>webdrivermanager</artifactId>
-      <version>5.3.1</version>
+      <version>5.5.3</version>
     </dependency>
     <!-- Used by the REST calls -->
     <dependency>
@@ -75,7 +66,7 @@
     <dependency>
       <groupId>com.deque.html.axe-core</groupId>
       <artifactId>selenium</artifactId>
-      <version>4.7.0</version>
+      <version>4.8.0</version>
     </dependency>
   </dependencies>
   <build>

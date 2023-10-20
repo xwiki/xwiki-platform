@@ -21,6 +21,7 @@ package org.xwiki.livedata.internal;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +31,9 @@ import java.util.stream.Stream;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.component.manager.ComponentManager;
@@ -156,6 +159,19 @@ class DefaultLiveDataConfigurationResolverTest
         LiveDataConfiguration liveDataConfig = this.objectMapper.readValue(input, LiveDataConfiguration.class);
 
         assertEquals(output, this.objectMapper.writeValueAsString(this.resolver.resolve(liveDataConfig)), message);
+    }
+
+    @Test
+    void withInitialize() throws Exception
+    {
+        // Test with a default minimally initialized config. This is useful to simulate a custom source with its own way
+        // to initialize its config.
+        LiveDataConfiguration config = new LiveDataConfiguration();
+        config.initialize();
+        String expected = FileUtils.readFileToString(new File("src/test/resources/withInitialize.json"),
+            Charset.defaultCharset());
+        assertEquals(expected, this.objectMapper.writerWithDefaultPrettyPrinter()
+            .writeValueAsString(this.resolver.resolve(this.resolver.resolve(config))));
     }
 
     private static Stream<String[]> getTestData() throws Exception

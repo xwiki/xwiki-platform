@@ -1,4 +1,5 @@
 org.xwiki.panels.internal.LeftPanelsUIExtensionManager
 org.xwiki.panels.internal.PanelClassDocumentInitializer
+org.xwiki.panels.internal.PanelWikiUIExtension
 org.xwiki.panels.internal.PanelWikiUIExtensionComponentBuilder
 org.xwiki.panels.internal.RightPanelsUIExtensionManager

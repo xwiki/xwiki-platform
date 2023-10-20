@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.po.image.edit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -50,5 +51,52 @@ public class ImageDialogAdvancedEditForm extends BaseElement
     public String getAlignment()
     {
         return getDriver().findElement(By.cssSelector("#advanced [name='alignment']:checked")).getAttribute("value");
+    }
+
+    /**
+     * Sets the width of the image.
+     *
+     * @param width the integer value of the image width
+     * @since 15.6RC1
+     * @since 15.5.1
+     * @since 14.10.14
+     */
+    public void setWidth(int width)
+    {
+        WebElement imageWidth = getImageWidthElement();
+        imageWidth.clear();
+
+        String fullString = String.valueOf(width);
+        for (int i = 0; i < fullString.length(); i++) {
+            imageWidth.sendKeys(String.valueOf(fullString.charAt(i)));
+            int expectedSize = i + 1;
+            // Input the chars one by one to wait for the size ratio computation to be applied before typing in the next
+            // characters. If the chars are entered too fast, some are ignored.  
+            getDriver().waitUntilCondition(input -> {
+                String value = imageWidth.getAttribute("value");
+                return value.length() == expectedSize;
+            });
+            // Without this wait, the next iteration might fail when sending the key since the element is not 
+            // re-enabled soon enough.
+            getDriver().waitUntilElementIsEnabled(imageWidth);
+        }
+    }
+
+    /**
+     * Checks if the width input field is enabled.
+     *
+     * @return {@code true} if the width input field is enabled, {@code false} otherwise
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.8RC1
+     */
+    public boolean isWidthEnabled()
+    {
+        return getImageWidthElement().isEnabled();
+    }
+
+    private WebElement getImageWidthElement()
+    {
+        return getDriver().findElement(By.cssSelector("#advanced [name='imageWidth']"));
     }
 }

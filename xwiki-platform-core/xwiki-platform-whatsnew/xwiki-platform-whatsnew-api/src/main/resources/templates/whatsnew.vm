@@ -24,8 +24,9 @@
 #set ($discard = $response.setHeader('X-Robots-Tag', 'noindex'))
 #template("startpage.vm")
 <div class="main layoutsubsection">
-  <div id="mainContentArea">
-    #template("hierarchy.vm")
+  #template("hierarchy.vm")
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     #set($titleToDisplay = $services.localization.render('platform.whatsnew.title'))
     ## Do not display the content menu or the "last modified by" since the page is not about the current document and
     ## it would be weird to display actions or info about the current doc's content.
@@ -83,6 +84,6 @@
       #end
       <div class="clearfloats"></div>
     </div> ## xcontent
-  </div>## mainContentArea
+  </main>## mainContentArea
 </div>## main
 #template("endpage.vm")

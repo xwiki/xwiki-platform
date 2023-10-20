@@ -191,6 +191,7 @@ public class ExtensionSecurityLiveDataConfigurationProvider implements Provider<
         descriptor.setEditable(false);
         descriptor.setSortable(false);
         descriptor.setFilterable(false);
+        descriptor.setDisplayer(new DisplayerDescriptor(HTML_DISPLAYER_ID));
         return descriptor;
     }
 

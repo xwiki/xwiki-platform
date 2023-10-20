@@ -1427,11 +1427,11 @@
 //## Define colors for form feedback states and, by default, alerts.
 
 @state-success-text:             @brand-success;
-@state-success-bg:               #dff0d8;
+@state-success-bg:               #e5f3df;
 @state-success-border:           @brand-success;
 
 @state-info-text:                @brand-info;
-@state-info-bg:                  #d9edf7;
+@state-info-bg:                  #e1f1f9;
 @state-info-border:              @brand-info;
 
 @state-warning-text:             @brand-warning;
@@ -1439,7 +1439,7 @@
 @state-warning-border:           @brand-warning;
 
 @state-danger-text:              @brand-danger;
-@state-danger-bg:                #f2dede;
+@state-danger-bg:                #f8ecec;
 @state-danger-border:            @brand-danger;
 
 

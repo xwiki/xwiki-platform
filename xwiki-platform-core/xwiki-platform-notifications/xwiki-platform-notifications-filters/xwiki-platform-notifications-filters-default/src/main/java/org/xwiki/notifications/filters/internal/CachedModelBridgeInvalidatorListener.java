@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
@@ -83,6 +84,10 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
                     ((CachedModelBridge) this.bridge).invalidatePreferencefilter(new WikiReference(owner));
                 }
             }
+        } else if (source instanceof DocumentReference) {
+            ((CachedModelBridge) this.bridge).invalidatePreferencefilter((DocumentReference) source);
+        } else if (source instanceof WikiReference) {
+            ((CachedModelBridge) this.bridge).invalidatePreferencefilter((WikiReference) source);
         }
     }
 }

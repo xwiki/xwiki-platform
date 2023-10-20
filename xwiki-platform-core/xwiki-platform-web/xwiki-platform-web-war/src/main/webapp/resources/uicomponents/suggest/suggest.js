@@ -730,7 +730,8 @@ var XWiki = (function(XWiki){
         noHighlight: true, // we do the highlighting ourselves
         containerTagName: 'a'
       });
-      item.containerElement.setAttribute('href', arr[i].url);
+      // When the url is empty, we need to put a correct default value to avoid unexpected page loads/reloads
+      item.containerElement.setAttribute('href', arr[i].url || 'javascript:void(0)');
       item.listItemElement.addEventListener('focusin', (event) => pointer.setHighlight(event.currentTarget));
       list.addItem(item);
     }

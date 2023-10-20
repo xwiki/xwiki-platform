@@ -19,8 +19,20 @@
  */
 package org.xwiki.export.pdf.browser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,17 +55,6 @@ import org.xwiki.export.pdf.internal.browser.CookieFilter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AbstractBrowserPDFPrinter}.
@@ -88,7 +89,7 @@ class BrowserPDFPrinterTest
     ArgumentCaptor<CookieFilterContext> cookieFilterContextCaptor;
 
     @BeforeEach
-    void configure()
+    void configure() throws Exception
     {
         ReflectionUtils.setFieldValue(this.printer, "logger", this.logger);
         ReflectionUtils.setFieldValue(this.printer, "configuration", this.configuration);
@@ -98,7 +99,7 @@ class BrowserPDFPrinterTest
         when(this.printer.getRequest()).thenReturn(this.request);
 
         when(this.request.getContextPath()).thenReturn("/xwiki");
-        when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
+        when(this.configuration.getXWikiURI()).thenReturn(new URI("//xwiki-host"));
         when(this.configuration.getPageReadyTimeout()).thenReturn(30);
     }
 
@@ -148,6 +149,26 @@ class BrowserPDFPrinterTest
         assertEquals(browserPrintPreviewURL, this.cookieFilterContextCaptor.getValue().getTargetURL());
 
         verify(this.browserTab).close();
+    }
+
+    @Test
+    void printWithXWikiSchemeAndPortSpecified() throws Exception
+    {
+        when(this.configuration.getXWikiURI()).thenReturn(new URI("ftp://xwiki-host:8080"));
+
+        Cookie[] cookies = new Cookie[] {mock(Cookie.class)};
+        when(this.request.getCookies()).thenReturn(cookies);
+
+        when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
+
+        try {
+            this.printer.print(new URL("https://external:9293/xwiki/bin/export/Some/Page?x=y#z"));
+        } catch (IOException e) {
+            assertEquals("Couldn't find an alternative print preview URL " +
+                "that the web browser used for PDF printing can access.", e.getMessage());
+        }
+
+        verify(this.browserTab).navigate(new URL("ftp://xwiki-host:8080/xwiki/rest/client?media=json"));
     }
 
     @Test

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<extension>
-  <id>snaplocalextension</id>
-  <version>1.0-SNAPSHOT</version>
-  <type>xar</type>
-</extension>

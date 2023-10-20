@@ -1429,11 +1429,11 @@
 //## Define colors for form feedback states and, by default, alerts.
 
 @state-success-text:             @brand-success;
-@state-success-bg:               #dff0d8;
+@state-success-bg:               #e5f3df;
 @state-success-border:           darken(@state-success-text, 5%);
 
 @state-info-text:                @brand-info;
-@state-info-bg:                  #d9edf7;
+@state-info-bg:                  #e1f1f9;
 @state-info-border:              darken(@state-info-text, 7%);
 
 @state-warning-text:             @brand-warning;
@@ -1441,7 +1441,7 @@
 @state-warning-border:           darken(@state-warning-text, 5%);
 
 @state-danger-text:              @brand-danger;
-@state-danger-bg:                #f2dede;
+@state-danger-bg:                #f8ecec;
 @state-danger-border:            darken(@state-danger-text, 5%);
 
 
@@ -2230,7 +2230,11 @@ input[type="checkbox"] {
   .close {
     color: @text-color;
   }
-}</lessCode>
+}
+
+/* Font */
+@import (css) "@{open-sans-font-path}";
+</lessCode>
     </property>
     <property>
       <link-color/>

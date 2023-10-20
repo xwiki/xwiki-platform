@@ -54,6 +54,7 @@
       class="draggable-item"
       v-for="property in properties"
       :key="property.id"
+      :title="property.description"
       v-show="logic.isPropertyVisible(property.id)"
     >
       <!-- Wrapper for the column header -->
@@ -186,7 +187,22 @@ export default {
       e.data.leftColumn = th.querySelector(".column-name");
       e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
       e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
-      e.data.rightColumnBaseWidth = e.data.rightColumn.getBoundingClientRect()?.width;
+      e.data.rightColumnBaseWidth = e.data.rightColumn?.getBoundingClientRect()?.width;
+
+      // Give all column names a fixed width so that relative widths don't change when resizing (in case the current
+      // widths are not the actual column widths).
+      // First, collect all widths, then set them all to avoid that due to the first values being set the other values
+      // change.
+      const widths = [];
+      let columns = th.closest("tr").querySelectorAll(".column-name");
+      // Filter columns that aren't visible to avoid setting a width of zero on them.
+      columns = Array.from(columns).filter(column => column.closest("th").style.display !== "none");
+      for (const column of columns) {
+        widths.push(column.getBoundingClientRect().width);
+      }
+      for (let i = 0; i < columns.length; i++) {
+        columns[i].style.width = `${widths[i]}px`;
+      }
     },
 
     resizeColumn (e) {
@@ -203,9 +219,10 @@ export default {
     },
 
     resetColumnSize (e) {
-      const th = e.currentTarget.closest("th");
-      const column = th.querySelector(".column-name");
-      column.style.width = "unset";
+      // Reset all column sizes as resizing a single column sets sizes for all columns.
+      for (const column of e.currentTarget.closest("tr").querySelectorAll(".column-name")) {
+        column.style.removeProperty("width");
+      }
     },
 
   },
@@ -228,18 +245,25 @@ export default {
   justify-content: flex-start;
   align-items: center;
   cursor: pointer;
+  /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
+   when the column has been resized to a smaller width that is prevented by some table cell. */
+  min-width: 100%;
+  position: relative;
 }
 
 .layout-table .handle {
   height: 100%;
   margin-left: -@table-cell-padding;
   padding: 0 @table-cell-padding;
+  color: @text-color;
+  background-color: @xwiki-page-content-bg;
   cursor: pointer; /* IE */
   cursor: grab;
   opacity: 0;
+  position: absolute;
 }
 .layout-table .column-name:hover .handle {
-  opacity: 1;
+  opacity: 0.8;
   transition: opacity 0.2s;
 }
 .layout-table .handle .fa {
@@ -250,7 +274,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 10px;
 }
 
 .layout-table .sort-icon {

@@ -807,7 +807,7 @@
       <brand-info>#336699</brand-info>
     </property>
     <property>
-      <brand-primary>#0088CC</brand-primary>
+      <brand-primary>#0075b0</brand-primary>
     </property>
     <property>
       <brand-success>#008000</brand-success>
@@ -849,7 +849,7 @@
       <btn-info-color/>
     </property>
     <property>
-      <btn-primary-bg>#0088CC</btn-primary-bg>
+      <btn-primary-bg>#0075b0</btn-primary-bg>
     </property>
     <property>
       <btn-primary-color>#FFFFFF</btn-primary-color>
@@ -931,7 +931,7 @@
 </lessCode>
     </property>
     <property>
-      <link-color>#0088CC</link-color>
+      <link-color>#0075b0</link-color>
     </property>
     <property>
       <logo/>

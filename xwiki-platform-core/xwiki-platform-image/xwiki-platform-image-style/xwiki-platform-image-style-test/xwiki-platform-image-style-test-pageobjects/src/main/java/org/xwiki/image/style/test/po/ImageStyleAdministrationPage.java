@@ -22,6 +22,7 @@ package org.xwiki.image.style.test.po;
 import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -63,7 +64,10 @@ public class ImageStyleAdministrationPage extends ViewPage
     {
         XWikiWebDriver driver = getDriver();
         driver.findElementWithoutWaiting(By.id("targetTitle")).sendKeys(identifier);
-        driver.findElementWithoutWaiting(By.cssSelector("#newImageStyleForm input[type='submit']")).click();
+        WebElement submitButton =
+            driver.findElementWithoutWaiting(By.cssSelector("#newImageStyleForm input[type='submit']"));
+        driver.waitUntilElementIsEnabled(submitButton);
+        submitButton.click();
         return new ImageStyleConfigurationForm();
     }
 

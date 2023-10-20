@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.security.internal;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -58,10 +59,15 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
 
     private boolean started;
 
+    private CompletableFuture<Boolean> completableFuture;
+
     /**
      * Initialize and start the scheduler.
+     *
+     * @return a completable future set to {@code true} once a first job is done and the security scan is enabled, or
+     *     {@code false} once a first job is done and the security scan is disabled
      */
-    public synchronized void start()
+    public synchronized CompletableFuture<Boolean> start()
     {
         if (this.executor == null) {
             this.started = true;
@@ -76,21 +82,28 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
             });
 
             this.executor.scheduleWithFixedDelay(this, 0, this.extensionSecurityConfiguration.getScanDelay(), HOURS);
+            this.completableFuture = new CompletableFuture<>();
         }
+        return this.completableFuture;
     }
 
     /**
      * Restart the executor. This is needed when the delay is updated from the administration.
+     *
+     * @return a completable future set to {@code true} once a first job is done after the restart and the security scan
+     *     is enabled, or {@code false} once a first job is done after the restart and the security scan is disabled.
+     *     {@code null} is returned if restart is called before {@link #start()} is ever called
      */
-    public void restart()
+    public CompletableFuture<Boolean> restart()
     {
         if (!this.started) {
-            return;
+            return null;
         }
-        
+
         this.executor.shutdown();
         this.executor = null;
-        start();
+        this.completableFuture = null;
+        return start();
     }
 
     @Override
@@ -98,6 +111,7 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
     {
         if (!this.extensionSecurityConfiguration.isSecurityScanEnabled()) {
             this.logger.info("Extension security scan disabled.");
+            this.completableFuture.complete(false);
             return;
         }
 
@@ -113,11 +127,14 @@ public class ExtensionSecurityScheduler implements Runnable, Disposable
         } catch (Exception e) {
             this.logger.error("Failed to execute job", e);
         }
+        this.completableFuture.complete(true);
     }
 
     @Override
     public void dispose()
     {
-        this.executor.shutdownNow();
+        if (this.executor != null) {
+            this.executor.shutdownNow();
+        }
     }
 }

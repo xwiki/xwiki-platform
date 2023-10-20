@@ -19,38 +19,34 @@
  */
 package org.xwiki.rendering.internal.macro.velocity.filter;
 
-import org.junit.Assert;
-
 import org.apache.velocity.VelocityContext;
-import org.junit.Test;
-import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate the behavior of {@link HTMLVelocityMacroFilter}.
  * 
  * @version $Id$
  */
-public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
+@ComponentTest
+class HTMLVelocityMacroFilterTest
 {
-    private VelocityMacroFilter filter;
+    @InjectMockComponents
+    private HTMLVelocityMacroFilter filter;
 
-    private VelocityContext context;
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        this.filter = getComponentManager().getInstance(VelocityMacroFilter.class, "html");
-        this.context = new VelocityContext();
-    }
+    private VelocityContext context = new VelocityContext();
 
     public void assertFilter(String expected, String input)
     {
-        Assert.assertEquals(expected, this.filter.before(input, this.context));
+        assertEquals(expected, this.filter.before(input, this.context));
     }
 
     @Test
-    public void testFilter()
+    void testFilter()
     {
         assertFilter("T T", "T T");
         assertFilter("T T", "T  T");
@@ -65,7 +61,7 @@ public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testFilterSP()
+    void testFilterSP()
     {
         assertFilter("T$spT", "T$spT");
         assertFilter("T $spT", "T  $spT");
@@ -74,7 +70,7 @@ public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testFilterNL()
+    void testFilterNL()
     {
         assertFilter("${nl}", "$nl");
         assertFilter("T${nl}", "T  $nl");
@@ -92,7 +88,7 @@ public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testFilterIndent()
+    void testFilterIndent()
     {
         assertFilter("#if (true)\ntext#end", "#if (true)\n text#end");
         assertFilter("#if (true)\ntext#end", "#if (true)\n  text#end");
@@ -102,20 +98,20 @@ public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testFilterComment()
+    void testFilterComment()
     {
         assertFilter("", "##comment\n#*comment*#");
     }
 
     @Test
-    public void testFilterDirective()
+    void testFilterDirective()
     {
         assertFilter("#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro() T",
             "##comment\n#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro()\nT");
     }
 
     @Test
-    public void testFilterDirectiveSet()
+    void testFilterDirectiveSet()
     {
         assertFilter("#set()\n", "#set()\n");
         assertFilter("#set() ", "#set() ");
@@ -129,7 +125,7 @@ public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testFilterDirectiveMacro()
+    void testFilterDirectiveMacro()
     {
         assertFilter("#somemacro() T", "#somemacro()\nT");
         assertFilter("#somemacro() #set()\nT", "#somemacro()\n#set()\nT");
@@ -137,17 +133,23 @@ public class HTMLVelocityMacroFilterTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testFilterWithMSNL()
+    void testFilterWithMSNL()
     {
         assertFilter("#set()\n", "#set()\r\n");
         assertFilter("#set()\n", "#set()\r");
     }
 
     @Test
-    public void testInvalidOrPartial()
+    void testInvalidOrPartial()
     {
         assertFilter("#${escapetool.H}${declaredRight}#${escapetool.H}",
             "#${escapetool.H}${declaredRight}#${escapetool.H}");
         assertFilter("$ notvar", "$ notvar");
+    }
+
+    @Test
+    void isPreparationSupported()
+    {
+        assertTrue(this.filter.isPreparationSupported());
     }
 }

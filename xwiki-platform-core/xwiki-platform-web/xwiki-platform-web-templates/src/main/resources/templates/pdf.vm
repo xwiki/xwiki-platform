@@ -38,7 +38,17 @@
 #end
 <div id="xwikicontent">
   #foreach ($page in $pages)
-    #set ($pageDoc = $xwiki.getDocument($page))
+    #set ($documentReference = $services.model.resolveDocument($page))
+    ## Make sure the current document is rendered using the sheet specified on the request. The sheet is not applied if
+    ## the XWikiDocument instance being rendered is different than the instance found on the XWiki context. Note that
+    ## starting with XWIKI-20716 (The URL sheet is applied to a document gathered from the store) the instance returned
+    ## by getDocument() never matches the instance wrapped by $doc (even when the document is retrieved from cache),
+    ## because when $doc is initialized the cached XWikiDocument instance is cloned.
+    #if ($documentReference == $doc.documentReference)
+      #set ($pageDoc = $doc)
+    #else
+      #set ($pageDoc = $xwiki.getDocument($documentReference))
+    #end
     $pageDoc.getRenderedContent()
     #if ($request.includechilds)
       #set ($clevel = $numbertool.toNumber($request.includechilds).intValue())

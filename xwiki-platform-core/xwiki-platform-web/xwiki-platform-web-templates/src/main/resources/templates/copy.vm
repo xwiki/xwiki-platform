@@ -28,16 +28,19 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     #error($services.localization.render('core.rename.nonexistingDocument'))
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.copy.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
+
     ##------------------------------------------------
     ## Get source reference
     ##------------------------------------------------
@@ -233,7 +236,7 @@
     </form>
     #end
     <div class="clearfloats"></div>
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
 #template("endpage.vm")
 #end

@@ -375,24 +375,35 @@ XWiki.Dashboard = Class.create( {
   onEditGadgetClick : function(event) {
     var gadget = event.element().up('.gadget');
 
+    /**
+     * Finds the first direct child element of the given element with the specified class name.
+     *
+     * @param {Element} element - the element to search for the child in
+     * @param {string} className - the class name of the child element to find
+     * @returns {Element|undefined} the direct child element with the specified class name, or undefined if not found
+     */
+    function findDirectChildWithClass(element, className) {
+      return element.immediateDescendants().filter((e) => e.hasClassName(className)).first();
+    }
+
     if (gadget) {
       // check if it is a macro
-      var gadgetMetadata = gadget.down('.metadata');
+      const gadgetMetadata = findDirectChildWithClass(gadget, 'metadata');
       if (!gadgetMetadata) {
         return;
       }
-      var macroMetadata = gadgetMetadata.down('.isMacro');
+      const macroMetadata = findDirectChildWithClass(gadgetMetadata, 'isMacro');
       if (macroMetadata && macroMetadata.innerHTML == 'true') {
         // it's a macro, edit it
         // get the gadget id
         var gadgetId = this._getGadgetId(gadget);
         var title, macroCall;
         // get the gadget metadata, start the wizard
-        var titleMetadata = gadgetMetadata.down(".title");
+        const titleMetadata = findDirectChildWithClass(gadgetMetadata, 'title');
         if (titleMetadata) {
           title = titleMetadata.innerHTML;
         }
-        var macroCommentMetadata = gadgetMetadata.down('.content');
+        const macroCommentMetadata = findDirectChildWithClass(gadgetMetadata, 'content');
         if (macroCommentMetadata) {
           var macroComment = macroCommentMetadata.innerHTML;
           macroCall = this._parseMacroCallComment(macroComment);

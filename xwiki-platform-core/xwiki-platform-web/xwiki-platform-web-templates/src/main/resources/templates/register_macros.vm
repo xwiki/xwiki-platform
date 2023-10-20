@@ -77,7 +77,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     'label': $services.localization.render('core.register.password'),
     'params': {
       'type': 'password',
-      'autocomplete': 'off',
+      'autocomplete': 'new-password',
       'size': '60'
     },
     'validate': {
@@ -94,7 +94,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     'label': $services.localization.render('core.register.passwordRepeat'),
     'params': {
       'type': 'password',
-      'autocomplete': 'off',
+      'autocomplete': 'new-password',
       'size': '60'
     },
     'validate': {

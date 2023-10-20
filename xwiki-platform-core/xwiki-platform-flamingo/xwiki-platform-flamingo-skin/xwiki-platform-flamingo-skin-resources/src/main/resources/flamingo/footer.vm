@@ -18,7 +18,8 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #if($isInServletMode)## Visible only in a page
-<div id="footerglobal">
+## Set as an HTML footer for better DOM tree semantics to facilitate navigation with inclusive techs.
+<footer id="footerglobal">
   <div id="xwikilicence">$!copyright</div>
   #set ($version = $xwiki.getSpacePreference('version'))
   #if ("$!version" == "")
@@ -39,6 +40,6 @@
       #end
     </div>
   #end
-</div>
+</footer>
 #end
 ### TODO: Format the footer for pdf output

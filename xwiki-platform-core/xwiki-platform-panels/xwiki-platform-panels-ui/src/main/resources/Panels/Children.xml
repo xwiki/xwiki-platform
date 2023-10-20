@@ -120,7 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('panels.children.title'))
+#navigationPanelHeader($services.localization.render('panels.children.title'))
 ## Escape special characters in macro parameter values.
 #set ($openTo = $services.model.serialize($doc.documentReference, 'default').replaceAll('([~"])', '~$1'))
 {{documentTree showTranslations="false" showAttachments="false" compact="true" root="document:$openTo" /}}

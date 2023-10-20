@@ -19,6 +19,8 @@
  */
 package org.xwiki.export.pdf;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,9 +54,9 @@ public interface PDFExportConfiguration
     /**
      * @return the name or id of the Docker network to add the Chrome Docker container to; this is useful when XWiki
      *         itself runs inside a Docker container and you want to have the Chrome container in the same network in
-     *         order for them to communicate, see {@link #getXWikiHost()}; defaults to "{@code bridge}" the default
+     *         order for them to communicate, see {@link #getXWikiURI()}; defaults to "{@code bridge}" the default
      *         Docker network
-     * @see #getXWikiHost()
+     * @see #getXWikiURI()
      */
     String getDockerNetwork();
 
@@ -74,13 +76,29 @@ public interface PDFExportConfiguration
     int getChromeRemoteDebuggingPort();
 
     /**
-     * @return the host name or IP address that the headless Chrome browser should use to access the XWiki instance
-     *         (i.e. the print preview page); defaults to "{@code host.xwiki.internal}" which means the host running the
-     *         Docker daemon; if XWiki runs itself inside a Docker container then you should use the assigned network
-     *         alias, provided both containers (XWiki and Chrome) are in the same Docker network, specified by
-     *         {@link #getDockerNetwork()};
+     * @return the number of seconds to wait for the Chrome remote debugging service to responde before giving up
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.7
      */
-    String getXWikiHost();
+    default int getChromeRemoteDebuggingTimeout()
+    {
+        return 10;
+    }
+
+    /**
+     * @return the base URI that the headless Chrome browser should use to access the XWiki instance (i.e. the print
+     *         preview page); the host (domain or IP address) is mandatory but the scheme and port number are optional
+     *         (they default on the scheme and port number used when triggering the PDF export); defaults to
+     *         "{@code host.xwiki.internal}" which means the host running the Docker daemon; if XWiki runs itself inside
+     *         a Docker container then you should use the assigned network alias, provided both containers (XWiki and
+     *         Chrome) are in the same Docker network, specified by {@link #getDockerNetwork()};
+     * @throws URISyntaxException if the specified URI is not valid
+     * @since 14.10.15
+     * @since 15.5.2
+     * @since 15.7RC1
+     */
+    URI getXWikiURI() throws URISyntaxException;
 
     /**
      * @return {@code true} if the PDF export should be performed server-side, e.g. using a headless Chrome web browser
@@ -117,12 +135,12 @@ public interface PDFExportConfiguration
      * @return the maximum content size, in kilobytes (KB), an user is allowed to export to PDF; in order to compute the
      *         content size we sum the size of the HTML rendering for each of the XWiki documents included in the
      *         export; the size of external resources, such as images, style sheets, JavaScript code is not taken into
-     *         account; {@code 0} means no limit; defaults to {@code 100KB}
+     *         account; {@code 0} means no limit; defaults to {@code 5MB}
      * @since 14.10
      */
     default int getMaxContentSize()
     {
-        return 100;
+        return 5000;
     }
 
     /**

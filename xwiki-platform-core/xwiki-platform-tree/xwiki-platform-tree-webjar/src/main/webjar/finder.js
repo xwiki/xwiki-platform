@@ -53,6 +53,7 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
       resultInfo: options.finder.suggestion.info,
       resultType: options.finder.suggestion.type,
       resultValue: 'text',
+      resultURL: 'a_attr.href',
       script: options.finder.url,
       timeout: 0,
       varname: 'query'
@@ -80,6 +81,11 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
         $(this).next('.value').prepend(this);
       });
     }
+  });
+
+  $(document).on('click.xtreeFinderSuggestion', '.xtree-finder-suggestions .suggestItem', function(event) {
+    // Don't follow the link when selecting a suggestion because we want to open the tree to that location.
+    event.preventDefault();
   });
 
   $.jstree.plugins.finder = function (options, parent) {

@@ -31,7 +31,6 @@ import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.platform.security.requiredrights.internal.analyzer.XWikiDocumentRequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration;
 import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection;
 import org.xwiki.rendering.block.XDOM;

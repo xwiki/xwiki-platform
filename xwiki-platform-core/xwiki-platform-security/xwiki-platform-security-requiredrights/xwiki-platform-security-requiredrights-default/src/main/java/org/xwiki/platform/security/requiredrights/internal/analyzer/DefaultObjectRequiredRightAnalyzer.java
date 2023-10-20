@@ -172,7 +172,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
             result = List.of(new RequiredRightAnalysisResult(reference,
                 this.translationMessageSupplierProvider.get(translationMessage),
                 this.stringCodeBlockSupplierProvider.get(value),
-                RequiredRight.SCRIPT_OR_MAYBE_PROGRAM));
+                RequiredRight.SCRIPT_AND_MAYBE_PROGRAM));
         } else {
             result = List.of();
         }

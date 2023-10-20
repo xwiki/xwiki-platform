@@ -51,17 +51,17 @@ public class RequiredRight
     /**
      * Script right required.
      */
-    public static final RequiredRight SCRIPT = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, false);
+    public static final RequiredRight SCRIPT = new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, false);
 
     /**
      * Script right might be required, but a manual review is needed to confirm if the right is required.
      */
-    public static final RequiredRight MAYBE_SCRIPT = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true);
+    public static final RequiredRight MAYBE_SCRIPT = new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true);
 
     /**
      * Script right is required, programming right might be required.
      */
-    public static final List<RequiredRight> SCRIPT_OR_MAYBE_PROGRAM = List.of(SCRIPT, MAYBE_PROGRAM);
+    public static final List<RequiredRight> SCRIPT_AND_MAYBE_PROGRAM = List.of(SCRIPT, MAYBE_PROGRAM);
 
     private final Right right;
 

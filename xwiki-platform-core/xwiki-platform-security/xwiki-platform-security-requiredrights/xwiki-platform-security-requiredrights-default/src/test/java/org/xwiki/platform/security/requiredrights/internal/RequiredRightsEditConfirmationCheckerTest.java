@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
@@ -39,7 +38,6 @@ import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.platform.security.requiredrights.internal.analyzer.XWikiDocumentRequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration;
 import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection;
 import org.xwiki.rendering.block.XDOM;
@@ -83,7 +81,6 @@ class RequiredRightsEditConfirmationCheckerTest
     private RequiredRightsEditConfirmationChecker editConfirmationChecker;
 
     @MockComponent
-    @Named(XWikiDocumentRequiredRightAnalyzer.ID)
     private RequiredRightAnalyzer<XWikiDocument> analyzer;
 
     @MockComponent

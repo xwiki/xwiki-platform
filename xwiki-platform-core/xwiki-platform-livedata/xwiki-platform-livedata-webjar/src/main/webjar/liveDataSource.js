@@ -23,7 +23,10 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
 
   var baseURL = module.config().contextPath + '/rest/liveData/sources/';
 
+  const entriesRequests = {};
+
   var getEntries = function(liveDataQuery) {
+    var source = liveDataQuery.source;
     var entriesURL = getEntriesURL(liveDataQuery.source);
 
     var parameters = {
@@ -51,7 +54,45 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     parameters.sort = liveDataQuery.sort.map(sort => sort.property);
     parameters.descending = liveDataQuery.sort.map(sort => sort.descending);
 
-    return Promise.resolve($.getJSON(entriesURL, $.param(parameters, true)).then(toLiveData));
+    // We abort previous requests to avoid a race condition.
+    // It can happen that getEntries is called twice in a short
+    // time (when the user is typing in a filter field for instance)
+    // and that the first request succeeds after the second
+    // request, and its results would replace the "fresher"
+    // state.
+    //
+    // But we must only abort requests from the same source, otherwise we risk
+    // aborting a request for another live table. To make sure we abort only
+    // a request from the same source, we build a unique "source key"
+    // corresponding to this source, using the all possible relevant source
+    // parameters always in the same order.
+    //
+    // See https://jira.xwiki.org/browse/XWIKI-21447
+    const sourceKey = JSON.stringify([
+      source.id, source.$doc, source.className, source.resultPage,
+      source.template, source.translationPrefix, source.vm
+    ]);
+    entriesRequests[sourceKey]?.abort();
+    const entriesRequest = $.getJSON(entriesURL, $.param(parameters, true));
+    entriesRequests[sourceKey] = entriesRequest;
+
+    return Promise.resolve(entriesRequest.then(toLiveData))
+      .finally(cleanupRequest.bind(null, entriesRequest, sourceKey));
+  };
+
+  var cleanupRequest = function(requestToClean, sourceKey) {
+    // We reset the request object to null for two reasons:
+    // - avoid keeping an object we don't need anymore in memory, preventing it
+    //   from being GC'd
+    // - make sure we don't attempt to abort a request that already terminated.
+    //
+    // We only nullify the request if it is the request we just handled.
+    // Otherwise, this means that a fresher request is in flight. In which case
+    // we need to be able to abort this fresher one if yet another request is
+    // fired before it succeeds.
+    if (requestToClean === entriesRequests[sourceKey]) {
+      entriesRequests[sourceKey] = null;
+    }
   };
 
   var getEntriesURL = function(source) {

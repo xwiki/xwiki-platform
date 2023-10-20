@@ -967,6 +967,9 @@
       <panel-default-text>#333333</panel-default-text>
     </property>
     <property>
+      <panel-header-text/>
+    </property>
+    <property>
       <text-color>#333333</text-color>
     </property>
     <property>

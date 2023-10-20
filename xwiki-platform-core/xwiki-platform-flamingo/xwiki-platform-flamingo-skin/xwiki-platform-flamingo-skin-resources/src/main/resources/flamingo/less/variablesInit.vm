@@ -98,8 +98,8 @@
 
   @panel-bg:                            $theme.panelBackgroundColor;
   @panel-default-text:                  $theme.panelTextColor;
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @panel-header-text:             $theme.panelHeaderTextColor;
+  @panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @panel-header-text:                   $theme.panelHeaderTextColor;
 
   ##
   ## XWiki variables: LESS variables specific to XWiki
@@ -226,8 +226,8 @@
   ## currently, it comes from the old color theme object (see colorThemeInit.vm)
   // Default
   @xwiki-border-color:                  $theme.borderColor;
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @panel-header-text:             $theme.panelHeaderTextColor;
+  @panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @panel-header-text:                   $theme.panelHeaderTextColor;
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;

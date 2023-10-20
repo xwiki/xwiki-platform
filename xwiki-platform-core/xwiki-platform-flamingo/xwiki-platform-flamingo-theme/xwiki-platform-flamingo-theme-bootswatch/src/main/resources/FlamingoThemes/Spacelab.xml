@@ -1978,6 +1978,9 @@
       <panel-default-text/>
     </property>
     <property>
+      <panel-header-text/>
+    </property>
+    <property>
       <text-color/>
     </property>
     <property>

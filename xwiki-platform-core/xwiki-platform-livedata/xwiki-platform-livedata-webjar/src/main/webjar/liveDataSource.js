@@ -23,6 +23,8 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
 
   var baseURL = module.config().contextPath + '/rest/liveData/sources/';
 
+  let entriesRequest;
+
   var getEntries = function(liveDataQuery) {
     var entriesURL = getEntriesURL(liveDataQuery.source);
 
@@ -51,7 +53,33 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     parameters.sort = liveDataQuery.sort.map(sort => sort.property);
     parameters.descending = liveDataQuery.sort.map(sort => sort.descending);
 
-    return Promise.resolve($.getJSON(entriesURL, $.param(parameters, true)).then(toLiveData));
+    // We abort previous requests to avoid a race condition.
+    // It can happen that getEntries is called twice in a short
+    // time (when the user is typing in a filter field for instance)
+    // and that the first request succeeds after the second
+    // request, and its results would replace the "fresher"
+    // state.
+    //
+    // See https://jira.xwiki.org/browse/XWIKI-21447
+    entriesRequest?.abort();
+    entriesRequest = $.getJSON(entriesURL, $.param(parameters, true));
+
+    return Promise.resolve(entriesRequest.then(toLiveData))
+      .finally(cleanupRequest.bind(null, entriesRequest));
+  };
+
+  var cleanupRequest = function(requestToClean) {
+    // We reset the request object to null for two reasons:
+    // - avoid keeping an object we don't need anymore in memory, preventing it from being GC'd
+    // - make sure we don't attempt to abort a request that already terminated.
+    //
+    // We only nullify the request if it is the request we just handled.
+    // Otherwise, this means that a fresher request is in flight. In which case
+    // we need to be able to abort this fresher one if yet another request is
+    // fired before it succeeds.
+    if (requestToClean === entriesRequest) {
+      entriesRequest = null;
+    }
   };
 
   var getEntriesURL = function(source) {

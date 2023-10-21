@@ -34,6 +34,7 @@
     <xwiki.extension.name>Required Rights API</xwiki.extension.name>
     <!-- Category to display in the Extension Manager. -->
     <xwiki.extension.category>api</xwiki.extension.category>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

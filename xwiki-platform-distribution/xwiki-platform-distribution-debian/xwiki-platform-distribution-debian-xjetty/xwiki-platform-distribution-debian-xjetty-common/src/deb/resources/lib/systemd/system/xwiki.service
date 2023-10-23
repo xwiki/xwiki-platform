@@ -9,10 +9,12 @@ After=network.target
 RequiresMountsFor=/var/lib/xwiki/data
 
 [Service]
+WorkingDirectory=/var/lib/xwiki/
+
 # Lifecycle
 Type=simple
-ExecStart=/bin/sh /usr/lib/xwiki-jetty/start_xwiki.sh
-ExecStop=/bin/sh /usr/lib/xwiki-jetty/stop_xwiki.sh
+ExecStart=/bin/bash /usr/lib/xwiki-jetty/start_xwiki.sh
+ExecStop=/bin/bash /usr/lib/xwiki-jetty/stop_xwiki.sh
 Restart=on-abort
 
 # Logging

@@ -19,9 +19,9 @@
  */
 define('xwiki-realtime-typingTests', function() {
   'use strict';
-  var setRandomizedInterval = function(func, target, range) {
-    var timeout;
-    var again = function() {
+  function setRandomizedInterval(func, target, range) {
+    let timeout;
+    const again = function() {
       timeout = setTimeout(function() {
         again();
         func();
@@ -33,44 +33,37 @@ define('xwiki-realtime-typingTests', function() {
         clearTimeout(timeout);
       }
     };
-  };
+  }
 
-  var testInput = function(rootElement, textNode, offset, callback) {
-    var i = 0,
+  function testInput(rootElement, textNode, offset, callback) {
+    let i = 0,
       j = offset,
       textInput = " The quick red fox jumps over the lazy brown dog.",
-      errors = 0,
-      maxErrors = 15,
       interval;
-    var cancel = function() {
+    const cancel = function() {
       interval.cancel();
     };
 
     interval = setRandomizedInterval(function() {
       callback();
-      try {
-        // "Type" the next character from the text input inside the given text node.
-        textNode.insertData(Math.min(j, textNode.length), textInput.charAt(i));
-      } catch (error) {
-        errors++;
-        if (errors >= maxErrors) {
-          console.log('Max error number exceeded.');
-          cancel();
-        }
 
-        console.error(error);
+      if (textNode?.isConnected && textNode?.nodeType === Node.TEXT_NODE) {
+        // "Type" the next character from the text input.
+        textNode.insertData(Math.min(j, textNode.length), textInput.charAt(i));
+      } else {
         // Continue typing in a new text node.
         textNode = document.createTextNode('');
         rootElement.appendChild(textNode);
         j = -1;
       }
+
       // Type again the text input when we finish it.
       i = (i + 1) % textInput.length;
       j++;
     }, 200, 50);
 
     return {cancel};
-  };
+  }
 
   return {
     setRandomizedInterval,

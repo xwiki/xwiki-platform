@@ -581,11 +581,11 @@ define('xwiki-realtime-saver', [
         }
       };
 
-      var saveRoutine = function(andThen, force, autosave) {
+      function saveRoutine(andThen, force) {
         // If this is ever true in your save routine, complain and abort.
         lastSaved.receivedISAVE = false;
 
-        var toSave = mainConfig.getTextValue();
+        const toSave = mainConfig.getTextValue();
         if (toSave === null) {
           warn("Unable to get the content of the document. Don't save.");
           return;
@@ -601,34 +601,35 @@ define('xwiki-realtime-saver', [
         } else {
           andThen(null, true);
         }
-      };
+      }
 
-      var saveButtonAction = function(cont) {
-        debug("Saver.create.saveand" + (cont ? 'view' : 'continue'));
+      let preventDefaultSave = true;
+      function saveButtonAction(continueEditing) {
+        debug("Saver.create.saveand" + (continueEditing ? 'continue' : 'view'));
 
         saveRoutine(function(e) {
           if (e) {
             warn(e);
           }
 
-          lastSaved.shouldRedirect = cont;
-          document.fire('xwiki:actions:save', {
-            form: $('#' + config.formId)[0],
-            continue: 1
-          });
-        }, /* force: */ true, cont);
-      };
+          lastSaved.shouldRedirect = !continueEditing;
+          preventDefaultSave = false;
+          // We use the Save & Continue button to trigger the save because we want to perform some action after the
+          // content is saved and we handle the redirect to view mode ourselves.
+          $(`#${config.formId} [name="action_saveandcontinue"]`).click();
+        }, /* force: */ true);
+      }
 
-      // Replace callbacks for the save buttons.
-      $('[name="action_save"], [name="action_saveandcontinue"]').each(function() {
-        // TODO: Update this if we rewrite actionButtons.js to use jQuery instead of Prototype.js
-        var clickListeners = Event.cache[this._prototypeUID || this.uniqueID]?.click?.map(entry => entry.handler);
-        $(this).data('prototype.js/clickListeners', clickListeners);
-        this.stopObserving('click');
-      }).off('click.realtime-saver').on('click.realtime-saver', function(event) {
-        event.preventDefault();
-        saveButtonAction(/* shouldRedirect: */ $(this).attr('name') === 'action_save');
-      });
+      // Special handling of save action.
+      $(document).off('xwiki:actions:beforeSave.realtime-saver')
+        .on('xwiki:actions:beforeSave.realtime-saver', function(event) {
+          if (preventDefaultSave) {
+            event.preventDefault();
+            saveButtonAction($(event.target).attr('name') === 'action_saveandcontinue');
+          }
+          // Reset the flag for the next save.
+          preventDefaultSave = true;
+        });
 
       // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
       $('[name="action_preview"]').remove();
@@ -799,11 +800,11 @@ define('xwiki-realtime-saver', [
     clearTimeout(mainConfig.autosaveTimeout);
     rtData = {};
     // Remove the merge routine from the save buttons.
-    $(document).off('xwiki:document:saved.realtime-saver xwiki:document:saveFailed.realtime-saver');
-    // Remove our custom click listeners from the save buttons and restore the original click listeners.
-    $('[name="action_save"], [name="action_saveandcontinue"]').off('click.realtime-saver').each(function() {
-      $(this).data('prototype.js/clickListeners')?.forEach(this.observe.bind(this, 'click'));
-    });
+    $(document).off([
+      'xwiki:actions:beforeSave.realtime-saver',
+      'xwiki:document:saved.realtime-saver',
+      'xwiki:document:saveFailed.realtime-saver'
+    ].join(' '));
   };
 
   Saver.setLastSavedContent = function(content) {

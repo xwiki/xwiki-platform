@@ -32,8 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Skin - Tests - Page Objects</description>
   <properties>
-    <!-- None of the classes is valid -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

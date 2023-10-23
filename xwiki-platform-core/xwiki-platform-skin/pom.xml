@@ -35,6 +35,13 @@
     <module>xwiki-platform-skin-api</module>
     <module>xwiki-platform-skin-skinx</module>
     <module>xwiki-platform-skin-ui</module>
-    <module>xwiki-platform-skin-test</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-skin-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

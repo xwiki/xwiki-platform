@@ -78,3 +78,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+/unit-tests.xml
+/*.tgz

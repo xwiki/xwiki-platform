@@ -18,24 +18,61 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 pipeline {
-    agent {
-        dockerContainer 'node:18.18.1-alpine3.18'
-    }
+    agent any
     stages {
+        stage('Debug') {
+            steps {
+                sh 'id'
+                sh 'pwd'
+            }
+        }
+        stage('Install') {
+            steps {
+                nvm('v18.18.2') {
+                    sh 'npm ci'
+                }
+            }
+        }
+        stage('Lint') {
+            steps {
+                nvm('v18.18.2') {
+                    sh 'npm run lint'
+                }
+            }
+        }
         stage('Build') {
             steps {
-                sh 'npm install'
+                nvm('v18.18.2') {
+                    sh 'npm run build'
+                }
             }
         }
         stage('Unit Tests') {
             steps {
-                sh 'npm run test:unit'
+                nvm('v18.18.2') {
+                    sh 'npm run test:unit:ci'
+                }
             }
         }
         stage('End to End Tests') {
             steps {
-                sh 'npm run test:e2e:dev'
+                nvm('v18.18.2') {
+                    sh 'npm run test:e2e'
+                }
             }
+        }
+        stage('Pack') {
+            steps {
+                nvm('v18.18.2') {
+                    sh 'npm pack'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: '*.tgz', fingerprint: true
+            junit 'unit-tests.xml'
         }
     }
 }

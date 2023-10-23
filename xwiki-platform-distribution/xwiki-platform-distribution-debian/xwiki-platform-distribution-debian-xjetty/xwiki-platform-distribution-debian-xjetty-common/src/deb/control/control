@@ -1,11 +1,9 @@
-Package: xwiki-common
+Package: xwiki-xjetty-common
 Version: [[version]]
 Section: java
 Priority: optional
-Provides: xwiki
 Architecture: all
-Depends: ucf (>= 0.30), dbconfig-common (>= 1.8.0), openjdk-17-jre-headless | openjdk-11-jre-headless
-Conflicts: xwiki-enterprise-common
+Depends: xwiki-common (= [[version]])
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

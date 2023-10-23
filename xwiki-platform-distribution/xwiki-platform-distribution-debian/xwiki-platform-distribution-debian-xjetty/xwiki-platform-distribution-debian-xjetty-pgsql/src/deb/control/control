@@ -1,11 +1,12 @@
-Package: xwiki-common
+Package: xwiki-xjetty-pgsql
 Version: [[version]]
 Section: java
 Priority: optional
-Provides: xwiki
 Architecture: all
-Depends: ucf (>= 0.30), dbconfig-common (>= 1.8.0), openjdk-17-jre-headless | openjdk-11-jre-headless
-Conflicts: xwiki-enterprise-common
+Depends: xwiki-pgsql-common (= [[version]]), xwiki-xjetty-common (= [[version]])
+Provides: xwiki-tomcat-database
+Replaces: xwiki-tomcat-database
+Conflicts: xwiki-tomcat-database
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

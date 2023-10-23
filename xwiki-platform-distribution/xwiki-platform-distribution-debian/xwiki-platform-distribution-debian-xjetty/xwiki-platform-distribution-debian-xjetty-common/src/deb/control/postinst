@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+#########################
+# Rights
+#########################
+
+## Make sure XWiki is able to write in the data folder
+if [ ! 'xwiki' = `stat -c '%U' /var/lib/xwiki/data` ]; then
+  chown -R tomcat.tomcat /var/lib/xwiki/data
+fi
+
+#########################
+# Configuration
+#########################
+
+. /usr/share/debconf/confmodule
+
+#########################
+# Reload the service
+#########################
+
+# Need to reload systemd for the injected xwiki service configuration to be taken into account
+systemctl daemon-reload

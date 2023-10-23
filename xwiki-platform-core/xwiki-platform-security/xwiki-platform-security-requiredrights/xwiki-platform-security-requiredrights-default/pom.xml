@@ -31,6 +31,10 @@
   <description>Default implementation of the Required Rights API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Required Rights Application</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

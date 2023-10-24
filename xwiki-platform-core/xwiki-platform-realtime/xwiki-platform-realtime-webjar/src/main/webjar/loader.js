@@ -33,17 +33,17 @@ define('xwiki-realtime-loader', [
 
   if (!realtimeConfig.webSocketURL) {
     console.log('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
-    return false;
+    return;
   }
 
-  var module = {messages: Messages},
+  let module = {messages: Messages},
 
   // FIXME: The real-time JavaScript code is not loaded anymore on the "lock" page so this code is not really used. We
   // need to decide if we want to re-add the real-time JavaScript code on the lock page and how.
   getDocLock = module.getDocLock = function() {
-    var lockedBy = document.querySelectorAll('p.xwikimessage .wikilink a');
-    var force = document.querySelectorAll('a[href*="force=1"][href*="/edit/"]');
-    return (lockedBy.length && force.length) ? force[0] : false;
+    const lockedBy = document.querySelectorAll('p.xwikimessage .wikilink a');
+    const force = document.querySelectorAll('a[href*="force=1"][href*="/edit/"]');
+    return (lockedBy.length && force.length) ? force[0] : null;
   },
 
   isForced = module.isForced = window.location.href.indexOf('force=1') >= 0,
@@ -68,7 +68,7 @@ define('xwiki-realtime-loader', [
   },
 
   getConfig = module.getConfig = function() {
-    var userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
+    const userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
     return {
       WebsocketURL: realtimeConfig.webSocketURL,
       htmlConverterUrl: new XWiki.Document('ConvertHTML', 'RTFrontend').getURL('get', $.param({
@@ -91,7 +91,7 @@ define('xwiki-realtime-loader', [
   // Returns a promise that resolves with the list of editor channels available for the content field of the current
   // document in the current language.
   checkSocket = function() {
-    var path = doc.language + '/content/';
+    const path = doc.language + '/content/';
     return doc.getChannels({path}).then(function(channels) {
       return channels.filter(channel => channel?.path?.length > 2 && channel?.userCount > 0)
         .map(channel => channel.path.slice(2).join('/'));
@@ -122,7 +122,7 @@ define('xwiki-realtime-loader', [
     }
   };
 
-  var displayModal = module.displayModal = function(createType, existingTypes, callback, info) {
+  let displayModal = module.displayModal = function(createType, existingTypes, callback, info) {
     if (XWiki.widgets.RealtimeCreateModal) {
       return;
     }
@@ -153,16 +153,16 @@ define('xwiki-realtime-loader', [
        * Gets the content of the modal dialog using AJAX.
        */
       createContent : function() {
-        var message = Messages.requestASession;
+        let message = Messages.requestASession;
         if (existingTypes.length > 1) {
           message = Messages['redirectDialog.pluralPrompt'];
         } else if (existingTypes.length === 1) {
           message = Messages.sessionInProgress;
         }
 
-        var content = createModalContent(message, Messages.get('redirectDialog.create', info.name));
-        var classesButtons = existingTypes.map(type => 'realtime-button-' + type).join(' ');
-        var buttonsDiv = content.find('.realtime-buttons').addClass(classesButtons).data('modal', this);
+        const content = createModalContent(message, Messages.get('redirectDialog.create', info.name));
+        const classesButtons = existingTypes.map(type => 'realtime-button-' + type).join(' ');
+        const buttonsDiv = content.find('.realtime-buttons').addClass(classesButtons).data('modal', this);
         buttonsDiv.find('button').on('click', function() {
           callback();
           buttonsDiv.data('modal').closeDialog();
@@ -201,7 +201,7 @@ define('xwiki-realtime-loader', [
   },
 
   createModalContent = function(message, primaryActionLabel) {
-    var content = $(
+    const content = $(
       '<div class="modal-popup">' +
         '<p></p>' +
         '<div class="realtime-buttons">' +
@@ -215,12 +215,13 @@ define('xwiki-realtime-loader', [
   },
 
   getRequestContent = function(info, callback) {
-    var content = createModalContent(Messages['requestDialog.prompt'], Messages.get('requestDialog.create', info.name));
+    const content = createModalContent(Messages['requestDialog.prompt'],
+      Messages.get('requestDialog.create', info.name));
 
     // Initialize auto-accept
-    var autoAccept = $('<p></p>').appendTo(content);
-    var i = 30;
-    var interval = setInterval(function() {
+    const autoAccept = $('<p></p>').appendTo(content);
+    let i = 30;
+    const interval = setInterval(function() {
       i--;
       autoAccept.html(Messages['requestDialog.autoAccept'] + i + 's');
       if (i <= 0) {
@@ -230,7 +231,7 @@ define('xwiki-realtime-loader', [
       }
     }, 1000);
 
-    var buttonCreate = content.find('button').on('click', function() {
+    const buttonCreate = content.find('button').on('click', function() {
       clearInterval(interval);
       try {
         callback(true);
@@ -239,7 +240,7 @@ define('xwiki-realtime-loader', [
       }
     });
 
-    var buttonReject = $('<button class="btn btn-danger"></button>').text(Messages['requestDialog.reject']);
+    const buttonReject = $('<button class="btn btn-danger"></button>').text(Messages['requestDialog.reject']);
     buttonReject.insertBefore(buttonCreate).on('click', function() {
       clearInterval(interval);
       try {
@@ -260,8 +261,8 @@ define('xwiki-realtime-loader', [
   },
 
   getReloadContent = function() {
-    var content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
-    var buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
+    const content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
+    const buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
     buttonReload.on('click', window.location.reload.bind(window.location, true)).insertAfter(content.find('button'));
     return content[0];
   },
@@ -275,15 +276,15 @@ define('xwiki-realtime-loader', [
   };
 
   module.displayDisableModal = function(callback) {
-    var content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
+    const content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
 
-    var buttonOK = content.find('button').on('click', callback.bind(null, true));
+    const buttonOK = content.find('button').on('click', callback.bind(null, true));
     $('<button class="btn btn-default"></button>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
       .on('click', callback.bind(null, false));
-    return void displayCustomModal(content[0]);
+    displayCustomModal(content[0]);
   };
 
-  var availableRt = {};
+  const availableRt = {};
   module.setAvailableRt = function(info) {
     availableRt[info.type] = {
       info,
@@ -291,16 +292,16 @@ define('xwiki-realtime-loader', [
     };
   };
 
-  var createRtCalled = false,
+  let createRtCalled = false,
   createRt = function(info) {
     if (createRtCalled) {
       return;
     }
     createRtCalled = true;
-    var $saveButton = $('#mainEditArea').find('input[name="action_saveandcontinue"]');
+    const $saveButton = $('#mainEditArea').find('input[name="action_saveandcontinue"]');
     if ($saveButton.length) {
-      var comment = $('#commentinput');
-      var previousComment = comment.val();
+      const comment = $('#commentinput');
+      const previousComment = comment.val();
       comment.val(Messages.autoAcceptSave);
       $saveButton.click();
       $(document).one('xwiki:document:saved.createRt', function() {
@@ -317,7 +318,7 @@ define('xwiki-realtime-loader', [
   },
 
   isEditorCompatible = function() {
-    var matchedType;
+    let matchedType;
     Object.keys(availableRt).some(function(type) {
       if ((availableRt[type].info.compatible || []).indexOf(XWiki.editor) !== -1) {
         matchedType = type;
@@ -335,19 +336,12 @@ define('xwiki-realtime-loader', [
     }, 5000);
   });
 
-  var fullScreen = !!($('body').attr('data-maximized') || $('html').attr('style')),
+  let fullScreen = !!($('body').attr('data-maximized') || $('html').attr('style')),
 
   // Trigger a resize event to resize the editable area in fullscreen mode.
   resize = function() {
-    var event;
-    if (typeof(Event) === 'function') {
-      event = new Event('resize');
-    } else {
-      event = document.createEvent('Event');
-      event.initEvent('resize', true, true);
-    }
     setTimeout(function() {
-      window.dispatchEvent(event);
+      window.dispatchEvent(new Event('resize'));
     });
   },
 
@@ -385,26 +379,26 @@ define('xwiki-realtime-loader', [
   });
 
   // Scroll to the warning box when a message is displayed or updated.
-  var scrollToBox = function($box) {
+  let scrollToBox = function($box) {
     moveBox();
     $box[0].scrollIntoView();
   },
 
   warningVisible = false,
   displayWarning = function() {
-    var $after = getBoxPosition();
+    const $after = getBoxPosition();
     if (unload || warningVisible || !$after.length) {
       return;
     }
     warningVisible = true;
-    var $warning = $('<div></div>', {
+    const $warning = $('<div></div>', {
       'class': 'xwiki-realtime-warning xwiki-realtime-box box warningmessage'
     }).insertAfter($after);
     scrollToBox($warning);
     $('<strong></strong>').text(Messages.conflictsWarning).appendTo($warning);
     $('<br/>').appendTo($warning);
     $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
-    var editor = isEditorCompatible();
+    const editor = isEditorCompatible();
     if (!module.isRt && editor) {
       $('<br/>').appendTo($warning);
       $('<span></span>').html(Messages.conflictsWarningInfo).appendTo($warning);
@@ -418,13 +412,13 @@ define('xwiki-realtime-loader', [
   },
 
   displayWsWarning = function(isError) {
-    var $after = getBoxPosition();
+    const $after = getBoxPosition();
     if (unload || warningVisible || !$after.length) {
       return;
     }
     warningVisible = true;
-    var type = isError ? 'errormessage' : 'warningmessage';
-    var $warning = $('<div></div>', {
+    const type = isError ? 'errormessage' : 'warningmessage';
+    const $warning = $('<div></div>', {
       'class': 'xwiki-realtime-warning xwiki-realtime-box box ' + type
     }).insertAfter($after);
     scrollToBox($warning);
@@ -445,12 +439,12 @@ define('xwiki-realtime-loader', [
 
   connectingVisible = false,
   displayConnecting = function() {
-    var $after = getBoxPosition();
+    const $after = getBoxPosition();
     if (unload || connectingVisible || !$after.length) {
       return;
     }
     connectingVisible = true;
-    var $warning = $('<div></div>', {
+    const $warning = $('<div></div>', {
       'class': 'xwiki-realtime-connecting xwiki-realtime-box box infomessage'
     }).insertAfter($after);
     scrollToBox($warning);
@@ -465,12 +459,12 @@ define('xwiki-realtime-loader', [
 
   wsErrorVisible = false,
   displayWsError = function() {
-    var $after = getBoxPosition();
+    const $after = getBoxPosition();
     if (unload || wsErrorVisible || !$after.length) {
       return;
     }
     wsErrorVisible = true;
-    var $warning = $('<div></div>', {
+    const $warning = $('<div></div>', {
       'class': 'xwiki-realtime-disconnected xwiki-realtime-box box errormessage'
     }).insertAfter($after);
     scrollToBox($warning);
@@ -522,8 +516,8 @@ define('xwiki-realtime-loader', [
     if (!allRt.wChan) {
       return;
     }
-    var channel = allRt.wChan;
-    var network = allRt.network;
+    const channel = allRt.wChan;
+    const network = allRt.network;
     // Handle leave events.
     channel.on('leave', function() {
       hideWarning();
@@ -533,7 +527,7 @@ define('xwiki-realtime-loader', [
     });
     // Handle incoming messages.
     channel.on('message', function(msg, sender) {
-      var data = tryParse(msg);
+      const data = tryParse(msg);
       switch(data?.cmd) {
         // Someone wants to create a realtime session. If the current user is editing offline, display the modal.
         case 'request': return onRequestMessage(data, channel);
@@ -551,7 +545,7 @@ define('xwiki-realtime-loader', [
     if (lock || !data.type) {
       return;
     }
-    var response = {
+    const response = {
       cmd: 'answer',
       type: data.type
     };
@@ -570,7 +564,7 @@ define('xwiki-realtime-loader', [
       channel.bcast(JSON.stringify(response));
     // We're editing offline: display the modal.
     } else {
-      var content = getRequestContent(availableRt[data.type].info, function(state) {
+      const content = getRequestContent(availableRt[data.type].info, function(state) {
         if (state) {
           // Accepted: save and create the realtime session.
           availableRt[data.type].cb();
@@ -589,7 +583,7 @@ define('xwiki-realtime-loader', [
     if (!allRt.request) {
       return;
     }
-    var state = data.state;
+    const state = data.state;
     allRt.request(state);
     if (state === -1) {
       ErrorBox.show('unavailable');
@@ -625,16 +619,16 @@ define('xwiki-realtime-loader', [
   },
 
   joinAllUsers = function() {
-    var config = getConfig();
-    var getChannels = doc.getChannels.bind(doc, {
+    const config = getConfig();
+    const getChannels = doc.getChannels.bind(doc, {
       path: doc.language + '/events/all',
       create: true
     });
     getChannels().then(channels => {
-      var channelKey = channels[0].key;
+      const channelKey = channels[0].key;
       if (channelKey) {
         require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
-          var onError = function (error) {
+          const onError = function (error) {
             allRt.error = true;
             displayWsWarning();
             console.error(error);
@@ -649,7 +643,7 @@ define('xwiki-realtime-loader', [
 
   onNetfluxConnect = function(config, getChannels, channelKey, onError, network) {
     allRt.network = network;
-    var onOpen = function(channel) {
+    const onOpen = function(channel) {
       allRt.userList = channel.members;
       allRt.wChan = channel;
       addMessageHandler();
@@ -665,7 +659,7 @@ define('xwiki-realtime-loader', [
     network.join(channelKey).then(onOpen, onError);
     // Add direct messages handler.
     network.on('message', function(msg, sender) {
-      var data = tryParse(msg);
+      const data = tryParse(msg);
       if (data?.cmd === 'displayWarning') {
         displayWarning();
       }
@@ -712,7 +706,7 @@ define('xwiki-realtime-loader', [
     // Replace the save actions to check the version first.
     $('#mainEditArea').find('input[name="action_save"], input[name="action_saveandcontinue"]').each(function() {
       // TODO: Update this if we rewrite actionButtons.js to use jQuery instead of Prototype.js
-      var clickListeners = Event.cache[this._prototypeUID || this.uniqueID]?.click?.map(entry => entry.handler);
+      const clickListeners = Event.cache[this._prototypeUID || this.uniqueID]?.click?.map(entry => entry.handler);
       $(this).data('prototype.js/clickListeners', clickListeners);
       this.stopObserving('click');
     }).off('click.realtime-loader').on('click.realtime-loader', function(event) {
@@ -746,10 +740,10 @@ define('xwiki-realtime-loader', [
   },
 
   parseKeyData = function(editorId, channels) {
-    var keys = {};
-    var eventsChannel = channels.getByPath([doc.language, 'events', '1.0']);
-    var userDataChannel = channels.getByPath([doc.language, 'events', 'userdata']);
-    var editorChannel = channels.getByPath([doc.language, 'content', editorId]);
+    let keys = {};
+    const eventsChannel = channels.getByPath([doc.language, 'events', '1.0']);
+    const userDataChannel = channels.getByPath([doc.language, 'events', 'userdata']);
+    const editorChannel = channels.getByPath([doc.language, 'content', editorId]);
     if (!eventsChannel || !userDataChannel || !editorChannel) {
       console.error('Missing document channels.');
     } else {

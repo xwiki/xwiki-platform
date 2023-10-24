@@ -22,6 +22,10 @@
   "prHourlyLimit" : 0,
   "prConcurrentLimit" : 0,
 
+  // Create different pull request for each major upgrade
+  "separateMajorReleases" : true,
+  "separateMultipleMajor" : true,
+
   // Skip Eclipse M2E special setup "dependency"
   "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],
 

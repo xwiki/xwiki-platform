@@ -24,17 +24,28 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>15.10-SNAPSHOT</version>
+    <artifactId>xwiki-platform-realtime-wysiwyg</artifactId>
+    <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-realtime</artifactId>
-  <name>XWiki Platform - Realtime - Parent POM</name>
+  <artifactId>xwiki-platform-realtime-wysiwyg-test</artifactId>
+  <name>XWiki Platform - Realtime - WYSIWYG - Test - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Adds support for real-time editing in XWiki.</description>
+  <description>Tests for the Realtime WYSIWYG Editor</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-realtime-ui</module>
-    <module>xwiki-platform-realtime-webjar</module>
-    <module>xwiki-platform-realtime-wiki</module>
-    <module>xwiki-platform-realtime-wysiwyg</module>
+    <module>xwiki-platform-realtime-wysiwyg-test-pageobjects</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-realtime-wysiwyg-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

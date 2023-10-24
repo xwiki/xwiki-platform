@@ -40,6 +40,9 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
     @FindBy(name = "XWiki.EditorBindingClass_0_roleHint")
     private WebElement defaultWYSIWYGEditorSelect;
 
+    @FindBy(css = "form#wysiwyg input[name='formactionsac'][type='submit']")
+    private WebElement saveButton;
+
     /**
      * Open the WYSIWYG editor administration section.
      * 
@@ -64,6 +67,14 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
     public Select getDefaultWYSIWYGEditorSelect()
     {
         return new Select(this.defaultWYSIWYGEditorSelect);
+    }
+
+    public WYSIWYGEditorAdministrationSectionPage setDefaultWYSIWYGEditor(String editorName)
+    {
+        getDefaultWYSIWYGEditorSelect().selectByVisibleText(editorName);
+        // The save action reloads the page.
+        this.saveButton.click();
+        return new WYSIWYGEditorAdministrationSectionPage();
     }
 
     /**

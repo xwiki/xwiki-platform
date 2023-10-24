@@ -85,11 +85,12 @@ define('xwiki-realtime-wysiwygEditor', [
     }
 
     Interface.realtimeAllowed(useRt);
+    let allowRealtimeCheckbox = $();
     // Don't display the checkbox in the following cases:
     // * useRt 0 (instead of true/false) => we can't connect to the websocket service
     // * realtime is disabled and we're not an advanced user
     if (useRt !== 0 && (useRt || editorConfig.isAdvancedUser)) {
-      const allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
+      allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
       allowRealtimeCheckbox.on('change', function() {
         if (allowRealtimeCheckbox.prop('checked')) {
           Interface.realtimeAllowed(true);

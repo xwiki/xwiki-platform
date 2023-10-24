@@ -28,7 +28,7 @@
     <version>15.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-realtime-wiki</artifactId>
-  <name>XWiki Platform - Realtime - Wiki</name>
+  <name>XWiki Platform - Realtime - Wiki - Parent POM</name>
   <packaging>pom</packaging>
   <description>Adds support for real-time wiki syntax (text) editing in XWiki.</description>
   <modules>

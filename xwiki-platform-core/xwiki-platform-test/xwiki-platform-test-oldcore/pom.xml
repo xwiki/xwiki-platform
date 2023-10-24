@@ -65,7 +65,7 @@
     <dependency>
       <groupId>jmock</groupId>
       <artifactId>jmock</artifactId>
-      <version>1.2.0</version>
+      <version>2004-03-19</version>
     </dependency>
     <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
     <dependency>

@@ -24,17 +24,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>15.5.4-SNAPSHOT</version>
+    <artifactId>xwiki-platform-realtime-wysiwyg-test</artifactId>
+    <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-realtime</artifactId>
-  <name>XWiki Platform - Realtime - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Adds support for real-time editing in XWiki.</description>
-  <modules>
-    <module>xwiki-platform-realtime-ui</module>
-    <module>xwiki-platform-realtime-webjar</module>
-    <module>xwiki-platform-realtime-wiki</module>
-    <module>xwiki-platform-realtime-wysiwyg</module>
-  </modules>
+  <artifactId>xwiki-platform-realtime-wysiwyg-test-pageobjects</artifactId>
+  <name>XWiki Platform - Realtime - WYSIWYG - Test - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>Page Objects for the Realtime WYSIWYG Editor</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- The realtime WYSIWYG editor is based on CKEditor. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

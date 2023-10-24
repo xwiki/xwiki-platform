@@ -28,11 +28,19 @@
     <version>15.5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-realtime-wysiwyg</artifactId>
-  <name>XWiki Platform - Realtime - WYSIWYG</name>
+  <name>XWiki Platform - Realtime - WYSIWYG - Parent POM</name>
   <packaging>pom</packaging>
   <description>Adds support for real-time WYSIWYG (rich-text) editing in XWiki.</description>
   <modules>
     <module>xwiki-platform-realtime-wysiwyg-ui</module>
     <module>xwiki-platform-realtime-wysiwyg-webjar</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-realtime-wysiwyg-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

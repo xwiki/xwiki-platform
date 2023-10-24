@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.29</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <!-- We are stuck at version 9.x until we upgrade to a version of SolrJ which use a more recent version (or something else) -->
-    <jetty.client.version>9.4.53.v20231009</jetty.client.version>
+    <jetty.client.version>11.0.17</jetty.client.version>
     <jetty.server.version>10.0.17</jetty.server.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.1.100.Final</netty.version>

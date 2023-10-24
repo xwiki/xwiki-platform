@@ -18,7 +18,7 @@
     "lz-string": "1.5.0",
     "u-node": "0.0.2",
     "vuedraggable": "2.24.3",
-    "vue-tippy": "4.16.0",
+    "vue-tippy": "6.3.1",
     "vue2-touch-events": "3.2.3",
     "dompurify": "3.0.6"
   },

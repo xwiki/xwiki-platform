@@ -36,58 +36,6 @@
     {
       "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
       "enabled": false
-    },
-
-    // We have to stay on Jetty Client 9 for now
-    {
-      "matchPackagePrefixes": ["org.eclipse.jetty"],
-      "allowedVersions": "/^9\..*$/"
-    },
-    // But we can use Jetty Server 10
-    {
-      "matchPackageNames": ["org.eclipse.jetty:jetty-server"],
-      "allowedVersions": "/^10\..*$/"
-    },
-
-    // Remove when upgrading to Solr 9
-    {
-      "matchPackagePrefixes": ["org.apache.solr"],
-      "allowedVersions": "/^8\..*$/"
-    },
-
-    // Various dependencies we cannot update yet because of the move to jakarta package
-    {
-      "matchPackagePrefixes": ["org.hibernate:hibernate-"],
-      "allowedVersions": "/^5\..*$/"
-    },
-    {
-      "matchPackagePrefixes": ["org.simplejavamail:simple-java-mail"],
-      "allowedVersions": "/^6\..*$/"
-    },
-    {
-      "matchPackagePrefixes": ["com.icegreen:greenmail-junit5"],
-      "allowedVersions": "/^1\..*$/"
-    },
-
-    // We currently support Vue 2.
-    {
-      "matchPackageNames": ["vue", "org.webjars.npm:vue"],
-      "allowedVersions": "/^2\..*$/"
-    },
-    {
-      "matchPackageNames": ["@vue/test-utils"],
-      // @vue/test-utils 1.x targets Vue 2. @vue/test-utils 2.x targets Vue 3.
-      "allowedVersions": "/^1\..*$/"
-    },
-    {
-      "matchPackageNames": ["vue-i18n", "org.webjars.npm:vue-i18n"],
-      // vue-i18n 8.x targets Vue 2. vue-i18n 9.x targets Vue 3.
-      "allowedVersions": "/^8\..*$/"
-    },
-    {
-      "matchPackageNames": ["vue-tippy"],
-      // vue-tippy 4.x targets Vue 2. vue-tippy 9.x targets Vue 3.
-      "allowedVersions": "/^4\..*$/"
     }
   ]
 }

@@ -1,7 +1,10 @@
 org.xwiki.extension.index.internal.DefaultExtensionIndex
 org.xwiki.extension.index.internal.ExtensionIndexInitializerListener
 org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer
+org.xwiki.extension.index.internal.ExtensionIndexSolrUtil
 org.xwiki.extension.index.internal.ExtensionIndexStore
 org.xwiki.extension.index.internal.ExtensionInstallListener
 org.xwiki.extension.index.internal.job.ExtensionIndexJob
 org.xwiki.extension.index.internal.job.ExtensionIndexJobScheduler
+org.xwiki.extension.index.internal.migration.R150501000XWIKI21136DataMigration
+org.xwiki.extension.index.internal.listener.ExtensionIndexCleanupListener

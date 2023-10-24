@@ -1,0 +1,93 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+ {
+  // We want all suggestions right away
+  "prHourlyLimit" : 0,
+  "prConcurrentLimit" : 0,
+
+  // Skip Eclipse M2E special setup "dependency"
+  "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],
+
+  "packageRules": [
+    // Indicate the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
+    {
+      "matchDatasources": ["maven"],
+      "registryUrls": ["https://nexus.xwiki.org/nexus/content/repositories/public/"]
+    },
+
+    // There is no point trying to find updates for commons, rendering and platform dependencies
+    {
+      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
+      "enabled": false
+    },
+
+    // We have to stay on Jetty Client 9 for now
+    {
+      "matchPackagePrefixes": ["org.eclipse.jetty"],
+      "allowedVersions": "/^9\..*$/"
+    },
+    // But we can use Jetty Server 10
+    {
+      "matchPackageNames": ["org.eclipse.jetty:jetty-server"],
+      "allowedVersions": "/^10\..*$/"
+    },
+
+    // Remove when upgrading to Solr 9
+    {
+      "matchPackagePrefixes": ["org.apache.solr"],
+      "allowedVersions": "/^8\..*$/"
+    },
+
+    // Various dependencies we cannot update yet because of the move to jakarta package
+    {
+      "matchPackagePrefixes": ["org.hibernate:hibernate-"],
+      "allowedVersions": "/^5\..*$/"
+    },
+    {
+      "matchPackagePrefixes": ["org.simplejavamail:simple-java-mail"],
+      "allowedVersions": "/^6\..*$/"
+    },
+    {
+      "matchPackagePrefixes": ["com.icegreen:greenmail-junit5"],
+      "allowedVersions": "/^1\..*$/"
+    },
+
+    // We currently support Vue 2.
+    {
+      "matchPackageNames": ["vue", "org.webjars.npm:vue"],
+      "allowedVersions": "/^2\..*$/"
+    },
+    {
+      "matchPackageNames": ["@vue/test-utils"],
+      // @vue/test-utils 1.x targets Vue 2. @vue/test-utils 2.x targets Vue 3.
+      "allowedVersions": "/^1\..*$/"
+    },
+    {
+      "matchPackageNames": ["vue-i18n", "org.webjars.npm:vue-i18n"],
+      // vue-i18n 8.x targets Vue 2. vue-i18n 9.x targets Vue 3.
+      "allowedVersions": "/^8\..*$/"
+    },
+    {
+      "matchPackageNames": ["vue-tippy"],
+      // vue-tippy 4.x targets Vue 2. vue-tippy 9.x targets Vue 3.
+      "allowedVersions": "/^4\..*$/"
+    }
+  ]
+}

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,6 +35,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.BaseDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataLayoutDescriptor;
@@ -182,7 +184,12 @@ public class LiveDataMacroConfiguration
     private LiveDataMeta getMeta(LiveDataMacroParameters parameters)
     {
         LiveDataMeta meta = new LiveDataMeta();
-        meta.setLayouts(getLayouts(parameters));
+        List<LiveDataLayoutDescriptor> layouts = getLayouts(parameters);
+        meta.setLayouts(layouts);
+        // If it exists, use the id of the first layout as the default layout. 
+        Optional.ofNullable(layouts)
+            .flatMap(ls -> ls.stream().findFirst().map(BaseDescriptor::getId))
+            .ifPresent(meta::setDefaultLayout);
         meta.setPagination(getPagination(parameters));
         return meta;
     }

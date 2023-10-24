@@ -39,9 +39,14 @@ public class ImageDialogUrlSelectForm extends BaseElement
      */
     public void setUrlValue(String url)
     {
-        WebElement iconField = getDriver()
-            .findElement(By.cssSelector(".image-selector-modal .image-selector .urlTab input[name='urlField']"));
-        iconField.clear();
-        iconField.sendKeys(url);
+        By urlFieldSelector = By.cssSelector(".image-selector-modal .image-selector .urlTab input[name='urlField']");
+        WebElement urlField = getDriver().findElement(urlFieldSelector);
+        getDriver().waitUntilElementIsEnabled(urlField);
+        urlField.clear();
+        // Wait for the select button to be disabled on the modal before continuing to make sure that the 
+        // set value is taken into account.
+        getDriver().waitUntilElementIsDisabled(
+            getDriver().findElement(By.cssSelector(".image-selector-modal button.btn-primary")));
+        urlField.sendKeys(url);
     }
 }

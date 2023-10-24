@@ -52,6 +52,7 @@ image.style.administration.liveData.type.hint=Тип стилю зображен
 image.style.administation.newImageStyle.label=Новий стиль зображення
 image.style.administation.newImageStyle.hint=Ідентифікатор нового стилю зображення.
 image.style.administation.newImageStyle.placeHolder=Ідентифікатор
+image.style.administation.newImageStyle.normalizedTitle=Новий стиль зображення, згідно з правилами іменування [{0}].
 Image.Style.Code.ImageStyleClass_adjustableAlignment=Регульоване вирівнювання
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Якщо цей пункт позначено, користувачеві дозволено налаштувати вирівнювання зображення.
 Image.Style.Code.ImageStyleClass_adjustableBorder=Регульована межа
@@ -82,5 +83,7 @@ Image.Style.Code.ImageStyleClass_type=Тип
 Image.Style.Code.ImageStyleClass_type_hint=Тип стилю зображення (використовується як CSS клас).
 Image.Style.Code.ConfigurationClass_defaultStyle=Стиль за умовчанням
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Стиль зображення за умовчанням для цієї вікі.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Примусово використовувати стиль за умовчанням
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Якщо вибрано, обмеження стилю за умовчанням застосовуються до конфігурації зображення, і користувачі змушені вибирати стиль.
 </content>
 </xwikidoc>

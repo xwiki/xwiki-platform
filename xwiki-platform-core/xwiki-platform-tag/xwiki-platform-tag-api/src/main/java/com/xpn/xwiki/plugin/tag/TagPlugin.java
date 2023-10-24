@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,6 +44,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * TagPlugin is a plugin that allows to manipulate tags easily. It allows to get, rename and delete tags.
@@ -80,6 +83,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     private static final String LIKE_APPEND = ".%";
 
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
     /**
      * Tag plugin constructor.
      * 
@@ -97,6 +102,16 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new TagPluginApi((TagPlugin) plugin, context);
+    }
+
+    private UserReferenceResolver getUserReferenceResolver()
+    {
+        if (this.documentReferenceUserReferenceResolver == null) {
+            this.documentReferenceUserReferenceResolver =
+                Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, "document");
+        }
+
+        return this.documentReferenceUserReferenceResolver;
     }
 
     /**
@@ -398,7 +413,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, tag);
 
             // Since we're changing the document we need to set the new author
-            document.setAuthorReference(context.getUserReference());
+            document.getAuthors()
+                .setOriginalMetadataAuthor(getUserReferenceResolver().resolve(context.getUserReference()));
 
             context.getWiki().saveDocument(document, comment, true, context);
 

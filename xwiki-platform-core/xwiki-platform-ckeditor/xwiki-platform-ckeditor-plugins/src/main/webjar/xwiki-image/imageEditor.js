@@ -88,6 +88,11 @@ define('imageEditor', [
   'xwiki-selectize'
 ], function($, $modal, imageStyleClient, translations) {
     'use strict';
+    
+    // Used to store the image styles once loaded by initImageStyleField.
+    var imageStylesCache;
+  // Used to store the default style configuration once loaded by loadImageStylesDefault.
+    var defaultStyleCache;
 
     function initImageStyleField(modal) {
       return new Promise(function(resolve, reject) {
@@ -97,6 +102,7 @@ define('imageEditor', [
         if (imageStylesField.length > 0) {
           imageStyleClient.loadImageStylesDefault()
             .then(function(defaultStyle) {
+              defaultStyleCache = defaultStyle;
               var settings = {
                 preload: true,
                 persist: true,
@@ -106,15 +112,36 @@ define('imageEditor', [
                 load: function(typedText, callback) {
                   imageStyleClient.loadImageStyles().then(function(values) {
                     var imageStyles = values.imageStyles.map(function(value) {
+                      let type = value.type;
+                      // We don't persist the type (i.e., the empty string) when the default style is forced.
+                      // To do so, we replace the type of the default style with the empty string.
+                      if (defaultStyle.forceDefaultStyle === "true" && type === defaultStyle.defaultStyle) {
+                        type = '';
+                      }
                       return {
                         label: value.prettyName,
-                        value: value.type
+                        value: type
                       };
                     });
-                    imageStyles.unshift({label: '---', value: ''});
+                    // The '---' style is only introduced when the default style is not forced, meaning that users
+                    // are free to configure the image without constraints.
+                    if (defaultStyle.forceDefaultStyle !== "true") {
+                      imageStyles.unshift({label: '---', value: ''});
+                    }
+                    // Save the image styles in cache so that it can be used by other parts of the core. For instance,
+                    // to update the currently selected style if it is unknown.
+                    imageStylesCache = imageStyles;
                     callback(imageStyles);
+                    
+                    // Search for the type of the default image style by its identifier.
+                    const filteredValues = values.imageStyles.filter(
+                      (style) => style.identifier === defaultStyle.defaultStyle);
+                    let defaultType = "";
+                    if (defaultStyle.forceDefaultStyle !== "true" && filteredValues.length > 0) {
+                      defaultType = filteredValues[0].type;
+                    }
                     // Sets the default value once the values are loaded.
-                    imageStylesField.data('selectize').addItem(defaultStyle.defaultStyle || '');
+                    imageStylesField.data('selectize').addItem(defaultType || '');
                   }, function(err) {
                     reject(err);
                   });
@@ -168,6 +195,11 @@ define('imageEditor', [
       img.onload = function () {
         promise.resolve(this);
       };
+
+      img.onerror = function () {
+        promise.reject(this);
+      };
+      
       var data = modal.data('input');
       // Resolve the image url and assign it to a transient image object to be able to access its width and height.
       img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
@@ -290,6 +322,9 @@ define('imageEditor', [
 
           return result;
 
+        }, function () {
+          // Don't compute a dimension when the url cannot be resolved to an image.
+          return undefined;
         });
       }
 
@@ -309,7 +344,9 @@ define('imageEditor', [
           imageWidthField.prop('disabled', true);
           imageHeightField.prop('disabled', true);
           return $.when(updateRatio(field, inputValue)).then(function (value) {
-            targetField.val(value);
+            if (value !== undefined) {
+              targetField.val(value);
+            }
             imageWidthField.prop('disabled', false);
             imageHeightField.prop('disabled', false);
             // In Edge, when the fields are disabled, the focus is lost and needs to be restored after the size is 
@@ -443,7 +480,13 @@ define('imageEditor', [
     }
 
     function getImageResourceURL(resourceReference, editor, params) {
-      return CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor) + '&' + $.param(params || {});
+      var resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor);
+      // Only set the params for resource reference that can support it. Sending the custom params to external urls does
+      // not make sense as they are not able to interpret them.
+      if (resourceReference.type !== 'url') {
+        resourceURL = resourceURL + '&' + $.param(params || {});
+      }
+      return resourceURL;
     }
 
     function updateAdvancedFromStyle(imageStyle, modal) {
@@ -491,8 +534,15 @@ define('imageEditor', [
         modal.data('input').imageData = modal.data('input').imageData || {};
         modal.data('input').imageData.imageStyle = imageStyle;
 
+        var searchedImageStyle = imageStyle;
+        // Use the constraints of the default style when the style value is the empty string and forceDefaultStyle
+        // is set to true, as the default style is not persisted (i.e., the empty string).
+        if(defaultStyleCache.forceDefaultStyle === "true" && imageStyle === '') {
+          searchedImageStyle = defaultStyleCache.defaultStyle;
+        }
+        
         var config = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
-          return imageStyleConfig.type !== '' && imageStyleConfig.type === imageStyle;
+          return imageStyleConfig.type !== '' && imageStyleConfig.type === searchedImageStyle;
         });
         var noStyle = false;
         if (config === undefined) {
@@ -515,6 +565,19 @@ define('imageEditor', [
       });
     }
 
+    function updateImageStyleFormField(imageData) {
+      if (imageData.imageStyle || imageData.imageStyle === '') {
+        var style = imageData.imageStyle;
+        // Fallback to the default value if the currently defined style is unknown.
+        if (imageStylesCache !== undefined) {
+          if (!imageStylesCache.some((imageStyle) => imageStyle.value === imageData.imageStyle)) {
+            style = '';
+          }
+        }
+        $('#imageStyles')[0].selectize.setValue(style);
+      }
+    }
+
     // Update the form according to the modal input data.
     // 
     function updateForm(modal) {
@@ -528,9 +591,7 @@ define('imageEditor', [
       $('.image-editor a[href="#standard"]').tab('show');
 
       // Style
-      if (imageData.imageStyle || imageData.imageStyle === '') {
-        $('#imageStyles')[0].selectize.setValue(imageData.imageStyle);
-      }
+      updateImageStyleFormField(imageData);
 
       // Alt
       $('#altText').val(imageData.alt);

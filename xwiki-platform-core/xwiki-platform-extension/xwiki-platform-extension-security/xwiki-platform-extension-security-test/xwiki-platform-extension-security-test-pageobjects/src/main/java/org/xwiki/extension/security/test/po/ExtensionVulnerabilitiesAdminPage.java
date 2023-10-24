@@ -19,7 +19,9 @@
  */
 package org.xwiki.extension.security.test.po;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -39,8 +41,9 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
      * Go to the extension vulnerabilities section of the administration.
      *
      * @return the corresponding page object
+     * @since 15.5
      */
-    public static ExtensionVulnerabilitiesAdminPage getToExtensionVulnerabilitiesAdmin()
+    public static ExtensionVulnerabilitiesAdminPage goToExtensionVulnerabilitiesAdmin()
     {
         getUtil().gotoPage(new LocalDocumentReference("XWiki", "XWikiPreferences"), "admin", Map.of(
             "editor", "globaladmin",
@@ -65,6 +68,20 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
     }
 
     /**
+     * Set the url of the reviews url field in the configuration section.
+     *
+     * @param url the url to set to the reviews url field
+     * @return the current page object
+     */
+    public ExtensionVulnerabilitiesAdminPage setReviewsURL(String url)
+    {
+        WebElement element = getDriver().findElement(By.id("XWiki.Extension.Security.Code.ConfigClass_0_reviewsURL"));
+        element.clear();
+        element.sendKeys(url);
+        return this;
+    }
+
+    /**
      * Save the configuration by clicking on the save button of the configuration form.
      */
     public void saveConfig()
@@ -78,5 +95,50 @@ public class ExtensionVulnerabilitiesAdminPage extends ViewPage
     public LiveDataElement getLiveData()
     {
         return new LiveDataElement("extension-vulnerabilities-list");
+    }
+
+    /**
+     * @return the page object for the live data of the page
+     * @since 15.9RC1
+     * @since 15.5.3
+     */
+    public LiveDataElement getEnvironmentLiveData()
+    {
+        return new LiveDataElement("environment-vulnerabilities-list");
+    }
+
+    /**
+     * @return the list of CVE IDs to review (i.e., that have not been reviewed as safe)
+     * @since 15.9RC1
+     * @since 15.5.3
+     */
+    public List<String> getCveIDsToReview()
+    {
+        List<String> listExtensionCVEs = getCVEsFromLiveData(getLiveData());
+
+        // Switch to the environment tab
+        getDriver().findElementWithoutWaiting(By.cssSelector("[href='#environment-vulnerabilities']")).click();
+        
+        List<String> listEnvironmentCVEs = getCVEsFromLiveData(getEnvironmentLiveData());
+        listExtensionCVEs.addAll(listEnvironmentCVEs);
+
+        return listExtensionCVEs;
+    }
+
+    private List<String> getCVEsFromLiveData(LiveDataElement liveData)
+    {
+        return liveData
+            // Set the pagination to a large number of entries, assuming we will not have more than 100 extensions 
+            // with known vulnerabilities at the same time.
+            .setPagination(100)
+            .getTableLayout()
+            .getAllCells("CVE IDs")
+            .stream()
+            .flatMap(cell -> getDriver().findElementsWithoutWaiting(cell, By.cssSelector(".html-wrapper > a"))
+                .stream()
+                // Exclude links with class "small" as they correspond to already reviewed CVEs. 
+                .filter(element -> !element.getAttribute("class").contains("small")))
+            .map(WebElement::getText)
+            .collect(Collectors.toList());
     }
 }

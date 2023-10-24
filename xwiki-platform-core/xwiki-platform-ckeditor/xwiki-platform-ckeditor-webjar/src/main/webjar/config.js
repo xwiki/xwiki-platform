@@ -153,6 +153,7 @@ CKEDITOR.editorConfig = function(config) {
       'xwiki-config',
       'xwiki-filter',
       'xwiki-focusedplaceholder',
+      'xwiki-icon',
       'xwiki-image-old',
       'xwiki-image',
       'xwiki-link',

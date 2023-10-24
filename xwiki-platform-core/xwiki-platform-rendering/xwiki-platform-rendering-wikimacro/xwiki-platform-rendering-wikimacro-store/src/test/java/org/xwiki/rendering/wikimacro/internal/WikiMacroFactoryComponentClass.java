@@ -48,6 +48,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     WikiMacroEventListener.class,
     DefaultWikiMacroFactory.class,
     DefaultWikiMacroManager.class,
+    DefaultWikiMacro.class,
     DefaultContentParser.class,
     org.xwiki.rendering.internal.parser.DefaultContentParser.class,
     DefaultWikiMacroRenderer.class,

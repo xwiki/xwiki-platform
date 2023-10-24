@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,10 +55,13 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailGroupingStrategy;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.notifications.preferences.email.NotificationEmailUserPreferenceManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Attachment;
@@ -93,6 +95,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private static final String ATTACHMENTS = "attachments";
 
     private static final String EMAIL_USER = "emailUser";
+
+    private static final String MIMEMESSAGE_EXTRADATA_KEY = "notifications";
 
     @Inject
     protected Logger logger;
@@ -136,10 +140,14 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private ComponentManager componentManager;
 
     @Inject
-    private NotificationConfiguration notificationConfiguration;
+    private NotificationEmailGroupingStrategy fallbackNotificationEmailGroupingStrategy;
 
     @Inject
-    private NotificationEmailGroupingStrategy fallbackNotificationEmailGroupingStrategy;
+    private NotificationEmailUserPreferenceManager notificationEmailUserPreferenceManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     private final MailListener listener = new VoidMailListener()
     {
@@ -162,13 +170,9 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private Map<String, Object> factoryParameters = new HashMap<>();
 
-    private Map<String, List<EntityEvent>> eventsMappingPerId = new ConcurrentHashMap<>();
-
-    private Map<MimeMessage, List<EntityEvent>> eventsMappingPerMessage = new ConcurrentHashMap<>();
-
     private EntityReference templateReference;
 
-    private Iterator<List<CompositeEvent>> processingEvents = null;
+    private Iterator<List<CompositeEvent>> processingEvents;
 
     private List<CompositeEvent> currentEvents = Collections.emptyList();
 
@@ -180,6 +184,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private boolean hasNext;
 
+    private NotificationEmailInterval interval;
+
     /**
      * Initialize the iterator. A class extending {@link AbstractMimeMessageIterator} should implement a same initialize
      * method that calls this one at the end of its execution.
@@ -189,11 +195,12 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
      * @param templateReference reference to the mail template
      */
     protected void initialize(Iterator<DocumentReference> userIterator, Map<String, Object> factoryParameters,
-        EntityReference templateReference)
+        EntityReference templateReference, NotificationEmailInterval interval)
     {
         this.userIterator = userIterator;
         this.factoryParameters = factoryParameters;
         this.templateReference = templateReference;
+        this.interval = interval;
 
         computeNext();
     }
@@ -201,10 +208,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     private void onPrepare(ExtendedMimeMessage message, boolean delete)
     {
         // Indicate that we don't need to send this user notification anymore
-        List<EntityEvent> events = this.eventsMappingPerId.remove(message.getUniqueMessageId());
-        if (events == null) {
-            events = this.eventsMappingPerMessage.remove(message);
-        }
+        List<EntityEvent> events = (List<EntityEvent>) message.getExtraData(MIMEMESSAGE_EXTRADATA_KEY);
 
         // Forget about the mail notification so that it's not sent again
         if (events != null && delete) {
@@ -215,23 +219,33 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
     protected abstract List<CompositeEvent> retrieveCompositeEventList(DocumentReference user)
         throws NotificationException;
 
-    private NotificationEmailGroupingStrategy getEmailGroupingStrategy()
+    private NotificationEmailGroupingStrategy getEmailGroupingStrategy(DocumentReference userDocReference)
     {
         NotificationEmailGroupingStrategy strategy = this.fallbackNotificationEmailGroupingStrategy;
-        String emailGroupingStrategyHint = this.notificationConfiguration.getEmailGroupingStrategyHint();
+        UserReference userReference = this.documentReferenceUserReferenceResolver.resolve(userDocReference);
+        String emailGroupingStrategyHint =
+                this.notificationEmailUserPreferenceManager.getEmailGroupingStrategy(userReference, this.interval);
         if (this.componentManager.hasComponent(NotificationEmailGroupingStrategy.class, emailGroupingStrategyHint)) {
             try {
                 strategy = this.componentManager
                         .getInstance(NotificationEmailGroupingStrategy.class, emailGroupingStrategyHint);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Error while loading NotificationEmailGroupingStrategy with hint [{}]. " +
-                                "Fallback on default strategy. Root cause: [{}]",
-                        emailGroupingStrategyHint, ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Error while loading NotificationEmailGroupingStrategy with hint [{}] for user "
+                        + "[{}] and interval [{}]. "
+                        + "Fallback on default strategy. Root cause: [{}]",
+                        emailGroupingStrategyHint,
+                        userReference,
+                        this.interval,
+                        ExceptionUtils.getRootCauseMessage(e));
                 this.logger.debug("Root cause of the error was: ", e);
             }
         } else {
-            this.logger.warn("Cannot find a NotificationEmailGroupingStrategy with hint [{}]. " +
-                    "Fallback on default strategy.", emailGroupingStrategyHint);
+            this.logger.warn("Cannot find a NotificationEmailGroupingStrategy with hint [{}] for user [{}] "
+                    + "and interval [{}]. "
+                    + "Fallback on default strategy.",
+                    emailGroupingStrategyHint,
+                    userReference,
+                    this.interval);
         }
         return strategy;
     }
@@ -256,8 +270,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
                 try {
                     List<CompositeEvent> compositeEvents = retrieveCompositeEventList(this.currentUser);
                     if (!compositeEvents.isEmpty()) {
-                        this.processingEvents =
-                                getEmailGroupingStrategy().groupEventsPerMail(compositeEvents).iterator();
+                        this.processingEvents = getEmailGroupingStrategy(this.currentUser)
+                                .groupEventsPerMail(compositeEvents).iterator();
                         this.currentEvents = this.processingEvents.next();
                     }
                 } catch (NotificationException e) {
@@ -398,7 +412,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
         WikiReference currentWiki = xcontext.getWikiReference();
 
-        MimeMessage message = null;
+        ExtendedMimeMessage message = null;
         try {
             // Switch to user's wiki to make sure the mail is generated from target user point of view
             xcontext.setWikiReference(this.currentUser.getWikiReference());
@@ -407,17 +421,14 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
                 this.documentReferenceResolver.resolve(this.templateReference, this.currentUser);
 
             updateFactoryParameters(templateDocumentReference);
-            message = this.factory.createMessage(templateDocumentReference, this.factoryParameters);
+            message = ExtendedMimeMessage.wrap(this.factory.createMessage(templateDocumentReference,
+                this.factoryParameters));
 
             List<EntityEvent> events = new ArrayList<>();
             this.currentEvents.forEach(
                 ce -> ce.getEvents().forEach(event -> events.add(new DefaultEntityEvent(event, this.currentUsedId))));
 
-            if (message instanceof ExtendedMimeMessage) {
-                this.eventsMappingPerId.put(((ExtendedMimeMessage) message).getUniqueMessageId(), events);
-            } else {
-                this.eventsMappingPerMessage.put(message, events);
-            }
+            message.addExtraData(MIMEMESSAGE_EXTRADATA_KEY, events);
         } catch (Exception e) {
             this.logger.error(ERROR_MESSAGE, this.currentUser, e);
         } finally {

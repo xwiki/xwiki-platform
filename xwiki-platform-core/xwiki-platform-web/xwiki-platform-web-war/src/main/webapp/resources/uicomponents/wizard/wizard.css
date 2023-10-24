@@ -58,7 +58,6 @@
   color: $theme.textSecondaryColor;
   height: 15px;
   line-height: 15px;
-  opacity: .5;
   width: 15px;
 }
 
@@ -78,7 +77,6 @@
 
 .steps .name.done {
   color: $theme.textSecondaryColor;
-  opacity: .5;
 }
 
 .steps.vertical {

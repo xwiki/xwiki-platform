@@ -99,11 +99,17 @@ def builds = [
       mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
+  'Flavor Test - Security' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Security',
+      pom: 'xwiki-platform-distribution-flavor-test-security/pom.xml'
+    )
+  },
   'TestRelease': {
     build(
       name: 'TestRelease',
       goals: 'clean install',
-      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
+      profiles: 'release,hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
       properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddoclint=all'
     )
   },
@@ -210,6 +216,10 @@ private void buildStandardAll(builds)
             'flavor-test-upgrade': {
               // Run the Flavor Upgrade tests
               builds['Flavor Test - Upgrade'].call()
+            },
+            'flavor-test-security': {
+              // Run the Flavor Security tests
+              builds['Flavor Test - Security'].call()
             }
           )
         }

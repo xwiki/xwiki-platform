@@ -75,7 +75,7 @@ export default {
 .livedata-entry-selector-info-bar {
   margin-bottom: 1rem;
   padding: 12px;
-  border-radius: 5px;
+  border-radius: @border-radius-base;
   background-color: @panel-default-heading-bg;
 }
 

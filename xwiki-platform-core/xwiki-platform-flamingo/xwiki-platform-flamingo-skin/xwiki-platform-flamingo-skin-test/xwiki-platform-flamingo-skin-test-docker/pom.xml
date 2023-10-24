@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>15.6-SNAPSHOT</version>
+    <version>15.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
@@ -134,6 +134,12 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Needed for CompareIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-diff-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -175,6 +181,12 @@
       <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <!-- Needed for HibernateStoreAPIIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>

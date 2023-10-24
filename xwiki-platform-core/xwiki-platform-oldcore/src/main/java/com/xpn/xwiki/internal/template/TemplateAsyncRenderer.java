@@ -71,8 +71,6 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 
     private Syntax targetSyntax;
 
-    private String transformationId;
-
     private TemplateContent content;
 
     private boolean blockMode;
@@ -84,7 +82,6 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         this.blockMode = blockMode;
 
         this.inline = inline;
-        this.transformationId = this.renderingContext.getTransformationId();
 
         Syntax contextTargetSyntax = this.renderingContext.getTargetSyntax();
         this.targetSyntax = contextTargetSyntax != null ? contextTargetSyntax : Syntax.PLAIN_1_0;

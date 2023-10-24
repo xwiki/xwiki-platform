@@ -1,24 +1,5 @@
 #template('colorThemeInit.vm')
 
-/*!
-#macro (toRGBa $hexColor $opacity)
-  #set ($macro.hexColor = "$!hexColor")
-  #if ($macro.hexColor.matches('#[0-9a-fA-F]{3}'))
-    ## Expand the color value.
-    #set ($macro.hexColor = $macro.hexColor.replaceAll('(\w)', '$1$1'))
-  #end
-  #if ($macro.hexColor.matches('#[0-9a-fA-F]{6}'))
-    #set ($integer = 0)
-    #set ($red = $integer.parseInt($macro.hexColor.substring(1,3), 16))
-    #set ($green = $integer.parseInt($macro.hexColor.substring(3,5), 16))
-    #set ($blue = $integer.parseInt($macro.hexColor.substring(5), 16))
-    rgba($red, $green, $blue, $opacity)
-  #end
-#end
-#set ($lightBackgroundSecondaryColor = "#toRGBa($theme.backgroundSecondaryColor, 0.5)")
-#set ($lightTextSecondaryColor = "#toRGBa($theme.textSecondaryColor, 0.5)")
-*/
-
 /**
  * Raw (Wiki Syntax) Diff
  */
@@ -45,7 +26,7 @@
 
 td.diff-line-number {
   border-right: 1px solid $theme.borderColor;
-  color: $lightTextSecondaryColor;
+  color: $theme.textSecondaryColor;
   text-align: center;
   vertical-align: middle;
 }
@@ -83,9 +64,9 @@ td.diff-line.diff-line-decision span.diff-decision {
 }
 
 td.diff-line-meta {
-  background-color: $lightBackgroundSecondaryColor;
-  color: $lightTextSecondaryColor;
-  padding: .4em .5em;
+  background-color: $theme.backgroundSecondaryColor;
+  color: $theme.textSecondaryColor;
+  padding: .8em .5em;
 }
 
 .diff-line del {

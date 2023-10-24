@@ -23,8 +23,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -33,10 +36,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.map.AbstractReferenceMap;
+import org.apache.commons.collections4.map.ReferenceMap;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -105,8 +109,16 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /** The cache instance. */
     private Cache<SecurityCacheEntry> cache;
 
-    /** The new entry being added. */
-    private SecurityCacheEntry newEntry;
+    /**
+     * A map of all entries that are strongly referenced somewhere. This includes all entries in the above cache, but
+     * also all entries that are referenced as parents somewhere and that are thus required for the hierarchy to be
+     * complete and to support correct hierarchical cache invalidation. When an entry is removed from the cache, the
+     * GC will also remove it from the internal entries unless it is still referenced as a parent somewhere else. For
+     * this to work, the only strong references to SecurityCacheEntry are stored during entry creation, in the cache
+     * and in the list of parents.
+     */
+    private final Map<String, SecurityCacheEntry> internalEntries =
+        new ReferenceMap<>(AbstractReferenceMap.ReferenceStrength.HARD, AbstractReferenceMap.ReferenceStrength.WEAK);
 
     /**
      * @return a new configured security cache
@@ -136,7 +148,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Cache entry.
      */
-    private class SecurityCacheEntry implements DisposableCacheValue
+    private class SecurityCacheEntry
     {
         /**
          * The cached security entry.
@@ -239,7 +251,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                         + "in the cache.",
                     entry.getUserReference(), entry, wiki));
             }
-            if (!parent2.isUser()) {
+            // If the user is the guest user, don't throw an exception as the guest user isn't stored as user.
+            if (!parent2.isUser() && entry.getUserReference().getOriginalReference() != null) {
                 throw new ParentEntryEvictedException(String.format(
                     "The second parent [%s] for the entry [%s] with wiki [%s] is not a user entry.",
                     parent2, entry, wiki));
@@ -438,21 +451,15 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * children recursively. This method is not thread safe in regards to the cache, proper locking should be done
          * externally.
          */
-        @Override
         public void dispose()
         {
             if (!disposed) {
+                DefaultSecurityCache.this.cache.remove(getKey());
+                DefaultSecurityCache.this.internalEntries.remove(getKey());
                 disposed = true;
 
-                // Try to limit the conflicts caused by cache invalidation.
-                // There is still one entry removed from the cache but retries should help deal with that.
-                suspendInvalidation();
-                try {
-                    disconnectFromParents();
-                    disposeChildren();
-                } finally {
-                    resumeInvalidation();
-                }
+                disconnectFromParents();
+                disposeChildren();
             }
         }
 
@@ -475,18 +482,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                         if (logger.isDebugEnabled()) {
                             logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
                         }
-                        // XWIKI-13746: Prevent an addition in progress to bite his own entry in a bad way.
-                        if (child == newEntry) {
-                            child.dispose();
-                        } else {
-                            try {
-                                DefaultSecurityCache.this.cache.remove(child.getKey());
-                            } catch (Throwable e) {
-                                logger.error("Security cache failure during eviction of entry [{}]", child.getKey(), e);
-                            }
-                        }
+                        child.dispose();
                     }
                 }
+                // Avoid the extra work of the garbage collector by clearing the set.
+                children.clear();
             }
         }
 
@@ -498,7 +498,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         private void addChild(SecurityCacheEntry entry)
         {
             if (this.children == null) {
-                this.children = new ArrayList<>();
+                // Use a weak set to avoid that upper entries in the hierarchy prevent their children from being
+                // garbage collected and removed from internalEntries.
+                this.children = Collections.newSetFromMap(new WeakHashMap<>());
             }
             this.children.add(entry);
         }
@@ -633,12 +635,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(SecurityReference reference)
     {
-        readLock.lock();
-        try {
-            return cache.get(getEntryKey(reference));
-        } finally {
-            readLock.unlock();
-        }
+        return getInternal(getEntryKey(reference));
     }
 
     /**
@@ -649,12 +646,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getEntry(UserSecurityReference userReference, SecurityReference reference)
     {
-        readLock.lock();
-        try {
-            return cache.get(getEntryKey(userReference, reference));
-        } finally {
-            readLock.unlock();
-        }
+        return getInternal(getEntryKey(userReference, reference));
     }
 
     /**
@@ -665,9 +657,43 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private SecurityCacheEntry getShadowEntry(SecurityReference userReference, SecurityReference wiki)
     {
+        return getInternal(getShadowEntryKey(userReference, wiki));
+    }
+
+    /**
+     * Get a security cache entry from the cache or the internal map. In the latter case, the entry is re-inserted
+     * into the cache. This method can be called without locking, it uses the read lock internally.
+     *
+     * @param key the key of the entry to retrieve
+     * @throws IllegalStateException if the entry has been disposed (this should never happen)
+     * @return the entry corresponding to the given key, null if none is available in the cache
+     */
+    private SecurityCacheEntry getInternal(String key)
+    {
         readLock.lock();
         try {
-            return cache.get(getShadowEntryKey(userReference, wiki));
+            SecurityCacheEntry result = cache.get(key);
+            if (result == null) {
+                // Try to get the entry from the internal map which may have, e.g., parents that are no longer in the
+                // cache but still referenced by entries in the cache.
+                // Synchronize to avoid concurrent modification of the map as get() may trigger the eviction of
+                // garbage collected entries. All other operations are done under the write lock.
+                synchronized (this.internalEntries) {
+                    result = this.internalEntries.get(key);
+                }
+
+                if (result != null) {
+                    // Try re-inserting the entry into the cache to give it another chance of being stored directly.
+                    this.cache.set(key, result);
+                }
+            }
+
+            if (result != null && result.disposed) {
+                throw new IllegalCacheStateException(
+                    String.format("Entry [%s] has been disposed without being removed from the cache.", result));
+            }
+
+            return result;
         } finally {
             readLock.unlock();
         }
@@ -692,7 +718,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     private boolean isAlreadyInserted(String key, SecurityEntry entry, Collection<GroupSecurityReference> groups)
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        SecurityCacheEntry oldEntry = cache.get(key);
+        SecurityCacheEntry oldEntry = getInternal(key);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
                 // Another thread has inserted an entry which is different from this entry!
@@ -717,27 +743,27 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     /**
      * Add a new entry in the cache and prevent cache container deadlock (in cooperation with the entry dispose method)
      * in case adding the entry cause this same entry to be evicted.
-     * 
+     *
      * @param key the key of the entry to be added.
      * @param entry the entry to add.
-     * @throws ConflictingInsertionException when the entry have been disposed while being added, the full load should
-     *             be retried.
      */
-    private void addEntry(String key, SecurityCacheEntry entry) throws ConflictingInsertionException
+    private void addEntry(String key, SecurityCacheEntry entry)
     {
-        try {
-            newEntry = entry;
-            cache.set(key, newEntry);
-            if (entry.disposed) {
-                // XWIKI-13746: The added entry have been disposed while being added, meaning that the eviction
-                // triggered by adding the entry has hit the entry itself, so remove it and fail.
-                cache.remove(key);
-                throw new ConflictingInsertionException(String.format(
-                    "The cache entry [%s] with key [%s] has been disposed by another thread while being added.", entry,
-                    key));
-            }
-        } finally {
-            newEntry = null;
+        cache.set(key, entry);
+        // Don't store access entries in the internal entries as they can never be the parent of another entry, and
+        // thus it is not important to keep them outside the cache. While this could be seen as an additional "cache"
+        // layer for access entries, this is not the purpose of the internal entries map. Instead, the size of the
+        // cache should be increased if this is desired.
+        if (!(entry.getEntry() instanceof SecurityAccessEntry)) {
+            this.internalEntries.put(key, entry);
+        }
+
+        if (entry.disposed) {
+            // This should never happen as entries cannot be disposed while being added to the cache as both
+            // operations require the write lock. However, if it happens, there is a serious bug in the code so
+            // better fail with an exception.
+            throw new IllegalCacheStateException(
+                String.format("Entry [%s] has been disposed while being added to the cache.", entry));
         }
     }
 
@@ -848,7 +874,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
             logger.debug("Added access entry [{}] into the cache.", key);
         } finally {
-            newEntry = null;
             writeLock.unlock();
         }
     }
@@ -861,7 +886,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     SecurityEntry get(String entryKey)
     {
-        SecurityCacheEntry entry = cache.get(entryKey);
+        SecurityCacheEntry entry = getInternal(entryKey);
         return (entry != null) ? entry.getEntry() : null;
     }
 
@@ -910,7 +935,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     if (logger.isDebugEnabled()) {
                         logger.debug("Remove outdated access entry for [{}].", getEntryKey(user, entity));
                     }
-                    this.cache.remove(entry.getKey());
+                    entry.dispose();
                 }
             } finally {
                 writeLock.unlock();
@@ -933,7 +958,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     if (logger.isDebugEnabled()) {
                         logger.debug("Remove outdated rule entry for [{}].", getEntryKey(entity));
                     }
-                    this.cache.remove(entry.getKey());
+                    entry.dispose();
                 }
             } finally {
                 writeLock.unlock();

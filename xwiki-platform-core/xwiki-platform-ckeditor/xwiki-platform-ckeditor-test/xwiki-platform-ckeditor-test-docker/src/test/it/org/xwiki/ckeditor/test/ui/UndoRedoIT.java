@@ -59,14 +59,14 @@ public class UndoRedoIT extends AbstractCKEditorIT
 
     @Test
     @Order(1)
-    void undoRedoWithPlaceholder() throws Exception
+    void undoRedoWithPlaceholder(TestUtils setup, TestReference testReference) throws Exception
     {
         textArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three", Keys.ENTER);
 
         // Undo 4 steps.
         textArea.sendKeys(Keys.chord(Keys.CONTROL, "zzzz"));
 
-        // Redo 2 steps
+        // Redo 2 steps.
         textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, "zz"));
 
         assertSourceEquals("one\n\ntwo\n\n ");

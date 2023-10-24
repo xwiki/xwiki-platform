@@ -1,0 +1,179 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="uk">
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>solr.admin.title=Адміністрування пошуку Solr
+solr.admin.submit=Застосувати
+solr.admin.error.action={0} не вдалося:
+solr.admin.error.notallowed=У Вас недостатньо прав для виконання цієї дії.
+solr.admin.error.norights=Для доступу до цього розділу потрібні права адміністратора.
+solr.admin.success.action={0} успішно ініційовано.
+solr.admin.status.title=Статус
+solr.admin.status.queueSize.label=Розмір черги
+solr.admin.status.queueSize.hint=Кількість об'єктів, які залишилося проіндексувати, повторно проіндексувати або видалити з індексу (залежно від виконаної дії).
+solr.admin.indexing.title=Індексування
+solr.admin.indexing.action.label=Дія
+solr.admin.indexing.action.hint=Дія, яку потрібно виконати над індексом.
+solr.admin.indexing.action.select_index=Додати до індексу
+solr.admin.indexing.action.select_delete=Видалити з індексу
+solr.admin.indexing.action.select_reindex=Переіндексувати
+solr.admin.indexing.wiki.label=Вікі
+solr.admin.indexing.wiki.hint=Вікі, для всіх документів якої буде вплинути вибрана дія.
+solr.admin.indexing.wiki.select_farm=Глобально
+solr.admin.indexing.query.label=Користувацький запит
+solr.admin.indexing.query.hint=Додатковий запит для обмежених документів, на які вплине вибрана дія в індексі.
+solr.admin.info.affectedDocuments=Викликані документи в індексі:
+solr.sortBy=Сортувати за:
+solr.sortBy.score=Відповідність
+solr.sortBy.title_sort=Заголовком
+solr.sortBy.date=Дата останньої зміни
+solr.sortBy.author_display_sort=Останній автор
+solr.sortBy.filename_sort=Ім'я файлу
+solr.sortBy.attsize_sort=Розмір файлу
+solr.sortBy.attdate_sort=Дата завантаження
+solr.sortBy.attauthor_display_sort=Завантажено
+solr.sortOrder.asc=За зростанням
+solr.sortOrder.desc=За спаданням
+solr.options=Показати:
+solr.options.highlight=Виділення
+solr.options.highlight.title=Відображення точного збігу у результаті
+solr.options.facet=Аспекти
+solr.options.facet.title=Дозволити додаткову фільтрацію результату
+solr.result.language=Мова
+solr.result.locatedIn=Розташований в
+solr.result.author=Змінено {0} о {1}
+solr.result.mediaType=Тип файлу {0}
+solr.result.uploadedBy=Завантажено {0} о {1} ({2})
+solr.result.highlightAll=Виділити усі збіги
+solr.facets.title=Уточнити пошук
+solr.facets.hint=Виберіть категорію та активуйте фільтри за поточними результатами
+solr.facets.resetAll=Скинути все
+solr.facets.expandAll=Розгорнути все
+solr.facets.collapseAll=Згорнути все
+solr.facets.emptyValue=Пусте значення
+solr.facets.moreValues={0} більше
+solr.filterBy.type.document=Документ
+solr.filterBy.type.attachment=Вкладення
+solr.filterBy.type.object=Об'єкт
+solr.filterBy.type.object_property=Властивість об'єкта
+solr.filterBy.fileType.image=Зображення
+solr.filterBy.fileType.audio=Аудіо
+solr.filterBy.fileType.video=Відео
+solr.filterBy.fileType.text=Текст
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=Презентація
+solr.filterBy.fileType.spreadsheet=Таблиця
+solr.filterBy.fileType.archive=Архів
+solr.filterBy.fileType.font=Шрифт
+solr.filterBy.fileType.other=Інше
+solr.facet.fileType.text.plain=Звичайний текст
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Вихідний код Java
+solr.facet.fileType.text.sh=Shell скрипт
+solr.facet.fileType.image.icon=Піктограма
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Бінарні дані
+solr.facet.date.today=Сьогодні
+solr.facet.date.last7Days=Минулі 7 днів
+solr.facet.date.last30Days=Минулі 30 днів
+solr.facet.date.olderThan30Days=Старше ніж 30 днів
+solr.facet.date.customInterval=Користувацький інтервал дати й часу
+solr.facet.date.start=Початкова дата та час
+solr.facet.date.end=Кінцева дата та час
+solr.facet.date.applyCustomInterval=Застосувати
+solr.facet.date.between=Від {0} до {1}
+solr.facet.date.after=Після {0}
+solr.facet.date.before=До {0}
+solr.facet.date.any=Будь-яка дата
+solr.facet.size.tiny=Крихітний
+solr.facet.size.small=Малий
+solr.facet.size.medium=Середній
+solr.facet.size.large=Великий
+solr.facet.size.between=Від {0} до {1}
+solr.facet.size.lessThan=Менше ніж {0}
+solr.facet.size.moreThan=Більш ніж {0}
+solr.facet.size.any=Будь-який розмір
+solr.field.type=Тип результату
+solr.field.locale=Мова
+solr.field.locale.emptyValue=Жодної мови
+solr.field.locale.emptyValue.hint=Деякі документи не мають мовний комплект, оскільки вони містять скрипти (які написані не природною мовою) або вони складають інтерфейс користувача, який відображається поточною мовою (як ця сторінка).
+solr.field.wiki=Вікі
+solr.field.spaces=Розташування
+solr.field.space_exact=Розташування
+solr.field.space_facet=Розташування
+solr.field.name=Сторінка
+solr.field.name_exact=Сторінка
+solr.field.title=Назва
+solr.field.author=Останній автор
+solr.field.author_display=Останній автор
+solr.field.creator=Автор
+solr.field.creator_display=Автор
+solr.field.date=Дата останньої зміни
+solr.field.creationdate=Дата створення
+solr.field.doccontent=Відображання вмісту документа
+solr.field.doccontentraw=Вміст неопрацьованих документів
+solr.field.class=Тип об'єкта
+solr.field.class.definedBy=Визначено {0} » {1}
+solr.field.propertyname=Назва властивості
+solr.field.propertyvalue=Значення властивості
+solr.field.filename=Назва вкладення
+solr.field.attcontent=Вміст вкладення
+solr.field.comment=Коментарі
+solr.field.objcontent=Об'єкти
+solr.field.mimetype=Тип файлу
+solr.field.attauthor=Завантажено
+solr.field.attauthor_display=Завантажено
+solr.field.attdate=Дата завантаження
+solr.field.attsize=Розмір файлу
+solr.uix.docdoesnotexist.title=Ви шукали одну з наступних сторінок замість цього?
+solr.uix.attachmentdoesnotexist.title=Ви шукали одне з наступних вкладень замість цього?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location=Розташований у {0} » {1} » {2}
+
+## until 7.2RC1
+solr.field.space=Розташування
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

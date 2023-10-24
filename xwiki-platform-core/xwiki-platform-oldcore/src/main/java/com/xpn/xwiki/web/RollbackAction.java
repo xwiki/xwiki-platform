@@ -79,7 +79,7 @@ public class RollbackAction extends XWikiAction
         }
 
         // Perform the rollback.
-        xwiki.rollback(tdoc, rev, context);
+        xwiki.rollback(tdoc, rev, true, true, context);
 
         // Forward to view.
         String redirect = Utils.getRedirect("view", context);

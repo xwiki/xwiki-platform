@@ -20,9 +20,7 @@
 package org.xwiki.notifications.filters.internal.event;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,8 +47,8 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
 @Named("notificationfilterpreference")
 public class NotificationFilterPreferenceEventConverter extends AbstractEventConverter
 {
-    private static final Set<Class<? extends Event>> EVENTS = new HashSet<>(Arrays
-        .asList(NotificationFilterPreferenceAddOrUpdatedEvent.class, NotificationFilterPreferenceDeletedEvent.class));
+    private static final Set<Class<? extends Event>> EVENTS =
+        Set.of(NotificationFilterPreferenceAddOrUpdatedEvent.class);
 
     private static final String PROP_OWNER = "owner";
 

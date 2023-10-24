@@ -89,6 +89,7 @@ rendering.macro.menu.content.description=Definieren Sie die Menüstruktur mit Hi
 # Menu UI
 menu.ui.openSubMenu=Das Untermenü öffnen.
 menu.ui.closeSubMenu=Das Untermenü schließen.
+menu.ui.horizontal.toggler.description=Das horizontale Menü umschalten.
 
 # Menu WebHome
 menu.description=Dies ist eine einfache Anwendung, mit der Sie Navigationsmenüs erstellen können, die entweder horizontal als obere Leiste nach dem Seitenkopf oder vertikal in einem Seitenpanel angezeigt werden.

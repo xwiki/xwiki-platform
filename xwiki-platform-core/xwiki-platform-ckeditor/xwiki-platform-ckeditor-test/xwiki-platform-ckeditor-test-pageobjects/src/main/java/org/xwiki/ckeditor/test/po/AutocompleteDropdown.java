@@ -19,6 +19,7 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -66,6 +67,30 @@ public class AutocompleteDropdown extends BaseElement
             return getDriver()
                 .findElementWithoutWaiting(this.container, By.className("ckeditor-autocomplete-item-shortcut"))
                 .getText();
+        }
+        
+        /**
+         * Clicks on the item.
+         * @since 15.7RC1
+        */
+        public void click() {
+            container.click();
+        }
+
+        /**
+         * @return the list of badges of an item.
+         * @since 15.7RC1
+         */
+        public Iterable<String> getBadges() {
+            Iterable<WebElement> badgeElements = getDriver().findElementsWithoutWaiting(this.container, 
+                    By.className("ckeditor-autocomplete-item-badge"));
+            
+            ArrayList<String> badges = new ArrayList<>();
+            for (WebElement badge : badgeElements) {
+                badges.add(badge.getText());
+            }
+            
+            return badges;
         }
     }
 
@@ -116,10 +141,27 @@ public class AutocompleteDropdown extends BaseElement
      */
     public AutocompleteDropdown waitForItemSelected(String query, String label)
     {
-        By selector = By.xpath("//*[contains(@class, 'cke_autocomplete_opened') and @data-query = '" + query + "']"
-            + "//*[contains(@class, 'cke_autocomplete_selected')]//*[. = '" + label + "']");
-        getDriver().waitUntilElementIsVisible(selector);
-        this.selectedItem = getDriver().findElementWithoutWaiting(selector);
+        // We don't use an XPath selector because the given query and label can contain quotes or apostrophes which
+        // can't be escaped in a generic way because the Web browsers are supporting only XPath 1.0 (double
+        // quote/apostrophe encoding was introduced in XPath 2.0).
+        this.selectedItem = getDriver().waitUntilCondition(driver -> {
+            try {
+                // First check if the auto-complete drop down is opened and matches the given query.
+                WebElement dropdown = getDriver().findElementWithoutWaiting(By.className("cke_autocomplete_opened"));
+                if (query.equals(dropdown.getDomAttribute("data-query"))) {
+                    // Then check if the selected item matches the given label.
+                    WebElement selectedItem =
+                        getDriver().findElementWithoutWaiting(dropdown, By.className("cke_autocomplete_selected"));
+                    if (selectedItem.isDisplayed() && selectedItem.getText().contains(label)) {
+                        return selectedItem;
+                    }
+                }
+            } catch (Exception e) {
+                // Try again.
+            }
+            return null;
+        });
+
         return this;
     }
 

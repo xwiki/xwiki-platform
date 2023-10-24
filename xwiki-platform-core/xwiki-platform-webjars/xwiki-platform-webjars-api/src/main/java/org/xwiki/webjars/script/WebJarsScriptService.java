@@ -37,7 +37,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.version.Version;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
@@ -247,10 +246,8 @@ public class WebJarsScriptService implements ScriptService
             Extension extension = getExtension(extensionId, namespace);
             if (extension != null) {
                 // Generate the URL based on the found extension
-                // The name of the folder in the webjar is based on the version of the module at build time
-                Version webjarSourceVersion = extension.getId().getVersion().getSourceVersion();
                 resourceReference = getResourceReference(getArtifactId(extension.getId().getId()),
-                    webjarSourceVersion.getValue(), namespace, path, urlParams);
+                    extension.getId().getVersion().getValue(), namespace, path, urlParams);
             } else {
                 // Fallback on a URL which does not include the version
                 resourceReference = getResourceReference(artifactId, null, namespace, path, urlParams);

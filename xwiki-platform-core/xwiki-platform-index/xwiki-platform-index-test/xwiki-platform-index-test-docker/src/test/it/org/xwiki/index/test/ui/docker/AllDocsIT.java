@@ -19,12 +19,14 @@
  */
 package org.xwiki.index.test.ui.docker;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.index.test.po.AllDocsLivetable;
 import org.xwiki.index.test.po.AllDocsPage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -48,10 +50,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.4RC1
  */
 @UITest
-public class AllDocsIT
+class AllDocsIT
 {
     @Test
-    public void verifyAllDocs(TestUtils setup, TestInfo testInfo, TestReference testReference)
+    void verifyAllDocs(TestUtils setup, TestInfo testInfo, TestReference testReference)
     {
         // Fixture
         setup.loginAsSuperAdmin();
@@ -61,10 +63,74 @@ public class AllDocsIT
         // tests
         validateActionsAndGuest(setup);
         validateFilterDoc(setup, testReference);
-        validateCopyLink(setup, testInfo,  testReference);
+        validateCopyLink(setup, testInfo, testReference);
         validateRenameLink(setup, testInfo, testReference);
         validateDeleteLink(setup, testReference);
         validateRightLink(setup, testReference);
+    }
+
+    /**
+     * Test attachment listing, filtering and sorting.
+     * <p>
+     * This test is against XWiki Enterprise XE-701 https://jira.xwiki.org/browse/XE-701 (fixed in 2.5M1).
+     */
+    @Test
+    void attachmentsTabFilteringAndSorting(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create 2 pages with attachments so that this test filter returns only one.
+        // Note that we need to be logged in.
+        String className = testReference.getLastSpaceReference().getName();
+        setup.createPageWithAttachment(className, "Page", null, null, "attachment1.txt",
+            new ByteArrayInputStream("attachment content1".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+        setup.createPageWithAttachment(className, "OtherPage", null, null, "attachment2.txt",
+            new ByteArrayInputStream("attachment content2".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+
+        AllDocsPage docsPage = AllDocsPage.gotoPage();
+        TableLayoutElement liveData = docsPage.clickAttachmentsTab().getTableLayout();
+
+        // Here we test if all the Columns are displayed.
+        assertTrue(liveData.hasColumn("Type"), "No Type column found");
+        assertTrue(liveData.hasColumn("Name"), "No Name column found");
+        assertTrue(liveData.hasColumn("Location"), "No Location column found");
+        assertTrue(liveData.hasColumn("Size"), "No Size column found");
+        assertTrue(liveData.hasColumn("Date"), "No Date column found");
+        assertTrue(liveData.hasColumn("Author"), "No Author column found");
+
+        String defaultLocationFilter = className + ".";
+
+        liveData.filterColumn("Location", defaultLocationFilter);
+
+        assertEquals(2, liveData.countRows());
+
+        // Filter by attachment file name.
+        liveData.filterColumn("Name", "t1");
+        assertEquals(1, liveData.countRows());
+        assertEquals("attachment1.txt", liveData.getCell("Name", 1).getText());
+
+        // Clear the filter.
+        liveData.filterColumn("Name", "");
+
+        // Filter by attachment location.
+        liveData.filterColumn("Location", defaultLocationFilter + "Oth");
+        assertEquals(1, liveData.countRows());
+        assertEquals(className + "OtherPage", liveData.getCell("Location", 1).getText());
+
+        // Reset the filter.
+        liveData.filterColumn("Location", defaultLocationFilter);
+
+        // Sort by attachment file name. The live table should be already sorted by file name ascending. This will
+        // reverse the order.
+        assertEquals("attachment2.txt", liveData.getCell("Name", 2).getText());
+        liveData.sortBy("Name");
+        assertEquals(2, liveData.countRows());
+        assertEquals("attachment2.txt", liveData.getCell("Name", 1).getText());
+
+        // Sort by attachment location.
+        liveData.sortBy("Location");
+        assertEquals(className + "Page", liveData.getCell("Location", 2).getText());
+        liveData.sortBy("Location");
+        assertEquals(2, liveData.countRows());
+        assertEquals(className + "Page", liveData.getCell("Location", 1).getText());
     }
 
     /**
@@ -172,7 +238,7 @@ public class AllDocsIT
         livetable = page.clickIndexTab();
         livetable.filterColumn(2, testName);
         assertEquals(1, livetable.getRowCount());
-        assertEquals(testSpace+renamedPageName, livetable.getCell(1, 2).getText());
+        assertEquals(testSpace + renamedPageName, livetable.getCell(1, 2).getText());
 
         setup.deletePage(renamedPageReference);
         setup.createPage(testReference, "", testReference.getLastSpaceReference().getName());

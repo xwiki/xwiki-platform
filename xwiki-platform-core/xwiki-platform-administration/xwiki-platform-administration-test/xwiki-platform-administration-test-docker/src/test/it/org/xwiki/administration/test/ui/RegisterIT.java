@@ -19,22 +19,22 @@
  */
 package org.xwiki.administration.test.ui;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AbstractRegistrationPage;
 import org.xwiki.test.ui.po.RegistrationPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -161,6 +161,22 @@ class RegisterIT
         assertTrue(registrationPage.validationFailureMessagesInclude("Please enter a valid email address."));
     }
 
+    @Test
+    @Order(8)
+    void registerWikiSyntaxName(TestUtils testUtils) throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, false, false);
+        String password = "SomePassword";
+        String firstName = "]]{{/html}}{{html clean=false}}HT&amp;ML";
+        String lastName = "]]{{/html}}";
+        String username = "WikiSyntaxName";
+        registrationPage.fillRegisterForm(firstName, lastName, username, password, password, "wiki@example.com");
+        assertTrue(validateAndRegister(testUtils, false, false, registrationPage));
+
+        assertEquals(String.format("%s %s (%s): Registration successful.", firstName, lastName, username),
+            ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
+    }
+
     private AbstractRegistrationPage setUp(TestUtils testUtils, boolean useLiveValidation, boolean isModal)
         throws Exception
     {
@@ -236,7 +252,7 @@ class RegisterIT
         if (isModal) {
             return administrationModalUserCreation(testUtils, registrationPage);
         } else {
-            return guestUserRegistration(testUtils, registrationPage);
+            return guestUserRegistration(registrationPage);
         }
     }
 
@@ -265,17 +281,11 @@ class RegisterIT
         }
     }
 
-    private boolean guestUserRegistration(TestUtils testUtils, AbstractRegistrationPage registrationPage)
+    private boolean guestUserRegistration(AbstractRegistrationPage registrationPage)
     {
         registrationPage.clickRegister();
 
-        List<WebElement> infos = testUtils.getDriver().findElements(By.className("infomessage"));
-        for (WebElement info : infos) {
-            if (info.getText().contains("Registration successful.")) {
-                return true;
-            }
-        }
-        return false;
+        return ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().isPresent();
     }
 
     private void tryToLoginAsJohnSmith(TestUtils testUtils, AbstractRegistrationPage registrationPage)

@@ -1,0 +1,109 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.XClassTranslations" locale="uk">
+  <web>XWiki</web>
+  <name>XClassTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>#
+# Default Class Sheet
+#
+
+platform.xclass.defaultClassSheet.title=Шаблон класу за умовчанням
+platform.xclass.defaultClassSheet.description=Ви можете відредагувати цю сторінку, щоб змінити представлення класів за умовчанням, або ви можете скопіювати її, щоб створити налаштоване подання лише для одного або кількох класів.
+platform.xclass.defaultClassSheet.properties.heading=Властивості класу
+platform.xclass.defaultClassSheet.properties.empty=У цього класу ще немає жодних властивостей. Ви можете використовувати {0}редактор класів{1}, щоб визначити їх.
+platform.xclass.defaultClassSheet.properties.edit=Ви можете використовувати {0}редактор класів{1}, щоб додати або змінити властивості класу.
+platform.xclass.defaultClassSheet.createPage.heading=Створити нову сторінку
+platform.xclass.defaultClassSheet.createPage.pageAlreadyExists=Цільова сторінка вже існує. Будь ласка, виберіть іншу назву або {0}перегляньте{1} наявну сторінку.
+platform.xclass.defaultClassSheet.createPage.denied=Ви не маєте дозволу на створення цієї сторінки
+platform.xclass.defaultClassSheet.createPage.label=Створити цю сторінку
+platform.xclass.defaultClassSheet.pages.heading=Наявні сторінки
+platform.xclass.defaultClassSheet.pages.description=Наступні сторінки містять об'єкти, описані цим класом.
+platform.xclass.defaultClassSheet.sheets.heading=Аркуші класу
+platform.xclass.defaultClassSheet.sheets.missing=Перед використанням цього класу ви повинні створити аркуш та шаблон для нього. Щоб зробити це, дотримуйтеся наведених нижче інструкцій.
+platform.xclass.defaultClassSheet.sheets.description={0}Аркуш{1} дозволяє керувати представленням сторінок цього типу. Ви можете використовувати презентацію за умовчанням, яка містить перелік усіх доступних полів, або створити власну презентацію. Ви також можете вибрати різні презентації для перегляду та для режимів редагування.
+platform.xclass.defaultClassSheet.sheets.create=Створити аркуш
+platform.xclass.defaultClassSheet.sheets.notBound=Аркуш не прив'язаний до класу, тому він не буде застосований автоматично, коли відображається сторінка, яка містить об'єкт цього класу.
+platform.xclass.defaultClassSheet.sheets.bind=Прив'язати аркуш до класу
+platform.xclass.defaultClassSheet.sheets.view=Переглянути сторінку аркуша ({0})
+platform.xclass.defaultClassSheet.sheets.list=Наступні аркуші класу прив'язані до цього класу:
+platform.xclass.defaultClassSheet.template.heading=Шаблон класу
+platform.xclass.defaultClassSheet.template.description={0}Шаблон{1} – це сторінка, яка використовується як модель під час створення нової сторінки цього типу. Він містить екземпляр вашого {0}класу{1}.
+platform.xclass.defaultClassSheet.template.create=Створити шаблон
+platform.xclass.defaultClassSheet.template.missingObject=Шаблон не містить об''єкт типу {0}.
+platform.xclass.defaultClassSheet.template.addObject=Додати об''єкт {0} до шаблону
+platform.xclass.defaultClassSheet.template.view=Переглянути сторінку шаблону ({0})
+platform.xclass.defaultClassSheet.templateProvider.heading=Клас постачальника шаблонів
+platform.xclass.defaultClassSheet.templateProvider.description={0}Постачальник шаблонів{0} дозволяє створювати вікі-сторінки за допомогою наявного шаблону. Шаблон буде відображено в меню {0}Створити{0}.
+platform.xclass.defaultClassSheet.templateProvider.create=Створити постачальник шаблонів
+platform.xclass.defaultClassSheet.templateProvider.view=Переглянути сторінку постачальника шаблонів ({0})
+platform.xclass.templateProvider.defaultDescription=Додати новий запис {0}.
+
+#
+# Default Object Sheet
+#
+
+xclass.defaultObjectSheet.noProperties=Відсутні властивості
+
+#
+# Classes
+#
+
+platform.xclass.classes.title=Типи даних
+platform.xclass.classes.description=Цей інструмент дозволяє визначати структуровані типи даних (класи) у вашій вікі. Зверніться до {0}посібника розробника{1}, щоб ознайомитися з моделлю даних XWiki та публічними API.
+platform.xclass.classes.templates.heading=Шаблони для нових типів даних
+platform.xclass.classes.templates.description=Ось шаблони та аркуші для створення нових класів:
+platform.xclass.classes.templates.classSheet=Код за умовчанням для відображення класу
+platform.xclass.classes.templates.classTemplate=Шаблон сторінки для нових класів
+platform.xclass.classes.templates.objectSheet=Код за умовчанням для відображення екземплярів класу (об'єктів)
+platform.xclass.classes.createClass.heading=Створити новий тип даних
+platform.xclass.classes.createClass.description=Виберіть просту назву, наприклад {0}Стаття{1}, {0}Книга{1}, {0}Співробітник{1}. ''{0}Клас{1}'' буде автоматично додано в кінці.
+platform.xclass.classes.createClass.denied=Ви не маєте дозволу на створення цього класу
+platform.xclass.classes.createClass.title.hint=Назва нового класу
+platform.xclass.classes.createClass.title.placeholder=Новий клас
+platform.xclass.classes.createClass.location.hint=Розташування в ієрархії сторінок, де буде створено новий клас
+platform.xclass.classes.createClass.parent.hint=Батько нового класу
+platform.xclass.classes.createClass.parent.placeholder=Шлях.До.Класу
+platform.xclass.classes.createClass.name.hint=Назва нового класу
+platform.xclass.classes.createClass.label=Створити цей клас
+platform.xclass.classes.livetable.heading=Типи даних, що визначені в цій вікі
+platform.xclass.classes.livetable.doc.title=Клас
+platform.xclass.classes.livetable.doc.location=Розташування
+platform.xclass.classes.livetable.doc.date=Дата
+platform.xclass.classes.livetable.doc.author=Останній автор
+platform.xclass.classes.livetable.pageCount=Кількість сторінок
+platform.xclass.classes.livetable._actions=Дії
+</content>
+  </xwikidoc>

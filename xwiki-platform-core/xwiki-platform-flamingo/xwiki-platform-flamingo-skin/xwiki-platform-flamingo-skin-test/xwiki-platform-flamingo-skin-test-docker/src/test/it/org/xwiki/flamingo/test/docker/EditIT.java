@@ -66,7 +66,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.2RC1
  */
-@UITest
+@UITest(
+    // Required so that calls to TestUtils#setPropertyInXWikiCfg() can succeed.
+    properties = {
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.XWikiConfigurationPageForTest"
+    }
+)
 public class EditIT
 {
     @BeforeAll

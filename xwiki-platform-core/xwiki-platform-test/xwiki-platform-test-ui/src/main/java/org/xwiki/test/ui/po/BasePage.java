@@ -600,7 +600,7 @@ public class BasePage extends BaseElement
     public String getErrorContent()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
             .getText();
     }
 
@@ -634,7 +634,7 @@ public class BasePage extends BaseElement
     public String getXWikiMessageContent()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
             .getText();
     }
 

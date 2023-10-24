@@ -112,8 +112,7 @@ public class XarExtensionPlan implements Closeable
                                 pages = new HashMap<>();
                                 this.previousXAREntries.put(wiki, pages);
                             }
-                            // We want to replace the key too because the type might be different but HashMap keep the
-                            // old one
+                            // We want to replace the key too because the type might be different but HashMap keep the old one
                             pages.remove(entry);
                             pages.put(entry, xarPlanEntry);
                         }
@@ -121,14 +120,8 @@ public class XarExtensionPlan implements Closeable
                 }
 
                 // Get new entries
-                LocalExtension nextExtension = null;
-                if (action.getAction() != Action.UNINSTALL) {
-                    if (action.getLocalExtension() != null) {
-                        nextExtension = action.getLocalExtension();
-                    } else if (action.getExtension() != null) {
-                        nextExtension = localReposirory.getLocalExtension(action.getExtension().getId());
-                    }
-                }
+                LocalExtension nextExtension = action.getAction() != Action.UNINSTALL && action.getExtension() != null
+                    ? localReposirory.getLocalExtension(action.getExtension().getId()) : null;
 
                 if (nextExtension != null) {
                     try {
@@ -147,8 +140,7 @@ public class XarExtensionPlan implements Closeable
                                 pages = new HashMap<>();
                                 this.nextXAREntries.put(wiki, pages);
                             }
-                            // We want to replace the key too because the type might be different but HashMap keep the
-                            // old one
+                            // We want to replace the key too because the type might be different but HashMap keep the old one
                             pages.remove(entry);
                             pages.put(entry, nextExtension);
                         }

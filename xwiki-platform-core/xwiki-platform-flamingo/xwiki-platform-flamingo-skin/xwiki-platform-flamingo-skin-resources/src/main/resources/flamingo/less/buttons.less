@@ -9,72 +9,78 @@
   #gradient > .vertical-three-colors(lighten(@color, 10%), @color, 50%, darken(@color, 5%));
 }
 
+.btn-background(@color) {
+  background-color: @color;
+}
+
 .btn-border(@color) {
   border: 1px solid @color;
-  border-bottom-color: darken(@color, 10%);
-  .box-shadow(~"inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05)");
 }
 
 /* &-.button selectors are added in order to override the mapping and legacy usage of .button class */
 .btn {
   &-default {
-    .btn-gradient(lighten(@btn-default-bg, 5%));
-    .btn-border(@btn-default-bg);
+    .btn-background(lighten(@btn-default-bg, 5%));
+    .btn-border(darken(@btn-default-bg, 10%));
 
     &:hover, 
     &:focus {
-      .btn-gradient(@btn-default-bg);
-      .btn-border(@btn-default-bg);
+      .btn-background(lighten(@btn-default-bg, 5%));
+      .btn-border(darken(@btn-default-bg, 20%));
+      
+      // Make sure the buttons have a proper focus highlight, 
+      // despite changes from some bootstrap classes such as 'dropdown-toggle'.
+      outline: revert;
     }
   }
 
   &-primary {
-    .btn-gradient(@btn-primary-bg);
+    .btn-background(@btn-primary-bg);
     .btn-border(@btn-primary-bg);
 
     &:hover {
-      .btn-gradient(darken(@btn-primary-bg, 5%));
-      .btn-border(@btn-primary-bg);
+      .btn-background(darken(@btn-primary-bg, 5%));
+      .btn-border(darken(@btn-primary-bg, 5%));
     }
   }
 
   &-success, &-success.button {
-    .btn-gradient(@btn-success-bg);
+    .btn-background(@btn-success-bg);
     .btn-border(@btn-success-bg);
 
     &:hover {
-      .btn-gradient(darken(@btn-success-bg, 5%));
-      .btn-border(@btn-success-bg);
+      .btn-background(darken(@btn-success-bg, 5%));
+      .btn-border(darken(@btn-success-bg, 5%));
     }
   }
 
   &-info, &-info.button {
-    .btn-gradient(@btn-info-bg);
+    .btn-background(@btn-info-bg);
     .btn-border(@btn-info-bg);
 
     &:hover {
-      .btn-gradient(darken(@btn-info-bg, 5%));
-      .btn-border(@btn-info-bg);
+      .btn-background(darken(@btn-info-bg, 5%));
+      .btn-border(darken(@btn-info-bg, 5%));
     }
   }
 
   &-warning, &-warning.button {
-    .btn-gradient(@btn-warning-bg);
+    .btn-background(@btn-warning-bg);
     .btn-border(@btn-warning-bg);
 
     &:hover {
-      .btn-gradient(darken(@btn-warning-bg, 5%));
-      .btn-border(@btn-warning-bg);
+      .btn-background(darken(@btn-warning-bg, 5%));
+      .btn-border(darken(@btn-warning-bg, 5%));
     }
   }
 
   &-danger, &-danger.button {
-    .btn-gradient(@btn-danger-bg);
+    .btn-background(@btn-danger-bg);
     .btn-border(@btn-danger-bg);
 
     &:hover {
-      .btn-gradient(darken(@btn-danger-bg, 5%));
-      .btn-border(@btn-danger-bg);
+      .btn-background(darken(@btn-danger-bg, 5%));
+      .btn-border(darken(@btn-danger-bg, 5%));
     }
   }
 }
@@ -118,26 +124,32 @@ a.secondary{
   .btn-default;
 }
 
+// Size ===================================================================
+.btn-xs {
+  min-height: @target-size-minimum;
+  min-width: @target-size-minimum;
+}
+
 // Gradients & Mapping ====================================================
 /* These rules need to be applied after since they overwrite the mapping. They cover the usage before Bootstrap adoption. */
 
 input.button, .buttonwrapper button, .buttonwrapper a {
-  .btn-gradient(@btn-primary-bg);
+  .btn-background(@btn-primary-bg);
   .btn-border(@btn-primary-bg);
   &:hover {
-    .btn-gradient(darken(@btn-primary-bg, 5%));
-    .btn-border(@btn-primary-bg);
+    .btn-background(darken(@btn-primary-bg, 5%));
+    .btn-border(darken(@btn-primary-bg, 5%));
   }
 }
 
 .buttonwrapper input.secondary, .buttonwrapper button.secondary, .buttonwrapper a.secondary, a.secondary {
-  .btn-gradient(lighten(@btn-default-bg, 5%));
-  .btn-border(@btn-default-bg);
+  .btn-background(lighten(@btn-default-bg, 5%));
+  .btn-border(darken(@btn-default-bg, 10%));
 
   &:hover, 
   &:focus {
-    .btn-gradient(@btn-default-bg);
-    .btn-border(@btn-default-bg);
+    .btn-background(lighten(@btn-default-bg, 5%));
+    .btn-border(darken(@btn-default-bg, 20%));
   }
 }
 
@@ -183,4 +195,14 @@ input.button, .buttonwrapper button, .buttonwrapper a {
     color: @navbar-default-link-hover-color;
     background-color: @navbar-default-link-hover-bg;
   }
+}
+
+// Buttons groups ==================================================
+/* Manually overrides the default border round rules of the btn-group blocks in case of hidden input following the last
+   visible button.
+   The :not selectors are here to have a rule weight for this rule higher than the one making the intermediate buttons 
+   without rounded corners. */
+.btn-group > .btn-group-last:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: @border-radius-base;
+  border-bottom-right-radius: @border-radius-base;
 }

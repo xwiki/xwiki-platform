@@ -148,6 +148,7 @@ notifications.settings.applications.title=Anwendungen
 notifications.settings.applications.hint=Hier ist die Liste der Anwendungen, welche Ihnen Benachrichtigungen schicken können. Sie können diese aktivieren oder deaktivieren.
 notifications.settings.applications.forGuest=Melden Sie sich an oder registrieren Sie sich, um die Einstellungen für Ihre Benachrichtigungen zu ändern.
 notifications.settings.applications.appName=Name
+notifications.settings.applications.table.dropdown.toggle.label=Die Details für Benachrichtigungen von der Anwendung {0} umschalten.
 notifications.settings.events=Ereignisse
 notifications.settings.watch.title=Verfolgte Seiten
 notifications.settings.watch.autowatchmode=Automatisches Abonnieren von Seiten

@@ -203,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
 platform.appwithinminutes.appHomePageMovedWarning=L'application pourrait ne plus fonctionner correctement car elle a été renommée ou déplacée sans que son code n'ait été mis à jour. Merci de modifier l'application en mettant le code à jour pas à pas.
+platform.appwithinminutes.appHomePageNoScriptRight=Vous ne disposez pas de droits suffisants sur les scripts afin de créer ou modifier une application. Si vous continuez, cette application risque de ne pas fonctionner correctement.
 AppWithinMinutes.LiveTableClass_description=Description
 AppWithinMinutes.LiveTableClass_columns=Colonnes du tableau dynamique
 
@@ -212,6 +213,10 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=TOUS LES DOCUMENTS de l''
 platform.appwithinminutes.deleteAppDoesNotExistError=L'application indiquée n'existe pas.
 platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas une application App Within Minutes valide.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a été indiqué.
+
+### Rename Application
+appWithinMinutes.renameApp.label=Renommer l'application
+appWithinMinutes.renameApp.close=Fermer
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Vous pouvez modifier le titre de l'application sans la renommer, simplement en éditant sa page d'accueil.

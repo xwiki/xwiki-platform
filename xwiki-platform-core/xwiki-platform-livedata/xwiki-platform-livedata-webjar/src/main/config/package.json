@@ -9,8 +9,8 @@
     "test": "vue-cli-service test:unit"
   },
   "engines": {
-    "npm": "9.8.1",
-    "node": "18.18.0"
+    "npm": "10.2.1",
+    "node": "18.18.2"
   },
   "dependencies": {
     "vue": "2.7.14",

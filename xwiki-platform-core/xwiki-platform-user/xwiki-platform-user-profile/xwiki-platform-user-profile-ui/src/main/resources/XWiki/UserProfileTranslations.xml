@@ -37,7 +37,11 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=The wiki contains documents that are not displayed by default. These hidden documents represent technical content, like application classes, configuration pages, macros, styles, scripts, etc.
-XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
+XWiki.XWikiUsers_fontSize.hint=Change the font size for the main text.
+XWiki.XWikiUsers_darkMode.hint=Enable dark mode.
+XWiki.XWikiUsers_underline.hint=Set your underline preferences. Default is to underline only inline links.
+XWiki.XWikiUsers_reducedMotion.hint=Set your preferences regarding motion on the page. Default is based upon the system settings.
+XWiki.XWikiUsers_displayIconTitle.hint=Display text hints next to icons to facilitate navigation.
 XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
 XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
 XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.

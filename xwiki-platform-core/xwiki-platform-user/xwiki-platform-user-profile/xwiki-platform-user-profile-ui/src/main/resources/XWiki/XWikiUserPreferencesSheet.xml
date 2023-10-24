@@ -287,7 +287,14 @@
       &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.displayPreferences'))&lt;/h1&gt;
       &lt;dl&gt;
         #displayField('displayHiddenDocuments', 'platform.core.profile.displayHiddenDocuments', '0')
-        #displayField('accessibility'         , 'platform.core.profile.enableAccessibility'   , '0')
+      &lt;/dl&gt;
+      &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h1&gt;
+      &lt;dl&gt;
+        #displayField('fontSize'         , 'platform.core.profile.accessibility.fontSize'   , '0')
+        #displayField('darkMode'         , 'platform.core.profile.accessibility.darkMode'   , '0')
+        #displayField('underline'         , 'platform.core.profile.accessibility.underline'   , '0')
+        #displayField('reducedMotion'         , 'platform.core.profile.accessibility.reducedMotion'   , '0')
+        #displayField('displayIconTitle'         , 'platform.core.profile.accessibility.displayIconTitle'   , '0')
       &lt;/dl&gt;
       &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.localizationPreferences'))&lt;/h1&gt;
       &lt;dl&gt;

@@ -100,7 +100,6 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
     #end
   </ul>
 </dialog>
-<span role='presentation' class='drawer-overlay'></span>
 #**
  * Display the UI extensions.
  *

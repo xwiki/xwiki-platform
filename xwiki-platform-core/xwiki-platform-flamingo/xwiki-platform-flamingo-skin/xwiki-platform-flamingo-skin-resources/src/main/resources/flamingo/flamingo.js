@@ -54,70 +54,44 @@ require(['jquery', 'bootstrap'], function($) {
    ** the class 'drawer-toggle'
   * A drawer container, that will have:
    ** a unique ID
-   ** the class 'drawer-nav' (mostly for style) 
-   ** the class 'closed' if the drawer is supposed to start in a closed state.
-   ** a label 
-   ** The content to display inside. It's asserted that at least one element in this content can receive focus.
+   ** the class 'drawer-nav' (for style) 
+   ** an accessible name 
+   ** The content to display inside.
   For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
  */
 require(['jquery'], function($) {
-  // The overlay is the same whatever the drawer opened.
-  const drawerOverlay = $(".drawer-overlay");
   $('.drawer-toggle').each(function(index) {
     // Setting up the drawer.
     let drawerContainerToggler = $(this);
     let drawerId = drawerContainerToggler.attr('aria-controls');
     let drawerContainer = $(document.getElementById(drawerId));
-    let focusableElements = drawerContainer.find('button, a, input:not([type="hidden"]), ' +
-     'select, textarea, [tabindex]:not([tabindex="-1"])');
-
-    // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
-    // which prevents us from using them in automated tests. We need something more reliable so we listen to
-    // 'drawer1.opened' and 'drawer1.closed' events and add our own markers.
+    
     let openDrawer = () => drawerContainer.trigger('drawer' + index + '.opened');
     let closeDrawer = () => drawerContainer.trigger('drawer' + index + '.closed');
     drawerContainerToggler.on('click', openDrawer);
-    drawerOverlay.on('click', closeDrawer);
+    // Close drawer when clicking the backdrop (or any element outside of the drawer itself).
+    drawerContainer.on('click', (event) => {
+      let drawerzone = event.target.getBoundingClientRect();
+      if (drawerzone.left > event.clientX || drawerzone.right < event.clientX
+        || drawerzone.top > event.clientY || drawerzone.bottom < event.clientY) {
+        closeDrawer();
+      }
+    });
 
     drawerContainer.on('drawer' + index + '.opened', function(event) {
       drawerContainerToggler.attr('aria-expanded', 'true');
-      // We update the state of the drawer (using setAttribute since it's faster)
-      drawerContainer.get(0).setAttribute('open','open');
-      function focusDrawer() {
-        if (drawerContainer.get(0).hasAttribute('open')) {
-          drawerContainer.trigger('focus');
-        }
-      };
-      function focusLastItem() {
-        if (drawerContainer.get(0).hasAttribute('open') && focusableElements.length !== 0) {
-          focusableElements.last().trigger('focus');
-        }
-      };
-      // The drawer can be closed by pressing the ESC key.
+      drawerContainer.get(0).showModal();
+      // The drawer can be closed by pressing the ESC key
       $("body").on('keydown.drawerClose', function (event) {
         if (event.key === 'Escape') {
           closeDrawer();
         }
       });
-      // The focus is set back to the start by setting focus outside of it
-      focusableElements.on('blur.drawerClose', function (event) {
-        if (event.relatedTarget != null && event.relatedTarget.closest('#' + $.escapeSelector(drawerId)) == null) {
-          focusDrawer();
-        }
-      });
-      drawerContainer.on('blur.drawerClose', function (event) {
-        if (event.relatedTarget != null && event.relatedTarget.closest('#' + $.escapeSelector(drawerId)) == null) {
-          focusLastItem();
-        }
-      });
     }).on('drawer' + index + '.closed', function(event) {
-      // We update the state of the drawer
-      drawerContainer.removeAttr('open');
+      drawerContainer.get(0).close();
       drawerContainerToggler.attr('aria-expanded', 'false');
-      // We remove the listeners that were created when the drawer opened up
+      // We remove the listener that was created when the drawer opened up
       $("body").off('keydown.drawerClose');
-      focusableElements.off('blur.drawerClose');
-      drawerContainer.off('blur.drawerClose');
     });
     
     // When the drawer is closed, collapse sub items

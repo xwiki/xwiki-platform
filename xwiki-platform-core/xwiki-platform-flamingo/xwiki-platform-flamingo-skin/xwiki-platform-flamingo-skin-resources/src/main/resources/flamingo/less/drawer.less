@@ -27,12 +27,8 @@
 
 
 #tmDrawer.drawer-nav {
-  display: block;
-  z-index: 5300;
   background-color: @xwiki-drawer-bg;
   width: @xwiki-drawer-width;
-  position: fixed;
-  top: 0;
   right: 0;
   overflow: hidden;
   height: 100vh;
@@ -40,6 +36,8 @@
   transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), visibility .6s;
   padding: 0;
   border: 0;
+  // We overwrite max-height over browser defaults for dialog
+  max-height: 100vh;
   
   &:not([open]) {
     // We use visibility here to avoid breaking the animations.
@@ -48,22 +46,6 @@
   
   &[open] {
     margin-right: 0;
-  }
-
-  & + .drawer-overlay {
-    z-index: 5200;
-    position: fixed;
-    display: none;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    opacity: 0.2;
-    background-color: #fff - @xwiki-page-content-bg;
-  }
-
-  &[open] + .drawer-overlay {
-    display: block;
   }
 
   & .drawer-menu {

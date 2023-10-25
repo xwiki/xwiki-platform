@@ -19,8 +19,15 @@
  */
 package org.xwiki.realtime.wysiwyg.test.po;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
+import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Represents the realtime rich text area.
@@ -33,6 +40,39 @@ import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 public class RealtimeRichTextAreaElement extends RichTextAreaElement
 {
     /**
+     * Represents the position of a coeditor in the rich text area (displayed on the left side).
+     */
+    public static class CoeditorPosition extends BaseElement
+    {
+        private WebElement container;
+
+        public CoeditorPosition(WebElement container)
+        {
+            this.container = container;
+        }
+
+        public String getCoeditorId()
+        {
+            return StringUtils.removeStart(this.container.getAttribute("id"), "rt-user-");
+        }
+
+        public String getAvatarURL()
+        {
+            return this.container.getAttribute("src");
+        }
+
+        public String getAvatarHint()
+        {
+            return this.container.getAttribute("title");
+        }
+
+        public Point getLocation()
+        {
+            return this.container.getLocation();
+        }
+    }
+
+    /**
      * Creates a new realtime rich text area element.
      * 
      * @param iframe the in-line frame used by the realtime rich text area
@@ -40,5 +80,29 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     public RealtimeRichTextAreaElement(WebElement iframe)
     {
         super(iframe);
+    }
+
+    /**
+     * @return the position of the coeditors inside the rich text area
+     */
+    public List<CoeditorPosition> getCoeditorPositions()
+    {
+        try {
+            getDriver().switchTo().frame(this.iframe);
+            return getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
+                .map(CoeditorPosition::new).collect(Collectors.toList());
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
+    }
+
+    /**
+     * @param coeditorId the coeditor identifier
+     * @return the location where the specified coeditor is currently editing
+     */
+    public CoeditorPosition getCoeditorPosition(String coeditorId)
+    {
+        return getCoeditorPositions().stream().filter(position -> position.getCoeditorId().equals(coeditorId))
+            .findFirst().orElse(null);
     }
 }

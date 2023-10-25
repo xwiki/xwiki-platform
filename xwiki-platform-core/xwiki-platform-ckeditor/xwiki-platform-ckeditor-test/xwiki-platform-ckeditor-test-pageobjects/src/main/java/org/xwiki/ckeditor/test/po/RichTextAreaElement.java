@@ -37,7 +37,7 @@ public class RichTextAreaElement extends BaseElement
     /**
      * The in-line frame element.
      */
-    private final WebElement iframe;
+    protected final WebElement iframe;
 
     /**
      * Creates a new rich text area element.
@@ -168,6 +168,20 @@ public class RichTextAreaElement extends BaseElement
         try {
             getDriver().switchTo().frame(this.iframe);
             getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
+    }
+
+    /**
+     * @return the scroll top position of the rich text area
+     */
+    public int getScrollTop()
+    {
+        try {
+            getDriver().switchTo().frame(this.iframe);
+            return Integer
+                .parseInt(getDriver().findElementWithoutWaiting(By.tagName("html")).getDomProperty("scrollTop"));
         } finally {
             getDriver().switchTo().defaultContent();
         }

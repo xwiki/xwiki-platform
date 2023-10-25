@@ -19,7 +19,13 @@
  */
 package org.xwiki.realtime.wysiwyg.test.po;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
+import org.xwiki.test.ui.po.BaseElement;
 
 /**
  * Represents the realtime CKEditor tool bar.
@@ -32,6 +38,59 @@ import org.xwiki.ckeditor.test.po.CKEditorToolBar;
 public class RealtimeCKEditorToolBar extends CKEditorToolBar
 {
     /**
+     * Represents a coeditor listed in the tool bar.
+     */
+    public static class Coeditor extends BaseElement
+    {
+        private WebElement container;
+
+        public Coeditor(WebElement container)
+        {
+            this.container = container;
+        }
+
+        public String getId()
+        {
+            return this.container.getAttribute("data-id");
+        }
+
+        public String getName()
+        {
+            return this.container.getText();
+        }
+
+        public String getReference()
+        {
+            return this.container.getAttribute("data-reference");
+        }
+
+        public String getURL()
+        {
+            return this.container.getAttribute("href");
+        }
+
+        public String getAvatarURL()
+        {
+            return getAvatar().getAttribute("src");
+        }
+
+        public String getAvatarHint()
+        {
+            return getAvatar().getAttribute("title");
+        }
+
+        public void click()
+        {
+            this.container.click();
+        }
+
+        private WebElement getAvatar()
+        {
+            return getDriver().findElementWithoutWaiting(this.container, By.className("rt-user-avatar"));
+        }
+    }
+
+    /**
      * Create a new tool bar instance for the given editor.
      * 
      * @param editor the editor that owns the tool bar
@@ -39,5 +98,23 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
     public RealtimeCKEditorToolBar(RealtimeCKEditor editor)
     {
         super(editor);
+    }
+
+    /**
+     * @return {@code true} if the user is editing alone, {@code false} otherwise
+     */
+    public boolean isEditingAlone()
+    {
+        return "Editing alone"
+            .equals(getDriver().findElementWithoutWaiting(getContainer(), By.className("rt-user-list")).getText());
+    }
+
+    /**
+     * @return the list of coeditors listed in the tool bar
+     */
+    public List<Coeditor> getCoeditors()
+    {
+        return getDriver().findElementsWithoutWaiting(getContainer(), By.className("rt-user-link")).stream()
+            .map(Coeditor::new).collect(Collectors.toList());
     }
 }

@@ -26,7 +26,6 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;

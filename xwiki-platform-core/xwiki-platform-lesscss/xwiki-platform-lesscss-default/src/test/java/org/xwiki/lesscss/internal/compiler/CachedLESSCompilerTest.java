@@ -110,9 +110,9 @@ class CachedLESSCompilerTest
         this.template = mock(Template.class);
     }
 
-    void mockTemplateExecution(String input, String result) throws Exception
+    void mockTemplateExecution(LESSResourceReference resource, String input, String result) throws Exception
     {
-        when(this.templateManager.createStringTemplate(input, InternalTemplateManager.SUPERADMIN_REFERENCE, null))
+        when(this.templateManager.createStringTemplate(resource.toString(), input, InternalTemplateManager.SUPERADMIN_REFERENCE, null))
             .thenReturn(this.template);
 
         doAnswer(new Answer<Void>()
@@ -133,7 +133,7 @@ class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent("skin2")).thenReturn("Some LESS content");
-        mockTemplateExecution("Some LESS content", "Some Velocity-rendered LESS content");
+        mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
         when(less4jCompiler.compile("Some Velocity-rendered LESS content", "skin2", false)).thenReturn("output");
 
         // Tests
@@ -165,7 +165,7 @@ class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent("skin2")).thenReturn("Some LESS content");
-        mockTemplateExecution("Some LESS content", "Some Velocity-rendered LESS content");
+        mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
 
         // Tests
         assertEquals("Some Velocity-rendered LESS content",
@@ -181,7 +181,7 @@ class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent("skin")).thenReturn("Some LESS content");
-        mockTemplateExecution("@import (reference) \"style.less.vm\";\nSome LESS content",
+        mockTemplateExecution(resource, "@import (reference) \"style.less.vm\";\nSome LESS content",
             "@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content");
         when(less4jCompiler.compile("@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content",
             "skin", false)).thenReturn("output");
@@ -196,7 +196,7 @@ class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent("skin")).thenReturn("Some LESS content");
-        mockTemplateExecution("Some LESS content", "Some Velocity-rendered LESS content");
+        mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
         Less4jException lessCompilerException = mock(Less4jException.class);
         when(less4jCompiler.compile("Some Velocity-rendered LESS content", "skin", false))
             .thenThrow(lessCompilerException);

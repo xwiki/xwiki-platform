@@ -20,6 +20,7 @@
 package org.xwiki.internal.migration;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -86,7 +87,12 @@ public class R141004000XWIKI20285DataMigration extends AbstractDocumentsMigratio
                     + "like '%{{info}}%services.localization.render%xe.invitation.internalDocument%{{/info}}%'", XWQL)
                 .<Object[]>execute()
                 .stream()
-                .flatMap(array -> resolveDocumentReference(String.valueOf(array[0]), String.valueOf(array[1])).stream())
+                .flatMap(array -> {
+                    // Oracle returns null for the empty string. Therefore, we need to convert back the null value
+                    // to the empty string.
+                    String locale = Objects.toString(array[1], "");
+                    return resolveDocumentReference(String.valueOf(array[0]), locale).stream();
+                })
                 // Exclude document that are provided by extensions, because they are fixed using the usual xar upgrade
                 // mechanism.
                 .filter(documentReference -> !this.installedXARs.isExtensionDocument(documentReference))

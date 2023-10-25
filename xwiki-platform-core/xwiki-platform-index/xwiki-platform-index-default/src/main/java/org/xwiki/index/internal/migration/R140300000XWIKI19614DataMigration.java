@@ -20,6 +20,7 @@
 package org.xwiki.index.internal.migration;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -95,8 +96,12 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
                     .setWiki(context.getWikiId())
                     .<Object[]>execute()
                     .stream()
-                    .flatMap(
-                        array -> resolveDocumentReference(String.valueOf(array[0]), String.valueOf(array[1])).stream())
+                    .flatMap(array -> {
+                        // Oracle returns null for the empty string. Therefore, we need to convert back the null value
+                        // to the empty string.
+                        String locale = Objects.toString(array[1], "");
+                        return resolveDocumentReference(String.valueOf(array[0]), locale).stream();
+                    })
                     .collect(Collectors.toList());
             } catch (QueryException e) {
                 throw new DataMigrationException(

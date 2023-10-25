@@ -10,5 +10,5 @@ set -e
 # Restart XWiki service (only if it's active)
 if systemctl -q is-active xwiki.service
 then
- systemctl xwiki restart
+  deb-systemd-invoke restart xwiki.service
 fi

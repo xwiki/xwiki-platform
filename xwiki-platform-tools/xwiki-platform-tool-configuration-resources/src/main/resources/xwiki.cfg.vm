@@ -313,10 +313,9 @@ xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 #-# 1: the authentication is done for each request.
 # xwiki.authentication.always=0
 
-#-# Cookie encryption keys. You SHOULD replace these values with any random string,
-#-# as long as the length is the same.
-xwiki.authentication.validationKey=totototototototototototototototo
-xwiki.authentication.encryptionKey=titititititititititititititititi
+#-# Cookie encryption keys. They are randomly generated and stored when not specified.
+# xwiki.authentication.validationKey=totototototototototototototototo
+# xwiki.authentication.encryptionKey=titititititititititititititititi
 
 #-# Comma separated list of domains for which authentication cookies are set. This
 #-# concerns mostly wiki farms. The exact meaning is that when a user logs in, if

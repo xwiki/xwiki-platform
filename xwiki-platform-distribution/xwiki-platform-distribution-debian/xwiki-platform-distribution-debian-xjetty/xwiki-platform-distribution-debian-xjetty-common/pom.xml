@@ -167,6 +167,22 @@
                 <prefix>/usr/lib/xwiki-jetty</prefix>
               </mapper>
             </data>
+
+            <!-- Add XWiki as Jetty webapp -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki-jetty/webapps/xwiki</linkName>
+              <linkTarget>/usr/lib/xwiki</linkTarget>
+            </data>
+
+            <!-- Redirect log to /var/log/xwiki -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki-jetty/logs</linkName>
+              <linkTarget>/var/log/xwiki</linkTarget>
+            </data>
           </dataSet>
         </configuration>
       </plugin>

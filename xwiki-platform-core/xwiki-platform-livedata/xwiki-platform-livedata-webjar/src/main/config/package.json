@@ -33,7 +33,7 @@
     "less": "4.1.3",
     "less-loader": "11.1.3",
     "vue-template-compiler": "2.7.15",
-    "@vue/test-utils": "1.3.6",
+    "@vue/test-utils": "2.4.1",
     "jquery": "3.6.0",
     "@testing-library/jest-dom": "5.17.0",
     "flush-promises": "1.0.2",

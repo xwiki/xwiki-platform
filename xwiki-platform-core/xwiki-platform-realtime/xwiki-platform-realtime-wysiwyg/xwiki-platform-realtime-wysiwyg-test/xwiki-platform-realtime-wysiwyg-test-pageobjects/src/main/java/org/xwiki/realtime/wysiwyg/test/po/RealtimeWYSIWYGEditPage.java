@@ -19,6 +19,8 @@
  */
 package org.xwiki.realtime.wysiwyg.test.po;
 
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
@@ -32,6 +34,9 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
 {
+    @FindBy(className = "realtime-allow")
+    private WebElement allowRealtimeCheckbox;
+
     /**
      * Open the specified page in realtime WYSIWYG edit mode.
      * 
@@ -50,5 +55,35 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     public RealtimeCKEditor getContenEditor()
     {
         return new RealtimeCKEditor();
+    }
+
+    /**
+     * @return {@code true} if realtime editing is enabled, {@code false} otherwise
+     */
+    public boolean isRealtimeEditing()
+    {
+        return this.allowRealtimeCheckbox.isSelected();
+    }
+
+    /**
+     * Leave the realtime editing session.
+     */
+    public void leaveRealtimeEditing()
+    {
+        if (isRealtimeEditing()) {
+            this.allowRealtimeCheckbox.click();
+            // TODO: Handle the confirmation modal.
+        }
+    }
+
+    /**
+     * Join the realtime editing session.
+     */
+    public void joinRealtimeEditing()
+    {
+        if (!isRealtimeEditing()) {
+            // TODO: Handle the confirmation modal and the page reload.
+            this.allowRealtimeCheckbox.click();
+        }
     }
 }

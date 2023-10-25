@@ -100,4 +100,12 @@ public class CKEditorToolBar extends BaseElement
         // Wait for the conversion between HTML and wiki syntax (source) to be done.
         getDriver().waitUntilElementDisappears(this.container, By.cssSelector(".cke_button__source_icon.loading"));
     }
+
+    /**
+     * @return the element containing the tool bar
+     */
+    protected WebElement getContainer()
+    {
+        return this.container;
+    }
 }

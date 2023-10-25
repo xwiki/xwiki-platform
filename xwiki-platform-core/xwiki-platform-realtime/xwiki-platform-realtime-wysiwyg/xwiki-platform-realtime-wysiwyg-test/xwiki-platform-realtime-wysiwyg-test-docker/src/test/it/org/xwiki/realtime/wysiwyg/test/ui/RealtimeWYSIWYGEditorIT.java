@@ -20,12 +20,18 @@
 package org.xwiki.realtime.wysiwyg.test.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.WYSIWYGEditorAdministrationSectionPage;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
+import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
+import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeWYSIWYGEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -79,10 +85,50 @@ class RealtimeWYSIWYGEditorIT
     @Order(1)
     void editAlone(TestReference testReference, TestUtils setup)
     {
+        // Start fresh.
+        setup.deletePage(testReference);
+
         RealtimeWYSIWYGEditPage editPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor editor = editPage.getContenEditor();
-        editor.getRichTextArea().sendKeys("test");
-        ViewPage viewPage = editPage.clickSaveAndView();
+
+        // Verify that the Allow Realtime Collaboration checkbox is checked.
+        assertTrue(editPage.isRealtimeEditing());
+
+        // Verify that the Preview button is hidden.
+        assertFalse(editPage.getPreviewButton().isDisplayed());
+
+        // The Autosave checkbox is also hidden because autosave is done by the realtime editor (you can't disable it
+        // while editing in realtime).
+        assertFalse(editPage.getAutoSaveCheckbox().isDisplayed());
+
+        // Verify that we're editing alone.
+        assertTrue(editor.getToolBar().isEditingAlone());
+
+        RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
+        textArea.sendKeys("test");
+
+        // Verify the cursor indicator on the left of the editing area.
+        List<CoeditorPosition> coeditorPositions = textArea.getCoeditorPositions();
+        assertEquals(1, coeditorPositions.size());
+
+        CoeditorPosition selfPosition = coeditorPositions.get(0);
+        assertEquals("John", selfPosition.getAvatarHint());
+        assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
+            "Unexpected avatar URL: " + selfPosition.getAvatarURL());
+        assertEquals(3, selfPosition.getLocation().getX());
+        assertEquals(18, selfPosition.getLocation().getY());
+
+        // Verify the action buttons (Save and Cancel).
+        editPage.clickSaveAndContinue();
+        textArea.sendKeys(" alone");
+        ViewPage viewPage = editPage.clickCancel();
         assertEquals("test", viewPage.getContent());
+
+        // Edit again and verify the Save and View button.
+        viewPage.edit();
+        editPage = new RealtimeWYSIWYGEditPage();
+        editPage.getContenEditor().getRichTextArea().sendKeys(" alone");
+        viewPage = editPage.clickSaveAndView();
+        assertEquals("test alone", viewPage.getContent());
     }
 }

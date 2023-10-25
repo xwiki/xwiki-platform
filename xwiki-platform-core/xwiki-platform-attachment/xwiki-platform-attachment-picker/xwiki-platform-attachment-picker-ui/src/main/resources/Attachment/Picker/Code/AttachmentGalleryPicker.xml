@@ -303,7 +303,7 @@
   .attachmentGroup.selected {
     background-color: @gray-lighter;
     outline: 1px dotted #CCC;
-    border-radius: 5px;
+    border-radius: @border-radius-base;
   }
 
 

@@ -1,0 +1,14 @@
+Package: xwiki-xjetty-mysql
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: xwiki-mysql-common (= [[version]]), xwiki-xjetty-common (= [[version]])
+Provides: xwiki-tomcat-database
+Replaces: xwiki-tomcat-database
+Conflicts: xwiki-tomcat-database
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]
+Bugs: [[debian.bugs]]
+Homepage: [[debian.homepage]]

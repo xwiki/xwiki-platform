@@ -50,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -152,11 +153,7 @@ import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.Block.Axes;
-import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
@@ -7832,11 +7829,10 @@ public class XWiki implements EventListener
             Block curentBlock = getRenderingContext().getCurrentBlock();
 
             if (curentBlock != null) {
-                MetaDataBlock metaDataBlock =
-                    curentBlock.getFirstBlock(new MetadataBlockMatcher(MetaData.SYNTAX), Axes.ANCESTOR_OR_SELF);
+                Optional<Syntax> syntaxMetadata = curentBlock.getSyntaxMetadata();
 
-                if (metaDataBlock != null) {
-                    return (Syntax) metaDataBlock.getMetaData().getMetaData(MetaData.SYNTAX);
+                if (syntaxMetadata.isPresent()) {
+                    return syntaxMetadata.get();
                 }
             }
         }

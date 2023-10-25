@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>15.9-SNAPSHOT</version>
+    <version>15.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -37,7 +37,7 @@
 
     <war.path>${project.build.directory}/war</war.path>
 
-    <xwiki.properties.environment.permanentDirectory>/var/lib/xwiki/data</xwiki.properties.environment.permanentDirectory>
+    <xwiki.properties.environment.permanentDirectory>${xwikiDataDir}</xwiki.properties.environment.permanentDirectory>
 
     <xwiki.extension.features>xwiki</xwiki.extension.features>
     <debian.package>xwiki-common</debian.package>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>15.9-SNAPSHOT</version>
+      <version>15.10-SNAPSHOT</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>

@@ -52,6 +52,7 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
         ##
         #displayDrawerUIX('org.xwiki.plaftorm.drawer.header')
       </div>
+      <button class="btn btn-primary drawer-close" title="$escapetool.xml($services.localization.render('core.menu.drawer.close.title'))">$services.icon.renderHTML('cross')</button>
     </li>
     ##
     ## Display the content of the drawer

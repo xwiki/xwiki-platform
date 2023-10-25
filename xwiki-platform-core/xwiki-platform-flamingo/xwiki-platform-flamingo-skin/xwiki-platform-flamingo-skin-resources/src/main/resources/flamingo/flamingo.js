@@ -57,6 +57,7 @@ require(['jquery', 'bootstrap'], function($) {
    ** the class 'drawer-nav' (for style) 
    ** an accessible name 
    ** The content to display inside.
+  In addition, the drawer can contain a `.drawer-close` button that will close the drawer on click.
   For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
  */
 require(['jquery'], function($) {
@@ -77,13 +78,15 @@ require(['jquery'], function($) {
         closeDrawer();
       }
     });
+    // Close drawer when clicking on a close button inside it
+    drawerContainer.find('.drawer-close').on('click', closeDrawer);
 
     drawerContainer.on('drawer' + index + '.opened', function(event) {
-      // We use the drawer-close class to make sure the transition to slidein is not shortcutted when showing the modal
-      drawerContainer.addClass('drawer-close');
+      // We use the drawer-transitioning class to make sure the transition to slidein is not shortcutted when showing the modal
+      drawerContainer.addClass('drawer-transitioning');
       drawerContainerToggler.attr('aria-expanded', 'true');
       drawerContainer.get(0).showModal();
-      drawerContainer.removeClass('drawer-close');
+      drawerContainer.removeClass('drawer-transitioning');
       // The drawer can be closed by pressing the ESC key
       $("body").on('keydown.drawerClose', function (event) {
         if (event.key === 'Escape') {
@@ -95,11 +98,11 @@ require(['jquery'], function($) {
       
       function waitAnimation() {
         drawerContainer.get(0).close();
-        drawerContainer.removeClass('drawer-close');
+        drawerContainer.removeClass('drawer-transitioning');
         drawerContainer.get(0).removeEventListener('transitionend', waitAnimation);
       }
-      // We use the drawer-close class to give time for the hide modal transition to play.
-      drawerContainer.addClass('drawer-close');
+      // We use the drawer-transitioning class to give time for the hide modal transition to play.
+      drawerContainer.addClass('drawer-transitioning');
       drawerContainer.get(0).addEventListener('transitionend', waitAnimation);
       // We remove the listener that was created when the drawer opened up
       $("body").off('keydown.drawerClose');

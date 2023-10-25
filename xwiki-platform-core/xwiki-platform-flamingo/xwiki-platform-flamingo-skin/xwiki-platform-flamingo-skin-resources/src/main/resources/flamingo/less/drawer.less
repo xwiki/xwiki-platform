@@ -33,14 +33,23 @@
   overflow: hidden;
   height: 100vh;
   margin-right: -@xwiki-drawer-width;
-  transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000), visibility .6s;
+  transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
   padding: 0;
   border: 0;
   // We overwrite max-height over browser defaults for dialog
   max-height: 100vh;
+  
+  &::backdrop {
+    opacity: 0;
+    background-color: #fff - @xwiki-page-content-bg;
+    transition: opacity .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+  }
 
-  &[open]:not(.drawer-close) {
+  &[open]:not(.drawer-transitioning) {
     margin-right: 0;
+    &::backdrop {
+      opacity: 0.2;
+    }
   }
 
   & .drawer-menu {
@@ -64,6 +73,10 @@
 
     // Brand =================================================================
     .drawer-brand {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
       background-color: @xwiki-drawer-brand-bg;
       border-bottom: 1px solid @xwiki-drawer-brand-border;
       font-weight: 400;
@@ -84,15 +97,13 @@
       // Avatar styling
       img {
         border-radius: 50%;
-        float: left;
         height: 50px;
         width: 50px;
       }
 
       .brand-links {
-        float: left;
+        flex-grow: 1;
         margin-left: 16px;
-        margin-top: 8px;
 
         a {
           font-size: 14px;

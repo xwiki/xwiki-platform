@@ -40,13 +40,13 @@ import org.xwiki.properties.ConverterManager;
  */
 public class CommonsConfigurationSource implements ConfigurationSource
 {
-    private Configuration configuration;
-
     /**
      * Component used for performing type conversions.
      */
     @Inject
-    private ConverterManager converterManager;
+    protected ConverterManager converterManager;
+
+    private Configuration configuration;
 
     protected Configuration getConfiguration()
     {

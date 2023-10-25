@@ -79,8 +79,11 @@ require(['jquery'], function($) {
     });
 
     drawerContainer.on('drawer' + index + '.opened', function(event) {
+      // We use the drawer-close class to make sure the transition to slidein is not shortcutted when showing the modal
+      drawerContainer.addClass('drawer-close');
       drawerContainerToggler.attr('aria-expanded', 'true');
       drawerContainer.get(0).showModal();
+      drawerContainer.removeClass('drawer-close');
       // The drawer can be closed by pressing the ESC key
       $("body").on('keydown.drawerClose', function (event) {
         if (event.key === 'Escape') {
@@ -88,8 +91,16 @@ require(['jquery'], function($) {
         }
       });
     }).on('drawer' + index + '.closed', function(event) {
-      drawerContainer.get(0).close();
       drawerContainerToggler.attr('aria-expanded', 'false');
+      
+      function waitAnimation() {
+        drawerContainer.get(0).close();
+        drawerContainer.removeClass('drawer-close');
+        drawerContainer.get(0).removeEventListener('transitionend', waitAnimation);
+      }
+      // We use the drawer-close class to give time for the hide modal transition to play.
+      drawerContainer.addClass('drawer-close');
+      drawerContainer.get(0).addEventListener('transitionend', waitAnimation);
       // We remove the listener that was created when the drawer opened up
       $("body").off('keydown.drawerClose');
     });

@@ -38,13 +38,8 @@
   border: 0;
   // We overwrite max-height over browser defaults for dialog
   max-height: 100vh;
-  
-  &:not([open]) {
-    // We use visibility here to avoid breaking the animations.
-    visibility: hidden;
-  }
-  
-  &[open] {
+
+  &[open]:not(.drawer-close) {
     margin-right: 0;
   }
 

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>15.9-SNAPSHOT</version>
+    <version>15.10-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
-      <version>2.7.14</version>
+      <version>2.7.15</version>
       <exclusions>
         <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
         not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
@@ -167,7 +167,8 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v18.18.0</nodeVersion>
+              <nodeVersion>v20.9.0</nodeVersion>
+              <npmVersion>10.2.1</npmVersion>
             </configuration>
           </execution>
           <execution>

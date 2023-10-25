@@ -1,0 +1,24 @@
+#requiredRightsResults {
+  text-align: initial;
+}
+
+#requiredRightsResults .panel-heading {
+  padding: 0.7em;
+}
+
+#requiredRightsResults .panel-group {
+  margin-bottom: 0.5em;
+}
+
+#requiredRightsResults .panel-title a .fa {
+  width: 0.5em;
+}
+
+#requiredRightsResults .panel-title a[aria-expanded="false"] .icon-expanded {
+  display: none;
+}
+
+#requiredRightsResults .panel-title a[aria-expanded="true"] .icon-collapsed {
+  display: none;
+}
+ 

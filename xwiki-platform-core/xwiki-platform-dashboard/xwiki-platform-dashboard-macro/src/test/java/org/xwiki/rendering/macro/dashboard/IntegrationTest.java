@@ -19,15 +19,9 @@
  */
 package org.xwiki.rendering.macro.dashboard;
 
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Properties;
 
-import org.apache.velocity.VelocityContext;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
@@ -39,8 +33,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.DefaultVelocityManager;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -98,36 +91,8 @@ public class IntegrationTest implements RenderingTests
         // return true on is editing, to take as many paths possible
         when(mockGadgetSource.isEditing()).thenReturn(true);
 
-        // Mock VelocityManager used in macrodashboard_nested_velocity.test because we do not have an XWikiContext
-        // instance in the ExecutionContext.
-        VelocityManager mockVelocityManager = componentManager.registerMockComponent(VelocityManager.class);
-        when(mockVelocityManager.getVelocityContext()).thenReturn(new VelocityContext());
-        when(mockVelocityManager.getCurrentVelocityContext()).thenReturn(new VelocityContext());
-        when(mockVelocityManager.getVelocityEngine()).thenAnswer(new Answer<VelocityEngine>()
-        {
-            @Override
-            public VelocityEngine answer(InvocationOnMock invocation) throws Throwable
-            {
-                VelocityEngine velocityEngine = componentManager.getInstance(VelocityEngine.class);
-                Properties properties = new Properties();
-                velocityEngine.initialize(properties);
-
-                return velocityEngine;
-            };
-        });
-        when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
-            .thenAnswer(new Answer<Boolean>()
-            {
-                @Override
-                public Boolean answer(InvocationOnMock invocation) throws Throwable
-                {
-                    VelocityEngine velocityEngine = mockVelocityManager.getVelocityEngine();
-
-                    return velocityEngine.evaluate(mockVelocityManager.getVelocityContext(),
-                        (Writer) invocation.getArgument(0), (String) invocation.getArgument(1),
-                        (Reader) invocation.getArgument(2));
-                }
-            });
+        // Use the much lighter xwiki-commons velocity manager
+        componentManager.registerComponent(DefaultVelocityManager.class);
 
         ContextualAuthorizationManager authorization = componentManager.registerMockComponent(ContextualAuthorizationManager.class);
         when(authorization.hasAccess(Right.SCRIPT)).thenReturn(true);

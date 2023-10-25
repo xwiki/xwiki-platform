@@ -42,50 +42,92 @@
 #set ($videoCards = [{
   'title': $services.localization.render('help.videos.videoCard1.title'),
   'topics': [
-    $services.localization.render('help.videos.videoCard1.topic1'),
-    $services.localization.render('help.videos.videoCard1.topic2')
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/',
+      'label': $services.localization.render('help.videos.videoCard1.topic1')
+    },
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/Navigate/',
+      'label': $services.localization.render('help.videos.videoCard1.topic2')
+    }
   ],
   'url': 'https://www.youtube.com/embed/p5g6aDGOqWY',
   'duration': '4 min'
 }, {
   'title': $services.localization.render('help.videos.videoCard2.title'),
   'topics': [
-    $services.localization.render('help.videos.videoCard2.topic1'),
-    $services.localization.render('help.videos.videoCard2.topic2'),
-    $services.localization.render('help.videos.videoCard2.topic3')
+    {
+      'url': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Flamingo%20Theme%20Application#HHowtoselectatheme',
+      'label': $services.localization.render('help.videos.videoCard2.topic1')
+    },
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/ChangingTheLogoAndThePanels#HChangingyourwiki27spanels',
+      'label': $services.localization.render('help.videos.videoCard2.topic2')
+    },
+    {
+      'url': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Dashboard%20Macro#HAddinggadgets',
+      'label': $services.localization.render('help.videos.videoCard2.topic3')
+    }
   ],
   'url': 'https://www.youtube.com/embed/zX1Itoh3E68',
   'duration': '5 min'
 }, {
   'title': $services.localization.render('help.videos.videoCard3.title'),
   'topics': [
-    $services.localization.render('help.videos.videoCard3.topic1'),
-    $services.localization.render('help.videos.videoCard3.topic2'),
-    $services.localization.render('help.videos.videoCard3.topic3')
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/CreatingAPage',
+      'label': $services.localization.render('help.videos.videoCard3.topic1')
+    },
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/EditingAPage',
+      'label': $services.localization.render('help.videos.videoCard3.topic2')
+    },
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts#HViewMode',
+      'label': $services.localization.render('help.videos.videoCard3.topic3')
+    }
   ],
   'url': 'https://www.youtube.com/embed/onenEu21FIk',
   'duration': '6 min'
 }, {
   'title': $services.localization.render('help.videos.videoCard4.title'),
   'topics': [
-    $services.localization.render('help.videos.videoCard4.topic1'),
-    $services.localization.render('help.videos.videoCard4.topic2')
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/Imports#HImportingOfficedocuments',
+      'label': $services.localization.render('help.videos.videoCard4.topic1')
+    },
+    {
+      'url': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/TOC+Macro#HExample1:Simple',
+      'label': $services.localization.render('help.videos.videoCard4.topic2')
+    }
   ],
   'url': 'https://www.youtube.com/embed/csQVSRMVclM',
   'duration': '4 min'
 }, {
   'title': $services.localization.render('help.videos.videoCard5.title'),
   'topics': [
-    $services.localization.render('help.videos.videoCard5.topic1'),
-    $services.localization.render('help.videos.videoCard5.topic2')
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/CreatingABasicApp',
+      'label': $services.localization.render('help.videos.videoCard5.topic1')
+    },
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/FAQTutorial/FAQTutorialAWM#HCreatingnewFAQentries',
+      'label': $services.localization.render('help.videos.videoCard5.topic2')
+    }
   ],
   'url': 'https://www.youtube.com/embed/Pv4jPCaU99g',
   'duration': '7 min'
 }, {
   'title': $services.localization.render('help.videos.videoCard6.title'),
   'topics': [
-    $services.localization.render('help.videos.videoCard6.topic1'),
-    $services.localization.render('help.videos.videoCard6.topic2')
+    {
+      'url': 'https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Tutorials/CreatingExtensions/#HInstallinganExtension',
+      'label': $services.localization.render('help.videos.videoCard6.topic1')
+    },
+    {
+      'url': 'https://extensions.xwiki.org/xwiki/bin/view/Extension/Administration%20Application#HDescription',
+      'label': $services.localization.render('help.videos.videoCard6.topic2')
+    }
   ],
   'url': 'https://www.youtube.com/embed/Q4NHu6J5pX4',
   'duration': '3 min'
@@ -93,14 +135,24 @@
 
 #macro (helpVideoCard $data)
   &lt;div class="videoCard"&gt;
-    &lt;iframe src="$data.url" allowfullscreen title="$escapetool.xml($data.title)" role="presentation" &gt;&lt;/iframe&gt;
+    &lt;iframe src="$data.url" allowfullscreen title="$escapetool.xml($data.title)" role='application'
+        aria-describedby="video_hint_$foreach.index" &gt;
+    &lt;/iframe&gt;
+    &lt;span id="video_hint_$foreach.index" class="sr-only"&gt;
+      $escapetool.xml($services.localization.render('help.videos.hint'))
+    &lt;/span&gt;
     &lt;div class="videoCard-body"&gt;
       &lt;div class="videoCard-title"&gt;
         $escapetool.xml($data.title)
       &lt;/div&gt;
       &lt;ul&gt;
         #foreach ($topic in $data.topics)
-          &lt;li&gt;$topic&lt;/li&gt;
+          &lt;li&gt;#if ($topic.url)
+            &lt;a href="$escapetool.xml($topic.url)"&gt;$escapetool.xml($topic.label)&lt;/a&gt;
+          #else
+            $escapetool.xml($topic)
+          #end
+          &lt;/li&gt;
         #end
       &lt;/ul&gt;
     &lt;/div&gt;

@@ -118,23 +118,28 @@ class R140300000XWIKI19614DataMigrationTest
     {
         DocumentReference doc42 = new DocumentReference("xwiki", "XWiki", "Doc42");
         DocumentReference doc43 = new DocumentReference("xwiki", "XWiki", "Doc43");
+        DocumentReference doc44 = new DocumentReference("xwiki", "XWiki", "Doc44");
 
         when(this.wiki.hasBacklinks(this.context)).thenReturn(true);
 
         when(this.query.execute()).thenReturn(List.of(
             new String[] { "XWiki.Doc42", "" },
-            new String[] { "XWiki.Doc43", "fr" }
+            new String[] { "XWiki.Doc43", "fr" },
+            // Simulate a result return by Oracle, when the empty string is returned as null
+            new String[] { "XWiki.Doc44", null }
         ));
         when(this.resolver.resolve("XWiki.Doc42")).thenReturn(doc42);
         when(this.resolver.resolve("XWiki.Doc43")).thenReturn(doc43);
+        when(this.resolver.resolve("XWiki.Doc44")).thenReturn(doc44);
 
         this.migration.migrate();
 
         verify(this.query).setWiki("wiki1");
         verify(this.taskManager).addTask("wiki1", -7672023672109484185L, "links");
         verify(this.taskManager).addTask("wiki1", -3303915339101339304L, "links");
+        verify(this.taskManager).addTask("wiki1", 1722724816638329912L, "links");
 
-        assertEquals("[2] documents queued to task [links]", this.logCapture.getMessage(0));
+        assertEquals("[3] documents queued to task [links]", this.logCapture.getMessage(0));
         assertEquals(Level.INFO, this.logCapture.getLogEvent(0).getLevel());
     }
 

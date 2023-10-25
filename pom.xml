@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>15.9-SNAPSHOT</version>
+    <version>15.10-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>15.9-SNAPSHOT</version>
+  <version>15.10-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -53,18 +53,19 @@
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.17</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.9.0</tika.version>
+    <tika.version>2.9.1</tika.version>
     <pdfbox.version>2.0.29</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <!-- We are stuck at version 9.x until we upgrade to a version of SolrJ which use a more recent version (or something else) -->
-    <jetty.client.version>9.4.52.v20230823</jetty.client.version>
-    <jetty.server.version>10.0.16</jetty.server.version>
+    <jetty.client.version>9.4.53.v20231009</jetty.client.version>
+    <jetty.server.version>10.0.17</jetty.server.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.99.Final</netty.version>
+    <netty.version>4.1.100.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.3</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
     <solr.version>8.11.2</solr.version>
+    <zookeeper.version>3.9.1</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.19.1</testcontainers.version>
@@ -596,7 +597,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.16.1</version>
+        <version>1.16.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -720,7 +721,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>4.2</version>
+        <version>4.2.1</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -1095,6 +1096,23 @@
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
         <version>1.23.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper</artifactId>
+        <version>${zookeeper.version}</version>
+        <exclusions>
+          <!-- Workaround https://issues.apache.org/jira/browse/ZOOKEEPER-4763 -->
+          <exclusion>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper-jute</artifactId>
+        <version>${zookeeper.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

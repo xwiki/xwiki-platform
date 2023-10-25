@@ -19,13 +19,17 @@
  */
 package com.xpn.xwiki.internal.template;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -47,6 +51,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
@@ -223,7 +228,11 @@ public class InternalTemplateManager implements Initializable, Disposable
         public TemplateContent getContent() throws Exception
         {
             if (this.content == null) {
-                this.instant = this.resource.getInstant();
+                try {
+                    this.instant = this.resource.getInstant();
+                } catch (Exception e) {
+                    // Failed to get the resource instant, it's unknown
+                }
                 this.content = loadContent();
             } else if (this.instant != null) {
                 // Check if the resource has been modified
@@ -590,7 +599,7 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         // Initialize the filesystem template cache
         try {
-            this.templateCache = cacheManager.createNewCache(new LRUCacheConfiguration("template.filesystem", 500));
+            this.templateCache = cacheManager.createNewCache(new LRUCacheConfiguration("templates", 500));
         } catch (CacheException e) {
             this.logger.error("Failed to create the filesystem template cache", e);
         }
@@ -1016,7 +1025,7 @@ public class InternalTemplateManager implements Initializable, Disposable
         }
 
         // Try the cache
-        Template template = getCachedTemplate(templateId);
+        Template template = getCachedTemplate(templateId, () -> getResourceInstant(this.environment, templatePath));
 
         // Create a new instance if it could not be found in the cache
         if (template == null) {
@@ -1033,7 +1042,7 @@ public class InternalTemplateManager implements Initializable, Disposable
     private Template getTemplate(Resource<?> resource)
     {
         // Try the cache
-        Template template = getCachedTemplate(resource.getId());
+        Template template = getCachedTemplate(resource.getId(), resource::getInstant);
 
         if (template == null) {
             if (resource instanceof AbstractSkinResource) {
@@ -1050,15 +1059,29 @@ public class InternalTemplateManager implements Initializable, Disposable
         return template;
     }
 
-    private Template getCachedTemplate(String id)
+    private Template getCachedTemplate(String id, Callable<Instant> resourceInstantProvider)
     {
         Template template = null;
 
         if (this.templateCache != null) {
             template = this.templateCache.get(id);
 
+            // Check if the cached template is older than the actual resource last modification
             if (template != null) {
-                // Check if it's allowed to use the cached value
+                Instant instant = template.getInstant();
+
+                try {
+                    if (instant != null && instant.isBefore(resourceInstantProvider.call())) {
+                        template = null;
+                    }
+                } catch (Exception e) {
+                    this.logger.warn("Failed to get the instant for resource with idenfier [{}]: {}", id,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+
+            // Check if it's allowed to use the cached value
+            if (template != null) {
                 Instant templateInstant = template.getInstant();
                 if (templateInstant != null) {
                     // The template date is known, compare it to the cache clean date
@@ -1166,5 +1189,15 @@ public class InternalTemplateManager implements Initializable, Disposable
         throws Exception
     {
         return new StringTemplate(content, author, sourceReference);
+    }
+
+    public static Instant getResourceInstant(Environment environment, String path)
+        throws URISyntaxException, IOException
+    {
+        URL resourceUrl = environment.getResource(path);
+        Path resourcePath = Paths.get(resourceUrl.toURI());
+        FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+
+        return lastModifiedTime.toInstant();
     }
 }

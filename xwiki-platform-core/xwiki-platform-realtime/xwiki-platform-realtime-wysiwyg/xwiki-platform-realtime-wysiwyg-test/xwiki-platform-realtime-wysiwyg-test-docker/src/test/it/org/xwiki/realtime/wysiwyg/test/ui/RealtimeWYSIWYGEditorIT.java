@@ -28,6 +28,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.Point;
 import org.xwiki.administration.test.po.WYSIWYGEditorAdministrationSectionPage;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
@@ -95,7 +97,7 @@ class RealtimeWYSIWYGEditorIT
         assertTrue(editPage.isRealtimeEditing());
 
         // Verify that the Preview button is hidden.
-        assertFalse(editPage.getPreviewButton().isDisplayed());
+        assertFalse(editPage.hasPreviewButton());
 
         // The Autosave checkbox is also hidden because autosave is done by the realtime editor (you can't disable it
         // while editing in realtime).
@@ -105,7 +107,7 @@ class RealtimeWYSIWYGEditorIT
         assertTrue(editor.getToolBar().isEditingAlone());
 
         RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
-        textArea.sendKeys("test");
+        textArea.sendKeys("one");
 
         // Verify the cursor indicator on the left of the editing area.
         List<CoeditorPosition> coeditorPositions = textArea.getCoeditorPositions();
@@ -115,20 +117,23 @@ class RealtimeWYSIWYGEditorIT
         assertEquals("John", selfPosition.getAvatarHint());
         assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + selfPosition.getAvatarURL());
-        assertEquals(3, selfPosition.getLocation().getX());
-        assertEquals(18, selfPosition.getLocation().getY());
+        selfPosition.waitForLocation(new Point(3, 18));
+
+        // Verify that the cursor indicator is updated when typing.
+        textArea.sendKeys(Keys.ENTER, "two");
+        selfPosition.waitForLocation(new Point(3, 48));
 
         // Verify the action buttons (Save and Cancel).
         editPage.clickSaveAndContinue();
-        textArea.sendKeys(" alone");
+        textArea.sendKeys(Keys.ENTER, "three");
         ViewPage viewPage = editPage.clickCancel();
-        assertEquals("test", viewPage.getContent());
+        assertEquals("one\ntwo", viewPage.getContent());
 
         // Edit again and verify the Save and View button.
         viewPage.edit();
         editPage = new RealtimeWYSIWYGEditPage();
-        editPage.getContenEditor().getRichTextArea().sendKeys(" alone");
+        editPage.getContenEditor().getRichTextArea().sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "three");
         viewPage = editPage.clickSaveAndView();
-        assertEquals("test alone", viewPage.getContent());
+        assertEquals("one\ntwo\nthree", viewPage.getContent());
     }
 }

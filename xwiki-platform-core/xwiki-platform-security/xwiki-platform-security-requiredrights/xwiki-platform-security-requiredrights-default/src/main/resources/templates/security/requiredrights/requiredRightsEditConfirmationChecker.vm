@@ -73,7 +73,7 @@
 #end
 #set ($counter = 0)
 #initRequiredSkinExtensions()
-#set ($discard = $xwiki.ssfx.use('css/security/requiredrights/requiredRightsEditConfirmationChecker.css'))
+#set ($discard = $xwiki.ssrx.use('css/security/requiredrights/requiredRightsEditConfirmationChecker.css'))
 {{/velocity}}{{velocity}}
 #if ($analysisResults.hasAdded() || $analysisResults.hasRemoved())##
 (% id='requiredRightsResults' %)(((

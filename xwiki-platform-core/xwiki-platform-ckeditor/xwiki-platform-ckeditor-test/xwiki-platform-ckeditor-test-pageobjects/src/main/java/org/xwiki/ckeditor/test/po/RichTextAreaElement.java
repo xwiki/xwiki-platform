@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -42,7 +43,7 @@ public class RichTextAreaElement extends BaseElement
     /**
      * The in-line frame element.
      */
-    protected final WebElement iframe;
+    private final WebElement iframe;
 
     /**
      * Creates a new rich text area element.
@@ -122,12 +123,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public Object executeScript(String script, Object... arguments)
     {
-        try {
-            getDriver().switchTo().frame(this.iframe);
-            return getDriver().executeScript(script, arguments);
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
+        return getFromIFrame(() -> getDriver().executeScript(script, arguments));
     }
 
     /**
@@ -176,12 +172,10 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentEditable()
     {
-        try {
-            getDriver().switchTo().frame(this.iframe);
+        getFromIFrame(() -> {
             getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
+            return null;
+        });
     }
 
     /**
@@ -189,10 +183,15 @@ public class RichTextAreaElement extends BaseElement
      */
     public int getScrollTop()
     {
+        return getFromIFrame(() -> Integer
+            .parseInt(getDriver().findElementWithoutWaiting(By.tagName("html")).getDomProperty("scrollTop")));
+    }
+
+    protected <T> T getFromIFrame(Supplier<T> supplier)
+    {
         try {
             getDriver().switchTo().frame(this.iframe);
-            return Integer
-                .parseInt(getDriver().findElementWithoutWaiting(By.tagName("html")).getDomProperty("scrollTop"));
+            return supplier.get();
         } finally {
             getDriver().switchTo().defaultContent();
         }

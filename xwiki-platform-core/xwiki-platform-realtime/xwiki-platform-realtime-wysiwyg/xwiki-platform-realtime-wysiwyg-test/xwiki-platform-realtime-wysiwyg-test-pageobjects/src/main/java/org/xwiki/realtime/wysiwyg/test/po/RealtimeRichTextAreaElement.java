@@ -42,33 +42,44 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     /**
      * Represents the position of a coeditor in the rich text area (displayed on the left side).
      */
-    public static class CoeditorPosition extends BaseElement
+    public class CoeditorPosition extends BaseElement
     {
-        private WebElement container;
+        private String id;
 
-        public CoeditorPosition(WebElement container)
+        public CoeditorPosition(String id)
         {
-            this.container = container;
+            this.id = id;
         }
 
         public String getCoeditorId()
         {
-            return StringUtils.removeStart(this.container.getAttribute("id"), "rt-user-");
+            return StringUtils.removeStart(id, "rt-user-");
         }
 
         public String getAvatarURL()
         {
-            return this.container.getAttribute("src");
+            return getFromIFrame(() -> getContainer().getAttribute("src"));
         }
 
         public String getAvatarHint()
         {
-            return this.container.getAttribute("title");
+            return getFromIFrame(() -> getContainer().getAttribute("title"));
         }
 
         public Point getLocation()
         {
-            return this.container.getLocation();
+            return getFromIFrame(() -> getContainer().getLocation());
+        }
+
+        public CoeditorPosition waitForLocation(Point point)
+        {
+            getDriver().waitUntilCondition(driver -> getLocation().equals(point));
+            return this;
+        }
+
+        private WebElement getContainer()
+        {
+            return getDriver().findElement(By.id(this.id));
         }
     }
 
@@ -87,13 +98,8 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public List<CoeditorPosition> getCoeditorPositions()
     {
-        try {
-            getDriver().switchTo().frame(this.iframe);
-            return getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
-                .map(CoeditorPosition::new).collect(Collectors.toList());
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
+        return getFromIFrame(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
+            .map(element -> element.getAttribute("id")).map(CoeditorPosition::new).collect(Collectors.toList()));
     }
 
     /**

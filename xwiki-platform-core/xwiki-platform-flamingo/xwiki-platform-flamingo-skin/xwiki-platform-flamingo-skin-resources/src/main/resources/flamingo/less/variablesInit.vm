@@ -100,6 +100,9 @@
   @panel-default-text:                  $theme.panelTextColor;
   @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
   @panel-header-text:                   $theme.panelHeaderTextColor;
+  ## Kept for backward compatibility
+  @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
+  @panel-header-text:                   $theme.panelHeaderTextColor;
 
   ##
   ## XWiki variables: LESS variables specific to XWiki
@@ -233,6 +236,9 @@
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
   @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
   @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
+  ## Kept for backward compatibility
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
 
   ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
   ## Make sure the links are dark enough in the tmDrawer

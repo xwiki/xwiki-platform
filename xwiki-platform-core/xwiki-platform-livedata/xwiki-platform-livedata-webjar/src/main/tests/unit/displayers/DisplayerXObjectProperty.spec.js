@@ -20,7 +20,6 @@
 
 import DisplayerXObjectProperty from "../../../displayers/DisplayerXObjectProperty.vue";
 import {initWrapper} from "./displayerTestsHelper";
-import Vue from "vue";
 import $ from 'jquery';
 import flushPromises from "flush-promises";
 

@@ -199,6 +199,16 @@
             </configuration>
             <phase>test</phase>
           </execution>
+          <execution>
+            <id>npm-run-lint</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run lint</arguments>
+            </configuration>
+            <phase>test</phase>
+          </execution>
         </executions>
         <configuration>
           <workingDirectory>${project.build.directory}/vue</workingDirectory>

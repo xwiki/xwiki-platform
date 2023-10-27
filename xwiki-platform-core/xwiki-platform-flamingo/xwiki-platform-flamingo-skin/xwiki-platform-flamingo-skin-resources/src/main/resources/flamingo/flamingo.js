@@ -74,8 +74,9 @@ require(['jquery'], function($) {
       // Close drawer when clicking the backdrop (or any element outside of the drawer itself).
       drawerContainer.on('click', (event) => {
         let drawerzone = event.target.getBoundingClientRect();
-        if (drawerzone.left > event.clientX || drawerzone.right < event.clientX
-            || drawerzone.top > event.clientY || drawerzone.bottom < event.clientY) {
+        if (event.target === drawerContainer.get(0) &&
+            (drawerzone.left > event.clientX || drawerzone.right < event.clientX
+            || drawerzone.top > event.clientY || drawerzone.bottom < event.clientY)) {
           closeDrawer();
         }
       });

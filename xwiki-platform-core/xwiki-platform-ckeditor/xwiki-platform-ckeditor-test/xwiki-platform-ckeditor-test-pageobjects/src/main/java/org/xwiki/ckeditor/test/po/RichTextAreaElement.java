@@ -179,12 +179,15 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
-     * @return the scroll top position of the rich text area
+     * @return the placeholder text, if present
      */
-    public int getScrollTop()
+    public String getPlaceholder()
     {
-        return getFromIFrame(() -> Integer
-            .parseInt(getDriver().findElementWithoutWaiting(By.tagName("html")).getDomProperty("scrollTop")));
+        try {
+            return getActiveElement().getAttribute("data-cke-editorplaceholder");
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
     }
 
     protected <T> T getFromIFrame(Supplier<T> supplier)

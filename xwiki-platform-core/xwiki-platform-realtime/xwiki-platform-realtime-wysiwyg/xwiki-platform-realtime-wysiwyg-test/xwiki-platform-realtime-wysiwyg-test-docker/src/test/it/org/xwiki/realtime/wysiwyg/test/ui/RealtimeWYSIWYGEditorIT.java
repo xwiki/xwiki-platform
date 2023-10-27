@@ -21,17 +21,19 @@ package org.xwiki.realtime.wysiwyg.test.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
-import org.xwiki.administration.test.po.WYSIWYGEditorAdministrationSectionPage;
+import org.openqa.selenium.WindowType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
+import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeWYSIWYGEditPage;
@@ -70,22 +72,11 @@ import org.xwiki.test.ui.po.ViewPage;
     },
     resolveExtraJARs = true
 )
-class RealtimeWYSIWYGEditorIT
+class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 {
-    @BeforeAll
-    static void configure(TestUtils setup)
-    {
-        // Enable the real-time WYSIWYG editor.
-        setup.loginAsSuperAdmin();
-        WYSIWYGEditorAdministrationSectionPage.gotoPage().setDefaultWYSIWYGEditor("Realtime CKEditor");
-
-        // Test with a simple user.
-        setup.createUserAndLogin("John", "pass", "editor", "Wysiwyg");
-    }
-
     @Test
     @Order(1)
-    void editAlone(TestReference testReference, TestUtils setup)
+    void editAlone(TestReference testReference, TestUtils setup) throws Exception
     {
         // Start fresh.
         setup.deletePage(testReference);
@@ -105,6 +96,9 @@ class RealtimeWYSIWYGEditorIT
 
         // Verify that we're editing alone.
         assertTrue(editor.getToolBar().isEditingAlone());
+
+        // The Source button is currently disabled.
+        assertFalse(editor.getToolBar().canToggleSourceMode());
 
         RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
         textArea.sendKeys("one");
@@ -135,5 +129,145 @@ class RealtimeWYSIWYGEditorIT
         editPage.getContenEditor().getRichTextArea().sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "three");
         viewPage = editPage.clickSaveAndView();
         assertEquals("one\ntwo\nthree", viewPage.getContent());
+
+        // Edit again to verify the autosave.
+        viewPage.edit();
+        editPage = new RealtimeWYSIWYGEditPage();
+        textArea = editPage.getContenEditor().getRichTextArea();
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        textArea.sendKeys("zero");
+
+        // Wait for auto-save.
+        String saveStatus = editor.getToolBar().waitForAutoSave();
+        assertTrue(saveStatus.startsWith("Saved:"), "Unexpected save status: " + saveStatus);
+
+        viewPage = editPage.clickCancel();
+        assertEquals("zero\ntwo\nthree", viewPage.getContent());
+    }
+
+    @Test
+    @Order(2)
+    void editWithSelf(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        String firstCoeditorId = firstTextArea.getCoeditorPositions().get(0).getCoeditorId();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab.
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // FIXME: We need a simpler method to get the user ID in the real-time session.
+        String secondCoeditorId = secondTextArea.getCoeditorPositions().stream()
+            .filter(position -> !firstCoeditorId.equals(position.getCoeditorId())).findFirst().get().getCoeditorId();
+
+        // Verify the list of coeditors.
+        List<Coeditor> coeditors = secondEditor.getToolBar().waitForCoeditor(firstCoeditorId).getCoeditors();
+        assertEquals(1, coeditors.size());
+        Coeditor self = coeditors.get(0);
+        assertEquals("John", self.getName());
+        assertEquals("xwiki:XWiki.John", self.getReference());
+        assertTrue(setup.getURL(new DocumentReference("xwiki", "XWiki", "John")).endsWith(self.getURL()));
+        assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
+        assertEquals("John", self.getAvatarHint());
+
+        // Verify the placeholder text is present, because the content is empty.
+        assertEquals("Start typing here...", secondTextArea.getPlaceholder());
+
+        //
+        // First Tab
+        //
+
+        // Switch back to the first tab and verify the list of coeditors.
+        setup.getDriver().switchTo().window(firstTabHandle);
+        coeditors = firstEditor.getToolBar().waitForCoeditor(secondCoeditorId).getCoeditors();
+        assertEquals(1, coeditors.size());
+        self = coeditors.get(0);
+        assertEquals("John", self.getName());
+        assertEquals("xwiki:XWiki.John", self.getReference());
+        assertTrue(setup.getURL(new DocumentReference("xwiki", "XWiki", "John")).endsWith(self.getURL()));
+        assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
+        assertEquals("John", self.getAvatarHint());
+
+        // Type in the first tab to see that it gets propagated to the second tab.
+        firstTextArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three");
+
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and verify the content.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilContentContains("three");
+
+        // There should be no placeholder text anymore because the content is not empty.
+        assertNull(secondTextArea.getPlaceholder());
+        assertEquals("one\ntwo\nthree", secondTextArea.getText());
+
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        secondTextArea.sendKeys("zero");
+
+        // Verify the caret indicators on the left of the editing area.
+
+        // The first user is on the third line (paragraph).
+        CoeditorPosition firstPosition =
+            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(3, 78));
+        assertEquals("John", firstPosition.getAvatarHint());
+        assertTrue(firstPosition.getAvatarURL().contains("noavatar.png"),
+            "Unexpected avatar URL: " + firstPosition.getAvatarURL());
+
+        // The second user is on the first line (paragraph).
+        CoeditorPosition secondPosition =
+            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(3, 18));
+        assertEquals("John", secondPosition.getAvatarHint());
+        assertTrue(secondPosition.getAvatarURL().contains("noavatar.png"),
+            "Unexpected avatar URL: " + secondPosition.getAvatarURL());
+
+        assertEquals(2, secondTextArea.getCoeditorPositions().size());
+
+        // Verify that the caret indicator is updated on the first editor.
+        secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME);
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(3, 48));
+
+        // Verify that clicking on the coeditor indicator scrolls the editing area to the coeditor position.
+        // But first we need to add enough paragraphs to make the editing area scrollable.
+        for (int i = 0; i< 20; i++) {
+            firstTextArea.sendKeys(Keys.ENTER);
+        }
+        firstTextArea.sendKeys("end");
+
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and click on the coeditor indicator.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilContentContains("end");
+        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(3, 18 + 22 * 30));
+        assertFalse(firstPosition.isVisible(), "The coeditor position is visible before scrolling.");
+        secondEditor.getToolBar().getCoeditor(firstCoeditorId).click();
+        assertTrue(firstPosition.isVisible(), "The coeditor position is not visible after scrolling.");
     }
 }

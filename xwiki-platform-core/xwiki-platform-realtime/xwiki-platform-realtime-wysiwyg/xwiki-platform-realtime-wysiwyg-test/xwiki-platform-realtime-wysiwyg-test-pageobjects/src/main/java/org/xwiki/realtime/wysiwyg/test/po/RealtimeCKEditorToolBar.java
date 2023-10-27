@@ -37,6 +37,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class RealtimeCKEditorToolBar extends CKEditorToolBar
 {
+    private String lastMergeStatus;
+
     /**
      * Represents a coeditor listed in the tool bar.
      */
@@ -116,5 +118,48 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
     {
         return getDriver().findElementsWithoutWaiting(getContainer(), By.className("rt-user-link")).stream()
             .map(Coeditor::new).collect(Collectors.toList());
+    }
+
+    /**
+     * @param coeditorId the coeditor identifier
+     * @return the coeditor with the specified identifier or {@code null} if no such coeditor exists
+     */
+    public Coeditor getCoeditor(String coeditorId)
+    {
+        return getCoeditors().stream().filter(coeditor -> coeditor.getId().equals(coeditorId)).findFirst().orElse(null);
+    }
+
+    /**
+     * Wait for the specified coeditor to appear in the tool bar.
+     * 
+     * @param coeditorId the coeditor identifier
+     * @return this tool bar instance
+     */
+    public RealtimeCKEditorToolBar waitForCoeditor(String coeditorId)
+    {
+        getDriver().waitUntilElementIsVisible(getContainer(),
+            By.cssSelector(".rt-user-link[data-id='" + coeditorId + "']"));
+        return this;
+    }
+
+    /**
+     * Wait for the auto-save to be triggered.
+     * 
+     * @return the merge status message
+     */
+    public String waitForAutoSave()
+    {
+        // Unsaved changes are pushed after 60 seconds, but the check for unsaved changes is done every 20 seconds, so
+        // we need to wait at most 80 seconds.
+        int timeout = 80;
+
+        getDriver().waitUntilCondition(driver -> {
+            String newMergeStatus =
+                getDriver().findElementWithoutWaiting(getContainer(), By.className("realtime-merge")).getText();
+            boolean hasNewMergeStatus = !newMergeStatus.isEmpty() && !newMergeStatus.equals(this.lastMergeStatus);
+            this.lastMergeStatus = newMergeStatus;
+            return hasNewMergeStatus;
+        }, timeout);
+        return this.lastMergeStatus;
     }
 }

@@ -76,6 +76,14 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- We extend AbstractCKEditorIT. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-realtime-wysiwyg-test-pageobjects</artifactId>
       <version>${project.version}</version>

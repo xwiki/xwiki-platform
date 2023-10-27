@@ -25,7 +25,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -48,7 +51,20 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public CoeditorPosition(String id)
         {
+            this(id, false);
+        }
+
+        public CoeditorPosition(String id, boolean wait)
+        {
             this.id = id;
+
+            // Wait for the specified coeditor position to be available in the DOM.
+            if (wait) {
+                getFromIFrame(() -> {
+                    getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.id(id)));
+                    return null;
+                });
+            }
         }
 
         public String getCoeditorId()
@@ -73,13 +89,40 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public CoeditorPosition waitForLocation(Point point)
         {
-            getDriver().waitUntilCondition(driver -> getLocation().equals(point));
-            return this;
+            return getFromIFrame(() -> {
+                getDriver().waitUntilCondition(driver -> {
+                    try {
+                        return getContainer().getLocation().equals(point);
+                    } catch (StaleElementReferenceException e) {
+                        // The coeditor position (caret indicator) can be updated while we're waiting for it.
+                        return false;
+                    }
+                });
+                return this;
+            });
+        }
+
+        /**
+         * @return {@code true} if this caret indicator is visible in the rich text area
+         */
+        public boolean isVisible()
+        {
+            return getFromIFrame(() -> {
+                WebElement root = getDriver().findElementWithoutWaitingWithoutScrolling(By.tagName("html"));
+                Rectangle viewport = root.getRect();
+                int scrollLeft = Integer.parseInt(root.getDomProperty("scrollLeft"));
+                int scrollTop = Integer.parseInt(root.getDomProperty("scrollTop"));
+                Rectangle position = getContainer().getRect();
+                int x = position.getX() - scrollLeft;
+                int y = position.getY() - scrollTop;
+                return viewport.getX() <= x && x < (viewport.getX() + viewport.getWidth()) && viewport.getY() <= y
+                    && y < (viewport.getY() + viewport.getHeight());
+            });
         }
 
         private WebElement getContainer()
         {
-            return getDriver().findElement(By.id(this.id));
+            return getDriver().findElementWithoutWaitingWithoutScrolling(By.id(this.id));
         }
     }
 
@@ -108,7 +151,6 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public CoeditorPosition getCoeditorPosition(String coeditorId)
     {
-        return getCoeditorPositions().stream().filter(position -> position.getCoeditorId().equals(coeditorId))
-            .findFirst().orElse(null);
+        return new CoeditorPosition("rt-user-" + coeditorId, true);
     }
 }

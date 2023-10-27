@@ -49,9 +49,9 @@ require(['jquery', 'bootstrap'], function($) {
 /*
   Handle the behavior of all drawers on the page.
   In order to create a drawer that is compatible with this script, two elements are necessary:
-  * A drawer toggler button, that will have:
+  * A drawer opener button, that will have:
    ** a reference to the drawer container in its attribute 'aria-control'
-   ** the class 'drawer-toggle'
+   ** the class 'drawer-opener'
   * A drawer container, that will have:
    ** a unique ID
    ** the class 'drawer-nav' (for style) 
@@ -61,15 +61,15 @@ require(['jquery', 'bootstrap'], function($) {
   For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
  */
 require(['jquery'], function($) {
-  $('.drawer-toggle').each(function(index) {
+  $('.drawer-opener').each(function(index) {
     // Setting up the drawer.
-    let drawerContainerToggler = $(this);
-    let drawerId = drawerContainerToggler.attr('aria-controls');
+    let drawerOpener = $(this);
+    let drawerId = drawerOpener.attr('aria-controls');
     let drawerContainer = $(document.getElementById(drawerId));
     
     let openDrawer = () => drawerContainer.trigger('drawer' + index + '.opened');
     let closeDrawer = () => drawerContainer.trigger('drawer' + index + '.closed');
-    drawerContainerToggler.on('click', openDrawer);
+    drawerOpener.on('click', openDrawer);
     // Close drawer when clicking the backdrop (or any element outside of the drawer itself).
     drawerContainer.on('click', (event) => {
       let drawerzone = event.target.getBoundingClientRect();
@@ -84,7 +84,7 @@ require(['jquery'], function($) {
     drawerContainer.on('drawer' + index + '.opened', function(event) {
       // We use the drawer-transitioning class to make sure the transition to slidein is not shortcutted when showing the modal
       drawerContainer.addClass('drawer-transitioning');
-      drawerContainerToggler.attr('aria-expanded', 'true');
+      drawerOpener.attr('aria-expanded', 'true');
       drawerContainer.get(0).showModal();
       drawerContainer.removeClass('drawer-transitioning');
       // The drawer can be closed by pressing the ESC key
@@ -94,7 +94,7 @@ require(['jquery'], function($) {
         }
       });
     }).on('drawer' + index + '.closed', function(event) {
-      drawerContainerToggler.attr('aria-expanded', 'false');
+      drawerOpener.attr('aria-expanded', 'false');
       
       function waitAnimation() {
         drawerContainer.get(0).close();

@@ -45,7 +45,7 @@
  *#
 #macro(displayDrawerActivator)
   <li>
-    <button type="button" id="tmDrawerActivator" class="btn btn-link icon-navbar drawer-toggle" aria-controls="tmDrawer"
+    <button type="button" id="tmDrawerActivator" class="btn btn-link icon-navbar drawer-opener" aria-controls="tmDrawer"
       aria-expanded="false" title="$escapetool.xml($services.localization.render('core.menu.drawer'))"
       ><span class="sr-only">$escapetool.xml($services.localization.render('core.menu.toggleNavigation'))</span
       >$services.icon.renderHTML('menu')</button>

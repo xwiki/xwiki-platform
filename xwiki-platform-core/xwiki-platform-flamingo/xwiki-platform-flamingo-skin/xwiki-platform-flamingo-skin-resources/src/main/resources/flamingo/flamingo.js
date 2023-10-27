@@ -61,56 +61,59 @@ require(['jquery', 'bootstrap'], function($) {
   For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
  */
 require(['jquery'], function($) {
-  $('.drawer-opener').each(function(index) {
-    // Setting up the drawer.
-    let drawerOpener = $(this);
-    let drawerId = drawerOpener.attr('aria-controls');
-    let drawerContainer = $(document.getElementById(drawerId));
-    
-    let openDrawer = () => drawerContainer.trigger('drawer' + index + '.opened');
-    let closeDrawer = () => drawerContainer.trigger('drawer' + index + '.closed');
-    drawerOpener.on('click', openDrawer);
-    // Close drawer when clicking the backdrop (or any element outside of the drawer itself).
-    drawerContainer.on('click', (event) => {
-      let drawerzone = event.target.getBoundingClientRect();
-      if (drawerzone.left > event.clientX || drawerzone.right < event.clientX
-        || drawerzone.top > event.clientY || drawerzone.bottom < event.clientY) {
-        closeDrawer();
-      }
-    });
-    // Close drawer when clicking on a close button inside it
-    drawerContainer.find('.drawer-close').on('click', closeDrawer);
+  $(document).ready(function() {
+    $('.drawer-opener').each(function (index) {
+      // Setting up the drawer.
+      let drawerOpener = $(this);
+      let drawerId = drawerOpener.attr('aria-controls');
+      let drawerContainer = $(document.getElementById(drawerId));
 
-    drawerContainer.on('drawer' + index + '.opened', function(event) {
-      // We use the drawer-transitioning class to make sure the transition to slidein is not shortcutted when showing the modal
-      drawerContainer.addClass('drawer-transitioning');
-      drawerOpener.attr('aria-expanded', 'true');
-      drawerContainer.get(0).showModal();
-      drawerContainer.removeClass('drawer-transitioning');
-      // The drawer can be closed by pressing the ESC key
-      $("body").on('keydown.drawerClose', function (event) {
-        if (event.key === 'Escape') {
+      let openDrawer = () => drawerContainer.trigger('drawer' + index + '.opened');
+      let closeDrawer = () => drawerContainer.trigger('drawer' + index + '.closed');
+      drawerOpener.on('click', openDrawer);
+      // Close drawer when clicking the backdrop (or any element outside of the drawer itself).
+      drawerContainer.on('click', (event) => {
+        let drawerzone = event.target.getBoundingClientRect();
+        if (drawerzone.left > event.clientX || drawerzone.right < event.clientX
+            || drawerzone.top > event.clientY || drawerzone.bottom < event.clientY) {
           closeDrawer();
         }
       });
-    }).on('drawer' + index + '.closed', function(event) {
-      drawerOpener.attr('aria-expanded', 'false');
+      // Close drawer when clicking on a close button inside it
+      drawerContainer.find('.drawer-close').on('click', closeDrawer);
       
-      function waitTransition() {
-        drawerContainer.get(0).close();
+      drawerContainer.on('drawer' + index + '.opened', function (event) {
+        // We use the drawer-transitioning class to make sure the transition to slidein is not shortcutted when showing the modal
+        drawerContainer.addClass('drawer-transitioning');
+        drawerOpener.attr('aria-expanded', 'true');
+        drawerContainer.get(0).showModal();
         drawerContainer.removeClass('drawer-transitioning');
-        drawerContainer.get(0).removeEventListener('transitionend', waitTransition);
-      }
-      // We use the drawer-transitioning class to give time for the hide modal transition to play.
-      drawerContainer.addClass('drawer-transitioning');
-      drawerContainer.get(0).addEventListener('transitionend', waitTransition);
-      // We remove the listener that was created when the drawer opened up
-      $("body").off('keydown.drawerClose');
-    });
-    
-    // When the drawer is closed, collapse sub items
-    $(body).on('drawer' + index + '.closed', function() {
-      $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
+        // The drawer can be closed by pressing the ESC key
+        $("body").on('keydown.drawerClose', function (event) {
+          if (event.key === 'Escape') {
+            closeDrawer();
+          }
+        });
+      }).on('drawer' + index + '.closed', function (event) {
+        drawerOpener.attr('aria-expanded', 'false');
+
+        function waitTransition() {
+          drawerContainer.get(0).close();
+          drawerContainer.removeClass('drawer-transitioning');
+          drawerContainer.get(0).removeEventListener('transitionend', waitTransition);
+        }
+
+        // We use the drawer-transitioning class to give time for the hide modal transition to play.
+        drawerContainer.addClass('drawer-transitioning');
+        drawerContainer.get(0).addEventListener('transitionend', waitTransition);
+        // We remove the listener that was created when the drawer opened up
+        $("body").off('keydown.drawerClose');
+      });
+
+      // When the drawer is closed, collapse sub items
+      $(body).on('drawer' + index + '.closed', function () {
+        $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
+      });
     });
   });
 });

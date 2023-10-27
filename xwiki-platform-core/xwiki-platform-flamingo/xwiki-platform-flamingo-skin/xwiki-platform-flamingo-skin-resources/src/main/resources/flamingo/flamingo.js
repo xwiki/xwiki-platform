@@ -96,14 +96,14 @@ require(['jquery'], function($) {
     }).on('drawer' + index + '.closed', function(event) {
       drawerOpener.attr('aria-expanded', 'false');
       
-      function waitAnimation() {
+      function waitTransition() {
         drawerContainer.get(0).close();
         drawerContainer.removeClass('drawer-transitioning');
-        drawerContainer.get(0).removeEventListener('transitionend', waitAnimation);
+        drawerContainer.get(0).removeEventListener('transitionend', waitTransition);
       }
       // We use the drawer-transitioning class to give time for the hide modal transition to play.
       drawerContainer.addClass('drawer-transitioning');
-      drawerContainer.get(0).addEventListener('transitionend', waitAnimation);
+      drawerContainer.get(0).addEventListener('transitionend', waitTransition);
       // We remove the listener that was created when the drawer opened up
       $("body").off('keydown.drawerClose');
     });

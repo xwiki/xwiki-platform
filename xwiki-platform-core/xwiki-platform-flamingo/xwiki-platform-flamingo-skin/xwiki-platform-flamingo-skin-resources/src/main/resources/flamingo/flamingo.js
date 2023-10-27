@@ -89,7 +89,7 @@ require(['jquery'], function($) {
         drawerContainer.get(0).showModal();
         drawerContainer.removeClass('drawer-transitioning');
         // The drawer can be closed by pressing the ESC key
-        $("body").on('keydown.drawerClose', function (event) {
+        $("body").on('keydown.drawer' + index + 'Close', function (event) {
           if (event.key === 'Escape') {
             closeDrawer();
           }
@@ -107,7 +107,7 @@ require(['jquery'], function($) {
         drawerContainer.addClass('drawer-transitioning');
         drawerContainer.get(0).addEventListener('transitionend', waitTransition);
         // We remove the listener that was created when the drawer opened up
-        $("body").off('keydown.drawerClose');
+        $("body").off('keydown.drawer' + index + 'Close');
       });
 
       // When the drawer is closed, collapse sub items

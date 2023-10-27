@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.security.authentication.AuthenticationConfiguration;
 
 import com.xpn.xwiki.user.impl.xwiki.MyPersistentLoginManager;
 
@@ -46,6 +47,9 @@ public class MyPersistentLoginManagerProvider implements Provider<PersistentLogi
     @Inject
     @Named("xwikicfg")
     private ConfigurationSource config;
+
+    @Inject
+    private AuthenticationConfiguration authenticationConfiguration;
 
     @Override
     public PersistentLoginManagerInterface get()

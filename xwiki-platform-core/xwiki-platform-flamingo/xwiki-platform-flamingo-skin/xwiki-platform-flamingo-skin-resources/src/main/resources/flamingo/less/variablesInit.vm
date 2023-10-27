@@ -101,8 +101,8 @@
   @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
   @panel-header-text:                   $theme.panelHeaderTextColor;
   ## Kept for backward compatibility
-  @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
-  @panel-header-text:                   $theme.panelHeaderTextColor;
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
 
   ##
   ## XWiki variables: LESS variables specific to XWiki

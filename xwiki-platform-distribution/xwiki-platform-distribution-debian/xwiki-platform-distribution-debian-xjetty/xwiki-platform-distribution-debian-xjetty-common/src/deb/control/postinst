@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+#########################
+# Rights
+#########################
+
+# Create the xwiki user as defined in /usr/lib/sysusers.d/xwiki.conf
+systemd-sysusers
+
+# Make sure XWiki is able to write in the data directory
+if [ ! 'xwiki' = `stat -c '%U' /var/lib/xwiki/data` ]; then
+  chown -R xwiki:xwiki /var/lib/xwiki/data
+fi
+
+# Make sure the log directory exist
+if [ ! -d /var/log/xwiki ]; then
+  mkdir /var/log/xwiki
+fi
+
+# Make sure XWiki is able to write in the log directory
+if [ ! 'xwiki' = `stat -c '%U' /var/log/xwiki` ]; then
+  chown -R xwiki:xwiki /var/log/xwiki
+fi
+
+#########################
+# Reload the service
+#########################
+
+# Enable the service if not yet enabled or update it
+if deb-systemd-helper --quiet was-enabled 'xwiki.service'; then
+    deb-systemd-helper enable 'xwiki.service' >/dev/null || true
+else
+    deb-systemd-helper update-state 'xwiki.service' >/dev/null || true
+fi
+
+# Need to reload systemd for the injected xwiki service configuration to be taken into account
+systemctl daemon-reload

@@ -65,7 +65,7 @@ class NotificationMailPageTest extends PageTest
         String render = this.templateManager.render(TEMPLATE_PATH);
         Document document = Jsoup.parse(render);
         assertEquals("extension.security.notification.applicationName",
-            document.select("td:nth-child(1").text());
+            document.select("td:nth-child(1)").text());
         assertEquals("extension.security.notification.content [15]", document.select("td:nth-child(2)").text());
     }
 }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="RTFrontend.ConvertHTML" locale="">
+<xwikidoc version="1.5" reference="RTFrontend.ConvertHTML" locale="">
   <web>RTFrontend</web>
   <name>ConvertHTML</name>
   <language/>
@@ -52,8 +52,13 @@
   'documentReference': $documentReference
 })
 #if ($xcontext.action == 'get')
-  ## FIXME: We shouldn't depend on CKEditor. This code should work independent of the configured WYSIWYG editor.
-  $xwiki.getDocument('CKEditor.ContentSheet').getRenderedContent()
+  ## Check that the CSRF token matches the user.
+  #if (!$services.csrf.isTokenValid($request.form_token))
+    $response.sendError(403, $services.localization.render('rtfFrontend.convertHtml.invalidCsrfToken'))
+  #else
+    ## FIXME: We shouldn't depend on CKEditor. This code should work independent of the configured WYSIWYG editor.
+    $xwiki.getDocument('CKEditor.ContentSheet').getRenderedContent()
+  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -334,10 +334,10 @@ public class InternalTemplateManager implements Initializable, Disposable
 
     private class StringTemplate extends DefaultTemplate
     {
-        StringTemplate(String content, DocumentReference authorReference, DocumentReference documentReference)
+        StringTemplate(String id, String content, DocumentReference authorReference, DocumentReference documentReference)
             throws Exception
         {
-            super(new StringResource(content));
+            super(new StringResource(id, content));
 
             // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
             ((DefaultTemplateContent) this.getContent()).setAuthorReference(authorReference);
@@ -1177,18 +1177,19 @@ public class InternalTemplateManager implements Initializable, Disposable
     /**
      * Create a new template using a given content and a specific author and source document.
      *
+     * @param id the identifier of the template
      * @param content the template content
      * @param author the template author
      * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
      *            test the author right)
      * @return the template
      * @throws Exception if an error occurred during template instantiation
-     * @since 14.0RC1
+     * @since 14.9
      */
-    public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+    public Template createStringTemplate(String id, String content, DocumentReference author, DocumentReference sourceReference)
         throws Exception
     {
-        return new StringTemplate(content, author, sourceReference);
+        return new StringTemplate(id, content, author, sourceReference);
     }
 
     public static Instant getResourceInstant(Environment environment, String path)

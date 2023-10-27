@@ -125,7 +125,6 @@
    },
   "panels": {
     "panel-bg" : "color",
-    "panel-default-text" : "color",
     "panel-header-text" : "color"
   },
   "breadcrumb": {

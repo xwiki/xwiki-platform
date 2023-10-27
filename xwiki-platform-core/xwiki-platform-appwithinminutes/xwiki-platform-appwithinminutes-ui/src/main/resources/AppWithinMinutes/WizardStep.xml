@@ -47,9 +47,9 @@
     &lt;ul class="steps"&gt;
       #foreach ($step in $awmSteps)
         #set ($index = $foreach.index + 1)
-        #set ($extraClassName = "#if ($stepNumber == $index) active#elseif ($stepNumber &gt; $index) done#end")
+        #set ($extraClassName = "#if ($stepNumber == $index) step-active#elseif ($stepNumber &gt; $index) step-done#end")
         &lt;li&gt;
-          &lt;span class="number$extraClassName"&gt;
+          &lt;span class="btn btn-xs number$extraClassName"&gt;
             #if ($stepNumber &gt; $index)
               &amp;${escapetool.h}10004;
             #else

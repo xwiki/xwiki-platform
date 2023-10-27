@@ -441,7 +441,8 @@ define('editInPlace', [
         options.afterEdit(xwikiDocument);
         return xwikiDocument;
       }).finally(() =&gt; {
-        $('#xwikicontent').removeClass('loading');
+        // Remove the aria-expanded attribute which is incorrect for role=textbox
+        $('#xwikicontent').removeClass('loading').removeAttr('aria-expanded');
       // Then wait for an action (save, cancel, reload) only if the editors were loaded successfuly.
       }).then(maybeSave)
       // Then unlock the document both when the edit ended with success and with a failure.

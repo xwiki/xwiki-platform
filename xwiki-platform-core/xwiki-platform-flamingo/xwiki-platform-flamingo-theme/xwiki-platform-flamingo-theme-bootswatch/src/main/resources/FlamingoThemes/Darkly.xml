@@ -753,19 +753,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>panel-default-text</name>
-        <number>46</number>
-        <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
       <panel-header-text>
         <customDisplay/>
         <disabled>0</disabled>
@@ -2180,9 +2167,6 @@ a.list-group-item {
     </property>
     <property>
       <panel-bg>#222222</panel-bg>
-    </property>
-    <property>
-      <panel-default-text/>
     </property>
     <property>
       <panel-header-text/>

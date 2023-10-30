@@ -42,6 +42,9 @@ import org.xwiki.environment.Environment;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
@@ -73,7 +76,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
     private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
 
     private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new TemplateUpdatedEvent(), new TemplateDeletedEvent());
+        Arrays.asList(new TemplateUpdatedEvent(), new TemplateDeletedEvent());
 
     /**
      * Used to access the current {@link XWikiContext}.
@@ -97,9 +100,15 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
     private Environment environment;
 
     @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
     private Logger logger;
 
-    private Map<String, VelocityEngine> velocityEngines = new ConcurrentHashMap<>();
+    private final Map<String, VelocityEngine> velocityEngines = new ConcurrentHashMap<>();
 
     @Override
     public void initialize() throws InitializationException
@@ -114,7 +123,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
                 if (event instanceof TemplateEvent) {
                     TemplateEvent templateEvent = (TemplateEvent) event;
 
-                    velocityEngines.remove(templateEvent.getId());
+                    XWikiVelocityManager.this.velocityEngines.remove(templateEvent.getId());
                 }
             }
 
@@ -177,8 +186,8 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
 
     /**
      * @return the Velocity Engine corresponding to the current execution context. More specifically returns the
-     *         Velocity Engine for the current skin since each skin has its own Velocity Engine so that each skin can
-     *         have global velocimacros defined
+     *     Velocity Engine for the current skin since each skin has its own Velocity Engine so that each skin can have
+     *     global velocimacros defined
      * @throws XWikiVelocityException in case of an error while creating a Velocity Engine
      */
     @Override
@@ -248,10 +257,13 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
             }
         }
 
-        // Inject skin macros
-        if (skinMacrosTemplate != null) {
-            VelocityTemplate skinMacros = compile("", new StringReader(skinMacrosTemplate.getContent().getContent()));
-
+        // Inject skin macros if their author has at least Script rights.
+        if (skinMacrosTemplate != null
+            && this.authorizationManager.hasAccess(Right.SCRIPT, skinMacrosTemplate.getContent().getAuthorReference(),
+            skinMacrosTemplate.getContent().getDocumentReference()))
+        {
+            VelocityTemplate skinMacros =
+                compile("", new StringReader(skinMacrosTemplate.getContent().getContent()));
             velocityEngine.addGlobalMacros(skinMacros.getMacros());
         }
     }

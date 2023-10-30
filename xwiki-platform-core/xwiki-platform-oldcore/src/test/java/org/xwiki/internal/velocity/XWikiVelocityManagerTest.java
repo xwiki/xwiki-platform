@@ -22,15 +22,24 @@ package org.xwiki.internal.velocity;
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.mockito.Mock;
 import org.xwiki.internal.script.XWikiScriptContextInitializer;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.logging.internal.DefaultLoggerConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.script.internal.DefaultScriptContextManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateContent;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.internal.DefaultVelocityConfiguration;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -44,17 +53,29 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link XWikiVelocityManager}.
- * 
+ *
  * @version $Id$
  */
-@ComponentList(value = {DefaultScriptContextManager.class, XWikiScriptContextInitializer.class,
-    DefaultVelocityConfiguration.class, DefaultLoggerConfiguration.class})
+@ComponentList({
+    DefaultScriptContextManager.class,
+    XWikiScriptContextInitializer.class,
+    DefaultVelocityConfiguration.class,
+    DefaultLoggerConfiguration.class
+})
 @OldcoreTest
 public class XWikiVelocityManagerTest
 {
+    private static final DocumentReference TEMPLATE_DOCUMENT = new DocumentReference("xwiki", "XWiki", "TestMacros");
+
+    private static final DocumentReference SCRIPT_USER = new DocumentReference("xwiki", "XWiki", "Script");
+
     @MockComponent
     private ContextualLocalizationManager localizationManager;
 
@@ -64,19 +85,47 @@ public class XWikiVelocityManagerTest
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
+    @MockComponent
+    private SkinManager skinManager;
+
+    @Mock
+    private Skin skin;
+
+    @MockComponent
+    private TemplateManager templateManager;
+
+    @Mock
+    private Template template;
+
+    @Mock
+    private TemplateContent templateContent;
+
+    @MockComponent
+    private ConverterManager converterManager;
+
     @BeforeEach
-    public void beforeEach() throws ComponentLookupException
+    void beforeEach() throws Exception
     {
         this.oldcore.getExecutionContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
             new VelocityContext());
+
+        when(this.skinManager.getCurrentSkin(true)).thenReturn(this.skin);
+        when(this.templateManager.getTemplate("macros.vm")).thenReturn(this.template);
+        when(this.template.getId()).thenReturn("testMacros");
+        when(this.template.getContent()).thenReturn(this.templateContent);
+        when(this.templateContent.getDocumentReference()).thenReturn(TEMPLATE_DOCUMENT);
+        when(this.templateContent.getContent()).thenReturn("");
+
+        AuthorizationManager authorizationManager = this.oldcore.getMockAuthorizationManager();
+        when(authorizationManager.hasAccess(Right.SCRIPT, SCRIPT_USER, TEMPLATE_DOCUMENT)).thenReturn(true);
     }
 
     // Tests
 
     @Test
-    public void getVelocityContext()
+    void getVelocityContext()
     {
-        VelocityContext context = velocityManager.getVelocityContext();
+        VelocityContext context = this.velocityManager.getVelocityContext();
 
         assertNull(context.get("doc"));
         assertNull(context.get("sdoc"));
@@ -111,5 +160,20 @@ public class XWikiVelocityManagerTest
         assertNotSame(doc, context.get("doc"));
         assertNotNull(context.get("sdoc"));
         assertNotSame(sdoc, context.get("sdoc"));
+    }
+
+    @Test
+    void checkMacrosInjectionWithoutScriptRights() throws Exception
+    {
+        VelocityEngine engine = this.velocityManager.getVelocityEngine();
+        verify(engine, never()).addGlobalMacros(anyMap());
+    }
+
+    @Test
+    void checkMacrosInjectionWithScriptRights() throws Exception
+    {
+        when(this.templateContent.getAuthorReference()).thenReturn(SCRIPT_USER);
+        VelocityEngine engine = this.velocityManager.getVelocityEngine();
+        verify(engine).addGlobalMacros(anyMap());
     }
 }

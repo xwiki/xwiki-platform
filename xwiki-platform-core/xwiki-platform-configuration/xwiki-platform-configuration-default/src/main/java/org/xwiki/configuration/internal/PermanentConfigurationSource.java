@@ -114,21 +114,33 @@ public class PermanentConfigurationSource extends CommonsConfigurationSource imp
     @Override
     public void setProperty(String key, Object value) throws ConfigurationSaveException
     {
-        getConfiguration().clearProperty(key);
-        addProperty(key, value);
+        this.lock.writeLock().lock();
 
-        // Update the configuration file
-        save();
+        try {
+            getConfiguration().clearProperty(key);
+            addProperty(key, value);
+
+            // Update the configuration file
+            save();
+        } finally {
+            this.lock.writeLock().unlock();
+        }
     }
 
     @Override
     public void setProperties(Map<String, Object> properties) throws ConfigurationSaveException
     {
-        getConfiguration().clear();
-        properties.forEach(this::addProperty);
+        this.lock.writeLock().lock();
 
-        // Update the configuration file
-        save();
+        try {
+            getConfiguration().clear();
+            properties.forEach(this::addProperty);
+
+            // Update the configuration file
+            save();
+        } finally {
+            this.lock.writeLock().unlock();
+        }
     }
 
     private void save() throws ConfigurationSaveException

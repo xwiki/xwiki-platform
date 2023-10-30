@@ -50,8 +50,7 @@ import org.xwiki.test.docker.junit5.UITest;
 
         // Solr search is used to get suggestions for the link quick action.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
-    },
-    resolveExtraJARs = true
+    }
 )
 class AllIT
 {

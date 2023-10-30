@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.xpn.xwiki.objects.classes.NumberClass;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -101,7 +102,8 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("imaccount", "imaccount", 30);
         xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
         xclass.addStaticListField("usertype", "User type", "Simple|Advanced", "Simple");
-        xclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
+        xclass.addNumberField("font_size", "Font size", 30, NumberClass.TYPE_INTEGER);
+        xclass.addStaticListField("underline", "Underline links", "Yes|Only inline links (default)|No");
         xclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);
 

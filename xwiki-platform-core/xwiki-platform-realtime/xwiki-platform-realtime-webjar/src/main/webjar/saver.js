@@ -635,10 +635,10 @@ define('xwiki-realtime-saver', [
       $('[name="action_preview"]').remove();
 
       // Wait to get saved event.
-      var onSavedHandler = mainConfig.onSaved = function(event) {
+      const onSavedHandler = mainConfig.onSaved = function(event) {
         // This means your save has worked. Cache the last version.
-        var lastVersion = lastSaved.version;
-        var toSave = mainConfig.getTextValue();
+        const lastVersion = lastSaved.version;
+        const toSave = mainConfig.getTextValue();
         // Update your content.
         updateLastSaved(toSave);
 
@@ -677,8 +677,6 @@ define('xwiki-realtime-saver', [
 
         return true;
       };
-      // FIXME: Find a way to remove the old listener without using Prototype.js API.
-      document.stopObserving('xwiki:document:saved');
       $(document).on('xwiki:document:saved.realtime-saver', onSavedHandler);
 
       var onSaveFailedHandler = mainConfig.onSaveFailed = function(ev) {

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WindowType;
+import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
@@ -69,8 +70,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
         // Solr search is used to get suggestions for the link quick action.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
-    },
-    resolveExtraJARs = true
+    }
 )
 class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 {
@@ -170,7 +170,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Edit the page in the second browser tab.
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
-        RealtimeCKEditor secondEditor = firstEditPage.getContenEditor();
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         // FIXME: We need a simpler method to get the user ID in the real-time session.
@@ -269,5 +269,96 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertFalse(firstPosition.isVisible(), "The coeditor position is visible before scrolling.");
         secondEditor.getToolBar().getCoeditor(firstCoeditorId).click();
         assertTrue(firstPosition.isVisible(), "The coeditor position is not visible after scrolling.");
+    }
+
+    @Test
+    @Order(3)
+    void inplaceEditableMacro(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        firstTextArea.sendKeys(Keys.ENTER, "one");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilContentContains("one");
+        secondTextArea.sendKeys("/info");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/info", "Info Box");
+        secondTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // The content is reloaded when a macro is inserted.
+        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilContentEditable();
+        // Replace the default message text.
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        secondTextArea.sendKeys("my info tex");
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_LEFT, Keys.ARROW_LEFT, Keys.ARROW_LEFT));
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+
+        // Continue typing to verify that the selection is not lost in the second tab.
+        // Notice that we don't wait for the content to be updated because we want to verfiy that this can happen while
+        // we are typing.
+        firstTextArea.sendKeys(" two");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+
+        // Again, we don't wait for the content to be updated, because we don't need to. The content should be
+        // synchronized while we are typing.
+        secondTextArea.sendKeys("message");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+
+        firstTextArea.sendKeys(" three");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+
+        // Wait for the content to be synchronized before saving, otherwise we might save partial content and, more
+        // importantly, we could trigger the leave confirmation (if the content is synchronized after the content dirty
+        // flag is set to false by the action buttons listener).
+        secondTextArea.waitUntilContentContains("three");
+
+        // Save and check the result.
+        // FIXME: We use the keyboard shortcut to Save & View because clicking on the button blurs the editing area
+        // which causes a deferred update of its state after we mark it as not dirty, leading to the leave confirmation
+        // modal.
+        secondTextArea.sendKeys(Keys.chord(Keys.ALT, "s"));
+        ViewPage viewPage = new ViewPage();
+        assertEquals("my info message\none two three", viewPage.getContent());
     }
 }

@@ -28,7 +28,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -61,7 +60,11 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
             // Wait for the specified coeditor position to be available in the DOM.
             if (wait) {
                 getFromIFrame(() -> {
-                    getDriver().waitUntilCondition(ExpectedConditions.presenceOfElementLocated(By.id(id)));
+                    // Make sure we don't scroll the page when locating the coeditor position. Note that we can't use
+                    // ExpectedConditions.presenceOfElementLocated() because it calls driver.findElement() which is
+                    // overwritten in XWikiWebDriver to scroll the page.
+                    getDriver()
+                        .waitUntilCondition(driver -> getDriver().findElementWithoutWaitingWithoutScrolling(By.id(id)));
                     return null;
                 });
             }

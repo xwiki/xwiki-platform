@@ -1402,7 +1402,7 @@
           <groupId>org.xwiki.contrib</groupId>
           <artifactId>jshint-maven-plugin</artifactId>
           <!-- Lock down plugin version for build reproducibility -->
-          <version>1.7.1</version>
+          <version>1.7.2</version>
           <configuration>
             <globals>require,define</globals>
             <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->

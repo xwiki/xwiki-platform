@@ -88,6 +88,16 @@ class CommonsConfigurationSourceTest
     }
 
     @Test
+    void stringPropertyWhenSeveral()
+    {
+        this.configuration.addProperty("string", "value1");
+        this.configuration.addProperty("string", "value2");
+
+        assertEquals(List.of("value1", "value2"), this.source.getProperty("string"));
+        assertEquals("value1", this.source.getProperty("string", String.class));
+    }
+
+    @Test
     void stringPropertyWhenConversionError()
     {
         this.configuration.setProperty("string", "value");

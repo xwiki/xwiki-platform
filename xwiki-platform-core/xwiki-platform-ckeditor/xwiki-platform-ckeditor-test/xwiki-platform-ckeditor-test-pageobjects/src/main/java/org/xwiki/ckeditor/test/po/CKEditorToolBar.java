@@ -20,7 +20,6 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

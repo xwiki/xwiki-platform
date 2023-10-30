@@ -4216,7 +4216,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public List<String> getTagsList(XWikiContext context)
     {
-        List<String> tagList = null;
+        List<String> tagList = List.of();
 
         BaseProperty prop = getTagProperty();
         if (prop != null) {

@@ -19,6 +19,9 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
@@ -91,6 +94,12 @@ public class CKEditorToolBar extends BaseElement
         getDriver().findElementWithoutWaiting(this.container, By.className("cke_button__" + feature)).click();
     }
 
+    private boolean hasButton(String feature, Predicate<WebElement> predicate)
+    {
+        return getDriver().findElementsWithoutWaiting(this.container, By.className("cke_button__" + feature)).stream()
+            .anyMatch(predicate);
+    }
+
     /**
      * Switch between the WYSIWYG and Source mode, using the dedicated tool bar button.
      */
@@ -99,5 +108,21 @@ public class CKEditorToolBar extends BaseElement
         clickButton("source");
         // Wait for the conversion between HTML and wiki syntax (source) to be done.
         getDriver().waitUntilElementDisappears(this.container, By.cssSelector(".cke_button__source_icon.loading"));
+    }
+
+    /**
+     * @return {@code true} if the Source button is present on the toolbar and is enabled, {@code false} otherwise
+     */
+    public boolean canToggleSourceMode()
+    {
+        return hasButton("source", sourceButton -> sourceButton.isDisplayed() && sourceButton.isEnabled());
+    }
+
+    /**
+     * @return the element containing the tool bar
+     */
+    protected WebElement getContainer()
+    {
+        return this.container;
     }
 }

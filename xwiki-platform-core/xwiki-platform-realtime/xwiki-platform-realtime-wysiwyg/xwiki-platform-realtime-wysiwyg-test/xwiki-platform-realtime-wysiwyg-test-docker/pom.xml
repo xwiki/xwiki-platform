@@ -24,74 +24,51 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-ckeditor-test</artifactId>
+    <artifactId>xwiki-platform-realtime-wysiwyg-test</artifactId>
     <version>15.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
-  <name>XWiki Platform - CKEditor - Tests - Docker</name>
+  <artifactId>xwiki-platform-realtime-wysiwyg-test-docker</artifactId>
+  <name>XWiki Platform - Realtime - WYSIWYG - Test - Functional Tests in Docker</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
+       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
+  <description>Functional Docker-based tests for the Realtime WYSIWYG Editor</description>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
-    <!-- Dependencies for tested features. -->
+    <!-- Runtime dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-ui</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- We need this for the WYSIWYG editor administration section where we set the default WYSIWYG editor. -->
     <dependency>
-      <!-- We need this to test the syntax change from the Document Information panel. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <!-- We need this to test the Image Styles with the image dialog. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-style-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <!-- We need this to test the mentions Quick Action. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mentions-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <!-- We need this to test the code snippet Quick Action. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-code</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <!-- We need this to test that uninstalled macros are listed in the Quick Actions. -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-index</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <!-- We need this for the WYSIWYG editor administration section where CKEditor injects its configuration pane. -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- The JavaScript code needs to display localized messages and for this it needs to fetch them through REST so we
+      need an implementation of the localization REST API. -->
     <dependency>
-      <!-- We need this to test how the Children Macro is displayed in edit mode. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-index-tree-macro</artifactId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
+      <scope>runtime</scope>
     </dependency>
-    <!-- Test only dependencies. -->
+    <!-- We need an implementation of the WebSocket API (using XWiki components) -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-websocket</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!--Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>
@@ -99,43 +76,25 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- We extend AbstractCKEditorIT. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
       <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Required for tests involving solr indexation (e.g., page/attachment search in link insertions). -->
+    <!-- Realtime synchronization is done through WebSockets. -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
-      <version>${project.version}</version>
+      <groupId>javax.websocket</groupId>
+      <artifactId>javax.websocket-api</artifactId>
       <scope>test</scope>
-    </dependency>
-    <!-- Used by the image plugin to search for resources. (This is not in xwiki-platform-ckeditor-ui because it breaks the flavor.) -->
-    <!-- See https://github.com/xwiki/xwiki-platform/pull/2280#discussion_r1284086007 -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>xar</type>
-    </dependency>
-    <!-- Required for tests involving subwikis. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-template-default</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -145,23 +104,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/AbstractCKEditorIT.class</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

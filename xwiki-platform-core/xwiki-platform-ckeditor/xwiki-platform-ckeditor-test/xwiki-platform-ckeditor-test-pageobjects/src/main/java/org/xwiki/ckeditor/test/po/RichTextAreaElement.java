@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -122,12 +123,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public Object executeScript(String script, Object... arguments)
     {
-        try {
-            getDriver().switchTo().frame(this.iframe);
-            return getDriver().executeScript(script, arguments);
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
+        return getFromIFrame(() -> getDriver().executeScript(script, arguments));
     }
 
     /**
@@ -176,9 +172,29 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentEditable()
     {
+        getFromIFrame(() -> {
+            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+            return null;
+        });
+    }
+
+    /**
+     * @return the placeholder text, if present
+     */
+    public String getPlaceholder()
+    {
+        try {
+            return getActiveElement().getAttribute("data-cke-editorplaceholder");
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
+    }
+
+    protected <T> T getFromIFrame(Supplier<T> supplier)
+    {
         try {
             getDriver().switchTo().frame(this.iframe);
-            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+            return supplier.get();
         } finally {
             getDriver().switchTo().defaultContent();
         }

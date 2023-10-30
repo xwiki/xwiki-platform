@@ -129,14 +129,14 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
         return this.encryptionKey;
     }
 
-    private String getGeneratedKey(String name)
+    private synchronized String getGeneratedKey(String name)
     {
         // Try xwiki.cfg
-        String generatedKey = this.xwikiCfgConfiguration.getProperty(name);
+        String generatedKey = this.xwikiCfgConfiguration.getProperty(name, String.class);
 
         // Try the permanent configuration
         if (generatedKey == null) {
-            generatedKey = this.permanentConfiguration.getProperty(name);
+            generatedKey = this.permanentConfiguration.getProperty(name, String.class);
         }
 
         // If still not found, generate one and store it in the permanent configuration

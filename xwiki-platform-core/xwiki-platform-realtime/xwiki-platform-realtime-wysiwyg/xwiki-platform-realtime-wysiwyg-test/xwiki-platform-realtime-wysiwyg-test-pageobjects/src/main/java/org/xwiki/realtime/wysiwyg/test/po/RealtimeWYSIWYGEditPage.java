@@ -28,7 +28,6 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  * Represents the realtime WYSIWYG edit page.
  * 
  * @version $Id$
- * @since 14.10.19
  * @since 15.5.4
  * @since 15.9
  */

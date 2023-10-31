@@ -25,7 +25,6 @@ import org.xwiki.ckeditor.test.po.CKEditor;
  * Represents the realtime CKEditor.
  * 
  * @version $Id$
- * @since 14.10.19
  * @since 15.5.4
  * @since 15.9
  */

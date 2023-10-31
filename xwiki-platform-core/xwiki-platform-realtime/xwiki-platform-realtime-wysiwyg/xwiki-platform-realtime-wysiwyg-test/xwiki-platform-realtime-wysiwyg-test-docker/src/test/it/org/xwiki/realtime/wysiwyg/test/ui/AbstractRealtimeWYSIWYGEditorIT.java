@@ -30,7 +30,6 @@ import org.xwiki.test.ui.TestUtils;
  * Base class for real-time WYSIWYG editor tests.
  * 
  * @version $Id$
- * @since 14.10.19
  * @since 15.5.4
  * @since 15.9
  */

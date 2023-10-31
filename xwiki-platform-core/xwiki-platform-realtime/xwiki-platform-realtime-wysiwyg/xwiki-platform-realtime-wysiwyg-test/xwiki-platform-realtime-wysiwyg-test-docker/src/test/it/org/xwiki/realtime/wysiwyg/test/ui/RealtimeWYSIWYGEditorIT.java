@@ -47,7 +47,6 @@ import org.xwiki.test.ui.po.ViewPage;
  * Functional tests for the real-time WYSIWYG editor.
  * 
  * @version $Id$
- * @since 14.10.19
  * @since 15.5.4
  * @since 15.9
  */

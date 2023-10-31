@@ -684,6 +684,16 @@ public class XWikiWebDriver extends RemoteWebDriver
         executeScript(String.format("window.scrollTo(%d, %d)", xCoord, yCoord));
     }
 
+    /**
+     * Overwrites {@link WebDriver#findElement(By)} to make sure the found element is visible by scrolling it into view.
+     * This means that calling this method can have side effects on the User Interface. If the element you're looking
+     * for doesn't have to be visible in the viewport then you should use {@link #findElementWithoutScrolling(By)}
+     * instead.
+     * <p>
+     * Also node that this method is called internally by APIs such as
+     * {@code ExpectedConditions#presenceOfElementLocated()} so if you don't want the scrolling then you should
+     * implement your own {@link ExpectedCondition} using {@link #findElementWithoutScrolling(By)}.
+     */
     @Override
     public WebElement findElement(By by)
     {

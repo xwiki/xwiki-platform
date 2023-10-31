@@ -42,7 +42,6 @@ import org.xwiki.environment.Environment;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Skin;
@@ -98,9 +97,6 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
 
     @Inject
     private Environment environment;
-
-    @Inject
-    private AuthorExecutor authorExecutor;
 
     @Inject
     private AuthorizationManager authorizationManager;

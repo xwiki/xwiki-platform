@@ -35,7 +35,6 @@ import org.xwiki.test.ui.po.BaseElement;
  * Represents the realtime rich text area.
  * 
  * @version $Id$
- * @since 14.10.19
  * @since 15.5.4
  * @since 15.9
  */

@@ -27,9 +27,8 @@ import org.xwiki.test.docker.junit5.UITest;
  * All UI tests for the real-time WYSIWYG editor.
  *
  * @version $Id$
- * @since 14.10.19
  * @since 15.5.4
- * @since 15.19
+ * @since 15.9
  */
 @UITest(
     properties = {

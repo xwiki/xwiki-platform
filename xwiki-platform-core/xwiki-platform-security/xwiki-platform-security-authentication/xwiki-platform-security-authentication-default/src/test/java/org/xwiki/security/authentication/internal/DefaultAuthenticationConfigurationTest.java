@@ -100,13 +100,14 @@ class DefaultAuthenticationConfigurationTest
         assertNotEquals(validationKey, otherValidationKey);
 
         resetCache("validationKey");
-        when(this.permanentConfiguration.getProperty("xwiki.authentication.validationKey"))
+        when(this.permanentConfiguration.getProperty("xwiki.authentication.validationKey", String.class))
             .thenReturn("permanenentvalue");
 
         assertEquals("permanenentvalue", this.configuration.getValidationKey());
 
         resetCache("validationKey");
-        when(this.xwikiCfgConfiguration.getProperty("xwiki.authentication.validationKey")).thenReturn("xwikicfgvalue");
+        when(this.xwikiCfgConfiguration.getProperty("xwiki.authentication.validationKey", String.class))
+            .thenReturn("xwikicfgvalue");
 
         assertEquals("xwikicfgvalue", this.configuration.getValidationKey());
     }
@@ -127,13 +128,14 @@ class DefaultAuthenticationConfigurationTest
         assertNotEquals(encryptionKey, otherEncryptionKey);
 
         resetCache("encryptionKey");
-        when(this.permanentConfiguration.getProperty("xwiki.authentication.encryptionKey"))
+        when(this.permanentConfiguration.getProperty("xwiki.authentication.encryptionKey", String.class))
             .thenReturn("permanenentvalue");
 
         assertEquals("permanenentvalue", this.configuration.getEncryptionKey());
 
         resetCache("encryptionKey");
-        when(this.xwikiCfgConfiguration.getProperty("xwiki.authentication.encryptionKey")).thenReturn("xwikicfgvalue");
+        when(this.xwikiCfgConfiguration.getProperty("xwiki.authentication.encryptionKey", String.class))
+            .thenReturn("xwikicfgvalue");
 
         assertEquals("xwikicfgvalue", this.configuration.getEncryptionKey());
     }

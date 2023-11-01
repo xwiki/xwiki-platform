@@ -46,5 +46,17 @@
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Dependencies for AbstractCKEditorIT -->
+    <dependency>
+      <!-- Required for tests involving solr indexation (e.g., page/attachment search in link insertions). -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

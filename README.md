@@ -22,7 +22,7 @@ Read our [Release Notes](https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/).
 * [Continuous Integration](https://ci.xwiki.org/) setup launches a build for each commit.
 * [Issue Tracker](https://jira.xwiki.org/browse/XWIKI), if you want to report an issue.
 * [Development Flow](https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HGeneralDevelopmentFlow) to see the full list of tools we use to build the XWiki software.
-* [![Revved up by Gradle Enterprise](https://img.shields.io/badge/Revved%20up%20by-Gradle%20Enterprise-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.xwiki.org/scans)
+* [![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.xwiki.org/scans)
 
 ## Community
 We're always looking for contributors!

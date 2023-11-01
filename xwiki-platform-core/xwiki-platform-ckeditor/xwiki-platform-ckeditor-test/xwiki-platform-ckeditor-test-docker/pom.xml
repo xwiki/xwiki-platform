@@ -96,13 +96,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Required for tests involving solr indexation (e.g., page/attachment search in link insertions). -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
@@ -111,23 +104,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/AbstractCKEditorIT.class</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

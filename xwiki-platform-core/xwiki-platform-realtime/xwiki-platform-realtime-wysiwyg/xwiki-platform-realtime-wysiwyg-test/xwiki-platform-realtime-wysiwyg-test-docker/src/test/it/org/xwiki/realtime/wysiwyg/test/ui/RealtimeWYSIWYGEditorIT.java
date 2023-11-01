@@ -356,4 +356,210 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         ViewPage viewPage = secondEditPage.clickSaveAndView();
         assertEquals("my info message\none two three", viewPage.getContent());
     }
+
+    @Test
+    @Order(4)
+    void editDifferentParagraphs(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys("Start. ");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // Each user types in their own paragraph.
+        secondTextArea.waitUntilContentContains("Start. ");
+        secondTextArea.sendKeys(Keys.END, Keys.ENTER);
+
+        String firstUserText = "The five boxing wizards jump quickly. The quick brown fox jumps over the lazy dog. First";
+        String secondUserText = "The quick brown fox jumps over the lazy dog. The five boxing wizards jump quickly. Second";
+
+        String[] firstUserWords = firstUserText.split(" ");
+        String[] secondUserWords = secondUserText.split(" ");
+
+        for(int i = 0; i < Math.min(firstUserWords.length, secondUserWords.length); i++) {
+            //
+            // First Tab
+            //
+            setup.getDriver().switchTo().window(firstTabHandle);
+            firstTextArea.sendKeys(firstUserWords[i] + " ");
+
+            //
+            // Second Tab
+            //
+            setup.getDriver().switchTo().window(secondTabHandle);
+            secondTextArea.sendKeys(secondUserWords[i] + " ");
+        }
+
+        // Wait to receive all the content typed by the first user.
+        secondTextArea.waitUntilContentContains("First");
+
+        ViewPage viewPage = secondEditPage.clickSaveAndView();
+        assertEquals("Start. " + firstUserText + "\n" + secondUserText, viewPage.getContent());
+    }
+
+    @Test
+    @Order(5)
+    void editSameParagraph(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys("Separator. ", Keys.HOME);
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // Each user types in their own paragraph.
+        secondTextArea.waitUntilContentContains("Separator. ");
+        secondTextArea.sendKeys(Keys.END);
+
+        String text = "The quick brown fox jumps over the lazy dog.";
+        String[] words = text.split(" ");
+
+        for(int i = 0; i < words.length; i++) {
+            //
+            // First Tab
+            //
+            setup.getDriver().switchTo().window(firstTabHandle);
+            firstTextArea.sendKeys(words[i] + " ");
+
+            //
+            // Second Tab
+            //
+            setup.getDriver().switchTo().window(secondTabHandle);
+            secondTextArea.sendKeys(words[i] + " ");
+        }
+
+        //
+        // First Tab
+        //
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.sendKeys("First. ");
+
+        //
+        // Second Tab
+        //
+        setup.getDriver().switchTo().window(secondTabHandle);
+        // Wait to receive all the content typed by the first user.
+        secondTextArea.waitUntilContentContains("First.");
+
+        ViewPage viewPage = secondEditPage.clickSaveAndView();
+        assertEquals(text + " First. Separator. " + text, viewPage.getContent());
+    }
+
+    @Test
+    @Order(6)
+    void applyInlineStylesOnTheSameParagraph(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys("bold italic");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilContentContains("italic");
+        secondTextArea.sendKeys(Keys.END, " underline");
+        // Select the "underline" word.
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+
+        // If we don't wait then the italic style might be applied before the "underline" word is retrieved, which leads
+        // to the "underline" word being inserted inside the italic style.
+        firstTextArea.waitUntilContentContains("underline");
+
+        // Select the "italic" word and apply the italic style.
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "i"));
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        // Apply the underline style.
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "u"));
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        // Select the "bold" word and apply the bold style.
+        firstTextArea.sendKeys(Keys.ARROW_LEFT, Keys.ARROW_LEFT);
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "b"));
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.sendKeys(Keys.ARROW_RIGHT);
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "u"));
+        secondTextArea.sendKeys(" end");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.sendKeys(Keys.ARROW_RIGHT, "er");
+
+        firstTextArea.waitUntilContentContains("end");
+        String content = firstTextArea.getContent();
+        assertTrue(content.contains("<strong>bolder</strong> <em>italic</em> <ins>underline</ins> end"),
+            "Unexpected content: " + content);
+    }
 }

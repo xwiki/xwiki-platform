@@ -353,11 +353,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilContentContains("three");
 
         // Save and check the result.
-        // FIXME: We use the keyboard shortcut to Save & View because clicking on the button blurs the editing area
-        // which causes a deferred update of its state after we mark it as not dirty, leading to the leave confirmation
-        // modal.
-        secondTextArea.sendKeys(Keys.chord(Keys.ALT, "s"));
-        ViewPage viewPage = new ViewPage();
+        ViewPage viewPage = secondEditPage.clickSaveAndView();
         assertEquals("my info message\none two three", viewPage.getContent());
     }
 }

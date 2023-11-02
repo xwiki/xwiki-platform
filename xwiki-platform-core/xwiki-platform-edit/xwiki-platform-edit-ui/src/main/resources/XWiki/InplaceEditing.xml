@@ -1338,6 +1338,7 @@ input#document-title-input {
   /* Preserve the heading styles. */
   color: inherit;
   font-size: inherit;
+  background-color: @body-bg;
   /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
   height: @font-size-document-title * @headings-line-height + 2 * (1 + @document-title-input-padding-vertical);
   line-height: @headings-line-height;

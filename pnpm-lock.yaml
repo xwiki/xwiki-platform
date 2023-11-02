@@ -14,8 +14,8 @@ dependencies:
 
 devDependencies:
   '@axe-core/playwright':
-    specifier: ^4.8.1
-    version: 4.8.1(playwright-core@1.38.1)
+    specifier: 4.8.1
+    version: 4.8.1(playwright-core@1.39.0)
   '@playwright/test':
     specifier: 1.38.1
     version: 1.38.1
@@ -84,13 +84,13 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /@axe-core/playwright@4.8.1(playwright-core@1.38.1):
+  /@axe-core/playwright@4.8.1(playwright-core@1.39.0):
     resolution: {integrity: sha512-KC1X++UdRAwMLRvB+BIKFheyLHUnbJTL0t0Wbv6TJMozn2V2QyEtAcN6jyUiudtGiLUGhHCtj/eWorBnVZ4dAA==}
     peerDependencies:
       playwright-core: '>= 1.0.0'
     dependencies:
       axe-core: 4.8.2
-      playwright-core: 1.38.1
+      playwright-core: 1.39.0
     dev: true
 
   /@babel/code-frame@7.22.13:
@@ -1718,6 +1718,10 @@ packages:
 
   /core-util-is@1.0.2:
     resolution: {integrity: sha512-3lqz5YjWTYnW6dlDa5TLaTCcShfar1e40rmcJVwCBJC6mWlFuj0eCHIElmG1g5kyuJ/GD+8Wn4FFCcz4gJPfaQ==}
+    dev: true
+
+  /core-util-is@1.0.3:
+    resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
     dev: true
 
   /cross-spawn@7.0.3:
@@ -4098,6 +4102,12 @@ packages:
     hasBin: true
     dev: true
 
+  /playwright-core@1.39.0:
+    resolution: {integrity: sha512-+k4pdZgs1qiM+OUkSjx96YiKsXsmb59evFoqv8SKO067qBA+Z2s/dCzJij/ZhdQcs2zlTAgRKfeiiLm8PQ2qvw==}
+    engines: {node: '>=16'}
+    hasBin: true
+    dev: true
+
   /playwright@1.38.1:
     resolution: {integrity: sha512-oRMSJmZrOu1FP5iu3UrCx8JEFRIMxLDM0c/3o4bpzU5Tz97BypefWf7TuTNPWeCe279TPal5RtPPZ+9lW/Qkow==}
     engines: {node: '>=16'}
@@ -4284,7 +4294,7 @@ packages:
   /readable-stream@2.3.8:
     resolution: {integrity: sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==}
     dependencies:
-      core-util-is: 1.0.2
+      core-util-is: 1.0.3
       inherits: 2.0.4
       isarray: 1.0.0
       process-nextick-args: 2.0.1

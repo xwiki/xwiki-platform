@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-search-solr</artifactId>
+    <artifactId>xwiki-platform-search-solr-test</artifactId>
     <version>15.5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-test-utils</artifactId>

@@ -26,234 +26,234 @@
   #set ($discard = $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true))
   #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/locationPicker.js', true))
   #set ($discard = $xwiki.get('ssfx').use('uicomponents/widgets/locationPicker.css', true))
-<dl class="location-picker">
-  ##
-  ## ---------------------------------------------------------------------------------------------------------
-  ## Title field
-  ## ---------------------------------------------------------------------------------------------------------
-  ##
-  #set ($titleField = $options.title)
-  #set ($value = $request.getParameter($titleField.name))
-  #if (!$value)
-    #set ($value = $titleField.value)
-  #end
-  #set ($escapedValue = $escapetool.xml($value))
-  #if ($titleField.label)
-    <dt>
-      <label for="$escapetool.xml($!{options.id})Title">##
+  <dl class="location-picker">
+    ##
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Title field
+    ## ---------------------------------------------------------------------------------------------------------
+    ##
+    #set ($titleField = $options.title)
+    #set ($value = $request.getParameter($titleField.name))
+    #if (!$value)
+      #set ($value = $titleField.value)
+    #end
+    #set ($escapedValue = $escapetool.xml($value))
+    #if ($titleField.label)
+      <dt>
+        <label for="$escapetool.xml($!{options.id})Title">##
           $escapetool.xml($services.localization.render($titleField.label))##
-      </label>
-      <span class="xHint">$!escapetool.xml($services.localization.render($titleField.hint))</span>
+        </label>
+        <span class="xHint">$!escapetool.xml($services.localization.render($titleField.hint))</span>
+      </dt>
+      <dd>
+        <input type="text" id="$escapetool.xml($!{options.id})Title" name="$escapetool.xml($titleField.name)" value="$!escapedValue"
+          class="location-title-field" placeholder="$!escapetool.xml($services.localization.render($titleField.placeholder))" />
+      </dd>
+    #elseif ($titleField)
+      <dt class="hidden"></dt>
+      <dd class="hidden">
+        <input type="hidden" name="$titleField.name" value="$!escapedValue"
+          class="location-title-field" />
+      </dd>
+    #end
+    ##
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Location preview
+    ## ---------------------------------------------------------------------------------------------------------
+    ##
+    <dt>
+      <label>$escapetool.xml($services.localization.render($options.preview.label))</label>
+      <span class="xHint">$escapetool.xml($services.localization.render($options.preview.hint))</span>
     </dt>
     <dd>
-      <input type="text" id="$escapetool.xml($!{options.id})Title" name="$escapetool.xml($titleField.name)" value="$!escapedValue"
-             class="location-title-field" placeholder="$!escapetool.xml($services.localization.render($titleField.placeholder))" />
-    </dd>
-  #elseif ($titleField)
-    <dt class="hidden"></dt>
-    <dd class="hidden">
-      <input type="hidden" name="$titleField.name" value="$!escapedValue"
-             class="location-title-field" />
-    </dd>
-  #end
-  ##
-  ## ---------------------------------------------------------------------------------------------------------
-  ## Location preview
-  ## ---------------------------------------------------------------------------------------------------------
-  ##
-  <dt>
-    <label>$escapetool.xml($services.localization.render($options.preview.label))</label>
-    <span class="xHint">$escapetool.xml($services.localization.render($options.preview.hint))</span>
-  </dt>
-  <dd>
-    ## The breadcrumb is updated whenever the user changes the parent page. This causes the breadcrumb element to be
-    ## constantly replaced, preventing us from displaying the live validation message after it. In order to overcome
-    ## this, we wrap the breadcrumb element in a DIV that remains the same.
-    <div class="breadcrumb-container">
-      ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
+      ## The breadcrumb is updated whenever the user changes the parent page. This causes the breadcrumb element to be
+      ## constantly replaced, preventing us from displaying the live validation message after it. In order to overcome
+      ## this, we wrap the breadcrumb element in a DIV that remains the same.
+      <div class="breadcrumb-container">
+        ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
         #hierarchy($options.parent.reference $options)
         #locationPickerActions($options)
-    </div>
-    ##
-    ## ---------------------------------------------------------------------------------------------------------
-    ## Location advanced edit
-    ## ---------------------------------------------------------------------------------------------------------
-    ##
-    #locationAdvancedEdit($options)
-  </dd>
-</dl>
+      </div>
+      ##
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Location advanced edit
+      ## ---------------------------------------------------------------------------------------------------------
+      ##
+      #locationAdvancedEdit($options)
+    </dd>
+  </dl>
 #end
 
 #macro (locationPickerActions $options)
-<div class="location-actions">
-  ## Tree picker toggle
-  #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
-    #documentPickerModal($options)
-    <a href="#" class="location-action location-action-pick"
-       title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
-      $services.icon.renderHTML('chart-organisation')
-    </a>
-  #end
-  ## Location advanced edit button.
-  #if ($isAdvancedUser && ($options.name.label || $options.parent.label ||
-  ($options.wiki.label && $displayWikiFields)))
-    <a href="#" class="location-action location-action-edit"
-       title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
-      $services.icon.renderHTML('pencil')
-    </a>
-  #end
-</div>
+  <div class="location-actions">
+    ## Tree picker toggle
+    #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
+      #documentPickerModal($options)
+      <a href="#" class="location-action location-action-pick"
+         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
+        $services.icon.renderHTML('chart-organisation')
+      </a>
+    #end
+    ## Location advanced edit button.
+    #if ($isAdvancedUser && ($options.name.label || $options.parent.label ||
+        ($options.wiki.label && $displayWikiFields)))
+      <a href="#" class="location-action location-action-edit"
+         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
+        $services.icon.renderHTML('pencil')
+      </a>
+    #end
+  </div>
 #end
 
 #macro (locationAdvancedEdit $options)
-<div class="location-edit#if ($isDocumentTreeAvailable) hidden#end">
-  <dl>
-    ## ---------------------------------------------------------------------------------------------------------
-    ## Wiki field
-    ## ---------------------------------------------------------------------------------------------------------
-    #set ($wikiField = $options.wiki)
-    #set ($value = $request.getParameter($wikiField.name))
-    #if (!$value)
-      #set ($value = $wikiField.value)
-    #end
-    #set ($escapedValue = $escapetool.xml($value))
-    #if ($wikiField.label && $displayWikiFields)
-      <dt>
-        <label for="$escapetool.xml($!{options.id})Wiki">##
-            $escapetool.xml($services.localization.render($wikiField.label))##
-        </label>
-        <span class="xHint">$!escapetool.xml($services.localization.render($wikiField.hint))</span>
-      </dt>
-      <dd>
-        <select id="$!{options.id}Wiki" name="$wikiField.name" class="location-wiki-field">
-          #set ($wikis = $xwiki.wikiNames)
-          #foreach ($wiki in $wikis)
-            #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
-            #if ("$!wikiPrettyName.trim()" == '')
-              #set ($wikiPrettyName = $wiki)
-            #end
-            <option value="$!escapetool.xml($wiki)" #if ($wiki == $value) selected="selected" #end>
-              $!escapetool.xml($wikiPrettyName)
-            </option>
-          #end
-        </select>
-      </dd>
-    #elseif ($wikiField)
-      <dt class="hidden"></dt>
-      <dd class="hidden">
-        <input type="hidden" name="$wikiField.name" class="location-wiki-field" value="$!escapedValue" />
-      </dd>
-    #end
-    ## ---------------------------------------------------------------------------------------------------------
-    ## Parent Reference field
-    ## ---------------------------------------------------------------------------------------------------------
-    ##
-    #set ($parentField = $options.parent)
-    #set ($value = $request.getParameter($parentField.name))
-    #if (!$value)
-      #if ("$!parentField.reference" == '')
-        ## Default to the current document's space.
-        #set ($defaultParentReference = $doc.documentReference.lastSpaceReference)
-      #else
-        #set ($defaultParentReference = $parentField.reference)
+  <div class="location-edit#if ($isDocumentTreeAvailable) hidden#end">
+    <dl>
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Wiki field
+      ## ---------------------------------------------------------------------------------------------------------
+      #set ($wikiField = $options.wiki)
+      #set ($value = $request.getParameter($wikiField.name))
+      #if (!$value)
+        #set ($value = $wikiField.value)
       #end
-      ## Make sure to use the local serialized string reference.
-      ## Note: If the parent is a wiki reference, an empty value will be set in the input.
-      #set ($defaultParentReferenceString = $services.model.serialize($defaultParentReference, 'local'))
-      #set ($value = $defaultParentReferenceString)
-    #end
-    #set ($escapedValue = $escapetool.xml($value))
-    #if ($parentField.label)
-      <dt>
-        <label for="$escapetool.xml($!{options.id})ParentReference">##
+      #set ($escapedValue = $escapetool.xml($value))
+      #if ($wikiField.label && $displayWikiFields)
+        <dt>
+          <label for="$escapetool.xml($!{options.id})Wiki">##
+            $escapetool.xml($services.localization.render($wikiField.label))##
+          </label>
+          <span class="xHint">$!escapetool.xml($services.localization.render($wikiField.hint))</span>
+        </dt>
+        <dd>
+          <select id="$!{options.id}Wiki" name="$wikiField.name" class="location-wiki-field">
+            #set ($wikis = $xwiki.wikiNames)
+            #foreach ($wiki in $wikis)
+              #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
+              #if ("$!wikiPrettyName.trim()" == '')
+                #set ($wikiPrettyName = $wiki)
+              #end
+              <option value="$!escapetool.xml($wiki)" #if ($wiki == $value) selected="selected" #end>
+                $!escapetool.xml($wikiPrettyName)
+              </option>
+            #end
+          </select>
+        </dd>
+      #elseif ($wikiField)
+        <dt class="hidden"></dt>
+        <dd class="hidden">
+          <input type="hidden" name="$wikiField.name" class="location-wiki-field" value="$!escapedValue" />
+        </dd>
+      #end
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Parent Reference field
+      ## ---------------------------------------------------------------------------------------------------------
+      ##
+      #set ($parentField = $options.parent)
+      #set ($value = $request.getParameter($parentField.name))
+      #if (!$value)
+        #if ("$!parentField.reference" == '')
+          ## Default to the current document's space.
+          #set ($defaultParentReference = $doc.documentReference.lastSpaceReference)
+        #else
+          #set ($defaultParentReference = $parentField.reference)
+        #end
+        ## Make sure to use the local serialized string reference.
+        ## Note: If the parent is a wiki reference, an empty value will be set in the input.
+        #set ($defaultParentReferenceString = $services.model.serialize($defaultParentReference, 'local'))
+        #set ($value = $defaultParentReferenceString)
+      #end
+      #set ($escapedValue = $escapetool.xml($value))
+      #if ($parentField.label)
+        <dt>
+          <label for="$escapetool.xml($!{options.id})ParentReference">##
             $escapetool.xml($services.localization.render($parentField.label))##
-        </label>
-        <span class="xHint">$!escapetool.xml($services.localization.render($parentField.hint))</span>
-      </dt>
-      <dd>
-        <input type="text" id="$escapetool.xml($!{options.id})ParentReference" class="location-parent-field suggestSpaces"
-               name="$escapetool.xml($parentField.name)" value="$!escapedValue"
-               placeholder="$!escapetool.xml($services.localization.render($parentField.placeholder))"
-               #if ($parentField.readOnly)readonly#end />
-      </dd>
-    #else
-      <dt class="hidden"></dt>
-      <dd class="hidden">
-        <input type="hidden" name="$escapetool.xml($parentField.name)" value="$!escapedValue"
-               class="location-parent-field" />
-      </dd>
-    #end
-    ##
-    ## ---------------------------------------------------------------------------------------------------------
-    ## Name field
-    ## ---------------------------------------------------------------------------------------------------------
-    ##
-    #set ($nameField = $options.name)
-    #set ($value = $request.getParameter($nameField.name))
-    #if (!$value)
-      #set ($value = $nameField.value)
-    #end
-    #set ($escapedValue = $escapetool.xml($value))
-    #if ($nameField.label)
-      <dt>
-        <label for="$escapetool.xml($!{options.id})Name">##
+          </label>
+          <span class="xHint">$!escapetool.xml($services.localization.render($parentField.hint))</span>
+        </dt>
+        <dd>
+          <input type="text" id="$escapetool.xml($!{options.id})ParentReference" class="location-parent-field suggestSpaces"
+            name="$escapetool.xml($parentField.name)" value="$!escapedValue"
+            placeholder="$!escapetool.xml($services.localization.render($parentField.placeholder))"
+            #if ($parentField.readOnly)readonly#end />
+        </dd>
+      #else
+        <dt class="hidden"></dt>
+        <dd class="hidden">
+          <input type="hidden" name="$escapetool.xml($parentField.name)" value="$!escapedValue"
+                 class="location-parent-field" />
+        </dd>
+      #end
+      ##
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Name field
+      ## ---------------------------------------------------------------------------------------------------------
+      ##
+      #set ($nameField = $options.name)
+      #set ($value = $request.getParameter($nameField.name))
+      #if (!$value)
+        #set ($value = $nameField.value)
+      #end
+      #set ($escapedValue = $escapetool.xml($value))
+      #if ($nameField.label)
+        <dt>
+          <label for="$escapetool.xml($!{options.id})Name">##
             $escapetool.xml($services.localization.render($nameField.label))##
-        </label>
-        <span class="xHint">$escapetool.xml($services.localization.render($nameField.hint))</span>
-      </dt>
-      <dd>
-        <input type="text" id="$escapetool.xml($!{options.id})Name" name="$escapetool.xml($nameField.name)" class="location-name-field"
-               value="$!escapedValue"
-               placeholder="$!escapetool.xml($services.localization.render($nameField.placeholder))"
-               #if ($nameField.readOnly)readonly#end />
-      </dd>
-    #elseif ($nameField)
-      <dt class="hidden"></dt>
-      <dd class="hidden">
-        <input type="hidden" name="$nameField.name" class="location-name-field"
-               value="$!escapedValue" />
-      </dd>
-    #end
-  </dl>
-</div>
+          </label>
+          <span class="xHint">$escapetool.xml($services.localization.render($nameField.hint))</span>
+        </dt>
+        <dd>
+          <input type="text" id="$escapetool.xml($!{options.id})Name" name="$escapetool.xml($nameField.name)" class="location-name-field"
+            value="$!escapedValue"
+            placeholder="$!escapetool.xml($services.localization.render($nameField.placeholder))"
+            #if ($nameField.readOnly)readonly#end />
+        </dd>
+      #elseif ($nameField)
+        <dt class="hidden"></dt>
+        <dd class="hidden">
+          <input type="hidden" name="$nameField.name" class="location-name-field"
+            value="$!escapedValue" />
+        </dd>
+      #end
+    </dl>
+  </div>
 #end
 
 #macro (documentPickerModal $options)
-<div class="modal fade" tabindex="-1" role="dialog" data-backdrop="static">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <div class="modal-title">$services.localization.render('core.documentPicker.title')</div>
-      </div>
-      <div class="modal-body">
-        #set ($showWikis = $options.wiki && $displayWikiFields)
+  <div class="modal fade" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <div class="modal-title">$services.localization.render('core.documentPicker.title')</div>
+        </div>
+        <div class="modal-body">
+          #set ($showWikis = $options.wiki && $displayWikiFields)
           ## If we don't show the wikis then we need to show the root node (the current wiki) in order to be able to
           ## target top level documents (e.g. create a top level document, move a document to the top level, etc.).
           #set ($showRoot = !$showWikis)
           #set ($showTerminalDocuments = false || $options.showTerminalDocuments)
           #documentTree({
-        'class': 'location-tree',
-        'finder': true,
-        'showAttachments': false,
-        'showRoot': $showRoot,
-        'showTerminalDocuments': $showTerminalDocuments,
-        'showTranslations': false,
-        'showWikis': $showWikis,
-        'exclusions': "$!options.exclusions"
-      })
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">
-          $services.localization.render('core.documentPicker.cancel')
-        </button>
-        <button type="button" class="btn btn-primary" disabled="disabled">
-          $services.localization.render('core.documentPicker.select')
-        </button>
+            'class': 'location-tree',
+            'finder': true,
+            'showAttachments': false,
+            'showRoot': $showRoot,
+            'showTerminalDocuments': $showTerminalDocuments,
+            'showTranslations': false,
+            'showWikis': $showWikis,
+            'exclusions': "$!options.exclusions"
+          })
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            $services.localization.render('core.documentPicker.cancel')
+          </button>
+          <button type="button" class="btn btn-primary" disabled="disabled">
+            $services.localization.render('core.documentPicker.select')
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 #end

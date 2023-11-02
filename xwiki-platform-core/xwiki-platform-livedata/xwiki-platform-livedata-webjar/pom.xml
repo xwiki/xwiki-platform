@@ -168,7 +168,7 @@
             </goals>
             <configuration>
               <nodeVersion>v20.9.0</nodeVersion>
-              <npmVersion>10.2.1</npmVersion>
+              <npmVersion>10.2.3</npmVersion>
             </configuration>
           </execution>
           <execution>

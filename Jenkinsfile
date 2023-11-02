@@ -29,43 +29,44 @@ pipeline {
         stage('Install') {
             steps {
                 nvm('v20.9.0') {
-                    sh 'npm ci'
+                    sh 'corepack enable' 
+                    sh 'pnpm install'
                 }
             }
         }
         stage('Lint') {
             steps {
                 nvm('v20.9.0') {
-                    sh 'npm run lint'
+                    sh 'pnpm lint'
                 }
             }
         }
         stage('Build') {
             steps {
                 nvm('v20.9.0') {
-                    sh 'npm run build'
+                    sh 'pnpm build'
                 }
             }
         }
         stage('Unit Tests') {
             steps {
                 nvm('v20.9.0') {
-                    sh 'npm run test:unit:ci'
+                    sh 'pnpm test:unit:ci'
                 }
             }
         }
         stage('End to End Tests') {
             steps {
                 nvm('v20.9.0') {
-                    sh 'npx playwright install'
-                    sh 'npm run test:e2e'
+                    sh 'pnpm exec playwright install'
+                    sh 'pnpm test:e2e'
                 }
             }
         }
         stage('Pack') {
             steps {
                 nvm('v20.9.0') {
-                    sh 'npm pack'
+                    sh 'pnpm pack'
                 }
             }
         }

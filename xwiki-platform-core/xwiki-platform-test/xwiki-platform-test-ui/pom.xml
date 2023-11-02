@@ -55,7 +55,7 @@
     <dependency>
       <groupId>io.github.bonigarcia</groupId>
       <artifactId>webdrivermanager</artifactId>
-      <version>5.5.3</version>
+      <version>${webdrivermanager.version}</version>
     </dependency>
     <!-- Used by the REST calls -->
     <dependency>

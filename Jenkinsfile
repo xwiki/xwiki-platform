@@ -19,6 +19,10 @@
  */
 pipeline {
     agent any
+    environment {
+        BROWSERSTACK_USERNAME   = credentials('BROWSERSTACK_USERNAME')
+        BROWSERSTACK_ACCESS_KEY = credentials('BROWSERSTACK_ACCESS_KEY')
+    }
     stages {
         stage('Debug') {
             steps {
@@ -58,8 +62,7 @@ pipeline {
         stage('End to End Tests') {
             steps {
                 nvm('v20.9.0') {
-                    sh 'pnpm exec playwright install'
-                    sh 'pnpm test:e2e'
+                    sh 'pnpm test:e2e:browserstack'
                 }
             }
         }

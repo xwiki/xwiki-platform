@@ -1,26 +1,6 @@
-# Cristal
+# vue-project
 
-Cristal is a new project to build a new modular wiki UI using modern web technologies, which will support multiple
-backends (including of course [XWiki](https://www.xwiki.org/) to store Wiki data).
-
-* Project Lead: [Manuel Leduc](https://www.xwiki.org/xwiki/bin/view/XWiki/mleduc)
-* Documentation & Downloads: N/A <!-- [Documentation & Download](https://extensions.xwiki.org/xwiki/bin/view/Extension/
-  (extension
-  name)))-->
-* [Issue Tracker](https://jira.xwiki.org/projects/CRISTAL/summary)
-* Communication: [Forum](https://forum.xwiki.org/c/cristal/18), [Matrix Chat](https://matrix.to/#/#cristal:matrix.xwiki.com)
-* [Development Practices](https://dev.xwiki.org)
-* Minimal XWiki version supported: XWiki (minimal xwiki version)
-* License: LGPL 2.1
-* Translations: N/A
-* Wiki: https://cristal.xwiki.org/
-<!--* Sonar
-  Dashboard: [![Status](https://sonarcloud.io/api/project_badges/measure?project=(group id):(artifact id)&metric=alert_status)](https://sonarcloud.io/dashboard?id=(group
-  id):(artifact id))-->
-<!--* Continuous Integration
-  Status: [![Build Status](https://ci.xwiki.org/job/XWiki%20Contrib/job/(project id on ci)/job/master/badge/icon)](https://ci.xwiki.org/job/XWiki%20Contrib/job/(projct
-  id on ci)/job/master/)-->
-
+This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
 
@@ -65,20 +45,23 @@ npm run build
 npm run test:unit
 ```
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+### Run End-to-End Tests with [Playwright](https://playwright.dev)
 
 ```sh
-npm run test:e2e:dev
-```
+# Install browsers for the first run
+npx playwright install
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
+# When testing on CI, must build the project first
 npm run build
+
+# Runs the end-to-end tests
 npm run test:e2e
+# Runs the tests only on Chromium
+npm run test:e2e -- --project=chromium
+# Runs the tests of a specific file
+npm run test:e2e -- tests/example.spec.ts
+# Runs the tests in debug mode
+npm run test:e2e -- --debug
 ```
 
 ### Lint with [ESLint](https://eslint.org/)

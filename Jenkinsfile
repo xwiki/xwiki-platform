@@ -28,42 +28,43 @@ pipeline {
         }
         stage('Install') {
             steps {
-                nvm('v18.18.2') {
+                nvm('v20.9.0') {
                     sh 'npm ci'
                 }
             }
         }
         stage('Lint') {
             steps {
-                nvm('v18.18.2') {
+                nvm('v20.9.0') {
                     sh 'npm run lint'
                 }
             }
         }
         stage('Build') {
             steps {
-                nvm('v18.18.2') {
+                nvm('v20.9.0') {
                     sh 'npm run build'
                 }
             }
         }
         stage('Unit Tests') {
             steps {
-                nvm('v18.18.2') {
+                nvm('v20.9.0') {
                     sh 'npm run test:unit:ci'
                 }
             }
         }
         stage('End to End Tests') {
             steps {
-                nvm('v18.18.2') {
+                nvm('v20.9.0') {
+                    sh 'npx playwright install'
                     sh 'npm run test:e2e'
                 }
             }
         }
         stage('Pack') {
             steps {
-                nvm('v18.18.2') {
+                nvm('v20.9.0') {
                     sh 'npm pack'
                 }
             }
@@ -73,6 +74,7 @@ pipeline {
         always {
             archiveArtifacts artifacts: '*.tgz', fingerprint: true
             junit 'unit-tests.xml'
+            junit 'e2e-tests.xml'
         }
     }
 }

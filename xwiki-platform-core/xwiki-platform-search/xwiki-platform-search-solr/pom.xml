@@ -119,7 +119,7 @@
     <profile>
       <id>integration-tests</id>
       <modules>
-        <module>xwiki-platform-search-solr-test-utils</module>
+        <module>xwiki-platform-search-solr-test</module>
       </modules>
     </profile>
   </profiles>

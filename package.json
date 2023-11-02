@@ -36,7 +36,7 @@
     "@vue/tsconfig": "0.4.0",
     "browserstack-node-sdk": "1.30.0",
     "eslint": "8.52.0",
-    "eslint-plugin-vue": "9.17.0",
+    "eslint-plugin-vue": "9.18.1",
     "jsdom": "22.1.0",
     "npm-run-all2": "6.0.6",
     "prettier": "3.0.3",

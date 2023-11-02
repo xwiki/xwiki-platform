@@ -32,6 +32,9 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WindowType;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
+import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
+import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
@@ -42,6 +45,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Functional tests for the real-time WYSIWYG editor.
@@ -561,5 +565,80 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String content = firstTextArea.getContent();
         assertTrue(content.contains("<strong>bolder</strong> <em>italic</em> <ins>underline</ins> end"),
             "Unexpected content: " + content);
+    }
+
+    @Test
+    @Order(7)
+    void imageWithCaption(TestReference testReference, TestUtils setup) throws Exception
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Upload an image to test with.
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        setup.createPage(testReference, "", "");
+        setup.attachFile(testReference, attachmentName, getClass().getResourceAsStream("/" + attachmentName), false);
+
+        //
+        // First Tab
+        //
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys("before");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilContentContains("before");
+        secondTextArea.sendKeys(Keys.END, Keys.ENTER);
+
+        // Insert the image with caption.
+        ImageDialogSelectModal imageDialogSelectModal = secondEditor.getToolBar().insertImage();
+        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
+        imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
+        imageDialogEditModal.clickInsert();
+
+        // Focus the caption and edit it.
+        secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP);
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        secondTextArea.sendKeys("Tree");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.waitUntilContentContains("Tree");
+        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilContentContains("Small");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_LEFT));
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "b"));
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.sendKeys(Keys.ARROW_LEFT, "est");
+        firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
+        firstEditPage.clickSaveAndView();
+        assertEquals("before\n\n[[Smallest **Tree**>>image:image.gif]]\n\n ",
+            WikiEditPage.gotoPage(testReference).getContent());
     }
 }

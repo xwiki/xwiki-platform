@@ -68,6 +68,15 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used by the image plugin to search for resources. (This is not in xwiki-platform-ckeditor-ui because it breaks the flavor.) -->
+    <!-- See https://github.com/xwiki/xwiki-platform/pull/2280#discussion_r1284086007 -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!--Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

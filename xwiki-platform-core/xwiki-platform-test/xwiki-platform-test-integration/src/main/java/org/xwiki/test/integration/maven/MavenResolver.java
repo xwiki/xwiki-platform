@@ -222,11 +222,9 @@ public class MavenResolver
         boolean resolveExtraJARs)
         throws Exception
     {
-        List<Artifact> artifacts = new ArrayList<>();
-        for (ArtifactCoordinate artifactCoordinate : artifactCoordinates) {
-            Artifact artifact = artifactCoordinate.toArtifact(resolveVersion(artifactCoordinate, resolveExtraJARs));
+        List<Artifact> artifacts = resolveVersions(artifactCoordinates, resolveExtraJARs);
+        for (Artifact artifact : artifacts) {
             LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}]", artifact);
-            artifacts.add(artifact);
         }
         return artifacts;
     }
@@ -273,15 +271,16 @@ public class MavenResolver
      * Find the version to use if it's not specified. We look in the current Maven POM's dependencies to try to find
      * a matching artifact and get its version. If not, we default to the version of the current Maven POM module:
      * {@code getModelFromCurrentPOM().getVersion()}. Since resolving takes time and since it'll resolve
-     * SNAPSHOTs and it may not be what you want (you may have modifications done locally that you want to be used),
+     * SNAPSHOTs, and it may not be what you want (you may have modifications done locally that you want to be used),
      * we check if the {@code resolveExtraJARs} parameter is set or not.
      */
-    private String resolveVersion(ArtifactCoordinate artifactCoordinate, boolean resolveExtraJARs) throws Exception
+    private String resolveVersion(ArtifactCoordinate artifactCoordinate, boolean resolveExtraJARs,
+        Collection<Artifact> dependencies, String modelVersion)
     {
-        Model model = getModelFromCurrentPOM();
         String version = null;
-        if (resolveExtraJARs) {
-            for (Artifact dependencyArtifact : getDependencies(model)) {
+        // Only resolve the version if not specified, for performance reasons.
+        if (artifactCoordinate.getVersion() == null && resolveExtraJARs) {
+            for (Artifact dependencyArtifact : dependencies) {
                 if (dependencyArtifact.getGroupId().equals(artifactCoordinate.getGroupId())
                     && dependencyArtifact.getArtifactId().equals(artifactCoordinate.getArtifactId())
                     && dependencyArtifact.getExtension().equals(artifactCoordinate.getType()))
@@ -291,10 +290,25 @@ public class MavenResolver
                 }
             }
         }
-        if (version == null) {
-            version = model.getVersion();
+        if (artifactCoordinate.getVersion() == null && version == null) {
+            version = modelVersion;
         }
         return version;
+    }
+
+    private List<Artifact> resolveVersions(Collection<ArtifactCoordinate> artifactCoordinates, boolean resolveExtraJARs)
+        throws Exception
+    {
+        Model model = getModelFromCurrentPOM();
+        // Compute the dependencies once for performance reasons.
+        Collection<Artifact> dependencies = getDependencies(model);
+        List<Artifact> artifacts = new ArrayList<>();
+        for (ArtifactCoordinate artifactCoordinate : artifactCoordinates) {
+            Artifact artifact = artifactCoordinate.toArtifact(resolveVersion(artifactCoordinate, resolveExtraJARs,
+                dependencies, model.getVersion()));
+            artifacts.add(artifact);
+        }
+        return artifacts;
     }
 
     /**

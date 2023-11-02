@@ -9,7 +9,7 @@
     "test": "vue-cli-service test:unit"
   },
   "engines": {
-    "npm": "10.2.1",
+    "npm": "10.2.3",
     "node": "20.9.0"
   },
   "dependencies": {

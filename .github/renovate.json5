@@ -21,21 +21,4 @@
   // We want all suggestions right away
   "prHourlyLimit" : 0,
   "prConcurrentLimit" : 0,
-
-  // Skip Eclipse M2E special setup "dependency"
-  "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],
-
-  "packageRules": [
-    // Indicate the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
-    {
-      "matchDatasources": ["maven"],
-      "registryUrls": ["https://nexus.xwiki.org/nexus/content/repositories/public/"]
-    },
-
-    // There is always a more recent version of contrib parent or commons/rendering/platform and we don't want to upgrade just for that
-    {
-      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:", "org.xwiki.contrib:parent-"],
-      "enabled": false
-    }
-  ]
 }

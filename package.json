@@ -38,7 +38,7 @@
     "eslint": "8.52.0",
     "eslint-plugin-vue": "9.18.1",
     "jsdom": "22.1.0",
-    "npm-run-all2": "6.0.6",
+    "npm-run-all2": "6.1.1",
     "prettier": "3.0.3",
     "typescript": "5.2.2",
     "vite": "4.4.9",

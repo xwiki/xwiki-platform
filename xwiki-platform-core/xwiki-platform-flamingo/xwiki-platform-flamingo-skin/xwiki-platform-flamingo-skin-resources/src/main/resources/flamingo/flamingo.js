@@ -58,6 +58,8 @@ require(['jquery', 'bootstrap'], function($) {
    ** an accessible name 
    ** The content to display inside.
   In addition, the drawer can contain a `.drawer-close` button that will close the drawer on click.
+  It's expected for the drawer containers not to be nested in each other, this might lead to inconsistencies 
+  when closing them with the ESC key.
   For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
  */
 require(['jquery'], function($) {

@@ -2064,7 +2064,7 @@ a.list-group-item {
       <panel-bg>#060606</panel-bg>
     </property>
     <property>
-      <panel-default-text>#ffffff</panel-default-text>
+      <panel-header-text>#ffffff</panel-header-text>
     </property>
     <property>
       <text-color>#999999</text-color>

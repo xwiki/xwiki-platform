@@ -400,7 +400,7 @@ wrench = wrench
 zoom = search
 zoom_in = search-plus
 zoom_out = search-minus
-  </content>
+</content>
   <object>
     <name>IconThemes.FontAwesome</name>
     <number>0</number>

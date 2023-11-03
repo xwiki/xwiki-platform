@@ -188,7 +188,7 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki-jetty/webapps/xwiki/WEB-INF/jetty-web.xml</linkName>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
               <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
             </data>
           </dataSet>

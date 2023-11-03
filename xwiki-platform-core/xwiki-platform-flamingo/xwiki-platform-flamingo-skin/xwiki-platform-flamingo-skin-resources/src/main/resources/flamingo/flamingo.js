@@ -90,13 +90,15 @@ require(['jquery'], function($) {
         drawerContainer.get(0).showModal();
         drawerContainer.removeClass('drawer-transitioning');
         // The drawer can be closed by pressing the ESC key
-        $("body").on('keydown.drawer' + index + 'Close', function (event) {
+        drawerContainer.on('keydown.drawer' + index + 'Close', function (event) {
           if (event.key === 'Escape') {
             closeDrawer();
           }
         });
       }).on('drawer' + index + '.closed', function (event) {
         drawerOpener.attr('aria-expanded', 'false');
+        // When the drawer is closed, collapse sub items
+        drawerContainer.find('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
 
         function waitTransition() {
           drawerContainer.get(0).close();
@@ -108,12 +110,7 @@ require(['jquery'], function($) {
         drawerContainer.addClass('drawer-transitioning');
         drawerContainer.get(0).addEventListener('transitionend', waitTransition);
         // We remove the listener that was created when the drawer opened up
-        $("body").off('keydown.drawer' + index + 'Close');
-      });
-
-      // When the drawer is closed, collapse sub items
-      $(body).on('drawer' + index + '.closed', function () {
-        $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
+        drawerContainer.off('keydown.drawer' + index + 'Close');
       });
     });
   });

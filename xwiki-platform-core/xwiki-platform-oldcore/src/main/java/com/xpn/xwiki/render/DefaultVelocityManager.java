@@ -47,6 +47,8 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
@@ -80,7 +82,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
 
     private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new TemplateUpdatedEvent(), new TemplateDeletedEvent());
+        Arrays.asList(new TemplateUpdatedEvent(), new TemplateDeletedEvent());
 
     /**
      * Used to access the current {@link org.xwiki.context.ExecutionContext}.
@@ -120,6 +122,9 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
 
     @Inject
     private AuthorExecutor authorExecutor;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
 
     @Inject
     private Logger logger;
@@ -286,11 +291,13 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                 if (velocityEngine == null) {
                     velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, null);
 
-                    if (template != null) {
-                        // Local macros template
-                        // We execute it ourself to support any kind of template, Velocity only support resource
-                        // template by default
-                        try {
+                    try {
+                        if (template != null && this.authorizationManager.hasAccess(Right.SCRIPT,
+                            template.getContent().getAuthorReference(), template.getContent().getDocumentReference()))
+                        {
+                            // Local macros template, applied only if their author has at least Script rights.
+                            // We execute it ourself to support any kind of template, Velocity only support resource
+                            // template by default
                             final VelocityEngine finalVelocityEngine = velocityEngine;
 
                             this.authorExecutor.call(() -> {
@@ -300,9 +307,9 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                                 return null;
                             }, template.getContent().getAuthorReference(),
                                 template.getContent().getDocumentReference());
-                        } catch (Exception e) {
-                            this.logger.error("Failed to evaluate macros templates [{}]", template.getPath(), e);
                         }
+                    } catch (Exception e) {
+                        this.logger.error("Failed to evaluate macros templates [{}]", template.getPath(), e);
                     }
                 }
             }

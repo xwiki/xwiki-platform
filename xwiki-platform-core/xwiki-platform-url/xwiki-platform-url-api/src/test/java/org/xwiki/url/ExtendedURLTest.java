@@ -51,11 +51,11 @@ class ExtendedURLTest
     @Test
     void extractParameters() throws Exception
     {
-        URL url = new URL("http://localhost:8080/xwiki/?foo=bar&toto&foo=baz");
+        URL url = new URL("http://localhost:8080/xwiki/?foo=bar&to%26to%3Dto&foo=b%26z");
         ExtendedURL extendedURL = new ExtendedURL(url, null);
         Map<String, List<String>> parameters = extendedURL.extractParameters(url.toURI());
-        assertThat(parameters, hasEntry(is("foo"), hasItems("bar", "baz")));
-        assertThat(parameters, hasEntry(is("toto"), is(empty())));
+        assertThat(parameters, hasEntry(is("foo"), hasItems("bar", "b&z")));
+        assertThat(parameters, hasEntry(is("to&to=to"), is(empty())));
     }
 
     @Test

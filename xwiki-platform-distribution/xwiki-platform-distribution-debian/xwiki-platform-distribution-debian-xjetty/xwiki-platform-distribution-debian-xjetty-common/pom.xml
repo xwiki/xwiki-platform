@@ -41,14 +41,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
-      <version>${project.version}</version>
+      <version>15.10-SNAPSHOT</version>
       <type>war</type>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-      <version>${project.version}</version>
+      <version>15.10-SNAPSHOT</version>
       <type>zip</type>
       <optional>true</optional>
     </dependency>
@@ -71,7 +71,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-                  <version>${platform.version}</version>
+                  <version>15.10-SNAPSHOT</version>
                   <type>zip</type>
                 </artifactItem>
               </artifactItems>
@@ -91,7 +91,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-                  <version>${platform.version}</version>
+                  <version>15.10-SNAPSHOT</version>
                   <type>zip</type>
                 </artifactItem>
               </artifactItems>
@@ -111,7 +111,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
-                  <version>${platform.version}</version>
+                  <version>15.10-SNAPSHOT</version>
                   <type>war</type>
                 </artifactItem>
               </artifactItems>
@@ -182,6 +182,14 @@
               <symlink>true</symlink>
               <linkName>/usr/lib/xwiki-jetty/logs</linkName>
               <linkTarget>/var/log/xwiki</linkTarget>
+            </data>
+
+            <!-- Custom Jetty context configuration -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
             </data>
           </dataSet>
         </configuration>

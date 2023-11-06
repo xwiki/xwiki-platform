@@ -259,8 +259,15 @@ public class MavenResolver
         List<Artifact> artifacts = new ArrayList<>();
         Artifact currentPOMArtifact = new DefaultArtifact(model.getGroupId(), model.getArtifactId(),
             model.getPackaging(), model.getVersion());
+        // Don't include "test" dependencies as they should not be used to resolve extra jar artifact versions.
+        List<Dependency> normalizedDependencies = new ArrayList<>();
+        for (Dependency dependency : model.getDependencies()) {
+            if (!"test".equals(dependency.getScope())) {
+                normalizedDependencies.add(dependency);
+            }
+        }
         Collection<ArtifactResult> results = this.artifactResolver.getArtifactDependencies(currentPOMArtifact,
-            convertToArtifacts(model.getDependencies()));
+            convertToArtifacts(normalizedDependencies));
         for (ArtifactResult artifactResult : results) {
             artifacts.add(artifactResult.getArtifact());
         }

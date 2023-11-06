@@ -45,7 +45,7 @@
       <div>
         <input type="hidden" name="form_token" value="$!services.csrf.token" />
         <input type="hidden" name="register" value="1" />
-        <input type="hidden" name="xredirect" value="$escapetool.xml($!request.xredirect)" />
+        <input type="hidden" name="xredirect" value="$!escapetool.xml($!request.xredirect)" />
         #set ($class = $xwiki.getClass('XWiki.XWikiUsers'))
         #set ($obj = $class.newObject())
         #set ($serverobj = $class.newObject())

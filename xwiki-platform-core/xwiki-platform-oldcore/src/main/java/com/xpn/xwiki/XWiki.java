@@ -165,6 +165,7 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authservice.internal.AuthServiceManager;
@@ -3939,7 +3940,9 @@ public class XWiki implements EventListener
                 }
             }
 
-            if ((!password.equals(password2))) {
+            ResetPasswordManager resetPasswordManager = Utils.getComponent(ResetPasswordManager.class);
+            if ((!password.equals(password2)) || (!StringUtils.isEmpty(password) &&
+                !resetPasswordManager.isPasswordCompliantWithRegistrationRules(password))) {
                 // TODO: throw wrong password exception
                 return -2;
             }

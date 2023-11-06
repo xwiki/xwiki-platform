@@ -24,9 +24,9 @@
 #template("startpage.vm")
 #template("register_macros.vm")
 #set ($fields = [])
-#set ($registrationConfig = $NULL)
-#_loadConfig($registrationConfig)
-#definePasswordFields($fields, 'xwikipassword', 'xwikipassword2', $registrationConfig.passwordOptions)
+#set ($passwordOptions = $NULL)
+#_loadPasswordOptions($passwordOptions)
+#definePasswordFields($fields, 'xwikipassword', 'xwikipassword2', $passwordOptions)
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
   ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.

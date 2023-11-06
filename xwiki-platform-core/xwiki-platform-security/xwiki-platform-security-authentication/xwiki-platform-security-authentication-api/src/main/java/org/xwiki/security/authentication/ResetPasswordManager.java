@@ -20,6 +20,7 @@
 package org.xwiki.security.authentication;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -77,4 +78,14 @@ public interface ResetPasswordManager
      */
     void resetPassword(UserReference userReference, String newPassword)
         throws ResetPasswordException;
+
+    /**
+     * Ensure that the password matches the requirements provided by {@link RegistrationConfiguration}.
+     *
+     * @param newPassword the password to check
+     * @return {@code true} if the rules exposed in the {@link RegistrationConfiguration} are all respected.
+     * @since 15.10RC1
+     */
+    @Unstable
+    boolean isPasswordCompliantWithRegistrationRules(String newPassword);
 }

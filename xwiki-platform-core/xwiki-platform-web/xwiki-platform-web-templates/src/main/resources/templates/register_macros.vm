@@ -387,6 +387,17 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #end ## CSRF check
 #end##macro
 
+#macro(_loadPasswordOptions $return)
+  #set ($passwordOptions = {})
+  #set ($passwordOptions.passwordLength = $services.security.registration.passwordMinimumLength)
+  #set ($passwordRules = $services.security.registration.passwordRules)
+  #set($passwordOptions.passwordRuleOneLowerCaseEnabled = $passwordRules.contains('ONE_LOWER_CASE_CHARACTER'))
+  #set($passwordOptions.passwordRuleOneUpperCaseEnabled = $passwordRules.contains('ONE_UPPER_CASE_CHARACTER'))
+  #set($passwordOptions.passwordRuleOneNumberEnabled = $passwordRules.contains('ONE_NUMBER_CHARACTER'))
+  #set($passwordOptions.passwordRuleOneSymbolEnabled = $passwordRules.contains('ONE_SYMBOL_CHARACTER'))
+  #setVariable("$return" $passwordOptions)
+#end
+
 #*
  * Get the configuration to use for registration.
  *###
@@ -396,13 +407,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #set($registrationConfig.autoLogin = $services.security.registration.isAutoLoginEnabled())
   #set($registrationConfig.requireCaptcha = $services.security.registration.isCaptchaRequired())
   #set($registrationConfig.useEmailVerification = $services.security.registration.isEmailValidationRequired())
-  #set ($passwordOptions = {})
-  #set ($passwordOptions.passwordLength = $services.security.registration.passwordMinimumLength)
-  #set ($passwordRules = $services.security.registration.passwordRules)
-  #set($passwordOptions.passwordRuleOneLowerCaseEnabled = $passwordRules.contains('ONE_LOWER_CASE_CHARACTER'))
-  #set($passwordOptions.passwordRuleOneUpperCaseEnabled = $passwordRules.contains('ONE_UPPER_CASE_CHARACTER'))
-  #set($passwordOptions.passwordRuleOneNumberEnabled = $passwordRules.contains('ONE_NUMBER_CHARACTER'))
-  #set($passwordOptions.passwordRuleOneSymbolEnabled = $passwordRules.contains('ONE_SYMBOL_CHARACTER'))
+  #_loadPasswordOptions($passwordOptions)
   #set ($registrationConfig.passwordOptions = $passwordOptions)
   ## FIXME: All remaining values should probably also be retrieved from API
   #set($configurationClassName = 'XWiki.Registration')

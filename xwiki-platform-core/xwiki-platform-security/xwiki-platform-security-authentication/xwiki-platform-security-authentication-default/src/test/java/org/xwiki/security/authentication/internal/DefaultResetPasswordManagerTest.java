@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -40,6 +41,7 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
+import org.xwiki.security.authentication.RegistrationConfiguration;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.test.LogLevel;
@@ -65,7 +67,9 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -114,6 +118,9 @@ class DefaultResetPasswordManagerTest
     @MockComponent
     @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
+
+    @MockComponent
+    private RegistrationConfiguration registrationConfiguration;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
@@ -455,5 +462,152 @@ class DefaultResetPasswordManagerTest
         ResetPasswordException resetPasswordException = assertThrows(ResetPasswordException.class,
             () -> this.resetPasswordManager.resetPassword(otherUserReference, "some password"));
         assertEquals(exceptionMessage, resetPasswordException.getMessage());
+    }
+
+    @Test
+    void isPasswordCompliantWithRegistrationRules()
+    {
+        when(this.registrationConfiguration.getPasswordMinimumLength()).thenReturn(5);
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of());
+        when(this.registrationConfiguration.getPasswordMinimumLength()).thenReturn(3);
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of(
+            RegistrationConfiguration.PasswordRules.ONE_LOWER_CASE_CHARACTER));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of(
+            RegistrationConfiguration.PasswordRules.ONE_UPPER_CASE_CHARACTER));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of(
+            RegistrationConfiguration.PasswordRules.ONE_NUMBER_CHARACTER));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of(
+            RegistrationConfiguration.PasswordRules.ONE_SYMBOL_CHARACTER));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of(
+            RegistrationConfiguration.PasswordRules.ONE_LOWER_CASE_CHARACTER,
+            RegistrationConfiguration.PasswordRules.ONE_NUMBER_CHARACTER));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of(
+            RegistrationConfiguration.PasswordRules.ONE_LOWER_CASE_CHARACTER,
+            RegistrationConfiguration.PasswordRules.ONE_UPPER_CASE_CHARACTER));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordRules()).thenReturn(Set.of(
+            RegistrationConfiguration.PasswordRules.ONE_LOWER_CASE_CHARACTER,
+            RegistrationConfiguration.PasswordRules.ONE_UPPER_CASE_CHARACTER,
+            RegistrationConfiguration.PasswordRules.ONE_NUMBER_CHARACTER,
+            RegistrationConfiguration.PasswordRules.ONE_SYMBOL_CHARACTER
+            ));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
+
+        when(this.registrationConfiguration.getPasswordMinimumLength()).thenReturn(13);
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooooo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foooOOOOOoo"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fooOOOOo000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/ 000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foo_/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("fOOOOoo_/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ 000"));
+        assertTrue(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("foOOOo_/ éé000"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules(" _/"));
+        assertFalse(this.resetPasswordManager.isPasswordCompliantWithRegistrationRules("_/3434"));
     }
 }

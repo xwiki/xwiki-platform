@@ -20,6 +20,7 @@
 package org.xwiki.security.authentication.script;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -60,11 +61,17 @@ public class RegistrationScriptService implements ScriptService
     }
 
     /**
+     * The rules are returned as {@code String} and not as
+     * {@link org.xwiki.security.authentication.RegistrationConfiguration.PasswordRules} because manipulating a
+     * {@link Set} of {@link Enum} in velocity is not handy.
+     *
      * @return the set of rules to comply with for a creating a new password.
      */
-    public Set<RegistrationConfiguration.PasswordRules> getPasswordRules()
+    public Set<String> getPasswordRules()
     {
-        return this.registrationConfiguration.getPasswordRules();
+        return this.registrationConfiguration.getPasswordRules()
+            .stream().map(RegistrationConfiguration.PasswordRules::name)
+            .collect(Collectors.toSet());
     }
 
     /**

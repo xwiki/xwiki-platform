@@ -46,7 +46,7 @@ public class RegistrationConfigurationSource extends AbstractDocumentConfigurati
         new LocalDocumentReference(SPACE_NAMES, "Registration");
 
     private static final LocalDocumentReference DOC_REFERENCE =
-        new LocalDocumentReference(SPACE_NAMES, "RegistrationConfiguration");
+        new LocalDocumentReference(SPACE_NAMES, "RegistrationConfig");
 
     @Override
     protected DocumentReference getDocumentReference()

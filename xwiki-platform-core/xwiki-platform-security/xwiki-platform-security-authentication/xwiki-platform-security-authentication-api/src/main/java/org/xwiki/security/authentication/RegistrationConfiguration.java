@@ -20,6 +20,7 @@
 package org.xwiki.security.authentication;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -47,22 +48,37 @@ public interface RegistrationConfiguration
         /**
          * When one lower case character is mandatory.
          */
-        ONE_LOWER_CASE_CHARACTER,
+        ONE_LOWER_CASE_CHARACTER(".*[a-z]+.*"),
 
         /**
          * When one upper case character is mandatory.
          */
-        ONE_UPPER_CASE_CHARACTER,
+        ONE_UPPER_CASE_CHARACTER(".*[A-Z]+.*"),
 
         /**
          * When one symbol character is mandatory.
          */
-        ONE_SYMBOL_CHARACTER,
+        ONE_SYMBOL_CHARACTER(".*(_\\W)+.*"),
 
         /**
          * When one number character is mandatory.
          */
-        ONE_NUMBER_CHARACTER
+        ONE_NUMBER_CHARACTER(".*[0-9]+.*");
+
+        private final String regularExpression;
+
+        PasswordRules(String expression)
+        {
+            this.regularExpression = expression;
+        }
+
+        /**
+         * @return the pattern used by the rule to ensure it's respected.
+         */
+        public Pattern getPattern()
+        {
+            return Pattern.compile(this.regularExpression);
+        }
     }
 
     /**

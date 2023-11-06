@@ -21,9 +21,9 @@ package org.xwiki.notifications.notifiers.internal.email;
 
 import java.lang.reflect.Type;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
@@ -43,8 +43,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 9.11.1
  */
-public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRenderer
-        implements NotificationEmailRenderer
+@Component(roles = WikiEmailNotificationRenderer.class)
+public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRenderer implements NotificationEmailRenderer
 {
     private EmailTemplateRenderer emailTemplateRenderer;
 
@@ -57,18 +57,18 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
     /**
      * Constructs a new {@link WikiEmailNotificationRenderer}.
      *
-     * @param authorReference the author reference of the document
      * @param templateManager the {@link TemplateManager} to use
      * @param scriptContextManager the {@link ScriptContextManager} to use
      * @param componentManager the {@link ComponentManager} to use
      * @param baseObject the XObject which has the required properties to instantiate the component
      * @throws NotificationException if the properties of the given BaseObject could not be loaded
      */
-    public WikiEmailNotificationRenderer(DocumentReference authorReference, TemplateManager templateManager,
+    public void initialize(TemplateManager templateManager,
             ScriptContextManager scriptContextManager, ComponentManager componentManager, BaseObject baseObject)
             throws NotificationException
     {
-        super(authorReference, templateManager, scriptContextManager, componentManager, baseObject);
+        initialize(baseObject);
+
         try {
             emailTemplateRenderer = componentManager.getInstance(EmailTemplateRenderer.class);
         } catch (ComponentLookupException e) {

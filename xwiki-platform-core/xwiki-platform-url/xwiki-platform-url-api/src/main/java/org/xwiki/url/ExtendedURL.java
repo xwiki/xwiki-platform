@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -183,15 +184,17 @@ public class ExtendedURL implements Cloneable
     protected Map<String, List<String>> extractParameters(URI uri)
     {
         Map<String, List<String>> uriParameters;
-        if (uri.getQuery() != null) {
+        if (uri.getRawQuery() != null) {
             uriParameters = new LinkedHashMap<>();
-            for (String nameValue : Arrays.asList(uri.getQuery().split("&"))) {
+            for (String nameValue : Arrays.asList(uri.getRawQuery().split("&"))) {
                 String[] pair = nameValue.split("=", 2);
+                String name = URLDecoder.decode(pair[0], StandardCharsets.UTF_8);
                 // Check if the parameter has a value or not.
                 if (pair.length == 2) {
-                    addParameter(pair[0], pair[1], uriParameters);
+                    String value = URLDecoder.decode(pair[1], StandardCharsets.UTF_8);
+                    addParameter(name, value, uriParameters);
                 } else {
-                    addParameter(pair[0], null, uriParameters);
+                    addParameter(name, null, uriParameters);
                 }
             }
         } else {

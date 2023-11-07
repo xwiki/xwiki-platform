@@ -85,6 +85,7 @@ import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.velocity.XWikiWebappResourceLoaderInitializer;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
 import org.xwiki.velocity.internal.DefaultVelocityFactory;
@@ -219,6 +220,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultScriptContextManager.class,
     DefaultVelocityFactory.class,
     XWikiVelocityConfiguration.class,
+    XWikiWebappResourceLoaderInitializer.class,
     DefaultLoggerConfiguration.class,
     DefaultVelocityEngine.class,
     DefaultVelocityContextFactory.class,

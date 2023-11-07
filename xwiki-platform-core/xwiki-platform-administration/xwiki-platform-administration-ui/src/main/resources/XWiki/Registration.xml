@@ -212,7 +212,7 @@
   ##
   ##The password field, mandatory and must be at least 6 characters long.
   ##The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
-  #definePasswordFields($fields, 'register_password', 'register2_password', $$registrationConfig.passwordOptions)
+  #definePasswordFields($fields, 'register_password', 'register2_password', $registrationConfig.passwordOptions)
   ##
   ## The email address field, regex checked with an email pattern. Mandatory if registration uses email verification
   #set($field =

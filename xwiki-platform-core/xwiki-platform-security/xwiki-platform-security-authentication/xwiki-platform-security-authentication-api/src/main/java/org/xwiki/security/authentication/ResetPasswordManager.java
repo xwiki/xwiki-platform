@@ -87,5 +87,8 @@ public interface ResetPasswordManager
      * @since 15.10RC1
      */
     @Unstable
-    boolean isPasswordCompliantWithRegistrationRules(String newPassword);
+    default boolean isPasswordCompliantWithRegistrationRules(String newPassword)
+    {
+        return true;
+    }
 }

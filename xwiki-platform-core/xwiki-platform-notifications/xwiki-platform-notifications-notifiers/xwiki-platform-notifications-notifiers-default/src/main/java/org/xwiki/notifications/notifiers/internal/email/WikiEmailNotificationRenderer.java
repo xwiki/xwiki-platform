@@ -21,17 +21,15 @@ package org.xwiki.notifications.notifiers.internal.email;
 
 import java.lang.reflect.Type;
 
+import javax.inject.Inject;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.notifications.notifiers.internal.AbstractWikiNotificationRenderer;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
-import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -46,6 +44,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component(roles = WikiEmailNotificationRenderer.class)
 public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRenderer implements NotificationEmailRenderer
 {
+    @Inject
     private EmailTemplateRenderer emailTemplateRenderer;
 
     private Template htmlTemplate;
@@ -57,23 +56,14 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
     /**
      * Constructs a new {@link WikiEmailNotificationRenderer}.
      *
-     * @param templateManager the {@link TemplateManager} to use
-     * @param scriptContextManager the {@link ScriptContextManager} to use
-     * @param componentManager the {@link ComponentManager} to use
      * @param baseObject the XObject which has the required properties to instantiate the component
      * @throws NotificationException if the properties of the given BaseObject could not be loaded
      */
-    public void initialize(TemplateManager templateManager,
-            ScriptContextManager scriptContextManager, ComponentManager componentManager, BaseObject baseObject)
-            throws NotificationException
+    @Override
+    public void initialize(BaseObject baseObject) throws NotificationException
     {
-        initialize(baseObject);
+        super.initialize(baseObject);
 
-        try {
-            emailTemplateRenderer = componentManager.getInstance(EmailTemplateRenderer.class);
-        } catch (ComponentLookupException e) {
-            throw new NotificationException("Failed to create a new instance of WikiEmailNotificationRenderer.", e);
-        }
         this.htmlTemplate = extractTemplate(baseObject,
                 WikiEmailNotificationRendererDocumentInitializer.HTML_TEMPLATE);
         this.plainTextTemplate = extractTemplate(baseObject,

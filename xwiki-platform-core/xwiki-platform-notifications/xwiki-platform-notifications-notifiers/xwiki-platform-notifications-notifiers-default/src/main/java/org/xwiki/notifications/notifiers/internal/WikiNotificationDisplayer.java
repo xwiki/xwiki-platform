@@ -57,7 +57,7 @@ public class WikiNotificationDisplayer extends AbstractWikiNotificationRenderer 
     @Override
     public void initialize(BaseObject baseObject) throws NotificationException
     {
-        initialize(baseObject);
+        super.initialize(baseObject);
 
         this.supportedEvents = Arrays.asList(this.eventType);
         this.notificationTemplate =

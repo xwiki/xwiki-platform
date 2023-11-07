@@ -18,59 +18,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 pipeline {
-    agent any
+    agent {
+      label 'dockernodejs'
+    }
     environment {
         BROWSERSTACK_USERNAME   = credentials('BROWSERSTACK_USERNAME')
         BROWSERSTACK_ACCESS_KEY = credentials('BROWSERSTACK_ACCESS_KEY')
     }
     stages {
-        stage('Debug') {
-            steps {
-                sh 'id'
-                sh 'pwd'
-            }
-        }
         stage('Install') {
             steps {
-                nvm('v20.9.0') {
-                    sh 'corepack enable' 
-                    sh 'pnpm install'
-                }
+                sh 'pnpm install'
             }
         }
         stage('Lint') {
             steps {
-                nvm('v20.9.0') {
-                    sh 'pnpm lint'
-                }
+                sh 'pnpm lint'
             }
         }
         stage('Build') {
             steps {
-                nvm('v20.9.0') {
-                    sh 'pnpm build'
-                }
+                 sh 'pnpm build'
             }
         }
         stage('Unit Tests') {
             steps {
-                nvm('v20.9.0') {
-                    sh 'pnpm test:unit:ci'
-                }
+                sh 'pnpm test:unit:ci'
             }
         }
         stage('End to End Tests') {
             steps {
-                nvm('v20.9.0') {
-                    sh 'pnpm test:e2e:browserstack'
-                }
+                sh 'pnpm test:e2e:browserstack'
             }
         }
         stage('Pack') {
             steps {
-                nvm('v20.9.0') {
-                    sh 'pnpm pack'
-                }
+               sh 'pnpm pack'
             }
         }
     }

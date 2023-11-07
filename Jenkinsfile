@@ -22,7 +22,7 @@ pipeline {
       label 'dockernodejs'
     }
     environment {
-        BROWSERSTACK_USERNAME   = credentials('BROWSERSTACK_USERNAME')
+        BROWSERSTACK_USERNAME   = credentials(name: 'BROWSERSTACK_USERNAME', required: false)
         BROWSERSTACK_ACCESS_KEY = credentials('BROWSERSTACK_ACCESS_KEY')
     }
     stages {

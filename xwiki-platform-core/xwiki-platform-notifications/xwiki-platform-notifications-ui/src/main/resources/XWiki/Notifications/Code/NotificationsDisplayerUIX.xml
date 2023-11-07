@@ -322,7 +322,7 @@ Get the actual notifications.
     }
     var markAllReadButton = $('&lt;a href="#"&gt;')
       .addClass('notification-event-clean')
-      .html('$escapetool.xml($services.icon.renderHTML("trash"))&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
+      .html($jsontool.serialize("$services.icon.renderHTML('trash')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.clear'))"))
       .on('click', function (event) {
         // Avoid the menu closing
         event.preventDefault();

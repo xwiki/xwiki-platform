@@ -87,14 +87,14 @@ public abstract class AbstractRegistrationPage extends BasePage
     /** @return a list of WebElements representing validation failure messages. Use after calling register() */
     public List<WebElement> getValidationFailureMessages()
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//dd/span[@class='LV_validation_message LV_invalid']"));
+        return getDriver().findElementsWithoutWaiting(By.xpath("//dd/span[contains(@class,'LV_validation_message LV_invalid')]"));
     }
 
     /** @return Is the specified message included in the list of validation failure messages. */
     public boolean validationFailureMessagesInclude(String message)
     {
         return getDriver().findElementsWithoutWaiting(
-            By.xpath("//dd/span[@class='LV_validation_message LV_invalid' and . = '" + message + "']")).size() > 0;
+            By.xpath("//dd/span[contains(@class,'LV_validation_message LV_invalid') and . = '" + message + "']")).size() > 0;
     }
 
     /** Try to make LiveValidation validate the forms. */

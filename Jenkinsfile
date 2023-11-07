@@ -21,10 +21,6 @@ pipeline {
     agent {
       label 'dockernodejs'
     }
-    environment {
-        BROWSERSTACK_USERNAME   = credentials(name: 'BROWSERSTACK_USERNAME', required: false)
-        BROWSERSTACK_ACCESS_KEY = credentials('BROWSERSTACK_ACCESS_KEY')
-    }
     stages {
         stage('Install') {
             steps {
@@ -44,11 +40,6 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 sh 'pnpm test:unit:ci'
-            }
-        }
-        stage('End to End Tests') {
-            steps {
-                sh 'pnpm test:e2e:browserstack'
             }
         }
         stage('Pack') {

@@ -52,7 +52,6 @@ pipeline {
         always {
             archiveArtifacts artifacts: '*.tgz', fingerprint: true
             junit 'unit-tests.xml'
-            junit 'e2e-tests.xml'
         }
     }
 }

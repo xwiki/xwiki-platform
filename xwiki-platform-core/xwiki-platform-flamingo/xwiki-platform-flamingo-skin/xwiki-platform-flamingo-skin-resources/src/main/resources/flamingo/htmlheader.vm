@@ -114,6 +114,7 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------
+    <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
     #template("stylesheets.vm")
     #template("javascript.vm")
   </head>

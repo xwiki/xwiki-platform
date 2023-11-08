@@ -23,11 +23,11 @@ define('xwiki-realtime-userData', [
   'json.sortify'
 ], function(ChainPad, chainpadNetflux, jsonSortify) {
   'use strict';
-  var userData, onChange;
-  var updateUserData = function(textData) {
+  let userData, onChange;
+  function updateUserData(textData) {
     try {
-      var json = JSON.parse(textData);
-      for (var key in json) {
+      const json = JSON.parse(textData);
+      for (let key in json) {
         userData[key] = json[key];
       }
       if (typeof onChange === 'function') {
@@ -37,11 +37,11 @@ define('xwiki-realtime-userData', [
       console.log('Failed to parse user data: ' + textData);
       console.error(e);
     }
-  };
+  }
 
-  var module = {}, online, myId;
-  var createConfig = function(network, key, configData) {
-    var initializing = true;
+  let module = {}, online, myId;
+  function createConfig(network, key, configData) {
+    let initializing = true;
     return {
       initialState: '{}',
       network,
@@ -61,7 +61,7 @@ define('xwiki-realtime-userData', [
 
       onLocal: function() {
         if (!initializing && online) {
-          var strHyperJSON = jsonSortify(userData);
+          const strHyperJSON = jsonSortify(userData);
           module.chainpad.contentUpdate(strHyperJSON);
           if (module.chainpad.getUserDoc() !== strHyperJSON) {
             console.warn('userDoc !== strHyperJSON');
@@ -87,10 +87,10 @@ define('xwiki-realtime-userData', [
         }
       }
     };
-  };
+  }
 
-  var getMyUserData = function(configData, cursor) {
-    var myUserData = {
+  function getMyUserData(configData, cursor) {
+    const myUserData = {
       name: configData.userName
     };
     if (cursor) {
@@ -100,25 +100,25 @@ define('xwiki-realtime-userData', [
       myUserData.avatar = configData.userAvatar;
     }
     return myUserData;
-  };
+  }
 
-  var createUserData = function(configData, config) {
-    var cursor, oldCursor;
+  function createUserData(configData, config) {
+    let cursor, oldCursor;
     if (configData.editor && typeof configData.getCursor === 'function') {
       cursor = configData.getCursor;
       oldCursor = cursor();
     }
 
-    var userData = {};
+    const userData = {};
     userData[myId] = getMyUserData(configData, oldCursor);
 
-    var intervalId;
+    let intervalId;
     if (typeof cursor !== 'undefined') {
       intervalId = setInterval(function() {
         if (!online) {
           return;
         }
-        var newCursor = cursor();
+        const newCursor = cursor();
         if (oldCursor !== newCursor) {
           userData[myId] = userData[myId] || getMyUserData(configData);
           userData[myId]['cursor_' + configData.editor] = newCursor;
@@ -140,7 +140,7 @@ define('xwiki-realtime-userData', [
     };
 
     return userData;
-  };
+  }
 
   module.start = function(network, key, configData) {
     configData = configData || {};
@@ -153,7 +153,7 @@ define('xwiki-realtime-userData', [
     online = true;
     onChange = configData.onChange;
 
-    var config = createConfig(network, key, configData);
+    const config = createConfig(network, key, configData);
     userData = createUserData(configData, config);
 
     chainpadNetflux.start(config);

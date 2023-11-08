@@ -21,6 +21,7 @@ package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -49,12 +50,11 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -113,7 +113,7 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
 
         // Create a fake syntax to create the macro id.
         Syntax syntax = mock();
-        when(this.macroContentParser.getCurrentSyntax(any())).thenReturn(syntax);
+        when(block.getSyntaxMetadata()).thenReturn(Optional.of(syntax));
         MacroId macroId = new MacroId(scriptMacroName, syntax);
 
         // Mock a script macro.
@@ -143,12 +143,12 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
         // Create an XDOM block that acts as root.
         MetaData metaDataOuter = new MetaData();
         metaDataOuter.addMetaData(MetaData.SOURCE, "xwiki:Space.Page");
-        new XDOM(List.of(block), metaDataOuter);
 
         // Create a fake syntax to create the macro id.
         Syntax syntax = mock();
-        when(this.macroContentParser.getCurrentSyntax(any())).thenReturn(syntax);
+        metaDataOuter.addMetaData(MetaData.SYNTAX, syntax);
         MacroId macroId = new MacroId(macroName, syntax);
+        new XDOM(List.of(block), metaDataOuter);
 
         // Mock the macro.
         Macro<?> macro = mock();
@@ -162,7 +162,7 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
 
         XDOM xdom = mock();
         when(xdom.getMetaData()).thenReturn(metaDataOuter);
-        when(this.macroContentParser.parse(eq(testContent), any(), eq(false), eq(metaDataOuter), eq(false)))
+        when(this.macroContentParser.parse(eq(testContent), any(), any(), eq(false), eq(metaDataOuter), eq(false)))
             .thenReturn(xdom);
 
         RequiredRightAnalysisResult mockResult = mock();
@@ -171,11 +171,12 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
         List<RequiredRightAnalysisResult> result = this.analyzer.analyze(block);
 
         if (isWikiContent) {
-            verify(this.macroContentParser).parse(eq(testContent), any(), eq(false), eq(metaDataOuter), eq(false));
+            verify(this.macroContentParser).parse(eq(testContent), isNull(Syntax.class), any(), eq(false),
+                eq(metaDataOuter), eq(false));
             verify(this.xdomRequiredRightAnalyzer).analyze(xdom);
             assertEquals(List.of(mockResult), result);
         } else {
-            verify(this.macroContentParser, never()).parse(any(), any(), anyBoolean(), anyBoolean());
+            verifyNoInteractions(this.macroContentParser);
             verifyNoInteractions(this.xdomRequiredRightAnalyzer);
             assertEquals(List.of(), result);
         }

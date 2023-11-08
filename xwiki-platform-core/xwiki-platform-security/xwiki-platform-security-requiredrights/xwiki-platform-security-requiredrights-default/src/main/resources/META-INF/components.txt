@@ -1,5 +1,6 @@
 org.xwiki.platform.security.requiredrights.internal.analyzer.XWikiDocumentRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultMacroBlockRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultMacroRequiredRightReporter
 org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.XDOMRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.RequiredRightObjectRequiredRightAnalyzer

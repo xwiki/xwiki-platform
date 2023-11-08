@@ -18,28 +18,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-security</artifactId>
+    <artifactId>xwiki-platform-security-requiredrights</artifactId>
     <version>15.10-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-security-requiredrights</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Security - Required Rights - Parent POM</name>
-  <description>Parent POM for the Required Rights</description>
-  <modules>
-    <module>xwiki-platform-security-requiredrights-api</module>
-    <module>xwiki-platform-security-requiredrights-default</module>
-    <module>xwiki-platform-security-requiredrights-macro</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-security-requiredrights-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-security-requiredrights-macro</artifactId>
+  <name>XWiki Platform - Security - Required Rights - Macro</name>
+  <description>APIs for analyzing rendering macro's required rights</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Required Rights Macro Analysis API</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>api</xwiki.extension.category>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-api</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -2,10 +2,36 @@
 // Messages
 // --------------------------------------------------
 
-.successmessage, .errormessage, .warningmessage, .infomessage,
 span.successmessage, span.errormessage, span.warningmessage, span.infomessage, 
-span.box { // Used by: Inline boxes and messages
-  padding: floor(@font-size-base * 0.2);
+span.box { // Used by: Inline boxes
+  padding: 0 floor(@font-size-base * 0.2);
+  & > img {
+    // Style the icons of the message boxes
+    margin: 0 .5rem;
+    vertical-align: sub;
+  }
+}
+
+div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
+  // Used by: message boxes
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  
+  & > p {
+    // Content of the message box
+    flex-grow: 1;
+    flex-basis: 98%;
+  }
+  
+  & > img {
+    // We need to do a hack with the flex because the title is not contained in its own node, 
+    // it's just there in a textnode.
+    min-width: 2%;
+    max-height: 16px;
+    object-fit: contain;
+  }
+  
 }
 
 .box, .plainmessage, // Used by: Code Macro, Success Macro, etc.

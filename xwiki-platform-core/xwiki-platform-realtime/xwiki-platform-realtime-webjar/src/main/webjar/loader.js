@@ -36,7 +36,12 @@ define('xwiki-realtime-loader', [
     return;
   }
 
-  let module = {messages: Messages},
+  let module = {
+    messages: Messages,
+    isForced: window.location.href.indexOf('force=1') >= 0,
+    // Real-time enabled by default.
+    isRt: window.location.href.indexOf('realtime=false') < 0
+  },
 
   // FIXME: The real-time JavaScript code is not loaded anymore on the "lock" page so this code is not really used. We
   // need to decide if we want to re-add the real-time JavaScript code on the lock page and how.
@@ -45,10 +50,6 @@ define('xwiki-realtime-loader', [
     const force = document.querySelectorAll('a[href*="force=1"][href*="/edit/"]');
     return (lockedBy.length && force.length) ? force[0] : null;
   },
-
-  isForced = module.isForced = window.location.href.indexOf('force=1') >= 0,
-  // Real-time enabled by default.
-  isRt = module.isRt = window.location.href.indexOf('realtime=false') < 0,
 
   getRTEditorURL = module.getEditorURL = function(href, info) {
     href = href.replace(/\?(.*)$/, function (all, args) {
@@ -836,14 +837,15 @@ define('xwiki-realtime-loader', [
         if (lock) {
           // Found a lock link. Check active sessions.
           this.checkSessions(info);
-          reject();
+          reject(new Error('Lock detected'));
         } else if (window.XWiki.editor === info.type) {
           // No lock and we are using the right editor. Start realtime.
           this.updateKeys(info.type).then(keys => {
             if (!keys[info.type] || !keys.events || !keys.userdata) {
               ErrorBox.show('unavailable');
-              console.error('You are not allowed to create a new realtime session for that document.');
-              reject();
+              const error = new Error('You are not allowed to create a new realtime session for that document.');
+              console.error(error);
+              reject(error);
             } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
               resolve(keys);
             } else {

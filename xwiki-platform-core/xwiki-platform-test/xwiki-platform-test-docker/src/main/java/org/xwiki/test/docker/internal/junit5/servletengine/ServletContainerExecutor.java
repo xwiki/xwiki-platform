@@ -425,7 +425,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private void addJava17AddOpens(List<String> list)
     {
         list.add("--add-opens java.base/java.lang=ALL-UNNAMED");
+        list.add("--add-opens java.base/java.io=ALL-UNNAMED");
         list.add("--add-opens java.base/java.util=ALL-UNNAMED");
-        list.add("--add-opens java.base/java.concurrent=ALL-UNNAMED");
+        list.add("--add-opens java.base/java.util.concurrent=ALL-UNNAMED");
     }
 }

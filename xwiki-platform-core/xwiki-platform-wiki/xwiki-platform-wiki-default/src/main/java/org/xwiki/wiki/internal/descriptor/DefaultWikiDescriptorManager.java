@@ -91,7 +91,19 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             }
         }
 
+        // Sort by wiki pretty name (with a fallback on wiki id).
+        Collections.sort(result, (alice, bob) -> getDisplayName(alice).compareToIgnoreCase(getDisplayName(bob)));
+
         return result;
+    }
+
+    private String getDisplayName(WikiDescriptor descriptor)
+    {
+        String displayName = descriptor.getPrettyName();
+        if (StringUtils.isEmpty(displayName)) {
+            displayName = descriptor.getId();
+        }
+        return displayName;
     }
 
     @Override

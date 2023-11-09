@@ -429,6 +429,8 @@
       #end
       #set ($rules = $stringtool.join($ruleDescriptions, ','))
       {{translation key="security.registration.passwordRules.errorMessage" parameters="$rules"/}}
+    #elseif ($reg == -10)
+      {{translation key="core.register.invalidCaptcha"/}}
     #else
       {{translation key="core.register.registerFailed" parameters="$reg"/}}
     #end

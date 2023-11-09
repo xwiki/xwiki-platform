@@ -54,6 +54,11 @@ public class RegisterAction extends XWikiAction
     /** Name of the corresponding template and URL parameter. */
     private static final String REGISTER = "register";
 
+    /**
+     * Context variable used to store the state in case of problem.
+     */
+    private static final String REG_CONSTANT = "reg";
+
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterAction.class);
 
@@ -85,18 +90,18 @@ public class RegisterAction extends XWikiAction
             if (!csrfTokenCheck(context)) {
                 return false;
             }
+            int result;
             // Let's verify that the user submitted the right CAPTCHA (if required).
             if (!verifyCaptcha(context, xwiki)) {
-                return false;
-            }
-
-            int result;
-            if (this.registrationConfiguration.isEmailValidationRequired()) {
-                result = xwiki.createUser(true, "edit", context);
+                result = -10;
             } else {
-                result = xwiki.createUser(context);
+                if (this.registrationConfiguration.isEmailValidationRequired()) {
+                    result = xwiki.createUser(true, "edit", context);
+                } else {
+                    result = xwiki.createUser(context);
+                }
             }
-            getCurrentScriptContext().setAttribute("reg", Integer.valueOf(result), ScriptContext.ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute(REG_CONSTANT, Integer.valueOf(result), ScriptContext.ENGINE_SCOPE);
 
             // Redirect if a redirection parameter is passed.
             String redirect = Utils.getRedirect(request, null);

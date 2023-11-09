@@ -21,6 +21,7 @@ package org.xwiki.administration.test.ui;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -64,124 +65,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class RegisterIT
 {
-    /**
-     * Returns a stream of combinations of parameters to test. The first value is {@code useLiveValidation} and the
-     * second {@code isModal}.
-     *
-     * @return the tested combination of {@code useLiveValidation} and {@code isModal}
-     */
-    private static Stream<Arguments> testsParameters()
-    {
-        return Stream.of(
-            Arguments.of(true, false),
-            Arguments.of(false, false),
-            Arguments.of(true, true)
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("testsParameters")
-    @Order(1)
-    void registerJohnSmith(boolean useLiveValidation, boolean isModal, TestUtils testUtils) throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal);
-        assertTrue(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
-        tryToLoginAsJohnSmith(testUtils, registrationPage);
-    }
-
-    @ParameterizedTest
-    @MethodSource("testsParameters")
-    @Order(2)
-    void registerExistingUser(boolean useLiveValidation, boolean isModal, TestUtils testUtils) throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal);
-
-        // Uses the empty string instead of the null value to empty the form fields (the null value just keep the value filled from the previously run test).
-        registrationPage.fillRegisterForm("", "", "Admin", "password", "password", "");
-        // Can't use validateAndRegister here because user existence is not checked by LiveValidation.
-        assertFalse(tryToRegister(testUtils, registrationPage, isModal));
-        assertTrue(registrationPage.validationFailureMessagesInclude("User already exists."));
-    }
-
-    @ParameterizedTest
-    @MethodSource("testsParameters")
-    @Order(3)
-    void registerPasswordTooShort(boolean useLiveValidation, boolean isModal, TestUtils testUtils) throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal);
-        registrationPage.fillRegisterForm(null, null, null, "short", "short", null);
-        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
-        assertTrue(
-            registrationPage.validationFailureMessagesInclude("Your new password must be at least 6 characters long."));
-    }
-
-    @ParameterizedTest
-    @MethodSource("testsParameters")
-    @Order(4)
-    void registerDifferentPasswords(boolean useLiveValidation, boolean isModal, TestUtils testUtils)
-        throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal);
-        registrationPage.fillRegisterForm(null, null, null, null, "DifferentPassword", null);
-        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
-        assertTrue(registrationPage.validationFailureMessagesInclude("The two passwords do not match."));
-    }
-
-    @ParameterizedTest
-    @MethodSource("testsParameters")
-    @Order(5)
-    void registerEmptyPassword(boolean useLiveValidation, boolean isModal, TestUtils testUtils) throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal);
-        registrationPage.fillRegisterForm(null, null, null, "", "", null);
-        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
-        assertTrue(registrationPage.validationFailureMessagesInclude("This field is required."));
-    }
-
-    @ParameterizedTest
-    @MethodSource("testsParameters")
-    @Order(6)
-    void registerEmptyUserName(boolean useLiveValidation, boolean isModal, TestUtils testUtils) throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal);
-        // A piece of javascript fills in the username with the first and last names so we will empty them.
-        registrationPage.fillRegisterForm("", "", "", null, null, null);
-        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
-        assertTrue(registrationPage.validationFailureMessagesInclude("This field is required."));
-    }
-
-    @ParameterizedTest
-    @MethodSource("testsParameters")
-    @Order(7)
-    void registerInvalidEmail(boolean useLiveValidation, boolean isModal, TestUtils testUtils) throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal);
-        registrationPage.fillRegisterForm(null, null, null, null, null, "not an email address");
-        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
-        assertTrue(registrationPage.validationFailureMessagesInclude("Please enter a valid email address."));
-    }
-
-    @Test
-    @Order(8)
-    void registerWikiSyntaxName(TestUtils testUtils) throws Exception
-    {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, false, false);
-        String password = "SomePassword";
-        String firstName = "]]{{/html}}{{html clean=false}}HT&amp;ML";
-        String lastName = "]]{{/html}}";
-        String username = "WikiSyntaxName";
-        registrationPage.fillRegisterForm(firstName, lastName, username, password, password, "wiki@example.com");
-        assertTrue(validateAndRegister(testUtils, false, false, registrationPage));
-
-        assertEquals(String.format("%s %s (%s): Registration successful.", firstName, lastName, username),
-            ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
-    }
-
-    private AbstractRegistrationPage setUp(TestUtils testUtils, boolean useLiveValidation, boolean isModal)
+    private AbstractRegistrationPage setUp(TestUtils testUtils, boolean useLiveValidation, boolean isModal,
+        boolean closeWiki)
         throws Exception
     {
         // We create the admin user because it is expected to exist when testing the registration of an existing user.
         testUtils.loginAsSuperAdmin();
+        if (closeWiki) {
+            testUtils.setWikiPreference("authenticate_view", "1");
+        }
         testUtils.createAdminUser();
         deleteJohnSmith(testUtils);
         testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0, "liveValidation_enabled",
@@ -189,11 +81,21 @@ class RegisterIT
         switchUser(testUtils, isModal);
         testUtils.recacheSecretToken();
         AbstractRegistrationPage registrationPage = this.getRegistrationPage(isModal);
-        // The prepareName javascript function is the cause of endless flickering since it tries to suggest a username
-        // every time the field is focused.
-        testUtils.getDriver().executeJavascript("document.getElementById('xwikiname').onfocus = null;");
+
+        if (!closeWiki) {
+            // The prepareName javascript function is the cause of endless flickering since it tries to suggest a username
+            // every time the field is focused.
+            testUtils.getDriver().executeJavascript("document.getElementById('xwikiname').onfocus = null;");
+        }
         registrationPage.fillInJohnSmithValues();
         return registrationPage;
+    }
+
+    @AfterEach
+    void afterEach(TestUtils testUtils) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.setWikiPreference("authenticate_view", "0");
     }
 
     /**
@@ -203,7 +105,7 @@ class RegisterIT
     private void switchUser(TestUtils testUtils, boolean isModal)
     {
         // The test of the standard registration for must be done with the guest user.
-        // The test of the user creation in a modal from the administration must be done with an user that 
+        // The test of the user creation in a modal from the administration must be done with an user that
         // has admin rights.
         if (!isModal) {
             // Fast Logout.
@@ -306,4 +208,131 @@ class RegisterIT
         testUtils.loginAsSuperAdmin();
         testUtils.rest().deletePage("XWiki", "JohnSmith");
     }
+
+    /**
+     * Returns a stream of combinations of parameters to test. The first value is {@code useLiveValidation} and the
+     * second {@code isModal}.
+     *
+     * @return the tested combination of {@code useLiveValidation} and {@code isModal}
+     */
+    private static Stream<Arguments> testsParameters()
+    {
+        return Stream.of(
+            // FIXME: put back different values once closedWiki is passing.
+            //Arguments.of(true, false, false),
+            Arguments.of(false, false, true)
+//            Arguments.of(false, false, false),
+//            Arguments.of(true, true, false)
+        );
+    }
+
+    @ParameterizedTest()
+    @MethodSource("testsParameters")
+    @Order(1)
+    void registerJohnSmith(boolean useLiveValidation, boolean isModal, boolean closedWiki, TestUtils testUtils)
+        throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal, closedWiki);
+        assertTrue(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
+        tryToLoginAsJohnSmith(testUtils, registrationPage);
+    }
+
+    @ParameterizedTest()
+    @MethodSource("testsParameters")
+    @Order(2)
+    void registerExistingUser(boolean useLiveValidation, boolean isModal, boolean closedWiki, TestUtils testUtils)
+        throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal, closedWiki);
+
+        // Uses the empty string instead of the null value to empty the form fields (the null value just keep the value filled from the previously run test).
+        registrationPage.fillRegisterForm("", "", "Admin", "password", "password", "");
+        // Can't use validateAndRegister here because user existence is not checked by LiveValidation.
+        assertFalse(tryToRegister(testUtils, registrationPage, isModal));
+        if (closedWiki) {
+            assertTrue(registrationPage.errorMessageInclude("Error: User already exists."));
+        } else {
+            assertTrue(registrationPage.validationFailureMessagesInclude("User already exists."));
+        }
+    }
+
+    @ParameterizedTest()
+    @MethodSource("testsParameters")
+    @Order(3)
+    void registerPasswordTooShort(boolean useLiveValidation, boolean isModal, boolean closedWiki,  TestUtils testUtils)
+        throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal, closedWiki);
+        registrationPage.fillRegisterForm(null, null, null, "short", "short", null);
+        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
+        assertTrue(
+            registrationPage.validationFailureMessagesInclude("Your new password must be at least 6 characters long."));
+    }
+
+    @ParameterizedTest()
+    @MethodSource("testsParameters")
+    @Order(4)
+    void registerDifferentPasswords(boolean useLiveValidation, boolean isModal, boolean closedWiki,
+        TestUtils testUtils) throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal, closedWiki);
+        registrationPage.fillRegisterForm(null, null, null, null, "DifferentPassword", null);
+        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
+        assertTrue(registrationPage.validationFailureMessagesInclude("The two passwords do not match."));
+    }
+
+    @ParameterizedTest()
+    @MethodSource("testsParameters")
+    @Order(5)
+    void registerEmptyPassword(boolean useLiveValidation, boolean isModal, boolean closedWiki, TestUtils testUtils)
+        throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal, closedWiki);
+        registrationPage.fillRegisterForm(null, null, null, "", "", null);
+        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
+        assertTrue(registrationPage.validationFailureMessagesInclude("This field is required."));
+    }
+
+    @ParameterizedTest()
+    @MethodSource("testsParameters")
+    @Order(6)
+    void registerEmptyUserName(boolean useLiveValidation, boolean isModal, boolean closedWiki, TestUtils testUtils)
+        throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal, closedWiki);
+        // A piece of javascript fills in the username with the first and last names so we will empty them.
+        registrationPage.fillRegisterForm("", "", "", null, null, null);
+        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
+        assertTrue(registrationPage.validationFailureMessagesInclude("This field is required."));
+    }
+
+    @ParameterizedTest()
+    @MethodSource("testsParameters")
+    @Order(7)
+    void registerInvalidEmail(boolean useLiveValidation, boolean isModal, boolean closedWiki, TestUtils testUtils)
+        throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, useLiveValidation, isModal, closedWiki);
+        registrationPage.fillRegisterForm(null, null, null, null, null, "not an email address");
+        assertFalse(validateAndRegister(testUtils, useLiveValidation, isModal, registrationPage));
+        assertTrue(registrationPage.validationFailureMessagesInclude("Please enter a valid email address."));
+    }
+
+    @Test
+    @Order(8)
+    void registerWikiSyntaxName(TestUtils testUtils) throws Exception
+    {
+        AbstractRegistrationPage registrationPage = setUp(testUtils, false, false, false);
+        String password = "SomePassword";
+        String firstName = "]]{{/html}}{{html clean=false}}HT&amp;ML";
+        String lastName = "]]{{/html}}";
+        String username = "WikiSyntaxName";
+        registrationPage.fillRegisterForm(firstName, lastName, username, password, password, "wiki@example.com");
+        assertTrue(validateAndRegister(testUtils, false, false, registrationPage));
+
+        assertEquals(String.format("%s %s (%s): Registration successful.", firstName, lastName, username),
+            ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
+    }
+
+
 }

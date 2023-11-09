@@ -96,7 +96,7 @@ class DefaultAuthenticationConfigurationTest
         resetCache("validationKey");
         String otherValidationKey = this.configuration.getValidationKey();
 
-        assertNotNull(validationKey);
+        assertNotNull(otherValidationKey);
         assertNotEquals(validationKey, otherValidationKey);
 
         resetCache("validationKey");
@@ -124,7 +124,7 @@ class DefaultAuthenticationConfigurationTest
         resetCache("encryptionKey");
         String otherEncryptionKey = this.configuration.getEncryptionKey();
 
-        assertNotNull(encryptionKey);
+        assertNotNull(otherEncryptionKey);
         assertNotEquals(encryptionKey, otherEncryptionKey);
 
         resetCache("encryptionKey");

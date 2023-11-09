@@ -35,13 +35,12 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .more-actions .edit-all {
   display: block;
   padding: 2px 18px;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/pencil.png')") left top no-repeat;
 }
 
 /* Object editor */
 /* XClass */
 .xclass-title {
-  margin: 16px 0 2px;
+  margin: 16px 16px 2px 0;
 }
 .xclass-title h2 {
   border: none;
@@ -51,8 +50,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   padding: 0 0 0 0px;
 }
 .xclass-content {
- padding: 0 0 0 16px;
- margin: 0 0 10px 0;
+ margin: 0 0 0 16px;
 }
 
 /* XObject */
@@ -85,30 +83,20 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xobject dl, .xproperty dl {
   margin: 0;
 }
-#body .xobject-title h3, #body .xclass-title, .add_xobject-title {
-  padding-left: 14px !important; /* important for toucan */
-}
+
 .xobject-title:hover, .xclass-title:hover, .xproperty-title:hover {
   cursor: default;
 }
 .xobject-action {
   display: block;
-  overflow: hidden;
   position: absolute;
   top: 2px;
-  width: 16px;
-  height: 16px;
-  text-indent: 30px;
-  line-height: 30px;
-  background: transparent left top no-repeat;
 }
 .xobject-title .delete {
   right: 0;
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 .xobject-title .edit {
   right: 16px;
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 
 /* XProperty definition */
@@ -133,12 +121,14 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 .xproperty-title h2 {
   display: block;
-  padding: 2px 20px 2px 32px;
+  padding: 2px 20px 2px 18px;
   margin: 0;
   font-size: 1em;
   font-weight: 100;
-  background: transparent url("$xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')") 14px center no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')") 0 center no-repeat;
   min-height: 16px;
+  flex-grow: 1;
+}
 }
 .xproperty-title label {
   font-size: 60%;
@@ -158,34 +148,29 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 
 /* Expand/collapse */
 /* We need to increase the priority of the rule in order to override Toucan styles */
-#body .collapsable .xobject-title h3,
-#body .collapsable .xclass-title,
-#body .collapsable .xproperty-title {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')");
-  background-position: 0px center;
-  background-repeat: no-repeat;
+#body .collapsable > .xobject-title,
+#body .collapsable > .xclass-title,
+#body .collapsable > .xproperty-title {
+  display: flex;
+  gap: .5em;
+  align-items: baseline;
 }
-#body .collapsed .xobject-title h3,
-#body .collapsed .xclass-title,
-#body .collapsed .xproperty-title {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png')");
+#body .collapsable > .xobject-title > .toggle-collapsable,
+#body .collapsable > .xclass-title > .toggle-collapsable,
+#body .collapsable > .xproperty-title > .toggle-collapsable{
+  transform:  rotate(0);
 }
+
+#body .collapsable.collapsed > .xobject-title > .toggle-collapsable,
+#body .collapsable.collapsed > .xclass-title > .toggle-collapsable,
+#body .collapsable.collapsed > .xproperty-title > .toggle-collapsable{
+  transform:  rotate(-90deg);
+}
+
 .xclass.collapsed .xclass-content, .xobject.collapsed .xobject-content, .xproperty.collapsed .xproperty-content {
   display: none;
 }
-.collapsable dt .collapser {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')");
-  background-position: -4px center;
-  background-repeat: no-repeat;
-  cursor: default;
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  vertical-align: middle;
-}
-.collapsable dt .collapsed {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png')");
-}
+
 /* Disabled/Deprecated */
 .disabled {
   opacity: 0.5;
@@ -199,31 +184,24 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .syncProperties {
   font-weight: 900;
   display: inline-block;
-  padding: 2px 0 2px 22px;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/cross.png')") left center no-repeat;
-  margin-left: -22px;
+  padding: 2px 0 2px 0;
 }
 /* XProperty tools */
 .disabletool label {
   font-weight: 900;
 }
 .xproperty-title .tools {
-  float: right;
-  margin-top: -18px;
+  align-self: center;
 }
 .xproperty-title .tools .tool {
   width: 16px;
   height: 16px;
   float: left;
   background: transparent none center no-repeat;
-  text-indent: -9999px;
-}
-.xproperty-title .tools .delete {
-  background-image: url($xwiki.getSkinFile('icons/silk/cross.png'));
 }
 .xproperty-title .tools .move {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/move.png'));
   cursor: move;
+  color: $theme.linkColor;
 }
 .dragged .xproperty-title {
   border: 1px solid $theme.borderColor;
@@ -265,11 +243,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .PasswordClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
 }
-#add_xproperty {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") left center no-repeat;
-  padding-left: 14px;
-  margin-left: 16px;
-}
 #body #xwikiclassproperties #add_xproperty label,
 #body #xwikiobjects #add_xobject label {
   margin: 0;
@@ -302,8 +275,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .add_xobject-title {
   width: auto;
   font-style: italic;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") no-repeat left center;
-  display: inline;
   color: $theme.linkColor;
   font-size: 80%;
   padding-top: 2px;

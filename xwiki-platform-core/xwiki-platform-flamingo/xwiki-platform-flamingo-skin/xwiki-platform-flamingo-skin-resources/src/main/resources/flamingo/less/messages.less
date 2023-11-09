@@ -6,7 +6,7 @@ span.successmessage, span.errormessage, span.warningmessage, span.infomessage,
 span.box { // Used by: Inline boxes
   padding: 0 floor(@font-size-base * 0.2);
   & > img {
-    // Style the icons of the message boxes
+    // Style the icons for the inline boxes
     margin: 0 .5rem;
     vertical-align: sub;
   }
@@ -17,11 +17,14 @@ div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  // Increase font-weight only for the title (inline boxes don't display a title)
+  font-weight: bold;
   
   & > p {
     // Content of the message box
     flex-grow: 1;
     flex-basis: 98%;
+    font-weight: normal;
   }
   
   & > img {

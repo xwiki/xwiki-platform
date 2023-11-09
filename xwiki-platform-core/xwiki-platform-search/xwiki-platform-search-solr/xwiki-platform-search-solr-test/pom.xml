@@ -39,14 +39,9 @@
   </properties>
   <modules>
     <module>xwiki-platform-search-solr-test-pageobjects</module>
+    <module>xwiki-platform-search-solr-test-utils</module>
   </modules>
   <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-search-solr-test-utils</module>
-      </modules>
-    </profile>
     <profile>
       <id>docker</id>
       <modules>

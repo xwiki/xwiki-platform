@@ -20,11 +20,9 @@
 package org.xwiki.index.tree.internal.nestedpages;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -55,26 +54,22 @@ public class FarmTreeNode extends AbstractEntityTreeNode
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
     {
-        List<String> wikiIds = new ArrayList<String>(getWikiIds());
-        List<String> children = new ArrayList<String>();
-        for (String wikiId : subList(wikiIds, offset, limit)) {
-            children.add("wiki:" + wikiId);
-        }
-        return children;
+        return subList(getWikiDescriptors(), offset, limit).stream()
+            .map(wikiDescriptor -> "wiki:" + wikiDescriptor.getId()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
     public int getChildCount(String nodeId)
     {
-        return getWikiIds().size();
+        return getWikiDescriptors().size();
     }
 
-    private Collection<String> getWikiIds()
+    private List<WikiDescriptor> getWikiDescriptors()
     {
         try {
-            Set<String> wikiIds = new LinkedHashSet<>(this.wikiDescriptorManager.getAllIds());
-            wikiIds.removeAll(getExcludedWikis());
-            return wikiIds;
+            return this.wikiDescriptorManager.getAll().stream()
+                .filter(wikiDescriptor -> !getExcludedWikis().contains(wikiDescriptor.getId()))
+                .collect(Collectors.toList());
         } catch (WikiManagerException e) {
             this.logger.warn("Failed to retrieve the list of wikis. Root cause [{}].",
                 ExceptionUtils.getRootCauseMessage(e));

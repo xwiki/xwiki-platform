@@ -21,14 +21,14 @@
 define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   'use strict';
 
-  var baseURL = module.config().contextPath + '/rest/liveData/sources/';
+  const baseURL = module.config().contextPath + '/rest/liveData/sources/';
 
   let entriesRequest;
 
-  var getEntries = function(liveDataQuery) {
-    var entriesURL = getEntriesURL(liveDataQuery.source);
+  function getEntries(liveDataQuery) {
+    const entriesURL = getEntriesURL(liveDataQuery.source);
 
-    var parameters = {
+    const parameters = {
       properties: liveDataQuery.properties,
       offset: liveDataQuery.offset,
       limit: liveDataQuery.limit
@@ -68,7 +68,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
       .finally(cleanupRequest.bind(null, entriesRequest));
   };
 
-  var cleanupRequest = function(requestToClean) {
+  function cleanupRequest(requestToClean) {
     // We reset the request object to null for two reasons:
     // - avoid keeping an object we don't need anymore in memory, preventing it from being GC'd
     // - make sure we don't attempt to abort a request that already terminated.
@@ -82,13 +82,13 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     }
   };
 
-  var getEntriesURL = function(source) {
-    var entriesURL = baseURL + encodeURIComponent(source.id) + '/entries';
+  function getEntriesURL(source) {
+    const entriesURL = baseURL + encodeURIComponent(source.id) + '/entries';
     return addSourcePathParameters(source, entriesURL);
   };
 
   function addSourcePathParameters(source, url) {
-    var parameters = {
+    const parameters = {
       // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
       timestamp: new Date().getTime(),
       namespace: `wiki:${XWiki.currentWiki}`
@@ -104,7 +104,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     const url = `${baseURL}${encodedSourceId}/entries/${encodedEntryId}/properties/${encodedPropertyId}`
     return addSourcePathParameters(source, url);
   }
-  
+
   function getEntryURL(source, entryId) {
     const encodedSourceId = encodeURIComponent(source.id);
     const encodedEntryId = encodeURIComponent(entryId);
@@ -112,7 +112,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     return addSourcePathParameters(source, url);
   }
 
-  var addSourceParameters = function(parameters, source) {
+  function addSourceParameters(parameters, source) {
     $.each(source, (key, value) => {
       if (key !== 'id') {
         parameters['sourceParams.' + key] = value;
@@ -120,17 +120,17 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     });
   };
 
-  var toLiveData = function(data) {
+  function toLiveData(data) {
     return {
       count: data.count,
       entries: data.entries.map(entry => entry.values)
     };
   };
 
-  var addEntry = function(source, entry) {
+  function addEntry(source, entry) {
     return Promise.resolve($.post(getEntriesURL(source), entry).then(e => e.values));
   };
-  
+
   function updateEntry(source, entryId, values) {
     return Promise.resolve($.ajax({
       type: 'PUT',
@@ -140,17 +140,13 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     }));
   }
 
-  var getTranslations = function(locale, prefix, keys) {
+  function getTranslations(locale, prefix, key) {
     const translationsURL = `${module.config().contextPath}/rest/wikis/${XWiki.currentWiki}/localization/translations`;
-    return Promise.resolve($.getJSON(translationsURL, $.param({
-      locale: locale,
-      prefix: prefix,
-      key: keys
-    }, true)).then(toTranslationsMap));
+    return Promise.resolve($.getJSON(translationsURL, $.param({locale, prefix, key}, true)).then(toTranslationsMap));
   };
 
-  var toTranslationsMap = function(responseJSON) {
-    var translationsMap = {};
+  function toTranslationsMap(responseJSON) {
+    const translationsMap = {};
     responseJSON.translations?.forEach(translation => translationsMap[translation.key] = translation.rawSource);
     return translationsMap;
   };
@@ -167,7 +163,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   return {
     getEntries,
     addEntry,
-    updateEntry, 
+    updateEntry,
     updateEntryProperty,
     getTranslations
   };

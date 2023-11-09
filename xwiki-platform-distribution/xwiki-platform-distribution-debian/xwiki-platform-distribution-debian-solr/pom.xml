@@ -32,12 +32,7 @@
   <packaging>pom</packaging>
   <description>XWiki Solr cores</description>
   <modules>
-    <module>xwiki-platform-distribution-debian-solr-events</module>
-    <module>xwiki-platform-distribution-debian-solr-extension_index</module>
-    <module>xwiki-platform-distribution-debian-solr-ratings</module>
-    <module>xwiki-platform-distribution-debian-solr-search</module>
-    
-    <!-- Keep solr-all module at the end since it depends on the others -->
+    <module>xwiki-platform-distribution-debian-solr-cores</module>
     <module>xwiki-platform-distribution-debian-solr-all</module>
   </modules>
 </project>

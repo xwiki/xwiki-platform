@@ -27,6 +27,7 @@ import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.xwiki.attachment.AttachmentAccessWrapper;
@@ -36,8 +37,6 @@ import org.xwiki.attachment.validation.AttachmentValidationStep;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.tika.internal.TikaUtils;
 
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
@@ -75,12 +74,12 @@ public class MimetypeAttachmentValidationStep implements AttachmentValidationSte
             if (hasAllowedMimetypes && !checkMimetype(allowedMimetypes, mimeType)
                 || hasBlockerMimetypes && checkMimetype(blockerMimetypes, mimeType)) {
                 throw new AttachmentValidationException(String.format("Invalid mimetype [%s]", mimeType),
-                    SC_UNSUPPORTED_MEDIA_TYPE, "attachment.validation.mimetype.rejected",
+                    Response.Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(), "attachment.validation.mimetype.rejected",
                     List.of(allowedMimetypes, blockerMimetypes), null);
             }
         } catch (IOException e) {
             throw new AttachmentValidationException(String.format("Failed to read the input stream for [%s]", wrapper),
-                e, SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
+                e, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "attachment.validation.inputStream.error");
         }
     }
 

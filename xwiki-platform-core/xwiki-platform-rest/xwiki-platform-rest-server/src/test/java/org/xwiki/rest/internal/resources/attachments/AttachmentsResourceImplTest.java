@@ -20,15 +20,14 @@
 package org.xwiki.rest.internal.resources.attachments;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-import javax.activation.DataHandler;
 import javax.inject.Named;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -38,6 +37,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -104,6 +105,9 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
     @MockComponent
     @Named("compactwiki")
     EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @MockComponent
+    private Container container;
 
     @Mock
     private UserReference userReference;
@@ -189,14 +193,13 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        Multipart multipart = createMultipart("bio.txt", "myBio.txt", "blah", "text/plain");
+        mockRequest("bio.txt", "myBio.txt", "blah", "text/plain");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
             eq(false), eq(false))).thenReturn(attachment);
 
-        Response response =
-            this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, false, true);
+        Response response = this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", false, true);
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         assertEquals(attachment, response.getEntity());
@@ -221,17 +224,16 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        Multipart multipart = createMultipart("bio.txt", "myBio.txt", "blah", "text/plain");
+        mockRequest("bio.txt", "myBio.txt", "blah", "text/plain");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
             eq(false), eq(false))).thenReturn(attachment);
 
-        doThrow(AttachmentValidationException.class).when(this.attachmentValidator)
-            .validateAttachment(any());
+        doThrow(AttachmentValidationException.class).when(this.attachmentValidator).validateAttachment(any());
 
         assertThrows(AttachmentValidationException.class,
-            () -> this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, false, true));
+            () -> this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", false, true));
 
         // The cached document should not have been modified.
         assertNull(cachedDocument.getAttachment("myBio.txt"));
@@ -249,14 +251,13 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         AttachmentReference attachmentReference = new AttachmentReference("pom.xml", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
 
-        Multipart multipart = createMultipart("pom.xml", null, "<project/>", "application/xml");
+        mockRequest("pom.xml", null, "<project/>", "application/xml");
 
         Attachment attachment = mock(Attachment.class);
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
             eq(true), eq(false))).thenReturn(attachment);
 
-        Response response =
-            this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, true, false);
+        Response response = this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", true, false);
 
         assertEquals(Status.ACCEPTED.getStatusCode(), response.getStatus());
         assertEquals(attachment, response.getEntity());
@@ -268,27 +269,29 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         assertEquals("<project/>", IOUtils.toString(xwikiAttachment.getContentInputStream(this.xcontext)));
     }
 
-    private Multipart createMultipart(String originalFileName, String overwritingFileName, String content,
-        String mediaType) throws Exception
+    private void mockRequest(String originalFileName, String overwritingFileName, String content, String mediaType)
+        throws Exception
     {
-        MimeMultipart multipart = new MimeMultipart();
+        HttpServletRequest request = mock();
+
+        Collection<Part> parts = new ArrayList<>();
 
         if (originalFileName != null && content != null) {
-            MimeBodyPart filePart = new MimeBodyPart();
-            filePart.setDisposition("form-data");
-            filePart.setFileName(originalFileName);
-            filePart.setDataHandler(new DataHandler(new ByteArrayDataSource(content, mediaType)));
-            multipart.addBodyPart(filePart);
+            Part filePart = mock();
+            when(filePart.getSubmittedFileName()).thenReturn(originalFileName);
+            when(filePart.getInputStream()).thenReturn(new ByteArrayInputStream(content.getBytes()));
+            parts.add(filePart);
         }
 
         if (overwritingFileName != null) {
-            MimeBodyPart fileNamePart = new MimeBodyPart();
-            fileNamePart.setHeader("Content-Disposition", "form-data; name=\"filename\"");
-            fileNamePart.setText(overwritingFileName);
-            multipart.addBodyPart(fileNamePart);
+            Part fileNamePart = mock();
+            when(fileNamePart.getName()).thenReturn("filename");
+            when(fileNamePart.getInputStream()).thenReturn(new ByteArrayInputStream(overwritingFileName.getBytes()));
+            parts.add(fileNamePart);
         }
 
-        return multipart;
+        when(request.getParts()).thenReturn(parts);
+        when(this.container.getRequest()).thenReturn(new ServletRequest(request));
     }
 
     private XWikiDocument prepareXWikiDocument(DocumentReference documentReference, String serializedDocumentReference,

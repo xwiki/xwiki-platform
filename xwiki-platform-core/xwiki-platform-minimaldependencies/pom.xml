@@ -226,6 +226,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-jersey</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- FIXME: $services.security is a replacement for $xwiki.hasAccessLevel() and we have started using it in the
      Velocity templates. Most of these templates are located in platform-web and currently we don't declare the
      dependencies of platform-web (they are declared in the distribution) thus we need to bundle this script service

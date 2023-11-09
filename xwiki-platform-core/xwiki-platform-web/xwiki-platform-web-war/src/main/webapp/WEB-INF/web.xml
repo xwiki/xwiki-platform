@@ -192,7 +192,7 @@
 
   <filter-mapping>
     <filter-name>XWikiRESTContextInitializationFilter</filter-name>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
@@ -278,17 +278,16 @@
     -->
   </servlet>
 
-  <!-- RESTful API Restlet servlet -->
+  <!-- REST Service -->
   <servlet>
-    <servlet-name>RestletServlet</servlet-name>
-    <servlet-class>
-      org.xwiki.rest.internal.XWikiRestletServlet
-    </servlet-class>
+    <servlet-name>RESTServlet</servlet-name>
+    <servlet-class>org.xwiki.rest.jersey.internal.XWikiRESTServlet</servlet-class>
+    <multipart-config/>
   </servlet>
 
   <!-- RESTful API mapping -->
   <servlet-mapping>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 

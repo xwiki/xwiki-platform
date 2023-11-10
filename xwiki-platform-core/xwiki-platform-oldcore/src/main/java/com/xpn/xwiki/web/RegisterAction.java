@@ -93,7 +93,7 @@ public class RegisterAction extends XWikiAction
             int result;
             // Let's verify that the user submitted the right CAPTCHA (if required).
             if (!verifyCaptcha(context, xwiki)) {
-                result = -10;
+                result = -9;
             } else {
                 if (this.registrationConfiguration.isEmailValidationRequired()) {
                     result = xwiki.createUser(true, "edit", context);

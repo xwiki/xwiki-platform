@@ -3944,9 +3944,6 @@ public class XWiki implements EventListener
             if (!password.equals(password2)) {
                 // TODO: throw wrong password exception
                 return -2;
-            } else if (!StringUtils.isEmpty(password) &&
-                !resetPasswordManager.isPasswordCompliantWithRegistrationRules(password)) {
-                return -9;
             }
 
             if ((template != null) && (!template.equals(""))) {

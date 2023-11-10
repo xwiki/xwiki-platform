@@ -419,18 +419,11 @@
       {{translation key="core.register.userAlreadyExists"/}}
     #elseif($reg == -4)
       {{translation key="core.register.invalidUsername"/}}
+    #elseif ($reg == -9)
+      {{translation key="core.register.invalidCaptcha"/}}
+    ## Note that -10 is reserved already (see api.XWiki#createUser)
     #elseif($reg == -11)
       {{translation key="core.register.mailSenderWronglyConfigured"/}}
-    #elseif($reg == -9)
-      #set ($passwordRules = $services.security.registration.passwordRules)
-      #set ($ruleDescriptions = [])
-      #foreach ($rule in $passwordRules)
-        #set ($discard = $ruleDescriptions.add($services.localization.render("security.registration.passwordRules.${rule}.description")))
-      #end
-      #set ($rules = $stringtool.join($ruleDescriptions, ','))
-      {{translation key="security.registration.passwordRules.errorMessage" parameters="$rules"/}}
-    #elseif ($reg == -10)
-      {{translation key="core.register.invalidCaptcha"/}}
     #else
       {{translation key="core.register.registerFailed" parameters="$reg"/}}
     #end

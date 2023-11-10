@@ -31,15 +31,10 @@
     #elseif ($reg == -8)
       #error($services.localization.render('core.register.userAlreadyExists'))
     #elseif ($reg == -9)
-      #set ($passwordRules = $services.security.registration.passwordRules)
-      #set ($ruleDescriptions = [])
-      #foreach ($rule in $passwordRules)
-        #set ($discard = $ruleDescriptions.add($services.localization.render("security.registration.passwordRules.${rule}.description")))
-      #end
-      #set ($rules = $stringtool.join($ruleDescriptions, ','))
-      #error($services.localization.render('security.registration.passwordRules.errorMessage', [$rules]))
-    #elseif ($reg == -10)
       #error($services.localization.render('core.register.invalidCaptcha'))
+    ## Note that -10 is reserved already (see api.XWiki#createUser)
+    #elseif($reg == -11)
+      #error($services.localization.render('core.register.mailSenderWronglyConfigured'))
     #else
       #error($services.localization.render('core.register.registerFailed', [$reg]))
     #end

@@ -305,6 +305,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 #end
 #*
  * Server side validation, this is necessary for security and because not everyone has Javascript
+ * FIXME: In the future this should be removed and a Java API should be used instead, and probably perform the check
+ *  directly in the RegisterAction.
  *
  * @param $fields The array of fields to validate.
  * @param $request An XWikiRequest object which made the register request, used to get parameters.

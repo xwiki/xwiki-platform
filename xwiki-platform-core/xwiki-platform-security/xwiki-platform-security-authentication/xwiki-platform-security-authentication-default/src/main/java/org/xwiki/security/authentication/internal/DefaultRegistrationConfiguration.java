@@ -31,7 +31,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.security.authentication.RegistrationConfiguration;
 
 /**
- * Default implementation of {@link RegistrationConfiguration} based on the document XWiki.RegistrationConfiguration.
+ * Default implementation of {@link RegistrationConfiguration} based on the document {@code XWiki.RegistrationConfiguration}.
  *
  * @version $Id$
  * @since 15.10RC1

@@ -14,26 +14,34 @@ span.box { // Used by: Inline boxes
 
 div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
   // Used by: message boxes
-  display: flex;
+  display: inline-grid;
+  gap: .5rem;
   align-items: center;
-  flex-wrap: wrap;
-  // Increase font-weight only for the title (inline boxes don't display a title)
-  font-weight: bold;
-  
-  & > p {
-    // Content of the message box
-    flex-grow: 1;
-    flex-basis: 98%;
-    font-weight: normal;
-  }
+  padding-left: .5rem;
   
   & > img {
-    // We need to do a hack with the flex because the title is not contained in its own node, 
-    // it's just there in a textnode.
-    min-width: 2%;
-    max-height: 16px;
-    object-fit: contain;
+    grid-row-start: 1;
+    grid-row-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 2;
   }
+  
+  & > p {
+    grid-row-start: 2;
+    grid-row-end: 3;
+    grid-column-start: 2;
+    grid-column-end: 3;
+  }
+  
+  & > .box-title {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    font-weight: bold;
+  }
+  
+  
   
 }
 

@@ -172,7 +172,7 @@ class RequiredRightsEditConfirmationCheckerTest
         RequiredRightsChangedResult result = new RequiredRightsChangedResult();
         result.addToAdded(mock(RequiredRightAnalysisResult.class));
         when(this.requiredRightsChangedFilter.filter(any(), any())).thenReturn(result);
-        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, false)),
+        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, false, result)),
             this.editConfirmationChecker.check());
         verify(this.templateManager)
             .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");

@@ -19,9 +19,12 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
@@ -35,13 +38,13 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @since 15.9RC1
  */
 @Unstable
-public class RequiredRightAnalysisResult
+public class RequiredRightAnalysisResult implements Serializable
 {
     private final EntityReference entityReference;
 
-    private final Supplier<Block> summaryMessageProvider;
+    private final transient Supplier<Block> summaryMessageProvider;
 
-    private final Supplier<Block> detailedMessageProvider;
+    private final transient Supplier<Block> detailedMessageProvider;
 
     private final List<RequiredRight> requiredRights;
 
@@ -104,5 +107,33 @@ public class RequiredRightAnalysisResult
             .append("detailedMessageProvider", this.getDetailedMessage())
             .append("requiredRights", this.getRequiredRights())
             .toString();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        RequiredRightAnalysisResult that = (RequiredRightAnalysisResult) object;
+
+        return new EqualsBuilder()
+            .append(this.entityReference, that.entityReference)
+            .append(this.requiredRights, that.requiredRights)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.entityReference)
+            .append(this.requiredRights)
+            .toHashCode();
     }
 }

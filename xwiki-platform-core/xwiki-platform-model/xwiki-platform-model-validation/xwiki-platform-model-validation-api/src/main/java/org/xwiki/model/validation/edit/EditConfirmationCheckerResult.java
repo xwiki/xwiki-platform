@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.validation.edit;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.rendering.block.Block;
@@ -39,16 +41,35 @@ public class EditConfirmationCheckerResult
 
     private final boolean isError;
 
+    private final Serializable cache;
+
     /**
      * Constructs a new object with the specified message and error status.
+     * This constructor initializes the {@code cache} with a {@code null} value,
+     * meaning that the result can't be forced.
      *
      * @param message the message associated with the result
      * @param isError the error status of the result, error when {@code true}, warning otherwise
      */
     public EditConfirmationCheckerResult(Block message, boolean isError)
     {
+        this(message, isError, null);
+    }
+
+    /**
+     * Constructs a new object with the specified message, an error status, and a cache result object.
+     *
+     * @param message the message associated with the result
+     * @param isError the error status of the result, error when {@code true}, warning otherwise
+     * @param cache the cache value associated with the result
+     * @since 15.10RC1
+     */
+    @Unstable
+    public EditConfirmationCheckerResult(Block message, boolean isError, Serializable cache)
+    {
         this.message = message;
         this.isError = isError;
+        this.cache = cache;
     }
 
     /**
@@ -71,6 +92,17 @@ public class EditConfirmationCheckerResult
         return this.isError;
     }
 
+    /**
+     * The value used to represent this result in the cache.
+     * This is used to know if a given result has already been presented to the user, and ignored.
+     *
+     * @return the value used to represent this result in the cache
+     */
+    public Serializable getCache()
+    {
+        return this.cache;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -87,6 +119,7 @@ public class EditConfirmationCheckerResult
         return new EqualsBuilder()
             .append(this.isError, that.isError)
             .append(this.message, that.message)
+            .append(this.cache, that.cache)
             .isEquals();
     }
 
@@ -96,6 +129,7 @@ public class EditConfirmationCheckerResult
         return new HashCodeBuilder(17, 37)
             .append(this.message)
             .append(this.isError)
+            .append(this.cache)
             .toHashCode();
     }
 
@@ -105,6 +139,7 @@ public class EditConfirmationCheckerResult
         return new XWikiToStringBuilder(this)
             .append("message", getMessage())
             .append("isError", isError())
+            .append("cache", getCache())
             .toString();
     }
 }

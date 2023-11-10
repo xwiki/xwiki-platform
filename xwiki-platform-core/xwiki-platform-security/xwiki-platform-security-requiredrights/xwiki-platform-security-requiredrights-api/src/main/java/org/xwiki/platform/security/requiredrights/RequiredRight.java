@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -36,7 +37,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @since 15.9RC1
  */
 @Unstable
-public class RequiredRight
+public class RequiredRight implements Serializable
 {
     /**
      * Programming right required.

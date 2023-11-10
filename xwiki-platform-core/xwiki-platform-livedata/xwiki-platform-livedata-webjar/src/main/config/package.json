@@ -28,7 +28,7 @@
     "@vue/cli-service": "5.0.8",
     "@vue/cli-plugin-unit-jest": "5.0.8",
     "@babel/eslint-parser": "7.23.3",
-    "eslint": "8.52.0",
+    "eslint": "8.53.0",
     "eslint-plugin-vue": "9.18.1",
     "less": "4.2.0",
     "less-loader": "11.1.3",

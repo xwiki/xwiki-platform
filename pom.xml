@@ -1070,6 +1070,10 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>*</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+          </exclusion>
           <!-- We use slf4j in XWiki -->
           <exclusion>
             <groupId>org.apache.logging.log4j</groupId>

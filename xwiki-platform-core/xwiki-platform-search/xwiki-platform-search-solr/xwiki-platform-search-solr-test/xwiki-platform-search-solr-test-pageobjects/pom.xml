@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,31 +18,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-search-solr-test</artifactId>
     <version>15.10-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-solr</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - Search - Solr - Parent POM</name>
-  <description>Parent project for the Solr search engine.</description>
-  <modules>
-    <module>xwiki-platform-search-solr-server</module>
-    <module>xwiki-platform-search-solr-api</module>
-    <module>xwiki-platform-search-solr-query</module>
-    <module>xwiki-platform-search-solr-rest</module>
-    <module>xwiki-platform-search-solr-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-search-solr-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-search-solr-test-pageobjects</artifactId>
+  <name>XWiki Platform - Search - Solr - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Search - Solr - Tests - Page Objects</description>
+  <properties>
+    <!-- None of the classes is valid -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

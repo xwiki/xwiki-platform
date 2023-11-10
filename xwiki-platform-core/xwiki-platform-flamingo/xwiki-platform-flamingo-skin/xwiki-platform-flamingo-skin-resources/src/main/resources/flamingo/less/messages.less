@@ -16,12 +16,13 @@ span.box {
 // Used by: message boxes
 div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
   display: inline-grid;
-  gap: .5rem;
+  gap: .2rem .5rem;
   align-items: center;
   padding-left: .5rem;
+  padding-top: .5rem;
   
   & > img {
-    grid-area: ~"1/1/3/2";
+    grid-area: ~"1/1/2/2";
   }
   
   & > .box-title {

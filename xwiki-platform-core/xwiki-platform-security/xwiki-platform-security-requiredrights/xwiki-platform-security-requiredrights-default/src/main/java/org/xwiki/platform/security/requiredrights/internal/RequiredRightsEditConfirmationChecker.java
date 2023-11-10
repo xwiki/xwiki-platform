@@ -97,7 +97,7 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
                     RequiredRightsChangedResult analysisResults =
                         this.requiredRightsChangedFilter.filter(tdoc.getAuthors(), this.analyzer.analyze(tdoc));
                     // Do nothing if the analysis does not produce results relevant for the current user.
-                    if (!analysisResults.hasAdded() && !analysisResults.hasRemoved()) {
+                    if (analysisResults.isEmpty()) {
                         checkResult = Optional.empty();
                     } else {
                         this.scriptContextManager.getCurrentScriptContext()

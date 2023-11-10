@@ -134,7 +134,7 @@ class RequiredRightsChangedFilterTest
             new RequiredRightAnalysisResult(objectReference, () -> null, () -> null, requiredRights);
         List<RequiredRightAnalysisResult> resultList = List.of(requiredRightAnalysisResult);
         RequiredRightsChangedResult expected = new RequiredRightsChangedResult();
-        expected.addToAdded(requiredRightAnalysisResult);
+        expected.add(requiredRightAnalysisResult, SCRIPT, true, false);
         assertEquals(expected, this.filter.filter(this.documentAuthors, resultList));
     }
 
@@ -150,7 +150,7 @@ class RequiredRightsChangedFilterTest
             new RequiredRightAnalysisResult(entityReference, () -> null, () -> null, requiredRights);
         List<RequiredRightAnalysisResult> resultList = List.of(requiredRightAnalysisResult);
         RequiredRightsChangedResult expected = new RequiredRightsChangedResult();
-        expected.addToRemoved(requiredRightAnalysisResult);
+        expected.add(requiredRightAnalysisResult, SCRIPT, false, false);
         assertEquals(expected, this.filter.filter(this.documentAuthors, resultList));
     }
 

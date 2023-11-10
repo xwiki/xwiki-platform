@@ -2,8 +2,9 @@
 // Messages
 // --------------------------------------------------
 
+// Used by: Inline boxes
 span.successmessage, span.errormessage, span.warningmessage, span.infomessage, 
-span.box { // Used by: Inline boxes
+span.box { 
   padding: 0 floor(@font-size-base * 0.2);
   & > img {
     // Style the icons for the inline boxes
@@ -12,37 +13,26 @@ span.box { // Used by: Inline boxes
   }
 }
 
+// Used by: message boxes
 div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
-  // Used by: message boxes
   display: inline-grid;
   gap: .5rem;
   align-items: center;
   padding-left: .5rem;
   
   & > img {
-    grid-row-start: 1;
-    grid-row-end: 3;
-    grid-column-start: 1;
-    grid-column-end: 2;
-  }
-  
-  & > p {
-    grid-row-start: 2;
-    grid-row-end: 3;
-    grid-column-start: 2;
-    grid-column-end: 3;
+    grid-area: ~"1/1/3/2";
   }
   
   & > .box-title {
-    grid-row-start: 1;
-    grid-row-end: 2;
-    grid-column-start: 2;
-    grid-column-end: 3;
+    grid-area: ~"1/2/2/3";
     font-weight: bold;
   }
   
-  
-  
+  // Main message content
+  & > p {
+    grid-area: ~"2/2/3/3";
+  }
 }
 
 .box, .plainmessage, // Used by: Code Macro, Success Macro, etc.

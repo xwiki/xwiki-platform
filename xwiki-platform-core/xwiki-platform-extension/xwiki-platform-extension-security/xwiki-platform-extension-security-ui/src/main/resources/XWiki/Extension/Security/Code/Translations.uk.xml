@@ -44,6 +44,7 @@ extension.security.admin.generalWarning=Будь ласка, зверніть у
 extension.security.admin.configuration.title=Налаштування
 extension.security.admin.environment.explanation=Розширення, перелічені в цьому розділі, мають відомі вразливості, але знаходяться поза сферою дії XWiki. Це означає, що розширення надаються середовищем, у якому запущено XWiki (наприклад, його механізм сервлетів), і їх неможливо виправити шляхом оновлення XWiki чи одного з його розширень.
 extension.security.notification.message=Ми виявили {0} розширень із відомими уразливостями безпеки, подробиці див. у звіті {1}
+extension.security.experimental.warning=Знайте, що це розширення наразі є експериментальним і може призвести до представлення помилкового аналізу. Таким чином, наведені результати слід уважно прочитати, перш ніж вживанням будь-яких дій. 
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Сканування ввімкнено
 XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Якщо не обрано, сканування безпеки більше не виконуватиметься
 XWiki.Extension.Security.Code.ConfigClass_scanDelay=Затримка сканування

@@ -345,6 +345,12 @@ already take care of padding and shadow. */
   .nav;
   .nav-tabs;
   margin: 0;
+
+  > li.active > a:focus {
+    border-top-color: @xwiki-border-color;
+    border-left-color: @xwiki-border-color;
+    border-right-color: @xwiki-border-color;
+  }
 }
 
 #docExtrasTabsUl {

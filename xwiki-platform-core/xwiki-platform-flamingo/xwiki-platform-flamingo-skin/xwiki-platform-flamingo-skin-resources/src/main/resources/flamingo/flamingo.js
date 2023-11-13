@@ -89,7 +89,6 @@ require(['jquery'], function($) {
         // We use the drawer-transitioning class to make sure the transition to 
         // slide in is not shortcut when showing the modal
         drawerContainer.addClass('drawer-transitioning');
-        drawerOpener.attr('aria-expanded', 'true');
         drawerContainer.get(0).showModal();
         drawerContainer.removeClass('drawer-transitioning');
         // The drawer can be closed by pressing the ESC key
@@ -98,8 +97,9 @@ require(['jquery'], function($) {
             closeDrawer();
           }
         });
+        // At last, we indicate the new state of the drawer on the opener
+        drawerOpener.attr('aria-expanded', 'true');
       }).on('drawer' + index + '.closed', function (event) {
-        drawerOpener.attr('aria-expanded', 'false');
         // When the drawer is closed, collapse sub items
         drawerContainer.find('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
 
@@ -107,6 +107,8 @@ require(['jquery'], function($) {
           drawerContainer.get(0).close();
           drawerContainer.removeClass('drawer-transitioning');
           drawerContainer.get(0).removeEventListener('transitionend', waitTransition);
+          // At last, we indicate the new state of the drawer on the opener
+          drawerOpener.attr('aria-expanded', 'false');
         }
 
         // We use the drawer-transitioning class to give time for the hide modal transition to play.

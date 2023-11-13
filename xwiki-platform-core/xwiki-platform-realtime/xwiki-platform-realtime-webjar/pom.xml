@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>chainpad-webjar</artifactId>
-      <version>5.2.5-1</version>
+      <version>5.2.7</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

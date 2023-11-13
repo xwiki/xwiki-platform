@@ -219,16 +219,16 @@ define('xwiki-realtime-loader', [
     const content = createModalContent(Messages['requestDialog.prompt'],
       Messages.get('requestDialog.create', info.name));
 
-    // Initialize auto-accept
-    const autoAccept = $('<p></p>').appendTo(content);
+    // Initialize auto-create
+    const autoCreate = $('<p></p>').appendTo(content);
     let i = 30;
     const interval = setInterval(function() {
       i--;
-      autoAccept.html(Messages['requestDialog.autoAccept'] + i + 's');
+      autoCreate.text(Messages.get('requestDialog.autoCreate', i));
       if (i <= 0) {
         buttonCreate.click();
         clearInterval(interval);
-        autoAccept.remove();
+        autoCreate.remove();
       }
     }, 1000);
 

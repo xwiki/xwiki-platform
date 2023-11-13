@@ -43,7 +43,7 @@ define('xwiki-realtime-messages', {
     'requestDialog.prompt',
     'requestDialog.create',
     'requestDialog.reject',
-    'requestDialog.autoAccept',
+    'requestDialog.autoCreate',
     'requestDialog.saveError',
     'rejectDialog.prompt',
     'rejectDialog.invalid',

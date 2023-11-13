@@ -99,7 +99,6 @@
           @dblclick="resetColumnSize"
           @keydown.esc="resetColumnSize"
         >
-          <XWikiIcon :icon-descriptor="{name: 'arrow_out'}"/>
         </button>
       </div>
     </th>
@@ -302,32 +301,40 @@ export default {
 .layout-table th.draggable-item {
   display: table-cell;
   min-width: 4rem;
-  overflow: hidden;
-  padding: 8px 2px 8px 2px;
+  padding: 8px 0 8px 4px;
 }
 
 .layout-table .column-name {
   cursor: pointer;
   display: flex;
+  justify-content: space-between;
 }
 
 .layout-table .handle, .layout-table .resize-handle {
   padding: 0;
+}
+
+.layout-table .handle {
   opacity: 1;
   width: @target-size-minimum;
   height: @target-size-minimum;
   user-select: none;
 }
 
-.layout-table .handle {
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
+.layout-table .resize-handle {
+  cursor: col-resize;
+  min-width: 0;
+  width: 0;
+  border-width: 2px;
+  border-radius: 0;
+  margin-left: 4px;
 }
 
-.layout-table .resize-handle {
-    cursor: ew-resize;
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
+.layout-table .column-name:focus-within .resize-handle,
+.layout-table .column-name:hover .resize-handle {
+    border-color: darken(@btn-default-bg, 20%);
+    border-width: 3px;
+    margin-left: 2px;
 }
 
 .layout-table .property-name {

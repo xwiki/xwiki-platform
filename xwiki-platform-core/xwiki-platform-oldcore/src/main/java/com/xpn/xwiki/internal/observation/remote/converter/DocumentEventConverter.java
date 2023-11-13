@@ -21,8 +21,6 @@ package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -33,19 +31,13 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.LocaleUtils;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
 /**
  * Convert all document event to remote events and back to local events.
@@ -114,42 +106,5 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         }
 
         return false;
-    }
-
-    private XWikiDocument unserializeDeletedDocument(Serializable remoteData, XWikiContext xcontext)
-        throws XWikiException
-    {
-        Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
-
-        DocumentReference docReference = (DocumentReference) remoteDataMap.get(DOC_NAME);
-        Locale locale = LocaleUtils.toLocale((String) remoteDataMap.get(DOC_LANGUAGE));
-
-        XWikiDocument doc = new XWikiDocument(docReference, locale);
-        XWikiDocument origDoc = new XWikiDocument(docReference, locale);
-
-        // We have to get deleted document from the trash (hoping it is in the trash...)
-        XWiki xwiki = xcontext.getWiki();
-        XWikiRecycleBinStoreInterface store = xwiki.getRecycleBinStore();
-        XWikiDeletedDocument[] deletedDocuments = store.getAllDeletedDocuments(origDoc, xcontext, true);
-        if (deletedDocuments != null && deletedDocuments.length > 0) {
-            long index = deletedDocuments[0].getId();
-            try {
-                origDoc = store.restoreFromRecycleBin(index, xcontext, true);
-            } catch (Exception e) {
-                // The deleted document can be found in the database but there is an issue with the content
-                // Better a partial notification than no notification at all (what most listeners care about is the
-                // reference of the deleted document)
-                this.logger.error("Failed to restore deleted document [{}]", docReference, e);
-            }
-        }
-
-        doc.setOriginalDocument(origDoc);
-
-        // Force invalidating the cache to be sure it return (and keep) the right document
-        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
-            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(doc);
-        }
-
-        return doc;
     }
 }

@@ -296,7 +296,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-observation-remote</artifactId>
+      <artifactId>xwiki-platform-observation-remote-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

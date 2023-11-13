@@ -39,7 +39,7 @@ import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 
 /**
- * Register to {@link org.xwiki.observation.ObservationManager} for all events and send them to
+ * Register to {@link ObservationManager} for all events and send them to
  * {@link RemoteObservationManager}.
  *
  * @version $Id$

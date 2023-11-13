@@ -771,7 +771,7 @@ path=$services.webjars.url('org.webjars.npm:hyper-json', 'hyperjson.js')</parame
     </property>
     <property>
       <parameters>id=diff-dom
-path=$services.webjars.url('org.webjars.bower:diff-dom', 'browser/diffDOM.js')
+path=$services.webjars.url('org.webjars.npm:diff-dom', 'browser/diffDOM.js')
 exports=diffDOM</parameters>
     </property>
     <property>

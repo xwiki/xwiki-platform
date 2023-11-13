@@ -61,9 +61,12 @@ public class EditConfirmationScriptService implements ScriptService
     }
 
     /**
-     * Force the last {@link EditConfirmationChecker} components checks. Persist their last results, new checks are
-     * skipped as long as they match the persisted results.
+     * Force the last {@link EditConfirmationChecker} components checks. The results of the last call to
+     * {@link #check()} are persisted, and new checks are skipped as long as they match the persisted results.
+     *
+     * @since 15.10RC1
      */
+    @Unstable
     public void force()
     {
         this.editConfirmationCheckersManager.force();

@@ -34,7 +34,7 @@ import org.xwiki.model.validation.edit.EditConfirmationCheckerResults;
 public interface EditConfirmationCheckersManager
 {
     /**
-     * @return the aggregated results of the {@link EditConfirmationChecker} components.
+     * @return the aggregated results of the {@link EditConfirmationChecker} components
      */
     EditConfirmationCheckerResults check();
 

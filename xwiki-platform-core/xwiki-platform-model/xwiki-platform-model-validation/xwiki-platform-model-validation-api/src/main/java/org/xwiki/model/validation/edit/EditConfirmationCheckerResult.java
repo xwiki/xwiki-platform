@@ -20,6 +20,7 @@
 package org.xwiki.model.validation.edit;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -41,15 +42,20 @@ public class EditConfirmationCheckerResult
 
     private final boolean isError;
 
-    private final Serializable cache;
+    /**
+     * This value must be {@link Serializable} to be stored in the forces cache (e.g., an HTTP session).
+     */
+    private final Serializable skipValue;
 
     /**
-     * Constructs a new object with the specified message and error status.
-     * This constructor initializes the {@code cache} with a {@code null} value,
-     * meaning that the result can't be forced.
+     * Constructs a new object with the specified message and error status. This constructor initializes the
+     * {@code skipValue} with a {@code null} value, meaning that the result can't be skipped (i.e., if
+     * {@link EditConfirmationChecker#check()} does not return {@link Optional#empty()}, the result will always be
+     * presented to the user).
      *
      * @param message the message associated with the result
      * @param isError the error status of the result, error when {@code true}, warning otherwise
+     * @see #EditConfirmationCheckerResult(Block, boolean, Serializable)
      */
     public EditConfirmationCheckerResult(Block message, boolean isError)
     {
@@ -61,15 +67,18 @@ public class EditConfirmationCheckerResult
      *
      * @param message the message associated with the result
      * @param isError the error status of the result, error when {@code true}, warning otherwise
-     * @param cache the cache value associated with the result
+     * @param skipValue the skip value associated with the result. When {@code null} the result can't be skipped
+     *     (i.e., if {@link EditConfirmationChecker#check()} does not return {@link Optional#empty()}, the result will
+     *     always be presented to the user).
+     * @see #EditConfirmationCheckerResult(Block, boolean, Serializable)
      * @since 15.10RC1
      */
     @Unstable
-    public EditConfirmationCheckerResult(Block message, boolean isError, Serializable cache)
+    public EditConfirmationCheckerResult(Block message, boolean isError, Serializable skipValue)
     {
         this.message = message;
         this.isError = isError;
-        this.cache = cache;
+        this.skipValue = skipValue;
     }
 
     /**
@@ -93,14 +102,14 @@ public class EditConfirmationCheckerResult
     }
 
     /**
-     * The value used to represent this result in the cache.
-     * This is used to know if a given result has already been presented to the user, and ignored.
+     * The value used to check if a result can be skipped. This is used when checking if the content of the force cache
+     * is still equal to the current result.
      *
-     * @return the value used to represent this result in the cache
+     * @return the skip value of the current result
      */
-    public Serializable getCache()
+    public Serializable getSkipValue()
     {
-        return this.cache;
+        return this.skipValue;
     }
 
     @Override
@@ -119,7 +128,7 @@ public class EditConfirmationCheckerResult
         return new EqualsBuilder()
             .append(this.isError, that.isError)
             .append(this.message, that.message)
-            .append(this.cache, that.cache)
+            .append(this.skipValue, that.skipValue)
             .isEquals();
     }
 
@@ -129,7 +138,7 @@ public class EditConfirmationCheckerResult
         return new HashCodeBuilder(17, 37)
             .append(this.message)
             .append(this.isError)
-            .append(this.cache)
+            .append(this.skipValue)
             .toHashCode();
     }
 
@@ -139,7 +148,7 @@ public class EditConfirmationCheckerResult
         return new XWikiToStringBuilder(this)
             .append("message", getMessage())
             .append("isError", isError())
-            .append("cache", getCache())
+            .append("skipValue", getSkipValue())
             .toString();
     }
 }

@@ -45,8 +45,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
- * Default implementation of {@link EditConfirmationCheckersManager}.
- * Stores the forced results in the user's HTTP session.
+ * Default implementation of {@link EditConfirmationCheckersManager}. Stores the forced results in the user's HTTP
+ * session.
  *
  * @version $Id$
  * @since 15.10RC1
@@ -92,17 +92,19 @@ public class DefaultEditConfirmationCheckersManager implements EditConfirmationC
                 Optional<EditConfirmationCheckerResult> check = checker.check();
                 check.ifPresentOrElse(editConfirmationCheckerResult -> {
                     if (!result.isError()) {
-                        session.setAttribute(cachedKey, editConfirmationCheckerResult.getCache());
+                        session.setAttribute(cachedKey, editConfirmationCheckerResult.getSkipValue());
                     }
                 }, () -> session.removeAttribute(cachedKey));
                 Optional<EditConfirmationCheckerResult> checkResult = check
-                    .flatMap(r -> {
-                        // We ignore the result if this is not an error, the cache value is not null, and the  
-                        // cache value stored in session is equal to the cache value returned by the analysis.
-                        if (!r.isError() && forcedValue != null && Objects.equals(r.getCache(), forcedValue)) {
+                    .flatMap(editConfirmationCheckerResult -> {
+                        // We ignore the result if this is not an error, the forced value is not null, and the  
+                        // forced value stored in session is equal to the skip value returned by the analysis.
+                        if (!editConfirmationCheckerResult.isError() && forcedValue != null
+                            && Objects.equals(editConfirmationCheckerResult.getSkipValue(), forcedValue))
+                        {
                             return Optional.empty();
                         } else {
-                            return Optional.of(r);
+                            return Optional.of(editConfirmationCheckerResult);
                         }
                     });
                 return checkResult.stream();

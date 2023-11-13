@@ -163,5 +163,12 @@
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
+    <!-- Required to test edit_macros.vm -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

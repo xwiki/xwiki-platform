@@ -47,6 +47,10 @@
       <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

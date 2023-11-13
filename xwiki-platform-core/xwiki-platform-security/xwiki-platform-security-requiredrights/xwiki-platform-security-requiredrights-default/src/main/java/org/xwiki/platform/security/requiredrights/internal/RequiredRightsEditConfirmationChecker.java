@@ -104,7 +104,7 @@ public class RequiredRightsEditConfirmationChecker implements EditConfirmationCh
                             .setAttribute("analysisResults", analysisResults, GLOBAL_SCOPE);
                         XDOM message = this.templateManager
                             .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");
-                        checkResult = Optional.of(new EditConfirmationCheckerResult(message, false));
+                        checkResult = Optional.of(new EditConfirmationCheckerResult(message, false, analysisResults));
                     }
                 } catch (RequiredRightsException e) {
                     this.scriptContextManager.getCurrentScriptContext().setAttribute("exception", e, GLOBAL_SCOPE);

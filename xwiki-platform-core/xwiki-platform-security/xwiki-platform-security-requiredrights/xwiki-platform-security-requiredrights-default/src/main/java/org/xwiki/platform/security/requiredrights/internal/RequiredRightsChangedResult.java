@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.security.requiredrights.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +44,7 @@ import static java.util.Locale.ROOT;
  * @version $Id$
  * @since 15.9RC1
  */
-public class RequiredRightsChangedResult
+public class RequiredRightsChangedResult implements Serializable
 {
     private final List<RequiredRightAnalysisResult> added = new ArrayList<>();
 

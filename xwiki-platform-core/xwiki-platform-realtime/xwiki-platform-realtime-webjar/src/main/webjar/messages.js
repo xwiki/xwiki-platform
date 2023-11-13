@@ -50,7 +50,7 @@ define('xwiki-realtime-messages', {
     'rejectDialog.ok',
     'conflictsWarning',
     'conflictsWarningInfoRt',
-    'conflictsWarningInfo',
+    'conflictsWarningSuggestion',
     'conflictsWarningInfoLink',
     'wsError',
     'wsErrorInfo',

@@ -402,10 +402,16 @@ define('xwiki-realtime-loader', [
     const editor = isEditorCompatible();
     if (!module.isRt && editor) {
       $('<br/>').appendTo($warning);
-      $('<span></span>').html(Messages.conflictsWarningInfo).appendTo($warning);
-      $('<a></a>', {
+      // The parameter is the edit link but we can't inject it directly because we need to escape the HTML.
+      let suggestion = Messages.get('conflictsWarningSuggestion', '__0__');
+      // The translation message shouldn't contain HTML.
+      suggestion = $('<div></div>').text(suggestion).html();
+      // The link label shouldn't contain HTML.
+      const link = $('<a></a>', {
         href: getRTEditorURL(window.location.href, availableRt[editor].info)
-      }).text(Messages.conflictsWarningInfoLink).appendTo($warning);
+      }).text(Messages.conflictsWarningInfoLink).prop('outerHTML');
+      // Inject the link and append the suggestion.
+      $warning.append(suggestion.replace('__0__', link));
     } else if (module.isRt) {
       $('<br/>').appendTo($warning);
       $('<span></span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);

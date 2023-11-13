@@ -58,8 +58,8 @@ define('xwiki-realtime-toolbar', [
     return $('<div class="rt-user-list"></div>').attr('id', uid()).appendTo($container)[0];
   }
 
+  const userDisplayMode = Config.toolbarUserlist;
   function getOtherUsers(myUserId, userList, usersData) {
-    const displayConfig = Config.toolbarUserlist;
     return userList.map(function(userId) {
       // Collect the user data.
       const userData = usersData?.[userId];
@@ -85,7 +85,7 @@ define('xwiki-realtime-toolbar', [
       // Filter out users without data.
       return user;
     // Display each user. We don't need to separate the users with comma if the avatars are displayed.
-    }).map(displayUser).join((displayConfig === 'avatar' || displayConfig === 'both') ? '' : ', ');
+    }).map(displayUser).join((userDisplayMode === 'avatar' || userDisplayMode === 'both') ? '' : ', ');
   }
 
   function displayUser(user) {
@@ -95,10 +95,10 @@ define('xwiki-realtime-toolbar', [
       'data-id': user.id,
       'data-reference': user.reference
     });
-    if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {
+    if (userDisplayMode === undefined || userDisplayMode === 'name' || userDisplayMode === 'both') {
       userDisplay.text(user.name);
     }
-    if (displayConfig === 'avatar' || displayConfig === 'both') {
+    if (userDisplayMode === 'avatar' || userDisplayMode === 'both') {
       if (user.avatar) {
         $('<img class="rt-user-avatar"/>').attr({
           src: user.avatar,

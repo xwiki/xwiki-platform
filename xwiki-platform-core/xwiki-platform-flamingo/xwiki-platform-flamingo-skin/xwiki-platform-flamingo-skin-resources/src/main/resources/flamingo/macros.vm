@@ -484,7 +484,7 @@
     #end
   </div>
 </div>
-<hr/>
+<hr class="separator"/>
 #end
 
 #**

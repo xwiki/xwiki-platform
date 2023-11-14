@@ -3939,7 +3939,7 @@ public class XWiki implements EventListener
                 }
             }
 
-            if ((!password.equals(password2))) {
+            if (!password.equals(password2)) {
                 // TODO: throw wrong password exception
                 return -2;
             }

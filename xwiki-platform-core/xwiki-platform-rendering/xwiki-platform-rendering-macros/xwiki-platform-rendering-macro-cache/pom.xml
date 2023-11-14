@@ -44,7 +44,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-requiredrights-macro</artifactId>
-      <version>${platform.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

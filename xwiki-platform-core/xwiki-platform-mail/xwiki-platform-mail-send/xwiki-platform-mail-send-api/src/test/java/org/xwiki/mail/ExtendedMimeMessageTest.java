@@ -20,6 +20,8 @@
 package org.xwiki.mail;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -34,6 +36,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -184,4 +187,13 @@ class ExtendedMimeMessageTest
         assertEquals("MessagingException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 
+    @Test
+    void getAddExtraData()
+    {
+        ExtendedMimeMessage message = new ExtendedMimeMessage();
+        List<String> extraData = new ArrayList<>();
+        message.addExtraData("test", extraData);
+
+        assertSame(extraData, message.getExtraData("test"));
+    }
 }

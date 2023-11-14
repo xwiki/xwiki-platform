@@ -19,11 +19,13 @@
  */
 package org.xwiki.extension.index.internal;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.DefaultExtensionComponent;
 import org.xwiki.extension.Extension;
@@ -140,6 +142,22 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
      */
     public static final String SECURITY_ADVICE = "security_advice";
 
+    /**
+     * When {@code true} the extension is core.
+     */
+    public static final String IS_CORE_EXTENSION = "is_core_extension";
+
+    /**
+     * When {@code true} the extension has been reviewed and is not is considered as safe, {@code false} otherwise.
+     */
+    public static final String IS_REVIEWED_SAFE = "security_is_reviewed_safe";
+
+    /**
+     * Contains the explanations regarding why a given vulnerability can be considered as safe. This field contains an
+     * array of html contents.
+     */
+    public static final String IS_SAFE_EXPLANATIONS = "security_is_safe_explanations";
+
     private static final Pattern COMPONENT_SPECIAL_CHARS = Pattern.compile("[<>,]+");
 
     private static final long SCHEMA_VERSION_12_9 = 120900000;
@@ -150,10 +168,14 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
 
     private static final long SCHEMA_VERSION_15_5 = 150500000;
 
+    private static final long SCHEMA_VERSION_15_6 = 150600000;
+
+    private static final long SCHEMA_VERSION_15_9 = 150900000;
+
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_15_5;
+        return SCHEMA_VERSION_15_9;
     }
 
     @Override
@@ -226,6 +248,25 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             setPIntField(SECURITY_CVE_COUNT, false, false);
             setStringField(SECURITY_FIX_VERSION, false, false);
             setStringField(SECURITY_ADVICE, false, false);
+        }
+
+        if (cversion < SCHEMA_VERSION_15_6) {
+            setBooleanField(IS_REVIEWED_SAFE, true, false);
+            setStringField(IS_SAFE_EXPLANATIONS, true, false);
+        }
+
+        if (cversion < SCHEMA_VERSION_15_9) {
+            setBooleanField(IS_CORE_EXTENSION, false, false);
+            if (cversion >= SCHEMA_VERSION_15_6) {
+                // Cleanup previously required field from the index.
+                try {
+                    this.client.deleteByQuery("is_installed:[* TO *] OR is_from_environment:[* TO *]");
+                } catch (SolrServerException | IOException e) {
+                    throw new SolrException("Failed to cleanup is_installed field", e);
+                }
+                deleteField("is_installed", false);
+                deleteField("is_from_environment", false);
+            }
         }
     }
 

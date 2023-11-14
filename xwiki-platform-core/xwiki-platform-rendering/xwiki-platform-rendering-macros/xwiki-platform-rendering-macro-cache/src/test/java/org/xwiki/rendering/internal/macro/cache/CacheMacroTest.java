@@ -21,11 +21,19 @@ package org.xwiki.rendering.internal.macro.cache;
 
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroContentParser;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.cache.CacheMacroParameters;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -35,8 +43,9 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link CacheMacro}.
@@ -222,5 +231,18 @@ public class CacheMacroTest extends AbstractComponentTestCase
         context.setTransformation(macroTransformation);
         context.setSyntax(Syntax.XWIKI_2_0);
         return context;
+    }
+
+    @Test
+    public void prepare() throws MacroPreparationException
+    {
+        MacroBlock macroBlock = new MacroBlock("content", Map.of(), "content", false);
+        XDOM xdom = new XDOM(List.of(macroBlock));
+        xdom.getMetaData().addMetaData(MetaData.SYNTAX, Syntax.PLAIN_1_0);
+
+        this.cacheMacro.prepare(macroBlock);
+
+        assertEquals(new XDOM(List.of(new ParagraphBlock(List.of(new WordBlock("content"))))),
+            macroBlock.getAttribute(MacroContentParser.ATTRIBUTE_PREPARE_CONTENT_XDOM));
     }
 }

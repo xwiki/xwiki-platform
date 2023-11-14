@@ -163,22 +163,6 @@ thead.xwiki-livetable-display-header td.xwiki-livetable-display-header-filter se
   margin: 0;
   padding: 0 0 0 2px;
 }
-
-.xwiki-livetable-display-header-filter-date-combobox {
-  position: relative;
-}
-
-.xwiki-livetable-display-header-filter-date-combobox > .daterangepicker {
-  left: 50%;
-  top: 100%;
-  transform: translate(-50%, 0);
-  background: $theme.pageContentBackgroundColor;
-}
-
-.xwiki-livetable-display-header-filter-date-combobox > .daterangepicker .ranges li.active {
-  background: $theme.menuBackgroundColor;
-}
-
 .xwiki-livetable-filter-active {
   background-color: $theme.highlightColor !important;
   font-weight: bold;
@@ -423,7 +407,7 @@ table.livetable {
 
 /* Round the infomessage border and change the padding to uniformize the messages style with Live Data. */
 .xwiki-livetable-container div div.infomessage {
-  border-radius: 4px;
+  border-radius: 7px;
   padding: 0.1em 1em;
 }
 /* </Decoration> */

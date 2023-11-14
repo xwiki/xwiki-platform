@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.template;
 
+import java.time.Instant;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.filter.input.StringInputSource;
 
@@ -31,11 +33,19 @@ import com.xpn.xwiki.internal.skin.AbstractInputSourceResource;
 public class StringResource extends AbstractInputSourceResource<StringInputSource>
 {
     /**
+     * @param id the identifier of the template
      * @param resourceContent the content of the resource
+     * @since 15.9
      */
-    public StringResource(String resourceContent)
+    public StringResource(String id, String resourceContent)
     {
-        super(null, "StringResource", null, new StringInputSource(resourceContent));
+        super(id, "StringResource", null, new StringInputSource(resourceContent));
+    }
+
+    @Override
+    public Instant getInstant() throws Exception
+    {
+        return null;
     }
 
     @Override

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>15.6-SNAPSHOT</version>
+    <version>15.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data</name>
@@ -172,9 +172,16 @@
               <artifactId>xwiki-platform-ratings-api</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <!-- Search Solr API contains migration -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-search-solr-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Extension index contains migration -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-extension-index</artifactId>
               <version>${project.version}</version>
             </dependency>
           </dependencies>

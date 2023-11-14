@@ -1,0 +1,55 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.SolrSearchAdminIndexingUserTranslations" locale="uk">
+  <web>XWiki</web>
+  <name>SolrSearchAdminIndexingUserTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.SolrSearchAdminIndexingUser</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Admin Indexing User Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## keys for the admin section navigation
+admin.indexinguser=Користувач індексації
+admin.indexinguser.description=Вибрати користувача, з яким індексувати вміст вікі.
+
+## keys use on the admin "indexing user" page itself
+admin.indexinguser.explanation.part1=Індексатор виконується як фонове завдання, зазвичай без жодного користувача, пов'язаного з ним. Для сторінок, заголовок яких обчислюється за допомогою "шаблону" документа, обчислений заголовок не відображатиметься, якщо "шаблон" невидимий для анонімних користувачів. Особливо це стосується випадків, коли вікі закрито. У такому разі, напр. результати пошуку для профілів користувачів відображаються не з їхньою обчисленою назвою «Профіль "ім'я" "прізвище"», а лише з назвою сторінки (зазвичай «логін»).
+admin.indexinguser.explanation.part2=Щоб мати можливість показувати той самий заголовок у результатах пошуку, необхідно надати індексатору користувача, який має доступ до сторінок шаблону. Рекомендується створити окремий заблокований обліковий запис без спеціальних прав.
+admin.indexinguser.explanation.security.head=Примітка про безпеку:
+admin.indexinguser.explanation.security.content=Використання облікового запису з більшими правами перегляду, ніж інші користувачі, може спричинити витік назв сторінок зі сторінок, які ці користувачі зазвичай не бачать.
+admin.indexinguser.explanation.part3=Зміни в цьому параметрі застосовуються лише до сторінок, проіндексованих після внесення змін; для послідовного застосування змін рекомендується повне пере індексування.
+admin.indexinguser.explanation.mainwikionly=Це налаштування можна зробити лише в головній вікі, оскільки індексатор Solr запускається з основної вікі.
+
+## keys used by the configuration class
+XWiki.SolrSearchAdminIndexingUser_indexer.description=Користувач індексації
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=Обліковий запис користувача XWiki, що використовується для індексації сторінок у фоновому режимі.
+</content>
+  </xwikidoc>

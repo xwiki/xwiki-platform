@@ -44,8 +44,6 @@ public class ImageDialogSelectModal extends BaseModal
 
     private ImageDialogSelectModal(By selector)
     {
-        super(selector);
-
         // This modal is added on demand so we can't rely on the base constructor to remove the "fade in" effect. We
         // have to do the wait ourselves.
         getDriver().waitUntilElementIsVisible(selector);
@@ -59,7 +57,9 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogEditModal clickSelect()
     {
-        WebElement element = this.container.findElement(By.className("btn-primary"));
+        // We find the primary button in the footer because the Selection modal has other primary buttons.
+        // See XWIKI-21206.
+        WebElement element = this.container.findElement(By.cssSelector(".modal-footer .btn-primary"));
         getDriver().waitUntilElementIsEnabled(element);
         element.click();
         return new ImageDialogEditModal();

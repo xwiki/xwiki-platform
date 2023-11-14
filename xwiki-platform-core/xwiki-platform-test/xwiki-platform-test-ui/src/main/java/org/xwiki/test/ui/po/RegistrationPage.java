@@ -19,6 +19,10 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -46,5 +50,24 @@ public class RegistrationPage extends AbstractRegistrationPage
     public void clickRegister()
     {
         this.submitButton.click();
+    }
+
+    /**
+     * @since 14.10.17
+     * @since 15.5.3
+     * @since 15.8RC1
+     *
+     * @return the registration success message if present after submitting the registration form
+     */
+    public Optional<String> getRegistrationSuccessMessage()
+    {
+        List<WebElement> infos = getDriver().findElements(By.className("infomessage"));
+        for (WebElement info : infos) {
+            if (info.getText().contains("Registration successful.")) {
+                return Optional.of(info.getText());
+            }
+        }
+
+        return Optional.empty();
     }
 }

@@ -87,7 +87,10 @@ public class PDFExportOptionsModal extends BaseModal
     {
         super(By.id("pdfExportOptions"));
 
-        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.exportButtonLocator));
+        // We need to use a bigger timeout because the PDF generator might not be ready (e.g. if the remote Chrome was
+        // restarted so we need to reconnect to it).
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.exportButtonLocator),
+            PDFExportAdministrationSectionPage.CHROME_INIT_TIMEOUT);
         getDriver().waitUntilElementHasAttributeValue(By.id("pdfExportOptions"), "data-state", "loaded");
     }
 

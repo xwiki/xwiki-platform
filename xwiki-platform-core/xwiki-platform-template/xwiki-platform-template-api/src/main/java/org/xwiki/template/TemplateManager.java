@@ -438,10 +438,30 @@ public interface TemplateManager
      * @return the template
      * @throws Exception if an error occurred during template instantiation
      * @since 14.0RC1
+     * @deprecated use {@link #createStringTemplate(String, String, DocumentReference, DocumentReference)} instead
      */
+    @Deprecated(since = "15.9RC1")
     default Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
         throws Exception
     {
         return createStringTemplate(content, author);
+    }
+
+    /**
+     * Create a new template using a given content and a specific author and source document.
+     *
+     * @param id the identifier of the template
+     * @param content the template content
+     * @param author the template author
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return the template
+     * @throws Exception if an error occurred during template instantiation
+     * @since 15.9
+     */
+    default Template createStringTemplate(String id, String content, DocumentReference author,
+        DocumentReference sourceReference) throws Exception
+    {
+        return createStringTemplate(content, author, sourceReference);
     }
 }

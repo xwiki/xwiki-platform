@@ -120,7 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('xe.panels.spaces'))
+#navigationPanelHeader($services.localization.render('xe.panels.spaces'))
 #if ($hasAdmin)
   {{warning}}Deprecated: Replace with [[Navigation&gt;&gt;Panels.Navigation]] Panel{{/warning}}
 #end

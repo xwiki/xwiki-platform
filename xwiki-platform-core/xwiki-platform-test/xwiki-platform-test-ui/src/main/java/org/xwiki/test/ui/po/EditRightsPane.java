@@ -141,8 +141,8 @@ public class EditRightsPane extends BaseElement
     {
         final By iconLocator =
             By.xpath(String.format(
-                "//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '%s')]"
-                    + "/../../td[@data-title='%s']/button/img",
+                "//*[@id='usersandgroupstable-display']//tr[./td[@class='username']//a[contains(@href, '%s')]]"
+                    + "/td[@data-title='%s']/button/img",
                 entityName, rightName));
         final WebElement icon = getDriver().findElement(iconLocator);
         return State.getButtonImageState(icon);
@@ -151,7 +151,7 @@ public class EditRightsPane extends BaseElement
     public boolean hasEntity(String entityName)
     {
         return getDriver().hasElementWithoutWaiting(
-            By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '" + entityName
+            By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']//a[contains(@href, '" + entityName
             + "')]"));
     }
 
@@ -211,8 +211,8 @@ public class EditRightsPane extends BaseElement
                 "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
             final By buttonLocator =
                 By.xpath(
-                    String.format("//*[@id='usersandgroupstable-display']//td[@class='username']"
-                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/button/img", entityName, rightName));
+                    String.format("//*[@id='usersandgroupstable-display']//tr[./td[@class='username']"
+                        + "//a[contains(@href, '%s')]]/td[@data-title='%s']/button/img", entityName, rightName));
             final WebElement button = getDriver().findElement(buttonLocator);
             State currentState = State.getButtonImageState(button).getNextState();
             button.click();

@@ -65,7 +65,7 @@ public class DeleteVersionsAction extends XWikiAction
         Version v2 = versions[1];
 
         if (v1 != null && v2 != null) {
-            context.getWiki().deleteDocumentVersions(tdoc, v1.toString(), v2.toString(), context);
+            context.getWiki().deleteDocumentVersions(tdoc, v1.toString(), v2.toString(), true, context);
         }
 
         sendRedirect(context);

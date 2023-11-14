@@ -50,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -112,6 +113,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.edit.EditConfiguration;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -151,11 +153,7 @@ import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.Block.Axes;
-import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
@@ -490,6 +488,8 @@ public class XWiki implements EventListener
     private AuthorizationManager authorizationManager;
 
     private ReferenceUpdater referenceUpdater;
+
+    private CoreExtensionRepository coreExtensions;
 
     private ConfigurationSource getConfiguration()
     {
@@ -857,6 +857,15 @@ public class XWiki implements EventListener
         }
 
         return this.authServices;
+    }
+
+    public CoreExtensionRepository getCoreExtensionRepository()
+    {
+        if (this.coreExtensions == null) {
+            this.coreExtensions = Utils.getComponent(CoreExtensionRepository.class);
+        }
+
+        return this.coreExtensions;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1648,21 +1657,23 @@ public class XWiki implements EventListener
     public String getVersion()
     {
         if (this.version == null) {
-            try {
-                InputStream is = getResourceAsStream(VERSION_FILE);
-                try {
+            try (InputStream is = getResourceAsStream(VERSION_FILE)) {
+                if (is != null) {
                     XWikiConfig properties = new XWikiConfig(is);
                     this.version = properties.getProperty(VERSION_FILE_PROPERTY);
-                } finally {
-                    IOUtils.closeQuietly(is);
                 }
             } catch (Exception e) {
-                // Failed to retrieve the version, log a warning and default to "Unknown"
-                LOGGER.warn("Failed to retrieve XWiki's version from [" + VERSION_FILE + "], using the ["
-                    + VERSION_FILE_PROPERTY + "] property.", e);
-                this.version = "Unknown version";
+                // Failed to retrieve the version, log a warning
+                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property.", VERSION_FILE,
+                    VERSION_FILE_PROPERTY, e);
+            }
+
+            if (this.version == null) {
+                // Fallback on the version of the environment extension
+                this.version = getCoreExtensionRepository().getEnvironmentExtension().getId().getVersion().getValue();
             }
         }
+
         return this.version;
     }
 
@@ -3575,9 +3586,6 @@ public class XWiki implements EventListener
 
     public void flushCache(XWikiContext context)
     {
-        // We need to flush the virtual wiki list
-        this.initializedWikis = new ConcurrentHashMap<>();
-
         // We need to flush the group service cache
         if (this.groupService != null) {
             this.groupService.flushCache();
@@ -4698,6 +4706,27 @@ public class XWiki implements EventListener
     public void deleteDocumentVersions(XWikiDocument document, String version1, String version2, XWikiContext context)
         throws XWikiException
     {
+        deleteDocumentVersions(document, version1, version2, false, context);
+    }
+
+    /**
+     * Delete a range of versions from a document history.
+     * 
+     * @param document the document from which to delete versions
+     * @param version1 one end of the versions range to remove
+     * @param version2 the other end of the versions range to remove
+     * @param triggeredByUser {@code true} if the API is called directly by an action from a user and checks need to
+     * be performed for the rollback (See: {@link #rollback(XWikiDocument, String, boolean, boolean, XWikiContext)}).
+     * @param context the XWiki context
+     * @throws XWikiException
+     * @since 14.10.17
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public void deleteDocumentVersions(XWikiDocument document, String version1, String version2,
+        boolean triggeredByUser, XWikiContext context) throws XWikiException
+    {
         Version v1 = new Version(version1);
         Version v2 = new Version(version2);
 
@@ -4739,16 +4768,21 @@ public class XWiki implements EventListener
                 .notify(new DocumentVersionRangeDeletingEvent(document.getDocumentReferenceWithLocale(),
                     lowerBound.toString(), upperBound.toString()), document, context);
 
-            // Update the archive
-            context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
-            document.setDocumentArchive(archive);
 
             // There are still some versions left.
             // If we delete the most recent (current) version, then rollback to latest undeleted version.
+            // We do that right before updating the archive, in case it would cancel the action.
             Version previousVersion = archive.getLatestVersion();
             if (!document.getRCSVersion().equals(previousVersion)) {
-                context.getWiki().rollback(document, previousVersion.toString(), false, context);
+                context.getWiki().rollback(document, previousVersion.toString(), false, triggeredByUser, context);
             }
+
+            // Update the archive
+            context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
+            // Make sure the cached document archive is updated too
+            XWikiDocument cachedDocument =
+                context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context);
+            cachedDocument.setDocumentArchive(archive);
 
             // Notify after versions delete
             getObservationManager()
@@ -7556,6 +7590,25 @@ public class XWiki implements EventListener
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision, XWikiContext xcontext)
         throws XWikiException
     {
+        return rollback(tdoc, rev, addRevision, false, xcontext);
+    }
+
+    /**
+     * @param tdoc the document to rollback
+     * @param rev the revision to rollback to
+     * @param addRevision true if a new revision should be created
+     * @param triggeredByUser {@code true} if this has been triggered by a user and a check needs to be performed
+     * @param xcontext the XWiki context
+     * @return the new document
+     * @throws XWikiException when failing to rollback the document
+     * @since 14.10.17
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision,
+        boolean triggeredByUser, XWikiContext xcontext) throws XWikiException
+    {
         LOGGER.debug("Rolling back [{}] to version [{}]", tdoc, rev);
 
         // Clone the document before modifying to avoid concurrency issues
@@ -7631,6 +7684,10 @@ public class XWiki implements EventListener
             // Make sure to save a new version even if nothing changed
             document.setMetaDataDirty(true);
             message = localizePlainOrKey("core.comment.rollback", rev);
+        }
+
+        if (triggeredByUser) {
+            checkSavingDocument(xcontext.getUserReference(), document, message, false, xcontext);
         }
 
         ObservationManager om = getObservationManager();
@@ -7772,11 +7829,10 @@ public class XWiki implements EventListener
             Block curentBlock = getRenderingContext().getCurrentBlock();
 
             if (curentBlock != null) {
-                MetaDataBlock metaDataBlock =
-                    curentBlock.getFirstBlock(new MetadataBlockMatcher(MetaData.SYNTAX), Axes.ANCESTOR_OR_SELF);
+                Optional<Syntax> syntaxMetadata = curentBlock.getSyntaxMetadata();
 
-                if (metaDataBlock != null) {
-                    return (Syntax) metaDataBlock.getMetaData().getMetaData(MetaData.SYNTAX);
+                if (syntaxMetadata.isPresent()) {
+                    return syntaxMetadata.get();
                 }
             }
         }
@@ -7849,8 +7905,8 @@ public class XWiki implements EventListener
             // If the class does not have the same reference anymore it means it's coming from a different classloader
             // which generally imply that it's coming from an extension which has been reloaded or upgraded
             // Both still need to have the same class name as otherwise it means the current class did not had anything
-            // to with with the standard configuration (some authenticators register themself)
-            if (this.authService.getClass() != authClass
+            // to do with the standard configuration (some authenticators registering themself)
+            if (authClass != null && this.authService.getClass() != authClass
                 && this.authService.getClass().getName().equals(authClass.getName())) {
                 setAuthService(authClass);
             }

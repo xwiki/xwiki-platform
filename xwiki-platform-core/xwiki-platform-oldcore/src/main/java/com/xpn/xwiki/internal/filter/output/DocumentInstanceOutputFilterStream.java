@@ -89,11 +89,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
     private FilterEventParameters currentRevisionParameters;
 
-    private XWikiDocumentOutputFilterStream getXWikiDocumentOutputFilterStream()
-    {
-        return (XWikiDocumentOutputFilterStream) this.documentListener;
-    }
-
     @Override
     protected Object createFilter() throws FilterException
     {

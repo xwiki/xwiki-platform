@@ -53,7 +53,8 @@
       'editor': 'wiki',
       'template': $request.template,
       'parent': $request.parent,
-      'title': $classTitle
+      'title': $classTitle,
+      'form_token': $services.csrf.token
     })))
     ## Stop processing, since we already sent a redirect.
     #stop

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import org.openqa.selenium.By;
@@ -280,7 +281,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementIsVisible(WebElement parentElement, final By locator)
     {
-        waitUntilElementsAreVisible(parentElement, new By[] {locator}, true);
+        waitUntilElementsAreVisible(parentElement, new By[] { locator }, true);
     }
 
     /**
@@ -452,16 +453,20 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementIsEnabled(WebElement element)
     {
-        waitUntilCondition(driver -> {
-            try {
-                return element.isEnabled();
-            } catch (NotFoundException e) {
-                return false;
-            } catch (StaleElementReferenceException e) {
-                // The element was removed from DOM in the meantime
-                return false;
-            }
-        });
+        waitUntilCondition(element, WebElement::isEnabled);
+    }
+
+    /**
+     * Waits until the given element is disabled.
+     *
+     * @param element the element to wait on
+     * @since 15.6RC1
+     * @since 15.5.1
+     * @since 14.10.15
+     */
+    public void waitUntilElementIsDisabled(WebElement element)
+    {
+        waitUntilCondition(element, Predicate.not(WebElement::isEnabled));
     }
 
     /**
@@ -679,6 +684,16 @@ public class XWikiWebDriver extends RemoteWebDriver
         executeScript(String.format("window.scrollTo(%d, %d)", xCoord, yCoord));
     }
 
+    /**
+     * Overwrites {@link WebDriver#findElement(By)} to make sure the found element is visible by scrolling it into view.
+     * This means that calling this method can have side effects on the User Interface. If the element you're looking
+     * for doesn't have to be visible in the viewport then you should use {@link #findElementWithoutScrolling(By)}
+     * instead.
+     * <p>
+     * Also node that this method is called internally by APIs such as
+     * {@code ExpectedConditions#presenceOfElementLocated()} so if you don't want the scrolling then you should
+     * implement your own {@link ExpectedCondition} using {@link #findElementWithoutScrolling(By)}.
+     */
     @Override
     public WebElement findElement(By by)
     {
@@ -928,5 +943,19 @@ public class XWikiWebDriver extends RemoteWebDriver
         } else {
             return chainFrom.moveToElement(target, newOffsetX, newOffsetY);
         }
+    }
+
+    private void waitUntilCondition(WebElement element, Predicate<WebElement> condition)
+    {
+        waitUntilCondition(driver -> {
+            try {
+                return condition.test(element);
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
+            }
+        });
     }
 }

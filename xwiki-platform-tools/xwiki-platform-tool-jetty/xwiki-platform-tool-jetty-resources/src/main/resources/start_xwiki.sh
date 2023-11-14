@@ -214,13 +214,15 @@ if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
   fi
 fi
 
-# TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 is fixed. In summary we need this to allow the XWiki code
-# or 3rd party code to use reflection to access private variables (setAccessible() calls).
+# TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 is fixed. In summary we need this to allow the XWiki
+# code or 3rd party code to use reflection to access private variables (setAccessible() calls).
 # See https://tinyurl.com/tdhkn6mp
 if [ "$JAVA_VERSION" -gt 11 ]; then
   XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
+  XWIKI_OPENS_IO="--add-opens java.base/java.io=ALL-UNNAMED"
   XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
-  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_UTIL $XWIKI_OPTS"
+  XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.util.concurrent=ALL-UNNAMED"
+  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_IO $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENT $XWIKI_OPTS"
 fi
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command

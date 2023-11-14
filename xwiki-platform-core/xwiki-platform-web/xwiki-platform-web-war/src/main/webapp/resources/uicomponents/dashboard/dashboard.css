@@ -17,7 +17,7 @@
       {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
     ]
   })
-  border-radius: 4px 4px 0 0;
+  border-radius: 7px 7px 0 0;
   border: 1px solid $theme.borderColor;
   color: $theme.panelHeaderTextColor;
   #css_textShadow('0', '1px', '0', $theme.panelHeaderGradientColor)
@@ -26,13 +26,14 @@
 .panels .gadget, .dashboard-edit .gadget {
   background-color: $theme.panelBackgroundColor;
   margin: 1em 0;
+  border-radius: 7px;
 }
 
 .panels .gadget .gadget-content, .dashboard-edit .gadget .gadget-content {
   background-color: $theme.panelBackgroundColor;
   color: $theme.panelTextColor;
   padding: 10px 15px;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 7px 7px;
   border-width: 0 1px 1px;
   border-style: solid;
   border-color: $theme.borderColor;
@@ -97,7 +98,7 @@
 /* Add button decoration */
 .dashboard-edit .addgadget, .dashboard-edit .addcontainer {
   background: url($xwiki.getSkinFile("icons/silk/add.png")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
-  border-radius: 4px;
+  border-radius: 7px;
   color: $theme.menuAddEntryLinkColor;
   cursor: pointer;
   float: right;

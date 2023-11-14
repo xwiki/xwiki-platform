@@ -19,14 +19,21 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Default implementation for {@link AuthenticationConfiguration}.
@@ -38,12 +45,29 @@ import org.xwiki.security.authentication.AuthenticationConfiguration;
 @Singleton
 public class DefaultAuthenticationConfiguration implements AuthenticationConfiguration
 {
+    private static final String COOKIE_PREFIX = ".";
+
     /**
      * Defines from where to read the Resource configuration data.
      */
     @Inject
     @Named("authentication")
     private ConfigurationSource configuration;
+
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikiCfgConfiguration;
+
+    @Inject
+    @Named("permanent")
+    private ConfigurationSource permanentConfiguration;
+
+    @Inject
+    private Logger logger;
+
+    private String validationKey;
+
+    private String encryptionKey;
 
     @Override
     public int getMaxAuthorizedAttempts()
@@ -72,5 +96,59 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
     public boolean isAuthenticationSecurityEnabled()
     {
         return configuration.getProperty("isAuthenticationSecurityEnabled", true);
+    }
+
+    @Override
+    public List<String> getCookieDomains()
+    {
+        List<?> rawValues = this.xwikiCfgConfiguration.getProperty("xwiki.authentication.cookiedomains", List.class,
+            List.of());
+        return rawValues.stream()
+            .map(Object::toString)
+            .map(cookie -> StringUtils.startsWith(cookie, COOKIE_PREFIX) ? cookie : COOKIE_PREFIX + cookie)
+            .collect(toList());
+    }
+
+    @Override
+    public String getValidationKey()
+    {
+        if (this.validationKey == null) {
+            this.validationKey = getGeneratedKey("xwiki.authentication.validationKey");
+        }
+
+        return this.validationKey;
+    }
+
+    @Override
+    public String getEncryptionKey()
+    {
+        if (this.encryptionKey == null) {
+            this.encryptionKey = getGeneratedKey("xwiki.authentication.encryptionKey");
+        }
+
+        return this.encryptionKey;
+    }
+
+    private synchronized String getGeneratedKey(String name)
+    {
+        // Try xwiki.cfg
+        String generatedKey = this.xwikiCfgConfiguration.getProperty(name, String.class);
+
+        // Try the permanent configuration
+        if (generatedKey == null) {
+            generatedKey = this.permanentConfiguration.getProperty(name, String.class);
+        }
+
+        // If still not found, generate one and store it in the permanent configuration
+        if (generatedKey == null) {
+            generatedKey = RandomStringUtils.random(32);
+            try {
+                this.permanentConfiguration.setProperty(name, generatedKey);
+            } catch (ConfigurationSaveException e) {
+                this.logger.error("Failed to store the key, it will be generated at each restart", e);
+            }
+        }
+
+        return generatedKey;
     }
 }

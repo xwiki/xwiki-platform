@@ -158,6 +158,7 @@ class LiveDataMacroTest
         expectedConfig.append("      {'id':'table'},".trim());
         expectedConfig.append("      {'id':'cards'}".trim());
         expectedConfig.append("    ],".trim());
+        expectedConfig.append("    'defaultLayout':'table',".trim());
         expectedConfig.append("    'pagination':{".trim());
         expectedConfig.append("      'pageSizes':[15,25,50],".trim());
         expectedConfig.append("      'showPageSizeDropdown':true".trim());

@@ -19,14 +19,11 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
-import org.xwiki.test.ui.po.diff.EntityDiff;
+import org.xwiki.test.ui.po.diff.RawChanges;
+import org.xwiki.test.ui.po.diff.RenderedChanges;
 
 /**
  * Displays the differences between two versions of a document.
@@ -36,18 +33,26 @@ import org.xwiki.test.ui.po.diff.EntityDiff;
  */
 public class ChangesPane extends BaseElement
 {
-    private final static String previousChangeSelector = "#changes-info-boxes > a.changes-arrow-left";
-    private final static String nextChangeSelector = "#changes-info-boxes > a.changes-arrow-right";
+    private final static String previousChangeSelector = "#changes-info-boxes > #changes-arrows-box > a.changes-arrow-left";
+    private final static String nextChangeSelector = "#changes-info-boxes > #changes-arrows-box > a.changes-arrow-right";
     private final static String previousFromVersionSelector = "#changes-info-box-from .changes-arrow:first-child";
     private final static String nextFromVersionSelector = "#changes-info-box-from .changes-arrow:last-child";
     private final static String previousToVersionSelector = "#changes-info-box-to .changes-arrow:first-child";
     private final static String nextToVersionSelector = "#changes-info-box-to .changes-arrow:last-child";
 
-    /**
-     * The element that wraps all the changes.
-     */
-    @FindBy(id = "changescontent")
-    private WebElement container;
+    private static final String CLASS_ATTRIBUTE = "class";
+
+    @FindBy(id = "rawChanges")
+    private WebElement rawChangesContainer;
+
+    @FindBy(id = "renderedChanges")
+    private WebElement renderedChangesContainer;
+
+    @FindBy(css = "[data-hint=\"raw\"]")
+    private WebElement rawChangesButton;
+
+    @FindBy(css = "[data-hint=\"rendered\"]")
+    private WebElement renderedChangesButton;
 
     /**
      * The summary of the older version
@@ -64,11 +69,8 @@ public class ChangesPane extends BaseElement
     /**
      * The comment for the to version.
      */
-    @FindBy(id = "changes-info-comment")
+    @FindBy(css = "#changes-info-box-to .changes-info-comment")
     private WebElement changeComment;
-
-    @FindBy(className = "diff-summary")
-    private WebElement diffSummary;
 
     @FindBy(css = "#changes-info-box-to .changes-version a:not(.changes-arrow)")
     private WebElement toVersionElement;
@@ -119,47 +121,42 @@ public class ChangesPane extends BaseElement
     }
 
     /**
-     * @return {@code true} if the "No changes" message is displayed and there are no diffs displayed, {@code false}
-     *         otherwise
+     * @return the raw changes tab
+     * @since 14.10.15
+     * @since 15.5.1
+     * @since 15.6
      */
-    public boolean hasNoChanges()
+    public RawChanges getRawChanges()
     {
-        return getDriver().findElementsWithoutWaiting(container,
-            By.xpath("//div[@class = 'infomessage' and . = 'No changes']")).size() > 0
-            && getChangedEntities().isEmpty();
+        // Click on the raw changes tab.
+        this.rawChangesButton.click();
+        // Wait until the raw changes are loaded.
+        waitUntilTabIsReady(this.rawChangesContainer);
+        return new RawChanges(this.rawChangesContainer);
     }
 
     /**
-     * @return the summary for the displayed changes
+     * @return the rendered changes tab
+     * @since 14.10.15
+     * @since 15.5.1
+     * @since 15.6
      */
-    public DocumentDiffSummary getDiffSummary()
+    public RenderedChanges getRenderedChanges()
     {
-        return new DocumentDiffSummary(this.diffSummary);
+        // Click on the rendered changes tab.
+        this.renderedChangesButton.click();
+        // Wait until the rendered changes are loaded.
+        waitUntilTabIsReady(this.renderedChangesContainer);
+        return new RenderedChanges(this.renderedChangesContainer);
     }
 
-    /**
-     * @return the names (labels) for the entities that have been modified (have modified properties)
-     */
-    public List<String> getChangedEntities()
+    private void waitUntilTabIsReady(WebElement tab)
     {
-        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.xpath("//dl[@class = 'diff-group']/dt"));
-        List<String> labels = new ArrayList<>();
-        for (WebElement element : elements) {
-            labels.add(element.getText().trim());
-        }
-        return labels;
+        getDriver().waitUntilCondition(
+            driver -> tab.getAttribute(CLASS_ATTRIBUTE).contains("active")
+                && !tab.getAttribute(CLASS_ATTRIBUTE).contains("loading"));
     }
 
-    /**
-     * @param label the entity label
-     * @return the changes for the specified entity
-     */
-    public EntityDiff getEntityDiff(String label)
-    {
-        return new EntityDiff(this.container.findElement(By
-            .xpath("//dd[parent::dl[@class = 'diff-group'] and preceding-sibling::dt[normalize-space(.) = '" + label
-                + "']]")));
-    }
 
     /**
      * Click the previous change button

@@ -69,7 +69,7 @@ public class TableLayoutElement extends BaseElement
      * continuing. The default behavior being to use the typed text as the selected value without waiting.
      */
     public static final String FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS = "selectized.waitForSuggestions";
-    
+
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
 
     private static final String CLASS_HTML_ATTRIBUTE = "class";
@@ -436,7 +436,7 @@ public class TableLayoutElement extends BaseElement
      *
      * @param expectedRowCount the number of expected rows
      * @param timeout a custom timeout before stopping the wait and raising an error
-     * @param refresh if {@code true}, the 
+     * @param refresh if {@code true}, the
      */
     public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout, boolean refresh)
     {
@@ -449,7 +449,7 @@ public class TableLayoutElement extends BaseElement
             if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
-            
+
             // And the count of row is greater than the expected count.
             int count = countRows();
             LOGGER.info("TableLayoutElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
@@ -519,7 +519,12 @@ public class TableLayoutElement extends BaseElement
             }
         } else if (classes.contains("filter-text")) {
             element.clear();
-            element.sendKeys(content);
+            if (content.isEmpty()) {
+                // Make sure we generate some actual key events so LD notices the empty filter.
+                element.sendKeys(" ", Keys.BACK_SPACE);
+            } else {
+                element.sendKeys(content);
+            }
         } else if (classes.contains("filter-date")) {
             element.click();
             DateRangePicker picker = new DateRangePicker(element);
@@ -535,6 +540,23 @@ public class TableLayoutElement extends BaseElement
         if (wait) {
             waitUntilReady();
         }
+    }
+
+    /**
+     * Sort by the specified column and wait for the data to load.
+     *
+     * @param columnLabel the label of the column to sort
+     * @since 15.9RC1
+     */
+    public void sortBy(String columnLabel)
+    {
+        int columnIndex = findColumnIndex(columnLabel);
+
+        WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
+            + "(%d) .sort-icon", columnIndex)));
+        element.click();
+
+        waitUntilReady();
     }
 
     /**
@@ -599,6 +621,20 @@ public class TableLayoutElement extends BaseElement
         int columnNumber = findColumnIndex(columnLabel);
         return getRoot().findElement(
             By.cssSelector(String.format("tbody tr:nth-child(%d) td:nth-child(%d)", rowNumber, columnNumber)));
+    }
+
+    /**
+     * Return the list of {@link WebElement} of a column by its label.
+     *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
+     * @return the list of {@link WebElement} of the request column
+     * @since 15.9RC1
+     * @since 15.5.3
+     */
+    public List<WebElement> getAllCells(String columnLabel)
+    {
+        int columnNumber = findColumnIndex(columnLabel);
+        return getRoot().findElements(By.cssSelector(String.format("tbody tr td:nth-child(%d)", columnNumber)));
     }
 
     /**
@@ -742,6 +778,16 @@ public class TableLayoutElement extends BaseElement
     public Matcher<WebElement> getWebElementCellWithLinkMatcher(String text, String link)
     {
         return new CellWithLinkMatcher(text, link);
+    }
+
+    /**
+     * @param columnLabel The label of the column to check for
+     * @return If the given column exists
+     * @since 15.9RC1
+     */
+    public boolean hasColumn(String columnLabel)
+    {
+        return findColumnIndex(columnLabel) >= 0;
     }
 
     /**

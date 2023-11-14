@@ -25,12 +25,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.export.pdf.internal.job.DocumentRenderer;
 import org.xwiki.export.pdf.internal.job.PDFExportJob;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
@@ -46,6 +48,7 @@ import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.macro.toc.DefaultTocEntriesResolver;
 import org.xwiki.rendering.internal.renderer.event.EventBlockRenderer;
 import org.xwiki.rendering.internal.renderer.event.EventRenderer;
 import org.xwiki.rendering.internal.renderer.event.EventRendererFactory;
@@ -56,10 +59,13 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -69,11 +75,17 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link PDFTocMacro}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({EventBlockRenderer.class, EventRendererFactory.class, EventRenderer.class})
+@ComponentList({
+    EventBlockRenderer.class,
+    EventRendererFactory.class,
+    EventRenderer.class,
+    PdfTocTreeBuilderFactory.class,
+    DefaultTocEntriesResolver.class
+})
 class PDFTocMacroTest
 {
     @InjectMockComponents
@@ -95,6 +107,13 @@ class PDFTocMacroTest
     @MockComponent
     private LinkLabelGenerator linkLabelGenerator;
 
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManager;
+
     @Inject
     @Named("event/1.0")
     private BlockRenderer eventRenderer;
@@ -111,6 +130,12 @@ class PDFTocMacroTest
     private PDFExportJobStatus jobStatus = new PDFExportJobStatus(PDFExportJob.JOB_TYPE, this.request, null, null);
 
     private DocumentReference aliceReference = new DocumentReference("test", "Users", "Alice");
+
+    @BeforeComponent
+    void setup() throws Exception
+    {
+        when(this.contextComponentManager.get()).thenReturn(this.componentManager);
+    }
 
     @BeforeEach
     void configure()

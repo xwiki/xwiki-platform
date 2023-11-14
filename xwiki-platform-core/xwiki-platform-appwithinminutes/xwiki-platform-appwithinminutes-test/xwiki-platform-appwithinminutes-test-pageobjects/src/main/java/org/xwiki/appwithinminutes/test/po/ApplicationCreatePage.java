@@ -138,7 +138,13 @@ public class ApplicationCreatePage extends ViewPage
      */
     public ApplicationClassEditPage clickNextStep()
     {
+        // Make sure we actually wait for the page load to complete before returning.
+        getDriver().addPageNotYetReloadedMarker();
+
         clickNextStepButton();
+
+        getDriver().waitUntilPageIsReloaded();
+
         return new ApplicationClassEditPage();
     }
 

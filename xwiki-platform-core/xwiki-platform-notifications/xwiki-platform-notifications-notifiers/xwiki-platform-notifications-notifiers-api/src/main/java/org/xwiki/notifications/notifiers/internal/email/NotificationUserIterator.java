@@ -55,6 +55,7 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
     private Logger logger;
 
     private Iterator<DocumentReference> iterator;
+    private NotificationEmailInterval interval;
 
     /**
      * Initialize the user iterator.
@@ -63,6 +64,7 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
      */
     public void initialize(NotificationEmailInterval interval)
     {
+        this.interval = interval;
         try {
             this.iterator =
                 this.usersManager.getUsers(interval, this.wikiDescriptorManager.getCurrentWikiId()).iterator();
@@ -85,5 +87,14 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
     public DocumentReference next()
     {
         return this.iterator.next();
+    }
+
+    /**
+     * @return the interval the iterator is set for.
+     * @since 15.6RC1
+     */
+    public NotificationEmailInterval getInterval()
+    {
+        return this.interval;
     }
 }

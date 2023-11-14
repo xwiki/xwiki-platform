@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
@@ -48,6 +49,8 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.feed.synd.SyndPersonImpl;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * This is the default implementation of {@link NotificationRSSRenderer}.
@@ -75,6 +78,9 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
     private ScriptContextManager scriptContextManager;
 
     @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
     @Named("html/5.0")
     private BlockRenderer blockRenderer;
 
@@ -90,7 +96,9 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
         // Convert every author of the CompositeEvent to a SyndPerson and add it to the new entry
         for (DocumentReference author : eventNotification.getUsers()) {
             SyndPerson person = new SyndPersonImpl();
-            person.setName(author.getName());
+            XWikiContext context = this.contextProvider.get();
+            XWiki wiki = context.getWiki();
+            person.setName(wiki.getPlainUserName(author, context));
             eventAuthors.add(person);
         }
         entry.setAuthors(eventAuthors);

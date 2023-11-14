@@ -110,13 +110,13 @@ public class CKEditor extends BaseElement
         return getDriver().findElementWithoutWaiting(getContainer(), By.className("cke_source"));
     }
 
-    WebElement getContainer()
+    protected WebElement getContainer()
     {
         return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].container.$;",
             this.name);
     }
 
-    private WebElement getIframe()
+    protected WebElement getIframe()
     {
         return getDriver().findElementWithoutWaiting(getContainer(), By.className("cke_wysiwyg_frame"));
     }

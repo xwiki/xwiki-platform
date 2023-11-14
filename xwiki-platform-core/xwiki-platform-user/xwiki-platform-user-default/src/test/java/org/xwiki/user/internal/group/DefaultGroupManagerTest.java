@@ -55,6 +55,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isContextWiki;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -333,5 +334,18 @@ public class DefaultGroupManagerTest
         assertGetMembers(GLOBAL_GROUP_2, GLOBAL_GROUP_1, false);
         assertGetMembers(GLOBAL_GROUP_1, GLOBAL_GROUP_2, true);
         assertGetMembers(GLOBAL_GROUP_2, GLOBAL_GROUP_1, true);
+    }
+
+    /**
+     * Ensure that calling the API with guest user {@code null} reference doesn't lead to NPE.
+     */
+    @Test
+    void getGroupsWithGuest() throws GroupException
+    {
+        Collection<DocumentReference> groups = this.manager.getGroups(null, null, false);
+        assertTrue(groups.isEmpty());
+
+        groups = this.manager.getGroups(null, null, true);
+        assertTrue(groups.isEmpty());
     }
 }

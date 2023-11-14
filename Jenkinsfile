@@ -99,11 +99,17 @@ def builds = [
       mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
+  'Flavor Test - Security' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Security',
+      pom: 'xwiki-platform-distribution-flavor-test-security/pom.xml'
+    )
+  },
   'TestRelease': {
     build(
       name: 'TestRelease',
       goals: 'clean install',
-      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
+      profiles: 'release,hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
       properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddoclint=all'
     )
   },
@@ -121,7 +127,11 @@ def builds = [
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy,coverage',
       properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec',
-      sonar: true
+      sonar: true,
+      // Build with Java 17 since SonarCloud now requires it ("Starting from the 15th of November 2023,
+      // SonarCloud will no longer accept scans executed using Java 11"). To be removed once we build platform on
+      // Java 17.
+      javaTool: 'java17'
     )
   }
 ]
@@ -210,6 +220,10 @@ private void buildStandardAll(builds)
             'flavor-test-upgrade': {
               // Run the Flavor Upgrade tests
               builds['Flavor Test - Upgrade'].call()
+            },
+            'flavor-test-security': {
+              // Run the Flavor Security tests
+              builds['Flavor Test - Security'].call()
             }
           )
         }

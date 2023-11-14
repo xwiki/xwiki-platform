@@ -76,7 +76,6 @@
   'paths': {
     'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
-    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
@@ -189,20 +188,6 @@ if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
     disablePrototypeJS('hide', pluginsToDisable);
   });
 }
-require(['jquery', 'iscroll', 'drawer'], function($, IScroll) {
-  // Unfortunately drawer doesn't declare the dependency on iscroll and expects it to be defined as a global variable.
-  window.IScroll = IScroll;
-  $(function() {
-    // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
-    // which prevents us from using them in automated tests. We need something more reliable so we listen to
-    // 'drawer.opened' and 'drawer.closed' events and add our own markers.
-    $('.drawer-nav').closest('body').drawer().on('drawer.opened', function(event) {
-      $('#tmDrawerActivator').attr('aria-expanded', 'true');
-    }).on('drawer.closed', function(event) {
-      $('#tmDrawerActivator').attr('aria-expanded', 'false');
-    });
-  });
-});
 ##
 ## Pass useful contextual information from the server to the client using the global XWiki object.
 ##
@@ -296,7 +281,10 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)##
 #end
 #if($services.async.isEnabled())
-  $xwiki.jsfx.use("uicomponents/async/async.js", true)##
+  $xwiki.jsfx.use("uicomponents/async/async.js", {
+    'forceSkinAction': true,
+    'wysiwyg': true
+  })##
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions

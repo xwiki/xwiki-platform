@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>15.6-SNAPSHOT</version>
+    <version>15.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -452,6 +452,7 @@
   <modules>
     <module>xwiki-platform-distribution-flavor-test-misc</module>
     <module>xwiki-platform-distribution-flavor-test-pageobjects</module>
+    <module>xwiki-platform-distribution-flavor-test-security</module>
     <module>xwiki-platform-distribution-flavor-test-ui</module>
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>

@@ -19,9 +19,15 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.time.Duration;
+import java.util.function.Supplier;
+
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -95,16 +101,11 @@ public class RichTextAreaElement extends BaseElement
         if (keysToSend.length > 0) {
             try {
                 WebElement activeElement = getActiveElement();
-                // On Firefox we have to click on the editing area before typing, otherwise the typed keys are ignored.
-                // Unfortunately this can change the selection (caret position) within the editing area, but
-                // since we don't expose any API to access the selection we're safe for now. Ideally we should save the
-                // selection before clicking and then restore it after click, but it won't be easy to represent the
-                // selection because Selenium doesn't provide an API to represent text nodes and the selection is often
-                // inside a text node. We'd have to represent the selection relative to the parent element (using
-                // WebElement) but that moves us away from the standard DOM selection API.
-                // Also note that for some reason, using the Actions API (e.g. moving the mouse at a given offset within
-                // the editing area before clicking) doesn't have the same result.
-                activeElement.click();
+
+                // Calling sendKeys doesn't focus the contentEditable element on Firefox so the typed keys are simply
+                // ignored. We need to focus the element ourselves before sending the keys.
+                getDriver().executeScript("arguments[0].focus()", activeElement);
+
                 activeElement.sendKeys(keysToSend);
             } finally {
                 getDriver().switchTo().defaultContent();
@@ -122,12 +123,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public Object executeScript(String script, Object... arguments)
     {
-        try {
-            getDriver().switchTo().frame(this.iframe);
-            return ((JavascriptExecutor) getDriver()).executeScript(script.toString(), arguments);
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
+        return getFromIFrame(() -> getDriver().executeScript(script, arguments));
     }
 
     /**
@@ -149,6 +145,17 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
+     * Waits until the content of the rich text area contains the given HTML fragment.
+     * 
+     * @param html the HTML fragment to wait for
+     */
+    public void waitUntilContentContains(String html)
+    {
+        new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout()))
+            .until((ExpectedCondition<Boolean>) d -> StringUtils.contains(getContent(), html));
+    }
+
+    /**
      * @return the HTML element that has the focus in the Rich editor
      */
     private WebElement getActiveElement()
@@ -165,9 +172,29 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentEditable()
     {
+        getFromIFrame(() -> {
+            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+            return null;
+        });
+    }
+
+    /**
+     * @return the placeholder text, if present
+     */
+    public String getPlaceholder()
+    {
+        try {
+            return getActiveElement().getAttribute("data-cke-editorplaceholder");
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
+    }
+
+    protected <T> T getFromIFrame(Supplier<T> supplier)
+    {
         try {
             getDriver().switchTo().frame(this.iframe);
-            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+            return supplier.get();
         } finally {
             getDriver().switchTo().defaultContent();
         }

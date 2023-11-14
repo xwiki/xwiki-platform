@@ -67,4 +67,11 @@ public class AllIT
     class NestedUndoRedoIT extends UndoRedoIT
     {
     }
+    
+    @Nested
+    @DisplayName("Localization")
+    class NestedLocalizationIT extends LocalizationIT
+    {
+    }
+    
 }

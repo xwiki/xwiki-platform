@@ -34,7 +34,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.junit5.RuntimeUtils;
+
+import static org.xwiki.test.docker.junit5.database.Database.MARIADB;
+import static org.xwiki.test.docker.junit5.database.Database.MYSQL;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -108,10 +112,11 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             // No tag specific, use "latest"
             databaseContainer = new MySQLContainer<>("mysql:latest");
         }
-        startMySQLContainer(databaseContainer, testConfiguration);
+        startMySQLContainer(databaseContainer, testConfiguration, MYSQL);
     }
 
-    private void startMySQLContainer(JdbcDatabaseContainer<?> databaseContainer, TestConfiguration testConfiguration)
+    private void startMySQLContainer(JdbcDatabaseContainer<?> databaseContainer, TestConfiguration testConfiguration,
+        Database database)
         throws Exception
     {
         databaseContainer
@@ -140,10 +145,10 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
 
         // Allow the XWiki user to create databases (ie create subwikis)
-        grantMySQLPrivileges(databaseContainer);
+        grantMySQLPrivileges(databaseContainer, database);
     }
 
-    private void grantMySQLPrivileges(JdbcDatabaseContainer<?> databaseContainer) throws Exception
+    private void grantMySQLPrivileges(JdbcDatabaseContainer<?> databaseContainer, Database database) throws Exception
     {
         // Retry several times, as we're getting some flickering from time to time with the message:
         //   ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
@@ -154,7 +159,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             // put the credentials in a file.
             databaseContainer.execInContainer("sh", "-c",
                 String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
-            Container.ExecResult result = databaseContainer.execInContainer("mysql",
+            Container.ExecResult result = databaseContainer.execInContainer(getCommandName(database),
                 "--defaults-extra-file=credentials.cnf", "--verbose", "-e",
                 String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
@@ -211,7 +216,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             // No tag specific, use "latest"
             databaseContainer = new MariaDBContainer<>("mariadb:latest");
         }
-        startMySQLContainer(databaseContainer, testConfiguration);
+        startMySQLContainer(databaseContainer, testConfiguration, MARIADB);
     }
 
     private void startPostgreSQLContainer(TestConfiguration testConfiguration) throws Exception
@@ -298,5 +303,23 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             testConfiguration.getDatabase().setIP(databaseContainer.getNetworkAliases().get(0));
             testConfiguration.getDatabase().setPort(port);
         }
+    }
+
+    /**
+     * Since mariadb 11.0, the {@code mysql} executable is not available in the mariadb container. Consequently, we need
+     * to use the {@code mariadb} executable instead. This is safe since the {@code mysql} executable previously
+     * available was just a symbolic link to the {@code mariadb} executable.
+     *
+     * @param database the database to use for the selection of the command
+     * @return the name of the command to use to execute the SQL commands ({@code mysql} for mysql, {@code mariadb} for
+     *     mariadb)
+     */
+    private static String getCommandName(Database database)
+    {
+        String command = "mysql";
+        if (database == MARIADB) {
+            command = "mariadb";
+        }
+        return command;
     }
 }

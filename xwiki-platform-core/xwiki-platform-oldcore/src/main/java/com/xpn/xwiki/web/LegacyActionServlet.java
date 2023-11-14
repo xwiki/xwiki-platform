@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -51,8 +49,6 @@ import com.xpn.xwiki.internal.web.LegacyAction;
 public class LegacyActionServlet extends HttpServlet
 {
     private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LegacyActionServlet.class);
 
     private ResourceTypeResolver<ExtendedURL> typeResolver;
 

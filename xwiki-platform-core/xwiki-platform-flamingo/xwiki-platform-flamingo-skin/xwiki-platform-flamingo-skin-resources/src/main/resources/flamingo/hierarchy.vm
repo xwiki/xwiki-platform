@@ -19,6 +19,7 @@
 ## ---------------------------------------------------------------------------
 #template('xwikivars.vm')
 #if($isInServletMode) ## Visible only in a page
+  <nav id="hierarchy_breadcrumb" aria-label="$escapetool.xml($services.localization.render("web.hierarchy.label"))">
   #template('hierarchy_macros.vm')
   #######################################################
   ##                   CONTROLLER
@@ -34,4 +35,5 @@
     ##
     #hierarchy($NULL {'id': 'hierarchy', 'limit': 5, 'treeNavigation': true})
   #end
+  </nav>
 #end

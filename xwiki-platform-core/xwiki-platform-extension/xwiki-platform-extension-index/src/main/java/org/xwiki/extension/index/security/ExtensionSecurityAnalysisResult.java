@@ -41,6 +41,8 @@ public class ExtensionSecurityAnalysisResult
 
     private String advice;
 
+    private boolean coreExtension;
+
     /**
      * @param securityVulnerabilities the security vulnerabilities associated with the analyzed extension
      * @return the current object
@@ -95,6 +97,27 @@ public class ExtensionSecurityAnalysisResult
         }
     }
 
+    /**
+     * @return {@code true} when the extension is core, {@code false} otherwise
+     */
+    public boolean isCoreExtension()
+    {
+        return this.coreExtension;
+    }
+
+    /**
+     * Sets the flag indicating whether the extension is a core extension.
+     *
+     * @param coreExtension {@code true} to indicate that the extension is a core extension, {@code false}
+     *     otherwise
+     * @return the current object
+     */
+    public ExtensionSecurityAnalysisResult setCoreExtension(boolean coreExtension)
+    {
+        this.coreExtension = coreExtension;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -111,6 +134,7 @@ public class ExtensionSecurityAnalysisResult
         return new EqualsBuilder()
             .append(this.securityVulnerabilities, that.securityVulnerabilities)
             .append(this.advice, that.advice)
+            .append(this.coreExtension, that.coreExtension)
             .isEquals();
     }
 
@@ -120,6 +144,7 @@ public class ExtensionSecurityAnalysisResult
         return new HashCodeBuilder(17, 37)
             .append(this.securityVulnerabilities)
             .append(this.advice)
+            .append(this.coreExtension)
             .toHashCode();
     }
 
@@ -129,6 +154,7 @@ public class ExtensionSecurityAnalysisResult
         return new XWikiToStringBuilder(this)
             .append("securityVulnerabilities", this.securityVulnerabilities)
             .append("advice", this.advice)
+            .append("coreExtension", this.coreExtension)
             .toString();
     }
 }

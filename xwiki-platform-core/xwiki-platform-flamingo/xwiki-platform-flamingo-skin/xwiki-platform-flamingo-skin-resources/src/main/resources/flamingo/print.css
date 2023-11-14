@@ -74,7 +74,7 @@
   overflow: visible !important;
 }
 
-#mainContentArea, #xdocFooter, #docextrapanes {
+#mainContentArea, #xdocFooter, #docextrapanes, #hierarchy_breadcrumb {
   margin: 0;
   padding-left: 0;
   padding-right: 0;

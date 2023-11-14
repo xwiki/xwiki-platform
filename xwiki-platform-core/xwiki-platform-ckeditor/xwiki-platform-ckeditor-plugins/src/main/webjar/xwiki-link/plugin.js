@@ -111,6 +111,138 @@
           delete link.attributes['data-freestanding'];
         }
       });
+
+      // Register the [ autocomplete using the ckeditor mentions plugin.
+      editor.config.mentions = editor.config.mentions || [];
+      editor.config.mentions.push({
+        followingSpace: true,
+        marker: '[',
+        minChars: 0,
+        itemsLimit: 6,
+        feed: function (opts, callback) {
+          // We use the source document to compute the feed URL because we want the suggested link references to be
+          // relative to the edited document (we want the editor to output relative references as much as possible).
+          $.getJSON(editor.config.sourceDocument.getURL('get', $.param({
+            sheet: 'CKEditor.LinkSuggestions',
+            outputSyntax: 'plain',
+            language: XWiki.locale,
+            input: opts.query
+          })), function (data) {
+
+            const uploadItem = {
+              id: "_uploadAttachment",
+              iconClass: "fa fa-upload",
+              iconURL: "",
+              label: editor.localization.get('xwiki-link.upload'),
+              hint: editor.localization.get('xwiki-link.uploadHint')
+            };
+
+
+            // Upload attachment item should be the first in the list.
+            var callbackData = data;
+            if (uploadItem.label.toLowerCase().startsWith(opts.query.toLowerCase())) {
+              callbackData = [uploadItem, ...callbackData];
+            }
+
+            callback(callbackData);
+
+          });
+        },
+        itemTemplate:
+          `<li data-id="{id}" class="ckeditor-autocomplete-item">
+            <div>
+              <span class="ckeditor-autocomplete-item-icon-wrapper">` +
+                // We have to output both icon types but normally only one is defined and the other is hidden.
+                `<img src="{iconURL}"/>
+                <span class="{iconClass}"></span>
+              </span>
+              <span class="ckeditor-autocomplete-item-label">{label}</span>
+            </div>
+            <div class="ckeditor-autocomplete-item-hint">{hint}</div>
+          </li>`,
+        outputTemplate: function (item) {
+          // Upload a new attachment.
+          if (item.id === "_uploadAttachment") {
+
+            // Reuse attachment suggest code to show the file picker.
+            // Provides xwiki-attachments-store and xwiki-file-picker.
+            const requiredSkinExtensions = `<script src=` +
+              `'${XWiki.contextPath}/${XWiki.servletpath}` +
+              `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
+              `defer='defer'></script>`;
+            $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
+
+            require([
+              'xwiki-attachments-store',
+              'xwiki-file-picker',
+              'resource'
+            ], function (attachmentsStore, filePicker, resource) {
+              const convertFilesToAttachments = function (files, documentReference) {
+                const attachments = [];
+                for (var i = 0; i < files.length; i++) {
+                  const file = files.item(i);
+                  const attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
+                    documentReference);
+                  attachments.push(attachmentsStore.create(attachmentReference, file));
+                }
+                return attachments;
+              };
+
+              // Open the file picker
+              filePicker.pickLocalFiles({
+                accept: "*",
+                multiple: false
+              }).then(function (files) {
+                const attachments = convertFilesToAttachments(
+                  files,
+                  editor.config.sourceDocument.documentReference
+                );
+
+                // Cancel the insertion when no file is picked.
+                if (attachments.length === 0) {
+                  return;
+                }
+
+                const attachment = attachments[0];
+                const resourceReference = resource.convertEntityReferenceToResourceReference(
+                  XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT),
+                  editor.config.sourceDocument.documentReference);
+
+                // Insert the link immediately after closing the file picker.
+                editor.insertHtml($('<a></a>').attr({
+                    href: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor),
+                    'data-reference': CKEDITOR.plugins.xwikiResource.serializeResourceReference(resourceReference)
+                  }).text(attachment.name).prop('outerHTML'));
+
+                const notification = new XWiki.widgets.Notification(
+                  editor.localization.get('xwiki-link.uploadProgress', attachment.name),
+                  'inprogress');
+
+                // Upload the selected attachment
+                const attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
+                attachmentsStore.upload(attachmentReference, attachment.file).then(() => {
+                  notification.replace(
+                    new XWiki.widgets.Notification(
+                      editor.localization.get('xwiki-link.uploadSuccess', attachment.name),
+                      'done')
+                  );
+                }).catch(() => {
+                  notification.replace(
+                    new XWiki.widgets.Notification(
+                      editor.localization.get('xwiki-link.uploadError', attachment.name),
+                      'error')
+                  );
+                });
+              });
+            });
+
+            return "";
+          }
+          // Insert the selected link.
+          return '<a href="{url}" data-reference="{typed}|-|{type}|-|{reference}">{label}</a>';
+        }
+      });
+
     },
 
     afterInit: function(editor) {

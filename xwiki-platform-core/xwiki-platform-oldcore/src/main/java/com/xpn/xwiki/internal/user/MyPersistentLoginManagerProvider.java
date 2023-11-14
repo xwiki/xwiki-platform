@@ -26,10 +26,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.security.authentication.AuthenticationConfiguration;
 
 import com.xpn.xwiki.user.impl.xwiki.MyPersistentLoginManager;
 
@@ -47,6 +47,9 @@ public class MyPersistentLoginManagerProvider implements Provider<PersistentLogi
     @Named("xwikicfg")
     private ConfigurationSource config;
 
+    @Inject
+    private AuthenticationConfiguration authenticationConfiguration;
+
     @Override
     public PersistentLoginManagerInterface get()
     {
@@ -54,17 +57,17 @@ public class MyPersistentLoginManagerProvider implements Provider<PersistentLogi
 
         setIfSpecified("cookieprefix", persistentLoginManager::setCookiePrefix);
         setIfSpecified("cookiepath", persistentLoginManager::setCookiePath);
-        setIfSpecified("cookiedomains", cookieDomains -> {
-            persistentLoginManager.setCookieDomains(StringUtils.split(cookieDomains, ","));
-        });
+        persistentLoginManager.setCookieDomains(
+            this.authenticationConfiguration.getCookieDomains().toArray(new String[0]));
         setIfSpecified("cookielife", persistentLoginManager::setCookieLife);
         setIfSpecified("protection", persistentLoginManager::setProtection);
         setIfSpecified("useip", persistentLoginManager::setUseIP);
         setIfSpecified("encryptionalgorithm", persistentLoginManager::setEncryptionAlgorithm);
         setIfSpecified("encryptionmode", persistentLoginManager::setEncryptionMode);
         setIfSpecified("encryptionpadding", persistentLoginManager::setEncryptionPadding);
-        setIfSpecified("validationKey", persistentLoginManager::setValidationKey);
-        setIfSpecified("encryptionKey", persistentLoginManager::setEncryptionKey);
+
+        persistentLoginManager.setValidationKey(this.authenticationConfiguration.getValidationKey());
+        persistentLoginManager.setEncryptionKey(this.authenticationConfiguration.getEncryptionKey());
 
         return persistentLoginManager;
     }

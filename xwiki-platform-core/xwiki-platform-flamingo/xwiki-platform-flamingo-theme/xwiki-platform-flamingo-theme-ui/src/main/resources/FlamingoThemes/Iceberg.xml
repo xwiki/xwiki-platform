@@ -753,19 +753,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>panel-default-text</name>
-        <number>46</number>
-        <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
       <table-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -845,7 +832,7 @@
       <brand-primary/>
     </property>
     <property>
-      <brand-success>#56b881</brand-success>
+      <brand-success>#077537</brand-success>
     </property>
     <property>
       <brand-warning/>
@@ -881,7 +868,7 @@
       <btn-info-bg/>
     </property>
     <property>
-      <btn-info-color/>
+      <btn-info-color>#000000</btn-info-color>
     </property>
     <property>
       <btn-primary-bg>#386da7</btn-primary-bg>
@@ -890,7 +877,7 @@
       <btn-primary-color>#fff</btn-primary-color>
     </property>
     <property>
-      <btn-success-bg>#31754f</btn-success-bg>
+      <btn-success-bg/>
     </property>
     <property>
       <btn-success-color/>
@@ -973,11 +960,23 @@
 @gray-light: #727272;
 /* Gray-light is too light on a light backgrounds. @gray for muted text is easier to read. */
 @text-muted: @gray;
+/* The boxes background is too dark for links, we make it a lighter shade than bootstrap default. */
+@state-danger-bg: #f8ecec;
+@state-success-bg: #e5f3df;
+@state-info-bg: #e1f1f9;
+/* Input-color-placeholder is hardcoded in bootstrap, we need to override it. */
+@input-color-placeholder: @gray-light;
 
 /* Drawer */
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
 
+/* Headings */
+@headings-font-weight: 600;
+
+/* Font */
+@import (css) "@{open-sans-font-path}";
+  
 /* Other */
 @well-bg: @body-bg;
 
@@ -1018,9 +1017,6 @@
       <panel-bg>#fafafa</panel-bg>
     </property>
     <property>
-      <panel-default-text/>
-    </property>
-    <property>
       <table-bg/>
     </property>
     <property>
@@ -1030,7 +1026,7 @@
       <table-border-color/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#222222</text-color>
     </property>
     <property>
       <xwiki-page-content-bg/>

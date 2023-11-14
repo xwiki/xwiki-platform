@@ -104,7 +104,9 @@ public abstract class AbstractRegistrationPage extends BasePage
             By.xpath("//dd/span[contains(@class,'LV_validation_message LV_invalid')]"));
     }
 
-    /** @return a list of WebElements representing error messages. Use after calling register() */
+    /**
+      * @return a list of WebElements representing error messages. Use after calling register()
+      */
     public WebElement getErrorMessage(String message)
     {
         return getDriver().findElementWithoutWaiting(By.xpath("//div[@class = 'errormessage']"));

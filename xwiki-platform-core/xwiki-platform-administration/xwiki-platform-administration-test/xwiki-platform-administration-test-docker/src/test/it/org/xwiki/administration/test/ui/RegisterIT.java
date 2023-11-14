@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -34,7 +33,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AbstractRegistrationPage;
 import org.xwiki.test.ui.po.DeletePageOutcomePage;
-import org.xwiki.test.ui.po.DeletedPageEntry;
 import org.xwiki.test.ui.po.RegistrationPage;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -55,14 +53,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *       <b>closeWiki:</b> when {@code true} the wiki is set as private for guest user, otherwise it's readable for
  *       guest users
  *   </li>
+ *   <li>
+ *       <b>withRegistrationConfig</b> when {@code false} the {@code XWiki.RegistrationConfig} page is deleted to
+ *       test fallbacks when it's not available
+ *   </li>
  * </ul>
  * <p>
- * Three combinations of these parameters are tested:
- * <ul>
- *   <li>!isModal + !closeWiki</li>
- *   <li>!isModal + closeWiki</li>
- *   <li>isModal + !closeWiki</li>
- * </ul>
  *
  * @version $Id$
  * @since 13.4RC1
@@ -220,10 +216,10 @@ class RegisterIT
     }
 
     /**
-     * Returns a stream of combinations of parameters to test. The first value is {@code useLiveValidation} and the
-     * second {@code isModal}.
+     * Returns a stream of combinations of parameters to test. The first value is {@code isModal}, the
+     * second {@code closedWiki} and the last {@code withRegistrationConfig}.
      *
-     * @return the tested combination of {@code useLiveValidation} and {@code isModal}
+     * @return the tested combination of {@code isModal}, {@code closedWiki} and {@code withRegistrationConfig}
      */
     private static Stream<Arguments> testsParameters()
     {

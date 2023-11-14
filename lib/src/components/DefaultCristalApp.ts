@@ -23,34 +23,35 @@
  *
  **/
 
-import { injectable, Container , inject, multiInject } from "inversify";
+import {Container, inject, injectable, multiInject} from "inversify";
 import "reflect-metadata";
 
-import { Logger, DefaultLogger, LoggerConfig } from '@cristal/api';
-import { Ref, createApp, Component, App } from 'vue';
-import { createRouter, createWebHashHistory, RouteRecordRaw, Router } from 'vue-router';
+import {
+    CristalApp,
+    DefaultLogger,
+    DefaultPageData,
+    Logger,
+    LoggerConfig,
+    PageData,
+    SkinManager,
+    WikiConfig
+} from '@cristal/api';
+import {App, Component, createApp, Ref} from 'vue';
+import {createRouter, createWebHashHistory, Router, RouteRecordRaw} from 'vue-router';
 
 import '@mdi/font/css/materialdesignicons.css'
 
 // Manuel importing to reduce build size
 // import { VApp, VContainer, VRow, VCol, VAvatar } from 'vuetify/components'
 // import {} from 'vuetify/directives'
-
 import Index from '../index.vue'
 import IndexPerf from '../indexPerf.vue'
 
-import { CristalApp } from '@cristal/api';
+import {ExtensionManager} from '@cristal/extension-manager';
+import {UIXTemplateProvider, VueTemplateProvider} from '@cristal/skin';
+import {MenuEntry} from '@cristal/extension-menubuttons';
+import {Renderer} from '@cristal/rendering';
 
-import { ExtensionManager } from '@cristal/extension-manager';
-import { SkinManager } from '@cristal/api';
-import { VueTemplateProvider } from '@cristal/skin';
-import { UIXTemplateProvider } from '@cristal/skin';
-import { MenuEntry } from '@cristal/extension-menubuttons';
-import { Renderer } from '@cristal/rendering';
-
-import { WikiConfig } from '@cristal/api';
-import { PageData, DefaultPageData } from '@cristal/api';
-        
 // import i18n from './i18n'
 
 @injectable() 
@@ -145,7 +146,7 @@ public availableConfigurations : Map<string, WikiConfig>;
 
     switchConfig(configName : string) : void {
         this.logger.debug("Switching config to", configName);
-        let wikiConfig = this.availableConfigurations.get(configName)
+        const wikiConfig = this.availableConfigurations.get(configName)
         if (wikiConfig) {
             this.setWikiConfig(wikiConfig);
             if (wikiConfig.designSystem!="")
@@ -161,10 +162,15 @@ public availableConfigurations : Map<string, WikiConfig>;
         }
     }
 
+
+    // TODO remplace any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setAvailableConfigurations(config : Map<string, any>) {
         console.log(config);
+        // TODO remplace any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         config.forEach((wikiConfigObject: any, key: string) => {
-            let configType = wikiConfigObject?.configType;
+            const configType = wikiConfigObject?.configType;
 
             if (wikiConfigObject) {
                 const wikiConfig = this.container.getNamed<WikiConfig>("WikiConfig", configType);
@@ -198,7 +204,7 @@ public availableConfigurations : Map<string, WikiConfig>;
 
         this.logger.debug("Loading rendering module");
         try {
-            let renderer = this.container.get<Renderer>("Renderer");
+            const renderer = this.container.get<Renderer>("Renderer");
             return renderer.convert(source, sourceSyntax, targetSyntax, wikiConfig);
         } catch (e) {
             this.logger.error("Could not find a rendering module");
@@ -209,7 +215,7 @@ public availableConfigurations : Map<string, WikiConfig>;
     async preloadConverters() {
         this.logger.debug("Loading rendering module");
         try {
-            let renderer = this.container.get<Renderer>("Renderer");
+            const renderer = this.container.get<Renderer>("Renderer");
             await renderer.preloadConverters();
         } catch (e) {
             this.logger.error("Could not find a rendering module");
@@ -231,7 +237,7 @@ public availableConfigurations : Map<string, WikiConfig>;
                     this.page.html = pageContentData.html;
                 }
 
-                let sheet = (this.page.document && this.page.document.get("sheet")!=null) ? this.page.document.get("sheet") : ""
+                const sheet = (this.page.document && this.page.document.get("sheet")!=null) ? this.page.document.get("sheet") : ""
                 if (this.currentContentRef!=null) {
                     console.log("Updating vueJS content field to ", this.page.html);
                     this.currentContentRef.value.currentContent = this.page.html;
@@ -349,7 +355,7 @@ public availableConfigurations : Map<string, WikiConfig>;
             { path: '/:page/', component: this.skinManager.getTemplate("content") } as RouteRecordRaw,
           ]
 
-        let perfMode = this.wikiConfig.name.startsWith("Perf");
+        const perfMode = this.wikiConfig.name.startsWith("Perf");
         if (perfMode) {
             routes = [
                 { path: '/', component: this.skinManager.getTemplate("perfX") } as RouteRecordRaw,

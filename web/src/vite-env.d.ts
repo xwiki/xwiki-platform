@@ -24,3 +24,4 @@
  **/
 
 /// <reference types="vite-plugin-comlink/client" />
+// eslint-disable-line

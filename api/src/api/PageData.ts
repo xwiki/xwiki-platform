@@ -36,7 +36,9 @@ export interface PageData {
     js : Array<string>;
     version : string;
 
-    toObject() : any;
-    
-    fromObject(object : any) : void;
+    // TODO: remove any
+    toObject() : any; // eslint-disable-line
+
+    // TODO: remove any
+    fromObject(object : any) : void; // eslint-disable-line
 }

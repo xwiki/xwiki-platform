@@ -22,14 +22,15 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 export interface MyWorker {
     
     add(a : number) : number;
     
-    addToQueue(page: String) : void;
+    addToQueue(page: string) : void;
 
     getQueueSize() : number;
 
-    setPageLoadedCallback(fct : Function) : void;
+    setPageLoadedCallback(fct : (a: string) => void) : void;
 }
 

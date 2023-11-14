@@ -11,6 +11,6 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "license-header/header": [ "error", "../resources/license-header.js" ]
+    "license-header/header": [ "error", "/home/mleduc/cristal/cristal/resources/license-header.js" ]
   }
 }

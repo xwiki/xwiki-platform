@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 export interface QueueWorker {
     initialize() : void;
     
@@ -29,7 +30,7 @@ export interface QueueWorker {
     
     increment() : Promise<number>;
 
-    addToQueue(page: String) : Promise<void>;
+    addToQueue(page: string) : Promise<void>;
 
     getQueueSize() : Promise<number>;
 }

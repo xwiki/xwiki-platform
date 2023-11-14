@@ -36,13 +36,13 @@ export class CristalAppLoader extends CristalLoader {
         super(extensionList);
     }
 
-    public loadApp(config : any, isElectron : boolean) {
-        let configMap = new Map<string, any>(Object.entries(config));
+    public loadApp<T>(config : { [s: string]: T }, isElectron : boolean) {
+        const configMap = new Map<string, T>(Object.entries(config));
         this.cristal.setAvailableConfigurations(configMap);
         let configName : string = "XWiki";
 
         if (isElectron) {
-            let localConfigName = window.localStorage.getItem("currentApp");
+            const localConfigName = window.localStorage.getItem("currentApp");
             if (localConfigName!=null)
                 configName = localConfigName;
         } else {
@@ -88,13 +88,13 @@ export class CristalAppLoader extends CristalLoader {
         this.cristal.isElectron = isElectron;
         this.cristal.setContainer(this.container);
         
-        let response = await fetch(configPath);
-        let config = await response.json();
+        const response = await fetch(configPath);
+        const config = await response.json();
         this.loadApp(config, isElectron);
     }
 
     public static init(extensionList : Array<string>, configPage : string, staticBuild : boolean, isElectron : boolean) {
-        let cristalLoader = new CristalAppLoader(extensionList);
+        const cristalLoader = new CristalAppLoader(extensionList);
         cristalLoader.initializeContainer();
         cristalLoader.launchApp(staticBuild, configPage, isElectron);
     }

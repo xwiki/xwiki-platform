@@ -30,7 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Configuration source reading properties in XWiki.RegistrationConfiguration.
+ * Configuration source reading properties in {@code XWiki.RegistrationConfiguration}.
  *
  * @version $Id$
  * @since 15.10RC1

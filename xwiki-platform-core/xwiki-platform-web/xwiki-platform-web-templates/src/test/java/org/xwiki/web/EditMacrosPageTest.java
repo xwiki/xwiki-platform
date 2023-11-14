@@ -36,7 +36,6 @@ import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.model.validation.edit.EditConfirmationScriptService;
 import org.xwiki.model.validation.edit.internal.DefaultEditConfirmationCheckersManager;
-import org.xwiki.model.validation.edit.internal.EditConfirmationCheckersManager;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;

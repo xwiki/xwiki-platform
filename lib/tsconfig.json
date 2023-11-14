@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "rootDir" : "src",
+        "outDir" : "dist",
+        "resolveJsonModule": true,
+        "types": ["vite/client"]
+    },
+    "extends": "./../tsconfig.json",
+    "include": ["src"],
+}

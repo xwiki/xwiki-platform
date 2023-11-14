@@ -1,0 +1,37 @@
+{
+  "name": "@cristal/dsfr",
+  "version": "1.0.0",
+  "types": "dist/index.d.ts",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "directory": "dsfr",
+    "url": "https://git.xwikisas.com/experiments/cristal/prototype2023/"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "prepack": "pnpm build",
+    "build": "pnpm compile",
+    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
+    "test": "echo 'no test'",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "@cristal/api": "workspace:^",
+    "@gouvfr/dsfr": "^1.10.2",
+    "@gouvminint/vue-dsfr": "^4.7.0",
+    "inversify": "^6.0.2",
+    "oh-vue-icons": "1.0.0-rc3",
+    "vue": "^3.3.4",
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.2.4",
+    "vuetify": "^3.3.15"
+  },
+  "devDependencies": {
+    "vite": "^4.4.9",
+    "vue-tsc": "^1.8.8"
+  }
+}

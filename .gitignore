@@ -86,3 +86,4 @@ playwright-report/
 /unit-tests.xml
 /e2e-tests.xml
 /*.tgz
+.nx/

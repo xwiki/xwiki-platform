@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "rootDir" : "src",
+        "outDir" : "dist",
+        "types": ["vite/client"]
+    },
+    "extends": "./../tsconfig.json",
+    "include": ["src"],
+}

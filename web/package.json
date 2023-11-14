@@ -1,0 +1,43 @@
+{
+  "name": "@cristal/web",
+  "version": "1.0.0",
+  "types": "dist/index.d.ts",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "directory": "web",
+    "url": "https://git.xwikisas.com/experiments/cristal/prototype2023/"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "prepack": "pnpm build",
+    "build": "pnpm compile",
+    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
+    "test": "echo 'no test'",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "dev": "vite dev",
+    "prepare": "mkdir -p ./dist/apps && ln -fs ../../../extension-manager/dist/ dist/apps/extension-manager && ln -fs ../../../extension-menubuttons/dist/ dist/apps/extension-menubuttons && ln -fs ../../../skin/dist/ dist/apps/skin && ln -fs ../../../dsvuetify/dist/ dist/apps/dsvuetify && ln -fs ../../../storage/dist/ dist/apps/storage && ln -fs ../../../wikimodel/dist dist/apps/wikimodel && ln -fs ../../../dsfr/dist dist/apps/dsfr && ln -fs ../../../dsshoelace/dist dist/apps/dsshoelace",
+    "start": "lerna run build && pnpm prepare && NODE_ENV=production node src/server.js",
+    "quickstart": "lerna run build --scope @cristal/app && pnpm prepare && NODE_ENV=production node src/server.js"
+  },
+  "dependencies": {
+    "@cristal/lib": "workspace:^",
+    "express": "^4.18.2",
+    "vue": "^3.3.4",
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.2.4",
+    "vuetify": "^3.3.15"
+  },
+  "devDependencies": {
+    "@mdi/font": "^7.2.96",
+    "@vitejs/plugin-vue": "^4.4.1",
+    "vite": "^4.4.9",
+    "vite-plugin-comlink": "^3.0.5",
+    "vite-plugin-dts": "^3.6.3",
+    "vite-plugin-inspect": "^0.7.42",
+    "vite-plugin-vuetify": "^1.0.2"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@cristal/electron",
+  "private": true,
+  "license": "AGPL-3.0",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org",
+  "version": "1.0.0",
+  "main": "./main/dist/index.cjs",
+  "scripts": {
+    "electron": "cross-env MODE=production electron-builder build --config .electron-builder.config.js --dir --config.asar=false",
+    "package": "pnpm prepackage && mkdir -p dist/@cristal && pnpm linux",
+    "prepackage": "cross-env MODE=production electron-builder -mwl --config .electron-builder.config.js --dir --config.asar=false",
+    "linux": "electron-builder --linux deb tar.gz --config .electron-builder.config.js --dir --config.asar=false",
+    "win": "electron-builder --win nsis --config .electron-builder.config.js --dir --config.asar=false",
+    "mac": "electron-builder --mac dmg --config .electron-builder.config.js --dir --config.asar=false"
+  },
+  "devDependencies" : {
+    "cross-env": "7.0.3",
+    "electron": "27.0.2",
+    "electron-builder": "24.6.4"
+  },
+  "dependencies" : {
+    "electron-updater": "6.1.4"
+  }
+}

@@ -233,7 +233,6 @@
 
 #xwikieditor .main {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @xwiki-border-color;
 }
 
 #xwikieditcontent .main {
@@ -300,7 +299,6 @@
 #xdocFooter,
 #docextrapanes {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @xwiki-border-color;
   margin: 0 -@grid-gutter-width;
   padding: @line-height-computed @grid-gutter-width;
 }
@@ -323,6 +321,7 @@ already take care of padding and shadow. */
 }
 
 #docextrapanes {
+  box-shadow: 0 1px 2px @xwiki-border-color;
   border-top: 1px solid @xwiki-border-color;
   border-top-left-radius: @border-radius-base;
   border-top-right-radius: @border-radius-base;

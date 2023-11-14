@@ -81,6 +81,7 @@ public interface ResetPasswordManager
 
     /**
      * Ensure that the password matches the requirements provided by {@link RegistrationConfiguration}.
+     * Note that for backward compatibility reason the default return of this method is always {@code true}.
      *
      * @param newPassword the password to check
      * @return {@code true} if the rules exposed in the {@link RegistrationConfiguration} are all respected.

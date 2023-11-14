@@ -21,6 +21,9 @@ pipeline {
     agent {
       label 'dockernodejs'
     }
+    environment {
+      NX_CACHE_DIRECTORY = '/tmp/.nxcache'
+    }
     stages {
         stage('Install') {
             steps {

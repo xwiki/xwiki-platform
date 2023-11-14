@@ -821,8 +821,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
   }
   
   .dropdown-menu {
-    -webkit-box-shadow: none;
-    box-shadow: none;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .175);
+    border: none;
   }
 }
 

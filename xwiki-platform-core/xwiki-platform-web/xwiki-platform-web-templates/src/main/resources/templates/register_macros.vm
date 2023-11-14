@@ -420,7 +420,16 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set($registrationConfig.heading = "$services.localization.render('core.register.title')")
     #set($registrationConfig.welcomeMessage = "$services.localization.render('core.register.welcome')")
     #set($registrationConfig.defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
-    #set($registrationConfig.registrationSuccessMessage = '{{info}}$services.localization.render("core.register.successful", ["[[${userFullName}>>${userSpace}${userName}]]", ${userName}]){{/info}}')
+    #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
+    #set($userSpace = 'XWiki.')
+
+    #set($userLink = $xwiki.getUserName("$userSpace$userName"))
+    #define($registrationSuccessMessage)
+      #set($message = $services.localization.render('core.register.successful', 'xwiki/2.1', ['USERLINK', $userName]))
+      #set($userLink = $xwiki.getUserName("$userSpace$userName"))
+      {{info}}$message.replace('USERLINK', "{{html clean=false}}$userLink{{/html}}"){{/info}}
+    #end
+    #set ($registrationConfig.registrationSuccessMessage = $registrationSuccessMessage)
   #else
     #set($configObject = $configDocument.getObject($configurationClassName))
     #if ($xcontext.action == 'register')

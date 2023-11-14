@@ -33,7 +33,10 @@ import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AbstractRegistrationPage;
+import org.xwiki.test.ui.po.DeletePageOutcomePage;
+import org.xwiki.test.ui.po.DeletedPageEntry;
 import org.xwiki.test.ui.po.RegistrationPage;
+import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -68,12 +71,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class RegisterIT
 {
-    private AbstractRegistrationPage setUp(TestUtils testUtils, boolean isModal, boolean closeWiki) throws Exception
+    private AbstractRegistrationPage setUp(TestUtils testUtils, boolean isModal, boolean closeWiki,
+        boolean withRegistrationConfig) throws Exception
     {
         // We create the admin user because it is expected to exist when testing the registration of an existing user.
         testUtils.loginAsSuperAdmin();
         if (closeWiki) {
             testUtils.setWikiPreference("authenticate_view", "1");
+        }
+        if (!withRegistrationConfig) {
+            testUtils.deletePage("XWiki", "RegistrationConfig");
         }
         testUtils.createAdminUser();
         switchUser(testUtils, isModal);
@@ -92,9 +99,17 @@ class RegisterIT
     {
         testUtils.loginAsSuperAdmin();
         testUtils.setWikiPreference("authenticate_view", "0");
-        testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0, "passwordLength", 6);
-        testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
-            "passwordRuleOneNumberEnabled", 0);
+        ViewPage viewPage = testUtils.gotoPage("XWiki", "RegistrationConfig");
+        if (!viewPage.exists()) {
+            // We try to restore the page instead of creating back the object to have same values that were in
+            // the imported document.
+            DeletePageOutcomePage deletePageOutcomePage = new DeletePageOutcomePage();
+            deletePageOutcomePage.getDeletedTerminalPagesEntries().get(0).clickRestore();
+        } else {
+            testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0, "passwordLength", 6);
+            testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
+                "passwordRuleOneNumberEnabled", 0);
+        }
         deleteJohnSmith(testUtils);
     }
 
@@ -215,19 +230,22 @@ class RegisterIT
         return Stream.of(
             // Note: modal true and closedWiki true doesn't make sense here: we don't care if the wiki is closed or not
             // when checking the registration modal from administration.
-            Arguments.of(false, false),
-            Arguments.of(false, true),
-            Arguments.of(true, false)
+            Arguments.of(false, false, true),
+            Arguments.of(false, true, true),
+            Arguments.of(true, false, true),
+            Arguments.of(false, false, false),
+            Arguments.of(false, true, false),
+            Arguments.of(true, false, false)
         );
     }
 
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(1)
-    void registerJohnSmith(boolean isModal, boolean closedWiki, TestUtils testUtils)
+    void registerJohnSmith(boolean isModal, boolean closedWiki, boolean withRegistrationConfig, TestUtils testUtils)
         throws Exception
     {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         registrationPage.fillInJohnSmithValues();
         assertTrue(validateAndRegister(testUtils, isModal, registrationPage));
         tryToLoginAsJohnSmith(testUtils, AbstractRegistrationPage.JOHN_SMITH_PASSWORD, registrationPage);
@@ -236,9 +254,10 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(2)
-    void registerExistingUser(boolean isModal, boolean closedWiki, TestUtils testUtils) throws Exception
+    void registerExistingUser(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
 
         // Uses the empty string instead of the null value to empty the form fields (the null value just keep the value filled from the previously run test).
         registrationPage.fillRegisterForm("", "", "Admin", "password", "password", "");
@@ -254,9 +273,10 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(3)
-    void registerPasswordTooShort(boolean isModal, boolean closedWiki,  TestUtils testUtils) throws Exception
+    void registerPasswordTooShort(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         registrationPage.fillRegisterForm(null, null, null, "short", "short", null);
         assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
         assertTrue(
@@ -266,9 +286,10 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(4)
-    void registerDifferentPasswords(boolean isModal, boolean closedWiki, TestUtils testUtils) throws Exception
+    void registerDifferentPasswords(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         registrationPage.fillRegisterForm(null, null, null, null, "DifferentPassword", null);
         assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
         assertTrue(registrationPage.validationFailureMessagesInclude("The two passwords do not match."));
@@ -277,9 +298,10 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(5)
-    void registerEmptyPassword(boolean isModal, boolean closedWiki, TestUtils testUtils) throws Exception
+    void registerEmptyPassword(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         registrationPage.fillRegisterForm(null, null, null, "", "", null);
         assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
         assertTrue(registrationPage.validationFailureMessagesInclude("This field is required."));
@@ -288,9 +310,10 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(6)
-    void registerEmptyUserName(boolean isModal, boolean closedWiki, TestUtils testUtils) throws Exception
+    void registerEmptyUserName(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         // A piece of javascript fills in the username with the first and last names so we will empty them.
         registrationPage.fillRegisterForm("", "", "", null, null, null);
         assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
@@ -300,9 +323,10 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(7)
-    void registerInvalidEmail(boolean isModal, boolean closedWiki, TestUtils testUtils) throws Exception
+    void registerInvalidEmail(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         registrationPage.fillRegisterForm(null, null, null, null, null, "not an email address");
         assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
         assertTrue(registrationPage.validationFailureMessagesInclude("Please enter a valid email address."));
@@ -311,18 +335,20 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(8)
-    void registerWikiSyntaxName(boolean isModal, boolean closedWiki, TestUtils testUtils) throws Exception
+    void registerWikiSyntaxName(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
         // We don't really care of executing this test within the modal since it's about checking the success message
         // and in case of modal there's no success message with the user information.
         if (!isModal) {
-            AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+            AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
             String firstName = "]]{{/html}}{{html clean=false}}HT&amp;ML";
             String lastName = "]]{{/html}}";
             String password = AbstractRegistrationPage.JOHN_SMITH_PASSWORD;
             registrationPage.fillRegisterForm(firstName, lastName,
                 AbstractRegistrationPage.JOHN_SMITH_USERNAME, password, password, "wiki@example.com");
-            assertTrue(validateAndRegister(testUtils, isModal, registrationPage));
+            assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
+                + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
 
             assertEquals(String.format("%s %s (%s): Registration successful.", firstName, lastName,
                     AbstractRegistrationPage.JOHN_SMITH_USERNAME),
@@ -333,35 +359,40 @@ class RegisterIT
     @ParameterizedTest()
     @MethodSource("testsParameters")
     @Order(9)
-    void registerWithCustomPasswordPolicy(boolean isModal, boolean closedWiki, TestUtils testUtils) throws Exception
+    void registerWithCustomPasswordPolicy(boolean isModal, boolean closedWiki, boolean withRegistrationConfig,
+        TestUtils testUtils) throws Exception
     {
-        testUtils.loginAsSuperAdmin();
-        // Enforce using a password of 10 characters and a symbol
-        testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0, "passwordLength", 10);
-        testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
-            "passwordRuleOneNumberEnabled", 1);
+        // There's no point of running this one without registration config.
+        if (withRegistrationConfig) {
+            testUtils.loginAsSuperAdmin();
+            // Enforce using a password of 10 characters and a symbol
+            testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0, "passwordLength", 10);
+            testUtils.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
+                "passwordRuleOneNumberEnabled", 1);
 
-        AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki);
+            AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
 
-        String password = "password";
-        registrationPage.fillRegisterForm("John", "Smith", AbstractRegistrationPage.JOHN_SMITH_USERNAME,
-            password, password, "johnsmith@xwiki.org");
-        assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
-        assertTrue(registrationPage.validationFailureMessagesInclude(
-            "Your new password must be at least 10 characters long."));
+            String password = "password";
+            registrationPage.fillRegisterForm("John", "Smith", AbstractRegistrationPage.JOHN_SMITH_USERNAME,
+                password, password, "johnsmith@xwiki.org");
+            assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
+            assertTrue(registrationPage.validationFailureMessagesInclude(
+                "Your new password must be at least 10 characters long."));
 
-        password = "passwordpassword";
-        registrationPage.fillRegisterForm("John", "Smith", AbstractRegistrationPage.JOHN_SMITH_USERNAME,
-            password, password, "johnsmith@xwiki.org");
-        assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
-        assertTrue(registrationPage.validationFailureMessagesInclude(
-            "The password must contain at least one number."));
+            password = "passwordpassword";
+            registrationPage.fillRegisterForm("John", "Smith", AbstractRegistrationPage.JOHN_SMITH_USERNAME,
+                password, password, "johnsmith@xwiki.org");
+            assertFalse(validateAndRegister(testUtils, isModal, registrationPage));
+            assertTrue(registrationPage.validationFailureMessagesInclude(
+                "The password must contain at least one number."));
 
-        password = "password4password";
-        registrationPage.fillRegisterForm("John", "Smith", AbstractRegistrationPage.JOHN_SMITH_USERNAME,
-            password, password, "johnsmith@xwiki.org");
-        assertTrue(validateAndRegister(testUtils, isModal, registrationPage));
-        tryToLoginAsJohnSmith(testUtils, password, registrationPage);
+            password = "password4password";
+            registrationPage.fillRegisterForm("John", "Smith", AbstractRegistrationPage.JOHN_SMITH_USERNAME,
+                password, password, "johnsmith@xwiki.org");
+            assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
+                + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
+            tryToLoginAsJohnSmith(testUtils, password, registrationPage);
+        }
     }
 
 

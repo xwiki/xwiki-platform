@@ -35,7 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @UITest(properties = {
     "xwikiPropertiesAdditionalProperties=security.requiredRights.protection=warning",
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin," 
+        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
 class RequiredRightsIT
 {
@@ -53,7 +54,8 @@ class RequiredRightsIT
 
         setup.gotoPage(testReference, "edit");
 
-        RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement();
+        RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement()
+            .toggleDetails();
         assertEquals(1, requiredRightsPreEditCheckElement.count());
         assertEquals("The document's title contains \"#\" or \"$\" which might be executed as Velocity code "
                 + "if the document's author has script or programming rights.",

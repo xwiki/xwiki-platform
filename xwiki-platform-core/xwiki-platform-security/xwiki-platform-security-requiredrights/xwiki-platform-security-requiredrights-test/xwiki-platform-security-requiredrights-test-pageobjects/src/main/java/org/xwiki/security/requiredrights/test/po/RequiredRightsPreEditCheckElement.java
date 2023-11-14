@@ -73,6 +73,18 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
     }
 
     /**
+     * Expand/Fold the details.
+     *
+     * @return the current object
+     * @since 15.10RC1
+     */
+    public RequiredRightsPreEditCheckElement toggleDetails()
+    {
+        getDriver().findElement(By.className("required-rights-advanced-toggle")).click();
+        return this;
+    }
+
+    /**
      * Get the list of results and store them in {@link #results} the first time the method is called.
      *
      * @return the list of results
@@ -90,6 +102,6 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
      */
     private WebElement getRoot()
     {
-        return getDriver().findElementWithoutWaiting(By.id("requiredRightsResults"));
+        return getDriver().findElementWithoutWaiting(By.className("required-rights-results"));
     }
 }

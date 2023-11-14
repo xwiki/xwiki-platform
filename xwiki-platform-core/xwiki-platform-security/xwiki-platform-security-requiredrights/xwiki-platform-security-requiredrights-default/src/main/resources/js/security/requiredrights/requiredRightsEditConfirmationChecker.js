@@ -44,7 +44,7 @@ require(['jquery'], function ($) {
       })
   }
 
-  const modal = $('.force-edit-lock-modal');
+  const modal = $(document);
   init($(modal));
   modal.on('show.bs.modal', function () {
     init($(this));

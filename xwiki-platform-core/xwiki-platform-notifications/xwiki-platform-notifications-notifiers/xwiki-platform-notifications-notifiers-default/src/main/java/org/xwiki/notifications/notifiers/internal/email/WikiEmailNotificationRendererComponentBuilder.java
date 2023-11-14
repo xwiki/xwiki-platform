@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class WikiEmailNotificationRendererComponentBuilder extends AbstractWikiNotificationRendererComponentBuilder
 {
+    @Inject
     private Provider<WikiEmailNotificationRenderer> rendererProvider;
 
     @Override

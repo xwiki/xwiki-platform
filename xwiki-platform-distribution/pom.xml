@@ -184,22 +184,9 @@
     <xwiki.db.pgsql.extraMappings>mailsender.hbm.xml</xwiki.db.pgsql.extraMappings>
     <xwiki.db.pgsql.hbm.virtualMode>schema</xwiki.db.pgsql.hbm.virtualMode>
 
-    <!-- Derby -->
-    <xwiki.db.derby>derby</xwiki.db.derby>
-    <xwiki.db.derby.connection.username />
-    <xwiki.db.derby.connection.password />
-    <xwiki.db.derby.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.derby.connection.driver_class>
-    <xwiki.db.derby.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.derby.hbm.xwiki>
-    <xwiki.db.derby.hbm.feeds>feeds.hbm.xml</xwiki.db.derby.hbm.feeds>
-    <xwiki.db.derby.extraMappings>mailsender.hbm.xml</xwiki.db.derby.extraMappings>
-
     <!-- Oracle -->
     <xwiki.db.oracle>oracle</xwiki.db.oracle>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
-
-    <!-- H2 -->
-    <xwiki.db.h2>h2</xwiki.db.h2>
-    <xwiki.db.h2.extraMappings>mailsender.hbm.xml</xwiki.db.h2.extraMappings>
 
     <!-- Set HSQLDB by default -->
     <xwiki.db>${xwiki.db.hsqldb}</xwiki.db>

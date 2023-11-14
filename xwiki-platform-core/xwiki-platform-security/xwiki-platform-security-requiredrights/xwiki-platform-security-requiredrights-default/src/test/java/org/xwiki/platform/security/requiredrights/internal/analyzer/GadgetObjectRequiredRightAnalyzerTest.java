@@ -72,12 +72,12 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class GadgetObjectRequiredRightAnalyzerTest
 {
+    @InjectMockComponents
+    private GadgetObjectRequiredRightAnalyzer analyzer;
+
     @MockComponent
     @Named("translation")
     private BlockSupplierProvider<String> translationMessageSupplierProvider;
-
-    @InjectMockComponents
-    private GadgetObjectRequiredRightAnalyzer analyzer;
 
     @MockComponent
     private DocumentContextExecutor documentContextExecutor;

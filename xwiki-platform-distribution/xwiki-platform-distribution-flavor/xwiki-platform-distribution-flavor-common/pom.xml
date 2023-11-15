@@ -273,9 +273,9 @@
     </dependency>
     <!-- Temporary dependency until we migrate recommended extensions to jQuery 3.x -->
     <dependency>
-      <groupId>org.webjars</groupId>
+      <groupId>org.webjars.npm</groupId>
       <artifactId>jquery-migrate</artifactId>
-      <version>3.3.2</version>
+      <version>3.4.1</version>
       <optional>true</optional>
     </dependency>
     <!-- Inject the legacy event migrator in the administration -->

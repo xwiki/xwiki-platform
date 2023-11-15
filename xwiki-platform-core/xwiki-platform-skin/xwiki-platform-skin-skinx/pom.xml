@@ -76,8 +76,6 @@
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>
       <artifactId>yuicompressor</artifactId>
-      <!-- See https://jira.xwiki.org/browse/XWIKI-6148 to understand why we use a specially packaged version of
-           yuicompressor -->
       <version>2.4.8</version>
     </dependency>
     <!-- Used to minify and optimize the JavaScript code. -->

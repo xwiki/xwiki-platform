@@ -6772,11 +6772,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Return the document in the provided language.
      * <p>
-     * This method return this if the provided language does not exists. See
+     * This method return this if the provided language does not exist. See
      *
      * @param language the language of the document to return
      * @param context the XWiki Context
-     * @return the document in the provided language or this if the provided language does not exists
+     * @return the document in the provided language or this if the provided language does not exist
      * @throws XWikiException error when loading the document
      * @deprecated use {@link #getTranslatedDocument(Locale, XWikiContext)} instead
      */
@@ -6789,11 +6789,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Return the document in the provided language.
      * <p>
-     * This method return this if the provided language does not exists. See
+     * This method return this if the provided language does not exist. See
      *
      * @param locale the locale of the document to return
      * @param context the XWiki Context
-     * @return the document in the provided language or this if the provided language does not exists
+     * @return the document in the provided language or this if the provided language does not exist
      * @throws XWikiException error when loading the document
      */
     public XWikiDocument getTranslatedDocument(Locale locale, XWikiContext context) throws XWikiException

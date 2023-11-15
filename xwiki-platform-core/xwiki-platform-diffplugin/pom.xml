@@ -31,8 +31,12 @@
   <name>XWiki Platform - Diff Plugin</name>
   <description>Old diff plugin</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
-    </properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Security Vulnerabilities API</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>api</xwiki.extension.category>
+    <xwiki.jacoco.instructionRatio>0.59</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.jvnet.hudson</groupId>

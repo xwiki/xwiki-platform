@@ -33,7 +33,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>User Mentions API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.34</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.32</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

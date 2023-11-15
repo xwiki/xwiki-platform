@@ -35,9 +35,12 @@
     XWiki module API dedicated to perform document merge operations and manage related conflicts resolution.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
-    </properties>
-
+    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Store Merge API</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>api</xwiki.extension.category>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

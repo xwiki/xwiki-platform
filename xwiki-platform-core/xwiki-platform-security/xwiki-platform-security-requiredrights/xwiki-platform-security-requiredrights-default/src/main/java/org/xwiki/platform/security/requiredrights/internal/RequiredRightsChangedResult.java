@@ -71,6 +71,7 @@ public class RequiredRightsChangedResult implements Serializable
      * @param added {code true} if the right is granted to the current user, {@code false} if the right is granted
      *     to the document author
      * @param manualReviewNeeded {@code true} if manual review is needed for the right, {@code false} otherwise
+     * @since 15.10RC1
      */
     public void add(RequiredRightAnalysisResult analysis, Right right, boolean added,
         boolean manualReviewNeeded)

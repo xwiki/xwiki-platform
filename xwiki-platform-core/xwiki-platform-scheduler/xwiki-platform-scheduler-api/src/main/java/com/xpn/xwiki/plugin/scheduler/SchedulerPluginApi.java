@@ -58,7 +58,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
 
     /**
      * Return the trigger state of the given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS}
-     * XObject job. Possible values are : None (the trigger does not exists yet, or has been deleted), Normal, Blocked,
+     * XObject job. Possible values are : None (the trigger does not exist yet, or has been deleted), Normal, Blocked,
      * Complete, Error and Paused
      * 
      * @param object the XObject job to give the state of

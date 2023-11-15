@@ -1485,7 +1485,7 @@ public class Package
                 files.put(docInfo.getDoc().getSpace(), new HashMap<String, List<Map<String, String>>>());
             }
 
-            // If the document name does not exists in the space map of docs, we create it.
+            // If the document name does not exist in the space map of docs, we create it.
             if (files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
                 files.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
                     new ArrayList<Map<String, String>>());

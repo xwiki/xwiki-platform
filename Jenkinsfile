@@ -121,7 +121,10 @@ def builds = [
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy,coverage',
       properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec',
-      sonar: true
+      // We don't push to sonarcloud since it requires Java 17 since the 15th of November and that would force us
+      // to make the 14.10.x branch build with Java 17 which is not easy to do. This will autofix itself when the
+      // next LTS is 15.10.x.
+      sonar: false
     )
   }
 ]

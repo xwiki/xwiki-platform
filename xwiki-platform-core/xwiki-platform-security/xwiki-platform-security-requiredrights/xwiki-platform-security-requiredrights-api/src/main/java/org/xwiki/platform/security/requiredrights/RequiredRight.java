@@ -60,6 +60,13 @@ public class RequiredRight implements Serializable
     public static final RequiredRight MAYBE_SCRIPT = new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true);
 
     /**
+     * Wiki-level admin right required.
+     *
+     * @since 15.10RC1
+     */
+    public static final RequiredRight WIKI_ADMIN = new RequiredRight(Right.ADMIN, EntityType.WIKI, false);
+
+    /**
      * Script right is required, programming right might be required.
      */
     public static final List<RequiredRight> SCRIPT_AND_MAYBE_PROGRAM = List.of(SCRIPT, MAYBE_PROGRAM);

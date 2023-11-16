@@ -77,7 +77,7 @@
 
 
 
-  {{html wiki='false'}}
+  {{html}}
     <div>
       #set ($translatedMessage = $services.localization.render($translationKey))
       $escapetool.xml($translatedMessage)

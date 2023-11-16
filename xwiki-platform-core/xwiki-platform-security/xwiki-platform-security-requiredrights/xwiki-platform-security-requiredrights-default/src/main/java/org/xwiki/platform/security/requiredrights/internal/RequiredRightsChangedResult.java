@@ -119,6 +119,7 @@ public class RequiredRightsChangedResult implements Serializable
 
     /**
      * @return {@code true} if the result is empty, {@code false} otherwise
+     * @since 15.10RC1
      */
     public boolean isEmpty()
     {
@@ -151,6 +152,7 @@ public class RequiredRightsChangedResult implements Serializable
      * Returns a map of added rights as keys, and whether they require manual review as values.
      *
      * @return a map of added rights as keys, and whether they require manual review as values
+     * @since 15.10RC1
      */
     public Map<Right, Boolean> getAddedRights()
     {
@@ -161,6 +163,7 @@ public class RequiredRightsChangedResult implements Serializable
      * Returns a map of removed rights as keys, and whether they require manual review as values.
      *
      * @return a map of removed rights as keys, and whether they require manual review as values
+     * @since 15.10RC1
      */
     public Map<Right, Boolean> getRemovedRights()
     {
@@ -169,6 +172,7 @@ public class RequiredRightsChangedResult implements Serializable
 
     /**
      * @return {@code true} if any of the rights require manual review
+     * @since 15.10RC1
      */
     public boolean hasRightWithManualReviewNeeded()
     {

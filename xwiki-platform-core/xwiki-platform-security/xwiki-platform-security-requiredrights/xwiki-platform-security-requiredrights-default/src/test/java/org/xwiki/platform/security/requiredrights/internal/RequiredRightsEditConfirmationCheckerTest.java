@@ -19,7 +19,6 @@
  */
 package org.xwiki.platform.security.requiredrights.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +31,6 @@ import javax.script.ScriptContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
@@ -192,9 +190,7 @@ class RequiredRightsEditConfirmationCheckerTest
             WordBlock wordBlock = invocation.getArgument(0);
             printer.print(wordBlock.getWord());
             return null;
-        })
-            .when(this.htmlBlockRender)
-            .render(Mockito.<Block>any(), any());
+        }).when(this.htmlBlockRender).render(any(Block.class), any());
 
         RequiredRightsChangedResult result = new RequiredRightsChangedResult();
         DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");

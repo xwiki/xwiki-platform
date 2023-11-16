@@ -73,7 +73,7 @@ class RequiredRightsIT
 
         setup.createUserAndLogin("U1", "U1p");
 
-        // Create a page with a title containing a string that could be interpreted as velocity.
+        // Create a page with two velocity macros, by an user without script right.
         setup.createPage(testReference, "{{velocity}}macro1{{/velocity}}\n"
             + "{{velocity}}macro2{{/velocity}}", "");
 

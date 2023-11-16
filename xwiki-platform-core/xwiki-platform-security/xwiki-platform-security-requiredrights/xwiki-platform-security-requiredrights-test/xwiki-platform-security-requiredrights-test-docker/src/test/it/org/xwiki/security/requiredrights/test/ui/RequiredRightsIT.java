@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @UITest(properties = {
     "xwikiPropertiesAdditionalProperties=security.requiredRights.protection=warning",
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin," 
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
         + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
 class RequiredRightsIT
@@ -62,5 +62,40 @@ class RequiredRightsIT
             requiredRightsPreEditCheckElement.getSummary(0));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
         assertEquals("The title is [Hello $a].", requiredRightsPreEditCheckElement.getDetailedMessage(0));
+    }
+
+    @Test
+    void checkContentWithVelocityMacro(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+
+        setup.deletePage(testReference);
+
+        setup.createUserAndLogin("U1", "U1p");
+
+        // Create a page with two velocity macros, by an user without script right.
+        setup.createPage(testReference, "{{velocity}}macro1{{/velocity}}\n"
+            + "{{velocity}}macro2{{/velocity}}", "");
+
+        setup.loginAsSuperAdmin();
+
+        setup.gotoPage(testReference, "edit");
+
+        RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement()
+            .toggleDetails();
+        assertEquals(2, requiredRightsPreEditCheckElement.count());
+        assertEquals("A [velocity] scripting macro requires script rights.",
+            requiredRightsPreEditCheckElement.getSummary(0));
+        requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
+        assertEquals("Content\n"
+            + "the velocity script to execute\n"
+            + "macro1", requiredRightsPreEditCheckElement.getDetailedMessage(0));
+
+        assertEquals("A [velocity] scripting macro requires script rights.",
+            requiredRightsPreEditCheckElement.getSummary(1));
+        requiredRightsPreEditCheckElement.toggleDetailedMessage(1);
+        assertEquals("Content\n"
+            + "the velocity script to execute\n"
+            + "macro2", requiredRightsPreEditCheckElement.getDetailedMessage(1));
     }
 }

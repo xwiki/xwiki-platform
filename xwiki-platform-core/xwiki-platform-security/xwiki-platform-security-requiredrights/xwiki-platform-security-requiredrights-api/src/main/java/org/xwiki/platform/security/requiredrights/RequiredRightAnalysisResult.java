@@ -19,7 +19,6 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -38,13 +37,13 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @since 15.9RC1
  */
 @Unstable
-public class RequiredRightAnalysisResult implements Serializable
+public class RequiredRightAnalysisResult
 {
     private final EntityReference entityReference;
 
-    private final transient Supplier<Block> summaryMessageProvider;
+    private final Supplier<Block> summaryMessageProvider;
 
-    private final transient Supplier<Block> detailedMessageProvider;
+    private final Supplier<Block> detailedMessageProvider;
 
     private final List<RequiredRight> requiredRights;
 
@@ -125,6 +124,8 @@ public class RequiredRightAnalysisResult implements Serializable
         return new EqualsBuilder()
             .append(this.entityReference, that.entityReference)
             .append(this.requiredRights, that.requiredRights)
+            .append(this.summaryMessageProvider, that.summaryMessageProvider)
+            .append(this.detailedMessageProvider, that.detailedMessageProvider)
             .isEquals();
     }
 
@@ -134,6 +135,8 @@ public class RequiredRightAnalysisResult implements Serializable
         return new HashCodeBuilder(17, 37)
             .append(this.entityReference)
             .append(this.requiredRights)
+            .append(this.summaryMessageProvider)
+            .append(this.detailedMessageProvider)
             .toHashCode();
     }
 }

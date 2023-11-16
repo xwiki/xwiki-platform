@@ -20,7 +20,6 @@
 package org.xwiki.uiextension;
 
 import java.io.StringWriter;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.Test;
-import org.xwiki.cache.CacheControl;
 import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
@@ -105,9 +103,6 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
     @MockComponent
     private AuthorizationManager authorizationManager;
 
-    @MockComponent
-    private CacheControl cacheControl;
-
     @InjectMockComponents
     private WikiUIExtensionComponentBuilder builder;
 
@@ -121,9 +116,6 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
     @BeforeComponent
     public void configure(MockitoComponentManager componentManager, MockitoOldcore oldcore) throws Exception
     {
-        // Allow caching by default
-        when(this.cacheControl.isCacheReadAllowed((ChronoLocalDateTime) any())).thenReturn(true);
-
         // Required by BaseObjectReference
         DocumentReferenceResolver<String> resolver =
             componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);

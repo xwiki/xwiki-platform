@@ -20,7 +20,6 @@
 package org.xwiki.rendering.wikimacro.internal;
 
 import java.lang.reflect.Type;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +28,6 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.cache.CacheControl;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.model.reference.DocumentReference;
@@ -62,7 +60,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -92,9 +89,6 @@ class DefaultWikiMacroFactoryTest
     private ContentParser contentParser;
 
     @MockComponent
-    private CacheControl cacheControl;
-
-    @MockComponent
     @Named("macro")
     protected Transformation macroTransformation;
 
@@ -104,9 +98,6 @@ class DefaultWikiMacroFactoryTest
     @BeforeEach
     protected void setUp() throws Exception
     {
-        // Allow caching by default
-        when(this.cacheControl.isCacheReadAllowed((ChronoLocalDateTime) any())).thenReturn(true);
-
         // Build the macro definition document.
         this.macroObject = new BaseObject();
         this.macroObject.setXClassReference(WikiMacroConstants.WIKI_MACRO_CLASS_REFERENCE);

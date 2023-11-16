@@ -43,9 +43,11 @@ import com.xpn.xwiki.objects.BaseObject;
  * Required right analyzer for instances of XWiki.GadgetClass.
  *
  * @version $Id$
+ * @since 15.10RC1
  */
-@Component(hints = { "XWiki.GadgetClass" })
+@Component
 @Singleton
+@Named("XWiki.GadgetClass")
 public class GadgetObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
     @Inject

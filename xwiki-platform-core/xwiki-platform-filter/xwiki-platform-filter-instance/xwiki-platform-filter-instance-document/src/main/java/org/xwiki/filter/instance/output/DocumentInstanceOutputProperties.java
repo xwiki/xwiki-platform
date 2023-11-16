@@ -217,12 +217,12 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate if an exception should be thrown if a document save fail.
+     * @return Indicate if an exception should be thrown if a document save fails.
      * @since 6.2.6
      * @since 6.4.2
      */
-    @PropertyName("Stop when document save fail")
-    @PropertyDescription("Indicate if an exception should be thrown if a document save fail")
+    @PropertyName("Stop when document save fails")
+    @PropertyDescription("Indicate if an exception should be thrown if a document save fails")
     public boolean isStoppedWhenSaveFail()
     {
         return this.stoppedWhenSaveFail;

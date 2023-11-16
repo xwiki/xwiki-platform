@@ -44,6 +44,7 @@
 @import "modals";
 @import "misc";
 @import "panels";
+@import "scafolding";
 @import "tables";
 @import "tree";
 @import "type";

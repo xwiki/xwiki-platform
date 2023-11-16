@@ -60,4 +60,4 @@
   && ($isAdvancedUser || $stringtool.contains($renderedContent, 'xwikirenderingerror')))
   #warning($escapetool.xml($services.localization.render('core.document.restrictedInfo')))
 #end
-<hr/>
+<hr class="separator"/>

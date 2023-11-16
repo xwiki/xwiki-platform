@@ -105,6 +105,7 @@
   ## XWiki variables: LESS variables specific to XWiki
   ##
   @xwiki-border-color:                  $theme.borderColor;
+  @xwiki-separator-color:               @xwiki-border-color:;
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;

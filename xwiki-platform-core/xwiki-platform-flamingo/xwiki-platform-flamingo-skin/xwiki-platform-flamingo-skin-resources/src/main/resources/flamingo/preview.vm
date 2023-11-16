@@ -21,7 +21,7 @@
 <div class="main layoutsubsection">
 #template("hierarchy.vm")
 #template("contentview.vm")
-<hr />
+<hr class="separator"/>
 <div class="bottombuttons sticky-buttons">#template("previewactions.vm")</div>
 </div> ## main
 #template("endpage.vm")

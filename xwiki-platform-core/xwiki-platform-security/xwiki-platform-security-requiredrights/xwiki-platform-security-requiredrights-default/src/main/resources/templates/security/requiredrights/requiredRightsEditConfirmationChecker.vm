@@ -74,13 +74,10 @@
 #macro(displayRightsSentence $rightsMap $translationKey)
   #set ($footnoteChar = $services.localization.render('security.requiredrights.confirmationChecker.footnoteChar'))
   #if(!$rightsMap.isEmpty())
-
-
-
   {{html}}
     <div>
       #set ($translatedMessage = $services.localization.render($translationKey))
-      $escapetool.xml($translatedMessage)
+      <p>$escapetool.xml($translatedMessage)</p>
       <ul>
       #foreach ($entry in $rightsMap.entrySet())
         <li>$entry.key#if ($entry.value)<sup>$escapetool.xml($footnoteChar)</sup>#end</li>
@@ -89,15 +86,15 @@
     </div>
   {{/html}}
 
-
-
   #end
 #end
 #set ($counter = 0)
 #initRequiredSkinExtensions()
 #set ($discard = $xwiki.ssrx.use('css/security/requiredrights/requiredRightsEditConfirmationChecker.css'))
 #set ($discard = $xwiki.jsrx.use('js/security/requiredrights/requiredRightsEditConfirmationChecker.js'))
-{{/velocity}}{{velocity}}
+{{/velocity}}
+
+{{velocity}}
 #displayRightsSentence($analysisResults.getAddedRights() 'security.requiredrights.confirmationChecker.addedRights')
 #displayRightsSentence($analysisResults.getRemovedRights() 'security.requiredrights.confirmationChecker.removedRights')
 #if ($analysisResults.hasRightWithManualReviewNeeded())
@@ -106,10 +103,10 @@
       $services.localization.render('security.requiredrights.confirmationChecker.footnoteChar')
     ]))
   $services.rendering.escape($footnoteMessage, 'xwiki/2.1')
+
 #end
 #if ($analysisResults.hasAdded() || $analysisResults.hasRemoved())##
-
-{{html wiki='false'}}
+{{html}}
 <a href="#" class="required-rights-advanced-toggle" aria-controls="requiredRightsResults" aria-expanded="false">
   <span class="toggle-expand">
     $services.icon.renderHTML('caret-right')
@@ -136,7 +133,9 @@
   #end
   )))
 #end
-{{/velocity}}{{velocity output='false'}}
+{{/velocity}}
+
+{{velocity output='false'}}
 #getRequiredSkinExtensions($requiredSkinExtensions)
 #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 {{/velocity}}

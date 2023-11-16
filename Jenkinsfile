@@ -117,12 +117,13 @@ def builds = [
     //   which cover code in other modules)
     build(
       name: 'Quality',
-      // We don't run sonar and push to sonarcloud since it requires Java 17 since the 15th of November and that
-      // would force us to make the 14.10.x branch build with Java 17 which is not easy to do. This will autofix
-      // itself when the next LTS is 15.10.x.
-      goals: 'clean install jacoco:report',
+      goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy,coverage',
-      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec'
+      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec',
+      // Build with Java 17 since SonarCloud now requires it ("Starting from the 15th of November 2023,
+      // SonarCloud will no longer accept scans executed using Java 11"). To be removed once we build commons on
+      // Java 17.
+      javaTool: 'java17'
     )
   }
 ]

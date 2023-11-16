@@ -23,44 +23,49 @@
  *
  **/
 
-import { DefaultVueTemplateProvider } from "@cristal/skin";
-import { MacroProvider } from "@cristal/skin";
-import { MacroData } from "@cristal/skin";
-import { DefaultMacroData } from "@cristal/skin";
+import {
+  DefaultVueTemplateProvider,
+  DefaultMacroData,
+  MacroData,
+  MacroProvider,
+} from "@cristal/skin";
 
-export abstract class DefaultMacroProvider extends DefaultVueTemplateProvider implements MacroProvider {
-    public static cname = "cristal.macro";
-    public static hint = "macro";
-    public static priority = 1000;
-    public static singleton = true;
-    
-    
-    constructor() {
-        super()
-    }
+export abstract class DefaultMacroProvider
+  extends DefaultVueTemplateProvider
+  implements MacroProvider
+{
+  public static cname = "cristal.macro";
+  public static hint = "macro";
+  public static priority = 1000;
+  public static singleton = true;
 
-    getMacroRenderingType() {
-        return "vue";
-    }
+  getMacroRenderingType() {
+    return "vue";
+  }
 
-    parseParameters(element: HTMLElement): MacroData {
-        let macroData = new DefaultMacroData();
-        let attrs = element.getAttributeNames();
-        for (let i in attrs) {
-            let attr = attrs[i];
-            if (attr!="class" && attr!="macro-name") {
-                let value = element.getAttribute(attr);
-                if (value)
-                    macroData.getMacroParameters().set(attr, value)
-            }
+  parseParameters(element: HTMLElement): MacroData {
+    const macroData = new DefaultMacroData();
+    const attrs = element.getAttributeNames();
+    for (const i in attrs) {
+      const attr = attrs[i];
+      if (attr != "class" && attr != "macro-name") {
+        const value = element.getAttribute(attr);
+        if (value) {
+          macroData.getMacroParameters().set(attr, value);
         }
-        let content = element.firstChild?.textContent?.replace(/\[CDATA\[(.*?)\]\]/,"$1")
-        if (content)
-          macroData.setMacroContent(content);
-        return macroData;
+      }
     }
+    const content = element.firstChild?.textContent?.replace(
+      /\[CDATA\[(.*?)\]\]/,
+      "$1",
+    );
+    if (content) {
+      macroData.setMacroContent(content);
+    }
+    return macroData;
+  }
 
-    abstract getMacroName(): string;
-    
-    abstract renderMacroAsHTML(macroData: MacroData): String;
+  abstract getMacroName(): string;
+
+  abstract renderMacroAsHTML(macroData: MacroData): string;
 }

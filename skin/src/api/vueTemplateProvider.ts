@@ -26,11 +26,11 @@
 import { App, Component } from "vue";
 
 export interface VueTemplateProvider {
-    getVueComponent() : Component;
-    
-    getVueName() : string;
-    
-    isGlobal() : boolean;
+  getVueComponent(): Component;
 
-    registerComponents(app : App) : void;
+  getVueName(): string;
+
+  isGlobal(): boolean;
+
+  registerComponents(app: App): void;
 }

@@ -23,28 +23,32 @@
  *
  **/
 
-import { MenuEntryButton1 } from './menuEntryButton1';
-import { UIXMenuTemplateProvider } from './uixMenuTemplateProvider';
-import { UIXMenuTemplateProvider2 } from './uixMenuTemplateProvider2';
+import { MenuEntryButton1 } from "./menuEntryButton1";
+import { UIXMenuTemplateProvider } from "./uixMenuTemplateProvider";
+import { UIXMenuTemplateProvider2 } from "./uixMenuTemplateProvider2";
 import { Container } from "inversify";
-import { UIXTemplateProvider } from '@cristal/skin';
-import { MenuEntry } from '../api/menuEntry';
-import { Logger } from '@cristal/api';
-
+import { UIXTemplateProvider } from "@cristal/skin";
+import { MenuEntry } from "../api/menuEntry";
+import { Logger } from "@cristal/api";
 
 export class ComponentInit {
-    logger : Logger;
+  logger: Logger;
 
-    constructor(container : Container) {
-        this.logger = container.get<Logger>("Logger");
-        this.logger.setModule("menubuttons.components.componentsInit");
+  constructor(container: Container) {
+    this.logger = container.get<Logger>("Logger");
+    this.logger.setModule("menubuttons.components.componentsInit");
 
-        this.logger?.debug("Init MenuButtons components begin")
-        container.bind<MenuEntry>("MenuEntry").to(MenuEntryButton1);
-        container.bind<UIXTemplateProvider>("UIXTemplateProvider").to(UIXMenuTemplateProvider).whenTargetNamed(UIXMenuTemplateProvider.extensionPoint);
-        container.bind<UIXTemplateProvider>("UIXTemplateProvider").to(UIXMenuTemplateProvider2).whenTargetNamed(UIXMenuTemplateProvider2.extensionPoint);
+    this.logger?.debug("Init MenuButtons components begin");
+    container.bind<MenuEntry>("MenuEntry").to(MenuEntryButton1);
+    container
+      .bind<UIXTemplateProvider>("UIXTemplateProvider")
+      .to(UIXMenuTemplateProvider)
+      .whenTargetNamed(UIXMenuTemplateProvider.extensionPoint);
+    container
+      .bind<UIXTemplateProvider>("UIXTemplateProvider")
+      .to(UIXMenuTemplateProvider2)
+      .whenTargetNamed(UIXMenuTemplateProvider2.extensionPoint);
 
-        this.logger?.debug("Init MenuButtons components end")
-    }
+    this.logger?.debug("Init MenuButtons components end");
+  }
 }
-

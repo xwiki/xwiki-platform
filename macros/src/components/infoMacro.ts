@@ -24,21 +24,21 @@
  **/
 
 import { AlertMacro } from "./alertMacro";
-import Info from "../vue/info.vue";
+import Info from "../vue/c-info.vue";
 
 export class InfoMacro extends AlertMacro {
-    public static cname = "cristal.macro.info";
-    public static macroName = "info";
-       
-    constructor() {
-        super()
-    }
+  public static cname = "cristal.macro.info";
+  public static macroName = "info";
 
-    getMacroName(): string {
-        return InfoMacro.macroName;
-    }
+  constructor() {
+    super();
+  }
 
-    getVueComponent() {
-        return Info;
-    }
+  getMacroName(): string {
+    return InfoMacro.macroName;
+  }
+
+  getVueComponent() {
+    return Info;
+  }
 }

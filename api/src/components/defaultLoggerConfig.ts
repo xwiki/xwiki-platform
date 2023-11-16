@@ -28,98 +28,87 @@ import { LoggerConfig } from "../api/loggerConfig";
 
 @injectable()
 export class DefaultLoggerConfig implements LoggerConfig {
-    protected config : Map<string, string>;
-    protected computedConfig : Map<string, number>;
-    protected defaultLevel : string;
-    protected defaultLevelId : number;
-    protected levels : Map<string, number> = new Map<string, number>()
+  protected config: Map<string, string>;
+  protected computedConfig: Map<string, number>;
+  protected defaultLevel: string;
+  protected defaultLevelId: number;
+  protected levels: Map<string, number> = new Map<string, number>();
 
-    constructor(defaultLevel = "error") {
-        this.config = new Map<string, string>();
-        this.defaultLevel = defaultLevel;
-        this.computedConfig = new Map<string, number>();
-        this.levels.set("error", 1);
-        this.levels.set("warn", 2);
-        this.levels.set("info", 3);
-        this.levels.set("debug", 4);
-    }
+  constructor(defaultLevel = "error") {
+    this.config = new Map<string, string>();
+    this.defaultLevel = defaultLevel;
+    this.computedConfig = new Map<string, number>();
+    this.levels.set("error", 1);
+    this.levels.set("warn", 2);
+    this.levels.set("info", 3);
+    this.levels.set("debug", 4);
+  }
 
-    addLevel(module: string, level: string): void {
-        const nbLevel = this.levels.get(level);
-        if (nbLevel != undefined) {
-            this.config.forEach(key => {
-                if (key.startsWith(module)) {
-                    const currentLevel = this.computedConfig.get(key);
-                    if (currentLevel == null || (nbLevel && nbLevel > currentLevel)) {
-                        if (nbLevel)
-                         this.computedConfig.set(key, nbLevel);
-                    }
-                    
-                }                                                  
-            });
+  addLevel(module: string, level: string): void {
+    const nbLevel = this.levels.get(level);
+    if (nbLevel != undefined) {
+      this.config.forEach((key) => {
+        if (key.startsWith(module)) {
+          const currentLevel = this.computedConfig.get(key);
+          if (currentLevel == null || (nbLevel && nbLevel > currentLevel)) {
+            if (nbLevel) this.computedConfig.set(key, nbLevel);
+          }
         }
+      });
     }
-    getLevels(): Map<string, string> {
-        return this.config;
+  }
+  getLevels(): Map<string, string> {
+    return this.config;
+  }
+
+  getLevel(module: string): string {
+    let level = this.config.get(module);
+    if (!level) level = this.defaultLevel;
+    return level;
+  }
+
+  getLevelId(level: string): number {
+    const nbLevel = this.levels.get(level);
+    if (!nbLevel) return 10;
+    else return nbLevel;
+  }
+
+  setDefaultLevel(level: string) {
+    this.defaultLevel = level;
+    this.defaultLevelId = this.getLevelId(this.defaultLevel);
+  }
+
+  getDefaultLevel(): string {
+    return this.defaultLevel;
+  }
+
+  getDefaultLevelId(): number {
+    if (this.defaultLevelId) return this.defaultLevelId;
+    else {
+      this.defaultLevelId = this.getLevelId(this.defaultLevel);
+      return this.defaultLevelId;
     }
+  }
 
-    getLevel(module: string): string {
-        let level = this.config.get(module);
-        if (!level)
-          level = this.defaultLevel;
-        return level;
+  hasLevel(module: string, level: string): boolean {
+    let nbLevel = this.computedConfig.get(module);
+    if (!nbLevel) nbLevel = this.getDefaultLevelId();
+    const demandedLevel = this.getLevelId(level);
+
+    if (demandedLevel) {
+      if (nbLevel >= demandedLevel) return true;
     }
+    return false;
+  }
 
-    getLevelId(level: string) : number {
-        const nbLevel = this.levels.get(level);
-        if (!nbLevel)
-           return 10;
-        else 
-           return nbLevel;
+  hasLevelId(module: string, levelId: number): boolean {
+    let nbLevel = this.computedConfig.get(module);
+    if (!nbLevel) nbLevel = this.getDefaultLevelId();
+    const demandedLevel = levelId;
+
+    if (demandedLevel) {
+      if (nbLevel >= demandedLevel) return true;
     }
-
-    setDefaultLevel(level : string) {
-        this.defaultLevel = level;
-        this.defaultLevelId = this.getLevelId(this.defaultLevel);
-    }
-
-    getDefaultLevel() : string {
-        return this.defaultLevel;
-    }
-
-    getDefaultLevelId() : number {
-        if (this.defaultLevelId)
-          return this.defaultLevelId;
-        else {
-            this.defaultLevelId = this.getLevelId(this.defaultLevel)
-            return this.defaultLevelId;
-        }
-    }
-
-    hasLevel(module: string, level: string): boolean {
-        let nbLevel = this.computedConfig.get(module);
-        if (!nbLevel)
-          nbLevel = this.getDefaultLevelId();
-        const demandedLevel = this.getLevelId(level);
-
-        if (demandedLevel) {
-           if (nbLevel >= demandedLevel)
-             return true;
-        } 
-        return false;
-    }
-
-    hasLevelId(module: string, levelId: number): boolean {
-        let nbLevel = this.computedConfig.get(module);
-        if (!nbLevel)
-          nbLevel = this.getDefaultLevelId();
-        const demandedLevel = levelId;
-
-        if (demandedLevel) {
-           if (nbLevel >= demandedLevel)
-             return true;
-        } 
-        return false;
-    }
-
+    return false;
+  }
 }

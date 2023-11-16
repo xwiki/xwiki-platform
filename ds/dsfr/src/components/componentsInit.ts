@@ -28,8 +28,10 @@ import { Container } from "inversify";
 import { DSFRDesignSystemLoader } from "./dsfrDesignSystemLoader";
 
 export default class ComponentInit {
-    constructor(container : Container) {
-        container.bind<DesignSystemLoader>("DesignSystemLoader").to(DSFRDesignSystemLoader).whenTargetNamed("dsfr");
-    }
+  constructor(container: Container) {
+    container
+      .bind<DesignSystemLoader>("DesignSystemLoader")
+      .to(DSFRDesignSystemLoader)
+      .whenTargetNamed("dsfr");
+  }
 }
-

@@ -26,9 +26,12 @@
 import { WikiConfig } from "@cristal/api";
 
 export interface Renderer {
-    
-    preloadConverters() : Promise<void>;
+  preloadConverters(): Promise<void>;
 
-    convert(source : string, sourceSyntax : string, targetSyntax: string, wikiConfig: WikiConfig) : string;
+  convert(
+    source: string,
+    sourceSyntax: string,
+    targetSyntax: string,
+    wikiConfig: WikiConfig,
+  ): string;
 }
-

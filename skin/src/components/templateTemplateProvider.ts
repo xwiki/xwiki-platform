@@ -25,35 +25,37 @@
 
 import { VueTemplateProvider } from "../api/vueTemplateProvider";
 import DefaultVueTemplateProvider from "./defaultUIXTemplateProvider";
-import Template from "../vue/template.vue";
+import Template from "../vue/c-template.vue";
 import { Component } from "vue";
 import { Container, injectable } from "inversify";
 import "reflect-metadata";
 
 @injectable()
 export class TemplateComponent extends DefaultVueTemplateProvider {
-    public static cname = "cristal.vuejs.component";
-    public static hint = "template";
-    public static priority = 1000;
-    public static singleton = true;
-    
-    constructor() {
-        super();
-    }
+  public static cname = "cristal.vuejs.component";
+  public static hint = "template";
+  public static priority = 1000;
+  public static singleton = true;
 
-    getVueComponent(): Component {
-            return Template;
-    }
+  constructor() {
+    super();
+  }
 
-    getVueName() : string {
-        return "Template";
-    }
+  getVueComponent(): Component {
+    return Template;
+  }
 
-    isGlobal() : boolean {
-        return true;
-    }
+  getVueName(): string {
+    return "Template";
+  }
 
-    bindToContainer(container: Container): void {
-        container.bind<VueTemplateProvider>("VueTemplateProvider").to(TemplateComponent);
-    }
-} 
+  isGlobal(): boolean {
+    return true;
+  }
+
+  bindToContainer(container: Container): void {
+    container
+      .bind<VueTemplateProvider>("VueTemplateProvider")
+      .to(TemplateComponent);
+  }
+}

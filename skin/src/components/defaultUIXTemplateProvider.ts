@@ -29,14 +29,16 @@ import "reflect-metadata";
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
 
 @injectable()
-export default class DefaultUIXTemplateProvider extends DefaultVueTemplateProvider implements VueTemplateProvider {
-    public static cname = "cristal.vuejs.component";
-    public static hint = "uix";
-    public static priority = 1000;
-    public static singleton = true;
-    
-    
-    constructor() {
-        super()
-    }
-} 
+export default class DefaultUIXTemplateProvider
+  extends DefaultVueTemplateProvider
+  implements VueTemplateProvider
+{
+  public static cname = "cristal.vuejs.component";
+  public static hint = "uix";
+  public static priority = 1000;
+  public static singleton = true;
+
+  constructor() {
+    super();
+  }
+}

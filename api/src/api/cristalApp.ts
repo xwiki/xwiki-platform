@@ -32,35 +32,52 @@ import { LoggerConfig } from "./loggerConfig";
 import { SkinManager } from "./skinManager";
 
 export interface CristalApp {
+  getApp(): App;
 
-    getApp() : App;
-    getRouter() : Router;
-    getContainer() : Container;
-    setContainer(container : Container) : void;
- 
-    getWikiConfig() : WikiConfig;
-    setWikiConfig(wikiConfig : WikiConfig) : void;
+  getRouter(): Router;
 
-    getSkinManager() : SkinManager;
+  getContainer(): Container;
 
-    switchConfig(configName : string) : void;
+  setContainer(container: Container): void;
 
-    setAvailableConfigurations(config : Map<string, any>) : void;
-    getAvailableConfigurations() : Map<string, WikiConfig>;
+  getWikiConfig(): WikiConfig;
 
-    run() : Promise<void>;
+  setWikiConfig(wikiConfig: WikiConfig): void;
 
-    getUIXTemplates(extensionPoint : string) : Array<Component>;
-    getMenuEntries() : Array<string>;
+  getSkinManager(): SkinManager;
 
-    getCurrentPage(): string;
-    setCurrentPage(page : string): void;
-    setContentRef(ref : Ref) : void; 
-    loadPageFromURL(url : string) : Promise<void>;
-    loadPage() : Promise<void>;
+  switchConfig(configName: string): void;
 
-    getLogger(module : string) : Logger;
-    getLoggerConfig() : LoggerConfig;
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setAvailableConfigurations(config: Map<string, any>): void;
 
-    renderContent(source : string, sourceSyntax : string, targetSyntax : string, wikiConfig : WikiConfig) : string;
+  getAvailableConfigurations(): Map<string, WikiConfig>;
+
+  run(): Promise<void>;
+
+  getUIXTemplates(extensionPoint: string): Array<Component>;
+
+  getMenuEntries(): Array<string>;
+
+  getCurrentPage(): string;
+
+  setCurrentPage(page: string): void;
+
+  setContentRef(ref: Ref): void;
+
+  loadPageFromURL(url: string): Promise<void>;
+
+  loadPage(): Promise<void>;
+
+  getLogger(module: string): Logger;
+
+  getLoggerConfig(): LoggerConfig;
+
+  renderContent(
+    source: string,
+    sourceSyntax: string,
+    targetSyntax: string,
+    wikiConfig: WikiConfig,
+  ): string;
 }

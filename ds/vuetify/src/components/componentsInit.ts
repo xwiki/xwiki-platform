@@ -28,8 +28,10 @@ import { Container } from "inversify";
 import { VuetifyDesignSystemLoader } from "./vuetifyDesignSystemLoader";
 
 export default class ComponentInit {
-    constructor(container : Container) {
-        container.bind<DesignSystemLoader>("DesignSystemLoader").to(VuetifyDesignSystemLoader).whenTargetNamed("vuetify");
-    }
+  constructor(container: Container) {
+    container
+      .bind<DesignSystemLoader>("DesignSystemLoader")
+      .to(VuetifyDesignSystemLoader)
+      .whenTargetNamed("vuetify");
+  }
 }
-

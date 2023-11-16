@@ -4,13 +4,10 @@
   </DsfrCard>
 </template>
 <script lang="ts">
-import { DsfrCard } from '@gouvminint/vue-dsfr';
+import { DsfrCard } from "@gouvminint/vue-dsfr";
 
 export default {
-    props: ["title"],
-    data(props) {
-        return { };
-    },
-    components: { DsfrCard }
-}
+  components: { DsfrCard },
+  props: { title: { type: String, required: true } },
+};
 </script>

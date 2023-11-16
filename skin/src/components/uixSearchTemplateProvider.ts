@@ -25,26 +25,26 @@
 
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
 import { Component } from "vue";
-import Search from "../vue/search.vue";
+import Search from "../vue/c-search.vue";
 import { injectable } from "inversify";
 
 @injectable()
 export class UIXSearchTemplateProvider extends DefaultVueTemplateProvider {
-    public static cname = "cristal.vuejs.component";
-    public static hint = "";
-    public static priority = 1000;
-    public static singleton = true;
-    public static extensionPoint = "header.nav.center"
+  public static cname = "cristal.vuejs.component";
+  public static hint = "";
+  public static priority = 1000;
+  public static singleton = true;
+  public static extensionPoint = "header.nav.center";
 
-    registered  = false
+  registered = false;
 
-    getVueComponent(): Component {
-        return Search;
-    }
-    getVueName(): string {
-        return "Search";
-    }
-    isGlobal(): boolean {
-        return false;
-    }    
+  getVueComponent(): Component {
+    return Search;
+  }
+  getVueName(): string {
+    return "Search";
+  }
+  isGlobal(): boolean {
+    return false;
+  }
 }

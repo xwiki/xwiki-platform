@@ -23,17 +23,17 @@
  *
  **/
 
-import View from "../vue/view.vue";
-import Header from "../vue/header.vue";
-import Config from "../vue/config.vue";
-import Sidebar from "../vue/sidebar.vue";
-import Footer from "../vue/footer.vue";
-import Content from "../vue/content.vue";
-import Panel from "../vue/panel.vue";
-import Main from "../vue/main.vue";
-import Edit from "../vue/edit.vue";
-import Blog from "../vue/blog.vue";
-import Movie from "../vue/movie.vue";
+import View from "../vue/c-view.vue";
+import Header from "../vue/c-header.vue";
+import Config from "../vue/c-config.vue";
+import Sidebar from "../vue/c-sidebar.vue";
+import Footer from "../vue/c-footer.vue";
+import Content from "../vue/c-content.vue";
+import Panel from "../vue/c-panel.vue";
+import Main from "../vue/c-main.vue";
+import Edit from "../vue/c-edit.vue";
+import Blog from "../vue/c-blog.vue";
+import Movie from "../vue/c-movie.vue";
 
 import PerfEmpty from "../vue/perf/perfEmpty.vue";
 import PerfX from "../vue/perf/perfX.vue";
@@ -41,81 +41,84 @@ import PerfDirectVuetify from "../vue/perf/perfDirectVuetify.vue";
 import PerfDirectDSFR from "../vue/perf/perfDirectDSFR.vue";
 import PerfDirectSL from "../vue/perf/perfDirectSL.vue";
 
-
 import { App, Component } from "vue";
-import { DesignSystemLoader, SkinManager } from '@cristal/api';
+import { DesignSystemLoader, SkinManager } from "@cristal/api";
 import { Container, injectable } from "inversify";
 import "reflect-metadata";
 
 @injectable()
 export class DefaultSkinManager implements SkinManager {
-    public static DEFAULT_DESIGN_SYSTEM = "";
-    public static cname = "cristal.skin.manager";
-    public static hint = "default";
-    public static priority = 1000;
-    public static singleton = true;
-    public templates : Map<string, Component>;
-    public designSystem : string = "";
+  public static DEFAULT_DESIGN_SYSTEM = "";
+  public static cname = "cristal.skin.manager";
+  public static hint = "default";
+  public static priority = 1000;
+  public static singleton = true;
+  public templates: Map<string, Component>;
+  public designSystem: string = "";
 
-    constructor() {
-        this.templates = new Map<string, Component>;
-        this.templates.set("view", View);
-        this.templates.set("header", Header);
-        this.templates.set("config", Config);
-        this.templates.set("sidebar", Sidebar);
-        this.templates.set("content", Content);
-        this.templates.set("footer", Footer);
-        this.templates.set("panel", Panel);
-        this.templates.set("main", Main);
-        this.templates.set("edit", Edit);
-        this.templates.set("blog", Blog);
-        this.templates.set("movie", Movie);
+  constructor() {
+    this.templates = new Map<string, Component>();
+    this.templates.set("view", View);
+    this.templates.set("header", Header);
+    this.templates.set("config", Config);
+    this.templates.set("sidebar", Sidebar);
+    this.templates.set("content", Content);
+    this.templates.set("footer", Footer);
+    this.templates.set("panel", Panel);
+    this.templates.set("main", Main);
+    this.templates.set("edit", Edit);
+    this.templates.set("blog", Blog);
+    this.templates.set("movie", Movie);
 
-        // performance measurements
-        this.templates.set("perfX", PerfX);
-        this.templates.set("perfempty", PerfEmpty);
-        this.templates.set("perfvuetify", PerfDirectVuetify);
-        this.templates.set("perfdsfr", PerfDirectDSFR);
-        this.templates.set("perfsl", PerfDirectSL);
+    // performance measurements
+    this.templates.set("perfX", PerfX);
+    this.templates.set("perfempty", PerfEmpty);
+    this.templates.set("perfvuetify", PerfDirectVuetify);
+    this.templates.set("perfdsfr", PerfDirectDSFR);
+    this.templates.set("perfsl", PerfDirectSL);
+  }
+
+  public setDesignSystem(designSystem: string) {
+    this.designSystem = designSystem;
+  }
+
+  public getDesignSystem() {
+    return this.designSystem;
+  }
+
+  public getTemplate(name: string): Component | null {
+    return this.getDefaultTemplate(name);
+  }
+
+  public getDefaultTemplate(name: string): Component | null {
+    try {
+      return this.templates.get(name) as object;
+    } catch (e) {
+      console.error("Error loading default template ", name, e);
+      return null;
     }
+  }
 
-    public setDesignSystem(designSystem : string) {
-        this.designSystem = designSystem;
+  public loadDesignSystem(app: App, container: Container) {
+    let designSystemLoader: DesignSystemLoader | null = null;
+
+    try {
+      designSystemLoader = container.getNamed<DesignSystemLoader>(
+        "DesignSystemLoader",
+        this.designSystem,
+      );
+    } catch (e) {
+      console.error(
+        "Exception while loading design system ",
+        this.designSystem,
+      );
+      if (DefaultSkinManager.DEFAULT_DESIGN_SYSTEM != "")
+        designSystemLoader = container.getNamed<DesignSystemLoader>(
+          "DesignSystemLoader",
+          DefaultSkinManager.DEFAULT_DESIGN_SYSTEM,
+        );
     }
-
-    public getDesignSystem() {
-        return this.designSystem;
-    }
-
-    public getTemplate(name : string) : Component | null {
-        return this.getDefaultTemplate(name);
-    }
-
-    public getDefaultTemplate(name : string) : Component | null {
-        try {
-            const template = this.templates.get(name) as Object;
-            return template;
-        } catch (e) {
-            console.error("Error loading default template ", name, e)
-            return null;
-        }
-    }
-
-    public loadDesignSystem(app : App, container : Container) {
-        let designSystemLoader : DesignSystemLoader | null = null;
-
-        try {
-            designSystemLoader = container.getNamed<DesignSystemLoader>("DesignSystemLoader", this.designSystem);
-        } catch (e) {
-            console.error("Exception while loading design system ", this.designSystem);
-            if (DefaultSkinManager.DEFAULT_DESIGN_SYSTEM!="")
-               designSystemLoader = container.getNamed<DesignSystemLoader>("DesignSystemLoader", DefaultSkinManager.DEFAULT_DESIGN_SYSTEM);
-        }
-        if (designSystemLoader)
-            designSystemLoader.loadDesignSystem(app);
-        else
-            console.error("Cannot initialize design system");
-    }
-} 
-
-
+    if (designSystemLoader) designSystemLoader.loadDesignSystem(app);
+    else console.error("Cannot initialize design system");
+  }
+}

@@ -23,22 +23,22 @@
  *
  **/
 
-import ComponentInit from './components/componentsInit'
-import type { ExtensionConfig } from './api/extensionConfig'
-import type { ExtensionManager } from './api/extensionManager'
-import type { CristalComponent } from './api/cristalComponent'
-import type { DefaultComponent } from './components/defaultComponent'
-import { DefaultExtensionConfig } from './components/defaultExtensionConfig'
-import { DefaultExtensionManager } from './components/defaultExtensionManager'
-import { CristalLoader } from './components/cristalLoader'
+import ComponentInit from "./components/componentsInit";
+import type { ExtensionConfig } from "./api/extensionConfig";
+import type { ExtensionManager } from "./api/extensionManager";
+import type { CristalComponent } from "./api/cristalComponent";
+import type { DefaultComponent } from "./components/defaultComponent";
+import { DefaultExtensionConfig } from "./components/defaultExtensionConfig";
+import { DefaultExtensionManager } from "./components/defaultExtensionManager";
+import { CristalLoader } from "./components/cristalLoader";
 
 export {
-    ComponentInit,
-    ExtensionConfig,
-    ExtensionManager,
-    CristalComponent,
-    DefaultComponent,
-    DefaultExtensionConfig,
-    DefaultExtensionManager,
-    CristalLoader,
-}
+  ComponentInit,
+  ExtensionConfig,
+  ExtensionManager,
+  CristalComponent,
+  DefaultComponent,
+  DefaultExtensionConfig,
+  DefaultExtensionManager,
+  CristalLoader,
+};

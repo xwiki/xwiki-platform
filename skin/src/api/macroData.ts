@@ -24,13 +24,11 @@
  **/
 
 export interface MacroData {
-    
-    getMacroContent() : String;
+  getMacroContent(): string;
 
-    setMacroContent(content : String) : void;
+  setMacroContent(content: string): void;
 
-    getMacroParameters() : Map<String, String>;
+  getMacroParameters(): Map<string, string>;
 
-    getMacroParameter(name : String) : String | undefined;
-    
+  getMacroParameter(name: string): string | undefined;
 }

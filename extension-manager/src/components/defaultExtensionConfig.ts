@@ -25,15 +25,18 @@
 
 import { ExtensionConfig } from "../api/extensionConfig";
 
-
 export class DefaultExtensionConfig implements ExtensionConfig {
-    name: string;
-    entryFile: string | null;
-    staticModule : boolean | false;
+  name: string;
+  entryFile: string | null;
+  staticModule: boolean | false;
 
-    constructor(name : string, entryFile : string | null, staticModule : boolean | false) {
-        this.name = name;
-        this.entryFile = entryFile;
-        this.staticModule = staticModule;
-    }
+  constructor(
+    name: string,
+    entryFile: string | null,
+    staticModule: boolean | false,
+  ) {
+    this.name = name;
+    this.entryFile = entryFile;
+    this.staticModule = staticModule;
+  }
 }

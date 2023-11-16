@@ -23,24 +23,4 @@
  *
  **/
 
-import { Document } from './document'
-
-export interface PageData {
-    id : string,
-    name : string;
-    source : string;
-    syntax : string;
-    html : string;
-    document : Document;
-    css : Array<string>;
-    js : Array<string>;
-    version : string;
-
-    // TODO: remove any
-    toObject() : any; // eslint-disable-line
-
-    // TODO: remove any
-    fromObject(object : any) : void; // eslint-disable-line
-}
-
-export {versions} from 'node:process';
+export { versions } from "node:process";

@@ -26,27 +26,26 @@
 import { VueTemplateProvider } from "../api/vueTemplateProvider";
 import { injectable } from "inversify";
 import "reflect-metadata";
-import { App, Component } from "vue";
+import { Component } from "vue";
 
 @injectable()
 export default class DefaultVueTemplateProvider implements VueTemplateProvider {
-    public static cname = "cristal.vuejs.component";
-    public static hint = "template";
-    public static priority = 1000;
-    public static singleton = true;
-    
-    getVueComponent(): Component {
-        throw new Error("Method not implemented.");
-    }
+  public static cname = "cristal.vuejs.component";
+  public static hint = "template";
+  public static priority = 1000;
+  public static singleton = true;
 
-    getVueName()  : string {
-        throw new Error("Method not implemented.");
-    }
+  getVueComponent(): Component {
+    throw new Error("Method not implemented.");
+  }
 
-    isGlobal() : boolean {
-        return true;
-    }
+  getVueName(): string {
+    throw new Error("Method not implemented.");
+  }
 
-    registerComponents(app: App): void {
-    }
-} 
+  isGlobal(): boolean {
+    return true;
+  }
+
+  registerComponents(): void {}
+}

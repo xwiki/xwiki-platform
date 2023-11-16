@@ -24,38 +24,37 @@
  **/
 
 import { DefaultUIXTemplateProvider } from "@cristal/skin";
-import Menu from "./menu.vue";
+import Menu from "./c-menu.vue";
 import { injectable } from "inversify";
 import "reflect-metadata";
 import { Component } from "vue";
 
 @injectable()
-export class UIXMenuTemplateProvider2 extends DefaultUIXTemplateProvider {    
-    public static cname = "cristal.vuejs.component";
-    public static hint = "menu";
-    public static priority = 1000;
-    public static singleton = true;
-    public static extensionPoint = "sidebar.after"
+export class UIXMenuTemplateProvider2 extends DefaultUIXTemplateProvider {
+  public static cname = "cristal.vuejs.component";
+  public static hint = "menu";
+  public static priority = 1000;
+  public static singleton = true;
+  public static extensionPoint = "sidebar.after";
 
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    getVueComponent() : Component
-    {   
-        return Menu;
-    }
+  getVueComponent(): Component {
+    return Menu;
+  }
 
-    getMenuItems() : Array<string> {
-        const menus : Array<string> = [];
-        return menus;
-    }
+  getMenuItems(): Array<string> {
+    const menus: Array<string> = [];
+    return menus;
+  }
 
-    getVueName() : string {
-        return "Menu";
-    }
+  getVueName(): string {
+    return "Menu";
+  }
 
-    isGlobal() : boolean {
-        return false;
-    }
-} 
+  isGlobal(): boolean {
+    return false;
+  }
+}

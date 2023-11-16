@@ -23,35 +23,35 @@
  *
 -->
 <template>
-    <span>
-      Mounting time: {{ diff }}
-    </span>
-    <div v-for="index in 1000" :key="index">
-        <sl-alert open variant="warning" description="">This is an alert {{ index }}</sl-alert>
-    </div>
+  <span> Mounting time: {{ diff }} </span>
+  <div v-for="index in 1000" :key="index">
+    <sl-alert open variant="warning" description="">
+      This is an alert {{ index }}
+    </sl-alert>
+  </div>
 </template>
 <script lang="ts">
-    import { ref } from 'vue';
+import { ref } from "vue";
 
-    let time : number = 0; 
-    let diff : number = 0;
-    const diffRef = ref<number>(diff);
+let time: number = 0;
+let diff: number = 0;
+const diffRef = ref<number>(diff);
 
-    export default {
-        setup(props) {
-            time = (new Date()).getTime();
-            console.log("Performance measurement sl Setup");
-            return { diff : diffRef };
-        },
-        mounted() {
-            let time2 = (new Date()).getTime();
-            diffRef.value = time2 - time;
-            console.log("Performance measurement sl Mounted: ", diff);
-        },
-        updated() {
-            let time2 = (new Date()).getTime();
-            diffRef.value = time2 - time;
-            console.log("Performance measurement sl Updated: ", diff);
-        }
-    }
+export default {
+  setup() {
+    time = new Date().getTime();
+    console.log("Performance measurement sl Setup");
+    return { diff: diffRef };
+  },
+  mounted() {
+    let time2 = new Date().getTime();
+    diffRef.value = time2 - time;
+    console.log("Performance measurement sl Mounted: ", diff);
+  },
+  updated() {
+    let time2 = new Date().getTime();
+    diffRef.value = time2 - time;
+    console.log("Performance measurement sl Updated: ", diff);
+  },
+};
 </script>

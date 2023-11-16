@@ -31,11 +31,22 @@ import { InfoMacro } from "./infoMacro";
 import { SuccessMacro } from "./successMacro";
 
 export default class ComponentInit {
-    constructor(container : Container) {
-        container.bind<MacroProvider>("MacroProvider").to(ErrorMacro).whenTargetNamed(ErrorMacro.macroName);
-        container.bind<MacroProvider>("MacroProvider").to(WarningMacro).whenTargetNamed(WarningMacro.macroName);
-        container.bind<MacroProvider>("MacroProvider").to(InfoMacro).whenTargetNamed(InfoMacro.macroName);
-        container.bind<MacroProvider>("MacroProvider").to(SuccessMacro).whenTargetNamed(SuccessMacro.macroName);
-    }
+  constructor(container: Container) {
+    container
+      .bind<MacroProvider>("MacroProvider")
+      .to(ErrorMacro)
+      .whenTargetNamed(ErrorMacro.macroName);
+    container
+      .bind<MacroProvider>("MacroProvider")
+      .to(WarningMacro)
+      .whenTargetNamed(WarningMacro.macroName);
+    container
+      .bind<MacroProvider>("MacroProvider")
+      .to(InfoMacro)
+      .whenTargetNamed(InfoMacro.macroName);
+    container
+      .bind<MacroProvider>("MacroProvider")
+      .to(SuccessMacro)
+      .whenTargetNamed(SuccessMacro.macroName);
+  }
 }
-

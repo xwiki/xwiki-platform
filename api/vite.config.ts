@@ -1,14 +1,14 @@
-import { defineConfig, mergeConfig } from 'vite';
-import defaultConfig from './../vite.default.config.js';
+import { defineConfig, mergeConfig } from "vite";
+import defaultConfig from "./../vite.default.config.js";
 
-export default mergeConfig( 
-  defaultConfig, 
+export default mergeConfig(
+  defaultConfig,
   defineConfig({
-	build: {
-    		lib: {
-      			entry: "./src/index.ts",
-				name: 'api'
-    		}
-  	}
-}));
-
+    build: {
+      lib: {
+        entry: "./src/index.ts",
+        name: "api",
+      },
+    },
+  }),
+);

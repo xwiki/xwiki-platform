@@ -27,12 +27,11 @@ import { VueTemplateProvider } from "./vueTemplateProvider";
 import { MacroData } from "./macroData";
 
 export interface MacroProvider extends VueTemplateProvider {
-    
-    getMacroName() : string;
+  getMacroName(): string;
 
-    getMacroRenderingType() : string;
+  getMacroRenderingType(): string;
 
-    parseParameters(element : HTMLElement) : MacroData;
+  parseParameters(element: HTMLElement): MacroData;
 
-    renderMacroAsHTML(macroData : MacroData) : String;
+  renderMacroAsHTML(macroData: MacroData): string;
 }

@@ -23,6 +23,6 @@
  *
  **/
 
-import ComponentInit from './components/componentsInit.js'
+import ComponentInit from "./components/componentsInit.js";
 
 export { ComponentInit };

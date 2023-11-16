@@ -31,10 +31,17 @@ import { Renderer } from "../api/renderer";
 import { DefaultRenderer } from "./defaultRenderer";
 
 export default class ComponentInit {
-    constructor(container : Container) {
-        container.bind<Converter>("Converter").to(MarkdownToHTMLConverter).inSingletonScope().whenTargetNamed(MarkdownToHTMLConverter.converterName);
-        container.bind<Converter>("Converter").to(XWiki21ToHTMLConverter).inSingletonScope().whenTargetNamed(XWiki21ToHTMLConverter.converterName);
-        container.bind<Renderer>("Renderer").to(DefaultRenderer).inSingletonScope();
-    }
+  constructor(container: Container) {
+    container
+      .bind<Converter>("Converter")
+      .to(MarkdownToHTMLConverter)
+      .inSingletonScope()
+      .whenTargetNamed(MarkdownToHTMLConverter.converterName);
+    container
+      .bind<Converter>("Converter")
+      .to(XWiki21ToHTMLConverter)
+      .inSingletonScope()
+      .whenTargetNamed(XWiki21ToHTMLConverter.converterName);
+    container.bind<Renderer>("Renderer").to(DefaultRenderer).inSingletonScope();
+  }
 }
-

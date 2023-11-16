@@ -24,11 +24,11 @@
  **/
 
 export interface CristalComponent {
-    getName() : string;
+  getName(): string;
 
-    getHint() : string;
+  getHint(): string;
 
-    getPriority() : number;
+  getPriority(): number;
 
-    isSingleton() : boolean;
+  isSingleton(): boolean;
 }

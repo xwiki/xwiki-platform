@@ -23,21 +23,22 @@
  *
  **/
 
-import { ExtensionManager } from '../api/extensionManager';
-import { DefaultExtensionManager } from './defaultExtensionManager';
+import { ExtensionManager } from "../api/extensionManager";
+import { DefaultExtensionManager } from "./defaultExtensionManager";
 import { Container } from "inversify";
 import { Logger } from "@cristal/api";
 
 export default class ComponentInit {
-    logger : Logger;
+  logger: Logger;
 
-    constructor(container : Container) {
-        this.logger = container.get<Logger>("Logger");
-        this.logger.setModule("extensionmanager.components.componentsInit");
+  constructor(container: Container) {
+    this.logger = container.get<Logger>("Logger");
+    this.logger.setModule("extensionmanager.components.componentsInit");
 
-        this.logger?.debug("Init Extension Manager components begin")
-        container.bind<ExtensionManager>("ExtensionManager").to(DefaultExtensionManager);
-        this.logger?.debug("Init Extension Manager components end")
-    }
+    this.logger?.debug("Init Extension Manager components begin");
+    container
+      .bind<ExtensionManager>("ExtensionManager")
+      .to(DefaultExtensionManager);
+    this.logger?.debug("Init Extension Manager components end");
+  }
 }
-

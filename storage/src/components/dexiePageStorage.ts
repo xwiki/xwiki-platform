@@ -24,15 +24,16 @@
  **/
 
 // import { PageData } from "@cristal/api";
-import Dexie, { Table } from 'dexie';
+import Dexie, { Table } from "dexie";
 
 export default class DexiePageStorage extends Dexie {
-    pages!: Table<Object>; 
+  pages!: Table<object>;
 
-    constructor(wikiName : string) {
-        super('pages_' + wikiName);
-        this.version(2).stores({
-          pages: 'id, name, content, document, css, js, document.name, document.headline, document.creator' // Primary key and indexed props
-        });
-    }
+  constructor(wikiName: string) {
+    super("pages_" + wikiName);
+    this.version(2).stores({
+      pages:
+        "id, name, content, document, css, js, document.name, document.headline, document.creator", // Primary key and indexed props
+    });
+  }
 }

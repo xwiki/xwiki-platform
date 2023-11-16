@@ -25,26 +25,26 @@
 
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
 import { Component } from "vue";
-import Login from "../vue/login.vue";
+import Login from "../vue/c-login.vue";
 import { injectable } from "inversify";
 
 @injectable()
 export class UIXLoginTemplateProvider extends DefaultVueTemplateProvider {
-    public static cname = "cristal.vuejs.component";
-    public static hint = "";
-    public static priority = 1000;
-    public static singleton = true;
-    public static extensionPoint = "header.nav.right"
+  public static cname = "cristal.vuejs.component";
+  public static hint = "";
+  public static priority = 1000;
+  public static singleton = true;
+  public static extensionPoint = "header.nav.right";
 
-    registered  = false
+  registered = false;
 
-    getVueComponent(): Component {
-        return Login;
-    }
-    getVueName(): string {
-        return "Login";
-    }
-    isGlobal(): boolean {
-        return false;
-    }
+  getVueComponent(): Component {
+    return Login;
+  }
+  getVueName(): string {
+    return "Login";
+  }
+  isGlobal(): boolean {
+    return false;
+  }
 }

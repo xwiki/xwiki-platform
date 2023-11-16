@@ -25,59 +25,61 @@
 
 import { WikiConfig } from "@cristal/api";
 import { Converter } from "../api/converter";
-import { marked } from 'marked';
+import { marked } from "marked";
 import { baseUrl } from "marked-base-url";
 import macro from "./marked-macro";
-import DOMPurify from 'dompurify';
-import { Logger } from '@cristal/api';
+import DOMPurify from "dompurify";
+import { Logger } from "@cristal/api";
 import { inject, injectable } from "inversify";
 
 @injectable()
 export class MarkdownToHTMLConverter implements Converter {
-    
-    public static converterName  = "md_html";
+  public static converterName = "md_html";
 
-    private logger : Logger;
-    public markedInit : boolean;
-    public sanitizeConfig : DOMPurify.Config = { ADD_TAGS: ['#comment'], ADD_ATTR: ['macroname'], FORCE_BODY: true };
-   
-    constructor(@inject<Logger>("Logger") logger : Logger) {
-        this.logger = logger;
-        this.logger.setModule("rendering.markdown");
-        this.markedInit = false;
-      }
+  private logger: Logger;
+  public markedInit: boolean;
+  public sanitizeConfig: DOMPurify.Config = {
+    ADD_TAGS: ["#comment"],
+    ADD_ATTR: ["macroname"],
+    FORCE_BODY: true,
+  };
 
-    public async isConverterReady() : Promise<boolean> {
-        return true;
+  constructor(@inject<Logger>("Logger") logger: Logger) {
+    this.logger = logger;
+    this.logger.setModule("rendering.markdown");
+    this.markedInit = false;
+  }
+
+  public async isConverterReady(): Promise<boolean> {
+    return true;
+  }
+
+  public getSourceSyntax(): string {
+    return "md/1.0";
+  }
+
+  public getTargetSyntax(): string {
+    return "html/5.0";
+  }
+
+  public getVersion(): string {
+    return "1.0";
+  }
+
+  public getName(): string {
+    return MarkdownToHTMLConverter.converterName;
+  }
+
+  public convert(source: string, wikiConfig: WikiConfig): string {
+    let content = "";
+    if (this.markedInit == false) {
+      marked.use(baseUrl(wikiConfig.baseURL)).use(macro);
+      this.markedInit = true;
     }
-
-    public getSourceSyntax() : string {
-        return "md/1.0";
-    }
-
-    public getTargetSyntax() : string {
-        return "html/5.0";
-    }
-
-    public getVersion() : string {
-        return "1.0";
-    }
-
-    public getName() : string {
-        return MarkdownToHTMLConverter.converterName;
-    }
-
-    public convert(source : string, wikiConfig : WikiConfig) : string {
-        let content = "";
-        if (this.markedInit==false) {
-            marked.use(baseUrl(wikiConfig.baseURL)).use(macro);
-            this.markedInit = true;
-        }
-        let html = marked(source);
-        this.logger?.debug("HTML before sanitize", html);
-        content = DOMPurify.sanitize(html, this.sanitizeConfig) as string;
-        this.logger?.debug("HTML after sanitize", content);
-        return content;
-    }
+    const html = marked(source);
+    this.logger?.debug("HTML before sanitize", html);
+    content = DOMPurify.sanitize(html, this.sanitizeConfig) as string;
+    this.logger?.debug("HTML after sanitize", content);
+    return content;
+  }
 }
-

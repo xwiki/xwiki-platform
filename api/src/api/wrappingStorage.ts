@@ -25,10 +25,10 @@
 
 import { Storage } from "./storage";
 
-export interface WrappingStorage extends Storage {   
-    setStorage(storage : Storage) : void;
+export interface WrappingStorage extends Storage {
+  setStorage(storage: Storage): void;
 
-    getStorage() : Storage;
+  getStorage(): Storage;
 
-    updatePageContent(page: string, syntax: string): Promise<boolean>;
+  updatePageContent(page: string, syntax: string): Promise<boolean>;
 }

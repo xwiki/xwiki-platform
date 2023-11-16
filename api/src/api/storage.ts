@@ -27,22 +27,25 @@ import { PageData } from "./PageData";
 import { WikiConfig } from "./WikiConfig";
 
 export interface Storage {
+  setWikiConfig(config: WikiConfig): void;
 
-    setWikiConfig(config : WikiConfig) : void;
+  getWikiConfig(): WikiConfig;
 
-    getWikiConfig() : WikiConfig;
+  getPageRestURL(page: string, syntax: string): string;
 
-    getPageRestURL(page : string, syntax : string) : string;
+  getPageFromViewURL(url: string): string | null;
 
-    getPageFromViewURL(url : string) : string | null;
+  getImageURL(page: string, image: string): string;
 
-    getImageURL(page : string, image : string) : string ;
+  getPageContent(page: string, syntax: string): Promise<PageData>;
 
-    getPageContent(page: string, syntax: string): Promise<PageData>;
+  getPanelContent(
+    panel: string,
+    contextPage: string,
+    syntax: string,
+  ): Promise<PageData>;
 
-    getPanelContent(panel: string, contextPage: string, syntax: string): Promise<PageData>;
+  getEditField(jsonArticle: object, fieldName: string): Promise<string>;
 
-    getEditField(jsonArticle : object, fieldName : string): Promise<string>;
-
-    isStorageReady() : Promise<boolean>;
+  isStorageReady(): Promise<boolean>;
 }

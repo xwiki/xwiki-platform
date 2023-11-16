@@ -25,95 +25,89 @@
 
 import { injectable, inject } from "inversify";
 import "reflect-metadata";
-import { Storage, PageData, DefaultPageData } from '@cristal/api';
-import { WikiConfig } from '@cristal/api';
-import { Logger } from '@cristal/api';
+import { Storage, PageData, DefaultPageData } from "@cristal/api";
+import { WikiConfig } from "@cristal/api";
+import { Logger } from "@cristal/api";
 
 @injectable()
 export class GitHubStorage implements Storage {
+  public wikiConfig: WikiConfig;
+  public logger: Logger;
 
-    public wikiConfig : WikiConfig;
-    public logger : Logger;
+  constructor(@inject<Logger>("Logger") logger: Logger) {
+    this.logger = logger;
+    this.logger.setModule("storage.components.githubStorage");
+  }
 
-    constructor(@inject<Logger>("Logger") logger : Logger) {
-      this.logger = logger;
-      this.logger.setModule("storage.components.githubStorage");
+  public async isStorageReady(): Promise<boolean> {
+    return true;
+  }
+
+  setWikiConfig(wikiConfig: WikiConfig) {
+    this.wikiConfig = wikiConfig;
+  }
+
+  getWikiConfig() {
+    return this.wikiConfig;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getPageRestURL(page: string, syntax: string): string {
+    this.logger?.debug("GitHub Loading page", page);
+    return this.wikiConfig.baseRestURL + page;
+  }
+
+  getPageFromViewURL(url: string): string | null {
+    let page = null;
+    if (url.startsWith(this.wikiConfig.baseURL)) {
+      const uri = url.replace(this.wikiConfig.baseURL, "");
+      page = uri;
     }
-  
-    public async isStorageReady() : Promise<boolean> {
-      return true;
+    return page;
+  }
+
+  getImageURL(page: string, image: string): string {
+    return this.wikiConfig.baseRestURL + image;
+  }
+
+  hashCode = function (str: string): string {
+    let hash = 0,
+      i,
+      chr;
+    if (str.length === 0) return "" + hash;
+    for (i = 0; i < str.length; i++) {
+      chr = str.charCodeAt(i);
+      hash = (hash << 5) - hash + chr;
+      hash |= 0; // Convert to 32bit integer
     }
+    return "" + hash;
+  };
 
-    setWikiConfig(wikiConfig : WikiConfig) {
-        this.wikiConfig = wikiConfig;
-    }
+  async getPageContent(page: string, syntax: string): Promise<PageData> {
+    this.logger?.debug("GitHub Loading page", page);
+    const url = this.getPageRestURL(page, syntax);
+    const response = await fetch(url, { cache: "no-store" });
+    const text = await response.text();
+    let content = "";
+    if (syntax == "json") content = "";
+    else if (syntax == "md") content = text;
+    else if (syntax == "html") {
+      content = text;
+    } else content = "";
 
-    getWikiConfig() {
-      return this.wikiConfig;
-    }
+    const pageContentData = new DefaultPageData();
+    pageContentData.source = content;
+    pageContentData.syntax = "md";
+    pageContentData.css = [];
+    pageContentData.version = this.hashCode(content);
+    return pageContentData;
+  }
 
-    getPageRestURL(page: string, syntax : string): string {
-        this.logger?.debug("GitHub Loading page", page);
-        return this.wikiConfig.baseRestURL + page;
-    
-    }
+  async getPanelContent(): Promise<PageData> {
+    return new DefaultPageData();
+  }
 
-    getPageFromViewURL(url: string): string | null {
-        let page = null;
-        if (url.startsWith(this.wikiConfig.baseURL)) {
-            const uri = url.replace(this.wikiConfig.baseURL, "");
-            page = uri;
-        }
-        return page;
-    }
-
-    getImageURL(page : string, image : string) : string {
-        return this.wikiConfig.baseRestURL + image;
-    }
-
-    hashCode = function(str : string) : string {
-      var hash = 0,
-        i, chr;
-      if (str.length === 0) return "" + hash;
-      for (i = 0; i < str.length; i++) {
-        chr = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
-      }
-      return "" + hash;
-    }
-
-
-    async getPageContent(page: string, syntax: string) : Promise<PageData> {
-      this.logger?.debug("GitHub Loading page", page);
-        const url = this.getPageRestURL(page, syntax);
-        const response = await fetch(url, {cache: "no-store"});
-        const text = await response.text();
-        let content = ""
-        if (syntax=="json")
-          content = "";
-        else if (syntax=="md")
-          content = text;
-        else if (syntax=="html") {
-          content = text;
-        } else
-          content = "";
-
-          const pageContentData = new DefaultPageData();  
-          pageContentData.source = content;
-          pageContentData.syntax = "md";
-          pageContentData.css = [];
-          pageContentData.version = this.hashCode(content);
-          return pageContentData;
-  
-    }   
-
-    async getPanelContent(panel: string, contextPage: string, syntax: string): Promise<PageData> {
-      return new DefaultPageData();
-    }
-
-    async getEditField(jsonArticle : object, fieldName : string): Promise<string> {
-      return "";
-    }    
-
+  async getEditField(): Promise<string> {
+    return "";
+  }
 }

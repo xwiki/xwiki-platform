@@ -23,224 +23,280 @@
  *
  **/
 
-import { Logger, CristalApp } from "@cristal/api";
+import { CristalApp, Logger } from "@cristal/api";
 import { MacroProvider } from "../api/macroProvider";
-import { App, Component, VNode, createVNode, render } from 'vue';
+import { App, Component, createVNode, render, VNode } from "vue";
+
 // import { DefaultMacroData } from "../components/defaultMacroData";
 
 export class ContentTools {
+  static logger: Logger;
 
-    static logger : Logger;
+  public static init(cristal: CristalApp) {
+    this.logger = cristal?.getLogger("skin.vue.contenttools");
+  }
 
-    public static init(cristal : CristalApp) {
-        this.logger = cristal?.getLogger("skin.vue.contenttools");
-    }
-
-    /* 
+  /* 
         Method to intercept clicks in the HTML content and load the page using Cristal Wiki
     */
-    public static listenToClicks(element : HTMLElement, cristal : CristalApp | undefined) {
-      element.addEventListener(`click`, function handleClick(event : any) {
+  public static listenToClicks(
+    element: HTMLElement,
+    cristal: CristalApp | undefined,
+  ) {
+    element.addEventListener(
+      `click`,
+      // TODO get rid of any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      function handleClick(event: any) {
         const origin = event.target.closest(`a`);
-        
-        if (origin && origin.href) {
-            ContentTools.logger?.debug("You clicked", origin.href);
-            ContentTools.logger?.debug(event.target);
-            ContentTools.logger?.debug(event.target.href);
-            ContentTools.logger?.debug(location);
-            ContentTools.logger?.debug(location.hostname);
-            if (origin.href.startsWith(location.origin))  {
-              ContentTools.logger?.debug("URL is relative URL");
-              const page = event.target.href.replace(location.origin + location.pathname, "");
-              if (!page.startsWith("#")) {
-                   ContentTools.logger?.debug("New page should be", page);
-                  cristal?.setCurrentPage(page);
-                  cristal?.loadPage().then();
-              } else {
-                ContentTools.logger?.debug("Leaving alone page", page);
-                return;
-              }
+
+        if (origin?.href) {
+          ContentTools.logger?.debug("You clicked", origin.href);
+          ContentTools.logger?.debug(event.target);
+          ContentTools.logger?.debug(event.target.href);
+          ContentTools.logger?.debug(location);
+          ContentTools.logger?.debug(location.hostname);
+          if (origin.href.startsWith(location.origin)) {
+            ContentTools.logger?.debug("URL is relative URL");
+            const page = event.target.href.replace(
+              location.origin + location.pathname,
+              "",
+            );
+            if (!page.startsWith("#")) {
+              ContentTools.logger?.debug("New page should be", page);
+              cristal?.setCurrentPage(page);
+              cristal?.loadPage().then();
+            } else {
+              ContentTools.logger?.debug("Leaving alone page", page);
+              return;
             }
+          }
 
-            event.preventDefault();
-            if (cristal!=null)
-              cristal.loadPageFromURL(origin.href).then();
-            else
-              ContentTools.logger?.error("cristal object not injected properly in content.vue")
+          event.preventDefault();
+          if (cristal != null) {
+            cristal.loadPageFromURL(origin.href).then();
+          } else {
+            ContentTools.logger?.error(
+              "cristal object not injected properly in c-content.vue",
+            );
+          }
         }
-      }, true);
-    }
+      },
+      true,
+    );
+  }
 
-    /*
+  /*
         Method to load CSS sent by XWiki page
     */
-    public static loadCSS(css: string[]) {
-      if (css && css.length>0) {
-        // check new css
-        ContentTools.logger?.debug("Current CSS is ", css.length);
-        css.forEach(cssLink => {
-          const url = ContentTools.urlToLoad(cssLink);
-          if (url!=null) {
-            const divEl = document.createElement('link');
-            divEl.href = url;
-            divEl.type = "text/css";
-            divEl.rel = "stylesheet";
-            ContentTools.logger?.debug("Ready to load css ", divEl);
-            document.head.appendChild(divEl);
-          } else {
-              ContentTools.logger?.debug("CSS already loaded: ", cssLink)
-          }
-        });
-      }
+  public static loadCSS(css: string[]) {
+    if (css && css.length > 0) {
+      // check new css
+      ContentTools.logger?.debug("Current CSS is ", css.length);
+      css.forEach((cssLink) => {
+        const url = ContentTools.urlToLoad(cssLink);
+        if (url != null) {
+          const divEl = document.createElement("link");
+          divEl.href = url;
+          divEl.type = "text/css";
+          divEl.rel = "stylesheet";
+          ContentTools.logger?.debug("Ready to load css ", divEl);
+          document.head.appendChild(divEl);
+        } else {
+          ContentTools.logger?.debug("CSS already loaded: ", cssLink);
+        }
+      });
     }
+  }
 
-    /*
+  /*
         Method to load JS send by XWiki page
         THis code is not working
     */
-    public static loadJS(js: string[]) {
-        if (js && js.length>0) {
-          ContentTools.logger?.debug("Loading JS code for content");
-          js.forEach(jsLink => {
-            ContentTools.logger?.debug("JS Link: ", jsLink);
-            const url = ContentTools.urlToLoad(jsLink);
-            if (url!=null) {
-                const divEl = document.createElement('script');
-                divEl.src = url;
-                divEl.async = false;
-                ContentTools.logger?.debug("Ready to load js ", divEl);
-                document.head.appendChild(divEl);
-              } else {
-                ContentTools.logger?.debug("JS already loaded: ", jsLink)
-              }
-          });
-          ContentTools.logger?.debug("ready to fire event for main content");
-          try {
-            ContentTools.logger?.debug("prototype doc is", document)
-            // @ts-ignore
-            // document.fire("xwiki:dom:loaded");
-            // ContentTools.logger?.debug("dom loaded fired in content");
-          } catch(e) {
-            ContentTools.logger?.debug("exception firing event", e);
-          }
-      }  
+  public static loadJS(js: string[]) {
+    if (js && js.length > 0) {
+      ContentTools.logger?.debug("Loading JS code for content");
+      js.forEach((jsLink) => {
+        ContentTools.logger?.debug("JS Link: ", jsLink);
+        const url = ContentTools.urlToLoad(jsLink);
+        if (url != null) {
+          const divEl = document.createElement("script");
+          divEl.src = url;
+          divEl.async = false;
+          ContentTools.logger?.debug("Ready to load js ", divEl);
+          document.head.appendChild(divEl);
+        } else {
+          ContentTools.logger?.debug("JS already loaded: ", jsLink);
+        }
+      });
+      ContentTools.logger?.debug("ready to fire event for main content");
+      try {
+        ContentTools.logger?.debug("prototype doc is", document);
+        //// @ts-expect-error TODO describe
+        // document.fire("xwiki:dom:loaded");
+        // ContentTools.logger?.debug("dom loaded fired in content");
+      } catch (e) {
+        ContentTools.logger?.debug("exception firing event", e);
+      }
     }
- 
-    public static urlToLoad(html : string) : string | null {
-    let url1 : string | null = null
+  }
+
+  public static urlToLoad(html: string): string | null {
+    let url1: string | null = null;
     const range = document.createRange();
     range.setStart(document.head, 0);
     const contentToInject = range.createContextualFragment(html);
-    contentToInject.querySelectorAll('link[href], script[src]').forEach(function(resource : any) {
+    // TODO get rid of any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    contentToInject
+      .querySelectorAll("link[href], script[src]")
+      // TODO get rid of any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .forEach(function (resource: any) {
         url1 = resource.src || resource.href;
-        document.querySelectorAll('link[href], script[src]').forEach(function(resource2 : any) {
+        document.querySelectorAll("link[href], script[src]").forEach(function (
+          // TODO get rid of any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          resource2: any,
+        ) {
           const url2 = resource2.src || resource2.href;
           if (url1 && url1 == url2) {
-             return null;
+            return null;
           }
         });
-    });
+      });
     return url1;
-    }
+  }
 
-    public static transformImages(cristal : CristalApp | undefined, element : string) {
-        const xwikiContentEl = document.getElementById(element)
-        if (xwikiContentEl) {
-          const transform = function(img : HTMLImageElement | HTMLScriptElement) {
-            const srcItem = img.attributes.getNamedItem("src");
-            if (srcItem) {
-              ContentTools.logger?.debug("Found image with url ", srcItem.value)
-              if (srcItem.value.indexOf("http")!=0) {
-                let src = cristal?.getWikiConfig().storage.getImageURL(cristal.getCurrentPage(), srcItem.value)
-                if (src) {
-                  img.src = src;
-                  ContentTools.logger?.debug("Transforming image to url ", img.src);
-                }
-              }
+  public static transformImages(
+    cristal: CristalApp | undefined,
+    element: string,
+  ) {
+    const xwikiContentEl = document.getElementById(element);
+    if (xwikiContentEl) {
+      const transform = function (img: HTMLImageElement | HTMLScriptElement) {
+        const srcItem = img.attributes.getNamedItem("src");
+        if (srcItem) {
+          ContentTools.logger?.debug("Found image with url ", srcItem.value);
+          if (srcItem.value.indexOf("http") != 0) {
+            const src = cristal
+              ?.getWikiConfig()
+              .storage.getImageURL(cristal.getCurrentPage(), srcItem.value);
+            if (src) {
+              img.src = src;
+              ContentTools.logger?.debug("Transforming image to url ", img.src);
             }
           }
-          new MutationObserver(function (mutations : Array<MutationRecord>) {
-            ContentTools.logger?.debug("Called in mutation records")
-            const mutation = mutations[0];
-            mutation.addedNodes.item;
-            for (const { addedNodes} of mutations) {
-              addedNodes.forEach(addedNode => {
-                if (addedNode.nodeType == 1) {
-                  const imgs = (addedNode as HTMLElement).querySelectorAll('img');
-                  imgs.forEach(img => {
-                    transform(img);
-                  });
-                  if ((addedNode as HTMLElement).tagName === 'IMG') {
-                    transform(addedNode as HTMLImageElement);
-                  }
-                }
-              });
-            }
-          }).observe(xwikiContentEl, { childList: true, subtree: true }); 
         }
-    }
-
-    /*
-        Experimental funtion to transfor scripts
-    */
-    public static transformScripts(cristal : CristalApp | undefined) {
-          const transformScript = function(scriptEl : HTMLScriptElement) {
-            const srcItem = scriptEl.attributes.getNamedItem("src");
-            if (srcItem) {
-              ContentTools.logger?.debug("Content Found script with url ", srcItem.value)
-              if (srcItem.value.indexOf("/")==0) {
-                ContentTools.logger?.debug("Content Ready to transform script url", srcItem.value)
-                scriptEl.src = "https://wiki30.demo.xwiki.com" + srcItem.value;
-                ContentTools.logger?.debug("Content Transforming script to url ", scriptEl.src)
-              } else {
-                ContentTools.logger?.debug("Content Do not transform script url", srcItem.value);
+      };
+      new MutationObserver(function (mutations: Array<MutationRecord>) {
+        ContentTools.logger?.debug("Called in mutation records");
+        const mutation = mutations[0];
+        mutation.addedNodes.item;
+        for (const { addedNodes } of mutations) {
+          addedNodes.forEach((addedNode) => {
+            if (addedNode.nodeType == 1) {
+              const imgs = (addedNode as HTMLElement).querySelectorAll("img");
+              imgs.forEach((img) => {
+                transform(img);
+              });
+              if ((addedNode as HTMLElement).tagName === "IMG") {
+                transform(addedNode as HTMLImageElement);
               }
             }
-          }
-
-          new MutationObserver(function (mutations : Array<MutationRecord>) {
-            ContentTools.logger?.debug("Called in mutation records")
-            const mutation = mutations[0];
-            mutation.addedNodes.item;
-            for (const { addedNodes} of mutations) {
-              addedNodes.forEach(addedNode => {
-                if (addedNode.nodeType == 1) {
-                  const jsel= (addedNode as HTMLElement).querySelectorAll('script');
-                  jsel.forEach(jsel => {
-                    ContentTools.logger?.debug("Transforming script url " + jsel);
-                    transformScript(jsel);
-                  });
-                  if ((addedNode as HTMLElement).tagName === 'SCRIPT') {
-                    ContentTools.logger?.debug("Transforming script url " + (addedNode as HTMLScriptElement).src);
-                    transformScript(addedNode as HTMLScriptElement);
-                  }
-                }
-              });
-            }
-          }).observe(document.head, { childList: true, subtree: true });
+          });
+        }
+      }).observe(xwikiContentEl, { childList: true, subtree: true });
     }
+  }
 
-
-    public static mount(component : Component, props : any, children : unknown, element : HTMLElement, app : App) : Function {
-      let el : HTMLElement | null = element;
-      let vNode : VNode | null = createVNode(component, props, children);
-
-      if (app && app._context) 
-        vNode.appContext = app._context
-      if (el) 
-        render(vNode, el)
-      else if (typeof document !== 'undefined' ) 
-        render(vNode, el = document.createElement('div'))
-
-      const destroy = () => {
-        if (el) render(null, el)
-        el = null
-        vNode = null
+  /*
+        Experimental function to transform scripts
+    */
+  public static transformScripts() {
+    const transformScript = function (scriptEl: HTMLScriptElement) {
+      const srcItem = scriptEl.attributes.getNamedItem("src");
+      if (srcItem) {
+        ContentTools.logger?.debug(
+          "Content Found script with url ",
+          srcItem.value,
+        );
+        if (srcItem.value.indexOf("/") == 0) {
+          ContentTools.logger?.debug(
+            "Content Ready to transform script url",
+            srcItem.value,
+          );
+          scriptEl.src = "https://wiki30.demo.xwiki.com" + srcItem.value;
+          ContentTools.logger?.debug(
+            "Content Transforming script to url ",
+            scriptEl.src,
+          );
+        } else {
+          ContentTools.logger?.debug(
+            "Content Do not transform script url",
+            srcItem.value,
+          );
+        }
       }
-      return destroy;
+    };
+
+    new MutationObserver(function (mutations: Array<MutationRecord>) {
+      ContentTools.logger?.debug("Called in mutation records");
+      const mutation = mutations[0];
+      mutation.addedNodes.item;
+      for (const { addedNodes } of mutations) {
+        addedNodes.forEach((addedNode) => {
+          if (addedNode.nodeType == 1) {
+            const jsel = (addedNode as HTMLElement).querySelectorAll("script");
+            jsel.forEach((jsel) => {
+              ContentTools.logger?.debug("Transforming script url " + jsel);
+              transformScript(jsel);
+            });
+            if ((addedNode as HTMLElement).tagName === "SCRIPT") {
+              ContentTools.logger?.debug(
+                "Transforming script url " +
+                  (addedNode as HTMLScriptElement).src,
+              );
+              transformScript(addedNode as HTMLScriptElement);
+            }
+          }
+        });
+      }
+    }).observe(document.head, { childList: true, subtree: true });
+  }
+
+  public static mount(
+    component: Component,
+    // TODO get rid of any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    props: any,
+    children: unknown,
+    element: HTMLElement,
+    app: App,
+  ): () => void {
+    let el: HTMLElement | null = element;
+    let vNode: VNode | null = createVNode(component, props, children);
+
+    if (app && app._context) {
+      vNode.appContext = app._context;
+    }
+    if (el) {
+      render(vNode, el);
+    } else if (typeof document !== "undefined") {
+      render(vNode, (el = document.createElement("div")));
     }
 
-    /* 
+    const destroy = () => {
+      if (el) {
+        render(null, el);
+      }
+      el = null;
+      vNode = null;
+    };
+    return destroy;
+  }
+
+  /* 
         Method to look for Macros in client side rendering
         Macros are inserted by the WikiModel parser using the following syntax
           <pre class="wikimodel-macro" macroname="MACRONAME" param1="PARAMVALUE1" param2="PARAMVALUE2">
@@ -252,27 +308,39 @@ export class ContentTools {
             <!--[CDATA[This is a warning message]]-->
           </pre>
     */
-    public static transformMacros(element : HTMLElement, cristal : CristalApp) {
-        let macroTagList = element.getElementsByTagName("pre");
-        for (let i = 0; i < macroTagList.length; i++) {
-            let macroTag = macroTagList[i];
-            if (macroTag.className=="wikimodel-macro") {
-              let macroName = macroTag.getAttribute("macroname");
-              if (macroName!=null && macroName!="") {
-                ContentTools.logger.debug("Found macro", macroName);
-                try {
-                  let macroProvider = cristal?.getContainer().getNamed<MacroProvider>("MacroProvider", macroName)
-                  let vueComponent = macroProvider?.getVueComponent();
-                  if (vueComponent && cristal?.getApp()) {
-                    macroTag.id = "wikimodel-macro-" + macroName + "-1";
-                    let macroData = macroProvider.parseParameters(macroTag);
-                    this.mount(vueComponent, { "macroData" : macroData }, null, macroTag, cristal.getApp())
-                  }
-                } catch (e) {
-                  ContentTools.logger.debug("Could not find macro implementation for", macroName, e);
-                }
-              }
+  public static transformMacros(element: HTMLElement, cristal: CristalApp) {
+    const macroTagList = element.getElementsByTagName("pre");
+    for (let i = 0; i < macroTagList.length; i++) {
+      const macroTag = macroTagList[i];
+      if (macroTag.className == "wikimodel-macro") {
+        const macroName = macroTag.getAttribute("macroname");
+        if (macroName != null && macroName != "") {
+          ContentTools.logger.debug("Found macro", macroName);
+          try {
+            const macroProvider = cristal
+              ?.getContainer()
+              .getNamed<MacroProvider>("MacroProvider", macroName);
+            const vueComponent = macroProvider?.getVueComponent();
+            if (vueComponent && cristal?.getApp()) {
+              macroTag.id = "wikimodel-macro-" + macroName + "-1";
+              const macroData = macroProvider.parseParameters(macroTag);
+              this.mount(
+                vueComponent,
+                { macroData: macroData },
+                null,
+                macroTag,
+                cristal.getApp(),
+              );
             }
+          } catch (e) {
+            ContentTools.logger.debug(
+              "Could not find macro implementation for",
+              macroName,
+              e,
+            );
+          }
         }
+      }
     }
+  }
 }

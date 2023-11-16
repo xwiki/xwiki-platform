@@ -23,35 +23,33 @@
  *
 -->
 <template>
-    <span>
-      Mounting time: {{ diff }}
-    </span>
-    <div v-for="index in 1000" :key="index">
-        <x-alert type="warning" :title="'This is an alert ' + index"></x-alert>
-    </div>
+  <span> Mounting time: {{ diff }} </span>
+  <div v-for="index in 1000" :key="index">
+    <x-alert type="warning" :title="'This is an alert ' + index" />
+  </div>
 </template>
 <script lang="ts">
-    import { ref } from 'vue';
+import { ref } from "vue";
 
-    let time : number = 0; 
-    let diff : number = 0;
-    const diffRef = ref<number>(diff);
+let time: number = 0;
+let diff: number = 0;
+const diffRef = ref<number>(diff);
 
-    export default {
-        setup(props) {
-            time = (new Date()).getTime();
-            console.log("Performance measurement dsx Setup");
-            return { diff : diffRef };
-        },
-        mounted() {
-            let time2 = (new Date()).getTime();
-            diffRef.value = time2 - time;
-            console.log("Performance measurement dsx Mounted: ", diff);
-        },
-        updated() {
-            let time2 = (new Date()).getTime();
-            diffRef.value = time2 - time;
-            console.log("Performance measurement dsx Updated: ", diff);
-        }
-    }
+export default {
+  setup() {
+    time = new Date().getTime();
+    console.log("Performance measurement dsx Setup");
+    return { diff: diffRef };
+  },
+  mounted() {
+    let time2 = new Date().getTime();
+    diffRef.value = time2 - time;
+    console.log("Performance measurement dsx Mounted: ", diff);
+  },
+  updated() {
+    let time2 = new Date().getTime();
+    diffRef.value = time2 - time;
+    console.log("Performance measurement dsx Updated: ", diff);
+  },
+};
 </script>

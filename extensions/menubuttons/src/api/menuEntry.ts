@@ -24,7 +24,7 @@
  **/
 
 interface MenuEntry {
-    getMenuEntry() : string;
-} 
+  getMenuEntry(): string;
+}
 
-export { MenuEntry }
+export { MenuEntry };

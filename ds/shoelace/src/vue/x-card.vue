@@ -5,9 +5,6 @@
 </template>
 <script lang="ts">
 export default {
-  props: [ "title" ],
-  data(props) {
-    return {}
-  }
-}
+  props: { title: { type: String, required: true } },
+};
 </script>

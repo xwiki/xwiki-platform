@@ -24,21 +24,21 @@
  **/
 
 import { AlertMacro } from "./alertMacro";
-import Success from "../vue/success.vue";
+import Success from "../vue/c-success.vue";
 
 export class SuccessMacro extends AlertMacro {
-    public static cname = "cristal.macro.success";
-    public static macroName = "success";
-       
-    constructor() {
-        super()
-    }
+  public static cname = "cristal.macro.success";
+  public static macroName = "success";
 
-    getMacroName(): string {
-        return SuccessMacro.macroName;
-    }
+  constructor() {
+    super();
+  }
 
-    getVueComponent() {
-        return Success;
-    }
+  getMacroName(): string {
+    return SuccessMacro.macroName;
+  }
+
+  getVueComponent() {
+    return Success;
+  }
 }

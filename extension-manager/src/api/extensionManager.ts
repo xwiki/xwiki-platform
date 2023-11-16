@@ -27,13 +27,18 @@ import { CristalComponent } from "./cristalComponent";
 import { Container } from "inversify";
 
 export interface ExtensionManager extends CristalComponent {
+  addRemoteExtension(
+    name: string,
+    customEntryFile?: string | null,
+    staticModule?: boolean | false,
+  ): void;
 
-    addRemoteExtension(name : string, customEntryFile? : string | null, staticModule? : boolean | false) : void;
- 
-    setRemoteExtensionsConfig(remoteExtensionDefaultURL : string, remoteExtensionDefaultEntryFile : string) : void;
+  setRemoteExtensionsConfig(
+    remoteExtensionDefaultURL: string,
+    remoteExtensionDefaultEntryFile: string,
+  ): void;
 
-    loadExtension(extensionName : string, container : Container) : Promise<void>;
-    
-    loadExtensions(container : Container) : Promise<void>;
- 
+  loadExtension(extensionName: string, container: Container): Promise<void>;
+
+  loadExtensions(container: Container): Promise<void>;
 }

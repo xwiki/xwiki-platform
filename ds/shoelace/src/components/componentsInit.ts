@@ -28,8 +28,10 @@ import { Container } from "inversify";
 import { ShoelaceDesignSystemLoader } from "./shoelaceDesignSystemLoader";
 
 export default class ComponentInit {
-    constructor(container : Container) {
-        container.bind<DesignSystemLoader>("DesignSystemLoader").to(ShoelaceDesignSystemLoader).whenTargetNamed("shoelace");
-    }
+  constructor(container: Container) {
+    container
+      .bind<DesignSystemLoader>("DesignSystemLoader")
+      .to(ShoelaceDesignSystemLoader)
+      .whenTargetNamed("shoelace");
+  }
 }
-

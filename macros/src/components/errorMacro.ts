@@ -24,21 +24,21 @@
  **/
 
 import { AlertMacro } from "./alertMacro";
-import Error from "../vue/error.vue";
+import Error from "../vue/c-error.vue";
 
 export class ErrorMacro extends AlertMacro {
-    public static cname = "cristal.macro.error";
-    public static macroName = "error";
-       
-    constructor() {
-        super()
-    }
+  public static cname = "cristal.macro.error";
+  public static macroName = "error";
 
-    getMacroName(): string {
-        return ErrorMacro.macroName;
-    }
+  constructor() {
+    super();
+  }
 
-    getVueComponent() {
-        return Error;
-    }
+  getMacroName(): string {
+    return ErrorMacro.macroName;
+  }
+
+  getVueComponent() {
+    return Error;
+  }
 }

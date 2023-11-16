@@ -23,22 +23,38 @@
  *
  **/
 
-import type { SkinManager } from './api/skinManager.js';
-import type { CristalApp } from './api/cristalApp.js';
-import type { WikiConfig } from './api/WikiConfig.js';
-import type { Storage } from './api/storage.js';
-import type { PageData } from './api/PageData.js';
-import type { Document } from './api/document.js';
-import type { Logger } from './api/logger.js';
-import type { LoggerConfig } from './api/loggerConfig.js';
-import type { DesignSystemLoader } from './api/designSystemLoader.js';
-import { DefaultPageData } from './components/DefaultPageData.js';
-import { DefaultWikiConfig } from './components/defaultWikiConfig.js';
-import { JSONLDDocument } from './components/JSONLDDocument.js';
-import { DefaultLogger } from './components/defaultLogger.js';
-import { DefaultLoggerConfig } from './components/defaultLoggerConfig.js';
-import type { WrappingStorage } from './api/wrappingStorage.js';
-import ComponentInit from './components/componentsInit.js';
+import type { SkinManager } from "./api/skinManager.js";
+import type { CristalApp } from "./api/cristalApp.js";
+import type { WikiConfig } from "./api/WikiConfig.js";
+import type { Storage } from "./api/storage.js";
+import type { PageData } from "./api/PageData.js";
+import type { Document } from "./api/document.js";
+import type { Logger } from "./api/logger.js";
+import type { LoggerConfig } from "./api/loggerConfig.js";
+import type { DesignSystemLoader } from "./api/designSystemLoader.js";
+import { DefaultPageData } from "./components/DefaultPageData.js";
+import { DefaultWikiConfig } from "./components/defaultWikiConfig.js";
+import { JSONLDDocument } from "./components/JSONLDDocument.js";
+import { DefaultLogger } from "./components/defaultLogger.js";
+import { DefaultLoggerConfig } from "./components/defaultLoggerConfig.js";
+import type { WrappingStorage } from "./api/wrappingStorage.js";
+import ComponentInit from "./components/componentsInit.js";
 
-export { ComponentInit, SkinManager, CristalApp as CristalApp, WikiConfig, Storage, WrappingStorage, DefaultWikiConfig, PageData, DefaultPageData, 
-         Logger, LoggerConfig, DefaultLogger, DefaultLoggerConfig, Document, JSONLDDocument, DesignSystemLoader };
+export {
+  ComponentInit,
+  SkinManager,
+  CristalApp as CristalApp,
+  WikiConfig,
+  Storage,
+  WrappingStorage,
+  DefaultWikiConfig,
+  PageData,
+  DefaultPageData,
+  Logger,
+  LoggerConfig,
+  DefaultLogger,
+  DefaultLoggerConfig,
+  Document,
+  JSONLDDocument,
+  DesignSystemLoader,
+};

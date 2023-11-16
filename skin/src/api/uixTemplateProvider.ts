@@ -25,4 +25,4 @@
 
 import { VueTemplateProvider } from "./vueTemplateProvider";
 
-export type UIXTemplateProvider = VueTemplateProvider
+export type UIXTemplateProvider = VueTemplateProvider;

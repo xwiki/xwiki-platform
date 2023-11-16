@@ -30,12 +30,12 @@ import { MenuEntry } from "../api/menuEntry";
 
 @injectable()
 export class MenuEntryButton1 implements MenuEntry {
-    public static cname = "cristal.menu.MenuEntry";
-    public static hint = "button1";
-    public static priority = 1000;
-    public static singleton = true;
-    
-    public getMenuEntry() {
-       return 'Rollup module';
-    }
-} 
+  public static cname = "cristal.menu.MenuEntry";
+  public static hint = "button1";
+  public static priority = 1000;
+  public static singleton = true;
+
+  public getMenuEntry() {
+    return "Rollup module";
+  }
+}

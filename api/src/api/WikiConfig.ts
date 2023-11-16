@@ -23,24 +23,33 @@
  *
  **/
 
-import { Storage } from "../api/storage";
+import { Storage } from "./storage";
 
 export interface WikiConfig {
-    name : string;
-    baseURL : string;
-    baseRestURL : string;
-    homePage : string;
-    storage : Storage;
-    serverRendering : boolean;
-    designSystem : string;
-    offline : boolean;
+  name: string;
+  baseURL: string;
+  baseRestURL: string;
+  homePage: string;
+  storage: Storage;
+  serverRendering: boolean;
+  designSystem: string;
+  offline: boolean;
 
-    setConfig(name : string, baseURL : string, baseRestURL : string, homePage : string, 
-              serverRendering : boolean, designSystem : string, offline : boolean) : void;
+  setConfig(
+    name: string,
+    baseURL: string,
+    baseRestURL: string,
+    homePage: string,
+    serverRendering: boolean,
+    designSystem: string,
+    offline: boolean,
+  ): void;
 
-    setConfigFromObject(configObject : any) : void;
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setConfigFromObject(configObject: any): void;
 
-    isSupported(format: string) : boolean;
+  isSupported(format: string): boolean;
 
-    initialize() : void;
+  initialize(): void;
 }

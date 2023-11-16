@@ -27,14 +27,13 @@ import { Container } from "inversify";
 import { App, Component } from "vue";
 
 export interface SkinManager {
- 
-    getTemplate(name : string) : Component | null;
+  getTemplate(name: string): Component | null;
 
-    getDefaultTemplate(name : string) : Component | null;
+  getDefaultTemplate(name: string): Component | null;
 
-    loadDesignSystem(app : App, container : Container) : void;
+  loadDesignSystem(app: App, container: Container): void;
 
-    setDesignSystem(designSystem : string) : void;
+  setDesignSystem(designSystem: string): void;
 
-    getDesignSystem() : string;
+  getDesignSystem(): string;
 }

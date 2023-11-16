@@ -28,16 +28,19 @@ import { injectable, inject, named } from "inversify";
 import "reflect-metadata";
 
 @injectable()
-export class GitHubWikiConfig extends DefaultWikiConfig  {    
-    storage : Storage;
-    cristal : CristalApp;
+export class GitHubWikiConfig extends DefaultWikiConfig {
+  storage: Storage;
+  cristal: CristalApp;
 
-    constructor(@inject<Logger>("Logger") logger : Logger, @inject("Storage") @named("GitHub") storage : Storage, @inject("CristalApp") cristal : CristalApp) {
-        super(logger);
-        this.storage = storage;
-        this.cristal = cristal;
-        this.storage.setWikiConfig(this);
-        if (this.homePage=="")
-            this.homePage = "README.md"
-    }
+  constructor(
+    @inject<Logger>("Logger") logger: Logger,
+    @inject("Storage") @named("GitHub") storage: Storage,
+    @inject("CristalApp") cristal: CristalApp,
+  ) {
+    super(logger);
+    this.storage = storage;
+    this.cristal = cristal;
+    this.storage.setWikiConfig(this);
+    if (this.homePage == "") this.homePage = "README.md";
+  }
 }

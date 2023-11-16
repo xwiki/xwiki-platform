@@ -34,19 +34,21 @@ import { ComponentInit as QueueWorkerComponentInit } from "@cristal/sharedworker
 import { ComponentInit as RenderingComponentInit } from "@cristal/rendering";
 import { Container } from "inversify";
 
-
 export class StaticBuild {
-    public static init(container : Container, forceStaticBuild : boolean) {
-        if ((import.meta.env && import.meta.env.MODE=="development") || forceStaticBuild) {
-            new SkinComponentInit(container);
-            new MacrosComponentInit(container);
-            new VueDSComponentInit(container);
-            new DSFRComponentInit(container);
-            new ShoelaceComponentInit(container);
-            new StorageComponentInit(container);
-            new MenuButtonsComponentInit(container);
-            new QueueWorkerComponentInit(container);
-            new RenderingComponentInit(container);
-        }
+  public static init(container: Container, forceStaticBuild: boolean) {
+    if (
+      (import.meta.env && import.meta.env.MODE == "development") ||
+      forceStaticBuild
+    ) {
+      new SkinComponentInit(container);
+      new MacrosComponentInit(container);
+      new VueDSComponentInit(container);
+      new DSFRComponentInit(container);
+      new ShoelaceComponentInit(container);
+      new StorageComponentInit(container);
+      new MenuButtonsComponentInit(container);
+      new QueueWorkerComponentInit(container);
+      new RenderingComponentInit(container);
     }
+  }
 }

@@ -23,6 +23,6 @@
  *
  **/
 
-import type { QueueWorker } from './api/queueWorker'
-import type { MyWorker } from './api/myworker'
+import type { QueueWorker } from "./api/queueWorker";
+import type { MyWorker } from "./api/myworker";
 export { MyWorker, QueueWorker };

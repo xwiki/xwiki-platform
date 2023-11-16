@@ -23,99 +23,110 @@
  *
  **/
 
-import { Logger, LoggerConfig, CristalApp as CristalApp, WikiConfig, SkinManager } from "@cristal/api";
+import {
+  CristalApp as CristalApp,
+  Logger,
+  LoggerConfig,
+  SkinManager,
+  WikiConfig,
+} from "@cristal/api";
 import { Container, injectable } from "inversify";
-import { App, Component, Ref } from "vue";
+import { App, Component } from "vue";
 import { Router } from "vue-router";
 
 @injectable()
 export class WorkerCristalApp implements CristalApp {
+  private wikiConfig: WikiConfig;
+  private container: Container;
+  private availableConfigurations: Map<string, WikiConfig>;
 
-    private wikiConfig : WikiConfig;
-    private container : Container;
-    private availableConfigurations : Map<string, WikiConfig>;
+  public constructor() {
+    this.availableConfigurations = new Map<string, WikiConfig>();
+  }
 
-    public constructor() {
-        this.availableConfigurations = new Map<string, WikiConfig>();
-    }
+  getApp(): App {
+    throw new Error("Method not implemented.");
+  }
+  getRouter(): Router {
+    throw new Error("Method not implemented.");
+  }
+  getContainer(): Container {
+    return this.container;
+  }
 
-    getApp(): App<any> {
-        throw new Error("Method not implemented.");
-    }
-    getRouter(): Router {
-        throw new Error("Method not implemented.");
-    }
-    getContainer(): Container {
-        return this.container;
-    }
+  setContainer(container: Container): void {
+    this.container = container;
+  }
 
-    setContainer(container : Container) : void {
-        this.container = container;
-    }
+  getWikiConfig(): WikiConfig {
+    return this.wikiConfig;
+  }
+  setWikiConfig(wikiConfig: WikiConfig): void {
+    this.wikiConfig = wikiConfig;
+  }
 
-    getWikiConfig(): WikiConfig {
-        return this.wikiConfig;
-    }
-    setWikiConfig(wikiConfig: WikiConfig): void {
-        this.wikiConfig = wikiConfig;
-    }
+  getSkinManager(): SkinManager {
+    throw new Error("Method not implemented.");
+  }
 
-    getSkinManager() : SkinManager {
-        throw new Error("Method not implemented.");
-    }
+  switchConfig(): void {}
 
-    switchConfig(configName : string) : void {
-    }
+  // TODO remove use of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setAvailableConfigurations(config: Map<string, any>) {
+    console.log(config);
+    // TODO remove use of any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    config.forEach((wikiConfigObject: any, key: string) => {
+      const configType = wikiConfigObject?.configType;
 
-    setAvailableConfigurations(config : Map<string, any>) {
-        console.log(config);
-        config.forEach((wikiConfigObject: any, key: string) => {
-            let configType = wikiConfigObject?.configType;
+      if (wikiConfigObject) {
+        const wikiConfig = this.container.getNamed<WikiConfig>(
+          "WikiConfig",
+          configType,
+        );
+        wikiConfig.setConfigFromObject(wikiConfigObject);
+        this.availableConfigurations.set(key, wikiConfig);
+      }
+    });
+  }
 
-            if (wikiConfigObject) {
-                const wikiConfig = this.container.getNamed<WikiConfig>("WikiConfig", configType);
-                wikiConfig.setConfigFromObject(wikiConfigObject);
-                this.availableConfigurations.set(key, wikiConfig);
-            }
-        });
-    }
+  getAvailableConfigurations(): Map<string, WikiConfig> {
+    return this.availableConfigurations;
+  }
 
-    getAvailableConfigurations() : Map<string, WikiConfig> {
-        return this.availableConfigurations;
-    }
+  run(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  getUIXTemplates(): Component[] {
+    throw new Error("Method not implemented.");
+  }
+  getMenuEntries(): string[] {
+    throw new Error("Method not implemented.");
+  }
+  getCurrentPage(): string {
+    throw new Error("Method not implemented.");
+  }
+  setCurrentPage(): void {
+    throw new Error("Method not implemented.");
+  }
+  setContentRef(): void {
+    throw new Error("Method not implemented.");
+  }
+  loadPageFromURL(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  loadPage(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  getLogger(): Logger {
+    throw new Error("Method not implemented.");
+  }
+  getLoggerConfig(): LoggerConfig {
+    throw new Error("Method not implemented.");
+  }
 
-    run(): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    getUIXTemplates(extensionPoint: string): Component[] {
-        throw new Error("Method not implemented.");
-    }
-    getMenuEntries(): string[] {
-        throw new Error("Method not implemented.");
-    }
-    getCurrentPage(): string {
-        throw new Error("Method not implemented.");
-    }
-    setCurrentPage(page: string): void {
-        throw new Error("Method not implemented.");
-    }
-    setContentRef(ref: Ref<any>): void {
-        throw new Error("Method not implemented.");
-    }
-    loadPageFromURL(url: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    loadPage(): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    getLogger(module: string): Logger {
-        throw new Error("Method not implemented.");
-    }
-    getLoggerConfig(): LoggerConfig {
-        throw new Error("Method not implemented.");
-    }
-
-    renderContent(source : string, sourceSyntax : string, targetSyntax : string, wikiConfig : WikiConfig) : string {
-        throw new Error("Method not implemented.");
-    }
+  renderContent(): string {
+    throw new Error("Method not implemented.");
+  }
 }

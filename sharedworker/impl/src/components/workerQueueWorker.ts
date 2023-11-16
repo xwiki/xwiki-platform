@@ -28,27 +28,23 @@ import { QueueWorker } from "@cristal/sharedworker-api";
 
 @injectable()
 export default class WorkerQueueWorker implements QueueWorker {
+  public constructor() {
+    this.initialize();
+  }
 
-    public constructor() {
-        this.initialize();
-    }
+  public initialize() {}
 
-    public initialize() {
-    }
+  public getStatus(): boolean {
+    return true;
+  }
 
-    public getStatus() : boolean {
-        return true;
-    }
+  public async increment(): Promise<number> {
+    return 0;
+  }
 
-    public async increment() : Promise<number> {
-        return 0;
-    }
+  public async addToQueue(): Promise<void> {}
 
-    public async addToQueue(page : string) : Promise<void> {
-    }
-
-    public async getQueueSize() : Promise<number> {
-        return 0;
-    }
+  public async getQueueSize(): Promise<number> {
+    return 0;
+  }
 }
-

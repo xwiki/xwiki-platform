@@ -23,33 +23,39 @@
  *
  **/
 
-import { TemplateComponent } from './templateTemplateProvider';
-import { DefaultSkinManager } from './defaultSkinManager';
+import { TemplateComponent } from "./templateTemplateProvider";
+import { DefaultSkinManager } from "./defaultSkinManager";
 import { Container } from "inversify";
-import { Logger, SkinManager } from '@cristal/api';
-import { VueTemplateProvider } from '../api/vueTemplateProvider';
-import { UIXVueTemplateProvider } from './uixVueTemplateProvider';
-import { UIXLoginTemplateProvider } from './uixLoginTemplateProvider';
-import { UIXTemplateProvider } from '../api/uixTemplateProvider';
-import { UIXSearchTemplateProvider } from './uixSearchTemplateProvider';
-
-
+import { Logger, SkinManager } from "@cristal/api";
+import { VueTemplateProvider } from "../api/vueTemplateProvider";
+import { UIXVueTemplateProvider } from "./uixVueTemplateProvider";
+import { UIXLoginTemplateProvider } from "./uixLoginTemplateProvider";
+import { UIXTemplateProvider } from "../api/uixTemplateProvider";
+import { UIXSearchTemplateProvider } from "./uixSearchTemplateProvider";
 
 export default class ComponentInit {
+  logger: Logger;
 
-    logger : Logger;
-   
-    constructor(container : Container) {
-        this.logger = container.get<Logger>("Logger");
-        this.logger.setModule("skin.components.componentsInit");
+  constructor(container: Container) {
+    this.logger = container.get<Logger>("Logger");
+    this.logger.setModule("skin.components.componentsInit");
 
-        this.logger?.debug("Init Skin components begin")
-        container.bind<UIXTemplateProvider>("UIXTemplateProvider").to(UIXLoginTemplateProvider).whenTargetNamed(UIXLoginTemplateProvider.extensionPoint);
-        container.bind<UIXTemplateProvider>("UIXTemplateProvider").to(UIXSearchTemplateProvider).whenTargetNamed(UIXSearchTemplateProvider.extensionPoint);
-        container.bind<SkinManager>("SkinManager").to(DefaultSkinManager);
-        container.bind<VueTemplateProvider>("VueTemplateProvider").to(TemplateComponent);
-        container.bind<VueTemplateProvider>("VueTemplateProvider").to(UIXVueTemplateProvider);
-        this.logger?.debug("Init Skin components end")
-    }
+    this.logger?.debug("Init Skin components begin");
+    container
+      .bind<UIXTemplateProvider>("UIXTemplateProvider")
+      .to(UIXLoginTemplateProvider)
+      .whenTargetNamed(UIXLoginTemplateProvider.extensionPoint);
+    container
+      .bind<UIXTemplateProvider>("UIXTemplateProvider")
+      .to(UIXSearchTemplateProvider)
+      .whenTargetNamed(UIXSearchTemplateProvider.extensionPoint);
+    container.bind<SkinManager>("SkinManager").to(DefaultSkinManager);
+    container
+      .bind<VueTemplateProvider>("VueTemplateProvider")
+      .to(TemplateComponent);
+    container
+      .bind<VueTemplateProvider>("VueTemplateProvider")
+      .to(UIXVueTemplateProvider);
+    this.logger?.debug("Init Skin components end");
+  }
 }
-

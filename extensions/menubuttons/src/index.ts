@@ -23,7 +23,7 @@
  *
  **/
 
-import { ComponentInit } from './components/componentsInit.js'
-import type { MenuEntry } from './api/menuEntry'
+import { ComponentInit } from "./components/componentsInit.js";
+import type { MenuEntry } from "./api/menuEntry";
 
 export { ComponentInit, MenuEntry };

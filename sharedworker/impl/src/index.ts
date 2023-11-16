@@ -23,6 +23,6 @@
  *
  **/
 
-import ComponentInit from './components/componentsInit'
-import type { QueueWorker } from '@cristal/sharedworker-api'
+import ComponentInit from "./components/componentsInit";
+import type { QueueWorker } from "@cristal/sharedworker-api";
 export { ComponentInit, QueueWorker };

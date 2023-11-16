@@ -14,6 +14,10 @@
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*"
+    ],
+    "eslintconf": [
+      "{workspaceRoot}/.eslintrc",
+      "{workspaceRoot}/**/.eslintrc"
     ]
   },
   "targetDefaults": {
@@ -27,6 +31,13 @@
       ],
       "outputs": [
         "{projectRoot}/dist"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default",
+        "^default",
+        "eslintconf"
       ]
     },
     "compile": {

@@ -24,60 +24,59 @@
  **/
 
 export class WikiModel2 {
-    
-    
-    public constructor() {
-      this.loadWikiModel();
+  public constructor() {
+    this.loadWikiModel();
+  }
+
+  public loadWikiModel() {
+    try {
+      const divEl = document.createElement("script");
+      divEl.src =
+        "/src/apps/wikimodel/org.xwiki.rendering.wikimodel.nocache.js";
+      divEl.async = false;
+      document.head.appendChild(divEl);
+      console.log("After import WikiModel");
+      // @ts-expect-error TODO describe
+      console.log("Wikimodel:", window.WikiModel);
+      // @ts-expect-error TODO describe
+      if (window.WikiModel) {
+        // @ts-expect-error TODO describe
+        console.log("Wikimodel parse:", window.WikiModel.parse);
+      }
+    } catch (e) {
+      console.log("Exception loading wikimodel", e);
     }
+  }
 
-    public loadWikiModel() {
-        try {
-            const divEl = document.createElement('script');
-            divEl.src = "/src/apps/wikimodel/org.xwiki.rendering.wikimodel.nocache.js";
-            divEl.async = false;
-            document.head.appendChild(divEl);
-            console.log("After import WikiModel")
-            // @ts-ignore
-            console.log("Wikimodel:", window.WikiModel);
-            // @ts-ignore
-            if (window.WikiModel) {
-                // @ts-ignore
-                console.log("Wikimodel parse:", window.WikiModel.parse);
-            }
-        } catch (e) {
-            console.log("Exception loading wikimodel", e);
-        }
+  public async isWikiModelLoaded() {
+    // TODO get rid of any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sleep = (ms: any) => new Promise((r) => setTimeout(r, ms));
+
+    for (let i = 0; i < 10; i++) {
+      // @ts-expect-error TODO describe
+      if (!window.WikiModel) {
+        // this.logger?.debug("Sleeping 1sec mode waiting for WikiModel");
+        await sleep(1000);
+      } else {
+        // this.logger?.info("WikiModel is ready");
+        return true;
+      }
     }
+    // this.logger?.info("WikiModel is not ready");
+    return false;
+  }
 
-    public async isWikiModelLoaded() {
-        const sleep = (ms : any) => new Promise(r => setTimeout(r, ms));
-
-        for (let i=0;i<10;i++) {
-            // @ts-ignore
-            if (!window.WikiModel) {
-                // this.logger?.debug("Sleeping 1sec mode waiting for WikiModel");
-                await sleep(1000);
-            } else {
-                // this.logger?.info("WikiModel is ready");
-                return true;
-            }
-        }
-        // this.logger?.info("WikiModel is not ready");
-        return false;
+  public parse(source: string): string {
+    try {
+      console.log("Source is:", source);
+      // @ts-expect-error TODO describe
+      const result = window.WikiModel.parse(source);
+      console.log("Rendering is:", result);
+      return result;
+    } catch (e) {
+      console.log("Exception rendering", e);
+      return "Exception rendering: " + e;
     }
-
-    public parse(source: string) : string {
-        try {
-            console.log("Source is:", source)
-            // @ts-ignore
-            const result = window.WikiModel.parse(source);
-            console.log("Rendering is:", result)
-            // @ts-ignore
-            return result;
-        } catch (e) {
-            console.log("Exception rendering", e);
-            return "Exception rendering: " + e;
-        }
-    }
-
+  }
 }

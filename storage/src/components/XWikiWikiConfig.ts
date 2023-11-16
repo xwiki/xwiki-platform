@@ -28,24 +28,24 @@ import { injectable, inject, named } from "inversify";
 import "reflect-metadata";
 
 @injectable()
-export class XWikiWikiConfig extends DefaultWikiConfig  {
-     
-    storage : Storage;
-    cristal : CristalApp;
+export class XWikiWikiConfig extends DefaultWikiConfig {
+  storage: Storage;
+  cristal: CristalApp;
 
-    constructor(@inject<Logger>("Logger") logger : Logger, @inject("Storage") @named("XWiki") storage : Storage, @inject("CristalApp") cristal : CristalApp) {
-        super(logger);
-        this.cristal = cristal;
-        this.storage = storage;
-        this.storage.setWikiConfig(this);
-        if (this.homePage=="")
-            this.homePage = "Main.WebHome";
-    }
+  constructor(
+    @inject<Logger>("Logger") logger: Logger,
+    @inject("Storage") @named("XWiki") storage: Storage,
+    @inject("CristalApp") cristal: CristalApp,
+  ) {
+    super(logger);
+    this.cristal = cristal;
+    this.storage = storage;
+    this.storage.setWikiConfig(this);
+    if (this.homePage == "") this.homePage = "Main.WebHome";
+  }
 
-    isSupported(format: string): boolean {
-        if (format=="html" || format=="jsonld")
-           return true;
-        else
-           return false;
-    }
+  isSupported(format: string): boolean {
+    if (format == "html" || format == "jsonld") return true;
+    else return false;
+  }
 }

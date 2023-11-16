@@ -25,40 +25,41 @@
 
 import { DefaultMacroProvider } from "./defaultMacroProvider";
 import { MacroData } from "@cristal/skin";
-import Warning from "../vue/warning.vue";
+import Warning from "../vue/c-warning.vue";
 
 export class AlertMacro extends DefaultMacroProvider {
-    public static cname = "cristal.macro.alert";
-    public static macroName = "alert";
-    public static hint = "macro";
-    public static priority = 1000;
-    public static singleton = true;
-       
-    constructor() {
-        super()
-    }
+  public static cname = "cristal.macro.alert";
+  public static macroName = "alert";
+  public static hint = "macro";
+  public static priority = 1000;
+  public static singleton = true;
 
-    getMacroName(): string {
-        return AlertMacro.macroName;
-    }
+  constructor() {
+    super();
+  }
 
-    getVueComponent() {
-        return Warning;
-    }
-    
-    protected escapeHTML(source : String) {
-      let escape = document.createElement('textarea');
-      escape.textContent = source.toString();
-      return escape.innerHTML;
-    }
+  getMacroName(): string {
+    return AlertMacro.macroName;
+  }
 
-    renderMacroAsHTML(macroData: MacroData): String {
-        let title = macroData.getMacroParameter("title");
-        let result = "<div class='cristal-macro-" + this.getMacroName() + "'>";
-        if (title && title!="") {
-            result += this.escapeHTML(title) + "\n";
-        }
-        result += "<p>" + this.escapeHTML(macroData.getMacroContent()) + "</p></div>";
-        return result;
+  getVueComponent() {
+    return Warning;
+  }
+
+  protected escapeHTML(source: string) {
+    const escape = document.createElement("textarea");
+    escape.textContent = source.toString();
+    return escape.innerHTML;
+  }
+
+  renderMacroAsHTML(macroData: MacroData): string {
+    const title = macroData.getMacroParameter("title");
+    let result = "<div class='cristal-macro-" + this.getMacroName() + "'>";
+    if (title && title != "") {
+      result += this.escapeHTML(title) + "\n";
     }
+    result +=
+      "<p>" + this.escapeHTML(macroData.getMacroContent()) + "</p></div>";
+    return result;
+  }
 }

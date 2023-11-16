@@ -83,7 +83,7 @@ test-results/
 playwright-report/
 
 ## CI specific
-/unit-tests.xml
-/e2e-tests.xml
+unit-tests.xml
+e2e-tests.xml
 /*.tgz
 .nx/

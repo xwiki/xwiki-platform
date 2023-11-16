@@ -26,17 +26,15 @@
 import { WikiConfig } from "@cristal/api";
 
 export interface Converter {
-    
-    getSourceSyntax() : string;
+  getSourceSyntax(): string;
 
-    getTargetSyntax() : string;
+  getTargetSyntax(): string;
 
-    getVersion() : string;
+  getVersion(): string;
 
-    getName() : string;
+  getName(): string;
 
-    isConverterReady() : Promise<boolean>;
+  isConverterReady(): Promise<boolean>;
 
-    convert(source : string, wikiConfig: WikiConfig) : string;
+  convert(source: string, wikiConfig: WikiConfig): string;
 }
-

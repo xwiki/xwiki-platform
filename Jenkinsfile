@@ -42,19 +42,13 @@ pipeline {
         }
         stage('Unit Tests') {
             steps {
-                sh 'pnpm test:unit:ci'
-            }
-        }
-        stage('Pack') {
-            steps {
-               sh 'pnpm pack'
+                sh 'pnpm test'
             }
         }
     }
     post {
         always {
-            archiveArtifacts artifacts: '*.tgz', fingerprint: true
-            junit 'unit-tests.xml'
+            junit '**/unit-tests.xml'
         }
     }
 }

@@ -25,61 +25,78 @@
 
 import { DefaultPageData, Logger, PageData } from "@cristal/api";
 import OfflineStorage from "../api/offlineStorage";
-import DexiePageStorage from './dexiePageStorage';
+import DexiePageStorage from "./dexiePageStorage";
 import { inject, injectable } from "inversify";
 
 @injectable()
 export default class DexieOfflineStorage implements OfflineStorage {
-    private pageStorageMap : Map<string, DexiePageStorage> = new Map<string, DexiePageStorage>();
-    private logger : Logger;
+  private pageStorageMap: Map<string, DexiePageStorage> = new Map<
+    string,
+    DexiePageStorage
+  >();
+  private logger: Logger;
 
-    constructor(@inject<Logger>("Logger") logger : Logger) {
-      this.logger = logger;
-      this.logger.setModule("storage.components.dexieOfflineStorage");
+  constructor(@inject<Logger>("Logger") logger: Logger) {
+    this.logger = logger;
+    this.logger.setModule("storage.components.dexieOfflineStorage");
+  }
+
+  getPageStorage(wikiName: string): DexiePageStorage {
+    let pageStorage = this.pageStorageMap.get(wikiName);
+    if (pageStorage == null) {
+      pageStorage = new DexiePageStorage(wikiName);
+      this.pageStorageMap.set(wikiName, pageStorage);
     }
+    return pageStorage;
+  }
 
-    getPageStorage(wikiName : string) : DexiePageStorage {
-        let pageStorage = this.pageStorageMap.get(wikiName);
-        if (pageStorage==null) {
-          pageStorage = new DexiePageStorage(wikiName)
-          this.pageStorageMap.set(wikiName, pageStorage)
-        }
-        return pageStorage;
+  async getPage(wikiName: string, id: string): Promise<PageData | undefined> {
+    try {
+      this.logger.debug("Ready to load page from local storage", id);
+      const pageStorage = this.getPageStorage(wikiName);
+      this.logger.debug("pageStorage is ready, asking for page");
+      const pageObject = await pageStorage.pages.get(id);
+      const pageData = new DefaultPageData();
+      pageData.fromObject(pageObject);
+      return pageData;
+    } catch (e) {
+      this.logger.debug("Exception while trying to read from local storage", e);
+      return undefined;
     }
+  }
 
-    async getPage(wikiName: string, id : string) : Promise<PageData|undefined> {
-      try {
-        this.logger.debug("Ready to load page from local storage", id);
-        let pageStorage = this.getPageStorage(wikiName);
-        this.logger.debug("pageStorage is ready, asking for page");
-        let pageObject = await pageStorage.pages.get(id);    
-        let pageData = new DefaultPageData();
-        pageData.fromObject(pageObject);
-        return pageData; 
-      } catch (e) {
-        this.logger.debug("Exception while trying to read from local storage", e);
-        return undefined;
-      }
-    };
+  async savePage(wikiName: string, id: string, page: PageData): Promise<void> {
+    try {
+      const pageStorage = this.getPageStorage(wikiName);
+      await pageStorage.pages.add(page.toObject(), id);
+    } catch (e) {
+      this.logger.debug(
+        "Exception while trying to store in local storage",
+        wikiName,
+        id,
+        page,
+        e,
+      );
+    }
+  }
 
-    async savePage(wikiName : string, id : string, page : PageData) : Promise<void> {
-      try {
-        let pageStorage = this.getPageStorage(wikiName);
-        await pageStorage.pages.add(page.toObject(), id); 
-      } catch (e) {
-        this.logger.debug("Exception while trying to store in local storage", wikiName, id, page, e);
-      }
-    };
-
-    async updatePage(wikiName : string, id : string, page : PageData) : Promise<void> {
-      try {
-        let pageStorage = this.getPageStorage(wikiName);
-        this.logger.debug("Ready to store", page);
-        await pageStorage.pages.update(id, page.toObject()); 
-      } catch (e) {
-        this.logger.debug("Exception while trying to store in local storage", wikiName, id, page, e);
-      }
-    };
-
-
+  async updatePage(
+    wikiName: string,
+    id: string,
+    page: PageData,
+  ): Promise<void> {
+    try {
+      const pageStorage = this.getPageStorage(wikiName);
+      this.logger.debug("Ready to store", page);
+      await pageStorage.pages.update(id, page.toObject());
+    } catch (e) {
+      this.logger.debug(
+        "Exception while trying to store in local storage",
+        wikiName,
+        id,
+        page,
+        e,
+      );
+    }
+  }
 }

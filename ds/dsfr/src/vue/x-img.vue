@@ -1,11 +1,9 @@
 <template>
-  <img :src=src />
+  <!-- TODO: Add an alt property to the image, as a prop. -->
+  <img :src="src" />
 </template>
 <script lang="ts">
 export default {
-  props: [ "src"],
-  data(props) {
-    return {}
-  }
-}
+  props: { src: { type: String, required: true } },
+};
 </script>

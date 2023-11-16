@@ -32,65 +32,100 @@ import "reflect-metadata";
 import { Logger } from "@cristal/api";
 
 @injectable()
-export class DefaultExtensionManager extends DefaultComponent implements ExtensionManager {
- 
-    protected remoteExtensions : Map<string, ExtensionConfig>= new Map<string, ExtensionConfig>();
-    protected remoteExtensionDefaultURL  = "/apps/";
-    protected remoteExtensionDefaultEntryFile  = "main.bundle.js";
+export class DefaultExtensionManager
+  extends DefaultComponent
+  implements ExtensionManager
+{
+  protected remoteExtensions: Map<string, ExtensionConfig> = new Map<
+    string,
+    ExtensionConfig
+  >();
+  protected remoteExtensionDefaultURL = "/apps/";
+  protected remoteExtensionDefaultEntryFile = "main.bundle.js";
 
-    public logger : Logger;
+  public logger: Logger;
 
-    constructor(@inject<Logger>("Logger") logger : Logger) {
-        super();
-        this.logger = logger;
-        this.logger.setModule("extensionmanager.components.defaultExtensionManager");
+  constructor(@inject<Logger>("Logger") logger: Logger) {
+    super();
+    this.logger = logger;
+    this.logger.setModule(
+      "extensionmanager.components.defaultExtensionManager",
+    );
+  }
+
+  addRemoteExtension(
+    name: string,
+    customEntryFile: string | null,
+    staticModule: boolean | false,
+  ): void {
+    this.remoteExtensions.set(
+      name,
+      new DefaultExtensionConfig(name, customEntryFile, staticModule),
+    );
+  }
+
+  setRemoteExtensionsConfig(
+    remoteExtensionDefaultURL: string,
+    remoteExtensionDefaultEntryFile: string,
+  ): void {
+    this.remoteExtensionDefaultURL = remoteExtensionDefaultURL;
+    this.remoteExtensionDefaultEntryFile = remoteExtensionDefaultEntryFile;
+  }
+
+  async loadExtension(
+    extensionName: string,
+    container: Container,
+  ): Promise<void> {
+    try {
+      const componentConfig = this.remoteExtensions.get(extensionName);
+      const entryFile =
+        componentConfig && componentConfig.entryFile
+          ? componentConfig.entryFile
+          : this.remoteExtensionDefaultEntryFile;
+      const importPath =
+        this.remoteExtensionDefaultURL + extensionName + "/" + entryFile;
+      const cssImportPath =
+        this.remoteExtensionDefaultURL + extensionName + "/style.css";
+
+      this.logger?.debug("Ready to import ", importPath);
+      // css loading
+      try {
+        const cssModule = await import(/* @vite-ignore */ cssImportPath, {
+          assert: { type: "text/css" },
+        });
+        document.adoptedStyleSheets = [cssModule.default];
+      } catch (e) {
+        // TODO handle exception or comment why can safely be ignored
+      }
+      // js loading
+      const componentInitModule = await import(/* @vite-ignore */ importPath);
+      if (componentInitModule != null) {
+        this.logger?.debug(
+          "Found components Init for ",
+          extensionName,
+          componentInitModule,
+        );
+        const ComponentInit = componentInitModule.ComponentInit;
+        new ComponentInit(container);
+        this.logger?.debug("Succesfull components Init for ", extensionName);
+      } else {
+        this.logger?.debug("No components to load for ", extensionName);
+      }
+      return;
+    } catch (e) {
+      this.logger?.error(
+        "Exception while loading components from ",
+        extensionName,
+        e,
+      );
     }
-  
-    addRemoteExtension(name: string, customEntryFile : string | null, staticModule: boolean | false) : void {
-        this.remoteExtensions.set(name, new DefaultExtensionConfig(name, customEntryFile, staticModule));
+  }
+
+  async loadExtensions(container: Container) {
+    // loading component from App module
+    for (const key of this.remoteExtensions.keys()) {
+      await this.loadExtension(key, container);
     }
-
-    setRemoteExtensionsConfig(remoteExtensionDefaultURL: string, remoteExtensionDefaultEntryFile: string): void {
-        this.remoteExtensionDefaultURL = remoteExtensionDefaultURL; 
-        this.remoteExtensionDefaultEntryFile = remoteExtensionDefaultEntryFile;
-     }
-    
-    async loadExtension(extensionName: string, container : Container) : Promise<void> {
-        try {
-            const componentConfig = this.remoteExtensions.get(extensionName);
-            const entryFile = (componentConfig && componentConfig.entryFile) ? componentConfig.entryFile : this.remoteExtensionDefaultEntryFile;
-            const importPath = this.remoteExtensionDefaultURL + extensionName + '/' + entryFile;
-            const cssImportPath = this.remoteExtensionDefaultURL + extensionName + '/style.css';
-    
-            this.logger?.debug("Ready to import ", importPath);
-            // css loading
-            try {
-                const cssModule = await import(/* @vite-ignore */ cssImportPath, { assert: { type: "text/css" } });
-                document.adoptedStyleSheets = [cssModule.default];
-            } catch(e) {
-            }
-            // js loading
-            const componentInitModule = await import(/* @vite-ignore */ importPath);
-            if (componentInitModule!=null) {
-                this.logger?.debug("Found components Init for ", extensionName, componentInitModule)
-                const ComponentInit = componentInitModule.ComponentInit;
-                new ComponentInit(container);
-                this.logger?.debug("Succesfull components Init for ", extensionName)
-            } else {
-                this.logger?.debug("No components to load for ", extensionName);
-            }
-            return;
-        } catch (e) {
-            this.logger?.error("Exception while loading components from ", extensionName, e);
-        }
-     }
-
-    async loadExtensions(container : Container) {
-        // loading component from App module        
-        for (const key of this.remoteExtensions.keys()) {
-            await this.loadExtension(key, container);
-        }
-        return
-    }
-
+    return;
+  }
 }

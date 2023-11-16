@@ -28,8 +28,7 @@ import { QueueWorker } from "@cristal/sharedworker-api";
 import DefaultQueueWorker from "./defaultQueueWorker";
 
 export default class ComponentInit {
-    constructor(container : Container) {
-        container.bind<QueueWorker>("QueueWorker").to(DefaultQueueWorker);
-    }
+  constructor(container: Container) {
+    container.bind<QueueWorker>("QueueWorker").to(DefaultQueueWorker);
+  }
 }
-

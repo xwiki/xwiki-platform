@@ -23,51 +23,47 @@
  *
  **/
 
-import { WikiConfig } from "@cristal/api";
+import { Logger } from "@cristal/api";
 import { Converter } from "../api/converter";
-import { Logger } from '@cristal/api';
 import { inject, injectable } from "inversify";
-// import { WikiModel } from "./wikimodel";
 import { WikiModel } from "./wikimodel-teavm";
 
 @injectable()
 export class XWiki21ToHTMLConverter implements Converter {
-    public static converterName  = "xwiki_html";
+  public static converterName = "xwiki_html";
 
-    private logger : Logger;
-    public wikimodel: WikiModel;
-    
-    constructor(@inject<Logger>("Logger") logger : Logger) {
-      this.logger = logger;
-      this.logger.setModule("rendering.xwiki");
-      this.wikimodel = new WikiModel();
-    }
+  private logger: Logger;
+  public wikimodel: WikiModel;
 
-    public async isConverterReady() : Promise<boolean> {
-        return await this.wikimodel.isWikiModelLoaded()
-      }
-  
-    public getSourceSyntax() : string {
-        return "xwiki/2.1";
-    }
+  constructor(@inject<Logger>("Logger") logger: Logger) {
+    this.logger = logger;
+    this.logger.setModule("rendering.xwiki");
+    this.wikimodel = new WikiModel();
+  }
 
-    public getTargetSyntax() : string {
-        return "html/5.0";
-    }
+  public async isConverterReady(): Promise<boolean> {
+    return await this.wikimodel.isWikiModelLoaded();
+  }
 
-    public getVersion() : string {
-        return "1.0";
-    }
+  public getSourceSyntax(): string {
+    return "xwiki/2.1";
+  }
 
-    public getName() : string {
-        return XWiki21ToHTMLConverter.converterName;
-    }
+  public getTargetSyntax(): string {
+    return "html/5.0";
+  }
 
-    public convert(source : string, wikiConfig : WikiConfig) : string {
-        if (source==undefined)
-            return "";
-        
-        return this.wikimodel.parse(source); 
-    }
+  public getVersion(): string {
+    return "1.0";
+  }
+
+  public getName(): string {
+    return XWiki21ToHTMLConverter.converterName;
+  }
+
+  public convert(source: string): string {
+    if (source == undefined) return "";
+
+    return this.wikimodel.parse(source);
+  }
 }
-

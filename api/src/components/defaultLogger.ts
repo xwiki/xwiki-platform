@@ -30,35 +30,41 @@ import { LoggerConfig } from "../api/loggerConfig";
 
 @injectable()
 export class DefaultLogger implements Logger {
-    module: string;
-    
-    @inject("LoggerConfig")
-    loggerConfig : LoggerConfig;
+  module: string;
 
-    setModule(module : string) {
-        this.module = module;
-    }
+  @inject("LoggerConfig")
+  loggerConfig: LoggerConfig;
 
-    debug(...data: any[]): void {
-        if (!this.loggerConfig || this.loggerConfig.hasLevelId(this.module, 4))
-           data.unshift(this.module + ":")
-           console.debug.apply(null, data);
-    }
+  setModule(module: string) {
+    this.module = module;
+  }
 
-    info(...data: any[]): void {
-        data.unshift(this.module + ":")
-        console.info.apply(null, data);
- }
-    
-    warn(...data: any[]): void {
-        data.unshift(this.module + ":")
-        console.warn.apply(null, data);
- }
-    
-    error(...data: any[]): void {
-        data.unshift(this.module + ":")
-        console.error.apply(null, data);
- }
-    
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  debug(...data: any[]): void {
+    if (!this.loggerConfig || this.loggerConfig.hasLevelId(this.module, 4))
+      data.unshift(this.module + ":");
+    console.debug.apply(null, data);
+  }
 
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  info(...data: any[]): void {
+    data.unshift(this.module + ":");
+    console.info.apply(null, data);
+  }
+
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  warn(...data: any[]): void {
+    data.unshift(this.module + ":");
+    console.warn.apply(null, data);
+  }
+
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error(...data: any[]): void {
+    data.unshift(this.module + ":");
+    console.error.apply(null, data);
+  }
 }

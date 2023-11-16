@@ -23,47 +23,45 @@
  *
  **/
 
-
-import { WikiModelTeaVM } from '@cristal/rendering-wikimodel';
-
+import { WikiModelTeaVM } from "@cristal/rendering-wikimodel";
 
 export class WikiModel {
-    
-    
-    public constructor() {
-        this.loadWikiModel();
-    }
+  public constructor() {
+    this.loadWikiModel();
+  }
 
-    public async isWikiModelLoaded() : Promise<boolean> {
-        console.debug("In isWikiModelLoaded");
-        const sleep = (ms : any) => new Promise(r => setTimeout(r, ms));
+  public async isWikiModelLoaded(): Promise<boolean> {
+    console.debug("In isWikiModelLoaded");
 
-        for (let i=0;i<10;i++) {
-            // @ts-ignore
-            if (!window.main || !window.main.api) {
-                console.debug("Sleeping 1sec mode waiting for WikiModel");
-                await sleep(1000);
-            } else {
-                console.info("WikiModel is ready");
-                return true;
-            }
-        }   
-        console.info("WikiModel is not ready");
-        return false;
-    }
-    
-    public loadWikiModel() {
-        this.parse("**hello**");
-    }
+    // TODO get rid of any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sleep = (ms: any) => new Promise((r) => setTimeout(r, ms));
 
-    public parse(source: string) : string {
-        try {           
-            console.log("In teaVM wrapper code");
-            return WikiModelTeaVM.parse(source);
-        } catch (e) {
-            console.log("Exception rendering", e);
-            return "Exception rendering: " + e;
-        }
+    for (let i = 0; i < 10; i++) {
+      // @ts-expect-error TODO describe
+      if (!window.main || !window.main.api) {
+        console.debug("Sleeping 1sec mode waiting for WikiModel");
+        await sleep(1000);
+      } else {
+        console.info("WikiModel is ready");
+        return true;
+      }
     }
+    console.info("WikiModel is not ready");
+    return false;
+  }
 
+  public loadWikiModel() {
+    this.parse("**hello**");
+  }
+
+  public parse(source: string): string {
+    try {
+      console.log("In teaVM wrapper code");
+      return WikiModelTeaVM.parse(source);
+    } catch (e) {
+      console.log("Exception rendering", e);
+      return "Exception rendering: " + e;
+    }
+  }
 }

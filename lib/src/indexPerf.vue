@@ -24,9 +24,15 @@
 -->
 <template>
   <div>
-    <x-btn class="pagemenu" onclick="window.location = '/PerfDSFR/#/X'">DSFR</x-btn>
-    <x-btn class="pagemenu" onclick="window.location = '/Perf/#/X'">Vuetify</x-btn>
-    <x-btn class="pagemenu" onclick="window.location = '/PerfSL/#/X'">Shoelace</x-btn>
+    <x-btn class="pagemenu" onclick="window.location = '/PerfDSFR/#/X'"
+      >DSFR</x-btn
+    >
+    <x-btn class="pagemenu" onclick="window.location = '/Perf/#/X'"
+      >Vuetify</x-btn
+    >
+    <x-btn class="pagemenu" onclick="window.location = '/PerfSL/#/X'"
+      >Shoelace</x-btn
+    >
     &nbsp;
     <router-link to="/X">
       <x-btn class="pagemenu">X</x-btn>
@@ -34,48 +40,45 @@
     <router-link to="/empty">
       <x-btn class="pagemenu">Empty</x-btn>
     </router-link>
-    <router-link to="/dsfr" v-if="ds=='dsfr'">
+    <router-link v-if="ds == 'dsfr'" to="/dsfr">
       <x-btn class="pagemenu">Direct DSFR</x-btn>
     </router-link>
-    <router-link to="/vuetify" v-if="ds=='vuetify'">
+    <router-link v-if="ds == 'vuetify'" to="/vuetify">
       <x-btn class="pagemenu">Direct Vuetify</x-btn>
     </router-link>
-    <router-link to="/sl" v-if="ds=='shoelace'">
+    <router-link v-if="ds == 'shoelace'" to="/sl">
       <x-btn class="pagemenu">Direct Shoelace</x-btn>
-    </router-link>  
+    </router-link>
   </div>
   <br />
   <br />
   Design sytem: {{ ds }}
   <div>
-  <router-view>
-  </router-view>
+    <router-view> </router-view>
   </div>
 </template>
 <script lang="ts">
-import { CristalApp } from '@cristal/api';
-import { inject } from 'vue';
+import { CristalApp } from "@cristal/api";
+import { inject } from "vue";
 
 export default {
   setup() {
     const cristal = inject<CristalApp>("cristal");
-    console.log("Performance location hash is ", location.hash)
+    console.log("Performance location hash is ", location.hash);
     let hash = location.hash.substring(2);
-    if (hash=="")
-     hash = "X";
-    let name ="perf" + hash;
-    console.log("Template name is ", name)
-    return { name : name, ds : cristal?.getSkinManager().getDesignSystem() }
+    if (hash == "") hash = "X";
+    let name = "perf" + hash;
+    console.log("Template name is ", name);
+    return { name: name, ds: cristal?.getSkinManager().getDesignSystem() };
   },
   updated() {
     const cristal = inject<CristalApp>("cristal");
-    console.log("Performance location hash is ", location.hash)
+    console.log("Performance location hash is ", location.hash);
     let hash = location.hash.substring(2);
-    if (hash=="")
-     hash = "X";
-    let name ="perf" + hash;
-    console.log("Template name is ", name)
-    return { name : name, ds : cristal?.getSkinManager().getDesignSystem() }
-  }
-}
+    if (hash == "") hash = "X";
+    let name = "perf" + hash;
+    console.log("Template name is ", name);
+    return { name: name, ds: cristal?.getSkinManager().getDesignSystem() };
+  },
+};
 </script>

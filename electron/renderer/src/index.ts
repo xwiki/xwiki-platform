@@ -23,6 +23,20 @@
  *
  **/
 
-import { CristalAppLoader } from '@cristal/lib';
+import { CristalAppLoader } from "@cristal/lib";
 
-CristalAppLoader.init([ "skin", "dsvuetify", "dsfr", "dsshoelace", "macros", "storage", "extension-menubuttons", "sharedworker"], "./config.json", true, true);
+CristalAppLoader.init(
+  [
+    "skin",
+    "dsvuetify",
+    "dsfr",
+    "dsshoelace",
+    "macros",
+    "storage",
+    "extension-menubuttons",
+    "sharedworker",
+  ],
+  "./config.json",
+  true,
+  true,
+);

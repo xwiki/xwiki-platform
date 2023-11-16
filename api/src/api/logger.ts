@@ -17,22 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * This file is part of the Wiki 3.0 software prototype
+ * This file is part of the Cristal Wiki software prototype
  * @copyright  Copyright (c) 2023 XWiki SAS
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
 
 export interface Logger {
-    module: string;
+  module: string;
 
-    setModule(module : string) : void;
+  setModule(module: string): void;
 
-    debug(...data: any[]) : void;
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  debug(...data: any[]): void;
 
-    info(...data: any[]) : void;
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  info(...data: any[]): void;
 
-    warn(...data: any[]) : void;
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  warn(...data: any[]): void;
 
-    error(...data: any[]) : void;
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error(...data: any[]): void;
 }

@@ -34,20 +34,37 @@ import OfflineStorage from "../api/offlineStorage";
 import DexieOfflineStorage from "./dexieOfflineStorage";
 
 export default class ComponentInit {
-    logger : Logger;
-    
-    constructor(container : Container) {
-        this.logger = container.get<Logger>("Logger");
-        this.logger.setModule("storage.components.componentsInit");
+  logger: Logger;
 
-        this.logger?.debug("Init Sample Module components begin")
-        container.bind<OfflineStorage>("OfflineStorage").to(DexieOfflineStorage).inSingletonScope();
-        container.bind<WrappingStorage>("WrappingStorage").to(WrappingOfflineStorage).inSingletonScope();
-        container.bind<WikiConfig>("WikiConfig").to(XWikiWikiConfig).whenTargetNamed("XWiki");
-        container.bind<WikiConfig>("WikiConfig").to(GitHubWikiConfig).whenTargetNamed("GitHub");
-        container.bind<Storage>("Storage").to(XWikiStorage).whenTargetNamed("XWiki");
-        container.bind<Storage>("Storage").to(GitHubStorage).whenTargetNamed("GitHub");
-        this.logger?.debug("Init Sample Module components end")
-    }
+  constructor(container: Container) {
+    this.logger = container.get<Logger>("Logger");
+    this.logger.setModule("storage.components.componentsInit");
+
+    this.logger?.debug("Init Sample Module components begin");
+    container
+      .bind<OfflineStorage>("OfflineStorage")
+      .to(DexieOfflineStorage)
+      .inSingletonScope();
+    container
+      .bind<WrappingStorage>("WrappingStorage")
+      .to(WrappingOfflineStorage)
+      .inSingletonScope();
+    container
+      .bind<WikiConfig>("WikiConfig")
+      .to(XWikiWikiConfig)
+      .whenTargetNamed("XWiki");
+    container
+      .bind<WikiConfig>("WikiConfig")
+      .to(GitHubWikiConfig)
+      .whenTargetNamed("GitHub");
+    container
+      .bind<Storage>("Storage")
+      .to(XWikiStorage)
+      .whenTargetNamed("XWiki");
+    container
+      .bind<Storage>("Storage")
+      .to(GitHubStorage)
+      .whenTargetNamed("GitHub");
+    this.logger?.debug("Init Sample Module components end");
+  }
 }
-

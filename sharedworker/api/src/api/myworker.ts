@@ -24,13 +24,11 @@
  **/
 
 export interface MyWorker {
-    
-    add(a : number) : number;
-    
-    addToQueue(page: string) : void;
+  add(a: number): number;
 
-    getQueueSize() : number;
+  addToQueue(page: string): void;
 
-    setPageLoadedCallback(fct : (a: string) => void) : void;
+  getQueueSize(): number;
+
+  setPageLoadedCallback(fct: (a: string) => void): void;
 }
-

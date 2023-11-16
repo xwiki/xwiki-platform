@@ -23,27 +23,28 @@
  *
  **/
 
-import ComponentInit from './components/componentsInit'
-import { ContentTools } from './vue/contentTools'
-import { DefaultSkinManager } from './components/defaultSkinManager';
-import type { VueTemplateProvider } from './api/vueTemplateProvider';
-import type { UIXTemplateProvider } from './api/uixTemplateProvider';
-import type { MacroProvider } from './api/macroProvider';
-import type { MacroData } from './api/macroData';
-import { DefaultMacroData } from './components/defaultMacroData';
-import DefaultVueTemplateProvider from './components/defaultVueTemplateProvider';
-import DefaultUIXTemplateProvider from './components/defaultUIXTemplateProvider';
+import ComponentInit from "./components/componentsInit";
+import { ContentTools } from "./vue/contentTools";
+import { DefaultSkinManager } from "./components/defaultSkinManager";
+import type { VueTemplateProvider } from "./api/vueTemplateProvider";
+import type { UIXTemplateProvider } from "./api/uixTemplateProvider";
+import type { MacroProvider } from "./api/macroProvider";
+import type { MacroData } from "./api/macroData";
+import { DefaultMacroData } from "./components/defaultMacroData";
+import DefaultVueTemplateProvider from "./components/defaultVueTemplateProvider";
+import DefaultUIXTemplateProvider from "./components/defaultUIXTemplateProvider";
+import CTemplate from "./vue/c-template.vue";
 
 export {
-    ComponentInit,
-    VueTemplateProvider,
-    UIXTemplateProvider,
-    DefaultSkinManager,
-    DefaultVueTemplateProvider,
-    DefaultUIXTemplateProvider,
-    MacroProvider,
-    MacroData,
-    DefaultMacroData,
-    ContentTools,
-}
-
+  ComponentInit,
+  VueTemplateProvider,
+  UIXTemplateProvider,
+  DefaultSkinManager,
+  DefaultVueTemplateProvider,
+  DefaultUIXTemplateProvider,
+  MacroProvider,
+  MacroData,
+  DefaultMacroData,
+  ContentTools,
+  CTemplate,
+};

@@ -25,35 +25,37 @@
 
 import { VueTemplateProvider } from "../api/vueTemplateProvider";
 import DefaultVueTemplateProvider from "./defaultUIXTemplateProvider";
-import UIX from "../vue/uix.vue";
+import UIX from "../vue/c-uix.vue";
 import { Component } from "vue";
 import { Container, injectable } from "inversify";
 import "reflect-metadata";
 
 @injectable()
 export class UIXVueTemplateProvider extends DefaultVueTemplateProvider {
-    public static cname = "cristal.vuejs.component";
-    public static hint = "uix";
-    public static priority = 1000;
-    public static singleton = true;
-    
-    constructor() {
-        super();
-    }
-    
-    getVueComponent(): Component {
-        return UIX;
-    }
+  public static cname = "cristal.vuejs.component";
+  public static hint = "uix";
+  public static priority = 1000;
+  public static singleton = true;
 
-    getVueName() : string {
-        return "UIX";
-    }
+  constructor() {
+    super();
+  }
 
-    isGlobal() : boolean {
-        return true;
-    }
+  getVueComponent(): Component {
+    return UIX;
+  }
 
-    bindToContainer(container: Container): void {
-        container.bind<VueTemplateProvider>("VueTemplateProvider").to(UIXVueTemplateProvider);
-    }
-} 
+  getVueName(): string {
+    return "UIX";
+  }
+
+  isGlobal(): boolean {
+    return true;
+  }
+
+  bindToContainer(container: Container): void {
+    container
+      .bind<VueTemplateProvider>("VueTemplateProvider")
+      .to(UIXVueTemplateProvider);
+  }
+}

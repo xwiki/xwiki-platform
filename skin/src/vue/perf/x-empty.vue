@@ -22,11 +22,4 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
-</template>
-<script lang="ts">
-    export default {        
-        setup(props) {
-        }
-    }
-</script>
+<template><span></span></template>

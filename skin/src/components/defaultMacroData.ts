@@ -26,24 +26,22 @@
 import { MacroData } from "../api/macroData";
 
 export class DefaultMacroData implements MacroData {
-    protected macroContent : String = "";
-    protected macroParameters : Map<String, String> = new Map<String, String>();
+  protected macroContent: string = "";
+  protected macroParameters: Map<string, string> = new Map<string, string>();
 
-    
-    getMacroContent() : String {
-        return this.macroContent;
-    }
+  getMacroContent(): string {
+    return this.macroContent;
+  }
 
-    setMacroContent(content : String) : void {
-        this.macroContent = content;
-    }
+  setMacroContent(content: string): void {
+    this.macroContent = content;
+  }
 
-    getMacroParameters() : Map<String, String> {
-        return this.macroParameters;
-    }
+  getMacroParameters(): Map<string, string> {
+    return this.macroParameters;
+  }
 
-    getMacroParameter(name : String) : String| undefined {
-        return this.macroParameters.get(name);
-    }
-    
+  getMacroParameter(name: string): string | undefined {
+    return this.macroParameters.get(name);
+  }
 }

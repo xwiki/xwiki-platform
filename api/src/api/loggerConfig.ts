@@ -17,22 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * This file is part of the Wiki 3.0 software prototype
+ * This file is part of the Cristal Wiki software prototype
  * @copyright  Copyright (c) 2023 XWiki SAS
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
 
 export interface LoggerConfig {
-    addLevel(module : string, level: string) : void
+  addLevel(module: string, level: string): void;
 
-    getLevels() : Map<string, string>;
+  getLevels(): Map<string, string>;
 
-    getLevel(module : string) : string;
+  getLevel(module: string): string;
 
-    hasLevel(module : string, level: string) : boolean;
+  hasLevel(module: string, level: string): boolean;
 
-    hasLevelId(module : string, level: number) : boolean;
+  hasLevelId(module: string, level: number): boolean;
 
-    setDefaultLevel(level: string) : void;
+  setDefaultLevel(level: string): void;
 }

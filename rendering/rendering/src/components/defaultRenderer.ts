@@ -30,33 +30,43 @@ import { Converter } from "../api/converter";
 
 @injectable()
 export class DefaultRenderer implements Renderer {
+  private logger: Logger;
+  private cristalApp: CristalApp;
 
-    private logger : Logger;
-    private cristalApp : CristalApp;
+  constructor(
+    @inject<Logger>("Logger") logger: Logger,
+    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
+  ) {
+    this.logger = logger;
+    this.cristalApp = cristalApp;
+  }
 
-    constructor(@inject<Logger>("Logger") logger : Logger, @inject<CristalApp>("CristalApp") cristalApp : CristalApp) {
-        this.logger = logger;
-        this.cristalApp = cristalApp;
+  async preloadConverters(): Promise<void> {
+    const converters = this.cristalApp
+      .getContainer()
+      .getAll<Converter>("Converter");
+    for (let i = 0; i < converters.length; i++) {
+      this.logger.debug("Preloading converter", converters[i].getName());
+      await converters[i].isConverterReady();
     }
+  }
 
-    async preloadConverters(): Promise<void> {
-        let converters = this.cristalApp.getContainer().getAll<Converter>("Converter");
-        for (let i=0;i<converters.length;i++) {
-            this.logger.debug("Preloading converter", converters[i].getName());
-            await converters[i].isConverterReady();
-        }
+  convert(
+    source: string,
+    sourceSyntax: string,
+    targetSyntax: string,
+    wikiConfig: WikiConfig,
+  ): string {
+    const syntaxRenderer = sourceSyntax + "_" + targetSyntax;
+    this.logger.debug("Loading converter for ", syntaxRenderer);
+    try {
+      const converter = this.cristalApp
+        .getContainer()
+        .getNamed<Converter>("Converter", syntaxRenderer);
+      return converter.convert(source, wikiConfig);
+    } catch (e) {
+      this.logger.error("Could not find a converter for ", syntaxRenderer);
+      return source;
     }
-
-    convert(source: string, sourceSyntax: string, targetSyntax: string, wikiConfig: WikiConfig): string {
-        let syntaxRenderer = sourceSyntax + "_" + targetSyntax;
-        this.logger.debug("Loading converter for ", syntaxRenderer);
-        try {
-            let converter = this.cristalApp.getContainer().getNamed<Converter>("Converter", syntaxRenderer);
-            return converter.convert(source, wikiConfig);
-        } catch (e) {
-            this.logger.error("Could not find a converter for ", syntaxRenderer);
-            return source;
-        }
-    }
+  }
 }
-

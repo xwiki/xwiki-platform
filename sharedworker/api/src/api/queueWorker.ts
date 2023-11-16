@@ -24,14 +24,13 @@
  **/
 
 export interface QueueWorker {
-    initialize() : void;
-    
-    getStatus() : boolean;
-    
-    increment() : Promise<number>;
+  initialize(): void;
 
-    addToQueue(page: string) : Promise<void>;
+  getStatus(): boolean;
 
-    getQueueSize() : Promise<number>;
+  increment(): Promise<number>;
+
+  addToQueue(page: string): Promise<void>;
+
+  getQueueSize(): Promise<number>;
 }
-

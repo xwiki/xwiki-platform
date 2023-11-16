@@ -24,7 +24,7 @@
  **/
 
 export interface ExtensionConfig {
-    name : string | null;
-    entryFile : string | null;
-    staticModule: boolean | false;
+  name: string | null;
+  entryFile: string | null;
+  staticModule: boolean | false;
 }

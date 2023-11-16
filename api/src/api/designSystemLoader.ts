@@ -26,7 +26,5 @@
 import { App } from "vue";
 
 export interface DesignSystemLoader {
-
-    loadDesignSystem(app : App) : void;
+  loadDesignSystem(app: App): void;
 }
- 

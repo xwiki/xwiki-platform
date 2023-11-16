@@ -8,6 +8,12 @@
     "directory": "skin",
     "url": "https://git.xwikisas.com/experiments/cristal/prototype2023/"
   },
+  "files": [
+    "dist/*"
+  ],
+  "main": "dist/main.bundle.js",
+  "module": "dist/main.umd.cjs",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -15,22 +21,28 @@
     "clean": "rimraf dist",
     "prepack": "pnpm build",
     "build": "pnpm compile",
-    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
+    "compile": "vite build",
     "test": "echo 'no test'",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
     "@cristal/api": "workspace:^",
     "inversify": "^6.0.2",
     "pinia": "^2.1.6",
     "reflect-metadata": "^0.1.13",
-    "vue": "^3.3.4",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.4",
     "vuetify": "^3.3.15"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^4.4.1",
     "vite": "^4.4.9",
+    "vite-plugin-inspect": "^0.7.42",
+    "vite-plugin-vuetify": "^1.0.2",
+    "vue": "^3.3.7",
     "vue-tsc": "^1.8.8"
+  },
+  "peerDependencies": {
+    "vue": "^3.3.7"
   }
 }

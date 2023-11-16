@@ -23,15 +23,15 @@
  *
  **/
 
-import type {Session} from 'electron';
-import {app, shell} from 'electron';
-import {URL} from 'node:url';
+import type { Session } from "electron";
+import { app, shell } from "electron";
+import { URL } from "node:url";
 
 /**
  * Union for all existing permissions in electron
  */
 type Permission = Parameters<
-  Exclude<Parameters<Session['setPermissionRequestHandler']>[0], null>
+  Exclude<Parameters<Session["setPermissionRequestHandler"]>[0], null>
 >[1];
 
 /**
@@ -55,9 +55,11 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permission>>(
  *   href="https://github.com/"
  * >
  */
-const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>(['https://github.com']);
+const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>([
+  "https://github.com",
+]);
 
-app.on('web-contents-created', (_, contents) => {
+app.on("web-contents-created", (_, contents) => {
   /**
    * Block navigation to origins not on the allowlist.
    *
@@ -66,8 +68,8 @@ app.on('web-contents-created', (_, contents) => {
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
-  contents.on('will-navigate', (event, url) => {
-    const {origin} = new URL(url);
+  contents.on("will-navigate", (event, url) => {
+    const { origin } = new URL(url);
     if (ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       return;
     }
@@ -86,16 +88,21 @@ app.on('web-contents-created', (_, contents) => {
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#5-handle-session-permission-requests-from-remote-content
    */
-  contents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    const {origin} = new URL(webContents.getURL());
+  contents.session.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      const { origin } = new URL(webContents.getURL());
 
-    const permissionGranted = !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
-    callback(permissionGranted);
+      const permissionGranted =
+        !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
+      callback(permissionGranted);
 
-    if (!permissionGranted && import.meta.env.DEV) {
-      console.warn(`${origin} requested permission for '${permission}', but was rejected.`);
-    }
-  });
+      if (!permissionGranted && import.meta.env.DEV) {
+        console.warn(
+          `${origin} requested permission for '${permission}', but was rejected.`,
+        );
+      }
+    },
+  );
 
   /**
    * Hyperlinks leading to allowed sites are opened in the default browser.
@@ -107,8 +114,8 @@ app.on('web-contents-created', (_, contents) => {
    * @see https://www.electronjs.org/docs/latest/tutorial/security#14-disable-or-limit-creation-of-new-windows
    * @see https://www.electronjs.org/docs/latest/tutorial/security#15-do-not-use-openexternal-with-untrusted-content
    */
-  contents.setWindowOpenHandler(({url}) => {
-    const {origin} = new URL(url);
+  contents.setWindowOpenHandler(({ url }) => {
+    const { origin } = new URL(url);
 
     if (ALLOWED_EXTERNAL_ORIGINS.has(origin as `https://${string}`)) {
       // Open url in default browser.
@@ -118,7 +125,7 @@ app.on('web-contents-created', (_, contents) => {
     }
 
     // Prevent creating a new window.
-    return {action: 'deny'};
+    return { action: "deny" };
   });
 
   /**
@@ -128,11 +135,13 @@ app.on('web-contents-created', (_, contents) => {
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#12-verify-webview-options-before-creation
    */
-  contents.on('will-attach-webview', (event, webPreferences, params) => {
-    const {origin} = new URL(params.src);
+  contents.on("will-attach-webview", (event, webPreferences, params) => {
+    const { origin } = new URL(params.src);
     if (!ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       if (import.meta.env.DEV) {
-        console.warn(`A webview tried to attach ${params.src}, but was blocked.`);
+        console.warn(
+          `A webview tried to attach ${params.src}, but was blocked.`,
+        );
       }
 
       event.preventDefault();

@@ -22,47 +22,66 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
-import { JSONLDDocument } from './JSONLDDocument';
-import { PageData } from '../api/PageData';
-import { Document } from '../api/document';
+
+import { JSONLDDocument } from "./JSONLDDocument";
+import { PageData } from "../api/PageData";
+import { Document } from "../api/document";
 
 export class DefaultPageData implements PageData {
-    id : string;
-    name : string;
-    source : string;
-    syntax : string;
-    html : string;
-    document : Document;
-    css : Array<string>;
-    js : Array<string>;
-    version : string;
-    
-    public constructor(id : string = "", name : string = "", source : string = "", syntax : string = "") {
-        this.document = new JSONLDDocument({});
-        this.source = source;   
-        this.syntax = syntax;
-        this.html = "";
-        this.name = name;
-        this.id = id;
-        this.css = [];
-        this.js = [];  
-        this.version = ""; 
-    }
+  id: string;
+  name: string;
+  source: string;
+  syntax: string;
+  html: string;
+  document: Document;
+  css: Array<string>;
+  js: Array<string>;
+  version: string;
 
-    toObject() : any {
-        return { id : this.id, name: this.name, source: this.source, syntax: this.syntax, html : this.html,
-                 document : this.document.getSource(), css : this.css, js : this.js, version: this.version };
-    }
+  public constructor(
+    id: string = "",
+    name: string = "",
+    source: string = "",
+    syntax: string = "",
+  ) {
+    this.document = new JSONLDDocument({});
+    this.source = source;
+    this.syntax = syntax;
+    this.html = "";
+    this.name = name;
+    this.id = id;
+    this.css = [];
+    this.js = [];
+    this.version = "";
+  }
 
-    fromObject(object : any) {
-        this.id = object.id;
-        this.name = object.name;
-        this.source = object.source;
-        this.syntax = object.syntax;
-        this.html = object.html;
-        this.document = new JSONLDDocument(object.document);
-        this.css = object.css;
-        this.js = object.js;
-        this.version = object.version;
-    }
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  toObject(): any {
+    return {
+      id: this.id,
+      name: this.name,
+      source: this.source,
+      syntax: this.syntax,
+      html: this.html,
+      document: this.document.getSource(),
+      css: this.css,
+      js: this.js,
+      version: this.version,
+    };
+  }
+
+  // TODO get rid of any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fromObject(object: any) {
+    this.id = object.id;
+    this.name = object.name;
+    this.source = object.source;
+    this.syntax = object.syntax;
+    this.html = object.html;
+    this.document = new JSONLDDocument(object.document);
+    this.css = object.css;
+    this.js = object.js;
+    this.version = object.version;
+  }
 }

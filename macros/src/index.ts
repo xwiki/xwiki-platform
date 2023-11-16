@@ -23,7 +23,7 @@
  *
  **/
 
-import ComponentInit from './components/componentsInit.js'
-import { DefaultMacroProvider } from './components/defaultMacroProvider';
+import ComponentInit from "./components/componentsInit.js";
+import { DefaultMacroProvider } from "./components/defaultMacroProvider";
 
 export { ComponentInit, DefaultMacroProvider };

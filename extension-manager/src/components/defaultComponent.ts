@@ -29,30 +29,29 @@ import "reflect-metadata";
 
 @injectable()
 export class DefaultComponent implements CristalComponent {
-    public name : string;
-    public hint : string;
-    public priority : number;
-    public singleton : boolean;
+  public name: string;
+  public hint: string;
+  public priority: number;
+  public singleton: boolean;
 
-    constructor() {
-        this.name = "component.name";
-        this.hint = "default";
-        this.priority = 1000;
-        this.singleton = false;
-    }
+  constructor() {
+    this.name = "component.name";
+    this.hint = "default";
+    this.priority = 1000;
+    this.singleton = false;
+  }
 
-    getName() : string {
-        return this.name;
-    }
+  getName(): string {
+    return this.name;
+  }
 
-    getHint(): string {
-        return this.hint;
-    }
-    getPriority(): number {
-        return this.priority;
-    }
-    isSingleton(): boolean {
-        return this.singleton;
-    }
-
+  getHint(): string {
+    return this.hint;
+  }
+  getPriority(): number {
+    return this.priority;
+  }
+  isSingleton(): boolean {
+    return this.singleton;
+  }
 }

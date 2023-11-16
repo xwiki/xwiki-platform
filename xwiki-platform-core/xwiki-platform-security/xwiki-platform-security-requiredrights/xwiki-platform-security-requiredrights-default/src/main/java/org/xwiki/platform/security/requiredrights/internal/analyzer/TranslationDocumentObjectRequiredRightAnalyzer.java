@@ -38,9 +38,11 @@ import com.xpn.xwiki.objects.BaseObject;
  * Required right analyzer for instances of XWiki.TranslationDocumentClass.
  *
  * @version $Id$
+ * @since 15.10RC1
  */
-@Component(hints = { "XWiki.TranslationDocumentClass" })
+@Component
 @Singleton
+@Named("XWiki.TranslationDocumentClass")
 public class TranslationDocumentObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
     @Inject

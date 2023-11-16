@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -77,6 +78,9 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
     private BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
 
     @Inject
+    private BlockSupplierProvider<BaseObject> objectBlockSupplierProvider;
+
+    @Inject
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
@@ -89,14 +93,30 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
     private VelocityDetector velocityDetector;
 
     @Override
-    public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
+    public List<RequiredRightAnalysisResult> analyze(BaseObject object)
     {
         if (object == null) {
             return List.of();
         }
+
+        try {
+            return analyzeWithException(object);
+        } catch (Exception e) {
+            return List.of(
+                new RequiredRightAnalysisResult(object.getReference(),
+                    this.translationMessageSupplierProvider.get("security.requiredrights.object.error",
+                        ExceptionUtils.getRootCauseMessage(e)),
+                    this.objectBlockSupplierProvider.get(object),
+                    List.of(RequiredRight.MAYBE_PROGRAM))
+            );
+        }
+    }
+
+    private List<RequiredRightAnalysisResult> analyzeWithException(BaseObject object)
+        throws RequiredRightsException
+    {
         EntityReference xClassReference = object.getRelativeXClassReference();
         String className = this.compactEntityReferenceSerializer.serialize(xClassReference);
-
         try {
             RequiredRightAnalyzer<BaseObject> analyzer =
                 this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,

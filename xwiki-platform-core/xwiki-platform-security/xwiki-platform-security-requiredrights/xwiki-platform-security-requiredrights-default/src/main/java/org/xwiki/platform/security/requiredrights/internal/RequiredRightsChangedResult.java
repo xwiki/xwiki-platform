@@ -19,9 +19,8 @@
  */
 package org.xwiki.platform.security.requiredrights.internal;
 
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -48,11 +47,11 @@ import static org.xwiki.security.authorization.Right.SCRIPT;
  * @version $Id$
  * @since 15.9RC1
  */
-public class RequiredRightsChangedResult implements Serializable
+public class RequiredRightsChangedResult
 {
-    private final Set<RequiredRightAnalysisResult> added = new HashSet<>();
+    private final Set<RequiredRightAnalysisResult> added = new LinkedHashSet<>();
 
-    private final Set<RequiredRightAnalysisResult> removed = new HashSet<>();
+    private final Set<RequiredRightAnalysisResult> removed = new LinkedHashSet<>();
 
     private final Map<Right, Boolean> addedRights = new HashMap<>();
 
@@ -179,6 +178,24 @@ public class RequiredRightsChangedResult implements Serializable
         return this.removedRights.containsValue(true) || this.addedRights.containsValue(true);
     }
 
+    /**
+     * @return the set of added required rights analysis results
+     * @since 15.10RC1
+     */
+    public Set<RequiredRightAnalysisResult> getAdded()
+    {
+        return this.added;
+    }
+
+    /**
+     * @return the set of removed required rights analysis results
+     * @since 15.10RC1
+     */
+    public Set<RequiredRightAnalysisResult> getRemoved()
+    {
+        return this.removed;
+    }
+
     private static Map<EntityReference, Set<RequiredRightAnalysisResult>> makeMap(Set<RequiredRightAnalysisResult> list)
     {
         Map<EntityReference, Set<RequiredRightAnalysisResult>> map = new HashMap<>();
@@ -194,7 +211,7 @@ public class RequiredRightsChangedResult implements Serializable
             if (map.containsKey(entityReference)) {
                 map.get(entityReference).add(requiredRightAnalysisResult);
             } else {
-                map.put(entityReference, new HashSet<>(Set.of(requiredRightAnalysisResult)));
+                map.put(entityReference, new LinkedHashSet<>(Set.of(requiredRightAnalysisResult)));
             }
         }
         return map;

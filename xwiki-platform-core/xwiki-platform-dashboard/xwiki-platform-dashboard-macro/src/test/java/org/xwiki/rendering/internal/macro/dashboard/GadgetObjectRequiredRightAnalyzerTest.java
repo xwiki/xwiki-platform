@@ -17,24 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.security.requiredrights.internal.analyzer;
+package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.platform.security.requiredrights.internal.analyzer.XDOMRequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -54,7 +53,6 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -80,30 +78,23 @@ class GadgetObjectRequiredRightAnalyzerTest
     private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @MockComponent
-    private DocumentContextExecutor documentContextExecutor;
-
-    @MockComponent
     private ContentParser contentParser;
 
     @MockComponent
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Mock
-    BaseObject object;
+    private BaseObject object;
 
     @Mock
-    ObjectReference objectReference;
+    private ObjectReference objectReference;
 
-    DocumentReference documentReference;
+    private DocumentReference documentReference;
 
     @BeforeEach
     void setup() throws Exception
     {
         doReturn(this.objectReference).when(this.object).getReference();
-        when(this.documentContextExecutor.call(any(), any())).thenAnswer(invocation -> {
-            Callable<List<RequiredRightAnalysisResult>> callable = invocation.getArgument(0);
-            return callable.call();
-        });
 
         this.documentReference = new DocumentReference("xwiki", "Gadget", "WebHome");
         XWikiDocument xWikiDocument = new XWikiDocument(this.documentReference);
@@ -123,9 +114,8 @@ class GadgetObjectRequiredRightAnalyzerTest
         assertEquals(1, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
         assertEquals(this.objectReference, analysisResult.getEntityReference());
-        verify(this.translationMessageSupplierProvider).get("security.requiredrights.object.gadget.title");
-        verify(this.translationMessageSupplierProvider).get("security.requiredrights.object.gadget.title.description",
-            title);
+        verify(this.translationMessageSupplierProvider).get("dashboard.requiredrights.gadget.title");
+        verify(this.translationMessageSupplierProvider).get("dashboard.requiredrights.gadget.title.description", title);
 
         assertEquals(2, analysisResult.getRequiredRights().size());
         assertTrue(analysisResult.getRequiredRights().containsAll(

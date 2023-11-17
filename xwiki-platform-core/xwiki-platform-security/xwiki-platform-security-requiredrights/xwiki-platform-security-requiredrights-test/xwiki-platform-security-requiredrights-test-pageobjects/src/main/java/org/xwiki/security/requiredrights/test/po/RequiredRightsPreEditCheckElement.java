@@ -33,6 +33,8 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class RequiredRightsPreEditCheckElement extends BaseElement
 {
+    private static final String PANEL_BODY_CLASS = "panel-body";
+
     private List<WebElement> results;
 
     /**
@@ -59,7 +61,9 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
      */
     public void toggleDetailedMessage(int index)
     {
-        getResults().get(index).findElement(By.className("panel-title")).click();
+        WebElement result = getResults().get(index);
+        result.findElement(By.className("panel-title")).click();
+        getDriver().waitUntilElementIsVisible(result, By.className("panel-collapse"));
     }
 
     /**
@@ -69,7 +73,7 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
      */
     public String getDetailedMessage(int index)
     {
-        return getResults().get(index).findElement(By.className("panel-body")).getText();
+        return getResults().get(index).findElement(By.className(PANEL_BODY_CLASS)).getText();
     }
 
     /**
@@ -82,6 +86,22 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
     {
         getDriver().findElement(By.className("required-rights-advanced-toggle")).click();
         return this;
+    }
+
+    /**
+     * Waits for the content of the given detailed message to be equal to the provided expected value. This is required
+     * as calling get text can return partial value when the toggle transition from {@link #toggleDetails()} is not
+     * finished when calling {@link WebElement#getText()} on the panel body.
+     *
+     * @param index the index of the result to retrieve the detailed message of (the first result is index 0)
+     * @param expectedMessage the expected detailed message of the expected message
+     * @since 15.10RC1
+     */
+    public void waitForDetailedMessage(int index, String expectedMessage)
+    {
+        getDriver()
+            .waitUntilElementHasTextContent(() -> getResults().get(index).findElement(By.className(PANEL_BODY_CLASS)),
+                expectedMessage);
     }
 
     /**

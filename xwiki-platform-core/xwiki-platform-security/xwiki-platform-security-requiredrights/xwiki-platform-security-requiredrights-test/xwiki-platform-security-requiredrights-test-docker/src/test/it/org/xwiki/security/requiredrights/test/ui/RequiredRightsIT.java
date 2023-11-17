@@ -60,7 +60,7 @@ class RequiredRightsIT
                 + "if the document's author has script or programming rights.",
             requiredRightsPreEditCheckElement.getSummary(0));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
-        assertEquals("The title is [Hello $a].", requiredRightsPreEditCheckElement.getDetailedMessage(0));
+        requiredRightsPreEditCheckElement.waitForDetailedMessage(0, "The title is [Hello $a].");
     }
 
     @Test
@@ -86,15 +86,15 @@ class RequiredRightsIT
         assertEquals("A [velocity] scripting macro requires script rights.",
             requiredRightsPreEditCheckElement.getSummary(0));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
-        assertEquals("Content\n"
+        requiredRightsPreEditCheckElement.waitForDetailedMessage(0, "Content\n"
             + "the velocity script to execute\n"
-            + "macro1", requiredRightsPreEditCheckElement.getDetailedMessage(0));
+            + "macro1");
 
         assertEquals("A [velocity] scripting macro requires script rights.",
             requiredRightsPreEditCheckElement.getSummary(1));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(1);
-        assertEquals("Content\n"
+        requiredRightsPreEditCheckElement.waitForDetailedMessage(1, "Content\n"
             + "the velocity script to execute\n"
-            + "macro2", requiredRightsPreEditCheckElement.getDetailedMessage(1));
+            + "macro2");
     }
 }

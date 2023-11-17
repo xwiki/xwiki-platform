@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 15.9RC1
  */
 @UITest(properties = {
-    "xwikiPropertiesAdditionalProperties=security.requiredRights.protection=warning",
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
         + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })

@@ -174,7 +174,9 @@ public class FormContainerElement extends BaseElement
 
     public SelectElement getSelectElement(By by)
     {
-        return this.new SelectElement(getFormElement().findElement(by));
+        WebElement element = getFormElement().findElement(by);
+        getDriver().scrollTo(element);
+        return this.new SelectElement(element);
     }
 
     public class SelectElement extends BaseElement

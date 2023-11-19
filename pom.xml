@@ -733,7 +733,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>4.0</version>
+        <version>4.2</version>
       </dependency>
 
       <!-- Carte XML DTD -->

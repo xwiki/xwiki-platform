@@ -144,10 +144,14 @@
     </property>
     <property>
       <code>define('xwiki-like-messages', {
-  prefix: 'like.button.title.',
+  prefix: 'like.',
   keys: [
-    "unlike",
-    "like"
+    "button.title.unlike",
+    "button.title.like",
+    "newlike.success",
+    "newlike.error",
+    "unlike.success",
+    "unlike.error"
   ]
 });
 require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($, xm, l10n) {
@@ -173,11 +177,11 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
        likeButton.removeClass('btn-primary');
        likeButton.addClass('btn-default');
        likeButton.find('.like-number').text(data.counter);
-       likeButton.attr('title', l10n.get('unlike', data.counter));
+       likeButton.attr('title', l10n.get('button.title.unlike', data.counter));
        $('#is-liked').val('true');
-       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.success'))", 'done');
+       new XWiki.widgets.Notification(l10n.get('newlike.success'), 'done');
      }).catch(() =&gt; {
-       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.error'))", 'error');
+       new XWiki.widgets.Notification(l10n.get('newlike.error'), 'error');
      });
   };
 
@@ -191,11 +195,11 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       unlikeButton.removeClass('btn-default');
       unlikeButton.addClass('btn-primary');
       unlikeButton.find('.like-number').text(data.counter);
-      unlikeButton.attr('title', l10n.get('like', data.counter));
+      unlikeButton.attr('title', l10n.get('button.title.like', data.counter));
       $('#is-liked').val('false');
-      new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.success'))", 'done');
+      new XWiki.widgets.Notification(l10n.get('unlike.success'), 'done');
     }).catch(() =&gt; {
-      new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.error'))", 'error');
+      new XWiki.widgets.Notification(l10n.get('unlike.error'), 'error');
     });
   };
   $('.like-button').on('click', likeClick);
@@ -205,7 +209,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>

@@ -21,14 +21,12 @@
 define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   'use strict';
 
-  const baseURL = module.config().contextPath + '/rest/liveData/sources/';
+  var baseURL = module.config().contextPath + '/rest/liveData/sources/';
 
-  let entriesRequest;
+  var getEntries = function(liveDataQuery) {
+    var entriesURL = getEntriesURL(liveDataQuery.source);
 
-  function getEntries(liveDataQuery) {
-    const entriesURL = getEntriesURL(liveDataQuery.source);
-
-    const parameters = {
+    var parameters = {
       properties: liveDataQuery.properties,
       offset: liveDataQuery.offset,
       limit: liveDataQuery.limit
@@ -53,42 +51,16 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     parameters.sort = liveDataQuery.sort.map(sort => sort.property);
     parameters.descending = liveDataQuery.sort.map(sort => sort.descending);
 
-    // We abort previous requests to avoid a race condition.
-    // It can happen that getEntries is called twice in a short
-    // time (when the user is typing in a filter field for instance)
-    // and that the first request succeeds after the second
-    // request, and its results would replace the "fresher"
-    // state.
-    //
-    // See https://jira.xwiki.org/browse/XWIKI-21447
-    entriesRequest?.abort();
-    entriesRequest = $.getJSON(entriesURL, $.param(parameters, true));
-
-    return Promise.resolve(entriesRequest.then(toLiveData))
-      .finally(cleanupRequest.bind(null, entriesRequest));
+    return Promise.resolve($.getJSON(entriesURL, $.param(parameters, true)).then(toLiveData));
   };
 
-  function cleanupRequest(requestToClean) {
-    // We reset the request object to null for two reasons:
-    // - avoid keeping an object we don't need anymore in memory, preventing it from being GC'd
-    // - make sure we don't attempt to abort a request that already terminated.
-    //
-    // We only nullify the request if it is the request we just handled.
-    // Otherwise, this means that a fresher request is in flight. In which case
-    // we need to be able to abort this fresher one if yet another request is
-    // fired before it succeeds.
-    if (requestToClean === entriesRequest) {
-      entriesRequest = null;
-    }
-  };
-
-  function getEntriesURL(source) {
-    const entriesURL = baseURL + encodeURIComponent(source.id) + '/entries';
+  var getEntriesURL = function(source) {
+    var entriesURL = baseURL + encodeURIComponent(source.id) + '/entries';
     return addSourcePathParameters(source, entriesURL);
   };
 
   function addSourcePathParameters(source, url) {
-    const parameters = {
+    var parameters = {
       // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
       timestamp: new Date().getTime(),
       namespace: `wiki:${XWiki.currentWiki}`
@@ -104,7 +76,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     const url = `${baseURL}${encodedSourceId}/entries/${encodedEntryId}/properties/${encodedPropertyId}`
     return addSourcePathParameters(source, url);
   }
-
+  
   function getEntryURL(source, entryId) {
     const encodedSourceId = encodeURIComponent(source.id);
     const encodedEntryId = encodeURIComponent(entryId);
@@ -112,7 +84,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     return addSourcePathParameters(source, url);
   }
 
-  function addSourceParameters(parameters, source) {
+  var addSourceParameters = function(parameters, source) {
     $.each(source, (key, value) => {
       if (key !== 'id') {
         parameters['sourceParams.' + key] = value;
@@ -120,17 +92,17 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     });
   };
 
-  function toLiveData(data) {
+  var toLiveData = function(data) {
     return {
       count: data.count,
       entries: data.entries.map(entry => entry.values)
     };
   };
 
-  function addEntry(source, entry) {
+  var addEntry = function(source, entry) {
     return Promise.resolve($.post(getEntriesURL(source), entry).then(e => e.values));
   };
-
+  
   function updateEntry(source, entryId, values) {
     return Promise.resolve($.ajax({
       type: 'PUT',
@@ -140,13 +112,17 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     }));
   }
 
-  function getTranslations(locale, prefix, key) {
+  var getTranslations = function(locale, prefix, keys) {
     const translationsURL = `${module.config().contextPath}/rest/wikis/${XWiki.currentWiki}/localization/translations`;
-    return Promise.resolve($.getJSON(translationsURL, $.param({locale, prefix, key}, true)).then(toTranslationsMap));
+    return Promise.resolve($.getJSON(translationsURL, $.param({
+      locale: locale,
+      prefix: prefix,
+      key: keys
+    }, true)).then(toTranslationsMap));
   };
 
-  function toTranslationsMap(responseJSON) {
-    const translationsMap = {};
+  var toTranslationsMap = function(responseJSON) {
+    var translationsMap = {};
     responseJSON.translations?.forEach(translation => translationsMap[translation.key] = translation.rawSource);
     return translationsMap;
   };
@@ -163,7 +139,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   return {
     getEntries,
     addEntry,
-    updateEntry,
+    updateEntry, 
     updateEntryProperty,
     getTranslations
   };

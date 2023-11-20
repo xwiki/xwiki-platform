@@ -18,3 +18,4 @@ packages:
   - "electron/main"
   - "electron/preload"
   - "electron/renderer"
+  - "dev/config"

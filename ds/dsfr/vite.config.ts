@@ -1,14 +1,14 @@
-import { defineConfig, mergeConfig } from 'vite';
-import defaultConfig from './../../vite.vue.config.js';
+import { defineConfig, mergeConfig } from "vite";
+import defaultConfig from "./../../vite.vue.config.js";
 
-export default mergeConfig( 
-  defaultConfig, 
+export default mergeConfig(
+  defaultConfig,
   defineConfig({
-	build: {
-    		lib: {
-      			entry: "./src/index.ts",
-			name: 'dsfr'
-    		}
-  	}
-}));
-
+    build: {
+      lib: {
+        entry: "./src/index.ts",
+        name: "dsfr",
+      },
+    },
+  }),
+);

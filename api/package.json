@@ -2,6 +2,7 @@
   "name": "@cristal/api",
   "version": "1.0.0",
   "types": "dist/index.d.ts",
+  "type": "module",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "reflect-metadata": "^0.1.13",
     "vite": "^4.4.9",
     "vitest": "^0.34.6",
-    "vue-tsc": "^1.8.8"
+    "vue-tsc": "^1.8.8",
+    "@cristal/dev-config": "workspace:*"
   }
 }

@@ -22,12 +22,11 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
-  <component :is="comp" />
-</template>
 <script lang="ts" setup>
-import { inject, Component, ref } from "vue";
-import { Logger, SkinManager, CristalApp } from "@cristal/api";
+import type { Component } from "vue";
+import { inject } from "vue";
+import type { CristalApp, Logger } from "@cristal/api";
+import { type SkinManager } from "@cristal/api";
 
 let component: Component | undefined;
 let logger: Logger | undefined;
@@ -45,7 +44,10 @@ if (sm) {
   component = sm.getTemplate(props.name) || undefined;
 }
 
-let comp = ref(component);
+let comp = component;
 
 logger?.debug("Template component is", comp);
 </script>
+<template>
+  <component :is="comp" />
+</template>

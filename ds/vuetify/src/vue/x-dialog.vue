@@ -1,3 +1,15 @@
+<script lang="ts" setup>
+import { ref, defineProps } from "vue";
+
+const props = defineProps<{
+  isActive: boolean;
+  title: string;
+  type: number;
+  width: number;
+}>();
+const innerIsActive = ref(props.isActive);
+</script>
+
 <template>
   <v-dialog v-model="innerIsActive" :width="width">
     <template #activator>
@@ -14,14 +26,3 @@
     </template>
   </v-dialog>
 </template>
-<script lang="ts" setup>
-import { ref } from "vue";
-
-const props = defineProps<{
-  isActive: boolean;
-  title: string;
-  type: number;
-  width: number;
-}>();
-const innerIsActive = ref(props.isActive);
-</script>

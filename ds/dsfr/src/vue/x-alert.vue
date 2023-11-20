@@ -5,7 +5,7 @@
 </template>
 <script lang="ts">
 import { DsfrAlert } from "@gouvminint/vue-dsfr";
-import { PropType } from "vue";
+import type { PropType } from "vue";
 import type { DsfrAlertType } from "@gouvminint/vue-dsfr/types/components/DsfrAlert/DsfrAlert.vue";
 
 export default {

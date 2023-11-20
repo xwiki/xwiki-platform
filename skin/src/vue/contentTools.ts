@@ -23,9 +23,10 @@
  *
  **/
 
-import { CristalApp, Logger } from "@cristal/api";
-import { MacroProvider } from "../api/macroProvider";
-import { App, Component, createVNode, render, VNode } from "vue";
+import type { CristalApp, Logger } from "@cristal/api";
+import type { MacroProvider } from "../api/macroProvider";
+import type { App, Component, VNode } from "vue";
+import { createVNode, render } from "vue";
 
 // import { DefaultMacroData } from "../components/defaultMacroData";
 

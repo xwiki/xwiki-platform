@@ -23,8 +23,8 @@
  *
  **/
 
-import { Logger } from "@cristal/api";
-import { Converter } from "../api/converter";
+import type { Logger } from "@cristal/api";
+import type { Converter } from "../api/converter";
 import { inject, injectable } from "inversify";
 import { WikiModel } from "./wikimodel-teavm";
 

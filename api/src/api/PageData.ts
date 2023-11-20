@@ -23,7 +23,7 @@
  *
  **/
 
-import { Document } from "./document";
+import type { Document } from "./document";
 
 export interface PageData {
   id: string;
@@ -37,8 +37,8 @@ export interface PageData {
   version: string;
 
   // TODO: remove any
-    toObject() : any; // eslint-disable-line
+  toObject(): any; // eslint-disable-line
 
   // TODO: remove any
-    fromObject(object : any) : void; // eslint-disable-line
+  fromObject(object: any): void; // eslint-disable-line
 }

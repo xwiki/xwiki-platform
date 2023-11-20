@@ -35,15 +35,17 @@ import DefaultVueTemplateProvider from "./components/defaultVueTemplateProvider"
 import DefaultUIXTemplateProvider from "./components/defaultUIXTemplateProvider";
 import CTemplate from "./vue/c-template.vue";
 
-export {
-  ComponentInit,
+export type {
   VueTemplateProvider,
   UIXTemplateProvider,
+  MacroProvider,
+  MacroData,
+};
+export {
+  ComponentInit,
   DefaultSkinManager,
   DefaultVueTemplateProvider,
   DefaultUIXTemplateProvider,
-  MacroProvider,
-  MacroData,
   DefaultMacroData,
   ContentTools,
   CTemplate,

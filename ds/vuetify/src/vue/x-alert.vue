@@ -4,8 +4,8 @@
   </v-alert>
 </template>
 <script lang="ts">
-import { PropType } from "vue";
-import { VAlert } from "vuetify/lib/components/VAlert/index.mjs";
+import type { PropType } from "vue";
+import type { VAlert } from "vuetify/lib/components/VAlert/index.mjs";
 
 export default {
   components: {},

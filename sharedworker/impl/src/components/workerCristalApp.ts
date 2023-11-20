@@ -23,16 +23,17 @@
  *
  **/
 
-import {
+import type {
   CristalApp as CristalApp,
   Logger,
   LoggerConfig,
   SkinManager,
   WikiConfig,
 } from "@cristal/api";
-import { Container, injectable } from "inversify";
-import { App, Component } from "vue";
-import { Router } from "vue-router";
+import type { Container } from "inversify";
+import { injectable } from "inversify";
+import type { App, Component } from "vue";
+import type { Router } from "vue-router";
 
 @injectable()
 export class WorkerCristalApp implements CristalApp {

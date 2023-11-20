@@ -23,6 +23,6 @@
  *
  **/
 
-import { VueTemplateProvider } from "./vueTemplateProvider";
+import type { VueTemplateProvider } from "./vueTemplateProvider";
 
 export type UIXTemplateProvider = VueTemplateProvider;

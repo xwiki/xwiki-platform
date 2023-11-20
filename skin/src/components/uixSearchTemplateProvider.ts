@@ -24,7 +24,7 @@
  **/
 
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
-import { Component } from "vue";
+import type { Component } from "vue";
 import Search from "../vue/c-search.vue";
 import { injectable } from "inversify";
 

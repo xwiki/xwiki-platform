@@ -23,14 +23,19 @@
  *
  **/
 
-import { Container } from "inversify";
-import { Logger, Storage, WikiConfig, WrappingStorage } from "@cristal/api";
+import type { Container } from "inversify";
+import type {
+  Logger,
+  Storage,
+  WikiConfig,
+  WrappingStorage,
+} from "@cristal/api";
 import { XWikiStorage } from "./xwikiStorage";
 import { XWikiWikiConfig } from "./XWikiWikiConfig";
 import { GitHubStorage } from "./githubStorage";
 import { GitHubWikiConfig } from "./GitHubWikiConfig";
 import { WrappingOfflineStorage } from "./wrappingOfflineStorage";
-import OfflineStorage from "../api/offlineStorage";
+import type OfflineStorage from "../api/offlineStorage";
 import DexieOfflineStorage from "./dexieOfflineStorage";
 
 export default class ComponentInit {

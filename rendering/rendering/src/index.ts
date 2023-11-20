@@ -27,4 +27,5 @@ import ComponentInit from "./components/componentsInit";
 import type { Converter } from "./api/converter";
 import type { Renderer } from "./api/renderer";
 
-export { ComponentInit, Converter, Renderer };
+export type { Converter, Renderer };
+export { ComponentInit };

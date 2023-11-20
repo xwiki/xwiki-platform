@@ -23,8 +23,8 @@
  *
  **/
 
-import { DesignSystemLoader } from "@cristal/api";
-import { Container } from "inversify";
+import type { DesignSystemLoader } from "@cristal/api";
+import type { Container } from "inversify";
 import { ShoelaceDesignSystemLoader } from "./shoelaceDesignSystemLoader";
 
 export default class ComponentInit {

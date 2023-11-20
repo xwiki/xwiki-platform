@@ -23,8 +23,8 @@
  *
  **/
 
-import { CristalComponent } from "./cristalComponent";
-import { Container } from "inversify";
+import type { CristalComponent } from "./cristalComponent";
+import type { Container } from "inversify";
 
 export interface ExtensionManager extends CristalComponent {
   addRemoteExtension(

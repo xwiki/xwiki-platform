@@ -5,7 +5,7 @@
 </template>
 <script lang="ts">
 import "@shoelace-style/shoelace/dist/components/alert/alert";
-import { PropType } from "vue";
+import type { PropType } from "vue";
 
 type Types = "" | "success" | "warning" | "error" | "info";
 export default {

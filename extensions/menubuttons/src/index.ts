@@ -26,4 +26,5 @@
 import { ComponentInit } from "./components/componentsInit.js";
 import type { MenuEntry } from "./api/menuEntry";
 
-export { ComponentInit, MenuEntry };
+export type { MenuEntry };
+export { ComponentInit };

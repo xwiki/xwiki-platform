@@ -41,9 +41,10 @@ import PerfDirectVuetify from "../vue/perf/perfDirectVuetify.vue";
 import PerfDirectDSFR from "../vue/perf/perfDirectDSFR.vue";
 import PerfDirectSL from "../vue/perf/perfDirectSL.vue";
 
-import { App, Component } from "vue";
-import { DesignSystemLoader, SkinManager } from "@cristal/api";
-import { Container, injectable } from "inversify";
+import type { App, Component } from "vue";
+import type { DesignSystemLoader, SkinManager } from "@cristal/api";
+import type { Container } from "inversify";
+import { injectable } from "inversify";
 import "reflect-metadata";
 
 @injectable()

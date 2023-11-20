@@ -32,7 +32,7 @@ import { ComponentInit as MacrosComponentInit } from "@cristal/macros";
 import { ComponentInit as MenuButtonsComponentInit } from "@cristal/extension-menubuttons";
 import { ComponentInit as QueueWorkerComponentInit } from "@cristal/sharedworker-impl";
 import { ComponentInit as RenderingComponentInit } from "@cristal/rendering";
-import { Container } from "inversify";
+import type { Container } from "inversify";
 
 export class StaticBuild {
   public static init(container: Container, forceStaticBuild: boolean) {

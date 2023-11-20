@@ -22,20 +22,20 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
-  <CTemplate name="view" />
-</template>
 <script lang="ts">
 import { CTemplate } from "@cristal/skin";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  setup() {},
   components: {
     CTemplate,
   },
+  setup() {},
 });
 </script>
+<template>
+  <CTemplate name="view" />
+</template>
 <style scoped>
 :global(h1) {
   color: red;

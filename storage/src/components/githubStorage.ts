@@ -23,11 +23,10 @@
  *
  **/
 
-import { injectable, inject } from "inversify";
+import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import { Storage, PageData, DefaultPageData } from "@cristal/api";
-import { WikiConfig } from "@cristal/api";
-import { Logger } from "@cristal/api";
+import type { Logger, PageData, Storage, WikiConfig } from "@cristal/api";
+import { DefaultPageData } from "@cristal/api";
 
 @injectable()
 export class GitHubStorage implements Storage {

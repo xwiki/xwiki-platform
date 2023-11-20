@@ -23,13 +23,13 @@
  *
  **/
 
-import { Container } from "inversify";
-import { App, Component, Ref } from "vue";
-import { WikiConfig } from "./WikiConfig";
-import { Router } from "vue-router";
-import { Logger } from "./logger";
-import { LoggerConfig } from "./loggerConfig";
-import { SkinManager } from "./skinManager";
+import type { Container } from "inversify";
+import type { App, Component, Ref } from "vue";
+import type { WikiConfig } from "./WikiConfig";
+import type { Router } from "vue-router";
+import type { Logger } from "./logger";
+import type { LoggerConfig } from "./loggerConfig";
+import type { SkinManager } from "./skinManager";
 
 export interface CristalApp {
   getApp(): App;

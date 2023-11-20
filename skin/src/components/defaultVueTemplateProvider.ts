@@ -23,10 +23,10 @@
  *
  **/
 
-import { VueTemplateProvider } from "../api/vueTemplateProvider";
+import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import { injectable } from "inversify";
 import "reflect-metadata";
-import { Component } from "vue";
+import type { Component } from "vue";
 
 @injectable()
 export default class DefaultVueTemplateProvider implements VueTemplateProvider {

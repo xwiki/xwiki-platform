@@ -23,7 +23,12 @@
  *
  **/
 
-import { DefaultWikiConfig, CristalApp, Storage, Logger } from "@cristal/api";
+import {
+  DefaultWikiConfig,
+  type CristalApp,
+  type Storage,
+  type Logger,
+} from "@cristal/api";
 import { injectable, inject, named } from "inversify";
 import "reflect-metadata";
 

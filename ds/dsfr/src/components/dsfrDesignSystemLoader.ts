@@ -23,8 +23,8 @@
  *
  **/
 
-import { App } from "vue";
-import { DesignSystemLoader } from "@cristal/api";
+import type { App } from "vue";
+import type { DesignSystemLoader } from "@cristal/api";
 
 import { injectable } from "inversify";
 

@@ -58,7 +58,7 @@
   </div>
 </template>
 <script lang="ts">
-import { CristalApp } from "@cristal/api";
+import type { CristalApp } from "@cristal/api";
 import { inject } from "vue";
 
 export default {

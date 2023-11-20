@@ -23,7 +23,7 @@
  *
  **/
 
-import { CristalComponent } from "../api/cristalComponent";
+import type { CristalComponent } from "../api/cristalComponent";
 import { injectable } from "inversify";
 import "reflect-metadata";
 

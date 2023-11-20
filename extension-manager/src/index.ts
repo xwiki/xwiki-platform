@@ -32,11 +32,9 @@ import { DefaultExtensionConfig } from "./components/defaultExtensionConfig";
 import { DefaultExtensionManager } from "./components/defaultExtensionManager";
 import { CristalLoader } from "./components/cristalLoader";
 
+export type { ExtensionConfig, ExtensionManager, CristalComponent };
 export {
   ComponentInit,
-  ExtensionConfig,
-  ExtensionManager,
-  CristalComponent,
   DefaultComponent,
   DefaultExtensionConfig,
   DefaultExtensionManager,

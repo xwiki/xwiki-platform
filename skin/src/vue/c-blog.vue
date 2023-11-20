@@ -22,23 +22,8 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
-  <div>
-    <h1>
-      <Field :document="document" name="headline" :mode="mode" />
-    </h1>
-    <Field :document="document" name="html" :mode="mode" type="html" />
-    <x-divider />
-    Genre:
-    <Field :document="document" name="genre" :mode="mode" />
-    Created by
-    <Field :document="document" name="creator" :mode="mode" />
-    on
-    <Field :document="document" name="dateCreated" :mode="mode" />
-  </div>
-</template>
 <script lang="ts" setup>
-import { CristalApp, Document, Logger } from "@cristal/api";
+import type { CristalApp, Document, Logger } from "@cristal/api";
 import { inject, ref } from "vue";
 import Field from "./c-field.vue";
 
@@ -56,3 +41,18 @@ if (cristal != undefined) {
 const document = ref(props.document);
 const mode = ref(props.mode);
 </script>
+<template>
+  <div>
+    <h1>
+      <Field :document="document" name="headline" :mode="mode" />
+    </h1>
+    <Field :document="document" name="html" :mode="mode" type="html" />
+    <x-divider />
+    Genre:
+    <Field :document="document" name="genre" :mode="mode" />
+    Created by
+    <Field :document="document" name="creator" :mode="mode" />
+    on
+    <Field :document="document" name="dateCreated" :mode="mode" />
+  </div>
+</template>

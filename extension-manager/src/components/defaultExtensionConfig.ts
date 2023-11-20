@@ -23,7 +23,7 @@
  *
  **/
 
-import { ExtensionConfig } from "../api/extensionConfig";
+import type { ExtensionConfig } from "../api/extensionConfig";
 
 export class DefaultExtensionConfig implements ExtensionConfig {
   name: string;

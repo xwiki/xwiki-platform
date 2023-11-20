@@ -22,12 +22,69 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
+<script lang="ts" setup>
+import CTemplate from "./c-template.vue";
+import { inject, onMounted, onUpdated, ref } from "vue";
+import type { CristalApp, Logger } from "@cristal/api";
+import { ContentTools } from "./contentTools";
+
+const root = ref(null);
+
+const pageStatus = ref({
+  currentContent: "Initial content",
+  css: [],
+  js: [],
+  html: "",
+  document: null,
+  withSheet: false,
+  sheet: "",
+});
+let logger: Logger;
+
+const cristal = inject<CristalApp>("cristal");
+if (cristal != null) {
+  ContentTools.init(cristal);
+  logger = cristal.getLogger("skin.vue.content");
+  logger?.debug("cristal object content ref set");
+  cristal.setContentRef(pageStatus);
+} else {
+  console.error("cristal object not injected properly in c-content.vue");
+}
+logger?.debug("Sheet is ", pageStatus.value.sheet);
+logger?.debug("With Sheet is ", pageStatus.value.withSheet);
+
+let link = "/" + cristal?.getCurrentPage() + "/edit";
+let serverSideRendering = cristal?.getWikiConfig().serverRendering;
+
+onMounted(() => {
+  const cristal = inject<CristalApp>("cristal");
+  logger?.debug("in mounted");
+
+  ContentTools.transformImages(cristal, "xwikicontent");
+  // ContentTools.transformScripts(cristal);
+});
+
+onUpdated(() => {
+  const cristal = inject<CristalApp>("cristal");
+  logger?.debug("in updated");
+
+  logger?.debug("Sheet is ", pageStatus.value.sheet);
+  logger?.debug("With Sheet is ", pageStatus.value.withSheet);
+
+  if (cristal && root.value != null) {
+    ContentTools.listenToClicks(root.value, cristal);
+    ContentTools.transformMacros(root.value, cristal);
+  }
+  ContentTools.loadCSS(pageStatus.value.css);
+  ContentTools.loadJS(pageStatus.value.js);
+});
+</script>
+<template ref="root">
   <article id="content">
     <UIX uixname="content.before" />
     <div class="pagemenu">
       <router-link :to="link">
-        <x-btn class="pagemenu"> Edit </x-btn>
+        <x-btn class="pagemenu"> Edit</x-btn>
       </router-link>
     </div>
     <template v-if="pageStatus.withSheet && !serverSideRendering">
@@ -44,67 +101,7 @@
     <UIX uixname="content.after" />
   </article>
 </template>
-<script lang="ts">
-import { inject, ref } from "vue";
-import { CristalApp, Logger } from "@cristal/api";
-import { ContentTools } from "./contentTools";
-import CTemplate from "./c-template.vue";
-
-const pageStatus = ref({
-  currentContent: "Initial content",
-  css: [],
-  js: [],
-  html: "",
-  document: null,
-  withSheet: false,
-  sheet: "",
-});
-let logger: Logger;
-
-export default {
-  components: [CTemplate],
-  setup() {
-    const cristal = inject<CristalApp>("cristal");
-    if (cristal != null) {
-      ContentTools.init(cristal);
-      logger = cristal.getLogger("skin.vue.content");
-      logger?.debug("cristal object content ref set");
-      cristal.setContentRef(pageStatus);
-    } else {
-      console.error("cristal object not injected properly in c-content.vue");
-    }
-    logger?.debug("Sheet is ", pageStatus.value.sheet);
-    logger?.debug("With Sheet is ", pageStatus.value.withSheet);
-    return {
-      pageStatus: pageStatus,
-      link: "/" + cristal?.getCurrentPage() + "/edit",
-      serverSideRendering: cristal?.getWikiConfig().serverRendering,
-    };
-  },
-  mounted() {
-    const cristal = inject<CristalApp>("cristal");
-    logger?.debug("in mounted");
-
-    ContentTools.transformImages(cristal, "xwikicontent");
-    // ContentTools.transformScripts(cristal);
-  },
-  updated() {
-    const cristal = inject<CristalApp>("cristal");
-    logger?.debug("in updated");
-
-    logger?.debug("Sheet is ", pageStatus.value.sheet);
-    logger?.debug("With Sheet is ", pageStatus.value.withSheet);
-
-    if (cristal) {
-      ContentTools.listenToClicks(this.$el, cristal);
-      ContentTools.transformMacros(this.$el, cristal);
-    }
-    ContentTools.loadCSS(pageStatus.value.css);
-    ContentTools.loadJS(pageStatus.value.js);
-  },
-};
-</script>
-<style type="text/css">
+<style>
 .pagemenu {
   float: right;
 }

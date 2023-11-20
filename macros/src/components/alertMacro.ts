@@ -24,7 +24,7 @@
  **/
 
 import { DefaultMacroProvider } from "./defaultMacroProvider";
-import { MacroData } from "@cristal/skin";
+import type { MacroData } from "@cristal/skin";
 import Warning from "../vue/c-warning.vue";
 
 export class AlertMacro extends DefaultMacroProvider {

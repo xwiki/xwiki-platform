@@ -46,7 +46,7 @@
   </div>
 </template>
 <script lang="ts">
-import { CristalApp, WikiConfig } from "@cristal/api";
+import type { CristalApp, WikiConfig } from "@cristal/api";
 import { inject } from "vue";
 
 let cristal: CristalApp | undefined;

@@ -40,21 +40,23 @@ import { DefaultLoggerConfig } from "./components/defaultLoggerConfig.js";
 import type { WrappingStorage } from "./api/wrappingStorage.js";
 import ComponentInit from "./components/componentsInit.js";
 
-export {
-  ComponentInit,
+export type {
   SkinManager,
-  CristalApp as CristalApp,
+  CristalApp,
   WikiConfig,
   Storage,
   WrappingStorage,
-  DefaultWikiConfig,
   PageData,
-  DefaultPageData,
   Logger,
   LoggerConfig,
+  Document,
+  DesignSystemLoader,
+};
+export {
+  ComponentInit,
+  DefaultWikiConfig,
+  DefaultPageData,
   DefaultLogger,
   DefaultLoggerConfig,
-  Document,
   JSONLDDocument,
-  DesignSystemLoader,
 };

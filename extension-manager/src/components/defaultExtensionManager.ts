@@ -23,13 +23,14 @@
  *
  **/
 
-import { ExtensionManager } from "../api/extensionManager";
-import { ExtensionConfig } from "../api/extensionConfig";
+import type { ExtensionManager } from "../api/extensionManager";
+import type { ExtensionConfig } from "../api/extensionConfig";
 import { DefaultComponent } from "./defaultComponent";
 import { DefaultExtensionConfig } from "./defaultExtensionConfig";
-import { injectable, Container, inject } from "inversify";
+import type { Container } from "inversify";
+import { injectable, inject } from "inversify";
 import "reflect-metadata";
-import { Logger } from "@cristal/api";
+import type { Logger } from "@cristal/api";
 
 @injectable()
 export class DefaultExtensionManager

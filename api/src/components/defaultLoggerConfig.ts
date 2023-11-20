@@ -24,7 +24,7 @@
  **/
 
 import { injectable } from "inversify";
-import { LoggerConfig } from "../api/loggerConfig";
+import type { LoggerConfig } from "../api/loggerConfig";
 
 @injectable()
 export class DefaultLoggerConfig implements LoggerConfig {

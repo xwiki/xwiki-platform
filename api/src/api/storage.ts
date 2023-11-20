@@ -23,8 +23,8 @@
  *
  **/
 
-import { PageData } from "./PageData";
-import { WikiConfig } from "./WikiConfig";
+import type { PageData } from "./PageData";
+import type { WikiConfig } from "./WikiConfig";
 
 export interface Storage {
   setWikiConfig(config: WikiConfig): void;

@@ -23,7 +23,7 @@
  *
  **/
 
-import { PageData } from "@cristal/api";
+import type { PageData } from "@cristal/api";
 
 export default interface OfflineStorage {
   getPage(wikiName: string, id: string): Promise<PageData | undefined>;

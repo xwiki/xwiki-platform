@@ -23,7 +23,7 @@
  *
  **/
 
-import { VueTemplateProvider } from "../api/vueTemplateProvider";
+import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import { injectable } from "inversify";
 import "reflect-metadata";
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";

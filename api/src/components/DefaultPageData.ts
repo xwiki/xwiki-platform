@@ -24,8 +24,8 @@
  **/
 
 import { JSONLDDocument } from "./JSONLDDocument";
-import { PageData } from "../api/PageData";
-import { Document } from "../api/document";
+import type { PageData } from "../api/PageData";
+import type { Document } from "../api/document";
 
 export class DefaultPageData implements PageData {
   id: string;

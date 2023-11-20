@@ -23,8 +23,8 @@
  *
  **/
 
-import { VueTemplateProvider } from "./vueTemplateProvider";
-import { MacroData } from "./macroData";
+import type { VueTemplateProvider } from "./vueTemplateProvider";
+import type { MacroData } from "./macroData";
 
 export interface MacroProvider extends VueTemplateProvider {
   getMacroName(): string;

@@ -23,11 +23,12 @@
  *
  **/
 
-import { VueTemplateProvider } from "../api/vueTemplateProvider";
+import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import DefaultVueTemplateProvider from "./defaultUIXTemplateProvider";
 import Template from "../vue/c-template.vue";
-import { Component } from "vue";
-import { Container, injectable } from "inversify";
+import type { Component } from "vue";
+import type { Container } from "inversify";
+import { injectable } from "inversify";
 import "reflect-metadata";
 
 @injectable()

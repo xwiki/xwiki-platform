@@ -23,8 +23,9 @@
  *
  **/
 
-import { DefaultPageData, Logger, PageData } from "@cristal/api";
-import OfflineStorage from "../api/offlineStorage";
+import type { PageData } from "@cristal/api";
+import { DefaultPageData, type Logger } from "@cristal/api";
+import type OfflineStorage from "../api/offlineStorage";
 import DexiePageStorage from "./dexiePageStorage";
 import { inject, injectable } from "inversify";
 

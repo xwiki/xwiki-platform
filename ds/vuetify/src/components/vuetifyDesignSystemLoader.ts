@@ -23,7 +23,7 @@
  *
  **/
 
-import { App } from "vue";
+import type { App } from "vue";
 import {
   VAvatar,
   VContainer,
@@ -32,7 +32,7 @@ import {
   VImg,
   VTextField,
 } from "vuetify/components";
-import { DesignSystemLoader } from "@cristal/api";
+import type { DesignSystemLoader } from "@cristal/api";
 
 import "vuetify/styles";
 import { createVuetify } from "vuetify";

@@ -23,9 +23,14 @@
  *
  **/
 
-import { DefaultWikiConfig, Logger, Storage, CristalApp } from "@cristal/api";
-import { injectable, inject, named } from "inversify";
 import "reflect-metadata";
+import {
+  type CristalApp,
+  DefaultWikiConfig,
+  type Logger,
+  type Storage,
+} from "@cristal/api";
+import { inject, injectable, named } from "inversify";
 
 @injectable()
 export class GitHubWikiConfig extends DefaultWikiConfig {
@@ -41,6 +46,8 @@ export class GitHubWikiConfig extends DefaultWikiConfig {
     this.storage = storage;
     this.cristal = cristal;
     this.storage.setWikiConfig(this);
-    if (this.homePage == "") this.homePage = "README.md";
+    if (this.homePage == "") {
+      this.homePage = "README.md";
+    }
   }
 }

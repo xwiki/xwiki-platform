@@ -25,12 +25,12 @@
 
 import { TemplateComponent } from "./templateTemplateProvider";
 import { DefaultSkinManager } from "./defaultSkinManager";
-import { Container } from "inversify";
-import { Logger, SkinManager } from "@cristal/api";
-import { VueTemplateProvider } from "../api/vueTemplateProvider";
+import type { Container } from "inversify";
+import type { Logger, SkinManager } from "@cristal/api";
+import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import { UIXVueTemplateProvider } from "./uixVueTemplateProvider";
 import { UIXLoginTemplateProvider } from "./uixLoginTemplateProvider";
-import { UIXTemplateProvider } from "../api/uixTemplateProvider";
+import type { UIXTemplateProvider } from "../api/uixTemplateProvider";
 import { UIXSearchTemplateProvider } from "./uixSearchTemplateProvider";
 
 export default class ComponentInit {

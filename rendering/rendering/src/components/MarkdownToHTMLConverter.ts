@@ -23,13 +23,13 @@
  *
  **/
 
-import { WikiConfig } from "@cristal/api";
-import { Converter } from "../api/converter";
+import type { WikiConfig } from "@cristal/api";
+import type { Logger } from "@cristal/api";
+import type { Converter } from "../api/converter";
 import { marked } from "marked";
 import { baseUrl } from "marked-base-url";
 import macro from "./marked-macro";
 import DOMPurify from "dompurify";
-import { Logger } from "@cristal/api";
 import { inject, injectable } from "inversify";
 
 @injectable()

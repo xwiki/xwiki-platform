@@ -25,16 +25,16 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import {
+import type {
+  Document,
   Logger,
   PageData,
   Storage,
   WikiConfig,
-  Document,
   WrappingStorage,
 } from "@cristal/api";
-import OfflineStorage from "../api/offlineStorage";
-import { QueueWorker } from "@cristal/sharedworker-api";
+import type OfflineStorage from "../api/offlineStorage";
+import type { QueueWorker } from "@cristal/sharedworker-api";
 
 @injectable()
 export class WrappingOfflineStorage implements WrappingStorage {

@@ -23,10 +23,10 @@
  *
  **/
 
-import { Logger } from "../api/logger";
+import type { Logger } from "../api/logger";
 
 import { inject, injectable } from "inversify";
-import { LoggerConfig } from "../api/loggerConfig";
+import type { LoggerConfig } from "../api/loggerConfig";
 
 @injectable()
 export class DefaultLogger implements Logger {
@@ -42,8 +42,9 @@ export class DefaultLogger implements Logger {
   // TODO get rid of any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   debug(...data: any[]): void {
-    if (!this.loggerConfig || this.loggerConfig.hasLevelId(this.module, 4))
+    if (!this.loggerConfig || this.loggerConfig.hasLevelId(this.module, 4)) {
       data.unshift(this.module + ":");
+    }
     console.debug.apply(null, data);
   }
 

@@ -22,13 +22,10 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
-  <!-- eslint-disable vue/valid-v-for TODO introduce a key on components. -->
-  <component :is="component" v-for="component in comps" />
-</template>
 <script lang="ts" setup>
-import { inject, Component, ref, Ref } from "vue";
-import { Logger, CristalApp } from "@cristal/api";
+import type { Component } from "vue";
+import { inject, shallowRef } from "vue";
+import type { CristalApp, Logger } from "@cristal/api";
 
 let components: Array<Component> = [];
 let logger: Logger | undefined = undefined;
@@ -40,6 +37,10 @@ if (cristal) {
   logger = cristal.getLogger("skin.vue.template");
 }
 
-const comps: Ref<Array<Component>> = ref(components);
+const comps = shallowRef(components);
 logger?.debug("Extension Point name", props.uixname);
 </script>
+<template>
+  <!-- eslint-disable vue/valid-v-for TODO introduce a key on components. -->
+  <component :is="component" v-for="component in comps" />
+</template>

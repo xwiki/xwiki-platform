@@ -23,10 +23,11 @@
  *
  **/
 
-import { Logger, CristalApp, WikiConfig } from "@cristal/api";
+import type { WikiConfig } from "@cristal/api";
+import { type CristalApp, type Logger } from "@cristal/api";
 import { inject, injectable } from "inversify";
-import { Renderer } from "../api/renderer";
-import { Converter } from "../api/converter";
+import type { Renderer } from "../api/renderer";
+import type { Converter } from "../api/converter";
 
 @injectable()
 export class DefaultRenderer implements Renderer {

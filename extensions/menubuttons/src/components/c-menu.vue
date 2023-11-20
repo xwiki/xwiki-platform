@@ -23,7 +23,7 @@
  *
 -->
 <template>
-  <h2>UIX: Menu</h2>
+  <h2>Menu</h2>
   <ul>
     <li v-for="item in items" :key="item">
       {{ item }}
@@ -31,7 +31,7 @@
   </ul>
 </template>
 <script lang="ts">
-import { CristalApp } from "@cristal/api";
+import type { CristalApp } from "@cristal/api";
 
 import { inject } from "vue";
 

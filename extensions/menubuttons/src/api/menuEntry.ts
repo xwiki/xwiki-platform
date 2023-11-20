@@ -27,4 +27,4 @@ interface MenuEntry {
   getMenuEntry(): string;
 }
 
-export { MenuEntry };
+export type { MenuEntry };

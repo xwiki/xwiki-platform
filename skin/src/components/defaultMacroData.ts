@@ -23,7 +23,7 @@
  *
  **/
 
-import { MacroData } from "../api/macroData";
+import type { MacroData } from "../api/macroData";
 
 export class DefaultMacroData implements MacroData {
   protected macroContent: string = "";

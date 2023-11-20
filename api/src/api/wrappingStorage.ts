@@ -23,7 +23,7 @@
  *
  **/
 
-import { Storage } from "./storage";
+import type { Storage } from "./storage";
 
 export interface WrappingStorage extends Storage {
   setStorage(storage: Storage): void;

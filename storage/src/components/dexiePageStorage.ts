@@ -24,7 +24,8 @@
  **/
 
 // import { PageData } from "@cristal/api";
-import Dexie, { Table } from "dexie";
+import type { Table } from "dexie";
+import Dexie from "dexie";
 
 export default class DexiePageStorage extends Dexie {
   pages!: Table<object>;

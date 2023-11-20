@@ -23,26 +23,26 @@
  *
  **/
 
-import { Container, inject, injectable, multiInject } from "inversify";
+import type { Container } from "inversify";
+import { inject, injectable, multiInject } from "inversify";
 import "reflect-metadata";
 
-import {
+import type {
   CristalApp,
-  DefaultLogger,
-  DefaultPageData,
-  Logger,
   LoggerConfig,
   PageData,
-  SkinManager,
   WikiConfig,
 } from "@cristal/api";
-import { App, Component, createApp, Ref } from "vue";
 import {
-  createRouter,
-  createWebHashHistory,
-  Router,
-  RouteRecordRaw,
-} from "vue-router";
+  DefaultLogger,
+  DefaultPageData,
+  type Logger,
+  type SkinManager,
+} from "@cristal/api";
+import type { App, Component, Ref } from "vue";
+import { createApp } from "vue";
+import type { Router, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 import "@mdi/font/css/materialdesignicons.css";
 
@@ -52,10 +52,10 @@ import "@mdi/font/css/materialdesignicons.css";
 import Index from "../c-index.vue";
 import IndexPerf from "../indexPerf.vue";
 
-import { ExtensionManager } from "@cristal/extension-manager";
-import { UIXTemplateProvider, VueTemplateProvider } from "@cristal/skin";
-import { MenuEntry } from "@cristal/extension-menubuttons";
-import { Renderer } from "@cristal/rendering";
+import type { ExtensionManager } from "@cristal/extension-manager";
+import type { UIXTemplateProvider, VueTemplateProvider } from "@cristal/skin";
+import type { MenuEntry } from "@cristal/extension-menubuttons";
+import type { Renderer } from "@cristal/rendering";
 
 // import i18n from './i18n'
 

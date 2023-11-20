@@ -57,10 +57,10 @@
   </div>
 </template>
 <script lang="ts">
-import { CristalApp, Document, Logger } from "@cristal/api";
+import type { CristalApp, Document, Logger } from "@cristal/api";
 import { inject } from "vue";
 import Field from "./c-field.vue";
-import { PropType } from "vue/dist/vue";
+import type { PropType } from "vue/dist/vue";
 
 let logger: Logger;
 

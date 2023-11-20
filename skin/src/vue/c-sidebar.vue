@@ -22,6 +22,9 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
+<script lang="ts" setup>
+import CTemplate from "./c-template.vue";
+</script>
 <template>
   <aside id="sidebar">
     <UIX uixname="sidebar.before" />
@@ -32,6 +35,3 @@
     <UIX uixname="sidebar.after" />
   </aside>
 </template>
-<script lang="ts" setup>
-import CTemplate from "./c-template.vue";
-</script>

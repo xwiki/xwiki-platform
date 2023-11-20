@@ -23,7 +23,7 @@
  *
  **/
 
-import { Document } from "../api/document";
+import type { Document } from "../api/document";
 
 export class JSONLDDocument implements Document {
   // TODO get rid of any

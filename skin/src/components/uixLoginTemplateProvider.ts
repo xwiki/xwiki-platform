@@ -24,7 +24,7 @@
  **/
 
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
-import { Component } from "vue";
+import type { Component } from "vue";
 import Login from "../vue/c-login.vue";
 import { injectable } from "inversify";
 

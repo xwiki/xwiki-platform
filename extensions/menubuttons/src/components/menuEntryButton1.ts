@@ -26,7 +26,7 @@
 import { injectable } from "inversify";
 import "reflect-metadata";
 
-import { MenuEntry } from "../api/menuEntry";
+import type { MenuEntry } from "../api/menuEntry";
 
 @injectable()
 export class MenuEntryButton1 implements MenuEntry {

@@ -23,10 +23,10 @@
  *
  **/
 
-import { ExtensionManager } from "../api/extensionManager";
+import type { ExtensionManager } from "../api/extensionManager";
 import { DefaultExtensionManager } from "./defaultExtensionManager";
-import { Container } from "inversify";
-import { Logger } from "@cristal/api";
+import type { Container } from "inversify";
+import type { Logger } from "@cristal/api";
 
 export default class ComponentInit {
   logger: Logger;

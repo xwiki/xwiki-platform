@@ -26,10 +26,10 @@
 import { MenuEntryButton1 } from "./menuEntryButton1";
 import { UIXMenuTemplateProvider } from "./uixMenuTemplateProvider";
 import { UIXMenuTemplateProvider2 } from "./uixMenuTemplateProvider2";
-import { Container } from "inversify";
-import { UIXTemplateProvider } from "@cristal/skin";
-import { MenuEntry } from "../api/menuEntry";
-import { Logger } from "@cristal/api";
+import type { Container } from "inversify";
+import type { UIXTemplateProvider } from "@cristal/skin";
+import type { MenuEntry } from "../api/menuEntry";
+import type { Logger } from "@cristal/api";
 
 export class ComponentInit {
   logger: Logger;

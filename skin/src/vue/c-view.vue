@@ -22,6 +22,9 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
+<script lang="ts" setup>
+import CTemplate from "./c-template.vue";
+</script>
 <template>
   <div>
     <div id="view" class="wrapper">
@@ -34,6 +37,3 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import CTemplate from "./c-template.vue";
-</script>

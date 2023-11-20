@@ -23,8 +23,8 @@
  *
  **/
 
-import { Container } from "inversify";
-import { App, Component } from "vue";
+import type { Container } from "inversify";
+import type { App, Component } from "vue";
 
 export interface SkinManager {
   getTemplate(name: string): Component | null;

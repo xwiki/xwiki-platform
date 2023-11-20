@@ -23,7 +23,7 @@
  *
  **/
 
-import { WikiConfig } from "@cristal/api";
+import type { WikiConfig } from "@cristal/api";
 
 export interface Converter {
   getSourceSyntax(): string;

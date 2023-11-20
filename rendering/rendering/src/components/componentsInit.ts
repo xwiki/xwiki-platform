@@ -23,11 +23,11 @@
  *
  **/
 
-import { Container } from "inversify";
+import type { Container } from "inversify";
 import { MarkdownToHTMLConverter } from "./MarkdownToHTMLConverter";
-import { Converter } from "../api/converter";
+import type { Converter } from "../api/converter";
 import { XWiki21ToHTMLConverter } from "./XWikI21ToHTMLConverter";
-import { Renderer } from "../api/renderer";
+import type { Renderer } from "../api/renderer";
 import { DefaultRenderer } from "./defaultRenderer";
 
 export default class ComponentInit {

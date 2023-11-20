@@ -38,8 +38,9 @@
   </template>
 </template>
 <script lang="ts">
-import { CristalApp, Document, Logger, Storage } from "@cristal/api";
-import { defineComponent, inject, type PropType, ref, Ref } from "vue";
+import type { CristalApp, Document, Logger, Storage } from "@cristal/api";
+import type { Ref } from "vue";
+import { defineComponent, inject, type PropType, ref } from "vue";
 import { ContentTools } from "./contentTools";
 
 let logger: Logger | null = null;

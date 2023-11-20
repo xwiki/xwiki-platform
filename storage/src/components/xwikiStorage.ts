@@ -25,14 +25,8 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import {
-  Logger,
-  PageData,
-  DefaultPageData,
-  Storage,
-  WikiConfig,
-} from "@cristal/api";
-import { Document, JSONLDDocument } from "@cristal/api";
+import type { Document, PageData, Storage, WikiConfig } from "@cristal/api";
+import { DefaultPageData, JSONLDDocument, type Logger } from "@cristal/api";
 
 @injectable()
 export class XWikiStorage implements Storage {
@@ -74,7 +68,9 @@ export class XWikiStorage implements Storage {
     if (url.startsWith(this.wikiConfig.baseURL)) {
       const uri = url.replace(this.wikiConfig.baseURL, "");
       page = uri.replace("/bin", "").replace("/view/", "").replaceAll("/", ".");
-      if (page.endsWith(".")) page += "WebHome";
+      if (page.endsWith(".")) {
+        page += "WebHome";
+      }
     } else {
       page = url;
     }
@@ -82,7 +78,9 @@ export class XWikiStorage implements Storage {
   }
 
   getImageURL(page: string, image: string): string {
-    if (page == "") page = "Main.WebHome";
+    if (page == "") {
+      page = "Main.WebHome";
+    }
     const imageURL =
       this.wikiConfig.baseURL +
       "/bin/download/" +
@@ -95,7 +93,9 @@ export class XWikiStorage implements Storage {
 
   async getPageContent(page: string, syntax: string): Promise<PageData> {
     this.logger?.debug("XWiki Loading page", page);
-    if (page == "") page = "Main.WebHome";
+    if (page == "") {
+      page = "Main.WebHome";
+    }
     const url = this.getPageRestURL(page, syntax);
     this.logger?.debug("XWiki Loading url", url);
     const response = await fetch(url, { cache: "no-store" });

@@ -23,8 +23,8 @@
  *
  **/
 
-import { Container } from "inversify";
-import { MacroProvider } from "@cristal/skin";
+import type { Container } from "inversify";
+import type { MacroProvider } from "@cristal/skin";
 import { ErrorMacro } from "./errorMacro";
 import { WarningMacro } from "./warningMacro";
 import { InfoMacro } from "./infoMacro";

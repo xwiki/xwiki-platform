@@ -23,12 +23,8 @@
  *
  **/
 
-import {
-  DefaultVueTemplateProvider,
-  DefaultMacroData,
-  MacroData,
-  MacroProvider,
-} from "@cristal/skin";
+import type { MacroData, MacroProvider } from "@cristal/skin";
+import { DefaultVueTemplateProvider, DefaultMacroData } from "@cristal/skin";
 
 export abstract class DefaultMacroProvider
   extends DefaultVueTemplateProvider

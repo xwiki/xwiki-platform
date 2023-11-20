@@ -30,9 +30,11 @@
   </x-alert>
 </template>
 <script lang="ts">
-import { CristalApp, Logger } from "@cristal/api";
-import { inject, PropType } from "vue";
-import { ContentTools, MacroData } from "@cristal/skin";
+import type { CristalApp, Logger } from "@cristal/api";
+import type { PropType } from "vue";
+import { inject } from "vue";
+import type { MacroData } from "@cristal/skin";
+import { ContentTools } from "@cristal/skin";
 
 let logger: Logger | null = null;
 let addedHTMLField: Array<string> = [];

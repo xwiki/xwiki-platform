@@ -27,7 +27,7 @@ import { DefaultUIXTemplateProvider } from "@cristal/skin";
 import Menu from "./c-menu.vue";
 import { injectable } from "inversify";
 import "reflect-metadata";
-import { Component } from "vue";
+import type { Component } from "vue";
 
 @injectable()
 export class UIXMenuTemplateProvider extends DefaultUIXTemplateProvider {

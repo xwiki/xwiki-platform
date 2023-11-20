@@ -23,8 +23,8 @@
  *
 -->
 <script lang="ts" setup>
-import xlogo from "../images/logo-x.png";
 import CTemplate from "./c-template.vue";
+import xlogo from "../images/logo-x.png";
 import { ref } from "vue";
 
 const logo = xlogo;
@@ -35,25 +35,25 @@ const isActive = ref(false);
   <header id="header">
     <UIX uixname="header.before" />
     <x-container class="pa-0 ma-0" fluid>
-      <!--      <x-row align="start" no-gutters>-->
-      <!--        <x-col>-->
-      <!--          <UIX uixname="header.nav.left" />-->
-      <!--          <x-dialog width="auto" :logo="logo" title="Configuration">-->
-      <!--            <template #activator>-->
-      <!--              <x-img :width="50" :src="logo" />-->
-      <!--            </template>-->
-      <!--            <template #default>-->
-      <!--              <CTemplate name="config" v-bind="isActive" />-->
-      <!--            </template>-->
-      <!--          </x-dialog>-->
-      <!--        </x-col>-->
-      <!--        <x-col align="center" cols="6">-->
-      <!--          <UIX uixname="header.nav.center" />-->
-      <!--        </x-col>-->
-      <!--        <x-col align="right">-->
-      <!--          <UIX uixname="header.nav.right" />-->
-      <!--        </x-col>-->
-      <!--      </x-row>-->
+      <x-row align="start" no-gutters>
+        <x-col>
+          <UIX uixname="header.nav.left" />
+          <x-dialog width="auto" :logo="logo" title="Configuration">
+            <template #activator>
+              <x-img :width="50" :src="logo" />
+            </template>
+            <template #default>
+              <CTemplate name="config" v-bind="isActive" />
+            </template>
+          </x-dialog>
+        </x-col>
+        <x-col align="center" cols="6">
+          <UIX uixname="header.nav.center" />
+        </x-col>
+        <x-col align="right">
+          <UIX uixname="header.nav.right" />
+        </x-col>
+      </x-row>
     </x-container>
     <UIX uixname="header.after" />
   </header>

@@ -1,7 +1,8 @@
+import "reflect-metadata";
 import { expect, test } from "vitest";
-import { DefaultPageData } from "../../src/components/DefaultPageData";
+import { DefaultPageData } from "../DefaultPageData";
 
-// Dump test to have at least one test result to show in the CI.
+// Dumb test to have at least one test result to show in the CI.
 test("DefaultPageData", () => {
   const defaultPageData = new DefaultPageData(
     "id",

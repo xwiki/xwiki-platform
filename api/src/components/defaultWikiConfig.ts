@@ -106,11 +106,7 @@ export class DefaultWikiConfig implements WikiConfig {
   }
 
   isSupported(format: string): boolean {
-    if (format == "html") {
-      return true;
-    } else {
-      return false;
-    }
+    return format == "html";
   }
 
   initialize() {

@@ -36,6 +36,7 @@ import org.xwiki.test.docker.junit5.UITest;
         "org.xwiki.platform:xwiki-platform-resource-temporary",
         // Code macro highlighting works only if Jython is a core extension. It's not enough to use language=none in our
         // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
+        // TODO: Remove when https://jira.xwiki.org/browse/XWIKI-17972 is fixed
         "org.python:jython-slim"
     },
     resolveExtraJARs = true,

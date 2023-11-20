@@ -20,8 +20,8 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "dev": "vite dev",
     "prepare": "mkdir -p ./dist/apps && ln -fs ../../../extension-manager/dist/ dist/apps/extension-manager && ln -fs ../../../extension-menubuttons/dist/ dist/apps/extension-menubuttons && ln -fs ../../../skin/dist/ dist/apps/skin && ln -fs ../../../dsvuetify/dist/ dist/apps/dsvuetify && ln -fs ../../../storage/dist/ dist/apps/storage && ln -fs ../../../wikimodel/dist dist/apps/wikimodel && ln -fs ../../../dsfr/dist dist/apps/dsfr && ln -fs ../../../dsshoelace/dist dist/apps/dsshoelace",
-    "start": "lerna run build && pnpm prepare && NODE_ENV=production node src/server.js",
-    "quickstart": "lerna run build --scope @cristal/app && pnpm prepare && NODE_ENV=production node src/server.js"
+    "start": "pnpm run build && pnpm prepare && NODE_ENV=production node src/server.js",
+    "quickstart": "pnpm run build --scope @cristal/app && pnpm prepare && NODE_ENV=production node src/server.js"
   },
   "dependencies": {
     "@cristal/lib": "workspace:^",

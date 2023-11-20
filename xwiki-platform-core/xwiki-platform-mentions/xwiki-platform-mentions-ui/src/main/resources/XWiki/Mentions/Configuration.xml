@@ -355,13 +355,13 @@
       </selfMentionsColor>
     </class>
     <property>
-      <mentionsColor>rgba(194, 194, 194, 0.8)</mentionsColor>
+      <mentionsColor>@breadcrumb-bg</mentionsColor>
     </property>
     <property>
       <quoteActivated>1</quoteActivated>
     </property>
     <property>
-      <selfMentionsColor>rgba(255, 0, 1, 0.5)</selfMentionsColor>
+      <selfMentionsColor>@btn-danger-bg</selfMentionsColor>
     </property>
   </object>
 </xwikidoc>

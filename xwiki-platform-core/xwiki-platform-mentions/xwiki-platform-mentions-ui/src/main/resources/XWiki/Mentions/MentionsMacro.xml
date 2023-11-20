@@ -374,12 +374,15 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     <property>
       <code>.xwiki-mention {
   background-color: $services.mentions.mentionsColor;
-  border-radius: 10px;
-  padding: 2px 5px 2px 5px;
+  border-radius: @border-radius-small;
+  padding: 1px 5px 1px 5px;
+  border: 1px solid @dropdown-divider-bg;
 }
 
 .xwiki-mention.user.self {
   background-color: $services.mentions.selfMentionsColor;
+  color: @btn-danger-color;
+  border: 0;
 }
 
 .xwiki-mention.removed {
@@ -391,7 +394,7 @@ blockquote.mention-quote {
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>

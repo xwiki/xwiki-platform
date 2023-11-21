@@ -37,7 +37,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Required rights analyzer for icon themes.
  *
  * @version $Id$
- * @since 15.10RC1
+ * @since 15.10
  */
 @Component
 @Named("IconThemesCode.IconThemeClass")

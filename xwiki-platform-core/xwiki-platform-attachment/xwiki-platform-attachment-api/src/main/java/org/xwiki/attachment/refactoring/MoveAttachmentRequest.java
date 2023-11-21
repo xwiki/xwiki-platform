@@ -23,7 +23,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.refactoring.job.EntityRequest;
-import org.xwiki.stability.Unstable;
 
 /**
  * Job request for moving an attachment to a new location. A redirection can be persisted at the old location.
@@ -48,7 +47,6 @@ public class MoveAttachmentRequest extends EntityRequest
      *
      * @since 14.2RC1
      */
-    @Unstable
     public static final String UPDATE_REFERENCES = "updateReferences";
 
     /**

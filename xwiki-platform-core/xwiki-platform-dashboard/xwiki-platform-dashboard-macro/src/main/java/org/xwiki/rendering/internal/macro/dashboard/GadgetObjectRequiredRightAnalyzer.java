@@ -44,7 +44,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Required right analyzer for instances of XWiki.GadgetClass.
  *
  * @version $Id$
- * @since 15.10RC1
+ * @since 15.10
  */
 @Component
 @Singleton

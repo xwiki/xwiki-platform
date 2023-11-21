@@ -23,7 +23,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event triggered when a {@link javax.servlet.http.HttpSession} is destroyed.
@@ -42,7 +41,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.5
  * @since 14.4.1
  */
-@Unstable
 public class SessionDestroyedEvent implements Event
 {
     @Override

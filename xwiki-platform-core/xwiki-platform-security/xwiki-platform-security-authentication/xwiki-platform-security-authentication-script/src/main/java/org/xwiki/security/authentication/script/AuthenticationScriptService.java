@@ -38,19 +38,18 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.AuthenticationAction;
-import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
 import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.RetrieveUsernameException;
 import org.xwiki.security.authentication.RetrieveUsernameManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
 import org.xwiki.user.UserReference;
@@ -251,7 +250,6 @@ public class AuthenticationScriptService implements ScriptService
      * @since 13.10.10
      * @since 14.4.6
      */
-    @Unstable
     public void retrieveUsernameAndSendEmail(String userEmail) throws RetrieveUsernameException
     {
         Set<UserReference> users = this.retrieveUsernameManager.findUsers(userEmail);

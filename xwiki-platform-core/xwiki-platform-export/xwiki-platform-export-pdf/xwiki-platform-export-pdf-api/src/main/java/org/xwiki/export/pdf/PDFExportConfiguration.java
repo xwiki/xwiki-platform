@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * PDF export configuration options.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.5
  */
 @Role
-@Unstable
 public interface PDFExportConfiguration
 {
     /**

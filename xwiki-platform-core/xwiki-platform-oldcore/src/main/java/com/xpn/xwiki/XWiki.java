@@ -1025,7 +1025,6 @@ public class XWiki implements EventListener
      * @return {@code true} if the wiki has been initialized and the initialization is finished.
      * @since 14.4RC1
      */
-    @Unstable
     public boolean isWikiInitialized(String wikiId)
     {
         Job wikiInitializerJob = getWikiInitializerJob(wikiId);

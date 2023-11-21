@@ -571,7 +571,6 @@ public interface Event
      *         version of XWiki older than 14.7
      * @since 14.7RC1
      */
-    @Unstable
     default String getRemoteObservationId()
     {
         return null;

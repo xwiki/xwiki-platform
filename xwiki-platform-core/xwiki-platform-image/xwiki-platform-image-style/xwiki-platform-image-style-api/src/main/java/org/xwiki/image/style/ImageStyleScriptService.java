@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -38,7 +37,6 @@ import com.xpn.xwiki.XWikiContext;
  * @since 14.3RC1
  */
 @Component
-@Unstable
 @Singleton
 @Named("imageStyle")
 public class ImageStyleScriptService implements ScriptService

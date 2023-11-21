@@ -1635,7 +1635,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public String getRenderedContent(String text, Syntax sourceSyntaxId, boolean restrictedTransformationContext,
         XWikiDocument sDocument, boolean isolated, XWikiContext context)
     {
@@ -3056,7 +3055,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If object creation failed.
      * @since 14.0RC1
      */
-    @Unstable
     public BaseObject getXObject(ObjectReference objectReference, boolean create, XWikiContext context)
         throws XWikiException
     {
@@ -4377,7 +4375,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param editForm the form from which to read the list of files.
      * @since 14.3RC1
      */
-    @Unstable
     public void readTemporaryUploadedFiles(EditForm editForm)
     {
         getTemporaryAttachmentManager().attachTemporaryAttachmentsInDocument(this, editForm.getTemporaryUploadedFiles());
@@ -4391,7 +4388,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If an error occurs.
      * @since 14.0RC1
      */
-    @Unstable
     public void readAddedUpdatedAndRemovedObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         // We add the new objects that have been submitted in the form, before filling them with their values.
@@ -5887,7 +5883,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the entity references pointing to either document or attachments. If {@code null}, an error happened
      * @since 14.2RC1
      */
-    @Unstable
     public Set<EntityReference> getUniqueLinkedEntities(XWikiContext context)
     {
         // Return both document and attachment references.
@@ -9470,7 +9465,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.4
      * @since 13.10.10
      */
-    @Unstable
     public void initialize()
     {
         // There is no syntax by default in a new document and the default one is retrieved from the configuration

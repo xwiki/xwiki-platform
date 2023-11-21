@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -177,7 +176,6 @@ public class DeletedDocument extends Api
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public boolean canView()
     {
         return hasAccess(Right.VIEW);

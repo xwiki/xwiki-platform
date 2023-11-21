@@ -24,7 +24,6 @@ import java.util.Date;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Hold the information about a queued task.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.1RC1
  */
-@Unstable
 public class XWikiDocumentIndexingTask
 {
     private long id;
@@ -53,7 +51,6 @@ public class XWikiDocumentIndexingTask
      * @return the synthetic id of this deleted attachment. Uniquely identifies a link
      * @since 14.3RC1
      */
-    @Unstable
     public long getId()
     {
         return this.id;
@@ -76,7 +73,6 @@ public class XWikiDocumentIndexingTask
      * @return the document id
      * @since 14.3RC1
      */
-    @Unstable
     public long getDocId()
     {
         return this.docId;
@@ -86,7 +82,6 @@ public class XWikiDocumentIndexingTask
      * @param docId the id of the document to be processed
      * @since 14.3RC1
      */
-    @Unstable
     public void setDocId(long docId)
     {
         this.docId = docId;
@@ -96,7 +91,6 @@ public class XWikiDocumentIndexingTask
      * @return the version to of the document to be processed
      * @since 14.3RC1
      */
-    @Unstable
     public String getVersion()
     {
         return this.version;
@@ -106,7 +100,6 @@ public class XWikiDocumentIndexingTask
      * @param version the version of the document to be processed
      * @since 14.3RC1
      */
-    @Unstable
     public void setVersion(String version)
     {
         this.version = version;
@@ -116,7 +109,6 @@ public class XWikiDocumentIndexingTask
      * @return the type of the task to do on the document
      * @since 14.3RC1
      */
-    @Unstable
     public String getType()
     {
         return this.type;
@@ -126,7 +118,6 @@ public class XWikiDocumentIndexingTask
      * @param type the type of the task to do on the document
      * @since 14.3RC1
      */
-    @Unstable
     public void setType(String type)
     {
         // Replace duplicate strings with a canonical version. This is useful to lower the memory footprint when 
@@ -140,7 +131,6 @@ public class XWikiDocumentIndexingTask
      * @return the identifier of the instance that queued the task
      * @since 14.3RC1
      */
-    @Unstable
     public String getInstanceId()
     {
         return this.instanceId;
@@ -150,7 +140,6 @@ public class XWikiDocumentIndexingTask
      * @param instanceId the identifier of the instance that queued the task
      * @since 14.3RC1
      */
-    @Unstable
     public void setInstanceId(String instanceId)
     {
         this.instanceId = instanceId;

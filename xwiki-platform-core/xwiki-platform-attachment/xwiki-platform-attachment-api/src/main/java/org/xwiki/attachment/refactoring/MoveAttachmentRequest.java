@@ -31,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.0RC1
  */
-@Unstable
 public class MoveAttachmentRequest extends EntityRequest
 {
     /**
@@ -91,7 +90,6 @@ public class MoveAttachmentRequest extends EntityRequest
      * @return {@code true} if the references must be updated, {@code false} otherwise
      * @since 14.2RC1
      */
-    @Unstable
     public boolean isUpdateReferences()
     {
         return getProperty(UPDATE_REFERENCES, true);

@@ -29,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.3RC1
  */
 @Role
-@Unstable
 public interface ImageStyleConfiguration
 {
     /**

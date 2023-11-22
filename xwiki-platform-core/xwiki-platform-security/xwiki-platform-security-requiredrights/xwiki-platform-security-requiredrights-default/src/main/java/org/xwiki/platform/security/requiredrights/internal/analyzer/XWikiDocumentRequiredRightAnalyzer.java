@@ -21,9 +21,11 @@ package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.internal.DocumentContextExecutor;
@@ -36,6 +38,7 @@ import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplie
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.velocity.internal.util.VelocityDetector;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -63,6 +66,9 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
     @Inject
     private VelocityDetector velocityDetector;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     @Override
     public List<RequiredRightAnalysisResult> analyze(XWikiDocument document) throws RequiredRightsException
     {
@@ -88,7 +94,14 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
                 // Analyze the content
                 result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));
 
-                for (List<BaseObject> baseObjects : document.getXObjects().values()) {
+                // Analyze XObjects on the Root locale version of the document
+                XWikiDocument rootLocaleDocument = document;
+                if (document.getLocale() != null && !document.getLocale().equals(Locale.ROOT)) {
+                    XWikiContext context = this.contextProvider.get();
+                    rootLocaleDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
+                }
+
+                for (List<BaseObject> baseObjects : rootLocaleDocument.getXObjects().values()) {
                     for (BaseObject object : baseObjects) {
                         result.addAll(this.objectRequiredRightAnalyzer.analyze(object));
                     }

@@ -17,17 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.security.requiredrights.internal.analyzer;
+package org.xwiki.localization.wiki.internal;
 
 import java.util.List;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
@@ -38,6 +40,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,17 +66,42 @@ class TranslationDocumentObjectRequiredRightAnalyzerTest
     private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @MockComponent
+    @Named("stringCode")
+    private BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
+
+    @MockComponent
     private BlockSupplierProvider<BaseObject> xObjectDisplayerProvider;
 
-    @Mock
-    BaseObject object;
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    private WikiTranslationConfiguration translationConfiguration;
 
     @Mock
-    ObjectReference objectReference;
+    private XWikiContext context;
+
+    @Mock
+    private BaseObject object;
+
+    @Mock
+    private ObjectReference objectReference;
+
+    private XWikiDocument document;
+
+    private String documentContent;
 
     @BeforeEach
     void setup()
     {
+        this.document = new XWikiDocument(new DocumentReference("xwiki", "Test", "Translation"));
+        this.documentContent = "localization.test=translation";
+        this.document.setContent(this.documentContent);
+        when(this.contextProvider.get()).thenReturn(this.context);
+        when(this.context.getDoc()).thenReturn(this.document);
+
+        when(this.translationConfiguration.isRestrictUserTranslations()).thenReturn(true);
+
         doReturn(this.objectReference).when(this.object).getReference();
     }
 
@@ -84,17 +113,37 @@ class TranslationDocumentObjectRequiredRightAnalyzerTest
 
         List<RequiredRightAnalysisResult> analysisResults = this.analyzer.analyze(this.object);
 
-        assertEquals(1, analysisResults.size());
+        assertEquals(2, analysisResults.size());
         RequiredRightAnalysisResult analysisResult = analysisResults.get(0);
         assertEquals(this.objectReference, analysisResult.getEntityReference());
-        verify(this.translationMessageSupplierProvider).get("security.requiredrights.object.translationDocument."
+        verify(this.translationMessageSupplierProvider).get("localization.requiredrights.translationDocument."
             + scope.toLowerCase());
         verify(this.xObjectDisplayerProvider).get(this.object);
 
         assertEquals(1, analysisResult.getRequiredRights().size());
         RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
-        assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+        if (scope.equals("WIKI")) {
+            assertEquals(EntityType.WIKI, requiredRightResult.getEntityType());
+        } else {
+            assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+        }
+        assertFalse(requiredRightResult.isManualReviewNeeded());
+
+        analysisResult = analysisResults.get(1);
+        assertEquals(this.document.getDocumentReference(), analysisResult.getEntityReference());
+        verify(this.translationMessageSupplierProvider).get("localization.requiredrights.translationDocument."
+            + scope.toLowerCase() + ".content");
+        verify(this.stringCodeBlockSupplierProvider).get(this.documentContent);
+
+        assertEquals(1, analysisResult.getRequiredRights().size());
+        requiredRightResult = analysisResult.getRequiredRights().get(0);
+        assertEquals(requiredRight, requiredRightResult.getRight());
+        if (scope.equals("WIKI")) {
+            assertEquals(EntityType.WIKI, requiredRightResult.getEntityType());
+        } else {
+            assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+        }
         assertFalse(requiredRightResult.isManualReviewNeeded());
     }
 }

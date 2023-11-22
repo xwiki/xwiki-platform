@@ -351,17 +351,25 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
     background: transparent;
     border: none;
     box-shadow: none;
+    border-radius: @btn-border-radius-small;
     font-size: 1.33em;
     line-height: 1;
     vertical-align: middle;
-	padding: 0;
-	margin: 0;
+    padding: 0;
+    margin: 0;
+    outline: none;
+
+    &amp;:active, &amp;:focus, &amp;:active:focus {
+      outline: none;
+    }
 
     &amp;.btn-primary {
       color: @link-color;
 
       &amp;:hover {
         color: @text-color;
+        background-color: mix(@xwiki-page-content-bg, @text-color, 89%);
+        box-shadow: 0 0 0 0.2em mix(@xwiki-page-content-bg, @text-color, 89%);
       }
     }
 
@@ -370,6 +378,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
 
       &amp;:hover {
         color: @link-color;
+        background-color: mix(@xwiki-page-content-bg, @link-color, 89%);
+        box-shadow: 0 0 0 0.2em mix(@xwiki-page-content-bg, @link-color, 89%);
       }
     }
 

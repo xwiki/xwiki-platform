@@ -129,6 +129,7 @@ folder = folder-open
 user = user
 group = group
 heart = heart
+heart_empty = heart-o
 question = question-circle
 image = image
 key = key

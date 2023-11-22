@@ -10,7 +10,7 @@
   },
   "engines": {
     "npm": "10.2.4",
-    "node": "20.9.0"
+    "node": "20.10.0"
   },
   "dependencies": {
     "vue": "2.7.15",

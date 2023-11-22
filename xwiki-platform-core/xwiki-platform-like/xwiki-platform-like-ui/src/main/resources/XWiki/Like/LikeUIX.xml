@@ -190,7 +190,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
        likeButton.addClass('btn-primary');
        likeButton.html(data.buttonhtml);
        likeButton.attr('title', l10n.get('button.title.unlike'));
-       var likersLink = likeButton.siblings('.like-number').find('a');
+       let likersLink = likeButton.siblings('.like-number').find('a');
        likersLink.text(getLikersLinkText(data.counter));
        likersLink.attr('title', l10n.get('likers.link.title', data.counter));
        $('#is-liked').val('true');
@@ -562,7 +562,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($,
       #end
       &lt;button class="like-button btn $btnClass"
         #if($disabledButton) disabled #{end}
-        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;$services.icon.renderHTML($heartIconName)&lt;/button&gt; &lt;span class="like-number"&gt;&lt;a href="$escapetool.xml($doc.getURL('view', 'viewer=likers'))" title="$escapetool.xml($services.localization.render('like.likers.link.title', [$likeCount]))"&gt;$likersText&lt;/a&gt;&lt;/span&gt;
+        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;$services.icon.renderHTML($heartIconName)&lt;/button&gt; &lt;span class="like-number"&gt;&lt;a href="$escapetool.xml($doc.getURL('view', 'viewer=likers'))" title="$escapetool.xml($services.localization.render('like.likers.link.title', [$likeCount]))"&gt;$escapetool.xml($likersText)&lt;/a&gt;&lt;/span&gt;
     &lt;/div&gt;
   #end
 #end

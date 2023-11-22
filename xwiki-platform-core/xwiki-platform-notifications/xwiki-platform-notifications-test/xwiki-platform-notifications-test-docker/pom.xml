@@ -67,6 +67,12 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Nedded for computing diff in notification emails -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-diff-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
 
     <!-- ================================
          Test only dependencies

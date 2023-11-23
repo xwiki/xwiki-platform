@@ -554,11 +554,9 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     }
     var pivot = self;
     var newAlt = "yes";
-    var newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
     var setValue = "1";
     if (self.getAttribute('alt') == "yes") {
       newAlt = "no";
-      newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
       setValue = "0";
     }
     var paramMap = {};
@@ -568,7 +566,6 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     paramMap["parameters"]["comment"] = "$services.localization.render('authenticate_viewedit_savecomment')";
     paramMap["onSuccess"] = function() {
       pivot.alt = newAlt;
-      pivot.src = newSrc;
     }
     new Ajax.Request(saveURL, paramMap);
   };
@@ -590,7 +587,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "0"},
           onSuccess: function() {
             pivot.alt = "no";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
         }});
       } else {
         new Ajax.Request(url, {
@@ -598,7 +594,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "0"},
           onSuccess: function() {
             pivot.alt = "no";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
         }});
       }
     } else {
@@ -608,7 +603,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
           onSuccess: function() {
             pivot.alt = "yes";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
         }});
       } else {
         new Ajax.Request(url, {
@@ -616,7 +610,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
           onSuccess: function() {
             pivot.alt = "yes";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
         }});
       }
     }

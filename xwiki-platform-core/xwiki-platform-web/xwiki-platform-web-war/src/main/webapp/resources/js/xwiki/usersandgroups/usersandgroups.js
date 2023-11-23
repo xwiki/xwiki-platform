@@ -57,44 +57,42 @@ window.MSCheckbox = Class.create({
     this.state = defaultState;
     this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
     this.nrstates = this.states.length;
-    this.images = [
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')",
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')",
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"
+    this.icons = [
+      "",
+      "$escapetool.javascript($services.icon.renderHTML('check'))",
+      "$escapetool.javascript($services.icon.renderHTML('cross'))"
+    ];
+    this.stateClasses = [
+      "none",
+      "yes",
+      "no"
     ];
 
     
     
     this.button = document.createElement("button");
-    this.button.className = "rights-edit";
+    this.button.className = "btn btn-default btn-xs rights-edit";
     this.button.addEventListener('click', this.createClickHandler(this));
     
-    var img = document.createElement("img");
-    
-    this.button.appendChild(img);
-    
     $(domNode).appendChild(this.button);
-    this.draw(this.state);
+    this.draw();
   },
-
-  /**
-    * @todo Draw with the current this.state, don't pass as an argument.
-    */
-  draw: function(state)
+  
+  draw: function()
   {
-    //Change display image
-    var img = this.button.firstChild;
-    img.src = this.images[state];
+    //Change display icon
+    this.button.innerHTML = this.icons[this.state];
+    this.button.classList.add(this.stateClasses[this.state]);
     
     //Update the description of the button for accessibility.
     var button = this.button;
+    var state = this.state;
     require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
       var alts = [
         l10n['undefined'],
         l10n['allowed'],
         l10n['denied']
       ];
-      img.alt = alts[state];
       button.title = alts[state];
     });
   },
@@ -105,13 +103,16 @@ window.MSCheckbox = Class.create({
 
   next: function()
   {
+    // Reinitialize class list
+    this.button.classList.remove(this.stateClasses[this.state]);
+    
     this.state = this.nextState();
     if (this.table != undefined) {
       // TODO: Just update the cache, don't invalidate the row, once the rights are as stored as an
       // array, and not as a string.
       delete this.table.fetchedRows[this.idx];
     }
-    this.draw(this.state);
+    this.draw();
   },
 
   /* Confirmation cases:

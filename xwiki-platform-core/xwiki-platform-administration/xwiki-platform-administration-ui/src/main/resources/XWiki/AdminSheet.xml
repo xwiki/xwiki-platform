@@ -888,7 +888,7 @@ require(['jquery'], function($) {
 
 #admin-page-content label &gt; input[type="checkbox"],
 #admin-page-content label &gt; input[type="radio"] {
-  vertical-align: bottom;
+  vertical-align: middle;
 }
 
 /**

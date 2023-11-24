@@ -73,7 +73,8 @@ define('xwiki-realtime-wikiEditor', [
       allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(true);
       allowRealtimeCheckbox.on('change', function() {
         if (allowRealtimeCheckbox.prop('checked')) {
-          module.main(editorConfig, docKeys);
+          // TODO: Allow for enabling realtime without reloading the entire page.
+          window.location.href = editorConfig.rtURL;
         } else {
           Interface.realtimeAllowed(false);
           module.onAbort();

@@ -78,7 +78,7 @@
   id="environment-vulnerabilities-list"
   source="extensionSecurity"
   sourceParameters="isFromEnvironment=true"
-  properties="name,wikis,maxCVSS,cveID,fixVersion"
+  properties="name,wikis,maxCVSS,cveID,fixVersion,advice"
   showPageSizeDropdown="false"}}
 {{/liveData}}
 

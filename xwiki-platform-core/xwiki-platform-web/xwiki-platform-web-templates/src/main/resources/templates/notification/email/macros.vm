@@ -24,7 +24,7 @@
  * @param $linkText text of the link
  *#
 #macro(link $url $linkText)
-  <a color="#0088CC" style="color: #0088CC; text-decoration: none;" href="$escapetool.xml($url)">$linkText</a>
+  <a style="color: $theme.linkColor; text-decoration: none;" href="$escapetool.xml($url)">$linkText</a>
 #end
 #**
  * Display a little avatar of the user
@@ -65,18 +65,18 @@
 #end
 
 #macro(displayNotificationSkeleton $leftCell $rightCell)
-  <table width="100%">
+  <table style="width: 100%">
     <tr>
       ###
       ### Left cell
       ###
-      <td width="25%" style="width: 25%; vertical-align: top;" valign="top">
+      <td style="width: 25%; vertical-align: top;">
         $leftCell
       </td>
       ###
       ### Right cell
       ###
-      <td style="vertical-align: top;" valign="top">
+      <td style="vertical-align: top;">
         $rightCell
       </td>
     </tr>
@@ -147,7 +147,7 @@
   #if ("$!services.notification.preferences.getDiffType($emailUser)" != 'NOTHING')
     #set ($basicTypes = ['update', 'create'])
     #set ($compositeEventType = $event.type)
-    <table width="100%" style="margin: 5px 0; font-size: 0.8em; border-top: 1px dashed #e8e8e8">
+    <table style="width: 100%; margin: 5px 0; font-size: 0.8em; border-top: 1px dashed #e8e8e8">
       #foreach ($ev in $event.events)
         ## Display the event only on some conditions.
         ## See: https://jira.xwiki.org/browse/XWIKI-14846
@@ -158,8 +158,8 @@
             #set ($description = $ev.type)
           #end
           <tr style="vertical-align: top;">
-            <td width="33%" style="overflow: hidden;">#displayEmailNotificationEventUser($ev.user)</td>
-            <td width="45%">$escapetool.xml($description)</td>
+            <td style="width: 33%; overflow: hidden;">#displayEmailNotificationEventUser($ev.user)</td>
+            <td style="width: 33%">$escapetool.xml($description)</td>
             <td>
               #if ($diffUrl!='')
                 #link($diffUrl, $escapetool.xml($xwiki.formatDate($ev.date)))
@@ -274,7 +274,7 @@
     #set ($sortedEventList = $element.value)
     #if ($wiki != '')
       #set ($wikiDescriptor = $services.wiki.getById($wiki))
-      <li style="margin: 10px 0;"><img src="cid:NEWiki.png" alt="•" style="width: 10px;"/> $escapetool.xml($wikiDescriptor.prettyName)
+      <li style="margin: 10px 0;"><img src="cid:NEWiki.png" alt="" style="width: 10px;"/> $escapetool.xml($wikiDescriptor.prettyName)
         <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 5px;">
           #foreach ($ev in $sortedEventList)
             #displaySortedEventTOC($ev)
@@ -302,7 +302,6 @@
 #macro(displaySortedEvent $sortedEvent)
   #set ($id = $escapetool.xml($sortedEvent.event.events.get(0).id))
   <div class="notification" style="border-top: 1px dashed #E8E8E8;" id="$id">
-    <a name="$id"></a>
     $sortedEvent.html
   </div>
   #foreach ($ev in $sortedEvent.eventsWithTheSameDocument)

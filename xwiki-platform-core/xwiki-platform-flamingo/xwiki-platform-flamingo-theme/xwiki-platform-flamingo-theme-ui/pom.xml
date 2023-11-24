@@ -124,13 +124,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed by themes that uses Open Sans font, like Iceberg -->
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>open-sans</artifactId>
-      <version>1.1.0</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -2205,9 +2205,6 @@ input[type="checkbox"] {
     color: @text-color;
   }
 }
-
-/* Font */
-@import (css) "@{open-sans-font-path}";
 </lessCode>
     </property>
     <property>

@@ -24,23 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-realtime</artifactId>
-    <version>15.5.4-SNAPSHOT</version>
+    <artifactId>xwiki-platform-realtime-wiki-test</artifactId>
+    <version>16.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-realtime-wiki</artifactId>
-  <name>XWiki Platform - Realtime - Wiki - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Adds support for real-time wiki syntax (text) editing in XWiki.</description>
-  <modules>
-    <module>xwiki-platform-realtime-wiki-ui</module>
-    <module>xwiki-platform-realtime-wiki-webjar</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-realtime-wiki-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-realtime-wiki-test-pageobjects</artifactId>
+  <name>XWiki Platform - Realtime - Wiki - Test - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>Page Objects for the Realtime Wiki Editor</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

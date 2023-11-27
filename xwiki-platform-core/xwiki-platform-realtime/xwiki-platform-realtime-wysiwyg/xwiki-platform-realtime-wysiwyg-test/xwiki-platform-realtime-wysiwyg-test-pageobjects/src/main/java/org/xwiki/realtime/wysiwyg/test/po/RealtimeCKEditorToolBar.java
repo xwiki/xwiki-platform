@@ -102,6 +102,15 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
     }
 
     /**
+     * @return the user identifier in the real-time session
+     */
+    public String getUserId()
+    {
+        return getDriver().findElementWithoutWaiting(getContainer(), By.className("rt-toolbar"))
+            .getAttribute("data-user-id");
+    }
+
+    /**
      * @return {@code true} if the user is editing alone, {@code false} otherwise
      */
     public boolean isEditingAlone()

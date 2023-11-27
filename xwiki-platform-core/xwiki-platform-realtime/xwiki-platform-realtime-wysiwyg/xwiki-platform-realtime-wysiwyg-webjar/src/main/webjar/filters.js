@@ -23,6 +23,14 @@ define('xwiki-realtime-wysiwygEditor-filters', [], function() {
   const attributeActions = ['addAttribute', 'modifyAttribute', 'removeAttribute'];
   const forbiddenTags = ['SCRIPT', 'IFRAME', 'OBJECT', 'APPLET', 'VIDEO', 'AUDIO'];
 
+  const ignoredAttributes = [
+    // Ignore the aria-label attribute because it depends on the current user locale and thus it can create fights.
+    'aria-label',
+    // Ignore the focused block placeholder attribute because the focus is different for each user and also because the
+    // placeholder text depends on the current user locale.
+    'data-xwiki-focusedplaceholder',
+  ];
+
   // Widget attributes that may have different values for each user (so they can't really be synchronized).
   const ignoredWidgetAttributes = ['data-cke-widget-upcasted', 'data-cke-widget-id', 'data-cke-filter'];
 
@@ -104,16 +112,18 @@ define('xwiki-realtime-wysiwygEditor-filters', [], function() {
       },
 
       //
-      // Translated labels filter.
+      // Ignored attributes filter.
       //
       {
         filterHyperJSON: (hjson) => {
-          delete hjson[1]['aria-label'];
+          ignoredAttributes.forEach(attributeName => {
+            delete hjson[1][attributeName];
+          });
           return hjson;
         },
         // Don't change the aria-label attributes because they depend on the browser locale and they can create fights.
-        shouldRejectChange: (change) => change.diff.name === 'aria-label' &&
-          attributeActions.includes(change.diff.action)
+        shouldRejectChange: (change) => attributeActions.includes(change.diff.action) &&
+          ignoredAttributes.includes(change.diff.name)
       },
 
       //
@@ -151,7 +161,36 @@ define('xwiki-realtime-wysiwygEditor-filters', [], function() {
             }
           }
         }
-      }
+      },
+
+      //
+      // Filling character sequence filter.
+      // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_dom_selection.html#property-FILLING_CHAR_SEQUENCE
+      // See https://bugs.webkit.org/show_bug.cgi?id=15256 (Impossible to place an editable selection inside empty
+      // elements)
+      //
+      {
+        // Both shouldSerializeNode and filterHyperJSON are currently called only for elements so in order to filter
+        // text nodes we need to filter the direct text child nodes of the element passed to filterHyperJSON.
+        filterHyperJSON: (hjson) => {
+          const oldChildNodes = hjson[2];
+          const newChildNodes = [];
+          oldChildNodes.forEach(childNode => {
+            if (typeof childNode === 'string') {
+              // Remove the filling character sequence from text nodes.
+              childNode = childNode.replace(CKEDITOR.dom.selection.FILLING_CHAR_SEQUENCE, '');
+              // Ignore text nodes that are used only to allow the user to place the caret inside empty elements.
+              if (childNode !== '') {
+                newChildNodes.push(childNode);
+              }
+            } else {
+              newChildNodes.push(childNode);
+            }
+          });
+          hjson[2] = newChildNodes;
+          return hjson;
+        }
+      },
     ],
 
     shouldSerializeNode: function(node) {

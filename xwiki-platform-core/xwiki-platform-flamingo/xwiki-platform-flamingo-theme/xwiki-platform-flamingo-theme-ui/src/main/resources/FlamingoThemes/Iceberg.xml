@@ -972,7 +972,7 @@
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
 
 /* Headings */
-@headings-font-weight: 600;
+@headings-font-weight: 500;
 
 /* Other */
 @well-bg: @body-bg;

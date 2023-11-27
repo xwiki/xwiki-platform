@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Provides APIs related to attachments manipulation.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

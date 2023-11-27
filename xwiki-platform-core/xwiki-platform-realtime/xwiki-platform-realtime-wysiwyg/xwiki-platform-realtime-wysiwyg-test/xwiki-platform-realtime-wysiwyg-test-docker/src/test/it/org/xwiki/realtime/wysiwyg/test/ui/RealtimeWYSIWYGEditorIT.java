@@ -21,7 +21,6 @@ package org.xwiki.realtime.wysiwyg.test.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -107,14 +106,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys("one");
 
         // Verify the cursor indicator on the left of the editing area.
-        List<CoeditorPosition> coeditorPositions = textArea.getCoeditorPositions();
-        assertEquals(1, coeditorPositions.size());
-
-        CoeditorPosition selfPosition = coeditorPositions.get(0);
+        CoeditorPosition selfPosition = textArea.getCoeditorPosition(editor.getToolBar().getUserId());
         assertEquals("John", selfPosition.getAvatarHint());
         assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + selfPosition.getAvatarURL());
         selfPosition.waitForLocation(new Point(3, 18));
+
+        assertEquals(1, textArea.getCoeditorPositions().size());
 
         // Verify that the cursor indicator is updated when typing.
         textArea.sendKeys(Keys.ENTER, "two");
@@ -163,7 +161,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        String firstCoeditorId = firstTextArea.getCoeditorPositions().get(0).getCoeditorId();
+        String firstCoeditorId = firstEditor.getToolBar().getUserId();
 
         //
         // Second Tab
@@ -175,10 +173,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
-
-        // FIXME: We need a simpler method to get the user ID in the real-time session.
-        String secondCoeditorId = secondTextArea.getCoeditorPositions().stream()
-            .filter(position -> !firstCoeditorId.equals(position.getCoeditorId())).findFirst().get().getCoeditorId();
+        String secondCoeditorId = secondEditor.getToolBar().getUserId();
 
         // Verify the list of coeditors.
         List<Coeditor> coeditors = secondEditor.getToolBar().waitForCoeditor(firstCoeditorId).getCoeditors();
@@ -191,7 +186,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("John", self.getAvatarHint());
 
         // Verify the placeholder text is present, because the content is empty.
-        assertEquals("Start typing here...", secondTextArea.getPlaceholder());
+        secondTextArea.waitForPlaceholder("Start typing here...");
 
         //
         // First Tab
@@ -220,7 +215,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilContentContains("three");
 
         // There should be no placeholder text anymore because the content is not empty.
-        assertNull(secondTextArea.getPlaceholder());
+        secondTextArea.waitForPlaceholder(null);
         assertEquals("one\ntwo\nthree", secondTextArea.getText());
 
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -375,7 +370,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("Start. ");
+        firstTextArea.sendKeys("Start.");
 
         //
         // Second Tab
@@ -388,7 +383,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         // Each user types in their own paragraph.
-        secondTextArea.waitUntilContentContains("Start. ");
+        secondTextArea.waitUntilContentContains("Start.");
         secondTextArea.sendKeys(Keys.END, Keys.ENTER);
 
         String firstUserText = "The five boxing wizards jump quickly. The quick brown fox jumps over the lazy dog. First";
@@ -402,7 +397,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
             // First Tab
             //
             setup.getDriver().switchTo().window(firstTabHandle);
-            firstTextArea.sendKeys(firstUserWords[i] + " ");
+            firstTextArea.sendKeys(" " + firstUserWords[i]);
 
             //
             // Second Tab
@@ -411,11 +406,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
             secondTextArea.sendKeys(secondUserWords[i] + " ");
         }
 
+        secondTextArea.sendKeys("End.");
+
         // Wait to receive all the content typed by the first user.
         secondTextArea.waitUntilContentContains("First");
 
         ViewPage viewPage = secondEditPage.clickSaveAndView();
-        assertEquals("Start. " + firstUserText + "\n" + secondUserText, viewPage.getContent());
+        assertEquals("Start. " + firstUserText + "\n" + secondUserText + " End.", viewPage.getContent());
     }
 
     @Test
@@ -432,7 +429,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("Separator. ", Keys.HOME);
+        firstTextArea.sendKeys("Separator.", Keys.HOME);
 
         //
         // Second Tab
@@ -445,7 +442,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         // Each user types in their own paragraph.
-        secondTextArea.waitUntilContentContains("Separator. ");
+        secondTextArea.waitUntilContentContains("Separator.");
         secondTextArea.sendKeys(Keys.END);
 
         String text = "The quick brown fox jumps over the lazy dog.";
@@ -462,7 +459,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
             // Second Tab
             //
             setup.getDriver().switchTo().window(secondTabHandle);
-            secondTextArea.sendKeys(words[i] + " ");
+            secondTextArea.sendKeys(" " + words[i]);
         }
 
         //

@@ -178,7 +178,7 @@ define('xwiki-livedata', [
       this.firstEntriesLoading = false;
     }
 
-    editBus.init(this);
+    this.setEditBus(editBus.init(this));
 
     /**
      * Load given translations from the server
@@ -1520,8 +1520,12 @@ define('xwiki-livedata', [
     // Edit Bus
     //
 
+    setEditBus(editBusInstance) {
+      this.editBusInstance = editBusInstance;
+    },
+
     getEditBus() {
-      return editBus;
+      return this.editBusInstance;
     },
 
     /**

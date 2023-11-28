@@ -260,6 +260,8 @@
 .document-header {
   margin-top: -@line-height-computed;
   margin-bottom: @line-height-computed;
+  display: flex;
+  flex-wrap: wrap;
   #document-title h1 {
     word-wrap: break-word;
   }
@@ -269,6 +271,14 @@
   }
   .document-menu, .document-info {
     margin-top: @line-height-computed;
+  }
+  .document-info {
+    flex-grow: 1;
+  }
+  .document-menu {
+    margin-left: auto;
+    padding-left: @grid-gutter-width;
+    white-space: nowrap;
   }
 }
 

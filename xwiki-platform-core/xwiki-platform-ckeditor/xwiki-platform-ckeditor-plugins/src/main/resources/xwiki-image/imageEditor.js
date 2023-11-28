@@ -110,7 +110,7 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
                       var type = value.type;
                       // We don't persist the type (i.e., the empty string) when the default style is forced.
                       // To do so, we replace the type of the default style with the empty string.
-                      if (defaultStyle.forceDefaultStyle === "true" && type === defaultStyle.defaultStyle) {
+                      if (defaultStyle.forceDefaultStyle === "true" && value.identifier === defaultStyle.defaultStyle) {
                         type = '';
                       }
                       return {

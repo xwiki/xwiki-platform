@@ -130,7 +130,10 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       // Allow others to enhance the editor.
       $(document).trigger('xwiki:dom:updated', {'elements': editor.toArray()});
       // Focus the first visible input.
-      editor.find(':input').filter(':visible').focus();
+      var editInput = editor.find(':input').filter(':visible');
+      editInput.focus();
+      // Bind the label to the newly generated edit input
+      editableProperty.find('label').attr('for',editInput.attr('id'));
     }).catch(() => {
       new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
       return Promise.reject();

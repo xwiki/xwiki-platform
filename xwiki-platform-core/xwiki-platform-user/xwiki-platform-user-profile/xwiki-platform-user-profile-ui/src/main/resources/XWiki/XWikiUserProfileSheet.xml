@@ -566,7 +566,7 @@
 #set ($obj = $doc.getObject($xwikiUsersClassName))
 ##
 #if (!$obj)
-= $services.localization.render('xe.admin.users.sheet') =
+== $services.localization.render('xe.admin.users.sheet') ==
 
 {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
 

@@ -22,6 +22,7 @@ package org.xwiki.eventstream;
 import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * This interface represents the descriptor of an {@link UntypedRecordableEvent}. As an {@link UntypedRecordableEvent},
@@ -39,6 +40,16 @@ public interface UntypedRecordableEventDescriptor extends RecordableEventDescrip
      * @return the validation expression
      */
     String getValidationExpression();
+
+    /**
+     * @return the velocity template that generate the list of targets
+     * @since 9.11.2
+     * @since 10.0
+     */
+    default String getTargetExpression()
+    {
+        return null;
+    }
 
     /**
      * Get a list of the events that should trigger this particular event. Each event is represented by its canonical
@@ -65,11 +76,10 @@ public interface UntypedRecordableEventDescriptor extends RecordableEventDescrip
     DocumentReference getAuthorReference();
 
     /**
-     * @return the velocity template that generate the list of targets
-     * @since 9.11.2
-     * @since 10.0
+     * @return the reference of the entity associated with the event descriptor.
+     * @since 15.10RC1
      */
-    default String getTargetExpression()
+    default EntityReference getEntityReference()
     {
         return null;
     }

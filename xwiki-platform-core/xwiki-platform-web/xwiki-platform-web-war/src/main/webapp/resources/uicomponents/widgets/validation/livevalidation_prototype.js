@@ -109,6 +109,8 @@ LiveValidation.prototype = {
     }, optionsObj || {});
 	var node = this.options.insertAfterWhatNode || this.element;
     this.options.insertAfterWhatNode = $(node);
+    this.messageHolder = this.createMessageSpan();
+    this.options.insertAfterWhatNode.up().appendChild(this.messageHolder);
     Object.extend(this, this.options); // copy the options to the actual object
     // add to form if it has been provided
     if(this.form){
@@ -374,29 +376,37 @@ LiveValidation.prototype = {
    */
   createMessageSpan: function(){
     var span = document.createElement('span');
-    var textNode = document.createTextNode(this.message);
-    span.appendChild(textNode);
+    span.setAttribute('aria-live', 'polite');
     return span;
   },
     
   /**
-   *  inserts the element containing the message in place of the element that already exists (if it does)
+   *  inserts the element to contain the message in place of the element that already exists (if it does)
    *
    *  @param elementToInsert {HTMLElementObject} - an element node to insert
    */
-  insertMessage: function(elementToInsert){
+  insertMessageHolder: function(elementToInsert){
+    var className = this.validationFailed ? this.invalidClass : this.validClass;
+    $(elementToInsert).addClassName(this.messageClass + ' ' + className);
+    var parent = this.options.insertAfterWhatNode.up();
+    var nxtSibling = this.options.insertAfterWhatNode.next();
+    if (nxtSibling) {
+      parent.insertBefore(elementToInsert, nxtSibling);
+    }else{
+      parent.appendChild(elementToInsert);
+    }
+  },
+
+  /**
+   *  inserts the message in its container of the message that already exists (if it does)
+   */
+  insertMessage: function() {
     this.removeMessage();
     if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMesssage has been set to false or empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
       var className = this.validationFailed ? this.invalidClass : this.validClass;
-      $(elementToInsert).addClassName(this.messageClass + ' ' + className);
-      var parent = this.insertAfterWhatNode.up();
-      var nxtSibling = this.insertAfterWhatNode.next();
-      if (nxtSibling) {
-        parent.insertBefore(elementToInsert, nxtSibling);
-      }else{
-        parent.appendChild(elementToInsert);
-      }
+      this.messageHolder.addClassName(this.messageClass + ' ' + className);
+      this.messageHolder.textContent = this.message;
     }
   },
     
@@ -418,8 +428,8 @@ LiveValidation.prototype = {
    *	removes the message element if it exists
    */
   removeMessage: function(){
-	var nxtEl = this.insertAfterWhatNode.next('.' + this.messageClass);
-    if(nxtEl) nxtEl.remove();
+    this.messageHolder.className = 'message-holder';
+    this.messageHolder.textContent = '';
   },
     
   /**

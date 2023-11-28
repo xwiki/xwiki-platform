@@ -375,6 +375,12 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
+    public void setProperty(String key, Object value) throws ConfigurationSaveException
+    {
+        setProperties(Map.of(key, value));
+    }
+
+    @Override
     public void setProperties(Map<String, Object> properties) throws ConfigurationSaveException
     {
         try {

@@ -725,9 +725,9 @@ require(['scriptaculous/effects'], function() {
 
 .skin-colibri .panel-width-Small .applicationsPanel li {
   padding: 15px 0;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  border-radius: 7px;
   margin: 1px 0;
 }
 

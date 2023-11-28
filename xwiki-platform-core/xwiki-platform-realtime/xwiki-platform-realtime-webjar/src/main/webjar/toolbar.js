@@ -24,49 +24,49 @@ define('xwiki-realtime-toolbar', [
 ], function($, Config, Messages) {
   'use strict';
 
-  var uid = function() {
+  function uid() {
     return 'rt-uid-' + String(Math.random()).substring(2);
-  };
+  }
 
   // The element that contains the user list, debug link and lag.
-  var createRealtimeToolbar = function($container) {
+  function createRealtimeToolbar($container) {
     return $(
       '<div class="rt-toolbar">' +
         '<div class="rt-toolbar-leftside"></div>' +
         '<div class="rt-toolbar-rightside"></div>' +
       '</div>'
     ).attr('id', uid()).prependTo($container.first());
-  };
+  }
 
-  var createSpinner = function($container) {
+  function createSpinner($container) {
     return $('<div class="rt-spinner"></div>').attr('id', uid()).appendTo($container)[0];
-  };
+  }
 
-  var SPINNER_DISAPPEAR_TIME = 3000;
-  var SPINNER = ['-', '\\', '|', '/'];
-  var kickSpinner = function(spinnerElement, reversed) {
-    var text = spinnerElement.textContent || '-';
-    var delta = reversed ? -1 : 1;
+  const SPINNER_DISAPPEAR_TIME = 3000;
+  const SPINNER = ['-', '\\', '|', '/'];
+  function kickSpinner(spinnerElement, reversed) {
+    const text = spinnerElement.textContent || '-';
+    const delta = reversed ? -1 : 1;
     spinnerElement.textContent = SPINNER[(SPINNER.indexOf(text) + delta) % SPINNER.length];
     clearTimeout(spinnerElement.timeout);
     spinnerElement.timeout = setTimeout(function () {
       spinnerElement.textContent = '';
     }, SPINNER_DISAPPEAR_TIME);
-  };
+  }
 
-  var createUserList = function($container) {
+  function createUserList($container) {
     return $('<div class="rt-user-list"></div>').attr('id', uid()).appendTo($container)[0];
-  };
+  }
 
-  var getOtherUsers = function(myUserId, userList, usersData) {
-    var displayConfig = Config.toolbarUserlist;
+  const userDisplayMode = Config.toolbarUserlist;
+  function getOtherUsers(myUserId, userList, usersData) {
     return userList.map(function(userId) {
       // Collect the user data.
-      var userData = usersData?.[userId];
+      const userData = usersData?.[userId];
       if (userData && userId !== myUserId) {
-        var userJSON = userData.name?.replace(
+        const userJSON = userData.name?.replace(
           // <userReference>-encoded(<userName>)%2d<randomNumber>
-          /^(.*)-([^-]*)%2d[0-9]*$/,
+          /^(.*)-([^-]*)%2d\d*$/,
           function(all, userReference, userName) {
             return JSON.stringify({
               reference: userReference,
@@ -84,34 +84,37 @@ define('xwiki-realtime-toolbar', [
     }).filter(function(user) {
       // Filter out users without data.
       return user;
-    }).map(function(user) {
-      // Display the users.
-      var userDisplay = $('<a></a>').attr({
-        'class': Config.marginAvatar === 1 ? 'rt-user-link' : '',
-        'href': new XWiki.Document(XWiki.Model.resolve(user.reference, XWiki.EntityType.DOCUMENT)).getURL(),
-        'data-id': user.id,
-        'data-reference': user.reference
-      });
-      if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {
-        userDisplay.text(user.name);
-      }
-      if (displayConfig === 'avatar' || displayConfig === 'both') {
-        if (user.avatar) {
-          $('<img class="rt-user-avatar"/>').attr({
-            src: user.avatar,
-            title: user.name
-          }).prependTo(userDisplay);
-        } else if (user.avatar === '') {
-          $('<span class="rt-user-fake-avatar"></span>').attr('title', user.name).text(user.name.substring(0, 1))
-            .prependTo(userDisplay);
-        }
-      }
-      return userDisplay.prop('outerHTML');
-    // We don't need to separate the users with comma if the avatars are displayed.
-    }).join((displayConfig === 'avatar' || displayConfig === 'both') ? '' : ', ');
-  };
+    // Display each user. We don't need to separate the users with comma if the avatars are displayed.
+    }).map(displayUser).join((userDisplayMode === 'avatar' || userDisplayMode === 'both') ? '' : ', ');
+  }
 
-  var updateUserList = function(myUserName, listElement, userList, userData, onUserNameClick) {
+  function displayUser(user) {
+    const userDisplay = $('<a></a>').attr({
+      'class': Config.marginAvatar === 1 ? 'rt-user-link' : '',
+      'href': new XWiki.Document(XWiki.Model.resolve(user.reference, XWiki.EntityType.DOCUMENT)).getURL(),
+      'data-id': user.id,
+      'data-reference': user.reference
+    });
+    if (userDisplayMode === undefined || userDisplayMode === 'name' || userDisplayMode === 'both') {
+      userDisplay.text(user.name);
+    }
+    if (userDisplayMode === 'avatar' || userDisplayMode === 'both') {
+      if (user.avatar) {
+        $('<img class="rt-user-avatar"/>').attr({
+          src: user.avatar,
+          title: user.name
+        }).prependTo(userDisplay);
+      } else if (user.avatar === '') {
+        $('<span class="rt-user-fake-avatar"></span>').attr('title', user.name).text(user.name.substring(0, 1))
+          .prependTo(userDisplay);
+      }
+    }
+    return userDisplay.prop('outerHTML');
+  }
+
+  function updateUserList(myUserName, listElement, userList, userData, onUserNameClick) {
+    // Update the current user id on the tool bar (used by automated functional tests).
+    listElement.closest('.rt-toolbar').dataset.userId = myUserName;
     if (userList.indexOf(myUserName) < 0) {
       listElement.textContent = Messages.synchronizing;
       return;
@@ -126,31 +129,32 @@ define('xwiki-realtime-toolbar', [
       if (typeof onUserNameClick === 'function') {
         onUserNameClick($(this).attr('data-id'));
       } else if ($('iframe').length) {
-        var baseHref = $('iframe')[0].contentWindow.location.href.split('#')[0] || '';
+        const baseHref = $('iframe')[0].contentWindow.location.href.split('#')[0] || '';
         $('iframe')[0].contentWindow.location.href = baseHref + '#rt-user-' + $(this).attr('data-id');
       }
     });
-  };
+  }
 
-  var createLagElement = function($container) {
+  function createLagElement($container) {
     return $('<div class="rt-lag"></div>').attr('id', uid()).appendTo($container)[0];
-  };
+  }
 
-  var checkLag = function(getLag, lagElement) {
+  function checkLag(getLag, lagElement) {
     if (typeof getLag === 'function') {
-      var lag = getLag();
+      const lag = getLag();
       // Show the lag duration as a number of seconds.
       lagElement.textContent = Messages.lag + ' ' + (typeof lag === 'number' ? lag / 1000 : '??');
     }
-  };
+  }
 
-  var create = function({$container, myUserName, realtime, getLag, userList, config}) {
-    var toolbar = createRealtimeToolbar($container);
-    var userListElement = createUserList(toolbar.find('.rt-toolbar-leftside'));
-    var spinner = createSpinner(toolbar.find('.rt-toolbar-rightside'));
-    var lagElement = createLagElement(toolbar.find('.rt-toolbar-rightside'));
-    var userData = config.userData;
-    var changeNameID = config.changeNameID;
+  function create({$container, myUserName, realtime, getLag, userList, config}) {
+    // Save the current user id on the tool bar to be used by automated functional tests.
+    const toolbar = createRealtimeToolbar($container).attr('data-user-id', myUserName);
+    let userListElement = createUserList(toolbar.find('.rt-toolbar-leftside'));
+    const spinner = createSpinner(toolbar.find('.rt-toolbar-rightside'));
+    const lagElement = createLagElement(toolbar.find('.rt-toolbar-rightside'));
+    let userData = config.userData;
+    const changeNameID = config.changeNameID;
 
     // Check if the user is allowed to change their name.
     if (changeNameID) {
@@ -158,9 +162,9 @@ define('xwiki-realtime-toolbar', [
       userListElement = createChangeName($container, userListElement, changeNameID);
     }
 
-    var connected = false;
+    let connected = false;
     userList.change.push(function(newUserData) {
-      var users = userList.users;
+      const users = userList.users;
       if (users.indexOf(myUserName) !== -1) {
         connected = true;
       }
@@ -174,11 +178,11 @@ define('xwiki-realtime-toolbar', [
       updateUserList(myUserName, userListElement, users, userData, config.onUsernameClick);
     });
 
-    var ks = function() {
+    function ks() {
       if (connected) {
         kickSpinner(spinner);
       }
-    };
+    }
 
     realtime.onPatch(ks);
     // Try to filter out non-patch messages, doesn't have to be perfect this is just the spinner.
@@ -211,7 +215,7 @@ define('xwiki-realtime-toolbar', [
         connected = true;
       }
     };
-  };
+  }
 
   return {create};
 });

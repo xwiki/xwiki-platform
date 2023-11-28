@@ -39,7 +39,6 @@ import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -60,7 +59,6 @@ import static org.xwiki.attachment.refactoring.MoveAttachmentRequest.UPDATE_REFE
 @Component
 @Singleton
 @Named("attachment")
-@Unstable
 public class AttachmentScriptService implements ScriptService
 {
     @Inject
@@ -147,7 +145,6 @@ public class AttachmentScriptService implements ScriptService
      * @return the number of backlinks to the attachment
      * @since 14.2RC1
      */
-    @Unstable
     public long backlinksCount(AttachmentReference attachmentReference) throws AttachmentException
     {
         XWikiContext xcontext = this.xWikiContextProvider.get();

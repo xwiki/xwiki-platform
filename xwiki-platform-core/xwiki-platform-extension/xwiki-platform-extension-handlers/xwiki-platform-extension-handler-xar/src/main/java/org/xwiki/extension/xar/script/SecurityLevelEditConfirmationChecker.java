@@ -76,7 +76,7 @@ public class SecurityLevelEditConfirmationChecker implements EditConfirmationChe
         Optional<EditConfirmationCheckerResult> result;
         switch (protectionLevel) {
             case WARNING:
-                result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), false));
+                result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), false, protectionLevel));
                 break;
             case DENY:
                 result = Optional.of(new EditConfirmationCheckerResult(renderMessage(), true));

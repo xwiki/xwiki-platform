@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>15.9-SNAPSHOT</version>
+    <version>16.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-ui</artifactId>
   <name>XWiki Platform - Test - UI Tests Framework</name>
@@ -55,7 +55,7 @@
     <dependency>
       <groupId>io.github.bonigarcia</groupId>
       <artifactId>webdrivermanager</artifactId>
-      <version>5.5.3</version>
+      <version>${webdrivermanager.version}</version>
     </dependency>
     <!-- Used by the REST calls -->
     <dependency>

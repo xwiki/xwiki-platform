@@ -1374,7 +1374,6 @@ public class Document extends Api
      * @return the XWiki object from this document that matches the specified object reference
      * @since 14.0RC1
      */
-    @Unstable
     public Object getObject(ObjectReference objectReference, boolean create)
     {
         try {
@@ -2171,7 +2170,6 @@ public class Document extends Api
      * @since 14.10
      * @since 14.4.7
      */
-    @Unstable
     public boolean hasAccess(Right right)
     {
         return hasAccess(right, getXWikiContext().getUserReference());
@@ -3334,7 +3332,6 @@ public class Document extends Api
      * @return the authors of the document.
      * @since 14.0RC1
      */
-    @Unstable
     public DocumentAuthors getAuthors()
     {
         if (this.hasAccess(Right.PROGRAM)) {

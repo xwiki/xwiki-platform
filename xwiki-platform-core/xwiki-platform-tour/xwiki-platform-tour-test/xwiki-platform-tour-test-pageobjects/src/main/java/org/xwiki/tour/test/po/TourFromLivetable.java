@@ -23,7 +23,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * @version $Id$
- * @since 15.9-rc-1
+ * @since 15.9RC1
  */
 public class TourFromLivetable
 {

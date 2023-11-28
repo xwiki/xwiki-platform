@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -33,6 +34,7 @@ import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authentication.RegistrationConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -52,6 +54,11 @@ public class RegisterAction extends XWikiAction
     /** Name of the corresponding template and URL parameter. */
     private static final String REGISTER = "register";
 
+    /**
+     * Context variable used to store the state in case of problem.
+     */
+    private static final String REG_CONSTANT = "reg";
+
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterAction.class);
 
@@ -60,6 +67,9 @@ public class RegisterAction extends XWikiAction
 
     /** Allowed templates for this action. */
     private static final List<String> ALLOWED_TEMPLATES = Arrays.asList(REGISTER, "registerinline");
+
+    @Inject
+    private RegistrationConfiguration registrationConfiguration;
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -80,19 +90,18 @@ public class RegisterAction extends XWikiAction
             if (!csrfTokenCheck(context)) {
                 return false;
             }
+            int result;
             // Let's verify that the user submitted the right CAPTCHA (if required).
             if (!verifyCaptcha(context, xwiki)) {
-                return false;
-            }
-
-            int useemail = xwiki.getXWikiPreferenceAsInt("use_email_verification", 0, context);
-            int result;
-            if (useemail == 1) {
-                result = xwiki.createUser(true, "edit", context);
+                result = -9;
             } else {
-                result = xwiki.createUser(context);
+                if (this.registrationConfiguration.isEmailValidationRequired()) {
+                    result = xwiki.createUser(true, "edit", context);
+                } else {
+                    result = xwiki.createUser(context);
+                }
             }
-            getCurrentScriptContext().setAttribute("reg", Integer.valueOf(result), ScriptContext.ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute(REG_CONSTANT, Integer.valueOf(result), ScriptContext.ENGINE_SCOPE);
 
             // Redirect if a redirection parameter is passed.
             String redirect = Utils.getRedirect(request, null);

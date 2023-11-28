@@ -36,6 +36,18 @@ import org.openqa.selenium.support.FindBy;
  */
 public abstract class AbstractRegistrationPage extends BasePage
 {
+    /**
+     * Username used for registering a user with {@link #fillInJohnSmithValues()}.
+     * @since 15.10RC1
+     */
+    public static final String JOHN_SMITH_USERNAME = "JohnSmith";
+
+    /**
+     * Password used for registering a user with {@link #fillInJohnSmithValues()}.
+     * @since 15.10RC1
+     */
+    public static final String JOHN_SMITH_PASSWORD = "WeakPassword";
+
     @FindBy(id = "register")
     private WebElement registerFormElement;
 
@@ -45,7 +57,8 @@ public abstract class AbstractRegistrationPage extends BasePage
 
     public void fillInJohnSmithValues()
     {
-        fillRegisterForm("John", "Smith", "JohnSmith", "WeakPassword", "WeakPassword", "johnsmith@xwiki.org");
+        fillRegisterForm("John", "Smith", JOHN_SMITH_USERNAME, JOHN_SMITH_PASSWORD, JOHN_SMITH_PASSWORD,
+            "johnsmith@xwiki.org");
     }
 
     public void fillRegisterForm(final String firstName, final String lastName, final String username,
@@ -87,14 +100,32 @@ public abstract class AbstractRegistrationPage extends BasePage
     /** @return a list of WebElements representing validation failure messages. Use after calling register() */
     public List<WebElement> getValidationFailureMessages()
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//dd/span[@class='LV_validation_message LV_invalid']"));
+        return getDriver().findElementsWithoutWaiting(
+            By.xpath("//dd/span[contains(@class,'LV_validation_message LV_invalid')]"));
+    }
+
+    /**
+      * @return a list of WebElements representing error messages. Use after calling register()
+      */
+    public WebElement getErrorMessage(String message)
+    {
+        return getDriver().findElementWithoutWaiting(By.xpath("//div[@class = 'errormessage']"));
     }
 
     /** @return Is the specified message included in the list of validation failure messages. */
     public boolean validationFailureMessagesInclude(String message)
     {
-        return getDriver().findElementsWithoutWaiting(
-            By.xpath("//dd/span[@class='LV_validation_message LV_invalid' and . = '" + message + "']")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(
+            By.xpath("//dd/span[contains(@class,'LV_validation_message LV_invalid') and . = '" + message + "']"))
+            .isEmpty();
+    }
+
+    /** @return Is the specified message included in the list of error messages. */
+    public boolean errorMessageInclude(String message)
+    {
+        return !getDriver().findElementsWithoutWaiting(
+                By.xpath("//div[@class = 'errormessage' and . = '" + message + "']"))
+            .isEmpty();
     }
 
     /** Try to make LiveValidation validate the forms. */

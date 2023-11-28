@@ -23,14 +23,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiComponent;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -39,7 +40,6 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import com.xpn.xwiki.objects.BaseObject;
@@ -50,30 +50,29 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 2.0M1
  */
+@Component(roles = DefaultWikiMacro.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponent
     implements WikiMacro, NestedScriptMacroEnabled, WikiMacroConstants
 {
     /**
      * The {@link MacroDescriptor} for this macro.
      */
-    private final MacroDescriptor descriptor;
+    private MacroDescriptor descriptor;
 
-    private final int macroPriority;
+    private int macroPriority;
 
     /**
      * Constructs a new {@link DefaultWikiMacro}.
      * 
      * @param baseObject the object containing the component definition
      * @param descriptor the {@link MacroDescriptor} describing this macro.
-     * @param componentManager {@link ComponentManager} component used to look up for other components.
      * @throws WikiComponentException when failing to parse the content
-     * @throws ComponentLookupException when failing to looked required components
-     * @since 10.10RC1
+     * @since 15.9RC1
      */
-    public DefaultWikiMacro(BaseObject baseObject, MacroDescriptor descriptor, ComponentManager componentManager)
-        throws WikiComponentException, ComponentLookupException
+    void initialize(BaseObject baseObject, MacroDescriptor descriptor) throws WikiComponentException
     {
-        super(baseObject, Macro.class, descriptor.getId().getId(), componentManager);
+        super.initialize(baseObject, Macro.class, descriptor.getId().getId());
 
         this.descriptor = descriptor;
         this.macroPriority = baseObject.getIntValue(MACRO_PRIORITY_PROPERTY, 1000);
@@ -86,8 +85,8 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     }
 
     @Override
-    public List<Block> execute(WikiMacroParameters parameters, String macroContent,
-        MacroTransformationContext context) throws MacroExecutionException
+    public List<Block> execute(WikiMacroParameters parameters, String macroContent, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         // Create renderer
         DefaultWikiMacroRenderer renderer;
@@ -188,15 +187,5 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     boolean isCacheAllowed()
     {
         return this.cacheAllowed;
-    }
-
-    XDOM getContent()
-    {
-        return this.xdom;
-    }
-
-    Syntax getSyntax()
-    {
-        return this.syntax;
     }
 }

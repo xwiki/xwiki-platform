@@ -20,11 +20,10 @@
 package org.xwiki.rendering.block;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -99,10 +98,9 @@ public class ExpandedMacroBlock extends MacroBlock
     private BlockRenderer getContentRenderer()
     {
         if (this.componentManager != null) {
-            MetaDataBlock metaDataBlock =
-                getFirstBlock(new MetadataBlockMatcher(MetaData.SYNTAX), Axes.ANCESTOR_OR_SELF);
-            if (metaDataBlock != null) {
-                Syntax syntax = (Syntax) metaDataBlock.getMetaData().getMetaData(MetaData.SYNTAX);
+            Optional<Syntax> syntaxMetadata = getSyntaxMetadata();
+            if (syntaxMetadata.isPresent()) {
+                Syntax syntax = syntaxMetadata.get();
                 if (this.componentManager.hasComponent(BlockRenderer.class, syntax.toIdString())) {
                     try {
                         return this.componentManager.getInstance(BlockRenderer.class, syntax.toIdString());

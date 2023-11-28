@@ -19,13 +19,17 @@
  */
 package com.xpn.xwiki.internal.template;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -47,6 +51,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
@@ -223,7 +228,11 @@ public class InternalTemplateManager implements Initializable, Disposable
         public TemplateContent getContent() throws Exception
         {
             if (this.content == null) {
-                this.instant = this.resource.getInstant();
+                try {
+                    this.instant = this.resource.getInstant();
+                } catch (Exception e) {
+                    // Failed to get the resource instant, it's unknown
+                }
                 this.content = loadContent();
             } else if (this.instant != null) {
                 // Check if the resource has been modified
@@ -325,10 +334,10 @@ public class InternalTemplateManager implements Initializable, Disposable
 
     private class StringTemplate extends DefaultTemplate
     {
-        StringTemplate(String content, DocumentReference authorReference, DocumentReference documentReference)
+        StringTemplate(String id, String content, DocumentReference authorReference, DocumentReference documentReference)
             throws Exception
         {
-            super(new StringResource(content));
+            super(new StringResource(id, content));
 
             // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
             ((DefaultTemplateContent) this.getContent()).setAuthorReference(authorReference);
@@ -590,7 +599,7 @@ public class InternalTemplateManager implements Initializable, Disposable
 
         // Initialize the filesystem template cache
         try {
-            this.templateCache = cacheManager.createNewCache(new LRUCacheConfiguration("template.filesystem", 500));
+            this.templateCache = cacheManager.createNewCache(new LRUCacheConfiguration("templates", 500));
         } catch (CacheException e) {
             this.logger.error("Failed to create the filesystem template cache", e);
         }
@@ -1016,7 +1025,7 @@ public class InternalTemplateManager implements Initializable, Disposable
         }
 
         // Try the cache
-        Template template = getCachedTemplate(templateId);
+        Template template = getCachedTemplate(templateId, () -> getResourceInstant(this.environment, templatePath));
 
         // Create a new instance if it could not be found in the cache
         if (template == null) {
@@ -1033,7 +1042,7 @@ public class InternalTemplateManager implements Initializable, Disposable
     private Template getTemplate(Resource<?> resource)
     {
         // Try the cache
-        Template template = getCachedTemplate(resource.getId());
+        Template template = getCachedTemplate(resource.getId(), resource::getInstant);
 
         if (template == null) {
             if (resource instanceof AbstractSkinResource) {
@@ -1050,15 +1059,29 @@ public class InternalTemplateManager implements Initializable, Disposable
         return template;
     }
 
-    private Template getCachedTemplate(String id)
+    private Template getCachedTemplate(String id, Callable<Instant> resourceInstantProvider)
     {
         Template template = null;
 
         if (this.templateCache != null) {
             template = this.templateCache.get(id);
 
+            // Check if the cached template is older than the actual resource last modification
             if (template != null) {
-                // Check if it's allowed to use the cached value
+                Instant instant = template.getInstant();
+
+                try {
+                    if (instant != null && instant.isBefore(resourceInstantProvider.call())) {
+                        template = null;
+                    }
+                } catch (Exception e) {
+                    this.logger.warn("Failed to get the instant for resource with idenfier [{}]: {}", id,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+
+            // Check if it's allowed to use the cached value
+            if (template != null) {
                 Instant templateInstant = template.getInstant();
                 if (templateInstant != null) {
                     // The template date is known, compare it to the cache clean date
@@ -1120,6 +1143,34 @@ public class InternalTemplateManager implements Initializable, Disposable
         return null;
     }
 
+    /**
+     * Search for a template of a given name only in the configured skin (or it's skin parents).
+     * 
+     * @param templateName the name of the template to search
+     * @return the found {@link Template} or null if no template associated with the passed name could be found
+     * @since 15.10RC1
+     */
+    public Template getSkinTemplate(String templateName)
+    {
+        Template template = null;
+
+        // Try from skin
+        Skin skin = this.skins.getCurrentSkin(false);
+        if (skin != null) {
+            template = getTemplate(templateName, skin);
+        }
+
+        // Try from base skin if no skin is set
+        if (skin == null) {
+            Skin baseSkin = this.skins.getCurrentParentSkin(false);
+            if (baseSkin != null) {
+                template = getTemplate(templateName, baseSkin);
+            }
+        }
+
+        return template;
+    }
+
     public Template getTemplate(String templateName)
     {
         Template template = null;
@@ -1154,17 +1205,28 @@ public class InternalTemplateManager implements Initializable, Disposable
     /**
      * Create a new template using a given content and a specific author and source document.
      *
+     * @param id the identifier of the template
      * @param content the template content
      * @param author the template author
      * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
      *            test the author right)
      * @return the template
      * @throws Exception if an error occurred during template instantiation
-     * @since 14.0RC1
+     * @since 14.9
      */
-    public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+    public Template createStringTemplate(String id, String content, DocumentReference author, DocumentReference sourceReference)
         throws Exception
     {
-        return new StringTemplate(content, author, sourceReference);
+        return new StringTemplate(id, content, author, sourceReference);
+    }
+
+    public static Instant getResourceInstant(Environment environment, String path)
+        throws URISyntaxException, IOException
+    {
+        URL resourceUrl = environment.getResource(path);
+        Path resourcePath = Paths.get(resourceUrl.toURI());
+        FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+
+        return lastModifiedTime.toInstant();
     }
 }

@@ -48,8 +48,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_FROM_ENVIRONMENT;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_INSTALLED_EXTENSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_CORE_EXTENSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_REVIEWED_SAFE;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
@@ -113,7 +112,7 @@ class ExtensionSecuritySolrClientTest
 
         SolrQuery params = new SolrQuery();
         params.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
-        params.addFilterQuery(IS_FROM_ENVIRONMENT + ":false");
+        params.addFilterQuery(IS_CORE_EXTENSION + ":false");
         params.addFilterQuery(getNamespaceFilterQuery());
 
         verify(this.extensionIndexStore)
@@ -140,7 +139,7 @@ class ExtensionSecuritySolrClientTest
 
         SolrQuery params = new SolrQuery();
         params.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
-        params.addFilterQuery(IS_FROM_ENVIRONMENT + ":true");
+        params.addFilterQuery(IS_CORE_EXTENSION + ":true");
         params.addFilterQuery(getNamespaceFilterQuery());
 
         verify(this.extensionIndexStore)
@@ -152,8 +151,7 @@ class ExtensionSecuritySolrClientTest
 
     private static String getNamespaceFilterQuery()
     {
-        return String.format("(%s:[* TO *] OR %s:false)", FIELD_INSTALLED_NAMESPACES,
-            IS_INSTALLED_EXTENSION);
+        return String.format("(%s:[* TO *] OR %s:true)", FIELD_INSTALLED_NAMESPACES, IS_CORE_EXTENSION);
     }
 
     @Test
@@ -172,7 +170,7 @@ class ExtensionSecuritySolrClientTest
         expectedSolrQuery.addFilterQuery(String.format("%s:*test*", SECURITY_CVE_ID));
         expectedSolrQuery.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
         expectedSolrQuery.addFilterQuery(getNamespaceFilterQuery());
-        expectedSolrQuery.addFilterQuery(IS_FROM_ENVIRONMENT + ":false");
+        expectedSolrQuery.addFilterQuery(IS_CORE_EXTENSION + ":false");
 
         verify(this.extensionIndexStore).search(argThat((SolrQuery solrQuery) ->
             sameArraysNoOrder(solrQuery.getFilterQueries(), expectedSolrQuery.getFilterQueries())));
@@ -204,7 +202,7 @@ class ExtensionSecuritySolrClientTest
         expectedSolrQuery.addFilterQuery(String.format("%s:[%s TO 10]", SECURITY_MAX_CVSS, convertedValue));
         expectedSolrQuery.addFilterQuery(SECURITY_MAX_CVSS + ":{0 TO 10]");
         expectedSolrQuery.addFilterQuery(getNamespaceFilterQuery());
-        expectedSolrQuery.addFilterQuery(IS_FROM_ENVIRONMENT + ":false");
+        expectedSolrQuery.addFilterQuery(IS_CORE_EXTENSION + ":false");
 
         verify(this.extensionIndexStore).search(argThat((SolrQuery solrQuery) ->
             sameArraysNoOrder(solrQuery.getFilterQueries(), expectedSolrQuery.getFilterQueries())));

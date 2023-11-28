@@ -172,16 +172,18 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     // Create the popover
     var popover = $('&lt;div class="popover-content"&gt;#tr("tour.popover.show.hint")&lt;/div&gt;').appendTo(buttonContainer);
     // Create the button that will start the tour again
-    var button = $('&lt;button id="tourResume" class="btn btn-default btn-xs"&gt;$services.icon.renderHTML("info") #tr("tour.popover.show")&lt;/button&gt;').appendTo(buttonContainer);
+    var button = $($jsontool.serialize("&lt;button id='tourResume' class='btn btn-default btn-xs'&gt;$services.icon.renderHTML('info') #tr('tour.popover.show')&lt;/button&gt;")).appendTo(buttonContainer);
 
     if (showPopover) {
       buttonContainer.addClass('opened');
+      button.removeAttr('hidden');
       popover.attr('open','open');
     }
 
     button.on('click', function() {
       if (showPopover) {
         popover.removeAttr('open');
+        button.attr('hidden', true);
         buttonContainer.removeClass('opened');
       }
 
@@ -195,6 +197,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       } else {
         tour.restart();
       }
+      button.attr('hidden', true);
       buttonContainer.removeClass('opened');
     });
   }
@@ -346,6 +349,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
             createResumeButton(tour, true);
           } else {
             buttonContainer.addClass('opened');
+            let button = $('#tourResume');
+            button.removeAttr('hidden');
             // Show the popover
             let popover = buttonContainer.find('.popover-content').first();
             popover.attr('open','open');
@@ -545,6 +550,9 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
 
   &amp; &gt; #tourResume {
     width: fit-content;
+    &amp;[hidden] {
+      display: none;
+    }
   }
 
   &amp; &gt; .popover-content {

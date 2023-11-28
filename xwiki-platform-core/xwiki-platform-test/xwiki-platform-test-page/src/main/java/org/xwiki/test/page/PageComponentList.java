@@ -38,6 +38,8 @@ import org.xwiki.display.internal.DocumentContentAsyncExecutor;
 import org.xwiki.display.internal.DocumentContentAsyncRenderer;
 import org.xwiki.display.internal.DocumentContentDisplayer;
 import org.xwiki.display.internal.DocumentTitleDisplayer;
+import org.xwiki.internal.script.XWikiScriptContextInitializer;
+import org.xwiki.internal.velocity.XWikiVelocityManager;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
@@ -87,8 +89,7 @@ import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
-import org.xwiki.velocity.internal.DefaultVelocityEngine;
-import org.xwiki.velocity.internal.DefaultVelocityFactory;
+import org.xwiki.velocity.internal.InternalVelocityEngine;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.velocity.internal.XWikiMathTool;
@@ -131,8 +132,6 @@ import com.xpn.xwiki.objects.meta.NumberMetaClass;
 import com.xpn.xwiki.objects.meta.StaticListMetaClass;
 import com.xpn.xwiki.objects.meta.StringMetaClass;
 import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
-import com.xpn.xwiki.render.DefaultVelocityManager;
-import com.xpn.xwiki.render.XWikiScriptContextInitializer;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -218,12 +217,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
     // Velocity
     DefaultScriptContextManager.class,
-    DefaultVelocityFactory.class,
     XWikiVelocityConfiguration.class,
     DefaultLoggerConfiguration.class,
-    DefaultVelocityEngine.class,
+    InternalVelocityEngine.class,
     DefaultVelocityContextFactory.class,
-    DefaultVelocityManager.class,
+    XWikiVelocityManager.class,
     DefaultAuthorExecutor.class,
     VelocityExecutionContextInitializer.class,
     XWikiNumberTool.class,

@@ -17,6 +17,7 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#template('notification/macros.vm')
 #**
  * Display a styled link
  * @param $url URL of the link
@@ -94,7 +95,7 @@
 
 #macro(displayNotificationPage $event)
   <div>
-    <div style="background-color: #f5f5f5; color: #777777; padding: 4px 8px; border-radius: 4px; font-size: 8px;">
+    <div style="background-color: #f5f5f5; color: #777777; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
       #template('hierarchy_macros.vm')
       #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
     </div>

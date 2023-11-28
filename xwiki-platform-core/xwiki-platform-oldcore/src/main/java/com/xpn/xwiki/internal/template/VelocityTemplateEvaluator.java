@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.template;
 
 import java.io.StringReader;
 import java.io.Writer;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -97,9 +98,9 @@ public class VelocityTemplateEvaluator
             "Evaluate content of template with id [{}]", template.getId());
 
         try {
-            VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
-            VelocityTemplate velocityTemplate = getVelocityTemplate(velocityEngine, template, content);
+            VelocityTemplate velocityTemplate = getVelocityTemplate(template, content);
 
+            VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
             if (velocityTemplate != null) {
                 velocityEngine.evaluate(this.velocityManager.getVelocityContext(), writer, namespace, velocityTemplate);
             } else {
@@ -116,17 +117,20 @@ public class VelocityTemplateEvaluator
         }
     }
 
-    private VelocityTemplate getVelocityTemplate(VelocityEngine velocityEngine, Template template,
-        TemplateContent content) throws XWikiVelocityException
+    private VelocityTemplate getVelocityTemplate(Template template, TemplateContent content)
+        throws XWikiVelocityException
     {
         if (content instanceof DefaultTemplateContent) {
             DefaultTemplateContent templateContent = (DefaultTemplateContent) content;
 
             // Check if the content already been compiled
             if (!(templateContent.compiledContent instanceof VelocityTemplate)) {
+                // Velocity is not a fan of null template name
+                String templateId = Objects.toString(template.getId(), "unknown template");
+
                 // Compile the Velocity
                 templateContent.compiledContent =
-                    velocityEngine.compile(template.getId(), new StringReader(content.getContent()));
+                    this.velocityManager.compile(templateId, new StringReader(content.getContent()));
             }
 
             return (VelocityTemplate) templateContent.compiledContent;

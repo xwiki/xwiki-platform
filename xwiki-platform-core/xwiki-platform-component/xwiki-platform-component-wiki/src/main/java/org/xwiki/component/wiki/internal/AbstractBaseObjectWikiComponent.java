@@ -22,6 +22,7 @@ package org.xwiki.component.wiki.internal;
 import java.lang.reflect.Type;
 
 import org.xwiki.component.wiki.WikiComponent;
+import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -43,27 +44,27 @@ public abstract class AbstractBaseObjectWikiComponent implements WikiComponent
     public static final String XPROPERTY_SCOPE = "scope";
 
     /**
-     * @see {@link #getEntityReference()}
+     * @see #getEntityReference()
      */
     protected ObjectReference objectReference;
 
     /**
-     * @see {@link #getAuthorReference()}
+     * @see #getAuthorReference()
      */
     protected DocumentReference authorReference;
 
     /**
-     * @see {@link #getRoleType()}
+     * @see #getRoleType()
      */
     protected Type roleType;
 
     /**
-     * @see {@link #getRoleHint()}
+     * @see #getRoleHint()
      */
     protected String roleHint;
 
     /**
-     * @see {@link #getScope()}
+     * @see #getScope()
      */
     protected WikiComponentScope scope = WikiComponentScope.WIKI;
 
@@ -71,8 +72,10 @@ public abstract class AbstractBaseObjectWikiComponent implements WikiComponent
      * @param baseObject the object containing the component definition
      * @param roleType the role Type implemented
      * @param roleHint the role hint for this role implementation
+     * @throws WikiComponentException when failing to initialize
+     * @since 15.9RC1
      */
-    public AbstractBaseObjectWikiComponent(BaseObject baseObject, Type roleType, String roleHint)
+    protected void initialize(BaseObject baseObject, Type roleType, String roleHint) throws WikiComponentException
     {
         this.objectReference = baseObject.getReference();
 

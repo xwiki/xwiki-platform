@@ -132,6 +132,10 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       // Focus the first visible input.
       var editInput = editor.find(':input').filter(':visible');
       editInput.focus();
+      // Make sure the edit input has an ID, and use the name of the input as a fallback
+      if (!editInput.attr('id')) {
+        editInput.attr('id', editInput.attr('name'));
+      }
       // Bind the label to the newly generated edit input
       editableProperty.find('label').attr('for',editInput.attr('id'));
     }).catch(() => {

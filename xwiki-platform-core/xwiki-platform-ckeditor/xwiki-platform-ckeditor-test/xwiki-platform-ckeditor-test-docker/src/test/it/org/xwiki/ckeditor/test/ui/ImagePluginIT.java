@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.ui;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +38,6 @@ import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rest.model.jaxb.Object;
-import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -69,14 +68,17 @@ class ImagePluginIT
         DocumentReference imageStylesReference =
             new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code"), "ImageStyles");
         setup.deletePage(imageStylesReference, true);
-        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
-        createAndLoginStandardUser(setup);
+        // Calling "loginAsSuperAdmin" right after "createAndLoginStandardUser" can lead to the loginAsSuperAdmin call
+        // being ignored. It is also bad for test performance as the first login is done for nothing. Please remember to
+        // log in with the standard user as soon as superadmin is not needed in your tests. 
     }
 
     @Test
     @Order(1)
     void insertImage(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -111,8 +113,6 @@ class ImagePluginIT
     @Order(2)
     void insertImageWithStyle(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Create the image style as an admin.
-        setup.loginAsSuperAdmin();
         createBorderedStyle(setup);
 
         // Then test the image styles on the image dialog as a standard user.
@@ -163,6 +163,8 @@ class ImagePluginIT
     @Order(3)
     void insertIcon(TestUtils setup, TestReference testReference)
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         setup.deletePage(testReference);
         ViewPage newPage = setup.gotoPage(testReference);
 
@@ -186,6 +188,8 @@ class ImagePluginIT
     @Order(4)
     void insertUrl(TestUtils setup, TestReference testReference)
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         ViewPage newPage = setup.gotoPage(testReference);
 
         // Move to the WYSIWYG edition page.
@@ -214,6 +218,8 @@ class ImagePluginIT
     @Order(5)
     void activateCaptionIdPersistence(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Insert a first image.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -261,6 +267,8 @@ class ImagePluginIT
     @Order(6)
     void imageWithCaption(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -320,6 +328,8 @@ class ImagePluginIT
     @Order(7)
     void imageWrappedInLink(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -358,6 +368,8 @@ class ImagePluginIT
     @Order(8)
     void imageWrappedInLinkUI(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -385,6 +397,8 @@ class ImagePluginIT
     @Order(9)
     void imageWithLinkAndCaptionUI(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -446,6 +460,8 @@ class ImagePluginIT
     @Order(10)
     void editLegacyCenteredImage(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
@@ -469,6 +485,8 @@ class ImagePluginIT
     @Order(11)
     void updateImageSize(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -506,6 +524,8 @@ class ImagePluginIT
     @Order(12)
     void updateExternalImageSize(TestUtils setup, TestReference testReference) throws Exception
     {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
         // Upload an attachment to test with.
         String attachmentName = "image.gif";
         AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
@@ -552,7 +572,6 @@ class ImagePluginIT
     @Order(16)
     void forceDefaultStyle(TestUtils setup, TestReference testReference) throws Exception
     {
-        setup.loginAsSuperAdmin();
         // Change the configuration to have a default style and force it.
         DocumentReference configurationReference = getConfigurationReference(setup);
         setup.updateObject(configurationReference, "Image.Style.Code.ConfigurationClass", 0,
@@ -594,8 +613,6 @@ class ImagePluginIT
     @Order(17)
     void updateImageStyleSeveralTimes(TestUtils setup, TestReference testReference) throws Exception
     {
-        setup.loginAsSuperAdmin();
-        // Create the image style as an admin.
         createBorderedStyle(setup);
 
         // Then test the image styles on the image dialog as a standard user.
@@ -655,17 +672,13 @@ class ImagePluginIT
     {
         DocumentReference borderedStyleDocumentReference =
             new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "bordered");
-        setup.rest().delete(borderedStyleDocumentReference);
-        setup.rest().savePage(borderedStyleDocumentReference);
-        Object styleObject = setup.rest().object(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass");
-        Property borderedProperty = new Property();
-        borderedProperty.setName("prettyName");
-        borderedProperty.setValue("Bordered");
-        Property typeProperty = new Property();
-        typeProperty.setName("type");
-        typeProperty.setValue("bordered");
-        styleObject.withProperties(borderedProperty, typeProperty);
-        setup.rest().add(styleObject);
+        // For a reason I can't explain, using the rest API lead to random 401 http response, making the tests using the
+        // methods flickering. Using the UI based methods until I can understand the root cause.
+        setup.deletePage(borderedStyleDocumentReference);
+        setup.addObject(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass", Map.of(
+            "prettyName", "Bordered",
+            "type", "bordered"
+        ));
     }
 
     private static DocumentReference getConfigurationReference(TestUtils setup)

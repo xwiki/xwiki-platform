@@ -206,4 +206,10 @@ public class AllIT
     class NestedCompareIT extends CompareIT
     {
     }
+
+    @Nested
+    @DisplayName("XAR Export Tests")
+    class NestedXARExportIT extends XARExportIT
+    {
+    }
 }

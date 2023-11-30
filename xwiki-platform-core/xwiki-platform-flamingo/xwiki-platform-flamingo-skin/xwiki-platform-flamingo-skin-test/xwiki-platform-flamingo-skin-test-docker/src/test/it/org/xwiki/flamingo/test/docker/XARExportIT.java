@@ -17,22 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.test.ui;
+package org.xwiki.flamingo.test.docker;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Verify that the XAR export features works fine.
@@ -40,55 +42,47 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 10.9
  */
-public class XARExportIT extends AbstractTest
+@UITest
+public class XARExportIT
 {
-    @Test
-    public void scenarioExportXAR() throws Exception
+    @BeforeEach
+    void setupPages(TestUtils testUtils) throws Exception
     {
-        setupPages();
-        exportXARAll();
-        exportXARLotOfSelectedFiles();
-        exportXARWithUnselect();
-    }
-
-    private void setupPages() throws Exception
-    {
-        getUtil().loginAsSuperAdmin();
+        testUtils.loginAsSuperAdmin();
 
         // Create a space Foo
-        getUtil().createPage("Foo", "WebHome", "Foo", "Foo");
+        testUtils.createPage("Foo", "WebHome", "Foo", "Foo");
 
         // Create 50 pages under that space (will be used for the test with lot of selected pages)
         for (int i = 0; i < 50; i++) {
             String name = "Foo_" + i;
-            DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Foo", name), "WebHome");
-            if (!getUtil().rest().exists(documentReference)) {
-                getUtil().rest().savePage(documentReference);
+            DocumentReference documentReference = new DocumentReference("xwiki", List.of("Foo", name), "WebHome");
+            if (!testUtils.rest().exists(documentReference)) {
+                testUtils.rest().savePage(documentReference);
             }
         }
 
         for (int i = 0; i < 20; i++) {
             String name = "Foo_10_" + i;
             DocumentReference documentReference =
-                new DocumentReference("xwiki", Arrays.asList("Foo", "Foo_10", name), "WebHome");
-            if (!getUtil().rest().exists(documentReference)) {
-                getUtil().rest().savePage(documentReference);
+                new DocumentReference("xwiki", List.of("Foo", "Foo_10", name), "WebHome");
+            if (!testUtils.rest().exists(documentReference)) {
+                testUtils.rest().savePage(documentReference);
             }
         }
-
-        // Change the timeout as it might take time to load all nodes
-        getDriver().setTimeout(20);
     }
 
     /**
      * Scenario: export a XAR after opening the export window and selecting "Other Format". Don't change anything in the
      * tree of export.
      */
-    private void exportXARAll() throws Exception
+    @Test
+    @Order(1)
+    void exportXARAll(TestUtils testUtils) throws Exception
     {
-        getUtil().loginAsSuperAdmin();
+        testUtils.loginAsSuperAdmin();
 
-        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        ViewPage viewPage = testUtils.gotoPage("Foo", "WebHome");
         ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "XAR");
 
         TreeElement treeElement = exportTreeModal.getPageTree();
@@ -97,12 +91,12 @@ public class XARExportIT extends AbstractTest
 
         exportTreeModal.export();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
+        String postURL = testUtils.getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
         assertEquals(postURL, exportTreeModal.getAction());
 
-        assertEquals(Arrays.asList("xwiki:Foo.%"), exportTreeModal.getPagesValues());
-        assertEquals(Arrays.asList(""), exportTreeModal.getExcludesValues());
-        getUtil().forceGuestUser();
+        assertEquals(List.of("xwiki:Foo.%"), exportTreeModal.getPagesValues());
+        assertEquals(List.of(""), exportTreeModal.getExcludesValues());
+        testUtils.forceGuestUser();
     }
 
     /**
@@ -110,11 +104,13 @@ public class XARExportIT extends AbstractTest
      * selected is taken into account (See XWIKI-15444). To achieve this, we open every page in the pagination and
      * select everything.
      */
-    public void exportXARLotOfSelectedFiles()
+    @Test
+    @Order(2)
+    void exportXARLotOfSelectedFiles(TestUtils testUtils)
     {
-        getUtil().loginAsSuperAdmin();
+        testUtils.loginAsSuperAdmin();
 
-        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        ViewPage viewPage = testUtils.gotoPage("Foo", "WebHome");
         ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "XAR");
 
         TreeElement treeElement = exportTreeModal.getPageTree();
@@ -136,30 +132,33 @@ public class XARExportIT extends AbstractTest
             lastNode.deselect();
             lastNode.select();
 
-            getDriver().waitUntilElementDisappears(exportTreeModal.getContainer(), By.linkText(lastNodeLabel));
+            testUtils.getDriver().waitUntilElementDisappears(exportTreeModal.getContainer(),
+                By.linkText(lastNodeLabel));
         }
 
         assertEquals(50, root.getChildren().size());
 
         exportTreeModal.export();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
+        String postURL = testUtils.getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
         assertEquals(postURL, exportTreeModal.getAction());
 
-        assertEquals(Arrays.asList("xwiki:Foo.%"), exportTreeModal.getPagesValues());
-        assertEquals(Arrays.asList(""), exportTreeModal.getExcludesValues());
+        assertEquals(List.of("xwiki:Foo.%"), exportTreeModal.getPagesValues());
+        assertEquals(List.of(""), exportTreeModal.getExcludesValues());
 
-        getUtil().forceGuestUser();
+        testUtils.forceGuestUser();
     }
 
     /**
      * Scenario: Export a XAR after opening main tree and a subtree and unselecting nodes including the pagination node
      * of the subtree.
      */
-    public void exportXARWithUnselect()
+    @Test
+    @Order(3)
+    public void exportXARWithUnselect(TestUtils testUtils)
     {
-        getUtil().loginAsSuperAdmin();
-        ViewPage viewPage = getUtil().gotoPage("Foo", "WebHome");
+        testUtils.loginAsSuperAdmin();
+        ViewPage viewPage = testUtils.gotoPage("Foo", "WebHome");
         ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "XAR");
 
         TreeElement treeElement = exportTreeModal.getPageTree();
@@ -200,7 +199,7 @@ public class XARExportIT extends AbstractTest
 
         exportTreeModal.export();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
+        String postURL = testUtils.getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
         assertEquals(postURL, exportTreeModal.getAction());
 
         List<String> expectedPages = new ArrayList<>();
@@ -217,6 +216,6 @@ public class XARExportIT extends AbstractTest
         assertEquals(expectedPages, exportTreeModal.getPagesValues());
         assertEquals(expectedExcludes, exportTreeModal.getExcludesValues());
 
-        getUtil().forceGuestUser();
+        testUtils.forceGuestUser();
     }
 }

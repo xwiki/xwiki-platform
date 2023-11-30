@@ -40,6 +40,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -105,8 +106,10 @@ public class DefaultXWikiBridgeTest
         when(this.currentResolver.resolve(any(), eq(EntityType.DOCUMENT)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertEquals(noParameterReference, this.bridge.toCompatibleEntityReference(documentReference));
-        assertNotEquals(documentReference, this.bridge.toCompatibleEntityReference(documentReference));
+        EntityReference actual = this.bridge.toCompatibleEntityReference(documentReference);
+        assertEquals(noParameterReference, actual);
+        assertNotEquals(documentReference, actual);
+        assertSame(parentReference, actual.getParent());
     }
 
     @Test
@@ -121,7 +124,19 @@ public class DefaultXWikiBridgeTest
         when(this.currentResolver.resolve(any(), eq(EntityType.DOCUMENT)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertEquals(noParameterReference, this.bridge.toCompatibleEntityReference(documentReference));
-        assertNotEquals(documentReference, this.bridge.toCompatibleEntityReference(documentReference));
+        EntityReference actual = this.bridge.toCompatibleEntityReference(documentReference);
+        assertEquals(noParameterReference, actual);
+        assertNotEquals(documentReference, actual);
+    }
+
+    @Test
+    void toCompatibleEntityReferenceWithoutParametersReturnsSame()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+        when(this.currentResolver.resolve(any(), eq(EntityType.DOCUMENT)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        assertSame(documentReference, this.bridge.toCompatibleEntityReference(documentReference));
     }
 }

@@ -27,8 +27,16 @@ pnpm install
 
 ### Starting the project
 
+Starting on default port 9000.
+
 ```sh
 pnpm run start
+```
+
+Starting on an arbitrary port (e.g., 9001)
+
+```shell
+HTTP_PORT=9001 pnpm run start
 ```
 
 ### Compile and Minify for Production

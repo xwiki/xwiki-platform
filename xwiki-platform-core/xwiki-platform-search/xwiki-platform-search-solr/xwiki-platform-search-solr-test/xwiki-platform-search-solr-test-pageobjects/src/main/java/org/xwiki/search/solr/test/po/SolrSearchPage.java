@@ -25,16 +25,16 @@ import org.xwiki.test.ui.po.ViewPage;
 
 public class SolrSearchPage extends ViewPage
 {
-    @FindBy(id = "search-page-bar-input")
+    @FindBy(xpath = "//div[@class = 'search-ui']//input[@type = 'search']")
     private WebElement searchInput;
 
     @FindBy(xpath = "//div[@class = 'search-ui']//button[@type = 'submit']")
     private WebElement searchButton;
 
-    @FindBy(xpath = "//div[@class = 'search-ui']//button[@aria-controls = 'space_facet-dropdown']")
+    @FindBy(xpath = "//div[@data-name = 'space_facet']//div[@class = 'search-facet-header']")
     private WebElement spaceFaucetDropdownButton;
 
-    @FindBy(xpath = "//div[@id = 'space_facet-dropdown']")
+    @FindBy(xpath = "//div[@data-name = 'space_facet']//div[@class = 'search-facet-body']")
     private WebElement spaceFaucetDropdownContent;
 
     public static SolrSearchPage gotoPage()

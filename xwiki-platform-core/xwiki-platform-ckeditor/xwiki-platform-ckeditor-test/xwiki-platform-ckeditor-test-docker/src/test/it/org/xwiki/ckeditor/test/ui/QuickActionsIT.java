@@ -33,6 +33,7 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -68,6 +69,8 @@ public class QuickActionsIT extends AbstractCKEditorIT
      */
     private static final String TEST_TEXT = "Hello, world!";
 
+    private WYSIWYGEditPage editPage;
+
     @BeforeAll
     void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
@@ -81,7 +84,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
     @BeforeEach
     void beforeEach(TestUtils setup, TestReference testReference)
     {
-        edit(setup, testReference);
+        this.editPage = edit(setup, testReference);
     }
 
     @AfterEach
@@ -289,7 +292,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
         // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my info message");
 
         assertSourceEquals("{{info}}\nmy info message\n{{/info}}\n\n ");
@@ -308,7 +311,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
         // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my success message");
 
         assertSourceEquals("{{success}}\nmy success message\n{{/success}}\n\n ");
@@ -327,7 +330,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
         // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my warning message");
 
         assertSourceEquals("{{warning}}\nmy warning message\n{{/warning}}\n\n ");
@@ -346,7 +349,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
         textArea = editor.getRichTextArea();
         textArea.waitUntilContentEditable();
         // Delete the default message text.
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my error message");
 
         assertSourceEquals("{{error}}\nmy error message\n{{/error}}\n\n ");
@@ -506,13 +509,18 @@ public class QuickActionsIT extends AbstractCKEditorIT
     
     @Test
     @Order(24)
-    void emojiClickTriggersDropDown() throws Exception
+    void emojiClickTriggersDropDown(TestUtils setup) throws Exception
     {
         textArea.sendKeys("/emo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/emo", "Emoji");
-        // Click on the emoji Quick Action.
+
+        // Click on the emoji Quick Action (instead of pressing Enter).
         qa.getSelectedItem().click();
+        // The previous click leaves the mouse near the caret (where we type) and thus when the Emoji dropdown is shown
+        // the mouse may hover one of the suggested Emojis, changing the default selection. We need to move the mouse
+        // away so that we can verify the default selection.
+        setup.getDriver().createActions().moveToElement(this.editPage.getSaveAndViewButton()).perform();
 
         AutocompleteDropdown emoji = new AutocompleteDropdown();
         textArea.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, "cat");

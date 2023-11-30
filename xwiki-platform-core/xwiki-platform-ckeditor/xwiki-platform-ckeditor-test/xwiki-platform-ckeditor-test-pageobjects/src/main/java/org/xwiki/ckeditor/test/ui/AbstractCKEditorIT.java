@@ -46,12 +46,13 @@ public abstract class AbstractCKEditorIT
 
     protected RichTextAreaElement textArea;
 
-    void edit(TestUtils setup, TestReference testReference)
+    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference)
     {
         setup.deletePage(testReference, true);
-        WYSIWYGEditPage.gotoPage(testReference);
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
         this.editor = new CKEditor("content").waitToLoad();
         this.textArea = this.editor.getRichTextArea();
+        return editPage;
     }
 
     protected void createAndLoginStandardUser(TestUtils setup)

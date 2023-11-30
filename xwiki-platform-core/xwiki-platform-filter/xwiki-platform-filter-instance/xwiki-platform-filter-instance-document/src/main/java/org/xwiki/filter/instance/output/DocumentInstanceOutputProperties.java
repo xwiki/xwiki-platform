@@ -200,7 +200,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
      * @return true if the authors coming from the events should be kept.
      */
     @PropertyName("Preserve author")
-    @PropertyDescription("Indicate if the authors comming from the events should be kept."
+    @PropertyDescription("Indicate if the authors coming from the events should be kept."
         + " If false the current user is used.")
     public boolean isAuthorPreserved()
     {

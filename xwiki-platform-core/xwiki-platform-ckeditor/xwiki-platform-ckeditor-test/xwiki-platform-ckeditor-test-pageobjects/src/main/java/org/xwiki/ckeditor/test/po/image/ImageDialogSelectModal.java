@@ -57,7 +57,7 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogEditModal clickSelect()
     {
-        WebElement element = this.container.findElement(By.className("btn-primary"));
+        WebElement element = this.container.findElement(By.cssSelector(".modal-footer .btn-primary"));
         getDriver().waitUntilElementIsEnabled(element);
         element.click();
         return new ImageDialogEditModal();

@@ -184,22 +184,23 @@ public class DefaultIOService implements IOService
     public Collection<Annotation> getAnnotations(String target) throws IOServiceException
     {
         try {
-            // parse the target and extract the local reference serialized from it, by the same rules
+            // Parse the target and extract the local reference serialized from it, by the same rules.
             EntityReference targetReference = this.referenceResolver.resolve(target, EntityType.DOCUMENT);
-            // build the target identifier for the annotation
+            // Build the target identifier for the annotation.
             String localTargetId = target;
-            // and the name of the document where it should be stored
+            // And the name of the document where it should be stored.
             String docName = target;
-            if (targetReference.getType() == EntityType.DOCUMENT
-                || targetReference.getType() == EntityType.OBJECT_PROPERTY)
-            {
+            EntityType targetReferenceType = targetReference.getType();
+            boolean isDocumentType = targetReferenceType == EntityType.DOCUMENT;
+            boolean isObjectPropertyType = targetReferenceType == EntityType.OBJECT_PROPERTY;
+            if (isDocumentType || isObjectPropertyType) {
                 localTargetId = this.localSerializer.serialize(targetReference);
                 docName = this.serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
             }
-            // get the document
-            XWikiContext deprecatedContext = getXWikiContext();
-            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
-            // and the annotation class objects in it
+            // Get the document
+            XWikiContext xwikiContext = getXWikiContext();
+            XWikiDocument document = xwikiContext.getWiki().getDocument(docName, xwikiContext);
+            // And the annotation class objects in it
             List<BaseObject> objects = document.getXObjects(this.configuration.getAnnotationClassReference());
             // and build a list of Annotation objects
             List<Annotation> result = new ArrayList<>();
@@ -207,12 +208,14 @@ public class DefaultIOService implements IOService
                 return Collections.emptySet();
             }
             for (BaseObject object : objects) {
-                // use the object number as annotation id
+                // Use the object number as annotation id
                 if (object != null) {
                     String targetField = object.getStringValue(Annotation.TARGET_FIELD);
                     // The legacy behavior is to have a non-empty target, which can lead to issues when the document
                     // is moved. Now, we consider an object with an empty target as related to the containing document.
-                    if (Objects.equals(localTargetId, targetField) || Objects.equals("", targetField)) {
+                    if (Objects.equals(localTargetId, targetField)
+                        || (StringUtils.isBlank(targetField) && isDocumentType))
+                    {
                         result.add(loadAnnotationFromObject(object, localTargetId));
                     }
                 }
@@ -236,9 +239,10 @@ public class DefaultIOService implements IOService
             String localTargetId = target;
             // and the name of the document where it should be stored
             String docName = target;
-            if (targetReference.getType() == EntityType.DOCUMENT
-                || targetReference.getType() == EntityType.OBJECT_PROPERTY)
-            {
+            EntityType targetReferenceType = targetReference.getType();
+            boolean isDocumentType = targetReferenceType == EntityType.DOCUMENT;
+            boolean isObjectPropertyType = targetReferenceType == EntityType.OBJECT_PROPERTY;
+            if (isDocumentType || isObjectPropertyType) {
                 localTargetId = this.localSerializer.serialize(targetReference);
                 docName = this.serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
             }
@@ -251,7 +255,9 @@ public class DefaultIOService implements IOService
                 document.getXObject(this.configuration.getAnnotationClassReference(),
                     Integer.valueOf(annotationID));
             String targetField = object == null ? null : object.getStringValue(Annotation.TARGET_FIELD);
-            if (object == null || !(Objects.equals(localTargetId, targetField) || Objects.equals("", targetField))) {
+            if (object == null || !(Objects.equals(localTargetId, targetField)
+                || (StringUtils.isBlank(targetField) && isDocumentType)))
+            {
                 return null;
             }
             // use the object number as annotation id

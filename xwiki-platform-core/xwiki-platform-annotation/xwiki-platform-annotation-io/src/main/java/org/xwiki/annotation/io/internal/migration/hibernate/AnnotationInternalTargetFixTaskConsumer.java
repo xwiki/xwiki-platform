@@ -48,9 +48,9 @@ import com.xpn.xwiki.objects.BaseObject;
  *
  * @version $Id$
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-20699">XWIKI-20699</a>
- * @since 15.5.3
- * @since 15.8RC1
- * @since 14.10.17
+ * @since 15.5.5
+ * @since 15.10.1
+ * @since 16.0RC1
  */
 @Component
 @Singleton
@@ -91,7 +91,7 @@ public class AnnotationInternalTargetFixTaskConsumer implements TaskConsumer
     {
         boolean updated = false;
         for (BaseObject xObject : document.getXObjects(XWikiDocument.COMMENTSCLASS_REFERENCE)) {
-            if (task(document, xObject)) {
+            if (xObject != null && task(document, xObject)) {
                 updated = true;
             }
         }

@@ -20,12 +20,14 @@
 package org.xwiki.annotation.io.internal.migration.hibernate;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.internal.migration.AbstractDocumentsMigration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
@@ -35,19 +37,19 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Selects and queue the document that can require a target cleanup. Self-reference target are not required and can get
- * outdated in case of page move/copy. Therefore, it is better to remplace them with an empty target, implicitly
- * targeting the document holding the annotation XObject.
+ * Select and queue the document that can require an annotation target cleanup. Self-referencing annotation targets are
+ * not necessary and can get outdated in case of page move/copy. Therefore, it is better to replace them with the empty
+ * string, implicitly targeting the document holding the annotation XObject.
  *
  * @version $Id$
- * @since 15.5.3
- * @since 15.8RC1
- * @since 14.10.17
+ * @since 15.5.5
+ * @since 15.10.1
+ * @since 16.0RC1
  */
 @Component
-@Named("R150800000XWIKI20699")
+@Named("R160000000XWIKI20699")
 @Singleton
-public class R150800000XWIKI20699DataMigration extends AbstractDocumentsMigration
+public class R160000000XWIKI20699DataMigration extends AbstractDocumentsMigration
 {
     @Override
     public String getDescription()
@@ -58,7 +60,7 @@ public class R150800000XWIKI20699DataMigration extends AbstractDocumentsMigratio
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(150800000);
+        return new XWikiDBVersion(160000000);
     }
 
     @Override
@@ -68,7 +70,7 @@ public class R150800000XWIKI20699DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected List<String> selectDocuments() throws DataMigrationException
+    protected List<DocumentReference> selectDocuments() throws DataMigrationException
     {
         XWikiContext context = getXWikiContext();
         XWiki wiki = getXWikiContext().getWiki();
@@ -82,7 +84,10 @@ public class R150800000XWIKI20699DataMigration extends AbstractDocumentsMigratio
                     + "and prop.id.name='target'"
                     + "and prop.value <> ''", Query.HQL)
                 .setWiki(context.getWikiId())
-                .execute();
+                .execute()
+                .stream()
+                .flatMap(fullName -> resolveDocumentReference(String.valueOf(fullName), null).stream())
+                .collect(Collectors.toList());
         } catch (QueryException e) {
             throw new DataMigrationException(
                 String.format("Failed retrieve the list of all the documents with annotations for wiki [%s].",

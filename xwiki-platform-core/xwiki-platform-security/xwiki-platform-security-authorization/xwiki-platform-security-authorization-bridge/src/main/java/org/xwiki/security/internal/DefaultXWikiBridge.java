@@ -119,8 +119,12 @@ public class DefaultXWikiBridge implements XWikiBridge
             return reference;
         }
 
+        // Discard the parameters since they are not used by the authorization system but cause issues when comparing
+        // references for equality.
+        EntityReference noParameterReference = removeParameters(reference);
+
         // Make sure the reference is complete
-        EntityReference compatibleReference = this.currentResolver.resolve(reference, reference.getType());
+        EntityReference compatibleReference = this.currentResolver.resolve(noParameterReference, reference.getType());
 
         // Convert to PAGE reference to DOCUMENT reference since the security system design does not work well with PAGE
         // one (which have different kinds of right at the same level)
@@ -131,5 +135,17 @@ public class DefaultXWikiBridge implements XWikiBridge
         }
 
         return compatibleReference;
+    }
+
+    private static EntityReference removeParameters(EntityReference reference)
+    {
+        EntityReference parent = null;
+        EntityReference result = null;
+        for (EntityReference entry : reference.getReversedReferenceChain()) {
+            result = new EntityReference(entry.getName(), entry.getType(), parent);
+            parent = result;
+        }
+
+        return result;
     }
 }

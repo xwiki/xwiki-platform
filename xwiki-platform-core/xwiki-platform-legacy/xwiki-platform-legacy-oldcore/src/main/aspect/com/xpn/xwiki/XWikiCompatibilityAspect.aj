@@ -1465,4 +1465,37 @@ public privileged aspect XWikiCompatibilityAspect
         // invalid XWikiDocument object as it's been deleted...
         sourceDoc.clone(newDocument);
     }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, String params, XWikiContext context)
+    {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("<span class=\"tooltip_span\" onmouseover=\"");
+        buffer.append(params);
+        buffer.append("; return escape('");
+        buffer.append(message.replaceAll("'", "\\'"));
+        buffer.append("');\">");
+        buffer.append(html);
+        buffer.append("</span>");
+
+        return buffer.toString();
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltipJS(XWikiContext context)
+    {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("<script src=\"");
+        buffer.append(getSkinFile("ajax/wzToolTip.js", context));
+        buffer.append("\"></script>");
+        // buffer.append("<div id=\"dhtmltooltip\"></div>");
+
+        return buffer.toString();
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, XWikiContext context)
+    {
+        return addTooltip(html, message, "this.WIDTH='300'", context);
+    }
 }

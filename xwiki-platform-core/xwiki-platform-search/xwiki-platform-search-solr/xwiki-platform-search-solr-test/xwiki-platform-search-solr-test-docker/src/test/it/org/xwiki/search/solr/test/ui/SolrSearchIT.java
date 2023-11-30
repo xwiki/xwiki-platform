@@ -50,7 +50,7 @@ class SolrSearchIT
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
         searchPage.search("\"Test Document\"");
         searchPage.toggleSpaceFaucet();
-        assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFaucetContent());
+        assertEquals("1\n" + testDocumentLocation, searchPage.getSpaceFaucetContent());
     }
 
     private String computedHostURL(TestConfiguration testConfiguration)

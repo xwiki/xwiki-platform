@@ -3581,37 +3581,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public String displayTooltip(String fieldname, XWikiContext context)
-    {
-        try {
-            BaseObject object = getXObject();
-            if (object == null) {
-                object = getFirstObject(fieldname, context);
-            }
-            return displayTooltip(fieldname, object, context);
-        } catch (Exception e) {
-            return "";
-        }
-    }
 
-    public String displayTooltip(String fieldname, BaseObject obj, XWikiContext context)
-    {
-        String result = "";
-
-        try {
-            PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
-            String tooltip = pclass.getTooltip(context);
-            if ((tooltip != null) && (!tooltip.trim().equals(""))) {
-                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
-                    + "\" class=\"tooltip_image\" align=\"middle\" />";
-                result = context.getWiki().addTooltip(img, tooltip, context);
-            }
-        } catch (Exception e) {
-
-        }
-
-        return result;
-    }
 
     /**
      * @param fieldname the name of the field to display

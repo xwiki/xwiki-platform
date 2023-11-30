@@ -31,11 +31,10 @@ define('xwiki-livedata', [
   Vue,
   VueI18n,
   XWikiLivedata,
-  liveDataSource,
+  liveDataSourceModule,
   jsonMerge,
   editBus
 ) {
-
   /**
    * Make vue use the i18n plugin
    */
@@ -109,6 +108,8 @@ define('xwiki-livedata', [
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
   const Logic = function (element) {
+    // Make sure to have one live data source instance per 
+    this.liveDataSource = liveDataSourceModule.init();
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
     this.contentTrusted = element.getAttribute("data-config-content-trusted") === "true"; 
@@ -195,7 +196,7 @@ define('xwiki-livedata', [
       this.loadTranslations[componentName] = true;
       // Fetch translation and load them.
       try {
-        const translations = await liveDataSource.getTranslations(locale, prefix, keys);
+        const translations = await this.liveDataSource.getTranslations(locale, prefix, keys);
         i18n.mergeLocaleMessage(locale, translations)
       } catch (error) {
         console.error(error);
@@ -587,7 +588,7 @@ define('xwiki-livedata', [
       // Before fetch event
       this.triggerEvent("beforeEntryFetch");
       // Fetch entries from data source
-      return liveDataSource.getEntries(this.data.query)
+      return this.liveDataSource.getEntries(this.data.query)
         .then(data => {
           // After fetch event
           return data
@@ -685,7 +686,7 @@ define('xwiki-livedata', [
       const entryId = this.getEntryId(entry);
       // Once the entry updated, reload the whole livedata because changing a single entry can have an impact on other 
       // properties of the entry, but also possibly on other entriers, or in the way they are sorted.
-      liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
+      this.liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
         .then(() => this.updateEntries());
     },
 
@@ -696,7 +697,7 @@ define('xwiki-livedata', [
      */
     setValues({entryId, values}) {
       const source = this.data.query.source;
-      return liveDataSource.updateEntry(source, entryId, values)
+      return this.liveDataSource.updateEntry(source, entryId, values)
         .then(() => this.updateEntries());
 
     },

@@ -206,12 +206,12 @@ public class TreeNodeElement extends BaseElement
     public TreeNodeElement waitForIt()
     {
         getDriver().waitUntilCondition(driver -> {
-            // The aria-busy attribute is not directly on the li element, but it's on the a element located as a child
-            // of the li in the DOM.
-            WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.id(String.format("%s_anchor",
-                getId())));
             try {
-                return !Boolean.valueOf(anchor.getAttribute("aria-busy"));
+                // The aria-busy attribute is not directly on the li element, but it's on the element located as a
+                // child of the li in the DOM.
+                WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.id(String.format("%s_anchor",
+                    getId())));
+                return !Boolean.parseBoolean(anchor.getAttribute("aria-busy"));
             } catch (StaleElementReferenceException e) {
                 // The element has just been replaced. Try again.
                 return false;

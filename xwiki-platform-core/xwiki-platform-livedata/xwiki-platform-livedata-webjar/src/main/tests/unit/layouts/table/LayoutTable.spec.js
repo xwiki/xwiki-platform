@@ -99,8 +99,7 @@ describe('LayoutTable.vue', () => {
             data: {
               data: {
                 entries: [
-                  {id: "idx1"},
-                  {id: "idx2"}
+                  {id: 1}
                 ]
               }
             }
@@ -113,13 +112,11 @@ describe('LayoutTable.vue', () => {
     afterEntryFetchWrapper.callback();
     await Vue.nextTick();
     const rows = wrapper.findAllComponents(LayoutTableRow);
-    expect(rows.length).toBe(2);
-    expect(rows.at(0).props()).toStrictEqual({entry: {id: "idx1"}});
-    expect(rows.at(1).props()).toStrictEqual({entry: {id: "idx2"}});
-    expect(rows.at(0).attributes("data-livedata-entry-index")).toBe("0");
-    expect(rows.at(0).attributes("data-livedata-entry-id")).toBe("idx1");
-    expect(rows.at(1).attributes("data-livedata-entry-index")).toBe("1");
-    expect(rows.at(1).attributes("data-livedata-entry-id")).toBe("idx2");
+    expect(rows.length).toBe(1)
+    expect(rows.at(0).props()).toStrictEqual({
+      entry: {id: 1},
+      entryIdx: 0
+    })
     expect(wrapper.find('.noentries-card').exists()).toBe(false)
   })
 })

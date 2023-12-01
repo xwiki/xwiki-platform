@@ -25,7 +25,11 @@
   inside the Livedata configuration.
 -->
 <template>
-  <div class="card">
+  <div
+      class="card"
+      :data-livedata-entry-index="entryIdx"
+      :data-livedata-entry-id="logic.getEntryId(entry)"
+  >
 
     <!-- Card title-->
     <div class="card-title">
@@ -108,6 +112,11 @@ export default {
 
   props: {
     entry: Object,
+    // TODO: document
+    entryIdx: {
+      type: Number,
+      required: true
+    }
   },
 
   computed: {

@@ -4,7 +4,7 @@
         "configType" : "XWiki",
         "serverRendering" : false,
         "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
+        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
         "baseRestURL" : "/rest/wiki30/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
@@ -14,7 +14,7 @@
         "configType" : "XWiki",
         "serverRendering" : false,
         "offline" : true,
-        "baseURL" : "http://localhost:15680/xwiki",
+        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
         "baseRestURL" : "/rest/wiki30/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
@@ -24,7 +24,7 @@
         "configType" : "XWiki",
         "serverRendering" : true,
         "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
+        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
         "baseRestURL" : "/rest/wiki30/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
@@ -34,7 +34,7 @@
         "configType" : "XWiki",
         "serverRendering" : false,
         "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
+        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
         "baseRestURL" : "/rest/wiki30/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "dsfr"
@@ -44,17 +44,27 @@
         "configType" : "XWiki",
         "serverRendering" : false,
         "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
+        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
         "baseRestURL" : "/rest/wiki30/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "shoelace"
     },
-    "Wiki30" : {
-        "name" : "Wiki30",
+    "Localhost" : {
+        "name" : "Localhost",
         "configType" : "XWiki",
         "serverRendering" : false,
         "offline" : false,
-        "baseURL" : "https://wiki30.demo.xwiki.com/xwiki",
+        "baseURL" : "http://localhost:15680/xwiki",
+        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "homePage" : "Main.WebHome",
+        "designSystem" : "vuetify"
+    },
+    "LocalhostOffline" : {
+        "name" : "LocalhostOffline",
+        "configType" : "XWiki",
+        "serverRendering" : false,
+        "offline" : true,
+        "baseURL" : "http://localhost:15680/xwiki",
         "baseRestURL" : "/rest/wiki30/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"

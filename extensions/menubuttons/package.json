@@ -24,11 +24,11 @@
     "@cristal/skin": "workspace:^",
     "inversify": "^6.0.2",
     "reflect-metadata": "^0.1.13",
-    "vue": "^3.3.4",
+    "vue": "^3.3.8",
     "vue-i18n": "^9.2.2"
   },
   "devDependencies": {
     "vite": "^4.4.9",
-    "vue-tsc": "^1.8.8"
+    "vue-tsc": "^1.8.24"
   }
 }

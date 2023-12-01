@@ -21,12 +21,12 @@
   },
   "dependencies": {
     "comlink": "^4.4.1",
-    "vue": "^3.3.4",
+    "vue": "^3.3.8",
     "vue-i18n": "^9.2.2"
   },
   "devDependencies": {
     "vite": "^4.4.9",
     "vite-plugin-comlink": "^3.0.5",
-    "vue-tsc": "^1.8.8"
+    "vue-tsc": "^1.8.24"
   }
 }

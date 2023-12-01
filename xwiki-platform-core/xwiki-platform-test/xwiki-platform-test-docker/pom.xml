@@ -116,17 +116,14 @@
     <dependency>
       <groupId>${mysql.groupId}</groupId>
       <artifactId>${mysql.artifactId}</artifactId>
-      <version>${mysql.version}</version>
     </dependency>
     <dependency>
       <groupId>${mariadb.groupId}</groupId>
       <artifactId>${mariadb.artifactId}</artifactId>
-      <version>${mariadb.version}</version>
     </dependency>
     <dependency>
       <groupId>${oracle.groupId}</groupId>
       <artifactId>${oracle.artifactId}</artifactId>
-      <version>${oracle.version}</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>

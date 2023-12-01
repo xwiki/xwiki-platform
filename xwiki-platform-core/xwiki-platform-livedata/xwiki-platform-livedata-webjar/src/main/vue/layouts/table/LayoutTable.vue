@@ -75,6 +75,7 @@
             v-for="(entry, idx) in entries"
             :key="`table-${logic.getEntryId(entry)}-${idx}`"
             :entry="entry"
+            :data-index="idx"
           />
 
           <!-- Component to create a new entry -->

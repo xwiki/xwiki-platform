@@ -47,6 +47,7 @@ import static org.xwiki.security.authorization.Right.SCRIPT;
  * script service.
  *
  * @version $Id$
+ * @since 15.6RC1
  */
 @Component(roles = LiveDataRenderer.class)
 @Singleton

@@ -38,7 +38,6 @@
     <module>xwiki-platform-livedata-rest</module>
     <module>xwiki-platform-livedata-war</module>
     <module>xwiki-platform-livedata-webjar</module>
-    <module>xwiki-platform-livedata-ui</module>
   </modules>
   <profiles>
     <profile>

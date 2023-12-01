@@ -993,6 +993,53 @@
         <artifactId>docker-java-transport-httpclient5</artifactId>
         <version>${dockerJava.version}</version>
       </dependency>
+
+      <!-- Database connectors -->
+      <!-- Exclude optional dependencies -->
+      <dependency>
+        <groupId>${mysql.groupId}</groupId>
+        <artifactId>${mysql.artifactId}</artifactId>
+        <version>${mysql.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${mariadb.groupId}</groupId>
+        <artifactId>${mariadb.artifactId}</artifactId>
+        <version>${mariadb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${pgsql.groupId}</groupId>
+        <artifactId>${pgsql.artifactId}</artifactId>
+        <version>${pgsql.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${oracle.groupId}</groupId>
+        <artifactId>${oracle.artifactId}</artifactId>
+        <version>${oracle.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

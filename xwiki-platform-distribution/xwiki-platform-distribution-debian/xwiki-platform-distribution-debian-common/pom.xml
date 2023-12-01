@@ -53,19 +53,16 @@
     <dependency>
       <groupId>${mysql.groupId}</groupId>
       <artifactId>${mysql.artifactId}</artifactId>
-      <version>${mysql.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${pgsql.groupId}</groupId>
       <artifactId>${pgsql.artifactId}</artifactId>
-      <version>${pgsql.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${mariadb.groupId}</groupId>
       <artifactId>${mariadb.artifactId}</artifactId>
-      <version>${mariadb.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

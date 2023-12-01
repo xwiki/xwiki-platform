@@ -25,10 +25,8 @@
 <script lang="ts" setup>
 import CTemplate from "./c-template.vue";
 import xlogo from "../images/logo-x.png";
-import { ref } from "vue";
 
 const logo = xlogo;
-const isActive = ref(false);
 </script>
 
 <template>
@@ -39,11 +37,11 @@ const isActive = ref(false);
         <x-col>
           <UIX uixname="header.nav.left" />
           <x-dialog width="auto" :logo="logo" title="Configuration">
-            <template #activator>
-              <x-img :width="50" :src="logo" />
+            <template #activator="{ props }">
+              <x-img :width="50" :src="logo" v-bind="props" />
             </template>
             <template #default>
-              <CTemplate name="config" v-bind="isActive" />
+              <CTemplate name="config" />
             </template>
           </x-dialog>
         </x-col>

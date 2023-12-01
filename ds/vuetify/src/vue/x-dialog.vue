@@ -1,18 +1,17 @@
 <script lang="ts" setup>
-import { ref, defineProps } from "vue";
-
-const props = defineProps<{
-  isActive: boolean;
+import { defineProps } from "vue";
+defineProps<{
   title: string;
   type: number;
   width: number;
 }>();
-const innerIsActive = ref(props.isActive);
+
+// const innerIsActive = ref(props.isActive);
 </script>
 
 <template>
-  <v-dialog v-model="innerIsActive" :width="width">
-    <template #activator>
+  <v-dialog :width="width">
+    <template #activator="{ props }">
       <span v-bind="props">
         <slot name="activator" />
       </span>
@@ -20,7 +19,7 @@ const innerIsActive = ref(props.isActive);
     <template #default>
       <v-card :title="title">
         <v-card-text>
-          <slot name="default" v-bind="innerIsActive" />
+          <slot name="default" />
         </v-card-text>
       </v-card>
     </template>

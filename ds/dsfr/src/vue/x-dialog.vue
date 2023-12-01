@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { DsfrModal } from "@gouvminint/vue-dsfr";
 import { ref } from "vue";
+defineProps<{
+  title: string;
+  type: number;
+  width: number;
+}>();
 const isModalOpen = ref(false);
 </script>
 <template>
@@ -10,7 +15,7 @@ const isModalOpen = ref(false);
   <!-- TODO: make the title configurable -->
   <DsfrModal
     v-if="isModalOpen"
-    title="modalTitle"
+    :title="title"
     :opened="isModalOpen"
     @close="isModalOpen = false"
   >

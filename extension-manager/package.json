@@ -27,6 +27,6 @@
     "vue-i18n": "^9.2.2"
   },
   "devDependencies": {
-    "vite": "^4.4.9"
+    "vite": "5.0.5"
   }
 }

@@ -115,7 +115,8 @@ class ClassEditorIT
         editor.addField("Date").setPrettyName("Day");
 
         // Save and assert they are present.
-        ViewPage classView = editor.clickSaveAndView();
+        editor.clickSaveAndView(true);
+        ViewPage classView = editor.createPage();
         assertTrue(classView.getContent().contains("Available (boolean1: Boolean)"));
         assertTrue(classView.getContent().contains("Day (date1: Date)"));
 

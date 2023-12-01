@@ -65,7 +65,8 @@
         v-for="(entry, idx) in entries"
         :key="`card-${logic.getEntryId(entry)}-${idx}`"
         :entry="entry"
-        :data-index="idx"
+        :data-livedata-entry-index="idx"
+        :data-livedata-entry-id="logic.getEntryId(entry)"
       />
 
       <!-- Component to create a new entry -->

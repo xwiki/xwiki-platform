@@ -99,7 +99,8 @@ describe('LayoutCards.vue', () => {
             data: {
               data: {
                 entries: [
-                  {id: 1}
+                  {id: "idx1"},
+                  {id: "idx2"}
                 ]
               }
             }
@@ -111,9 +112,14 @@ describe('LayoutCards.vue', () => {
     // Manual trigger of the afterEntryFetch event.
     afterEntryFetchWrapper.callback();
     await Vue.nextTick();
-    let cards = wrapper.findAllComponents(LayoutCardsCard);
-    expect(cards.length).toBe(1);
-    expect(cards.at(0).props()).toStrictEqual({entry: {id: 1}});
+    const cards = wrapper.findAllComponents(LayoutCardsCard);
+    expect(cards.length).toBe(2);
+    expect(cards.at(0).props()).toStrictEqual({entry: {id: "idx1"}});
+    expect(cards.at(1).props()).toStrictEqual({entry: {id: "idx2"}});
+    expect(cards.at(0).attributes("data-livedata-entry-index")).toBe("0");
+    expect(cards.at(0).attributes("data-livedata-entry-id")).toBe("idx1");
+    expect(cards.at(1).attributes("data-livedata-entry-index")).toBe("1");
+    expect(cards.at(1).attributes("data-livedata-entry-id")).toBe("idx2");
     expect(wrapper.find('.noentries-card').exists()).toBe(false);
   })
 })

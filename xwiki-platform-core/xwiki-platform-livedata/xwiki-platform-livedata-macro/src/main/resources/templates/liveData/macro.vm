@@ -19,11 +19,11 @@
 ## ---------------------------------------------------------------------------
 ## Provide the macro to display a Live Data using Velocity. 
 ## Since: 16.0RC1
-#macro (liveData $parameters $advancedParameters)
+#macro (liveData $parameters $advancedParameters $syntax)
   #if ("$!advancedParameters" != '')
     #set($advancedParametersSerialized = $jsontool.serialize($advancedParameters))
   #end
   #foreach($block in $services.liveData.render($parameters, $advancedParametersSerialized))
-    $services.rendering.render($block, $doc.syntax.toIdString())
+    $services.rendering.render($block, $syntax)
   #end
 #end

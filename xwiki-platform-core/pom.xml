@@ -193,6 +193,22 @@
                 </item>
               </differences>
             </revapi.differences>
+
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class org.xwiki.livedata.macro.LiveDataMacroParameters</old>
+                  <new>class org.xwiki.livedata.macro.LiveDataMacroParameters</new>
+                  <superClass>org.xwiki.livedata.internal.LiveDataRendererParameters</superClass>
+                  <justification>Not a runtime breaking change.</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

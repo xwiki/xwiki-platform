@@ -613,7 +613,12 @@ define('xwiki-livedata', [
             this.translate('livedata.error.updateEntriesFailed')
               .then(value => new XWiki.widgets.Notification(value, 'error'));
           }
-          console.error('Failed to fetch the entries', err)
+          
+          // Do not log if the request has been aborted (e.g., because a second request was started for the same LD with
+          // new criteria).
+          if(err.statusText !== 'abort') {
+            console.error('Failed to fetch the entries', err);
+          }
         });
     },
 

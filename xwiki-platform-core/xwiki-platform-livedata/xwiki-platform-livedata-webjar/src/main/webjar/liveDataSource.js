@@ -24,6 +24,8 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
   function init() {
     var baseURL = module.config().contextPath + '/rest/liveData/sources/';
 
+    // Hold the most recent request to update the Live Data entries. It can be aborted. For instance, if some criteria 
+    // (e.g., filtering or sorting) are changed before the previous request is completed. 
     let entriesRequest;
 
     var getEntries = function(liveDataQuery) {
@@ -54,14 +56,10 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
       parameters.sort = liveDataQuery.sort.map(sort => sort.property);
       parameters.descending = liveDataQuery.sort.map(sort => sort.descending);
 
-      // We abort previous requests to avoid a race condition.
-      // It can happen that getEntries is called twice in a short
-      // time (when the user is typing in a filter field for instance)
-      // and that the first request succeeds after the second
-      // request, and its results would replace the "fresher"
-      // state.
-      //
-      // See https://jira.xwiki.org/browse/XWIKI-21447
+      // We abort previous requests to avoid a race condition. It can happen that getEntries is called twice in a short
+      // time (when the user is typing in a filter field for instance, quickly changing sorting, or just if the network 
+      // is slow) and that the first request succeeds after the second request, and its results would replace the
+      // "fresher" state.
       entriesRequest?.abort();
       entriesRequest = $.getJSON(entriesURL, $.param(parameters, true));
 

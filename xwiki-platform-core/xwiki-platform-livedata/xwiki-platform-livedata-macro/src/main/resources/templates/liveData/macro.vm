@@ -17,8 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## Provide the macro to display a Live Data using Velocity. 
 ## Since: 16.0RC1
+## Provide the macro to display a Live Data using Velocity.
+## $parameters the same parameters are the live data macro, but as an object instead of a set of macro parameters
+## $advancedParameters the advanced parameters usually located in the macro body, but as an object
+## $syntax the syntax to use for the rendering of the result
 #macro (liveData $parameters $advancedParameters $syntax)
   #if ("$!advancedParameters" != '')
     #set($advancedParametersSerialized = $jsontool.serialize($advancedParameters))

@@ -112,7 +112,13 @@ export default {
 
   props: {
     entry: Object,
-    // TODO: document
+    /**
+     * Index of the entry in the entries array.
+     * @since 14.10.20
+     * @since 15.5.5
+     * @since 15.10.1
+     * @since 16.0RC1
+     */
     entryIdx: {
       type: Number,
       required: true

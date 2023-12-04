@@ -68,7 +68,7 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
  * Page Test of the {@code XWiki.XWikiSyntaxMacrosList} document.
  *
  * @version $Id$
- * @since 16.4RC1
+ * @since 14.6RC1
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList

@@ -621,7 +621,6 @@
 }
 
 .theme-creation-form form {
-  border: 1px dotted $theme.borderColor;
   display: inline-block;
   padding: .5em;
   margin-bottom: 1em;

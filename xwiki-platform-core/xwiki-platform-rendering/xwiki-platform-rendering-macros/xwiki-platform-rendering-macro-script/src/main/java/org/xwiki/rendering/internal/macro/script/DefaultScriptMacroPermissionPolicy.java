@@ -31,6 +31,7 @@ import org.xwiki.rendering.macro.script.DefaultScriptMacroParameters;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Default Script Macro Permission policy: delegate to specific Script Macro Permission Policy using the
@@ -55,14 +56,32 @@ public class DefaultScriptMacroPermissionPolicy extends AbstractScriptMacroPermi
     {
         boolean hasPermission;
         try {
-            MacroPermissionPolicy policy = this.componentManager.getInstance(MacroPermissionPolicy.class,
-                ((DefaultScriptMacroParameters) parameters).getLanguage());
-            hasPermission = policy.hasPermission(parameters, context);
+            hasPermission = getMacroPermissionPolicy(parameters).hasPermission(parameters, context);
         } catch (ComponentLookupException e) {
             // No policy for that Macro, use the default implementation which forbids execution if the doc doesn't
             // have Programming Rights.
             hasPermission = super.hasPermission(parameters, context);
         }
         return hasPermission;
+    }
+
+    @Override
+    public Right getRequiredRight(ScriptMacroParameters parameters)
+    {
+        Right right;
+        try {
+            right = getMacroPermissionPolicy(parameters).getRequiredRight(parameters);
+        } catch (ComponentLookupException e) {
+            // No policy for that Macro, use the default implementation which requires Programming Rights.
+            right = super.getRequiredRight(parameters);
+        }
+        return right;
+    }
+
+    private MacroPermissionPolicy getMacroPermissionPolicy(ScriptMacroParameters parameters)
+        throws ComponentLookupException
+    {
+        return this.componentManager.getInstance(MacroPermissionPolicy.class,
+            ((DefaultScriptMacroParameters) parameters).getLanguage());
     }
 }

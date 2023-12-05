@@ -22,7 +22,6 @@ package org.xwiki.image.style.model;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * The image style POJO. Contains the list of all the configurable properties of an image style.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.3RC1
  */
-@Unstable
 public class ImageStyle
 {
     private String identifier;

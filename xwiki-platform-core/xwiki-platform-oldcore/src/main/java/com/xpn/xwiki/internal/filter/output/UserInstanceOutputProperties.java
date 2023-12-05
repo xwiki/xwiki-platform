@@ -110,7 +110,7 @@ public class UserInstanceOutputProperties extends InstanceOutputProperties
      * @since 6.2M1
      */
     @PropertyName("Preserve version")
-    @PropertyDescription("Indicate if the versions related informations comming from the events should be kept")
+    @PropertyDescription("Indicate if the versions related informations coming from the events should be kept")
     public boolean isVersionPreserved()
     {
         return this.versionPreserved;

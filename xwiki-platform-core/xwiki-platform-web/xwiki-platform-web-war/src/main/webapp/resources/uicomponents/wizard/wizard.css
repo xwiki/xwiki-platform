@@ -29,53 +29,48 @@
   vertical-align: middle;
 }
 
-.steps .number {
+.steps .number, .steps .number:hover, .steps .number:active {
   background-color: $theme.menuBackgroundColor;
-  border-radius: 10px 10px 10px 10px;
-  box-shadow: 0 -4px 5px rgba(0, 0, 0, 0.05) inset, 0 4px 3px rgba(252, 254, 255, 0.4) inset, 0 2px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
   color: $theme.menuLinkColor;
+  cursor: unset;
+  box-shadow: none;
   display: inline-block;
   font-weight: 700;
-  font-size: 0.85em;
-  height: 20px;
-  line-height: 20px;
+  line-height: 18px;
   text-align: center;
-  width: 20px;
+  min-height: 22px;
+  min-width: 22px;
 }
 
-.steps .number.active {
+
+.steps .number.step-active {
   background-color: transparent;
   border: 2px solid $theme.notificationSuccessColor;
   color: $theme.notificationSuccessColor;
-  height: 15px;
-  line-height: 15px;
-  width: 15px;
 }
 
-.steps .number.done {
+.steps .number.step-done {
   background-color: transparent;
   border: 2px solid $theme.textSecondaryColor;
   color: $theme.textSecondaryColor;
-  height: 15px;
-  line-height: 15px;
-  width: 15px;
 }
 
 /** Flamingo specific adjustment */
-.skin-flamingo .steps .number.active, .skin-flamingo .steps .number.done {
-  height: 20px;
-  width: 20px;
+.skin-flamingo .steps .number.step-active, .skin-flamingo .steps .number.step-done {
+  height: 24px;
+  width: 24px;
 }
 
 .steps .name {
   color: $theme.titleColor;
 }
 
-.steps .name.active {
+.steps .name.step-active {
   color: $theme.notificationSuccessColor;
 }
 
-.steps .name.done {
+.steps .name.step-done {
   color: $theme.textSecondaryColor;
 }
 

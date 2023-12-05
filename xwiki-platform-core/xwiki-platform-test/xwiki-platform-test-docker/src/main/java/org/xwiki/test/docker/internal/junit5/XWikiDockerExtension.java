@@ -318,11 +318,13 @@ public class XWikiDockerExtension extends AbstractExtension
 
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
-        // End the wcag validation process.
-        testContext.getUtil().getWCAGUtils().endWCAGValidation();
+        if (testContext != null) {
+            // End the wcag validation process.
+            testContext.getUtil().getWCAGUtils().endWCAGValidation();
 
-        // Shutdown the test context
-        shutdownPersistentTestContext(testContext);
+            // Shutdown the test context
+            shutdownPersistentTestContext(testContext);
+        }
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 

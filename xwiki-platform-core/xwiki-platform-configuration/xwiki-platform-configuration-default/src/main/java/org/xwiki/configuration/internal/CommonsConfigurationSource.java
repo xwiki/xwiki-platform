@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
@@ -40,13 +41,15 @@ import org.xwiki.properties.ConverterManager;
  */
 public class CommonsConfigurationSource implements ConfigurationSource
 {
-    private Configuration configuration;
-
     /**
      * Component used for performing type conversions.
      */
     @Inject
-    private ConverterManager converterManager;
+    protected ConverterManager converterManager;
+
+    protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private Configuration configuration;
 
     protected Configuration getConfiguration()
     {
@@ -80,7 +83,13 @@ public class CommonsConfigurationSource implements ConfigurationSource
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
-        return (T) getConfiguration().getProperty(key);
+        this.lock.readLock().lock();
+
+        try {
+            return (T) getConfiguration().getProperty(key);
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     @Override
@@ -91,11 +100,11 @@ public class CommonsConfigurationSource implements ConfigurationSource
 
         try {
             if (String.class == valueClass) {
-                result = (T) getConfiguration().getString(key);
+                result = (T) getString(key);
             } else if (List.class.isAssignableFrom(valueClass)) {
-                result = (T) getConfiguration().getList(key);
+                result = (T) getList(key);
             } else if (Properties.class.isAssignableFrom(valueClass)) {
-                result = (T) getConfiguration().getProperties(key);
+                result = (T) getProperties(key);
             } else {
                 Object value = getProperty(key);
                 if (value != null) {
@@ -111,27 +120,78 @@ public class CommonsConfigurationSource implements ConfigurationSource
         return result;
     }
 
+    private String getString(String key)
+    {
+        this.lock.readLock().lock();
+
+        try {
+            return getConfiguration().getString(key);
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    private List<Object> getList(String key)
+    {
+        this.lock.readLock().lock();
+
+        try {
+            return getConfiguration().getList(key);
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
+    private Properties getProperties(String key)
+    {
+        this.lock.readLock().lock();
+
+        try {
+            return getConfiguration().getProperties(key);
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
+
     @Override
     public List<String> getKeys()
     {
-        List<String> keysList = new ArrayList<>();
-        Iterator<String> keys = getConfiguration().getKeys();
-        while (keys.hasNext()) {
-            keysList.add(keys.next());
-        }
+        this.lock.readLock().lock();
 
-        return keysList;
+        try {
+            List<String> keysList = new ArrayList<>();
+            Iterator<String> keys = getConfiguration().getKeys();
+            while (keys.hasNext()) {
+                keysList.add(keys.next());
+            }
+
+            return keysList;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     @Override
     public boolean containsKey(String key)
     {
-        return getConfiguration().containsKey(key);
+        this.lock.readLock().lock();
+
+        try {
+            return getConfiguration().containsKey(key);
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     @Override
     public boolean isEmpty()
     {
-        return getConfiguration().isEmpty();
+        this.lock.readLock().lock();
+
+        try {
+            return getConfiguration().isEmpty();
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 }

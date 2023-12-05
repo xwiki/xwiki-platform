@@ -30,6 +30,7 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterDisplayer;
@@ -42,6 +43,7 @@ import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * This class is meant to be instanciated and then registered against the Component Manager by the
@@ -95,14 +97,18 @@ public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterD
 
             componentHint = generateComponentHint();
 
-            // Create the template from the given BaseObject property
-            String xObjectTemplate = baseObject.getStringValue(
-                    WikiNotificationFilterDisplayerDocumentInitializer.FILTER_TEMPLATE);
-            if (!StringUtils.isBlank(xObjectTemplate)) {
-                filterTemplate = templateManager.createStringTemplate(
-                        xObjectTemplate, this.getAuthorReference());
-            } else {
-                filterTemplate = null;
+            // Create the template from the given BaseObject propertybaseObject
+            filterTemplate = null;
+            BaseProperty property =
+                (BaseProperty) baseObject.get(WikiNotificationFilterDisplayerDocumentInitializer.FILTER_TEMPLATE);
+            if (property != null && property.getValue() != null) {
+                String xObjectTemplate = property.getValue().toString();
+                if (!StringUtils.isBlank(xObjectTemplate)) {
+                    EntityReferenceSerializer<String> serializer =
+                        componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+                    filterTemplate = templateManager.createStringTemplate(serializer.serialize(property.getReference()),
+                        xObjectTemplate, getAuthorReference(), baseObject.getDocumentReference());
+                }
             }
 
         } catch (Exception e) {

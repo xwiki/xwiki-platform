@@ -21,8 +21,6 @@ package org.xwiki.attachment.validation;
 
 import java.util.List;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception thrown in case of error while validating an attachment. This exception also provides additional accessors
  * to localize the error messages.
@@ -30,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.10
  */
-@Unstable
 public class AttachmentValidationException extends Exception
 {
     private static final long serialVersionUID = 1L;

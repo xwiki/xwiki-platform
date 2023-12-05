@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.image.style.model.ImageStyle;
-import org.xwiki.stability.Unstable;
 
 /**
  * Gives access to the image styles of the wiki.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.3RC1
  */
 @Role
-@Unstable
 public interface ImageStyleManager
 {
     /**

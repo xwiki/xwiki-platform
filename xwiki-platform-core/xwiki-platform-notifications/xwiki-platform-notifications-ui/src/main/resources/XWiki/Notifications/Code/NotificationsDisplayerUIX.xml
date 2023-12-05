@@ -322,7 +322,7 @@ Get the actual notifications.
     }
     var markAllReadButton = $('&lt;a href="#"&gt;')
       .addClass('notification-event-clean')
-      .html('$services.icon.renderHTML("trash")&amp;nbsp;$escapetool.xml($escapetool.javascript($services.localization.render('notifications.menu.clear')))')
+      .html($jsontool.serialize("$services.icon.renderHTML('trash')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.clear'))"))
       .on('click', function (event) {
         // Avoid the menu closing
         event.preventDefault();
@@ -854,7 +854,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
 }
 
 .notifications-toggles .bootstrap-switch .bootstrap-switch-label {
-  background-image: linear-gradient($theme.buttonSecondaryGradientColor, $theme.buttonSecondaryBackgroundColor 50%);
+  background-color: $theme.buttonSecondaryBackgroundColor;
   color: $theme.buttonSecondaryTextColor;
 }
 

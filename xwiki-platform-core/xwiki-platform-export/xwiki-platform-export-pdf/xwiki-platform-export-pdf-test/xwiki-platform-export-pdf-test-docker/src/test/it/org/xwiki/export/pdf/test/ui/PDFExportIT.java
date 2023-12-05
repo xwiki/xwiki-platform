@@ -71,6 +71,7 @@ import org.xwiki.test.ui.po.ViewPage;
         "org.xwiki.platform:xwiki-platform-resource-temporary",
         // Code macro highlighting works only if Jython is a core extension. It's not enough to use language=none in our
         // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
+        // TODO: Remove when https://jira.xwiki.org/browse/XWIKI-17972 is fixed
         "org.python:jython-slim"
     },
     resolveExtraJARs = true,
@@ -1143,6 +1144,24 @@ class PDFExportIT
             // The image from the word document.
             assertEquals(81, images.get(1).getRawWidth());
             assertEquals(81, images.get(1).getRawHeight());
+        }
+    }
+
+    @Test
+    @Order(25)
+    void ampersandInPageTitle(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.createPage(new LocalDocumentReference("A&B=C", testReference), "Page with & in title.", "A&B=C");
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and one content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            // Verify the text from the content page.
+            assertEquals("A&B=C\n2 / 2\nPage with & in title.\n", pdf.getTextFromPage(1));
         }
     }
 

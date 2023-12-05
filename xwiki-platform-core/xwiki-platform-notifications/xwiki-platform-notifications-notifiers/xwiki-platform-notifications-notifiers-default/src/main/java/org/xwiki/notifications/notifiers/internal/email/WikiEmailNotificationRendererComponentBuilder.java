@@ -21,24 +21,21 @@ package org.xwiki.notifications.notifiers.internal.email;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.notifications.notifiers.internal.AbstractWikiNotificationRendererComponentBuilder;
-import org.xwiki.script.ScriptContextManager;
-import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * This component allows the definition of a {@link NotificationDisplayer} in wiki pages.
- * It uses {@link org.xwiki.eventstream.UntypedRecordableEvent#getEventType} to be bound to a specific event type.
+ * This component allows the definition of a {@link NotificationDisplayer} in wiki pages. It uses
+ * {@link org.xwiki.eventstream.UntypedRecordableEvent#getEventType} to be bound to a specific event type.
  *
  * @version $Id$
  * @since 9.5RC1
@@ -49,13 +46,7 @@ import com.xpn.xwiki.objects.BaseObject;
 public class WikiEmailNotificationRendererComponentBuilder extends AbstractWikiNotificationRendererComponentBuilder
 {
     @Inject
-    private TemplateManager templateManager;
-
-    @Inject
-    private ScriptContextManager scriptContextManager;
-
-    @Inject
-    private ComponentManager componentManager;
+    private Provider<WikiEmailNotificationRenderer> rendererProvider;
 
     @Override
     public EntityReference getClassReference()
@@ -64,10 +55,12 @@ public class WikiEmailNotificationRendererComponentBuilder extends AbstractWikiN
     }
 
     @Override
-    protected WikiComponent instantiateComponent(DocumentReference authorReference, BaseObject baseObject)
-            throws NotificationException
+    protected WikiComponent instantiateComponent(BaseObject baseObject) throws NotificationException
     {
-        return new WikiEmailNotificationRenderer(authorReference, templateManager, scriptContextManager,
-                componentManager, baseObject);
+        WikiEmailNotificationRenderer renderer = this.rendererProvider.get();
+
+        renderer.initialize(baseObject);
+
+        return renderer;
     }
 }

@@ -134,7 +134,8 @@ public class PageWithTour extends ViewPage
 
     public boolean hasResumeButton()
     {
-        return getDriver().hasElementWithoutWaiting(By.id("tourResume"));
+        return getDriver().hasElementWithoutWaiting(By.id("tourResume")) 
+            && (getDriver().findElement(By.id("tourResume")).getAttribute("hidden") == null);
     }
 
     public void resume()

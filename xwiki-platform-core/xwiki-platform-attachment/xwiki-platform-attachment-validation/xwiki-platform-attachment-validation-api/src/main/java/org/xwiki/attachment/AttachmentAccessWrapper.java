@@ -22,8 +22,6 @@ package org.xwiki.attachment;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Provides the metadata required to access an attachment without depending on a specific implementation.
  * TODO: Should be moved to xwiki-platform-attachment-api as soon at its dependency to oldcore is removed.
@@ -31,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.10
  */
-@Unstable
 public interface AttachmentAccessWrapper
 {
     /**

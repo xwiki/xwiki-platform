@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.template;
 
 import java.io.StringReader;
 import java.io.Writer;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -124,9 +125,12 @@ public class VelocityTemplateEvaluator
 
             // Check if the content already been compiled
             if (!(templateContent.compiledContent instanceof VelocityTemplate)) {
+                // Velocity is not a fan of null template name
+                String templateId = Objects.toString(template.getId(), "unknown template");
+
                 // Compile the Velocity
                 templateContent.compiledContent =
-                    this.velocityManager.compile(template.getId(), new StringReader(content.getContent()));
+                    this.velocityManager.compile(templateId, new StringReader(content.getContent()));
             }
 
             return (VelocityTemplate) templateContent.compiledContent;

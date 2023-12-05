@@ -1025,7 +1025,6 @@ public class XWiki implements EventListener
      * @return {@code true} if the wiki has been initialized and the initialization is finished.
      * @since 14.4RC1
      */
-    @Unstable
     public boolean isWikiInitialized(String wikiId)
     {
         Job wikiInitializerJob = getWikiInitializerJob(wikiId);
@@ -3939,7 +3938,7 @@ public class XWiki implements EventListener
                 }
             }
 
-            if ((!password.equals(password2))) {
+            if (!password.equals(password2)) {
                 // TODO: throw wrong password exception
                 return -2;
             }
@@ -7905,8 +7904,8 @@ public class XWiki implements EventListener
             // If the class does not have the same reference anymore it means it's coming from a different classloader
             // which generally imply that it's coming from an extension which has been reloaded or upgraded
             // Both still need to have the same class name as otherwise it means the current class did not had anything
-            // to with with the standard configuration (some authenticators register themself)
-            if (this.authService.getClass() != authClass
+            // to do with the standard configuration (some authenticators registering themself)
+            if (authClass != null && this.authService.getClass() != authClass
                 && this.authService.getClass().getName().equals(authClass.getName())) {
                 setAuthService(authClass);
             }

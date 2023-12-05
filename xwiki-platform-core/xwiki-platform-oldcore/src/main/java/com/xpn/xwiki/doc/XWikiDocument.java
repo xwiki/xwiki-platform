@@ -1635,7 +1635,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public String getRenderedContent(String text, Syntax sourceSyntaxId, boolean restrictedTransformationContext,
         XWikiDocument sDocument, boolean isolated, XWikiContext context)
     {
@@ -2552,7 +2551,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if ((this.archive == null || this.archive.get() == null)) {
             XWikiDocumentArchive arch;
-            // A document not comming from the database cannot have an archive stored in the database
+            // A document not coming from the database cannot have an archive stored in the database
             if (this.isNew()) {
                 arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             } else {
@@ -2592,7 +2591,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return arch;
         }
 
-        // A document not comming from the database cannot have an archive stored in the database
+        // A document not coming from the database cannot have an archive stored in the database
         if (this.isNew()) {
             arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             setDocumentArchive(arch);
@@ -3056,7 +3055,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If object creation failed.
      * @since 14.0RC1
      */
-    @Unstable
     public BaseObject getXObject(ObjectReference objectReference, boolean create, XWikiContext context)
         throws XWikiException
     {
@@ -4216,7 +4214,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public List<String> getTagsList(XWikiContext context)
     {
-        List<String> tagList = null;
+        List<String> tagList = List.of();
 
         BaseProperty prop = getTagProperty();
         if (prop != null) {
@@ -4377,7 +4375,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param editForm the form from which to read the list of files.
      * @since 14.3RC1
      */
-    @Unstable
     public void readTemporaryUploadedFiles(EditForm editForm)
     {
         getTemporaryAttachmentManager().attachTemporaryAttachmentsInDocument(this, editForm.getTemporaryUploadedFiles());
@@ -4391,7 +4388,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If an error occurs.
      * @since 14.0RC1
      */
-    @Unstable
     public void readAddedUpdatedAndRemovedObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         // We add the new objects that have been submitted in the form, before filling them with their values.
@@ -4858,7 +4854,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Same as {@link #equals(Object)} but only for actual datas of the document.
      * <p>
      * The goal being to compare two versions of the same document this method skip every version/reference/author
-     * related information. For example it allows to compare a document comming from a another wiki and easily check if
+     * related information. For example it allows to compare a document coming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      *
      * @param otherDocument the document to compare
@@ -5887,7 +5883,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the entity references pointing to either document or attachments. If {@code null}, an error happened
      * @since 14.2RC1
      */
-    @Unstable
     public Set<EntityReference> getUniqueLinkedEntities(XWikiContext context)
     {
         // Return both document and attachment references.
@@ -9241,7 +9236,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
@@ -9261,7 +9256,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
@@ -9470,7 +9465,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.4
      * @since 13.10.10
      */
-    @Unstable
     public void initialize()
     {
         // There is no syntax by default in a new document and the default one is retrieved from the configuration

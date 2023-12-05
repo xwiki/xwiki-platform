@@ -200,7 +200,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
      * @return true if the authors coming from the events should be kept.
      */
     @PropertyName("Preserve author")
-    @PropertyDescription("Indicate if the authors comming from the events should be kept."
+    @PropertyDescription("Indicate if the authors coming from the events should be kept."
         + " If false the current user is used.")
     public boolean isAuthorPreserved()
     {
@@ -217,12 +217,12 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate if an exception should be thrown if a document save fail.
+     * @return Indicate if an exception should be thrown if a document save fails.
      * @since 6.2.6
      * @since 6.4.2
      */
-    @PropertyName("Stop when document save fail")
-    @PropertyDescription("Indicate if an exception should be thrown if a document save fail")
+    @PropertyName("Stop when document save fails")
+    @PropertyDescription("Indicate if an exception should be thrown if a document save fails")
     public boolean isStoppedWhenSaveFail()
     {
         return this.stoppedWhenSaveFail;

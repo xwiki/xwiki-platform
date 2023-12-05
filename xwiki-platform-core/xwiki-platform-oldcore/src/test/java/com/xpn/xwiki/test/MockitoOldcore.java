@@ -22,6 +22,7 @@ package com.xpn.xwiki.test;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -46,6 +47,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -366,6 +368,13 @@ public class MockitoOldcore
             this.spaceConfigurationSource = new MockConfigurationSource();
             getMocker().registerComponent(MockConfigurationSource.getDescriptor("space"),
                 this.spaceConfigurationSource);
+        }
+
+        // Make sure a CacheControl is available by default
+        if (!getMocker().hasComponent(CacheControl.class)) {
+            CacheControl cacheControl = getMocker().registerMockComponent(CacheControl.class);
+            // Allow caching by default since it's the most common case
+            when(cacheControl.isCacheReadAllowed((ChronoLocalDateTime) any())).thenReturn(true);
         }
 
         // Expose a XWikiStubContextProvider if none is exist

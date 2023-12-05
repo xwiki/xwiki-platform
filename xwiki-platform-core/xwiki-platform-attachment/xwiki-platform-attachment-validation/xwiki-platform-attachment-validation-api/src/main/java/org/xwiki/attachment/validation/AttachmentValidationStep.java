@@ -21,7 +21,6 @@ package org.xwiki.attachment.validation;
 
 import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * One attachment validation step. {@link AttachmentValidator} calls them one after the other and fails whenever a step
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10
  */
 @Role
-@Unstable
 public interface AttachmentValidationStep
 {
     /**

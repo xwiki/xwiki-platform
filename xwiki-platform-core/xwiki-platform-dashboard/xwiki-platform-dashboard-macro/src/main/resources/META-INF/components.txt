@@ -4,3 +4,4 @@ org.xwiki.rendering.internal.macro.dashboard.ColumnsDashboardRenderer
 org.xwiki.rendering.internal.macro.dashboard.DefaultGadgetRenderer
 org.xwiki.rendering.internal.macro.dashboard.EditableGadgetRenderer
 org.xwiki.rendering.internal.macro.dashboard.EmptyXDOMChecker
+org.xwiki.rendering.internal.macro.dashboard.GadgetObjectRequiredRightAnalyzer

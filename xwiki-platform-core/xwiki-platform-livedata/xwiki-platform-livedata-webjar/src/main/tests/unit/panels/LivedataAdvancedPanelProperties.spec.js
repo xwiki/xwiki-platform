@@ -48,7 +48,7 @@ function initWrapper({provide} = {}) {
             properties: ['id']
           }
         },
-        isPropertyVisible(propertyId) {
+        isPropertyVisible() {
           return propertyIsVisible;
         },
         setPropertyVisible(propertyId, visible) {

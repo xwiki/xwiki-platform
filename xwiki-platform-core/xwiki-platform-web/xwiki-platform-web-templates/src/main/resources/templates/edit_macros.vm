@@ -19,22 +19,18 @@
 ## ---------------------------------------------------------------------------
 #macro (getEditConfirmation)
   #set ($editConfirmation = $NULL)
-  ##
-  ## Check if edit is forced.
-  ##
-  #set ($session = $request.session)
-  #set ($sessionAttributeName = 'force_edit_' + $doc.prefixedFullName)
-  #set ($editForced = $session.getAttribute($sessionAttributeName))
-  #if (!$editForced && "$!request.get('force')" != '')
-    #set ($editForced = true)
-    #set ($discard = $session.setAttribute($sessionAttributeName, $editForced))
+  
+  ## Persist the results of the last analysis, and they will be ignored during the next check.
+  #set ($forced = "$!request.get('force')" != '')
+  #if ($forced)
+    $services.modelvalidation.edit.force()
   #end
   ##
-  ## Check if the document is protected and ask for confirmation if it is.
+  ## Calls the pre-edit checkers.
   ##
   #set ($checkResult = $services.modelvalidation.edit.check())
 
-  #if (!$checkResult.errorMessages.isEmpty() || (!$editForced && !$checkResult.warningMessages.isEmpty()))
+  #if (!$checkResult.errorMessages.isEmpty() || (!$forced && !$checkResult.warningMessages.isEmpty()))
     #set ($editConfirmation = {})
 
     #if ($checkResult.isError())
@@ -44,33 +40,40 @@
     #end
     #set ($discard = $editConfirmation.put('title', $services.localization.render($titleKey)))
     #define ($message)
-      <p>
-        #if ($checkResult.isError())
+      #if ($checkResult.isError())
+        <div class="box errormessage">
           #set ($messageKey = 'platform.core.editConfirmation.errors')
-        #else
+          $escapetool.xml($services.localization.render($messageKey))
+        </div>
+      #else
+        <div class="box warningmessage">
           #set ($messageKey = 'platform.core.editConfirmation.warnings')
-        #end
-        $escapetool.xml($services.localization.render($messageKey))
-      </p>
+          $escapetool.xml($services.localization.render($messageKey))
+        </div>
+      #end
       #if (!$checkResult.errorMessages.isEmpty())
-      <div class="box errormessage">
         #foreach ($block in $checkResult.errorMessages)
           $services.rendering.render($block, 'html/5.0')
           #if ($foreach.hasNext)
             <hr/>
           #end
         #end
-      </div>
       #end
       #if (!$checkResult.warningMessages.isEmpty())
-      <div class="box warningmessage">
+        ## If we display warnings, in addition to the errors, a warning block is presented before the warnings list.
+        #if ($checkResult.isError())
+          <hr/>
+          <div class="box warningmessage">
+            #set ($messageKey = 'platform.core.editConfirmation.additionalWarnings')
+            $escapetool.xml($services.localization.render($messageKey))
+          </div>
+        #end
         #foreach ($block in $checkResult.warningMessages)
           $services.rendering.render($block, 'html/5.0')
           #if ($foreach.hasNext)
             <hr/>
           #end
         #end
-      </div>
       #end
     #end
     #set ($discard = $editConfirmation.put('message', "$message"))

@@ -63,6 +63,10 @@ $services.progress.startStep('Display the title and content')
       #end
     </div>
   </div>
+  #if ($isPreview)
+    <hr />
+    <div class="bottombuttons sticky-buttons">#template("previewactions.vm")</div>
+  #end
 </main>
 $services.progress.endStep()
 

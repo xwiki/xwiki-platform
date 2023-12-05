@@ -19,27 +19,30 @@
  */
 package org.xwiki.test.ui;
 
-import com.deque.html.axecore.results.Results;
-import com.deque.html.axecore.results.Rule;
-import com.deque.html.axecore.selenium.AxeBuilder;
-
 import java.io.File;
 import java.io.FileWriter;
-import java.nio.charset.StandardCharsets;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.Ordering;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.po.BasePage;
+
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.results.Rule;
+import com.deque.html.axecore.selenium.AxeBuilder;
+import com.google.common.base.Functions;
+import com.google.common.collect.Ordering;
 
 import static java.util.Map.entry;
 
@@ -214,7 +217,7 @@ public class WCAGContext
 
         private int numberOfChecks(List<Rule> violations)
         {
-            return violations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
+            return (violations == null) ? 0 : violations.stream().mapToInt(rule -> rule.getNodes().size()).sum();
         }
 
         String getFailReport()
@@ -341,7 +344,7 @@ public class WCAGContext
      */
     private void updateStatusCountPerRule(Map<String, Integer> statusCountPerRule, List<Rule> newChecks)
     {
-        for (Rule violation : newChecks) {
+        for (Rule violation : CollectionUtils.emptyIfNull(newChecks)) {
             String violationID = violation.getId();
             int violationCount = violation.getNodes().size();
             statusCountPerRule.put(violationID,
@@ -365,8 +368,9 @@ public class WCAGContext
         updateStatusCountPerRule(passCountPerRule, axeResults.getPasses());
         updateStatusCountPerRule(allCountPerRule,
             Stream.of(axeResults.getViolations(), axeResults.getIncomplete(), axeResults.getPasses())
-            .flatMap(x -> x.stream())
-            .collect(Collectors.toList()));
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList()));
 
         if (wcagTestResults.failCount != 0) {
             LOGGER.error("[{} : {}] Found [{}] failing WCAG violations.",

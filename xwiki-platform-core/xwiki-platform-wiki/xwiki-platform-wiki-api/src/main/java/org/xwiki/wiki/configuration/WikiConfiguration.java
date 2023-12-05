@@ -20,7 +20,6 @@
 package org.xwiki.wiki.configuration;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the Wiki module.
@@ -42,7 +41,6 @@ public interface WikiConfiguration
      *         Default is true.
      * @since 14.9RC1
      */
-    @Unstable
     default boolean shouldCreateDatabase()
     {
         return true;

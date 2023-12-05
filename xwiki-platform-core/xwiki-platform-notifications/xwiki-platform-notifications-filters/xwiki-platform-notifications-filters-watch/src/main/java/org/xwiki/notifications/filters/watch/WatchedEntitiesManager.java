@@ -20,10 +20,13 @@
 package org.xwiki.notifications.filters.watch;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 
 /**
  * Manage the watched entities.
@@ -60,4 +63,9 @@ public interface WatchedEntitiesManager
      * @since 10.4RC1
      */
     Collection<String> getWatchedUsers(DocumentReference user) throws NotificationException;
+
+    default List<NotificationFilterPreference> getFilterPreferences(DocumentReference user, EntityReference entity)
+    {
+        return List.of();
+    }
 }

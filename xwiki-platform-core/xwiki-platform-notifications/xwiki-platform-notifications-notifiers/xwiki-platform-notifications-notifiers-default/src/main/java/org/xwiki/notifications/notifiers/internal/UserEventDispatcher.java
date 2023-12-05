@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -284,6 +285,10 @@ public class UserEventDispatcher
             && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
             // Associate the event with the user
             result = saveMailEntityEvent(event, entityId);
+        }
+
+        if (event instanceof DocumentDeletedEvent) {
+            this.userEventManager.cleanUpFilters((DocumentDeletedEvent) event, user);
         }
 
         return result;

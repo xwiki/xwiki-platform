@@ -290,11 +290,6 @@
       &lt;/dl&gt;
       &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h1&gt;
       &lt;dl&gt;
-        #set ($defaultValue = $xwiki.getXWikiPreference('font_size'))
-        #if ("$!defaultValue" == '')
-          #set ($defaultValue = 'Regular')
-        #end
-        #displayField('font_size'         , 'platform.core.profile.accessibility.fontSize'  , $defaultValue)
         #set ($defaultValue = $xwiki.getXWikiPreference('underline'))
         #if ("$!defaultValue" == '')
           #set ($defaultValue = 'Only inline links')

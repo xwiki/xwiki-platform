@@ -46,6 +46,26 @@ $originalUrl?$queryString## prevent line break in output
 
 <link href="#concatenateQueryParameter($defaultStyleURL, $urlParameters)" rel="stylesheet" type="text/css" media="all" />
 <link href="#concatenateQueryParameter($escapetool.xml($xwiki.getSkinFile('print.css', true)), $urlParameters)" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />
+## Take into consideration the user preferences regarding underline links
+#set ($underlining = "$!{xwiki.getUserPreference('underline')}")
+#if ($underlining == 'Yes')
+  a {
+  text-decoration: underline;
+  }
+#end
+#if ($underlining == 'Only inline links (default)')
+## We can use this syntax since CSS nesting is supported on all our supported browsers
+p, span, div {
+  & > .wikilink,
+  & > .wikiexternallink,
+  & > .wikiinternallink,
+  & > .wikicreatelink {
+    & > a {
+      text-decoration: underline;
+    }
+  }
+}
+#end
 ## The stylesheets configuration option allows to override the alternate stylesheets
 ## style1.css, style2.css and style3.css
 #set ($stylesheets = $xwiki.getSpacePreference('stylesheets'))

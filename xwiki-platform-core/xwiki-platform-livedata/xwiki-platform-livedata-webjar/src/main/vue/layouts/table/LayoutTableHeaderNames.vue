@@ -85,7 +85,7 @@
           @keydown.left="keyboardDragNDropLeft($event)"
           @keydown.right="keyboardDragNDropRight($event)"
         >
-          <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
+          <XWikiIcon :icon-descriptor="{name: 'right'}"/>
         </button>
 
         <!--
@@ -319,6 +319,18 @@ export default {
   width: @target-size-minimum;
   height: @target-size-minimum;
   user-select: none;
+  border: 0;
+  color: @btn-default-border;
+}
+
+.layout-table .column-name:focus-within .handle,
+.layout-table .column-name:hover .handle {
+    color: @text-muted;
+    border: 1px solid @text-muted;
+}
+
+.layout-table .draggable-item .handle .fa {
+    vertical-align: unset;
 }
 
 .layout-table .resize-handle {
@@ -327,14 +339,14 @@ export default {
   width: 0;
   border-width: 2px;
   border-radius: 0;
-  margin-left: 4px;
+  margin-left: 2px;
 }
 
 .layout-table .column-name:focus-within .resize-handle,
 .layout-table .column-name:hover .resize-handle {
-    border-color: darken(@btn-default-bg, 20%);
+    border-color: @text-muted;
     border-width: 3px;
-    margin-left: 2px;
+    margin-left: 0;
 }
 
 .layout-table .property-name {

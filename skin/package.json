@@ -39,10 +39,10 @@
     "vite": "4.5.1",
     "vite-plugin-inspect": "0.8.1",
     "vite-plugin-vuetify": "^1.0.2",
-    "vue": "^3.3.8",
+    "vue": "3.3.10",
     "vue-tsc": "^1.8.24"
   },
   "peerDependencies": {
-    "vue": "^3.3.8"
+    "vue": "3.3.10"
   }
 }

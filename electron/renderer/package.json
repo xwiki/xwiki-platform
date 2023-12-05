@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@cristal/lib": "workspace:^",
-    "vue": "^3.3.8"
+    "vue": "3.3.10"
   },
   "devDependencies": {
     "@types/node": "^20.8.10",

@@ -51,8 +51,8 @@ importers:
         specifier: 4.5.1
         version: 4.5.1(@types/node@20.8.10)
       vite-plugin-dts:
-        specifier: ^3.6.3
-        version: 3.6.3(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1)
+        specifier: 3.6.4
+        version: 3.6.4(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1)
       vite-plugin-inspect:
         specifier: 0.8.1
         version: 0.8.1(rollup@4.4.1)(vite@4.5.1)
@@ -635,8 +635,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5(comlink@4.4.1)(vite@4.5.1)
       vite-plugin-dts:
-        specifier: ^3.6.3
-        version: 3.6.3(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1)
+        specifier: 3.6.4
+        version: 3.6.4(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1)
       vite-plugin-inspect:
         specifier: 0.8.1
         version: 0.8.1(rollup@4.4.1)(vite@4.5.1)
@@ -1345,6 +1345,7 @@ packages:
 
   /@microsoft/api-extractor@7.38.3:
     resolution: {integrity: sha512-xt9iYyC5f39281j77JTA9C3ISJpW1XWkCcnw+2vM78CPnro6KhPfwQdPDfwS5JCPNuq0grm8cMdPUOPvrchDWw==}
+    hasBin: true
     dependencies:
       '@microsoft/api-extractor-model': 7.28.2
       '@microsoft/tsdoc': 0.14.2
@@ -2044,22 +2045,10 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@volar/language-core@1.10.10:
-    resolution: {integrity: sha512-nsV1o3AZ5n5jaEAObrS3MWLBWaGwUj/vAsc15FVNIv+DbpizQRISg9wzygsHBr56ELRH8r4K75vkYNMtsSNNWw==}
-    dependencies:
-      '@volar/source-map': 1.10.10
-    dev: true
-
   /@volar/language-core@1.11.1:
     resolution: {integrity: sha512-dOcNn3i9GgZAcJt43wuaEykSluAuOkQgzni1cuxLxTV0nJKanQztp7FxyswdRILaKH+P2XZMPRp2S4MV/pElCw==}
     dependencies:
       '@volar/source-map': 1.11.1
-    dev: true
-
-  /@volar/source-map@1.10.10:
-    resolution: {integrity: sha512-GVKjLnifV4voJ9F0vhP56p4+F3WGf+gXlRtjFZsv6v3WxBTWU3ZVeaRaEHJmWrcv5LXmoYYpk/SC25BKemPRkg==}
-    dependencies:
-      muggle-string: 0.3.1
     dev: true
 
   /@volar/source-map@1.11.1:
@@ -2179,25 +2168,6 @@ packages:
       vue-eslint-parser: 9.3.2(eslint@8.53.0)
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /@vue/language-core@1.8.22(typescript@5.3.2):
-    resolution: {integrity: sha512-bsMoJzCrXZqGsxawtUea1cLjUT9dZnDsy5TuZ+l1fxRMzUGQUG9+Ypq4w//CqpWmrx7nIAJpw2JVF/t258miRw==}
-    peerDependencies:
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      '@volar/language-core': 1.10.10
-      '@volar/source-map': 1.10.10
-      '@vue/compiler-dom': 3.3.8
-      '@vue/shared': 3.3.8
-      computeds: 0.0.1
-      minimatch: 9.0.3
-      muggle-string: 0.3.1
-      typescript: 5.3.2
-      vue-template-compiler: 2.7.15
     dev: true
 
   /@vue/language-core@1.8.24(typescript@5.3.2):
@@ -5347,6 +5317,7 @@ packages:
 
   /resolve@1.22.8:
     resolution: {integrity: sha512-oKWePCxqpd6FlLvGV1VU0x7bkPmmCNolxzjMf4NczoDnQcIWrAF+cPtZn5i6n+RfD2d9i0tzpKnG6Yk168yIyw==}
+    hasBin: true
     dependencies:
       is-core-module: 2.13.1
       path-parse: 1.0.7
@@ -6059,8 +6030,8 @@ packages:
       vite: 4.5.1(@types/node@20.8.10)
     dev: true
 
-  /vite-plugin-dts@3.6.3(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1):
-    resolution: {integrity: sha512-NyRvgobl15rYj65coi/gH7UAEH+CpSjh539DbGb40DfOTZSvDLNYTzc8CK4460W+LqXuMK7+U3JAxRB3ksrNPw==}
+  /vite-plugin-dts@3.6.4(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1):
+    resolution: {integrity: sha512-yOVhUI/kQhtS6lCXRYYLv2UUf9bftcwQK9ROxCX2ul17poLQs02ctWX7+vXB8GPRzH8VCK3jebEFtPqqijXx6w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       typescript: '*'
@@ -6071,7 +6042,7 @@ packages:
     dependencies:
       '@microsoft/api-extractor': 7.38.3
       '@rollup/pluginutils': 5.0.5(rollup@4.4.1)
-      '@vue/language-core': 1.8.22(typescript@5.3.2)
+      '@vue/language-core': 1.8.24(typescript@5.3.2)
       debug: 4.3.4
       kolorist: 1.8.0
       typescript: 5.3.2
@@ -6565,6 +6536,7 @@ packages:
   /z-schema@5.0.5:
     resolution: {integrity: sha512-D7eujBWkLa3p2sIpJA0d1pr7es+a7m0vFAnZLlCEKq/Ij2k0MLi9Br2UPxoxdYystm5K1yeBGzub0FlYUEWj2Q==}
     engines: {node: '>=8.0.0'}
+    hasBin: true
     dependencies:
       lodash.get: 4.4.2
       lodash.isequal: 4.5.0

@@ -29,7 +29,7 @@
   "devDependencies": {
     "reflect-metadata": "^0.1.13",
     "vite": "4.5.1",
-    "vitest": "^0.34.6",
+    "vitest": "1.0.1",
     "vue-tsc": "^1.8.24",
     "@cristal/dev-config": "workspace:*"
   }

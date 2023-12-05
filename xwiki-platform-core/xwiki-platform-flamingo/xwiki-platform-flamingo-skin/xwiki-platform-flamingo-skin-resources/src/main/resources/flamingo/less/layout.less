@@ -318,14 +318,19 @@ already take care of padding and shadow. */
   /* Padding and shadow is already in the #mainContentArea element */
   padding-top: 0;
   box-shadow: none;
+  /* Add a border the same color as the background to preserve vertical alignment with the content of the extra panes,
+     despite the left and right border (instead of a shadow previously). */
+  border-right: 1px solid @xwiki-page-content-bg;
+  border-left: 1px solid @xwiki-page-content-bg;
 }
 
 #docextrapanes {
-  box-shadow: 0 1px 2px @xwiki-border-color;
   border-top: 1px solid @xwiki-border-color;
   border-top-left-radius: @border-radius-base;
   border-top-right-radius: @border-radius-base;
   margin-top: -1px;
+  border-left: 1px solid @xwiki-border-color;
+  border-right: 1px solid @xwiki-border-color;
 }
 
 #xdocFooter {
@@ -336,6 +341,11 @@ already take care of padding and shadow. */
   flex-wrap: wrap;
   margin-bottom: floor((@grid-gutter-width / 2));
   padding-top: 0;
+  /* Add a border the same color as the background to preserve vertical alignment with the content of the extra panes,
+     despite the left and right border (instead of a shadow previously). */
+  border-right: 1px solid @xwiki-page-content-bg;
+  border-left: 1px solid @xwiki-page-content-bg;
+  border-bottom: 1px solid @xwiki-page-content-bg;
 }
 
 // Tabbar =====================================================================

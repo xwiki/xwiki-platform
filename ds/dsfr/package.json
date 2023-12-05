@@ -23,7 +23,7 @@
   "dependencies": {
     "@cristal/api": "workspace:^",
     "@gouvfr/dsfr": "^1.10.2",
-    "@gouvminint/vue-dsfr": "^4.7.0",
+    "@gouvminint/vue-dsfr": "5.2.0",
     "inversify": "^6.0.2",
     "oh-vue-icons": "1.0.0-rc3",
     "vue": "^3.3.8",

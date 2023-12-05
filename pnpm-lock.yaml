@@ -106,8 +106,8 @@ importers:
         specifier: ^1.10.2
         version: 1.10.2
       '@gouvminint/vue-dsfr':
-        specifier: ^4.7.0
-        version: 4.7.1(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.5)(vue@3.3.8)
+        specifier: 5.2.0
+        version: 5.2.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.5)(vue@3.3.8)
       inversify:
         specifier: ^6.0.2
         version: 6.0.2
@@ -1016,8 +1016,8 @@ packages:
     engines: {node: '>=18.16.1'}
     dev: false
 
-  /@gouvminint/vue-dsfr@4.7.1(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.5)(vue@3.3.8):
-    resolution: {integrity: sha512-hFyE4U1J+hMjqAYx2qXatmtxxQQn7eBQ4UY9M7D2GwdgT2APGnx8lWzO3P61ori2XhdZgaPsgKNPL1eo0Y8AdA==}
+  /@gouvminint/vue-dsfr@5.2.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.5)(vue@3.3.8):
+    resolution: {integrity: sha512-dqbSckosX+a6QiMxV64m65wXkR/B0yGquAX3jNID/4RpMJszhEGssGbZwZZLl/6RUaXAvVeJGwcJwHK4L3pE7A==}
     engines: {node: '>=18.x.x', npm: '>=8.x.x'}
     peerDependencies:
       oh-vue-icons: 1.0.0-rc3
@@ -1030,8 +1030,6 @@ packages:
       oh-vue-icons: 1.0.0-rc3(vue@3.3.8)
       vue: 3.3.8(typescript@5.2.2)
       vue-router: 4.2.5(vue@3.3.8)
-    optionalDependencies:
-      esbuild-linux-64: 0.15.18
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
@@ -3129,15 +3127,6 @@ packages:
     dev: true
     optional: true
 
-  /esbuild-linux-64@0.15.18:
-    resolution: {integrity: sha512-hNSeP97IviD7oxLKFuii5sDPJ+QHeiFTFLoLm7NZQligur8poNOWGIgpQ7Qf8Balb69hptMZzyOBIPtY09GZYw==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [linux]
-    requiresBuild: true
-    dev: false
-    optional: true
-
   /esbuild@0.18.20:
     resolution: {integrity: sha512-ceqxoedUrcayh7Y7ZX6NdbbDzGROiyVBgC4PriJThBKSVPWnnFHZAkfI1lJT8QFkOwH4qOS2SJkS4wvpGl8BpA==}
     engines: {node: '>=12'}
@@ -3187,6 +3176,7 @@ packages:
 
   /eslint-config-prettier@8.10.0(eslint@8.53.0):
     resolution: {integrity: sha512-SM8AMJdeQqRYT9O9zguiruQZaN7+z+E4eAP9oiLNGKMtomwaB1E9dcgUD6ZAn/eQAb52USbvezbiljfZUhbJcg==}
+    hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
     dependencies:
@@ -3195,6 +3185,7 @@ packages:
 
   /eslint-config-prettier@9.0.0(eslint@8.53.0):
     resolution: {integrity: sha512-IcJsTkJae2S35pRsRAwoCE+925rJJStOdkKnLVgtE+tEpqU0EVVM7OqrwxqgptKdX29NUwC82I5pXsGFIgSevw==}
+    hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
     dependencies:
@@ -4608,6 +4599,7 @@ packages:
 
   /nx@17.1.2:
     resolution: {integrity: sha512-pf94ri36cAiSzbYcPTJwQzttgAsHSjCLEni0Ilw6aVdjpoV2l6cggYxwddX7pgtCWuokVp/6KhAxVkbzvH65wg==}
+    hasBin: true
     requiresBuild: true
     peerDependencies:
       '@swc-node/register': ^1.6.7
@@ -5874,6 +5866,7 @@ packages:
   /vite@4.5.0(@types/node@20.8.10):
     resolution: {integrity: sha512-ulr8rNLA6rkyFAlVWw2q5YJ91v098AFQ2R0PRFwPzREXOUJQPtFUG0t+/ZikhaOCDqFoDhN6/v8Sq0o4araFAw==}
     engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
     peerDependencies:
       '@types/node': '>= 14'
       less: '*'
@@ -5908,6 +5901,7 @@ packages:
   /vitest@0.34.6(happy-dom@12.10.3):
     resolution: {integrity: sha512-+5CALsOvbNKnS+ZHMXtuUC7nL8/7F1F2DnHGjSsszX8zCjWSSviphCb/NuS9Nzf4Q03KyyDRBAXhF/8lffME4Q==}
     engines: {node: '>=v14.18.0'}
+    hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@vitest/browser': '*'
@@ -5977,6 +5971,7 @@ packages:
   /vue-demi@0.12.5(vue@3.3.8):
     resolution: {integrity: sha512-BREuTgTYlUr0zw0EZn3hnhC3I6gPWv+Kwh4MCih6QcAeaTlaIX0DwOVN0wHej7hSvDPecz4jygy/idsgKfW58Q==}
     engines: {node: '>=12'}
+    hasBin: true
     requiresBuild: true
     peerDependencies:
       '@vue/composition-api': ^1.0.0-rc.1
@@ -5991,6 +5986,7 @@ packages:
   /vue-demi@0.14.6(vue@3.3.8):
     resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
     engines: {node: '>=12'}
+    hasBin: true
     requiresBuild: true
     peerDependencies:
       '@vue/composition-api': ^1.0.0-rc.1
@@ -6049,6 +6045,7 @@ packages:
 
   /vue-tsc@1.8.24(typescript@5.2.2):
     resolution: {integrity: sha512-eH1CSj231OzVEY5Hi7wS6ubzyOEwgr5jCptR0Ddf2SitGcaXIsPVDvrprm3eolCdyhDt3WS1Eb2F4fGX9BsUUw==}
+    hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:

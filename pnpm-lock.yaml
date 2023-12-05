@@ -427,11 +427,11 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
       marked:
-        specifier: ^7.0.5
-        version: 7.0.5
+        specifier: 11.0.0
+        version: 11.0.0
       marked-base-url:
-        specifier: ^1.0.6
-        version: 1.1.1(marked@7.0.5)
+        specifier: 1.1.2
+        version: 1.1.2(marked@11.0.0)
     devDependencies:
       '@types/dompurify':
         specifier: ^3.0.2
@@ -4582,17 +4582,18 @@ packages:
     dependencies:
       semver: 6.3.1
 
-  /marked-base-url@1.1.1(marked@7.0.5):
-    resolution: {integrity: sha512-MCuBheOk7Y496A5O7PpY1NMjw9pcLfBCY9NdOe9lAhjXMBKXqRe1me/r7ipFSti1WiJ6OarH0XW9kVsS11jvSw==}
+  /marked-base-url@1.1.2(marked@11.0.0):
+    resolution: {integrity: sha512-Rgnd6tGrVhyPgQzPvKt1vBA3eUAHNtAXBJ/Xf30/e9kHufBqDK283HTqW9cPinV8lNcIVQ+JLSUwZnEPchyx6Q==}
     peerDependencies:
-      marked: '>= 4 < 11'
+      marked: '>= 4 < 12'
     dependencies:
-      marked: 7.0.5
+      marked: 11.0.0
     dev: false
 
-  /marked@7.0.5:
-    resolution: {integrity: sha512-lwNAFTfXgqpt/XvK17a/8wY9/q6fcSPZT1aP6QW0u74VwaJF/Z9KbRcX23sWE4tODM+AolJNcUtErTkgOeFP/Q==}
-    engines: {node: '>= 16'}
+  /marked@11.0.0:
+    resolution: {integrity: sha512-2GsW34uXaFEGTQ/+3rCnNC6vUYTAgFuDLGl70v/aWinA5mIJtTrrFAmfbLOfVvgPyxXuDVL9He/7reCK+6j3Sw==}
+    engines: {node: '>= 18'}
+    hasBin: true
     dev: false
 
   /matcher@3.0.0:

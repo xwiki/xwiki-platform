@@ -76,7 +76,7 @@ export class MarkdownToHTMLConverter implements Converter {
       marked.use(baseUrl(wikiConfig.baseURL)).use(macro);
       this.markedInit = true;
     }
-    const html = marked(source);
+    const html = marked(source) as string;
     this.logger?.debug("HTML before sanitize", html);
     content = DOMPurify.sanitize(html, this.sanitizeConfig) as string;
     this.logger?.debug("HTML after sanitize", content);

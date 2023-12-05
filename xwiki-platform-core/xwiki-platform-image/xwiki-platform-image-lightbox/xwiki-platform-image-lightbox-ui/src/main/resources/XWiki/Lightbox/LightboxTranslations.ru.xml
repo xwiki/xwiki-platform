@@ -57,5 +57,7 @@ image.lightbox.fullscreen.title=Полный экран
 image.lightbox.gallery.title=Галерея изображений
 image.lightbox.nextSlide.title=Следующее изображение
 image.lightbox.prevSlide.title=Предыдущее изображение
+image.lightbox.publisher.label=Публикатор изображения
+image.lightbox.toggler.label=Открыть действия с изображением
 </content>
   </xwikidoc>

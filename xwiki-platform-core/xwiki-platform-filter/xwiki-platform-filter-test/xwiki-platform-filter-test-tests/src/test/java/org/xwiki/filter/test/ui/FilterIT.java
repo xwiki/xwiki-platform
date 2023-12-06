@@ -31,6 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
@@ -62,6 +63,16 @@ public class FilterIT extends AbstractTest
         // Verify we're on the right page!
         Assert.assertEquals("Filter", this.vp.getMetaDataValue("space"));
         Assert.assertEquals("WebHome", this.vp.getMetaDataValue("page"));
+    }
+
+    @Test
+    public void testDefaultVersionPreservedValue() throws IOException, InterruptedException
+    {
+        URL url = getClass().getResource("/xml/document1.xml");
+        Select outputType = new Select(getDriver().findElement(By.id("filter_output_type")));
+        outputType.selectByValue("xwiki+instance");
+        WebElement inputElement = getDriver().findElement(By.id("filter_output_properties_descriptor_versionPreserved"));
+        Assert.assertEquals("true", inputElement.getAttribute("value"));
     }
 
     @Test

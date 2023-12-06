@@ -20,7 +20,7 @@
     "linux": "echo 'no task'"
   },
   "devDependencies": {
-    "@types/node": "^20.8.9",
+    "@types/node": "20.10.3",
     "typescript": "5.3.2",
     "unplugin-auto-expose": "^0.0.5",
     "vite": "4.5.1",

@@ -49,7 +49,7 @@ importers:
         version: 5.3.2
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vite-plugin-dts:
         specifier: 3.6.4
         version: 3.6.4(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1)
@@ -83,7 +83,7 @@ importers:
         version: 0.1.13
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vitest:
         specifier: 1.0.1
         version: 1.0.1(happy-dom@12.10.3)
@@ -138,7 +138,7 @@ importers:
         version: 12.10.3
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vitest:
         specifier: 1.0.1
         version: 1.0.1(happy-dom@12.10.3)
@@ -163,7 +163,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -188,7 +188,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -212,8 +212,8 @@ importers:
   electron/main:
     devDependencies:
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.10
+        specifier: 20.10.3
+        version: 20.10.3
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
@@ -225,7 +225,7 @@ importers:
         version: 5.3.2
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -233,8 +233,8 @@ importers:
   electron/preload:
     devDependencies:
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.10
+        specifier: 20.10.3
+        version: 20.10.3
       typescript:
         specifier: 5.3.2
         version: 5.3.2
@@ -243,7 +243,7 @@ importers:
         version: 0.0.5
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -258,14 +258,14 @@ importers:
         version: 3.3.10(typescript@5.3.2)
     devDependencies:
       '@types/node':
-        specifier: ^20.8.10
-        version: 20.8.10
+        specifier: 20.10.3
+        version: 20.10.3
       typescript:
         specifier: 5.3.2
         version: 5.3.2
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -315,7 +315,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -379,7 +379,7 @@ importers:
         version: 7.3.67
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -404,7 +404,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -438,7 +438,7 @@ importers:
         version: 3.0.5
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -457,7 +457,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -476,7 +476,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vite-plugin-comlink:
         specifier: ^3.0.5
         version: 3.0.5(comlink@4.4.1)(vite@4.5.1)
@@ -516,7 +516,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vite-plugin-comlink:
         specifier: ^3.0.5
         version: 3.0.5(comlink@4.4.1)(vite@4.5.1)
@@ -553,7 +553,7 @@ importers:
         version: 4.5.1(vite@4.5.1)(vue@3.3.10)
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vite-plugin-inspect:
         specifier: 0.8.1
         version: 0.8.1(rollup@4.4.1)(vite@4.5.1)
@@ -596,7 +596,7 @@ importers:
         version: 3.0.5
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
@@ -630,7 +630,7 @@ importers:
         version: 4.5.1(vite@4.5.1)(vue@3.3.10)
       vite:
         specifier: 4.5.1
-        version: 4.5.1(@types/node@20.8.10)
+        version: 4.5.1(@types/node@20.10.3)
       vite-plugin-comlink:
         specifier: ^3.0.5
         version: 3.0.5(comlink@4.4.1)(vite@4.5.1)
@@ -1707,7 +1707,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 20.10.1
+      '@types/node': 20.10.3
       '@types/responselike': 1.0.2
     dev: true
 
@@ -1730,7 +1730,7 @@ packages:
   /@types/fs-extra@9.0.13:
     resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
     dependencies:
-      '@types/node': 20.10.1
+      '@types/node': 20.10.3
     dev: true
 
   /@types/http-cache-semantics@4.0.4:
@@ -1744,7 +1744,7 @@ packages:
   /@types/keyv@3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 20.10.1
+      '@types/node': 20.10.3
     dev: true
 
   /@types/marked@5.0.2:
@@ -1759,15 +1759,8 @@ packages:
     resolution: {integrity: sha512-cOxcXsQ2sxiwkykdJqvyFS+MLQPLvIdwh5l6gNg8qF6s+C7XSkEWOZjK+XhUZd+mYvHV/180g2cnCcIl4l06Pw==}
     dev: true
 
-  /@types/node@20.10.1:
-    resolution: {integrity: sha512-T2qwhjWwGH81vUEx4EXmBKsTJRXFXNZTL4v0gi01+zyBmCwzE6TyHszqX01m+QHTEq+EZNo13NeJIdEqf+Myrg==}
-    requiresBuild: true
-    dependencies:
-      undici-types: 5.26.5
-    dev: true
-
-  /@types/node@20.8.10:
-    resolution: {integrity: sha512-TlgT8JntpcbmKUFzjhsyhGfP2fsiz1Mv56im6enJ905xG1DAYesxJaeSbGqQmAw8OWPdhyJGhGSQGKRNJ45u9w==}
+  /@types/node@20.10.3:
+    resolution: {integrity: sha512-XJavIpZqiXID5Yxnxv3RUDKTN5b81ddNC3ecsA0SoFXz/QU8OGBwZGMomiq0zw+uuqbL/krztv/DINAQ/EV4gg==}
     dependencies:
       undici-types: 5.26.5
 
@@ -1775,7 +1768,7 @@ packages:
     resolution: {integrity: sha512-E6OCaRmAe4WDmWNsL/9RMqdkkzDCY1etutkflWk4c+AcjDU07Pcz1fQwTX0TQz+Pxqn9i4L1TU3UFpjnrcDgxA==}
     requiresBuild: true
     dependencies:
-      '@types/node': 20.10.1
+      '@types/node': 20.10.3
       xmlbuilder: 15.1.1
     dev: true
     optional: true
@@ -1795,7 +1788,7 @@ packages:
   /@types/responselike@1.0.2:
     resolution: {integrity: sha512-/4YQT5Kp6HxUDb4yhRkm0bJ7TbjvTddqX7PZ5hz6qV3pxSo72f/6YPRo+Mu2DU307tm9IioO69l7uAwn5XNcFA==}
     dependencies:
-      '@types/node': 20.10.1
+      '@types/node': 20.10.3
     dev: true
 
   /@types/scheduler@0.16.8:
@@ -1819,7 +1812,7 @@ packages:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
     requiresBuild: true
     dependencies:
-      '@types/node': 20.10.1
+      '@types/node': 20.10.3
     dev: true
     optional: true
 
@@ -1965,7 +1958,7 @@ packages:
       vite: ^4.0.0 || ^5.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 4.5.1(@types/node@20.8.10)
+      vite: 4.5.1(@types/node@20.10.3)
       vue: 3.3.10(typescript@5.3.2)
     dev: true
 
@@ -5960,7 +5953,7 @@ packages:
       comlink: 4.4.1
       json5: 2.2.1
       magic-string: 0.26.7
-      vite: 4.5.1(@types/node@20.8.10)
+      vite: 4.5.1(@types/node@20.10.3)
     dev: true
 
   /vite-plugin-dts@3.6.4(rollup@4.4.1)(typescript@5.3.2)(vite@4.5.1):
@@ -5979,7 +5972,7 @@ packages:
       debug: 4.3.4
       kolorist: 1.8.0
       typescript: 5.3.2
-      vite: 4.5.1(@types/node@20.8.10)
+      vite: 4.5.1(@types/node@20.10.3)
       vue-tsc: 1.8.24(typescript@5.3.2)
     transitivePeerDependencies:
       - '@types/node'
@@ -6005,7 +5998,7 @@ packages:
       open: 9.1.0
       picocolors: 1.0.0
       sirv: 2.0.3
-      vite: 4.5.1(@types/node@20.8.10)
+      vite: 4.5.1(@types/node@20.10.3)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -6021,13 +6014,13 @@ packages:
       '@vuetify/loader-shared': 1.7.1(vue@3.3.10)(vuetify@3.4.5)
       debug: 4.3.4
       upath: 2.0.1
-      vite: 4.5.1(@types/node@20.8.10)
+      vite: 4.5.1(@types/node@20.10.3)
       vuetify: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
     transitivePeerDependencies:
       - supports-color
       - vue
 
-  /vite@4.5.1(@types/node@20.8.10):
+  /vite@4.5.1(@types/node@20.10.3):
     resolution: {integrity: sha512-AXXFaAJ8yebyqzoNB9fu2pHoo/nWX+xZlaRwoeYUxEqBO+Zj4msE5G+BhGBll9lYEKv9Hfks52PAF2X7qDYXQA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -6055,7 +6048,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.8.10
+      '@types/node': 20.10.3
       esbuild: 0.18.20
       postcss: 8.4.32
       rollup: 3.29.4

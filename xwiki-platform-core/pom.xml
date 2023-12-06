@@ -125,10 +125,47 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>Those APIs are still available with legacy packages.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltipJS(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String, com.xpn.xwiki.api.Object)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.objects.BaseObject, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

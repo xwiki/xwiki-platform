@@ -76,6 +76,16 @@ public class FilterIT extends AbstractTest
     }
 
     @Test
+    public void testDefaultVersionPreservedValue() throws IOException, InterruptedException
+    {
+        URL url = getClass().getResource("/xml/document1.xml");
+        Select outputType = new Select(getDriver().findElement(By.id("filter_output_type")));
+        outputType.selectByValue("xwiki+instance");
+        WebElement inputElement = getDriver().findElement(By.id("filter_output_properties_descriptor_versionPreserved"));
+        Assert.assertEquals("true", inputElement.getAttribute("value"));
+    }
+
+    @Test
     public void testConvertXMLURL() throws IOException, InterruptedException
     {
         ApplicationFilterHomePage page = ApplicationFilterHomePage.gotoPage();

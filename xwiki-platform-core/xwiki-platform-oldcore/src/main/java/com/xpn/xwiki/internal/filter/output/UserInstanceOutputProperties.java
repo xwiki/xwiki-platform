@@ -48,7 +48,7 @@ public class UserInstanceOutputProperties extends InstanceOutputProperties
     /**
      * @see #isVersionPreserved()
      */
-    private boolean versionPreserved;
+    private boolean versionPreserved = true;
 
     /**
      * @see #getGroupPrefix()

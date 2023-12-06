@@ -1113,14 +1113,14 @@ $html
  *
  * @param docNames list of document names.
  * @param displaySpaces true to group documents by space.
- * @param blacklistedSpaces spaces to exclude from the list.
+ * @param ignoredSpaces spaces to exclude from the list.
  *#
-#macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
+#macro(displayDocumentList $docNames $displaySpaces $ignoredSpaces)
   #set($documentList = [])
   #foreach($docName in $docNames)
     #if($xwiki.hasAccessLevel("view", $xcontext.user, $docName))
       #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
-      #if(("$!blacklistedSpaces" != '' && !$blacklistedSpaces.contains($document.getSpace())) || ("$!blacklistedSpaces" == '' && ($services.user.properties.displayHiddenDocuments() || !$document.isHidden())))
+      #if(("$!ignoredSpaces" != '' && !$ignoredSpaces.contains($document.getSpace())) || $services.user.properties.displayHiddenDocuments() || !$document.isHidden())
         #set($discard = $documentList.add($document))
       #end
     #end

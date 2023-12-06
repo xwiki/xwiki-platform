@@ -143,7 +143,6 @@ public interface DocumentModelBridge
      * @return the various authors information of a document.
      * @since 14.0RC1
      */
-    @Unstable
     default DocumentAuthors getAuthors()
     {
         return null;
@@ -174,7 +173,6 @@ public interface DocumentModelBridge
      * @return the last save date of the current document.
      * @since 14.0RC1
      */
-    @Unstable
     default Date getDate()
     {
         return null;

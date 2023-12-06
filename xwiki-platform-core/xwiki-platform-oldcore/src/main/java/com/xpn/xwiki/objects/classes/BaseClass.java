@@ -39,7 +39,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
@@ -749,7 +748,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, boolean restricted)
     {
         return addTextAreaField(fieldName, fieldPrettyName, cols, rows, (String) null, restricted);
@@ -771,7 +769,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor, boolean restricted)
     {
         return addTextAreaField(fieldName, fieldPrettyName, cols, rows, editor, null, restricted);
@@ -811,7 +808,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor,
         String contenttype, boolean restricted)
     {

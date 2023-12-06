@@ -314,7 +314,7 @@ public class SolrRatingsManager implements RatingsManager
             oldRating = existingRating.get();
 
             // If the vote is not 0 or if we store zero, we just modify the existing vote
-            if (vote != 0) {
+            if (vote != 0 || this.getRatingConfiguration().isZeroStored()) {
                 result = new DefaultRating(oldRating)
                     .setUpdatedAt(new Date())
                     .setVote(vote);
@@ -322,7 +322,7 @@ public class SolrRatingsManager implements RatingsManager
                 // It's an update of a vote
                 event = new UpdatedRatingEvent(result, oldRating.getVote());
             // Else we remove it.
-            } else if (this.ratingsConfiguration.isZeroStored()) {
+            } else {
                 this.removeRating(oldRating.getId());
             }
         }

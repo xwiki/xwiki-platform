@@ -413,27 +413,43 @@ define('xwiki-realtime-wysiwygEditor', [
         crypto: Crypto,
         network: editorConfig.network,
 
-        // OT
-        //patchTransformer: Chainpad.NaiveJSONTransformer
+        // Operational Transformation
+        // The synchronization is done on JSON so we need to make sure the output of the synchronization is always
+        // valid JSON.
+        patchTransformer: Chainpad.NaiveJSONTransformer,
+
+        validateContent: function(content) {
+          try {
+            JSON.parse(content || '{}');
+            return true;
+          } catch (e) {
+            console.error("Failed to parse JSON content, rejecting patch.", {
+              content,
+              error: e
+            });
+            return false;
+          }
+        },
 
         onRemote: function(info) {
           if (initializing) {
             return;
           }
 
-          const shjson = info.realtime.getUserDoc();
+          const remoteContent = info.realtime.getUserDoc();
 
-          // Build a DOM from HJSON, diff, and patch the editor.
-          patchedEditor.setHyperJSON(shjson);
+          // Build a DOM from HyperJSON, diff and patch the editor.
+          patchedEditor.setHyperJSON(remoteContent);
 
-          const shjson2 = patchedEditor.getHyperJSON();
-          if (shjson2 !== shjson) {
-            console.error('shjson2 !== shjson');
-            const diff = Chainpad.Diff.diff(shjson, shjson2);
-            console.log(shjson, diff);
-            module.chainpad.contentUpdate(shjson2);
+          const localContent = patchedEditor.getHyperJSON();
+          if (localContent !== remoteContent) {
+            console.error('Unexpected local content after synchronization: ', {
+              expected: remoteContent,
+              actual: localContent,
+              diff: Chainpad.Diff.diff(remoteContent, localContent)
+            });
           } else {
-            // Notify the content change.
+            // Notify the content change (e.g. to update the empty line placeholders).
             editor.fire('change');
           }
         },
@@ -590,11 +606,16 @@ define('xwiki-realtime-wysiwygEditor', [
             return;
           }
           // Stringify the JSON and send it into ChainPad.
-          const shjson = patchedEditor.getHyperJSON();
-          module.chainpad.contentUpdate(shjson);
+          const localContent = patchedEditor.getHyperJSON();
+          module.chainpad.contentUpdate(localContent);
 
-          if (module.chainpad.getUserDoc() !== shjson) {
-            console.error("realtime.getUserDoc() !== shjson");
+          const remoteContent = module.chainpad.getUserDoc();
+          if (remoteContent !== localContent) {
+            console.error('Unexpected remote content after synchronization: ', {
+              expected: localContent,
+              actual: remoteContent,
+              diff: Chainpad.Diff.diff(localContent, remoteContent)
+            });
           }
         }
       };

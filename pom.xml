@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>15.10-SNAPSHOT</version>
+    <version>16.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>15.10-SNAPSHOT</version>
+  <version>16.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -68,7 +68,7 @@
     <zookeeper.version>3.9.1</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.19.2</testcontainers.version>
+    <testcontainers.version>1.19.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -114,7 +114,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.6.0</pgsql.version>
+    <pgsql.version>42.7.0</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.11.0.0</oracle.version>
@@ -172,7 +172,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.24.0</version>
+        <version>4.25.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -597,7 +597,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.16.2</version>
+        <version>1.17.1</version>
       </dependency>
 
       <!-- PDF -->
@@ -1117,6 +1117,53 @@
         <groupId>org.apache.zookeeper</groupId>
         <artifactId>zookeeper-jute</artifactId>
         <version>${zookeeper.version}</version>
+      </dependency>
+
+      <!-- Database connectors -->
+      <!-- Exclude optional dependencies -->
+      <dependency>
+        <groupId>${mysql.groupId}</groupId>
+        <artifactId>${mysql.artifactId}</artifactId>
+        <version>${mysql.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${mariadb.groupId}</groupId>
+        <artifactId>${mariadb.artifactId}</artifactId>
+        <version>${mariadb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${pgsql.groupId}</groupId>
+        <artifactId>${pgsql.artifactId}</artifactId>
+        <version>${pgsql.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${oracle.groupId}</groupId>
+        <artifactId>${oracle.artifactId}</artifactId>
+        <version>${oracle.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

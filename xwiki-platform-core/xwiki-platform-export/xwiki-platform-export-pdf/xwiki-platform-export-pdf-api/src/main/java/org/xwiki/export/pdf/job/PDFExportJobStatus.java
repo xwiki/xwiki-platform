@@ -32,7 +32,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * The status of the PDF export job.
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4.2
  * @since 14.5
  */
-@Unstable
 public class PDFExportJobStatus extends DefaultJobStatus<PDFExportJobRequest>
 {
     /**

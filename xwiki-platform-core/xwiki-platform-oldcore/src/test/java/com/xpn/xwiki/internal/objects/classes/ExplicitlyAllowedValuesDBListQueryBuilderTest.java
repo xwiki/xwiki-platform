@@ -19,25 +19,38 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import java.io.Writer;
+import java.util.concurrent.Callable;
+
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ExplicitlyAllowedValuesDBListQueryBuilder}.
@@ -45,27 +58,42 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.8RC1
  */
+@ComponentTest
 public class ExplicitlyAllowedValuesDBListQueryBuilderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryBuilder<DBListClass>> mocker =
-        new MockitoComponentMockingRule<QueryBuilder<DBListClass>>(ExplicitlyAllowedValuesDBListQueryBuilder.class);
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("math", "Some", "Page");
 
+    private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("wiki", "Users", "alice");
+
+    private static final String SQL = "select ...";
+
+    @InjectMockComponents
+    private ExplicitlyAllowedValuesDBListQueryBuilder builder;
+
+    @MockComponent
     private AuthorizationManager authorizationManager;
 
+    @MockComponent
+    @Named("secure")
     private QueryManager secureQueryManager;
+
+    @MockComponent
+    private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    private VelocityManager velocityManager;
+
+    @Mock
+    private VelocityEngine velocityEngine;
 
     private DBListClass dbListClass = new DBListClass();
 
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
-        this.authorizationManager = this.mocker.getInstance(AuthorizationManager.class);
-        this.secureQueryManager = this.mocker.getInstance(QueryManager.class, "secure");
-
         XWikiDocument ownerDocument = mock(XWikiDocument.class);
-        when(ownerDocument.getDocumentReference()).thenReturn(new DocumentReference("math", "Some", "Page"));
-        when(ownerDocument.getAuthorReference()).thenReturn(new DocumentReference("wiki", "Users", "alice"));
+        when(ownerDocument.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(ownerDocument.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
 
         BaseClass xclass = new BaseClass();
         xclass.setDocumentReference(ownerDocument.getDocumentReference());
@@ -73,25 +101,41 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         this.dbListClass.setOwnerDocument(ownerDocument);
         this.dbListClass.setObject(xclass);
         this.dbListClass.setName("category");
-        this.dbListClass.setSql("select ...");
+        this.dbListClass.setSql(SQL);
+
+        when(this.velocityManager.getVelocityEngine()).thenReturn(this.velocityEngine);
     }
 
     @Test
     public void buildWithScriptRight() throws Exception
     {
-        DocumentReference authorReference = this.dbListClass.getOwnerDocument().getAuthorReference();
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, authorReference, dbListClass.getReference()))
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE))
             .thenReturn(true);
 
-        AuthorExecutor authorExector = this.mocker.getInstance(AuthorExecutor.class);
         String evaluatedStatement = "test";
-        when(authorExector.call(any(), eq(authorReference), eq(this.dbListClass.getDocumentReference())))
-            .thenReturn(evaluatedStatement);
+        when(this.velocityEngine.evaluate(any(), any(), any(), eq(SQL))).thenAnswer(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                invocation.<Writer>getArgument(1).write(evaluatedStatement);
+
+                return true;
+            }
+        });
+        when(this.authorExecutor.call(any(), eq(AUTHOR_REFERENCE), eq(DOCUMENT_REFERENCE))).thenAnswer(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.<Callable<String>>getArgument(0).call();
+            }
+        });
 
         Query query = mock(Query.class);
         when(this.secureQueryManager.createQuery(evaluatedStatement, Query.HQL)).thenReturn(query);
 
-        assertSame(query, this.mocker.getComponentUnderTest().build(this.dbListClass));
+        assertSame(query, this.builder.build(this.dbListClass));
     }
 
     @Test
@@ -100,7 +144,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilderTest
         Query query = mock(Query.class);
         when(this.secureQueryManager.createQuery(this.dbListClass.getSql(), Query.HQL)).thenReturn(query);
 
-        assertSame(query, this.mocker.getComponentUnderTest().build(this.dbListClass));
+        assertSame(query, this.builder.build(this.dbListClass));
 
         verify(query).setWiki("math");
     }

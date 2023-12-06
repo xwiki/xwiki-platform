@@ -134,7 +134,9 @@ public class UserAddedEventListener extends AbstractEventListener
                 List<BaseObject> xObjects = notificationConfiguration.getXObjects(TOGGLEABLE_FILTER_PREFERENCE_CLASS);
 
                 for (BaseObject xObject : xObjects) {
-                    userDocument.addXObject(xObject.duplicate());
+                    if (xObject != null) {
+                        userDocument.addXObject(xObject.duplicate());
+                    }
                 }
             }
         } finally {

@@ -30,9 +30,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -114,6 +114,9 @@ public class UserEventDispatcher
 
     @Inject
     private RemoteObservationManagerConfiguration remoteObservation;
+
+    @Inject
+    private DeletedDocumentCleanUpFilterProcessingQueue cleanUpFilterProcessingQueue;
 
     @Inject
     private Logger logger;
@@ -287,8 +290,9 @@ public class UserEventDispatcher
             result = saveMailEntityEvent(event, entityId);
         }
 
-        if (event instanceof DocumentDeletedEvent) {
-            this.userEventManager.cleanUpFilters((DocumentDeletedEvent) event, user);
+        // FIXME: reuse constant from EventType once it's moved (see https://jira.xwiki.org/browse/XWIKI-21669)
+        if (StringUtils.equals(event.getType(), "delete")) {
+            this.cleanUpFilterProcessingQueue.addCleanUpTask(user, event.getDocument());
         }
 
         return result;

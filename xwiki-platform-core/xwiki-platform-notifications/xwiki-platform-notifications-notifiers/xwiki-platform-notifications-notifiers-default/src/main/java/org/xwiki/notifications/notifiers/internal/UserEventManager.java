@@ -24,17 +24,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -43,7 +39,6 @@ import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
@@ -53,13 +48,11 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.event.CleaningFilterEvent;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -101,12 +94,6 @@ public class UserEventManager implements Initializable
 
     @Inject
     private UnboundedEntityCacheManager cacheManager;
-
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @Inject
-    private ObservationManager observationManager;
 
     private Map<EntityReference, Date> userCreationDateCache;
 
@@ -314,31 +301,5 @@ public class UserEventManager implements Initializable
             }
         }
         return false;
-    }
-
-    public void cleanUpFilters(DocumentDeletedEvent event, DocumentReference user)
-    {
-        DocumentReference deletedDocumentReference = event.getDocumentReference();
-        String serializedReference = this.entityReferenceSerializer.serialize(deletedDocumentReference);
-        try {
-            Set<NotificationFilterPreference> matchingPreferences =
-                this.notificationFilterPreferenceManager.getFilterPreferences(user)
-                    // We only clean up the filters matching exactly the page reference
-                    // we never clean up filters for space / wiki there
-                    .stream().filter(pref -> StringUtils.equals(pref.getPageOnly(), serializedReference))
-                    .collect(Collectors.toSet());
-            if (!matchingPreferences.isEmpty()) {
-                CleaningFilterEvent cleaningFilterEvent = new CleaningFilterEvent();
-                this.observationManager.notify(cleaningFilterEvent, deletedDocumentReference, matchingPreferences);
-                if (!cleaningFilterEvent.isCanceled()) {
-                    for (NotificationFilterPreference matchingPreference : matchingPreferences) {
-                        this.notificationFilterPreferenceManager.deleteFilterPreference(user,
-                            matchingPreference.getId());
-                    }
-                }
-            }
-        } catch (NotificationException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

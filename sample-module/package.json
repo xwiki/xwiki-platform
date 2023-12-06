@@ -1,7 +1,7 @@
 {
   "name": "@cristal/sample-module",
   "version": "1.0.0",
-  "types" : "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -12,16 +12,19 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-     "clean": "rimraf dist",
-     "prepack": "pnpm build",
-     "build": "pnpm compile",
-     "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
-     "test": "echo 'no test'",
-     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "clean": "rimraf dist",
+    "prepack": "pnpm build",
+    "build": "pnpm compile",
+    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
+    "test": "echo 'no test'",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
+    "@cristal/api": "workspace:^",
     "vue": "3.3.10",
-    "vue-i18n": "9.8.0",
-    "@cristal/api": "workspace:^"
+    "vue-i18n": "9.8.0"
+  },
+  "devDependencies": {
+    "rimraf": "5.0.5"
   }
 }

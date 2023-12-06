@@ -31,6 +31,7 @@
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
+    "rimraf": "5.0.5",
     "vite": "4.5.1",
     "vite-plugin-comlink": "^3.0.5",
     "vue-tsc": "1.8.25"

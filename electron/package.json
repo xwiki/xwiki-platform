@@ -7,6 +7,7 @@
   "version": "1.0.0",
   "main": "./main/dist/index.cjs",
   "scripts": {
+    "clean": "rimraf dist",
     "electron": "cross-env MODE=production electron-builder build --config .electron-builder.config.js --dir --config.asar=false",
     "package": "pnpm prepackage && mkdir -p dist/@cristal && pnpm linux",
     "prepackage": "cross-env MODE=production electron-builder -mwl --config .electron-builder.config.js --dir --config.asar=false",
@@ -14,12 +15,13 @@
     "win": "electron-builder --win nsis --config .electron-builder.config.js --dir --config.asar=false",
     "mac": "electron-builder --mac dmg --config .electron-builder.config.js --dir --config.asar=false"
   },
-  "devDependencies" : {
+  "devDependencies": {
     "cross-env": "7.0.3",
     "electron": "28.0.0",
-    "electron-builder": "24.9.1"
+    "electron-builder": "24.9.1",
+    "rimraf": "5.0.5"
   },
-  "dependencies" : {
+  "dependencies": {
     "electron-updater": "6.1.7"
   }
 }

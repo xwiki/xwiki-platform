@@ -767,7 +767,7 @@ $fn
     #end
     #foreach ($childDocName in $page.children)
       #set ($childDoc = $xwiki.getDocument($childDocName))
-      #if ($childDoc && !$childDoc.isHidden())
+      #if ($childDoc && ($services.user.properties.displayHiddenDocuments() || !$childDoc.isHidden()))
         #if ($withPageBreaks)
           #pagebreak()
         #end

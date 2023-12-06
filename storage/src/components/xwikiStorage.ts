@@ -143,7 +143,7 @@ export class XWikiStorage implements Storage {
   async getPanelContent(panel: string, contextPage: string): Promise<PageData> {
     const url =
       this.wikiConfig.baseURL +
-      "/rest/wiki30/panel?media=json" +
+      "/rest/cristal/panel?media=json" +
       "&page=" +
       contextPage +
       "&panel=" +

@@ -6,7 +6,7 @@
   "repository": {
     "type": "git",
     "directory": "sharedworker/impl",
-    "url": "https://git.xwikisas.com/experiments/cristal/prototype2023/"
+    "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "exports": {
     ".": "./src/index.ts"

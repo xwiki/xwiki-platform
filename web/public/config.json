@@ -5,7 +5,7 @@
         "serverRendering" : false,
         "offline" : false,
         "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
     },
@@ -15,7 +15,7 @@
         "serverRendering" : false,
         "offline" : true,
         "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
     },
@@ -25,7 +25,7 @@
         "serverRendering" : true,
         "offline" : false,
         "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
     },
@@ -35,7 +35,7 @@
         "serverRendering" : false,
         "offline" : false,
         "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "dsfr"
     },
@@ -45,7 +45,7 @@
         "serverRendering" : false,
         "offline" : false,
         "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "shoelace"
     },
@@ -55,7 +55,7 @@
         "serverRendering" : false,
         "offline" : false,
         "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
     },
@@ -65,7 +65,7 @@
         "serverRendering" : false,
         "offline" : true,
         "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"
     },
@@ -105,7 +105,7 @@
         "serverRendering" : false,
         "offline" : false,
         "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "",
         "designSystem" : "vuetify"
     },
@@ -115,7 +115,7 @@
         "serverRendering" : false,
         "offline" : false,
         "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "",
         "designSystem" : "shoelace"
     },
@@ -125,7 +125,7 @@
         "serverRendering" : false,
         "offline" : false,
         "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/wiki30/page?media=json",
+        "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "",
         "designSystem" : "dsfr"
     }

@@ -140,7 +140,7 @@
       </use>
     </class>
     <property>
-      <cache>long</cache>
+      <cache>default</cache>
     </property>
     <property>
       <code>## Add extra style based on the preferences of the user
@@ -455,7 +455,7 @@
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('font_size'))
         #if ("$!defaultValue" == '')
-        #set ($defaultValue = 'Regular')
+          #set ($defaultValue = 'Regular')
         #end
         #displayField('font_size'         , 'platform.core.profile.accessibility.fontSize'  , $defaultValue)
         #set ($defaultValue = $xwiki.getXWikiPreference('underline'))

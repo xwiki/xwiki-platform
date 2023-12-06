@@ -597,7 +597,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.16.2</version>
+        <version>1.17.1</version>
       </dependency>
 
       <!-- PDF -->
@@ -1117,6 +1117,53 @@
         <groupId>org.apache.zookeeper</groupId>
         <artifactId>zookeeper-jute</artifactId>
         <version>${zookeeper.version}</version>
+      </dependency>
+
+      <!-- Database connectors -->
+      <!-- Exclude optional dependencies -->
+      <dependency>
+        <groupId>${mysql.groupId}</groupId>
+        <artifactId>${mysql.artifactId}</artifactId>
+        <version>${mysql.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${mariadb.groupId}</groupId>
+        <artifactId>${mariadb.artifactId}</artifactId>
+        <version>${mariadb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${pgsql.groupId}</groupId>
+        <artifactId>${pgsql.artifactId}</artifactId>
+        <version>${pgsql.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>${oracle.groupId}</groupId>
+        <artifactId>${oracle.artifactId}</artifactId>
+        <version>${oracle.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -126,7 +126,9 @@ define('xwiki-realtime-wysiwygEditor-patches', [
         // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
         const patch = this.diffDOM.diff(DiffDOM.nodeToObj(oldContent), DiffDOM.nodeToObj(newContent));
         this._shouldRestoreSelection = false;
-        this.diffDOM.apply(oldContent, patch);
+        this.diffDOM.apply(oldContent, patch, {
+          document: oldContent.ownerDocument
+        });
 
         try {
           this._initializeWidgets();

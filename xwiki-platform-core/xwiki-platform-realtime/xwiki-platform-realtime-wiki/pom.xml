@@ -35,4 +35,12 @@
     <module>xwiki-platform-realtime-wiki-ui</module>
     <module>xwiki-platform-realtime-wiki-webjar</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-realtime-wiki-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

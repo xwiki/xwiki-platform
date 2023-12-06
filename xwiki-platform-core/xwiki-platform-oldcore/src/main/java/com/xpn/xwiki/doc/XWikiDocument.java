@@ -2551,7 +2551,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if ((this.archive == null || this.archive.get() == null)) {
             XWikiDocumentArchive arch;
-            // A document not comming from the database cannot have an archive stored in the database
+            // A document not coming from the database cannot have an archive stored in the database
             if (this.isNew()) {
                 arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             } else {
@@ -2591,7 +2591,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return arch;
         }
 
-        // A document not comming from the database cannot have an archive stored in the database
+        // A document not coming from the database cannot have an archive stored in the database
         if (this.isNew()) {
             arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             setDocumentArchive(arch);
@@ -3581,37 +3581,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public String displayTooltip(String fieldname, XWikiContext context)
-    {
-        try {
-            BaseObject object = getXObject();
-            if (object == null) {
-                object = getFirstObject(fieldname, context);
-            }
-            return displayTooltip(fieldname, object, context);
-        } catch (Exception e) {
-            return "";
-        }
-    }
 
-    public String displayTooltip(String fieldname, BaseObject obj, XWikiContext context)
-    {
-        String result = "";
-
-        try {
-            PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
-            String tooltip = pclass.getTooltip(context);
-            if ((tooltip != null) && (!tooltip.trim().equals(""))) {
-                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
-                    + "\" class=\"tooltip_image\" align=\"middle\" />";
-                result = context.getWiki().addTooltip(img, tooltip, context);
-            }
-        } catch (Exception e) {
-
-        }
-
-        return result;
-    }
 
     /**
      * @param fieldname the name of the field to display
@@ -4854,7 +4824,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Same as {@link #equals(Object)} but only for actual datas of the document.
      * <p>
      * The goal being to compare two versions of the same document this method skip every version/reference/author
-     * related information. For example it allows to compare a document comming from a another wiki and easily check if
+     * related information. For example it allows to compare a document coming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      *
      * @param otherDocument the document to compare
@@ -9236,7 +9206,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
@@ -9256,7 +9226,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},

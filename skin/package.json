@@ -30,7 +30,7 @@
     "inversify": "^6.0.2",
     "pinia": "^2.1.6",
     "reflect-metadata": "^0.1.13",
-    "vue-i18n": "^9.2.2",
+    "vue-i18n": "9.8.0",
     "vue-router": "^4.2.4",
     "vuetify": "3.4.5"
   },

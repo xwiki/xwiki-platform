@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "vue": "3.3.10",
-    "vue-i18n": "^9.2.2",
+    "vue-i18n": "9.8.0",
     "@cristal/api": "workspace:^"
   }
 }

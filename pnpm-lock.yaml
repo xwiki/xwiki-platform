@@ -69,8 +69,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
       vue-router:
         specifier: ^4.2.4
         version: 4.2.5(vue@3.3.10)
@@ -118,14 +118,14 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
       vue-router:
         specifier: ^4.2.4
         version: 4.2.5(vue@3.3.10)
       vuetify:
         specifier: 3.4.5
-        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
+        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
     devDependencies:
       '@cristal/dev-config':
         specifier: workspace:^
@@ -180,11 +180,11 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
       vuetify:
         specifier: 3.4.5
-        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
+        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
     devDependencies:
       vite:
         specifier: 4.5.1
@@ -285,8 +285,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
     devDependencies:
       vite:
         specifier: 5.0.5
@@ -310,8 +310,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
     devDependencies:
       vite:
         specifier: 4.5.1
@@ -365,14 +365,14 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
       vue-router:
         specifier: ^4.2.4
         version: 4.2.5(vue@3.3.10)
       vuetify:
         specifier: 3.4.5
-        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
+        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
     devDependencies:
       '@mdi/font':
         specifier: ^7.2.96
@@ -399,8 +399,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
     devDependencies:
       vite:
         specifier: 4.5.1
@@ -452,8 +452,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
     devDependencies:
       vite:
         specifier: 4.5.1
@@ -471,8 +471,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
     devDependencies:
       vite:
         specifier: 4.5.1
@@ -508,8 +508,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
       vue-router:
         specifier: ^4.2.4
         version: 4.2.5(vue@3.3.10)
@@ -539,14 +539,14 @@ importers:
         specifier: ^0.1.13
         version: 0.1.13
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
       vue-router:
         specifier: ^4.2.4
         version: 4.2.5(vue@3.3.10)
       vuetify:
         specifier: 3.4.5
-        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
+        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: 4.5.1
@@ -588,8 +588,8 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
     devDependencies:
       '@types/dompurify':
         specifier: ^3.0.2
@@ -613,14 +613,14 @@ importers:
         specifier: 3.3.10
         version: 3.3.10(typescript@5.3.2)
       vue-i18n:
-        specifier: ^9.2.2
-        version: 9.6.5(vue@3.3.10)
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
       vue-router:
         specifier: ^4.2.4
         version: 4.2.5(vue@3.3.10)
       vuetify:
         specifier: 3.4.5
-        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
+        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
     devDependencies:
       '@mdi/font':
         specifier: ^7.2.96
@@ -1235,22 +1235,22 @@ packages:
     resolution: {integrity: sha512-dvuCeX5fC9dXgJn9t+X5atfmgQAzUOWqS1254Gh0m6i8wKd10ebXkfNKiRK+1GWi/yTvvLDHpoxLr0xxxeslWw==}
     dev: true
 
-  /@intlify/core-base@9.6.5:
-    resolution: {integrity: sha512-LzbGXiZkMWPIHnHI0g6q554S87Cmh2mmCmjytK/3pDQfjI84l+dgGoeQuKj02q7EbULRuUUgYVZVqAwEUawXGg==}
+  /@intlify/core-base@9.8.0:
+    resolution: {integrity: sha512-UxaSZVZ1DwqC/CltUZrWZNaWNhfmKtfyV4BJSt/Zt4Or/fZs1iFj0B+OekYk1+MRHfIOe3+x00uXGQI4PbO/9g==}
     engines: {node: '>= 16'}
     dependencies:
-      '@intlify/message-compiler': 9.6.5
-      '@intlify/shared': 9.6.5
+      '@intlify/message-compiler': 9.8.0
+      '@intlify/shared': 9.8.0
 
-  /@intlify/message-compiler@9.6.5:
-    resolution: {integrity: sha512-WeJ499thIj0p7JaIO1V3JaJbqdqfBykS5R8fElFs5hNeotHtPAMBs4IiA+8/KGFkAbjJusgFefCq6ajP7F7+4Q==}
+  /@intlify/message-compiler@9.8.0:
+    resolution: {integrity: sha512-McnYWhcoYmDJvssVu6QGR0shqlkJuL1HHdi5lK7fNqvQqRYaQ4lSLjYmZxwc8tRNMdIe9/KUKfyPxU9M6yCtNQ==}
     engines: {node: '>= 16'}
     dependencies:
-      '@intlify/shared': 9.6.5
+      '@intlify/shared': 9.8.0
       source-map-js: 1.0.2
 
-  /@intlify/shared@9.6.5:
-    resolution: {integrity: sha512-gD7Ey47Xi4h/t6P+S04ymMSoA3wVRxGqjxuIMglwRO8POki9h164Epu2N8wk/GHXM/hR6ZGcsx2HArCCENjqSQ==}
+  /@intlify/shared@9.8.0:
+    resolution: {integrity: sha512-TmgR0RCLjzrSo+W3wT0ALf9851iFMlVI9EYNGeWvZFUQTAJx0bvfsMlPdgVtV1tDNRiAfhkFsMKu6jtUY1ZLKQ==}
     engines: {node: '>= 16'}
 
   /@isaacs/cliui@8.0.2:
@@ -2213,7 +2213,7 @@ packages:
       find-cache-dir: 3.3.2
       upath: 2.0.1
       vue: 3.3.10(typescript@5.3.2)
-      vuetify: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
+      vuetify: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
 
   /@xmldom/xmldom@0.8.10:
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
@@ -6018,7 +6018,7 @@ packages:
       debug: 4.3.4
       upath: 2.0.1
       vite: 4.5.1(@types/node@20.10.3)
-      vuetify: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10)
+      vuetify: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
     transitivePeerDependencies:
       - supports-color
       - vue
@@ -6202,14 +6202,14 @@ packages:
       - supports-color
     dev: true
 
-  /vue-i18n@9.6.5(vue@3.3.10):
-    resolution: {integrity: sha512-dpUEjKHg7pEsaS7ZPPxp1CflaR7bGmsvZJEhnszHPKl9OTNyno5j/DvMtMSo41kpddq4felLA7GK2prjpnXVlw==}
+  /vue-i18n@9.8.0(vue@3.3.10):
+    resolution: {integrity: sha512-Izho+6PYjejsTq2mzjcRdBZ5VLRQoSuuexvR8029h5CpN03FYqiqBrShMyf2I1DKkN6kw/xmujcbvC+4QybpsQ==}
     engines: {node: '>= 16'}
     peerDependencies:
       vue: ^3.0.0
     dependencies:
-      '@intlify/core-base': 9.6.5
-      '@intlify/shared': 9.6.5
+      '@intlify/core-base': 9.8.0
+      '@intlify/shared': 9.8.0
       '@vue/devtools-api': 6.5.1
       vue: 3.3.10(typescript@5.3.2)
 
@@ -6268,7 +6268,7 @@ packages:
       '@vue/shared': 3.3.10
       typescript: 5.3.2
 
-  /vuetify@3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.6.5)(vue@3.3.10):
+  /vuetify@3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10):
     resolution: {integrity: sha512-JptPH5iTCTrAyiI65Av8zCB6oZT0JUqMjlAF/1wPE2Rse3xoMSej/BpwI7+iXKSX6endExZCItrPp1oor4a65w==}
     engines: {node: ^12.20 || >=14.13}
     peerDependencies:
@@ -6290,7 +6290,7 @@ packages:
       typescript: 5.3.2
       vite-plugin-vuetify: 1.0.2(vite@4.5.1)(vue@3.3.10)(vuetify@3.4.5)
       vue: 3.3.10(typescript@5.3.2)
-      vue-i18n: 9.6.5(vue@3.3.10)
+      vue-i18n: 9.8.0(vue@3.3.10)
 
   /webidl-conversions@7.0.0:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}

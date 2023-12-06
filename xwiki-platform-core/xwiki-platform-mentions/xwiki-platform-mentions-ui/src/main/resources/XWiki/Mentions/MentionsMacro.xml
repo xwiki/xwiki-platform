@@ -373,15 +373,15 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     </property>
     <property>
       <code>.xwiki-mention {
-  background-color: $services.mentions.mentionsColor;
+  background-color: $services.mentions.mentionsBackground;
   border-radius: 10px;
   padding: 1px 5px 1px 5px;
   border: 1px solid @dropdown-divider-bg;
 }
 
 .xwiki-mention.user.self {
-  background-color: $services.mentions.selfMentionsColor;
-  color: @btn-danger-color;
+  background-color: $services.mentions.selfMentionsBackground;
+  color: $services.mentions.selfMentionsColor;
   border: 0;
 }
 

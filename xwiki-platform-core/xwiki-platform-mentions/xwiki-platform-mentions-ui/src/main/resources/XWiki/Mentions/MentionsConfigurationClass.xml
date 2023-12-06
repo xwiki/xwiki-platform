@@ -47,20 +47,20 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
-    <mentionsColor>
+    <mentionsBackground>
       <customDisplay/>
       <disabled>0</disabled>
       <hint/>
-      <name>mentionsColor</name>
+      <name>mentionsBackground</name>
       <number>1</number>
       <picker>0</picker>
-      <prettyName>mentionsColor</prettyName>
+      <prettyName>mentionsBackground</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </mentionsColor>
+    </mentionsBackground>
     <quoteActivated>
       <customDisplay/>
       <defaultValue>1</defaultValue>
@@ -76,6 +76,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </quoteActivated>
+    <selfMentionsBackground>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>selfMentionsBackground</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>selfMentionsBackground</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </selfMentionsBackground>
     <selfMentionsColor>
       <customDisplay/>
       <disabled>0</disabled>

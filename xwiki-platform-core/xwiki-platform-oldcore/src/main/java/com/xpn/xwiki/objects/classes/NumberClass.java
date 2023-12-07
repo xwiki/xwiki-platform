@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +70,8 @@ public class NumberClass extends PropertyClass
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "number";
+
+    private static final String PARSING_WARNING_MSG = "Invalid number entered for property {} of class {}: {}";
 
     /** Logging helper object. */
     private static final Logger LOG = LoggerFactory.getLogger(NumberClass.class);
@@ -126,28 +132,30 @@ public class NumberClass extends PropertyClass
         BaseProperty property = newProperty();
         String ntype = getNumberType();
         Number nvalue = null;
+        boolean valueBlank = StringUtils.isBlank(value);
 
-        try {
-            if (ntype.equals(TYPE_INTEGER)) {
-                if ((value != null) && (!value.equals(""))) {
-                    nvalue = Integer.valueOf(value);
+        if (!valueBlank) {
+            try {
+                NumberFormat numberFormat = NumberFormat.getNumberInstance(getOwnerDocument().getLocale());
+                Number number = numberFormat.parse(value);
+
+                if (ntype.equals(TYPE_INTEGER) && number.intValue() == Integer.parseInt(number.toString())) {
+                    nvalue = number.intValue();
+                } else if (ntype.equals(TYPE_FLOAT) && number.floatValue() == Float.parseFloat(number.toString())) {
+                    nvalue = number.floatValue();
+                } else if (ntype.equals(TYPE_DOUBLE) && number.doubleValue() == Double.parseDouble(number.toString())) {
+                    nvalue = number.doubleValue();
+                } else if (ntype.equals(TYPE_LONG) && number.longValue() == Long.parseLong(number.toString())) {
+                    nvalue = number.longValue();
                 }
-            } else if (ntype.equals(TYPE_FLOAT)) {
-                if ((value != null) && (!value.equals(""))) {
-                    nvalue = Float.valueOf(value);
-                }
-            } else if (ntype.equals(TYPE_DOUBLE)) {
-                if ((value != null) && (!value.equals(""))) {
-                    nvalue = Double.valueOf(value);
-                }
-            } else {
-                if ((value != null) && (!value.equals(""))) {
-                    nvalue = Long.valueOf(value);
-                }
+            } catch (ParseException | NumberFormatException e) {
+                // We log a debug with the stack, just in case.
+                LOG.debug(PARSING_WARNING_MSG, getName(), getObject(), value, e);
             }
-        } catch (NumberFormatException e) {
-            LOG.warn("Invalid number entered for property " + getName() + " of class " + getObject().getName() + ": "
-                + value);
+        }
+
+        if (nvalue == null && !valueBlank) {
+            LOG.warn(PARSING_WARNING_MSG, getName(), getObject(), value);
             // Returning null makes sure that the old value (if one exists) will not be discarded/replaced
             return null;
         }

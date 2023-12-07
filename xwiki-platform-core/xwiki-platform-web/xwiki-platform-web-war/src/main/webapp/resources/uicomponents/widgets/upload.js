@@ -125,16 +125,16 @@ var XWiki = (function(XWiki) {
       // Set up the icons and their text alternatives
       // The inprogress icon is a special case, we set the content using a GIF background in CSS
       statusUI.STATUS_ICON_INPROGRESS = UploadUtils.createDiv('status-icon icon-inprogress', '');
-      statusUI.STATUS_ICON_INPROGRESS_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.inprogress')");
+      statusUI.STATUS_ICON_INPROGRESS_ALTERNATIVE = UploadUtils.createSpan('sr-only', "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.icon.inprogress'))");
       statusUI.STATUS_ICON_INPROGRESS.insert(statusUI.STATUS_ICON_INPROGRESS_ALTERNATIVE);
       statusUI.STATUS_ICON_DONE = UploadUtils.createDiv('status-icon icon-done', "$!escapetool.javascript($services.icon.renderHTML('check'))");
-      statusUI.STATUS_ICON_DONE_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.done')");
+      statusUI.STATUS_ICON_DONE_ALTERNATIVE = UploadUtils.createSpan('sr-only', "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.icon.done'))");
       statusUI.STATUS_ICON_DONE.insert(statusUI.STATUS_ICON_DONE_ALTERNATIVE);
       statusUI.STATUS_ICON_CANCELED = UploadUtils.createDiv('status-icon icon-canceled', "$!escapetool.javascript($services.icon.renderHTML('remove'))");
-      statusUI.STATUS_ICON_CANCELED_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.canceled')");
+      statusUI.STATUS_ICON_CANCELED_ALTERNATIVE = UploadUtils.createSpan('sr-only', "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.icon.canceled'))");
       statusUI.STATUS_ICON_CANCELED.insert(statusUI.STATUS_ICON_CANCELED_ALTERNATIVE);
       statusUI.STATUS_ICON_ERROR = UploadUtils.createDiv('status-icon icon-error', "$!escapetool.javascript($services.icon.renderHTML('error'))");
-      statusUI.STATUS_ICON_ERROR_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.error')");
+      statusUI.STATUS_ICON_ERROR_ALTERNATIVE = UploadUtils.createSpan('sr-only', "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.icon.error'))");
       statusUI.STATUS_ICON_ERROR.insert(statusUI.STATUS_ICON_ERROR_ALTERNATIVE);
       statusUI.UPLOAD_STATUS.insert(statusUI.STATUS_ICON_INPROGRESS).insert(statusUI.STATUS_ICON_DONE).insert(statusUI.STATUS_ICON_CANCELED).insert(statusUI.STATUS_ICON_ERROR);
       
@@ -142,7 +142,7 @@ var XWiki = (function(XWiki) {
         statusUI.FILE_INFO   = UploadUtils.createDiv('file-info');
         (statusUI.FILE_NAME  = UploadUtils.createSpan('file-name', this.file.name)).title = this.file.type;
         statusUI.FILE_SIZE   = UploadUtils.createSpan('file-size', ' (' + UploadUtils.bytesToSize(this.file.size) + ')');
-        statusUI.FILE_CANCEL = UploadUtils.createButton("$services.localization.render('core.widgets.html5upload.item.cancel')", this.cancelUpload.bindAsEventListener(this));
+        statusUI.FILE_CANCEL = UploadUtils.createButton("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.item.cancel'))", this.cancelUpload.bindAsEventListener(this));
         // TODO MIME type icon?
 
         statusUI.FILE_INFO.insert(statusUI.FILE_NAME).insert(statusUI.FILE_SIZE).insert(statusUI.FILE_CANCEL);
@@ -248,7 +248,7 @@ var XWiki = (function(XWiki) {
       this.request && this.request.abort();
       this.canceled = true;
       clearInterval(this.timer);
-      this.statusUI.FILE_CANCEL.addClassName('upload-canceled-label').removeClassName('buttonwrapper').update("$services.localization.render('core.widgets.html5upload.item.canceled')");
+      this.statusUI.FILE_CANCEL.addClassName('upload-canceled-label').removeClassName('buttonwrapper').update("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.item.canceled'))");
       this.statusUI.UPLOAD_STATUS.removeClassName('upload-inprogress').addClassName('upload-canceled');
     },
 
@@ -409,12 +409,12 @@ var XWiki = (function(XWiki) {
 
     /** Templates for feedback messages displayed to the user. */
     messages : {
-      UNKNOWN_ERROR         : new Template("$services.localization.render('core.widgets.html5upload.error.unknown', ['#{name}'])"),
-      INVALID_FILE_TYPE     : new Template("$services.localization.render('core.widgets.html5upload.error.invalidType', ['#{name}'])"),
-      UPLOAD_LIMIT_EXCEEDED : new Template("$services.localization.render('core.widgets.html5upload.error.invalidSize', ['#{name}', '#{size}'])"),
-      UPLOAD_ABORTED        : new Template("$services.localization.render('core.widgets.html5upload.error.aborted', ['#{name}'])"),
-      UPLOAD_FINISHING      : new Template("$services.localization.render('core.widgets.html5upload.status.finishing', ['#{name}'])"),
-      UPLOAD_FINISHED       : new Template("$services.localization.render('core.widgets.html5upload.status.finished', ['#{name}', '#{size}'])")
+      UNKNOWN_ERROR         : new Template("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.error.unknown', ['#{name}']))"),
+      INVALID_FILE_TYPE     : new Template("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.error.invalidType', ['#{name}']))"),
+      UPLOAD_LIMIT_EXCEEDED : new Template("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.error.invalidSize', ['#{name}', '#{size}']))"),
+      UPLOAD_ABORTED        : new Template("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.error.aborted', ['#{name}']))"),
+      UPLOAD_FINISHING      : new Template("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.finishing', ['#{name}']))"),
+      UPLOAD_FINISHED       : new Template("$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.finished', ['#{name}', '#{size}']))")
     },
 
     /**
@@ -485,11 +485,11 @@ var XWiki = (function(XWiki) {
       statusUI.CONTAINER = UploadUtils.createDiv('upload-status-container');
       statusUI.LIST = UploadUtils.createDiv('upload-status-list');
       statusUI.CANCEL = UploadUtils.createButton(
-        "$services.localization.render('core.widgets.html5upload.cancelAll')",
+        "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.cancelAll'))",
          this.cancelUpload.bindAsEventListener(this)
       );
       statusUI.HIDE = UploadUtils.createButton(
-        "$services.localization.render('core.widgets.html5upload.hideStatus')",
+        "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.hideStatus'))",
          this.hideUploadStatus.bindAsEventListener(this)
       );
       statusUI.HIDE.hide();

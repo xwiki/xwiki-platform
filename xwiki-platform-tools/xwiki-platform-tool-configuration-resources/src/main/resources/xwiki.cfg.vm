@@ -54,6 +54,9 @@
 
 #-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
 #-# group's document?
+#-# 0: XWiki.XWikiAllGroup behaves like any other group and, by default, new users are added to it (you can change that using xwiki.users.initialGroups)
+#-# 1: All users are considered members of the XWiki.XWikiAllGroup group no matter what it actually contains
+#-# The default is 0.
 # xwiki.authentication.group.allgroupimplicit=0
 
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document

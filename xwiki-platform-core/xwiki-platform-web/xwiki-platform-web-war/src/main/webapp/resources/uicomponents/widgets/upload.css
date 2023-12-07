@@ -13,11 +13,9 @@
   align-items: center;
   gap: 0.2em 1em;
 }
-
 .upload-status .status-icon {
   display: none;
 }
-
 .upload-status.upload-inprogress .status-icon.icon-inprogress,
 .upload-status.upload-done .status-icon.icon-done,
 .upload-status.upload-canceled .status-icon.icon-canceled,
@@ -29,7 +27,6 @@
   width: 17px;
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
 }
-
 .progress-info, .file-info {
   font-size: .91em;
 }

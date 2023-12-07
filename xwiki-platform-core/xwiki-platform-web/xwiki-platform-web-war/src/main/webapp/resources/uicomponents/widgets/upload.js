@@ -121,7 +121,23 @@ var XWiki = (function(XWiki) {
       var statusUI = this.statusUI = {};
 
       statusUI.UPLOAD_STATUS = UploadUtils.createDiv('upload-status upload-inprogress');
-
+      
+      // Set up the icons and their text alternatives
+      // The inprogress icon is a special case, we set the content using a GIF background in CSS
+      statusUI.STATUS_ICON_INPROGRESS = UploadUtils.createDiv('status-icon icon-inprogress', '');
+      statusUI.STATUS_ICON_INPROGRESS_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.inprogress')");
+      statusUI.STATUS_ICON_INPROGRESS.insert(statusUI.STATUS_ICON_INPROGRESS_ALTERNATIVE);
+      statusUI.STATUS_ICON_DONE = UploadUtils.createDiv('status-icon icon-done', "$!escapetool.javascript($services.icon.renderHTML('check'))");
+      statusUI.STATUS_ICON_DONE_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.done')");
+      statusUI.STATUS_ICON_DONE.insert(statusUI.STATUS_ICON_DONE_ALTERNATIVE);
+      statusUI.STATUS_ICON_CANCELED = UploadUtils.createDiv('status-icon icon-canceled', "$!escapetool.javascript($services.icon.renderHTML('remove'))");
+      statusUI.STATUS_ICON_CANCELED_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.canceled')");
+      statusUI.STATUS_ICON_CANCELED.insert(statusUI.STATUS_ICON_CANCELED_ALTERNATIVE);
+      statusUI.STATUS_ICON_ERROR = UploadUtils.createDiv('status-icon icon-error', "$!escapetool.javascript($services.icon.renderHTML('error'))");
+      statusUI.STATUS_ICON_ERROR_ALTERNATIVE = UploadUtils.createSpan('sr-only',"$services.localization.render('core.widgets.html5upload.status.icon.error')");
+      statusUI.STATUS_ICON_ERROR.insert(statusUI.STATUS_ICON_ERROR_ALTERNATIVE);
+      statusUI.UPLOAD_STATUS.insert(statusUI.STATUS_ICON_INPROGRESS).insert(statusUI.STATUS_ICON_DONE).insert(statusUI.STATUS_ICON_CANCELED).insert(statusUI.STATUS_ICON_ERROR);
+      
       if (this.options.enableFileInfo) {
         statusUI.FILE_INFO   = UploadUtils.createDiv('file-info');
         (statusUI.FILE_NAME  = UploadUtils.createSpan('file-name', this.file.name)).title = this.file.type;

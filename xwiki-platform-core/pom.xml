@@ -325,9 +325,14 @@
                      If you are using Groovy >= 2.3.0-rc-1, remember to include groovy-ant as a dependency.
                -->
               <dependency>
-                <groupId>org.apache.groovy</groupId>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-ant</artifactId>
-                <version>4.0.16</version>
+                <version>${groovy.version}</version>
               </dependency>
             </dependencies>
           </plugin>

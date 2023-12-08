@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.internal.macro;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Set;
 
@@ -27,11 +26,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.internal.LiveDataRenderer;
-import org.xwiki.livedata.internal.LiveDataRendererParameters;
 import org.xwiki.livedata.macro.LiveDataMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;

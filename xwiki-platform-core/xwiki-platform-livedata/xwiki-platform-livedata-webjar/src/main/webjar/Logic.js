@@ -108,7 +108,7 @@ define('xwiki-livedata', [
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
   const Logic = function (element) {
-    // Make sure to have one live data source instance per 
+    // Make sure to have one Live Data source instance per Live Data instance. 
     this.liveDataSource = liveDataSourceModule.init();
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");

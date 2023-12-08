@@ -193,7 +193,6 @@
                 </item>
               </differences>
             </revapi.differences>
-
             <revapi.differences>
               <differences>
                 <item>
@@ -207,8 +206,6 @@
                 </item>
               </differences>
             </revapi.differences>
-            
-            
           </analysisConfiguration>
         </configuration>
       </plugin>

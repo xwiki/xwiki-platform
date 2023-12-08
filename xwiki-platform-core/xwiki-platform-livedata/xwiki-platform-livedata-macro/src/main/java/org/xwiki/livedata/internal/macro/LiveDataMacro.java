@@ -41,7 +41,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Display dynamic lists of data.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -69,21 +69,10 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
         throws MacroExecutionException
     {
         try {
-            return this.liveDataRenderer.render(convertParams(parameters), content,
-                context.getTransformationContext().isRestricted());
+            return this.liveDataRenderer.render(parameters, content, context.getTransformationContext().isRestricted());
         } catch (LiveDataException e) {
             throw new MacroExecutionException("Failed to render the content of the LiveData macro.", e);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            throw new MacroExecutionException("Failed to convert the Live Data parameters.", e);
         }
-    }
-
-    private LiveDataRendererParameters convertParams(LiveDataMacroParameters parameters)
-        throws InvocationTargetException, IllegalAccessException, NoSuchMethodException
-    {
-        LiveDataRendererParameters rendererParams = new LiveDataRendererParameters();
-        PropertyUtils.copyProperties(rendererParams, parameters);
-        return rendererParams;
     }
 
     @Override

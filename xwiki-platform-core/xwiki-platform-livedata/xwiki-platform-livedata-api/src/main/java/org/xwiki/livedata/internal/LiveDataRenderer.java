@@ -85,7 +85,7 @@ public class LiveDataRenderer
     public List<Block> render(LiveDataRendererParameters parameters, String advancedParameters, boolean restricted)
         throws LiveDataException
     {
-        // Load the JavaScript code of the Live Data widget.
+        // Load the JavaScript code of the Live Data element.
         Map<String, Object> skinExtensionParameters = singletonMap("forceSkinAction", Boolean.TRUE);
         this.jsfx.use("uicomponents/widgets/liveData.js", skinExtensionParameters);
 

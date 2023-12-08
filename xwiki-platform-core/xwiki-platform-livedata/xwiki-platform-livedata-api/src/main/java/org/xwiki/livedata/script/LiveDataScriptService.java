@@ -177,7 +177,7 @@ public class LiveDataScriptService implements ScriptService
      * @param advancedParameters the advanced parameters to pass to the Live Data rendere
      * @return the list of {@link Block}s of the Live Data
      * @throws LiveDataException in case of error when rendering the Live Data
-     * @since 16.0RC1
+     * @since 16.0.0RC1
      */
     public List<Block> render(Map<String, Object> parameters, String advancedParameters) throws LiveDataException
     {

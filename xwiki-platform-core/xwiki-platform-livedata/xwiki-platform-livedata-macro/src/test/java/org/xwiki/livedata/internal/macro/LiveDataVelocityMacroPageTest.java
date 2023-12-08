@@ -19,22 +19,16 @@
  */
 package org.xwiki.livedata.internal.macro;
 
+import java.util.Map;
+
 import javax.inject.Named;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.internal.embed.EmbeddableComponentManagerFactory;
-import org.xwiki.component.internal.multi.DefaultComponentManagerManager;
 import org.xwiki.icon.IconManager;
-import org.xwiki.livedata.internal.DefaultLiveDataConfigurationResolver;
-import org.xwiki.livedata.internal.DefaultLiveDataSourceManager;
-import org.xwiki.livedata.internal.LiveDataRenderer;
-import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
-import org.xwiki.livedata.internal.StringLiveDataConfigurationResolver;
-import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
-import org.xwiki.livedata.script.LiveDataScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.template.internal.macro.TemplateMacro;
@@ -45,6 +39,7 @@ import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
 
@@ -54,27 +49,17 @@ import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
+ * Page test for the Live Data velocity macro.
+ *
  * @version $Id$
  * @since 15.6RC1
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
-@ComponentList({
-    TemplateMacro.class,
-    LiveDataScriptService.class,
-    DefaultLiveDataSourceManager.class,
-    DefaultComponentManagerManager.class,
-    EmbeddableComponentManagerFactory.class,
-    LiveDataConfigHelper.class,
-    StringLiveDataConfigurationResolver.class,
-    DefaultLiveDataConfigurationResolver.class,
-    LiveDataRenderer.class,
-    LiveDataRendererConfiguration.class,
-    DefaultExtendedRenderingConfiguration.class
-})
-//@DefaultIconManagerComponentList
+@ComponentList({ TemplateMacro.class })
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
+@LiveDataComponentList
 class LiveDataVelocityMacroPageTest extends PageTest
 {
     @MockComponent
@@ -85,7 +70,7 @@ class LiveDataVelocityMacroPageTest extends PageTest
     SkinExtension jsfx;
 
     @Test
-    void name() throws Exception
+    void simpleLiveDataMacro() throws Exception
     {
         IconSetup.setUp(this, "/icons/default.iconset");
         when(this.xwiki.getPluginApi(any(), any())).thenReturn(mock(SkinExtensionPluginApi.class));
@@ -96,10 +81,11 @@ class LiveDataVelocityMacroPageTest extends PageTest
             + "{{velocity}}\n"
             + "#liveData({'id': 'test'} {} 'xwiki/2.1')\n"
             + "{{/velocity}}";
-        System.out.println(content);
         document.setContent(content);
 
-        String renderedContent = document.getRenderedContent(this.context);
-        System.out.println(renderedContent);
+        Document doc = Jsoup.parse(document.getRenderedContent(this.context));
+        String attr = doc.select("div[data-config]").attr("data-config");
+        Map map = new ObjectMapper().readValue(attr, Map.class);
+        map.get("id").equals("test");
     }
 }

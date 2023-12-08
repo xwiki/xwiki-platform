@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Order;
@@ -116,8 +115,6 @@ class LiveDataIT
     @Order(1)
     void livedataLivetableTableLayout(TestUtils testUtils, TestReference testReference) throws Exception
     {
-        Function<String, String> stringStringFunction =
-            properties -> xwikiMacroContent(testUtils, testReference, properties);
         // Make sure an icon theme is configured.
         testUtils.setWikiPreference("iconTheme", "IconThemes.Silk");
 
@@ -133,8 +130,7 @@ class LiveDataIT
         String className = testUtils.serializeReference(testReference);
 
         // Initializes the page content.
-        createClassNameLiveDataPage(testUtils, testReference,
-            stringStringFunction);
+        createClassNameLiveDataPage(testUtils, testReference);
 
         // Creates the XClass.
         createXClass(testUtils, testReference);
@@ -337,15 +333,22 @@ class LiveDataIT
         testUtils.addClassProperty(testReference, USER_COLUMN, "Users");
     }
 
-    private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference,
-        Function<String, String> contentRenderer)
+    private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference)
         throws Exception
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
         Page page = rest.page(testReference);
         String properties =
             StringUtils.joinWith(",", NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, DOC_TITLE_COLUMN);
-        page.setContent(contentRenderer.apply(properties));
+        page.setContent("{{velocity}}\n"
+            + "{{liveData\n"
+            + "  id=\"test\"\n"
+            + "  properties=\"" + properties + "\"\n"
+            + "  source=\"liveTable\"\n"
+            + "  sourceParameters=\"translationPrefix=&className=" + testUtils.serializeReference(
+            testReference.getLocalDocumentReference()) + "\"\n"
+            + "}}{{/liveData}}\n"
+            + "{{/velocity}}");
         rest.save(page);
     }
 
@@ -381,18 +384,5 @@ class LiveDataIT
         jsonNodes.put("count", 1);
         jsonNodes.put("label", "first result");
         testUtils.createPage(resultPageDocumentReference, objectMapper.writeValueAsString(objectNode));
-    }
-
-    private static String xwikiMacroContent(TestUtils testUtils, TestReference testReference, String properties)
-    {
-        return String.format("{{velocity}}\n"
-                + "{{liveData\n"
-                + "  id=\"test\"\n"
-                + "  properties=\"%s\"\n"
-                + "  source=\"liveTable\"\n"
-                + "  sourceParameters=\"translationPrefix=&className=%s\"\n"
-                + "}}{{/liveData}}\n"
-                + "{{/velocity}}",
-            properties, testUtils.serializeReference(testReference.getLocalDocumentReference()));
     }
 }

@@ -193,6 +193,19 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <code>java.field.serialVersionUIDChanged</code>
+                  <old>field org.xwiki.security.authorization.Right.serialVersionUID</old>
+                  <new>field org.xwiki.security.authorization.Right.serialVersionUID</new>
+                  <oldSerialVersionUID>1</oldSerialVersionUID>
+                  <newSerialVersionUID>2</newSerialVersionUID>
+                  <justification>Needed to add a new field for needed rights, unlikely to cause real issues in practice as we're not storing serialized rights.</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

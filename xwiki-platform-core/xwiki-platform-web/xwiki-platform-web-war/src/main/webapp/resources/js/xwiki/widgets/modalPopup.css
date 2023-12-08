@@ -29,8 +29,7 @@
   color: $theme.panelTextColor;
   border: 1px solid $theme.borderColor;
   background-color: $theme.panelBackgroundColor;
-  border-radius: 7px;
-  box-shadow: 0 0 7px $theme.borderColor;
+  border-radius: 10px;
 }
 .xdialog-box {
   max-height: 100%; /* Needed because of position: fixed */
@@ -54,15 +53,9 @@
   color: $theme.panelHeaderTextColor;
 }
 .xdialog-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background-color: $theme.panelHeaderBackgroundColor;
-  border-radius: 7px 7px 0 0;
-  font-weight: bold;
-  font-size: 110%;
-  color: $theme.panelHeaderTextColor;
+  font-size: 142%;
+  padding: 15px;
+  border-bottom: 1px solid $theme.borderColor;
 }
 .xdialog-box .xform {
   width: 100%;

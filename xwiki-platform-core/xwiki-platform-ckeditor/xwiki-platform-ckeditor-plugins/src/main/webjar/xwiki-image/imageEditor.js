@@ -542,7 +542,7 @@ define('imageEditor', [
         }
         
         var config = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
-          return imageStyleConfig.type !== '' && imageStyleConfig.type === searchedImageStyle;
+          return imageStyleConfig.type !== '' && imageStyleConfig.identifier === searchedImageStyle;
         });
         var noStyle = false;
         if (config === undefined) {

@@ -33,6 +33,15 @@
         "{projectRoot}/dist"
       ]
     },
+    "test": {
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "outputs": [
+        "{projectRoot}/unit-tests.xml"
+      ]
+    },
     "lint": {
       "inputs": [
         "default",

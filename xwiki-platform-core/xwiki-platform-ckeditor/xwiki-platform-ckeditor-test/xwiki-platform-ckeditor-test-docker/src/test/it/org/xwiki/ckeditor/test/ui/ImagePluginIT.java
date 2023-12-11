@@ -575,7 +575,7 @@ class ImagePluginIT
         // Change the configuration to have a default style and force it.
         DocumentReference configurationReference = getConfigurationReference(setup);
         setup.updateObject(configurationReference, "Image.Style.Code.ConfigurationClass", 0,
-            "defaultStyle", "bordered",
+            "defaultStyle", "borderedPage",
             "forceDefaultStyle", "1");
 
         // Create the image style as an admin.
@@ -671,7 +671,7 @@ class ImagePluginIT
     private static void createBorderedStyle(TestUtils setup) throws Exception
     {
         DocumentReference borderedStyleDocumentReference =
-            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "bordered");
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "borderedPage");
         // For a reason I can't explain, using the rest API lead to random 401 http response, making the tests using the
         // methods flickering. Using the UI based methods until I can understand the root cause.
         setup.deletePage(borderedStyleDocumentReference);

@@ -114,8 +114,10 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
           })).done(function (html, textState, jqXHR) {
             var imageSelector = modal.find('.image-selector');
             var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
-            $(document).loadRequiredSkinExtensions(requiredSkinExtensions);
+            // It's important to insert the html content before loading the corresponding scripts. Otherwise, it's 
+            // possible for scripts to be loaded too fast and to be unable to access the expected html.
             imageSelector.html(html);
+            $(document).loadRequiredSkinExtensions(requiredSkinExtensions);
             $(document).trigger('xwiki:dom:updated', {'elements': imageSelector.toArray()});
             imageSelector.removeClass('loading');
 

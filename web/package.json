@@ -17,10 +17,13 @@
     "build": "pnpm compile",
     "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
     "test": "echo 'no test'",
+    "test:e2e": "playwright test",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "dev": "vite dev",
     "prepare": "mkdir -p ./dist/apps && ln -fs ../../../extension-manager/dist/ dist/apps/extension-manager && ln -fs ../../../extension-menubuttons/dist/ dist/apps/extension-menubuttons && ln -fs ../../../skin/dist/ dist/apps/skin && ln -fs ../../../dsvuetify/dist/ dist/apps/dsvuetify && ln -fs ../../../storage/dist/ dist/apps/storage && ln -fs ../../../wikimodel/dist dist/apps/wikimodel && ln -fs ../../../dsfr/dist dist/apps/dsfr && ln -fs ../../../dsshoelace/dist dist/apps/dsshoelace",
     "start": "pnpm run build && pnpm prepare && NODE_ENV=production node src/server.js",
+    "start:e2e": "run-p start start:e2e:xwiki",
+    "start:e2e:xwiki": "./start_xwiki.sh",
     "quickstart": "pnpm run build --scope @cristal/app && pnpm prepare && NODE_ENV=production node src/server.js"
   },
   "dependencies": {
@@ -33,7 +36,10 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.2.96",
+    "@playwright/test": "^1.40.1",
+    "@types/node": "20.10.3",
     "@vitejs/plugin-vue": "4.5.1",
+    "npm-run-all2": "6.1.1",
     "rimraf": "5.0.5",
     "vite": "4.5.1",
     "vite-plugin-comlink": "^3.0.5",

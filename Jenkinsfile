@@ -45,10 +45,16 @@ pipeline {
                 sh 'pnpm test'
             }
         }
+        stage('E2E Tests') {
+            steps {
+                sh 'pnpm run --filter ./web test:e2e'
+            }
+        }
     }
     post {
         always {
             junit '**/unit-tests.xml'
+            junit '**/e2e-tests.xml'
         }
     }
 }

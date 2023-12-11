@@ -42,7 +42,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue-i18n</artifactId>
-      <version>8.28.2</version>
+      <version>9.8.0</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>

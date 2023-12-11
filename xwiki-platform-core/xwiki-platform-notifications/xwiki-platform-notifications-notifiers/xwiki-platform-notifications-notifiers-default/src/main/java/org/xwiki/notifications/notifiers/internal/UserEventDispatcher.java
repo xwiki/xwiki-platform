@@ -53,6 +53,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.internal.DeletedDocumentCleanUpFilterProcessingQueue;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;

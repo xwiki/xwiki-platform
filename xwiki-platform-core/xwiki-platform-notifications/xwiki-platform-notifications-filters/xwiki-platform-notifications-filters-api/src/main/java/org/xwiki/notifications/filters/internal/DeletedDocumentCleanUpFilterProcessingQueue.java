@@ -1,4 +1,23 @@
-package org.xwiki.notifications.notifiers.internal;
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.notifications.filters.internal;
 
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -11,7 +30,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
@@ -19,28 +37,31 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
-import org.xwiki.eventstream.EntityEvent;
-import org.xwiki.index.TaskConsumer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.event.CleaningFilterEvent;
-import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.AbstractLocalEventListener;
-import org.xwiki.observation.event.BeginFoldEvent;
-import org.xwiki.observation.event.Event;
 
+/**
+ * Component in charge of processing tasks for cleaning up filters whenever a document is deleted.
+ * This component creates its own low priority thread for this task.
+ * Implementation inspired from {@code PrefilteringLiveNotificationEmailManager}.
+ *
+ * @version $Id$
+ * @since 15.10.2
+ * @since 16.0.0RC1
+ */
 @Component(roles = DeletedDocumentCleanUpFilterProcessingQueue.class)
 @Singleton
 public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializable, Disposable
 {
-    private class CleanUpFilterData
+    private static class CleanUpFilterData
     {
-        DocumentReference user;
-        DocumentReference deletedDocument;
+        private final DocumentReference user;
+        private final DocumentReference deletedDocument;
 
         CleanUpFilterData(DocumentReference user, DocumentReference deletedDocument)
         {
@@ -48,6 +69,8 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
             this.deletedDocument = deletedDocument;
         }
     }
+
+    private static final CleanUpFilterData STOP_DATA = new CleanUpFilterData(null, null);
 
     @Inject
     @Named("context")
@@ -69,13 +92,12 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
 
     private boolean disposed;
 
-
     @Override
     public void dispose() throws ComponentLifecycleException
     {
         this.disposed = true;
         this.cleanupQueue.clear();
-        // check if we can add something in the queue to avoid error during cleanup method
+        this.cleanupQueue.add(STOP_DATA);
     }
 
     @Override
@@ -89,6 +111,12 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
         optimizeThreadthread.start();
     }
 
+    /**
+     * Add a new task for cleaning up all {@link NotificationFilterPreference} owned by the given user and concerning
+     * the given document references.
+     * @param user the user for whom to delete filters for
+     * @param deletedDocument the document that has been deleted and for which to clean up the filters
+     */
     public void addCleanUpTask(DocumentReference user, DocumentReference deletedDocument)
     {
         if (!this.disposed) {
@@ -109,7 +137,9 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
                 break;
             }
 
-            this.performCleanup(cleanUpFilterData);
+            if (cleanUpFilterData != STOP_DATA) {
+                this.performCleanup(cleanUpFilterData);
+            }
         }
     }
 
@@ -136,7 +166,8 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
                 }
             }
         } catch (NotificationException e) {
-            throw new RuntimeException(e);
+            this.logger.error("Error while trying to clean up filter for user [{}] and document [{}]", user,
+                deletedDocumentReference, e);
         }
     }
 }

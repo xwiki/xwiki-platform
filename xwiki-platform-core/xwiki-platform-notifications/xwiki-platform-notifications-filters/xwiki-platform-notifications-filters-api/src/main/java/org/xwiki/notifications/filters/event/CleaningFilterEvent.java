@@ -20,7 +20,29 @@
 package org.xwiki.notifications.filters.event;
 
 import org.xwiki.observation.event.AbstractCancelableEvent;
+import org.xwiki.stability.Unstable;
 
+/**
+ * Event triggered when a user filter is about to be deleted, the event is sent with the following data:
+ * <ul>
+ *     <li>source: the reference of the deleted document explaining the cleaning of the filters</li>
+ *     <li>data: the actual {@code Set} of {@link org.xwiki.notifications.filters.NotificationFilterPreference} about
+ *     to be deleted
+ *     </li>
+ * </ul>
+ *
+ * This event is cancellable: canceling it means the data won't be deleted.
+ *
+ * @version $Id$
+ * @since 15.10.2
+ * @since 16.0.0RC1
+ */
+@Unstable
 public class CleaningFilterEvent extends AbstractCancelableEvent
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
 }

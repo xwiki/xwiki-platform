@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.Set;
+
 import javax.inject.Provider;
 
 import org.hibernate.Session;
@@ -236,8 +238,8 @@ class NotificationFilterPreferenceStoreTest
         when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
         this.notificationFilterPreferenceStore.deleteFilterPreference(userReference, filterId);
         verify(this.session).createQuery(
-            "delete from DefaultNotificationFilterPreference where internalId = :id");
-        verify(this.query).setParameter("id", internalId);
+            "delete from DefaultNotificationFilterPreference where internalId in (:id)");
+        verify(this.query).setParameter("id", String.valueOf(internalId));
         verify(this.query).executeUpdate();
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_REFERENCE.getName());
@@ -247,7 +249,7 @@ class NotificationFilterPreferenceStoreTest
             verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
         }
         verify(this.observationManager).notify(
-            any(NotificationFilterPreferenceDeletedEvent.class), eq(userReference), eq(filterId));
+            any(NotificationFilterPreferenceDeletedEvent.class), eq(userReference), eq(Set.of(filterId)));
     }
 
     @ParameterizedTest
@@ -261,8 +263,8 @@ class NotificationFilterPreferenceStoreTest
         when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
         this.notificationFilterPreferenceStore.deleteFilterPreference(wikiReference, filterId);
         verify(this.session).createQuery(
-            "delete from DefaultNotificationFilterPreference where internalId = :id");
-        verify(this.query).setParameter("id", internalId);
+            "delete from DefaultNotificationFilterPreference where internalId in (:id)");
+        verify(this.query).setParameter("id", String.valueOf(internalId));
         verify(this.query).executeUpdate();
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_REFERENCE.getName());

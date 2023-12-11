@@ -39,15 +39,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link DefaultModelBridge}.
+ * Tests for {@link DefaultFilterPreferencesModelBridge}.
  *
  * @version $Id$
  */
 @ComponentTest
-class DefaultNotificationPreferenceModelBridgeTest
+class DefaultNotificationPreferenceFilterPreferencesModelBridgeTest
 {
     @InjectMockComponents
-    private DefaultModelBridge defaultModelBridge;
+    private DefaultFilterPreferencesModelBridge defaultModelBridge;
 
     @MockComponent
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;

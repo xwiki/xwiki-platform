@@ -46,7 +46,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 
 /**
- * Wrap the default {@link ModelBridge} to store in the execution context the notification preferences to avoid fetching
+ * Wrap the default {@link FilterPreferencesModelBridge} to store in the execution context the notification preferences to avoid fetching
  * them several time during the same HTTP request.
  *
  * @version $Id$
@@ -55,14 +55,14 @@ import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheMa
 @Component
 @Named("cached")
 @Singleton
-public class CachedModelBridge implements ModelBridge, Initializable
+public class CachedFilterPreferencesModelBridge implements FilterPreferencesModelBridge, Initializable
 {
     private static final String PREFERENCEFILTERCACHE_NAME = "NotificationsFilterPreferences";
 
     private static final String TOGGLECACHE_NAME = "ToggeableFilterActivations";
 
     @Inject
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @Inject
     private UnboundedEntityCacheManager cacheManager;
@@ -104,7 +104,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
             return preferences;
         }
 
-        preferences = this.modelBridge.getFilterPreferences(userReference);
+        preferences = this.filterPreferencesModelBridge.getFilterPreferences(userReference);
 
         this.preferenceFilterCache.put(this.referenceFactory.getReference(userReference), preferences);
 
@@ -124,7 +124,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
             return preferences;
         }
 
-        preferences = this.modelBridge.getFilterPreferences(wikiReference);
+        preferences = this.filterPreferencesModelBridge.getFilterPreferences(wikiReference);
 
         this.preferenceFilterCache.put(this.referenceFactory.getReference(wikiReference), preferences);
 
@@ -140,7 +140,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
             return values;
         }
 
-        values = this.modelBridge.getToggeableFilterActivations(userReference);
+        values = this.filterPreferencesModelBridge.getToggeableFilterActivations(userReference);
 
         this.toggleCache.put(this.referenceFactory.getReference(userReference), values);
 
@@ -150,13 +150,20 @@ public class CachedModelBridge implements ModelBridge, Initializable
     @Override
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
-        this.modelBridge.deleteFilterPreference(user, filterPreferenceId);
+        this.filterPreferencesModelBridge.deleteFilterPreference(user, filterPreferenceId);
+    }
+
+    @Override
+    public void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        this.filterPreferencesModelBridge.deleteFilterPreferences(user, filterPreferenceIds);
     }
 
     @Override
     public void deleteFilterPreferences(DocumentReference user) throws NotificationException
     {
-        this.modelBridge.deleteFilterPreferences(user);
+        this.filterPreferencesModelBridge.deleteFilterPreferences(user);
         invalidateUserPreferencesFilters(user);
     }
 
@@ -164,7 +171,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
     public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
-        this.modelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
+        this.filterPreferencesModelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
     }
 
     @Override
@@ -172,7 +179,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
         throws NotificationException
     {
         // Remove the preferences from the database, then remove the preferences from the cache.
-        this.modelBridge.deleteFilterPreferences(wikiReference);
+        this.filterPreferencesModelBridge.deleteFilterPreferences(wikiReference);
         invalidateWikiPreferenceFilters(wikiReference);
     }
 
@@ -180,34 +187,34 @@ public class CachedModelBridge implements ModelBridge, Initializable
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {
-        this.modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
+        this.filterPreferencesModelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
     }
 
     @Override
     public void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {
-        this.modelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
+        this.filterPreferencesModelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
     }
 
     @Override
     public void saveFilterPreferences(WikiReference wikiReference,
         Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        this.modelBridge.saveFilterPreferences(wikiReference, filterPreferences);
+        this.filterPreferencesModelBridge.saveFilterPreferences(wikiReference, filterPreferences);
     }
 
     @Override
     public void saveFilterPreferences(DocumentReference user,
         Collection<NotificationFilterPreference> filterPreferences) throws NotificationException
     {
-        this.modelBridge.saveFilterPreferences(user, filterPreferences);
+        this.filterPreferencesModelBridge.saveFilterPreferences(user, filterPreferences);
     }
 
     @Override
     public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
     {
-        this.modelBridge.setStartDateForUser(user, startDate);
+        this.filterPreferencesModelBridge.setStartDateForUser(user, startDate);
     }
 
     @Override
@@ -215,7 +222,7 @@ public class CachedModelBridge implements ModelBridge, Initializable
         Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
         throws NotificationException
     {
-        this.modelBridge.createScopeFilterPreference(user, type, formats, eventTypes, reference);
+        this.filterPreferencesModelBridge.createScopeFilterPreference(user, type, formats, eventTypes, reference);
     }
 
     @Override
@@ -223,7 +230,8 @@ public class CachedModelBridge implements ModelBridge, Initializable
         Set<NotificationFormat> formats, List<String> eventTypes, EntityReference reference)
         throws NotificationException
     {
-        this.modelBridge.createScopeFilterPreference(wikiReference, type, formats, eventTypes, reference);
+        this.filterPreferencesModelBridge
+            .createScopeFilterPreference(wikiReference, type, formats, eventTypes, reference);
     }
 
     /**

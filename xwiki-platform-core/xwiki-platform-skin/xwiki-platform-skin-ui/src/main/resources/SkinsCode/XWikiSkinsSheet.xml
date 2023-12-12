@@ -149,7 +149,6 @@
     (((
       {{html}}&lt;button class="btn btn-default btn-xs"&gt;$services.icon.renderHTML('cross')&lt;/button&gt;{{/html}}
     )))
-    )))
     (% class="overrideProperties hidden" %)
     (((
       #set ($className = 'XWiki.XWikiSkinFileOverrideClass')

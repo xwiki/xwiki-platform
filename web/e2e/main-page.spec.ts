@@ -55,3 +55,19 @@ test("has content", async ({ page }) => {
   const locator = page.locator("#xwikicontent");
   await expect(locator).toContainText("Welcome to Main.WebHome");
 });
+
+test("can follow links", async ({ page }) => {
+  await page.goto(localDefaultPage);
+
+  await page.locator('a[href="Page2.WebHome"]').click();
+
+  await expect(page.locator("#xwikicontent")).toContainText(
+    "Welcome to Page2.WebHome",
+  );
+
+  await page.goBack();
+
+  await expect(page.locator("#xwikicontent")).toContainText(
+    "Welcome to Main.WebHome",
+  );
+});

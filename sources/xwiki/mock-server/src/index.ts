@@ -12,7 +12,7 @@ app.get("/", (_req, res) => {
 });
 
 app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
-  const page = req.params.page || "Main.WebHome";
+  const page = req.query.page || "Main.WebHome";
 
   res.appendHeader("Access-Control-Allow-Origin", "*");
 
@@ -26,12 +26,15 @@ app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
     encodingFormat: "xwiki/2.1",
     text: `= Welcome to ${page} =
 
-XWiki is the best tool to organize your knowledge.`,
+XWiki is the best tool to organize your knowledge.
+
+[[XWiki Syntax>>Page2.WebHome]]
+`,
   });
 });
 
 app.get("/xwiki/rest/cristal/panel", (req: Request, res: Response) => {
-  const panel = req.params.panel || "Main.WebHome";
+  const panel = req.query.panel || "Main.WebHome";
 
   res.appendHeader("Access-Control-Allow-Origin", "*");
 

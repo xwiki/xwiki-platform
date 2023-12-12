@@ -39,7 +39,7 @@ const pageStatus = ref({
   withSheet: false,
   sheet: "",
 });
-let logger: Logger;
+let logger: Logger | undefined = undefined;
 
 const cristal = inject<CristalApp>("cristal");
 if (cristal != null) {
@@ -79,8 +79,8 @@ onUpdated(() => {
   ContentTools.loadJS(pageStatus.value.js);
 });
 </script>
-<template ref="root">
-  <article id="content">
+<template>
+  <article id="content" ref="root">
     <UIX uixname="content.before" />
     <div class="pagemenu">
       <router-link :to="link">

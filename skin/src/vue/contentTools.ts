@@ -74,13 +74,6 @@ export class ContentTools {
           }
 
           event.preventDefault();
-          if (cristal != null) {
-            cristal.loadPageFromURL(origin.href).then();
-          } else {
-            ContentTools.logger?.error(
-              "cristal object not injected properly in c-content.vue",
-            );
-          }
         }
       },
       true,

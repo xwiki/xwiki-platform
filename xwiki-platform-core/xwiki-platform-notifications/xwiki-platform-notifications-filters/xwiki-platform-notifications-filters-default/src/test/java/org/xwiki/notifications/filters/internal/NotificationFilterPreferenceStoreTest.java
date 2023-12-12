@@ -239,7 +239,7 @@ class NotificationFilterPreferenceStoreTest
         this.notificationFilterPreferenceStore.deleteFilterPreference(userReference, filterId);
         verify(this.session).createQuery(
             "delete from DefaultNotificationFilterPreference where internalId in (:id)");
-        verify(this.query).setParameter("id", String.valueOf(internalId));
+        verify(this.query).setParameter("id", Set.of(internalId));
         verify(this.query).executeUpdate();
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_REFERENCE.getName());
@@ -264,7 +264,7 @@ class NotificationFilterPreferenceStoreTest
         this.notificationFilterPreferenceStore.deleteFilterPreference(wikiReference, filterId);
         verify(this.session).createQuery(
             "delete from DefaultNotificationFilterPreference where internalId in (:id)");
-        verify(this.query).setParameter("id", String.valueOf(internalId));
+        verify(this.query).setParameter("id", Set.of(internalId));
         verify(this.query).executeUpdate();
         if (useMainStore) {
             verify(this.context).setWikiId(MAIN_WIKI_REFERENCE.getName());

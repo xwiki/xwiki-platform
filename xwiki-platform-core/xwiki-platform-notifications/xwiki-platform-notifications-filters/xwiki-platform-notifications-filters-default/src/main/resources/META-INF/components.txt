@@ -11,3 +11,4 @@ org.xwiki.notifications.filters.internal.migrators.NotificationFilterPreferences
 org.xwiki.notifications.filters.internal.migrators.ScopeNotificationFilterClassMigrator
 org.xwiki.notifications.filters.internal.UserAddedEventListener
 org.xwiki.notifications.filters.migration.R140401000XWIKI15460DataMigration
+org.xwiki.notifications.filters.migration.R160000000XWIKI21448DataMigration

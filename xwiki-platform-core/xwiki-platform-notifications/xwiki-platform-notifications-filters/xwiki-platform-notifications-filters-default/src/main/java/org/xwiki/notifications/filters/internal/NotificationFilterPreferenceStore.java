@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -172,7 +171,7 @@ public class NotificationFilterPreferenceStore
         return configureContextWrapper(null, () -> {
             try {
                 List<DefaultNotificationFilterPreference> list = this.queryManager
-                    .createQuery("select nfp from DefaultNotificationFilterPreference nfp " + "order by nfp.internalId",
+                    .createQuery("select nfp from DefaultNotificationFilterPreference nfp order by nfp.internalId",
                         Query.HQL)
                     .setLimit(limit).setOffset(offset).execute();
                 // We return DefaultNotificationFilterPreference instead of NotificationFilterPreference because we
@@ -356,8 +355,7 @@ public class NotificationFilterPreferenceStore
             try {
                 hibernateStore.executeWrite(context, session ->
                     session.createQuery("delete from DefaultNotificationFilterPreference where internalId in (:id)")
-                    .setParameter("id",
-                        internalFilterPreferenceIds.stream().map(String::valueOf).collect(Collectors.joining(",")))
+                    .setParameter("id", internalFilterPreferenceIds)
                     .executeUpdate());
             } catch (XWikiException e) {
                 throw new NotificationException(

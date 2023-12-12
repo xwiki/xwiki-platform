@@ -159,10 +159,10 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
                 CleaningFilterEvent cleaningFilterEvent = new CleaningFilterEvent();
                 this.observationManager.notify(cleaningFilterEvent, deletedDocumentReference, matchingPreferences);
                 if (!cleaningFilterEvent.isCanceled()) {
-                    for (NotificationFilterPreference matchingPreference : matchingPreferences) {
-                        this.notificationFilterPreferenceManager.deleteFilterPreference(user,
-                            matchingPreference.getId());
-                    }
+                    this.notificationFilterPreferenceManager.deleteFilterPreferences(user,
+                        matchingPreferences.stream()
+                            .map(NotificationFilterPreference::getId)
+                            .collect(Collectors.toSet()));
                 }
             }
         } catch (NotificationException e) {

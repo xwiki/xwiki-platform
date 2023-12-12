@@ -19,3 +19,4 @@ packages:
   - "electron/preload"
   - "electron/renderer"
   - "dev/config"
+  - "sources/xwiki/mock-server"

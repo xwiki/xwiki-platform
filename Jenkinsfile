@@ -53,8 +53,12 @@ pipeline {
     }
     post {
         always {
-            junit '**/unit-tests.xml'
-            junit '**/e2e-tests.xml'
+            junit testResults: '**/unit-tests.xml', skipPublishingChecks: true
+            junit testResults: '**/e2e-tests.xml', skipPublishingChecks: true
+
+        }
+        failure {
+          archiveArtifacts artifacts: 'web/test-results'
         }
     }
 }

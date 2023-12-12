@@ -57,9 +57,11 @@ export class ContentTools {
           ContentTools.logger?.debug(event.target.href);
           ContentTools.logger?.debug(location);
           ContentTools.logger?.debug(location.hostname);
+          event.preventDefault();
+          // Case 1: the link is relative and/or points to the current host.
           if (origin.href.startsWith(location.origin)) {
             ContentTools.logger?.debug("URL is relative URL");
-            const page = event.target.href.replace(
+            const page = origin.href.replace(
               location.origin + location.pathname,
               "",
             );
@@ -71,9 +73,17 @@ export class ContentTools {
               ContentTools.logger?.debug("Leaving alone page", page);
               return;
             }
+          } else {
+            // Case 2: the link points to an external server, in this case we try to resolve it to a known page.
+            // Otherwise, the link is considered as external.
+            if (cristal != null) {
+              cristal.loadPageFromURL(origin.href).then();
+            } else {
+              ContentTools.logger?.error(
+                "cristal object not injected properly in c-content.vue",
+              );
+            }
           }
-
-          event.preventDefault();
         }
       },
       true,

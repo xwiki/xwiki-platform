@@ -855,9 +855,10 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# Indicates how documents are protected by required rights.
 #-#
 #-# The possible choices are:
-#-# * none (the default): no required rights check
-#-# * warning: a warning is presented to the user when trying to edit a document with required rights issues
-# security.requiredRights.protection=none
+#-# * none: no required rights check
+#-# * warning (the default): a warning is presented to the user when trying to edit a document with required rights
+#-# issues
+# security.requiredRights.protection=warning
 
 #-------------------------------------------------------------------------------------
 # URL

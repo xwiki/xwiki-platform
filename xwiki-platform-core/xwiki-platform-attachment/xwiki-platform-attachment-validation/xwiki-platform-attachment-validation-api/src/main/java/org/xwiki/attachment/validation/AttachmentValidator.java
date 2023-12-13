@@ -21,7 +21,6 @@ package org.xwiki.attachment.validation;
 
 import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide the operations to validate an attachment. For instance, by checking the size or the mimetype of the
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10
  */
 @Role
-@Unstable
 public interface AttachmentValidator
 {
     /**

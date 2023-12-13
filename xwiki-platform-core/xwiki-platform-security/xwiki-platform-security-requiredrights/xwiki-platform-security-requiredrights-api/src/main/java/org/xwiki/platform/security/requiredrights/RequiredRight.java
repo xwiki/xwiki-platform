@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -36,7 +37,7 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @since 15.9RC1
  */
 @Unstable
-public class RequiredRight
+public class RequiredRight implements Serializable
 {
     /**
      * Programming right required.
@@ -57,6 +58,13 @@ public class RequiredRight
      * Script right might be required, but a manual review is needed to confirm if the right is required.
      */
     public static final RequiredRight MAYBE_SCRIPT = new RequiredRight(Right.SCRIPT, EntityType.DOCUMENT, true);
+
+    /**
+     * Wiki-level admin right required.
+     *
+     * @since 15.10RC1
+     */
+    public static final RequiredRight WIKI_ADMIN = new RequiredRight(Right.ADMIN, EntityType.WIKI, false);
 
     /**
      * Script right is required, programming right might be required.

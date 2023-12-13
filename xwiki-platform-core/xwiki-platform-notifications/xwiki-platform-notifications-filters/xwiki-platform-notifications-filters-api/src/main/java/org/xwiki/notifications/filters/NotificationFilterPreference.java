@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.stability.Unstable;
 
 import static com.xpn.xwiki.doc.XWikiDocument.DB_SPACE_SEP;
 
@@ -156,7 +155,6 @@ public interface NotificationFilterPreference
      * @since 14.4.1
      * @since 13.10.7
      */
-    @Unstable
     default boolean isFromWiki(String wikiId)
     {
         String wikiIdWithPrefix = wikiId + DB_SPACE_SEP;
@@ -176,7 +174,6 @@ public interface NotificationFilterPreference
      * @since 14.4.1
      * @since 13.10.7
      */
-    @Unstable
     default Optional<String> getWikiId()
     {
         String wikiId = null;

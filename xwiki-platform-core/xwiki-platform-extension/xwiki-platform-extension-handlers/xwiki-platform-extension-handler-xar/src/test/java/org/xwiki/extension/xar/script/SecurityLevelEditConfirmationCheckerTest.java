@@ -107,6 +107,6 @@ class SecurityLevelEditConfirmationCheckerTest
     void checkWarning()
     {
         when(this.securityTool.getProtectionLevel(EDIT, USER_REFERENCE, DOCUMENT_REFERENCE)).thenReturn(WARNING);
-        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, false)), this.checker.check());
+        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, false, WARNING)), this.checker.check());
     }
 }

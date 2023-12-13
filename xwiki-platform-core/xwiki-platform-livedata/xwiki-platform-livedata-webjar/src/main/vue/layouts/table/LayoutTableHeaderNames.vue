@@ -318,6 +318,8 @@ export default {
     .handle {
       /* Always show the drag handler because hover is not available on mobile. */
       opacity: 1;
+      /* Display the drag handler next to the property name to avoid always hiding it. */
+      position: static;
     }
 
     /* Trim long property names. */

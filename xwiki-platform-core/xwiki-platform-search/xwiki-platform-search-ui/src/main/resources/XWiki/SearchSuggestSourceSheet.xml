@@ -70,7 +70,7 @@
     : #if ($editing)
         $doc.display($property.name, 'edit')
       #else
-        {{{$!object.getProperty($property.name).value}}}
+        $services.rendering.escape($!object.getProperty($property.name).value, 'xwiki/2.1')
       #end
   #end
 #end

@@ -523,7 +523,6 @@ public interface DocumentAccessBridge
      * @throws Exception If the document cannot be accessed.
      * @since 14.7RC1
      */
-    @Unstable
     default InputStream getAttachmentContent(EntityReference reference) throws Exception
     {
         throw new NotImplementedException("Method not implemented");

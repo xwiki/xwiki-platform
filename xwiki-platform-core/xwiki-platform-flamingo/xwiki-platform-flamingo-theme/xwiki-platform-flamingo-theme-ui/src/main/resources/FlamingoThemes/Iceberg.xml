@@ -972,11 +972,8 @@
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
 
 /* Headings */
-@headings-font-weight: 600;
+@headings-font-weight: 500;
 
-/* Font */
-@import (css) "@{open-sans-font-path}";
-  
 /* Other */
 @well-bg: @body-bg;
 

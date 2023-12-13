@@ -22,7 +22,6 @@ package org.xwiki.wysiwyg.converter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.wysiwyg.filter.MutableServletRequest;
 
 /**
@@ -33,7 +32,6 @@ import org.xwiki.wysiwyg.filter.MutableServletRequest;
  * @version $Id$
  * @since 14.10
  */
-@Unstable
 public class RequestParameterConversionResult
 {
     private MutableServletRequest request;

@@ -20,8 +20,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 #template("hierarchy.vm")
+#set($isPreview = true)
 #template("contentview.vm")
-<hr />
-<div class="bottombuttons sticky-buttons">#template("previewactions.vm")</div>
 </div> ## main
 #template("endpage.vm")

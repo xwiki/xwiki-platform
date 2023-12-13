@@ -21,7 +21,6 @@ package org.xwiki.index;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide the operation to consume a task.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.1RC1
  */
 @Role
-@Unstable
 public interface TaskConsumer
 {
     /**

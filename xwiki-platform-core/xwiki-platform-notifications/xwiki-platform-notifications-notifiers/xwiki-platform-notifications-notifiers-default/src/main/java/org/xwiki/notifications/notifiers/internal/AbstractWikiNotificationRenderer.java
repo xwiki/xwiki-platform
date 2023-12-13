@@ -19,11 +19,15 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
-import org.xwiki.component.manager.ComponentManager;
+import javax.inject.Inject;
+
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
@@ -32,6 +36,7 @@ import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * Helper to build wiki components that render templates related to notifications.
@@ -40,15 +45,19 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @since 10.0
  * @since 9.11.1
  */
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public abstract class AbstractWikiNotificationRenderer implements WikiComponent
 {
     protected static final String EVENT_BINDING_NAME = "event";
 
+    @Inject
     protected TemplateManager templateManager;
 
+    @Inject
     protected ScriptContextManager scriptContextManager;
 
-    protected ComponentManager componentManager;
+    @Inject
+    protected EntityReferenceSerializer<String> referenceSerializer;
 
     protected BaseObjectReference objectReference;
 
@@ -59,22 +68,14 @@ public abstract class AbstractWikiNotificationRenderer implements WikiComponent
     /**
      * Constructs a new {@link AbstractWikiNotificationRenderer}.
      *
-     * @param authorReference the author reference of the document
-     * @param templateManager the {@link TemplateManager} to use
-     * @param scriptContextManager the {@link ScriptContextManager} to use
-     * @param componentManager the {@link ComponentManager} to use
      * @param baseObject the XObject which has the required properties to instantiate the component
      * @throws NotificationException if the properties of the given BaseObject could not be loaded
+     * @since 15.10RC1
      */
-    public AbstractWikiNotificationRenderer(DocumentReference authorReference, TemplateManager templateManager,
-            ScriptContextManager scriptContextManager, ComponentManager componentManager, BaseObject baseObject)
-            throws NotificationException
+    public void initialize(BaseObject baseObject) throws NotificationException
     {
         this.objectReference = baseObject.getReference();
-        this.authorReference = authorReference;
-        this.templateManager = templateManager;
-        this.scriptContextManager = scriptContextManager;
-        this.componentManager = componentManager;
+        this.authorReference = baseObject.getOwnerDocument().getAuthorReference();
 
         this.eventType = this.extractProperty(baseObject, WikiNotificationDisplayerDocumentInitializer.EVENT_TYPE);
     }
@@ -82,14 +83,18 @@ public abstract class AbstractWikiNotificationRenderer implements WikiComponent
     protected Template extractTemplate(BaseObject baseObject, String propertyName) throws NotificationException
     {
         try {
-            String xObjectTemplate = this.extractProperty(baseObject, propertyName);
-            if (StringUtils.isNotBlank(xObjectTemplate)) {
-                return templateManager.createStringTemplate(xObjectTemplate, this.getAuthorReference());
+            BaseProperty property = (BaseProperty) baseObject.get(propertyName);
+            if (property != null && property.getValue() != null) {
+                String xObjectTemplate = property.getValue().toString();
+                if (StringUtils.isNotBlank(xObjectTemplate)) {
+                    return this.templateManager.createStringTemplate(
+                        this.referenceSerializer.serialize(property.getReference()), xObjectTemplate,
+                        getAuthorReference(), baseObject.getDocumentReference());
+                }
             }
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Unable to render the template provided in the base object [%s]",
-                            baseObject), e);
+                String.format("Unable to render the template provided in the base object [%s]", baseObject), e);
         }
 
         return null;

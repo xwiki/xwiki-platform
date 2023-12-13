@@ -241,7 +241,7 @@ public class DefaultTemplateManager implements TemplateManager
     public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
         throws Exception
     {
-        return createStringTemplate(null, content, author, sourceReference);
+        return createStringTemplate("Unknown template", content, author, sourceReference);
     }
 
     @Override

@@ -1374,7 +1374,6 @@ public class Document extends Api
      * @return the XWiki object from this document that matches the specified object reference
      * @since 14.0RC1
      */
-    @Unstable
     public Object getObject(ObjectReference objectReference, boolean create)
     {
         try {
@@ -1618,37 +1617,6 @@ public class Document extends Api
             return "";
         }
         return this.doc.displayPrettyName(fieldname, showMandatory, before, obj.getBaseObject(), getXWikiContext());
-    }
-
-    /**
-     * Displays the tooltip of the given field. This function uses the active object or will find the first object that
-     * has the given field.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname)
-    {
-        if (this.currentObj == null) {
-            return this.doc.displayTooltip(fieldname, getXWikiContext());
-        } else {
-            return this.doc.displayTooltip(fieldname, this.currentObj.getBaseObject(), getXWikiContext());
-        }
-    }
-
-    /**
-     * Displays the tooltip of the given field of the given object.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @param obj Object to find the class to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname, Object obj)
-    {
-        if (obj == null) {
-            return "";
-        }
-        return this.doc.displayTooltip(fieldname, obj.getBaseObject(), getXWikiContext());
     }
 
     /**
@@ -2171,7 +2139,6 @@ public class Document extends Api
      * @since 14.10
      * @since 14.4.7
      */
-    @Unstable
     public boolean hasAccess(Right right)
     {
         return hasAccess(right, getXWikiContext().getUserReference());
@@ -3334,7 +3301,6 @@ public class Document extends Api
      * @return the authors of the document.
      * @since 14.0RC1
      */
-    @Unstable
     public DocumentAuthors getAuthors()
     {
         if (this.hasAccess(Right.PROGRAM)) {

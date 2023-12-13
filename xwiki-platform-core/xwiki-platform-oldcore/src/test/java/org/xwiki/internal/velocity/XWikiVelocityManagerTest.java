@@ -35,7 +35,6 @@ import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
-import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -45,6 +44,7 @@ import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -92,13 +92,19 @@ public class XWikiVelocityManagerTest
     private Skin skin;
 
     @MockComponent
-    private TemplateManager templateManager;
+    private InternalTemplateManager templateManager;
 
     @Mock
-    private Template template;
+    private Template mainMacrosTemplate;
 
     @Mock
-    private TemplateContent templateContent;
+    private TemplateContent mainMacrosTemplateContent;
+
+    @Mock
+    private Template skinMacrosTemplate;
+
+    @Mock
+    private TemplateContent skinMacrosTemplateContent;
 
     @MockComponent
     private ConverterManager converterManager;
@@ -110,11 +116,12 @@ public class XWikiVelocityManagerTest
             new VelocityContext());
 
         when(this.skinManager.getCurrentSkin(true)).thenReturn(this.skin);
-        when(this.templateManager.getTemplate("macros.vm")).thenReturn(this.template);
-        when(this.template.getId()).thenReturn("testMacros");
-        when(this.template.getContent()).thenReturn(this.templateContent);
-        when(this.templateContent.getDocumentReference()).thenReturn(TEMPLATE_DOCUMENT);
-        when(this.templateContent.getContent()).thenReturn("");
+
+        when(this.templateManager.getSkinTemplate("macros.vm")).thenReturn(this.skinMacrosTemplate);
+        when(this.skinMacrosTemplate.getId()).thenReturn("testMacros");
+        when(this.skinMacrosTemplate.getContent()).thenReturn(this.skinMacrosTemplateContent);
+        when(this.skinMacrosTemplateContent.getDocumentReference()).thenReturn(TEMPLATE_DOCUMENT);
+        when(this.skinMacrosTemplateContent.getContent()).thenReturn("");
 
         AuthorizationManager authorizationManager = this.oldcore.getMockAuthorizationManager();
         when(authorizationManager.hasAccess(Right.SCRIPT, SCRIPT_USER, TEMPLATE_DOCUMENT)).thenReturn(true);
@@ -172,7 +179,7 @@ public class XWikiVelocityManagerTest
     @Test
     void checkMacrosInjectionWithScriptRights() throws Exception
     {
-        when(this.templateContent.getAuthorReference()).thenReturn(SCRIPT_USER);
+        when(this.skinMacrosTemplateContent.getAuthorReference()).thenReturn(SCRIPT_USER);
         VelocityEngine engine = this.velocityManager.getVelocityEngine();
         verify(engine).addGlobalMacros(anyMap());
     }

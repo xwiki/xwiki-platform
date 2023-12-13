@@ -1143,6 +1143,34 @@ public class InternalTemplateManager implements Initializable, Disposable
         return null;
     }
 
+    /**
+     * Search for a template of a given name only in the configured skin (or it's skin parents).
+     * 
+     * @param templateName the name of the template to search
+     * @return the found {@link Template} or null if no template associated with the passed name could be found
+     * @since 15.10RC1
+     */
+    public Template getSkinTemplate(String templateName)
+    {
+        Template template = null;
+
+        // Try from skin
+        Skin skin = this.skins.getCurrentSkin(false);
+        if (skin != null) {
+            template = getTemplate(templateName, skin);
+        }
+
+        // Try from base skin if no skin is set
+        if (skin == null) {
+            Skin baseSkin = this.skins.getCurrentParentSkin(false);
+            if (baseSkin != null) {
+                template = getTemplate(templateName, baseSkin);
+            }
+        }
+
+        return template;
+    }
+
     public Template getTemplate(String templateName)
     {
         Template template = null;

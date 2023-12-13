@@ -24,11 +24,14 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -37,7 +40,6 @@ import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
-import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
@@ -51,13 +53,20 @@ import org.xwiki.rendering.transformation.RenderingContext;
  * @version $Id$
  * @since 15.9RC1
  */
-public abstract class AbstractMacroBlockRequiredRightAnalyzer implements RequiredRightAnalyzer<MacroBlock>
+public abstract class AbstractMacroBlockRequiredRightAnalyzer
 {
     @Inject
     protected RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Inject
     protected MacroContentParser macroContentParser;
+
+    @Inject
+    protected BlockSupplierProvider<MacroBlock> macroBlockBlockSupplierProvider;
+
+    @Inject
+    @Named("translation")
+    protected BlockSupplierProvider<String> translationBlockSupplierProvider;
 
     @Inject
     private RenderingContext renderingContext;
@@ -77,7 +86,7 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer implements Require
      * @param macroBlock the MacroBlock to create the transformation context for
      * @return a macro transformation context
      */
-    protected MacroTransformationContext getTransformationContext(MacroBlock macroBlock)
+    private MacroTransformationContext getTransformationContext(MacroBlock macroBlock)
     {
         MacroTransformationContext macroTransformationContext = new MacroTransformationContext();
         macroTransformationContext.setId("RequiredRightAnalyzer_" + macroBlock.getId());
@@ -95,13 +104,12 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer implements Require
      * If the macro cannot be found, it returns null.
      *
      * @param macroBlock the MacroBlock to get the macro for
-     * @param transformationContext the content to get the rendering syntax from
      * @return the Macro object, or null if the macro is not found
      */
-    protected Macro<?> getMacro(MacroBlock macroBlock, MacroTransformationContext transformationContext)
+    protected Macro<?> getMacro(MacroBlock macroBlock)
     {
-        Syntax renderingSyntax = this.macroContentParser.getCurrentSyntax(transformationContext);
-        MacroId macroId = new MacroId(macroBlock.getId(), renderingSyntax);
+        Syntax syntax = macroBlock.getSyntaxMetadata().orElse(this.renderingContext.getDefaultSyntax());
+        MacroId macroId = new MacroId(macroBlock.getId(), syntax);
         Macro<?> macro = null;
         try {
             macro = this.macroManager.getMacro(macroId);
@@ -118,22 +126,44 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer implements Require
      * using the XDOM required right analyzer to determine the required rights.
      *
      * @param macroBlock the MacroBlock containing the macro content to analyze
-     * @param transformationContext the transformation context to use for parsing
+     * @param content the macro content to analyze
      * @return a list of RequiredRightAnalysisResult objects representing the required rights for the macro content
-     * @throws MacroExecutionException if an error occurs during macro execution
      * @throws RequiredRightsException if the required rights cannot be determined
      */
-    protected List<RequiredRightAnalysisResult> analyzeMacroContent(MacroBlock macroBlock,
-        MacroTransformationContext transformationContext) throws MacroExecutionException, RequiredRightsException
+    protected List<RequiredRightAnalysisResult> analyzeMacroContent(MacroBlock macroBlock, String content)
+        throws RequiredRightsException
+    {
+        return analyzeMacroContent(macroBlock, content, null);
+    }
+
+    /**
+     * Analyzes the macro content to determine the required rights.
+     * <p>
+     * It parses the macro content using the macro content parser and analyzes the resulting XDOM object
+     * using the XDOM required right analyzer to determine the required rights.
+     *
+     * @param macroBlock the MacroBlock containing the macro content to analyze
+     * @param content the macro content to analyze
+     * @param syntax the syntax of the macro content
+     * @return a list of RequiredRightAnalysisResult objects representing the required rights for the macro content
+     * @throws RequiredRightsException if the required rights cannot be determined
+     */
+    protected List<RequiredRightAnalysisResult> analyzeMacroContent(MacroBlock macroBlock, String content,
+        Syntax syntax) throws RequiredRightsException
     {
         // Keep whatever metadata was present on the XDOM.
         MetaData metaData = null;
         if (macroBlock.getRoot() instanceof XDOM) {
             metaData = new MetaData(((XDOM) macroBlock.getRoot()).getMetaData().getMetaData());
         }
-        XDOM xdom = this.macroContentParser
-            .parse(macroBlock.getContent(), transformationContext, false, metaData, macroBlock.isInline());
-        return this.xdomRequiredRightAnalyzer.analyze(xdom);
+        MacroTransformationContext transformationContext = getTransformationContext(macroBlock);
+        try {
+            XDOM xdom = this.macroContentParser
+                .parse(content, syntax, transformationContext, false, metaData, macroBlock.isInline());
+            return this.xdomRequiredRightAnalyzer.analyze(xdom);
+        } catch (Exception e) {
+            throw new RequiredRightsException("Failed to analyze macro content", e);
+        }
     }
 
     /**
@@ -169,5 +199,16 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer implements Require
             }
         }
         return result;
+    }
+
+    protected RequiredRightAnalysisResult reportAnalysisError(MacroBlock macroBlock, Exception e)
+    {
+        return new RequiredRightAnalysisResult(extractSourceReference(macroBlock),
+            this.translationBlockSupplierProvider.get("security.requiredrights.macro.analyzer.error",
+                macroBlock.getId(),
+                ExceptionUtils.getRootCauseMessage(e)),
+            this.macroBlockBlockSupplierProvider.get(macroBlock),
+            List.of(RequiredRight.MAYBE_PROGRAM)
+        );
     }
 }

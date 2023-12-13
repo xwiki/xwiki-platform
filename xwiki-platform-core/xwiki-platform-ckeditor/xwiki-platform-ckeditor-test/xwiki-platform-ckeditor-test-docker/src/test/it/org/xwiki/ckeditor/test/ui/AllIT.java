@@ -68,4 +68,10 @@ public class AllIT
     {
     }
     
+    @Nested
+    @DisplayName("Localization")
+    class NestedLocalizationIT extends LocalizationIT
+    {
+    }
+    
 }

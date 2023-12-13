@@ -28,7 +28,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.image.style.ImageStyleException;
 import org.xwiki.image.style.rest.model.jaxb.Styles;
-import org.xwiki.stability.Unstable;
 
 /**
  * Rest endpoint for the image styles.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.3RC1
  */
 @Path("/wikis/{wikiName}/imageStyles")
-@Unstable
 public interface ImageStylesResource
 {
     /**

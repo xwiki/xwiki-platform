@@ -19,22 +19,18 @@
 ## ---------------------------------------------------------------------------
 #macro (getEditConfirmation)
   #set ($editConfirmation = $NULL)
-  ##
-  ## Check if edit is forced.
-  ##
-  #set ($session = $request.session)
-  #set ($sessionAttributeName = 'force_edit_' + $doc.prefixedFullName)
-  #set ($editForced = $session.getAttribute($sessionAttributeName))
-  #if (!$editForced && "$!request.get('force')" != '')
-    #set ($editForced = true)
-    #set ($discard = $session.setAttribute($sessionAttributeName, $editForced))
+  
+  ## Persist the results of the last analysis, and they will be ignored during the next check.
+  #set ($forced = "$!request.get('force')" != '')
+  #if ($forced)
+    $services.modelvalidation.edit.force()
   #end
   ##
-  ## Check if the document is protected and ask for confirmation if it is.
+  ## Calls the pre-edit checkers.
   ##
   #set ($checkResult = $services.modelvalidation.edit.check())
 
-  #if (!$checkResult.errorMessages.isEmpty() || (!$editForced && !$checkResult.warningMessages.isEmpty()))
+  #if (!$checkResult.errorMessages.isEmpty() || (!$forced && !$checkResult.warningMessages.isEmpty()))
     #set ($editConfirmation = {})
 
     #if ($checkResult.isError())

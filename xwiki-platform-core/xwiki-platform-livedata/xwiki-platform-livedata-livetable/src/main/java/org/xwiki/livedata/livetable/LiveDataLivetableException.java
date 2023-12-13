@@ -19,8 +19,6 @@
  */
 package org.xwiki.livedata.livetable;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Livedata Livetable exception.
  *
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.10.4
  * @since 14.2RC1
  */
-@Unstable
 public class LiveDataLivetableException extends Exception
 {
     private static final long serialVersionUID = 3315810055928971046L;

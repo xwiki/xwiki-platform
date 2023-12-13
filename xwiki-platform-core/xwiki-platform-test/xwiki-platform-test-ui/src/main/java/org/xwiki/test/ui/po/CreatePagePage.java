@@ -179,7 +179,7 @@ public class CreatePagePage extends ViewPage
      * @param spaceReference document's space reference (parent nested document), ignored if {@code null}
      * @param pageName document's name (space name or page name, depending if terminal or not), ignored if {@code null}
      * @param isTerminalPage true if the new document is terminal, false for non-terminal
-     * @since public since 7.4M2
+     * @since 7.4M2
      */
     public void fillForm(String title, String spaceReference, String pageName, boolean isTerminalPage)
     {

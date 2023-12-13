@@ -1,2 +1,2 @@
 500:org.xwiki.rendering.internal.transformation.icon.XWikiIconTransformationConfiguration
-500:org.xwiki.rendering.transformation.icon.XWikiIconProvider
+org.xwiki.rendering.internal.transformation.icon.XWikiIconProvider

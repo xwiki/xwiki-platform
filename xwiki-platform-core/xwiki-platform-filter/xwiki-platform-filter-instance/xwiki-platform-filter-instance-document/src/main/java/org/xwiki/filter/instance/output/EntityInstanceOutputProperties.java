@@ -59,7 +59,7 @@ public class EntityInstanceOutputProperties extends InstanceOutputProperties
      * @return the comment to use when saving users
      */
     @PropertyName("Save comment")
-    @PropertyDescription("The comment to use when saving a user")
+    @PropertyDescription("The comment to use when saving a document")
     public String getSaveComment()
     {
         return this.saveComment;
@@ -77,7 +77,7 @@ public class EntityInstanceOutputProperties extends InstanceOutputProperties
      * @return the author to use when saving users
      */
     @PropertyName("Save author")
-    @PropertyDescription("The author to use when saving a user")
+    @PropertyDescription("The author to use when saving a document")
     public DocumentReference getAuthor()
     {
         return this.author;

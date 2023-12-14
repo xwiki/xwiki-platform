@@ -261,7 +261,7 @@
   @state-danger-bg:                     #f8ecec;
   @state-success-bg:                    #e5f3df;
   @state-info-bg:                       #e1f1f9;
-  ## We want to keep overwritting the @brand-danger value from bootstrap as it does not pass contrast checks on #fff
+  ## We override the @brand-danger value from bootstrap as it does not pass contrast checks on #fff
   @brand-danger:                        #cc3333;
 #end
 

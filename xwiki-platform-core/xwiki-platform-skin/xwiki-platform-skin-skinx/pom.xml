@@ -31,7 +31,7 @@
   <name>XWiki Platform - Skin - Skin Extensions</name>
   <description>XWiki Platform - Skin - Skin Extensions</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.25</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.24</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Build tools -->

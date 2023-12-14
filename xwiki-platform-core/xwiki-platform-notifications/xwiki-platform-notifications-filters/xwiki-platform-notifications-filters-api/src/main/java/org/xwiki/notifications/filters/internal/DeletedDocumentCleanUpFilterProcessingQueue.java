@@ -96,6 +96,9 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
     public void dispose() throws ComponentLifecycleException
     {
         this.disposed = true;
+
+        // Note that this implies that some filters might never be clean up:
+        // FIXME: this needs to be properly fixed in the future by refactoring all that once XWIKI-21692 is done
         this.cleanupQueue.clear();
         this.cleanupQueue.add(STOP_DATA);
     }
@@ -105,7 +108,7 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
     {
         // Start the clean up thread
         Thread optimizeThreadthread = new Thread(new ExecutionContextRunnable(this::cleanup, this.componentManager));
-        optimizeThreadthread.setName("Pre filtering Live mail notification optimizer");
+        optimizeThreadthread.setName("Notification filters clean up queue");
         optimizeThreadthread.setPriority(Thread.NORM_PRIORITY - 1);
         optimizeThreadthread.setDaemon(true);
         optimizeThreadthread.start();

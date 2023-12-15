@@ -71,7 +71,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-                  <version>15.10-SNAPSHOT</version>
+                  <version>${platform.version}</version>
                   <type>zip</type>
                 </artifactItem>
               </artifactItems>
@@ -91,7 +91,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-                  <version>15.10-SNAPSHOT</version>
+                  <version>${platform.version}</version>
                   <type>zip</type>
                 </artifactItem>
               </artifactItems>
@@ -111,7 +111,7 @@
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
                   <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
-                  <version>15.10-SNAPSHOT</version>
+                  <version>${platform.version}</version>
                   <type>war</type>
                 </artifactItem>
               </artifactItems>

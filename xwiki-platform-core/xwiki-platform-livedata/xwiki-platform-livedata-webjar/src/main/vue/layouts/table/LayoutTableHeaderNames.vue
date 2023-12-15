@@ -278,19 +278,15 @@ export default {
   justify-content: space-between;
 }
 
-
-
 .layout-table .resize-handle {
   padding: 0;
-}
-
-.layout-table .resize-handle {
   cursor: col-resize;
   min-width: 0;
   width: 0;
   border-width: 2px;
   border-radius: 0;
   margin-left: 2px;
+  margin-right: -2px;
 }
 
 .layout-table .column-name:focus-within .resize-handle,
@@ -298,6 +294,7 @@ export default {
     border-color: @text-muted;
     border-width: 3px;
     margin-left: 0;
+    margin-right: -3px;
 }
 
 .layout-table .property-name {

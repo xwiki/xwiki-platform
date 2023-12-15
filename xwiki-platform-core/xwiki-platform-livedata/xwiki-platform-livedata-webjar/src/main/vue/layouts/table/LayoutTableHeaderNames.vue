@@ -62,10 +62,12 @@
         <!-- Property Name -->
         <button 
           class="property-name handle"
-          :title="$t('livedata.action.columnName.hint')"
           @click="sort(property)"
           @keydown.left="keyboardDragNDrop($event, -1)"
           @keydown.right="keyboardDragNDrop($event, 1)"
+          :title="logic.isPropertySortable(property.id) ?
+            $t('livedata.action.columnName.sortable.hint') :
+            $t('livedata.action.columnName.default.hint')"
         >
           {{ property.name }}
           <!--

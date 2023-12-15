@@ -286,15 +286,22 @@ export default {
   border-width: 2px;
   border-radius: 0;
   margin-left: 2px;
-  margin-right: -2px;
 }
 
 .layout-table .column-name:focus-within .resize-handle,
 .layout-table .column-name:hover .resize-handle {
-    border-color: @text-muted;
-    border-width: 3px;
-    margin-left: 0;
-    margin-right: -3px;
+  border-color: @text-muted;
+  border-width: 3px;
+  margin-left: 0;
+}
+
+.layout-table .draggable-item:not(:last-child) .resize-handle {
+  margin-right: -2px;
+}
+
+.layout-table .draggable-item:not(:last-child) .column-name:focus-within .resize-handle,
+.layout-table .draggable-item:not(:last-child) .column-name:hover .resize-handle {
+  margin-right: -3px;
 }
 
 .layout-table .property-name {
@@ -308,7 +315,7 @@ export default {
 }
 
 .draggable-item .property-name.handle  {
-    opacity: 1;
+  opacity: 1;
 }
 
 .layout-table .sort-icon {

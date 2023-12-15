@@ -334,7 +334,6 @@ export default {
   .layout-table th.draggable-item {
     /* Overwrite the draggable-item display in order to show the property names (table header) as a column. */
     display: block;
-
     /* Trim long property names. */
     .property-name {
       white-space: nowrap;

@@ -627,7 +627,7 @@
       <code>/* Show only the generic form while the page is loading. The other forms, which have editor specific configuration
   properties, will be moved into tabs by the JavaScript code. */
 #admin-page-content .codeToExecute &gt; form,
-#admin-page-content &gt; h1.wikigeneratedheader {
+#admin-page-content &gt; h2.wikigeneratedheader {
   display: none;
 }
 #admin-page-content .codeToExecute &gt; form#wysiwyg {

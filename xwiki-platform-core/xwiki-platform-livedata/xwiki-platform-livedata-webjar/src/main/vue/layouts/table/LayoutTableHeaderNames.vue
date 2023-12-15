@@ -61,9 +61,11 @@
       <div class="column-name">
         <!-- Property Name -->
         <button 
-          class="property-name"
-          :title="$t('livedata.action.sort.hint')"
+          class="property-name handle"
+          :title="$t('livedata.action.columnName.hint')"
           @click="sort(property)"
+          @keydown.left="keyboardDragNDrop($event, -1)"
+          @keydown.right="keyboardDragNDrop($event, 1)"
         >
           {{ property.name }}
           <!--
@@ -75,27 +77,15 @@
             :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
             :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
         </button>
-        
-        <!--
-          Specify the handle to drag properties.
-        -->
-        <button
-          class="handle btn btn-xs btn-default"
-          :title="$t('livedata.action.reorder.hint')"
-          @keydown.left="keyboardDragNDropLeft($event)"
-          @keydown.right="keyboardDragNDropRight($event)"
-        >
-          <XWikiIcon :icon-descriptor="{name: 'reposition'}"/>
-        </button>
 
         <!--
           Specify the handle to resize properties
         -->
         <button class="resize-handle btn btn-xs btn-default" :title="$t('livedata.action.resizeColumn.hint')"
-          v-mousedownmove="resizeColumnInit"
-          @mousedownmove="resizeColumn"
-          @keydown.left="resizeColumnKeyboard($event, -10)"
-          @keydown.right="resizeColumnKeyboard($event, 10)"
+          v-mousedownmove="mouseResizeColumnInit"
+          @mousedownmove="mouseResizeColumn"
+          @keydown.left="keyboardResizeColumn($event, -10)"
+          @keydown.right="keyboardResizeColumn($event, 10)"
           @dblclick="resetColumnSize"
           @keydown.esc="resetColumnSize"
         >
@@ -185,42 +175,33 @@ export default {
         if (th.style.display !== "none") return th;
       }
     },
-    
-    keyboardDragNDropRight (e) {
+
+    keyboardDragNDrop(e,deltaIndex) {
       let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
       let oldIndex = Array.from(handles).indexOf(e.currentTarget);
-      let newIndex = oldIndex + 1;
-      if (newIndex < handles.length) {
-          this.logic.reorderProperty(oldIndex, newIndex);
+      let newIndex = oldIndex + deltaIndex;
+      if (newIndex >= handles.length) {
+        this.logic.reorderProperty(oldIndex, newIndex - handles.length);
+      } else if (newIndex <= -1) {
+        this.logic.reorderProperty(oldIndex, handles.length + newIndex);
       } else {
-          this.logic.reorderProperty(oldIndex, 0);
+        this.logic.reorderProperty(oldIndex, newIndex);
       }
       this.$nextTick(() => {
           handles[oldIndex].focus();
       });
     },
 
-    keyboardDragNDropLeft (e) {
-      let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
-      let oldIndex = Array.from(handles).indexOf(e.currentTarget);
-      let newIndex = oldIndex - 1;
-      if (newIndex > -1) {
-          this.logic.reorderProperty(oldIndex, newIndex);
-      } else {
-          this.logic.reorderProperty(oldIndex, handles.length - 1);
-      }
-      this.$nextTick(() => {
-          handles[oldIndex].focus();
-      });
-    },
-
-    resizeColumnInit (e) {
+    mouseResizeColumnInit (e) {
       const th = e.currentTarget.closest("th");
       e.data.leftColumn = th.querySelector(".column-name");
       e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
       e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
       e.data.rightColumnBaseWidth = e.data.rightColumn?.getBoundingClientRect()?.width;
+      this.resizeColumnInit(th);
+    },
 
+    resizeColumnInit (th) {
       // Give all column names a fixed width so that relative widths don't change when resizing (in case the current
       // widths are not the actual column widths).
       // First, collect all widths, then set them all to avoid that due to the first values being set the other values
@@ -237,50 +218,35 @@ export default {
       }
     },
 
-    resizeColumn (e) {
-      const offsetX = e.clientX - e.data.clickEvent.clientX;
+    resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth, rightColumnBaseWidth) {
       // Resize left column
-      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
-      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
-
+      let leftColumnWidth = leftColumnBaseWidth + offsetX;
+      leftColumn.style.width = `${leftColumnWidth}px`;
       // Resize right column
-      if (e.data.rightColumn) {
-        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
-        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
+      if (rightColumn) {
+          let rightColumnWidth = rightColumnBaseWidth - offsetX;
+          rightColumn.style.width = `${rightColumnWidth}px`;
       }
     },
 
-    resizeColumnKeyboard (e, amount) {
+    mouseResizeColumn (e) {
+      let offsetX = e.clientX - e.data.clickEvent.clientX;
+      let leftColumn = e.data.leftColumn;
+      let rightColumn = e.data.rightColumn;
+      let leftColumnBaseWidth = e.data.leftColumnBaseWidth;
+      let rightColumnBaseWidth = e.data.rightColumnBaseWidth;
+      this.resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth, rightColumnBaseWidth);
+    },
+
+    keyboardResizeColumn (e, offsetX) {
       const th = e.currentTarget.closest("th");
+      this.resizeColumnInit(th);
+
       let leftColumn = th.querySelector(".column-name");
       let leftColumnBaseWidth = leftColumn.getBoundingClientRect()?.width;
       let rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
       let rightColumnBaseWidth = rightColumn?.getBoundingClientRect()?.width;
-
-      // Give all column names a fixed width so that relative widths don't change when resizing (in case the current
-      // widths are not the actual column widths).
-      // First, collect all widths, then set them all to avoid that due to the first values being set the other values
-      // change.
-      const widths = [];
-      let columns = th.closest("tr").querySelectorAll(".column-name");
-      // Filter columns that aren't visible to avoid setting a width of zero on them.
-      columns = Array.from(columns).filter(column => column.closest("th").style.display !== "none");
-      for (const column of columns) {
-        widths.push(column.getBoundingClientRect().width);
-      }
-      for (let i = 0; i < columns.length; i++) {
-        columns[i].style.width = `${widths[i]}px`;
-      }
-      const offsetX = amount;
-      // Resize left column
-      const leftColumnWidth = leftColumnBaseWidth + offsetX;
-      leftColumn.style.width = `${leftColumnWidth}px`;
-
-      // Resize right column
-      if (rightColumn) {
-        const rightColumnWidth = rightColumnBaseWidth - offsetX;
-        rightColumn.style.width = `${rightColumnWidth}px`;
-      }
+      this.resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth, rightColumnBaseWidth);
     },
     
     resetColumnSize (e) {
@@ -310,27 +276,10 @@ export default {
   justify-content: space-between;
 }
 
-.layout-table .handle, .layout-table .resize-handle {
+
+
+.layout-table .resize-handle {
   padding: 0;
-}
-
-.layout-table .handle {
-  opacity: 1;
-  width: @target-size-minimum;
-  height: @target-size-minimum;
-  user-select: none;
-  border: 0;
-  color: @btn-default-border;
-}
-
-.layout-table .column-name:focus-within .handle,
-.layout-table .column-name:hover .handle {
-    color: @text-muted;
-    border: 1px solid @text-muted;
-}
-
-.layout-table .draggable-item .handle .fa {
-    vertical-align: unset;
 }
 
 .layout-table .resize-handle {
@@ -357,6 +306,10 @@ export default {
   border: 0;
   width: 100%;
   text-align: left;
+}
+
+.draggable-item .property-name.handle  {
+    opacity: 1;
 }
 
 .layout-table .sort-icon {

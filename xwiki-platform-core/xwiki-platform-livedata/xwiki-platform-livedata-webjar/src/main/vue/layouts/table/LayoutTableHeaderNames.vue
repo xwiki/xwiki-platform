@@ -319,9 +319,15 @@ export default {
   opacity: 0;
   padding-left: @table-cell-padding;
 }
+
+.layout-table .property-name .sort-icon {
+  vertical-align: baseline;
+}
+
 .layout-table .sort-icon.sorted {
   opacity: 1;
 }
+
 .layout-table .column-name:hover .sort-icon:not(.sorted),
 .layout-table .column-name:focus-within .sort-icon:not(.sorted) {
   opacity: 0.5;

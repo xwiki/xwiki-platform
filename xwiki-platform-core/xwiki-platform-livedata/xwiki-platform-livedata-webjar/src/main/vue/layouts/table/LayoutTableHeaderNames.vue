@@ -85,7 +85,7 @@
           @keydown.left="keyboardDragNDropLeft($event)"
           @keydown.right="keyboardDragNDropRight($event)"
         >
-          <XWikiIcon :icon-descriptor="{name: 'right'}"/>
+          <XWikiIcon :icon-descriptor="{name: 'reposition'}"/>
         </button>
 
         <!--

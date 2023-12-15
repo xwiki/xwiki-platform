@@ -176,7 +176,7 @@ export default {
       }
     },
 
-    keyboardDragNDrop(e,deltaIndex) {
+    keyboardDragNDrop(e, deltaIndex) {
       let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
       let oldIndex = Array.from(handles).indexOf(e.currentTarget);
       let newIndex = oldIndex + deltaIndex;

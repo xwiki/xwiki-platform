@@ -328,7 +328,7 @@
     #set($escapedAppName = $services.rendering.escape($appName, 'xwiki/2.1'))
     #set($doubleEscapedAppName = $services.rendering.escape($escapedAppName, 'xwiki/2.1'))
 
-    = {{translation key="admin.customize"/}} [[$doubleEscapedAppName&gt;&gt;$escapedAppName]]: =
+    == {{translation key="admin.customize"/}} [[$doubleEscapedAppName&gt;&gt;$escapedAppName]]: ==
   #end
 #end
 

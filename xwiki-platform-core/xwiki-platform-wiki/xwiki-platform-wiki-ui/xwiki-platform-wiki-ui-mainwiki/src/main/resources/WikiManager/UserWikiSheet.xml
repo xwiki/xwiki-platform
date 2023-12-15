@@ -488,7 +488,7 @@ return XWiki;
   {{html clean='false'}}
     &lt;div class='half column'&gt;
       &lt;div class='profile-section highlighted-profile-section'&gt;
-        &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
+        &lt;h2&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h2&gt;
         #set ($joinedWikis = [])
         #set ($wikis = $services.wiki.getAll())
         #foreach ($wiki in $wikis)

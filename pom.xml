@@ -60,7 +60,7 @@
     <jetty.client.version>9.4.53.v20231009</jetty.client.version>
     <jetty.server.version>10.0.18</jetty.server.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.101.Final</netty.version>
+    <netty.version>4.1.103.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.4</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
@@ -74,7 +74,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.5.8</libreoffice.version>
+    <libreoffice.version>7.5.9</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -108,13 +108,13 @@
     <mysql.version>8.2.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.3.0</mariadb.version>
+    <mariadb.version>3.3.1</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.0</pgsql.version>
+    <pgsql.version>42.7.1</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.11.0.0</oracle.version>
@@ -575,12 +575,12 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.13.0</version>
+        <version>5.14.0</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna-platform</artifactId>
-        <version>5.13.0</version>
+        <version>5.14.0</version>
       </dependency>
 
       <dependency>
@@ -848,7 +848,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>1.6.14</version>
+        <version>1.6.15</version>
       </dependency>
 
       <!-- Jetty client libraries -->
@@ -1099,7 +1099,7 @@
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.23.0</version>
+        <version>1.24.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>

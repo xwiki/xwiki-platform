@@ -291,7 +291,7 @@
               &lt;/a&gt;
             &lt;/div&gt;
           #end
-          &lt;h1&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h1&gt;
+          &lt;h2&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h2&gt;
           &lt;dl&gt;
             &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.dashboard.user.displayOnMainPage')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$doc.display('displayOnMainPage', $dashboardPrefs)&lt;/dd&gt;

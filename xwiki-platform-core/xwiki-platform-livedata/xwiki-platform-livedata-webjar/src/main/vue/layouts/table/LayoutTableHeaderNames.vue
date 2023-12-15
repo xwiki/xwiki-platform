@@ -178,7 +178,7 @@ export default {
       }
     },
 
-    keyboardDragNDrop(e,deltaIndex) {
+    keyboardDragNDrop(e, deltaIndex) {
       let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
       let oldIndex = Array.from(handles).indexOf(e.currentTarget);
       let newIndex = oldIndex + deltaIndex;
@@ -336,7 +336,6 @@ export default {
   .layout-table th.draggable-item {
     /* Overwrite the draggable-item display in order to show the property names (table header) as a column. */
     display: block;
-
     /* Trim long property names. */
     .property-name {
       white-space: nowrap;

@@ -754,8 +754,10 @@ editors.XDataEditors = Class.create({
         'class': 'tool move',
         title: 'Drag and drop to change the order'
       }).update('<span class="presentation">' +
-        $jsontool.serialize($services.icon.renderHTML('arrows')) + 
-        '</span><span class="sr-only">move</span>');
+        $jsontool.serialize($services.icon.renderHTML('up')) +
+        '</span><span class="sr-only">' +
+        $jsontool.serialize($services.localization.render('core.editors.class.moveProperty.handle.label') +
+        '</span>');
       item.makePositioned();
       item.appendChild(movebutton);
       movebutton.observe('click', function(event) {

@@ -5,12 +5,14 @@
   overflow: auto;
   border: none !important;
 }
+
 #body #xwikiobjects label, #body #xwikiclassproperties label {
   display: inline;
   text-transform: none;
   font-variant: normal;
   color: $theme.textPrimaryColor;
 }
+
 #body .xclass-title h2 span {
   border: none;
   color: inherit;
@@ -18,11 +20,13 @@
   margin: 0;
   position: static;
 }
+
 div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="checkbox"],
 div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio"] {
   width: auto;
   border: none;
 }
+
 .boolean-property input {
   width: auto !important;
   border: none !important;
@@ -32,6 +36,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .more-actions {
   padding: 8px 2px;
 }
+
 .more-actions .edit-all {
   display: block;
   padding: 2px 18px;
@@ -42,6 +47,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xclass-title {
   margin: 16px 16px 2px 0;
 }
+
 .xclass-title h2 {
   border: none;
   font-weight: bold;
@@ -49,6 +55,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   margin: 0;
   padding: 0 0 0 0px;
 }
+
 .xclass-content {
  margin: 0 0 0 16px;
 }
@@ -60,11 +67,13 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   cursor: default;
   background: transparent;
 }
+
 .xobject:hover .xobject-title,
 .xproperty:hover .xproperty-title {
   background-color: $theme.highlightColor;
   color: $theme.textPrimaryColor;
 }
+
 .xobject-title h3 {
   border: none;
   font-size: 100%;
@@ -74,11 +83,13 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   border: none;
   color: $theme.textColor;
 }
+
 .xobject-content {
   padding: 4px 14px 8px;
   border: none;
   margin-bottom: 2px;
 }
+
 /* XProperty */
 .xobject dl, .xproperty dl {
   margin: 0;
@@ -87,14 +98,18 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xobject-title:hover, .xclass-title:hover, .xproperty-title:hover {
   cursor: default;
 }
+
 .xobject-action {
   display: block;
   position: absolute;
   top: 2px;
 }
+
 .xobject-title .delete {
   right: 0;
+  color: $theme.notificationErrorColor;
 }
+
 .xobject-title .edit {
   right: 16px;
 }
@@ -104,21 +119,26 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   border: none;
   margin-top: .5em;
 }
+
 .xproperty-content {
   padding: 1em 0 1em 1em;
 }
+
 .xproperty-title {
   cursor: default;
   padding: 0px;
   overflow: hidden;
 }
+
 .xproperty-title .xproperty-property {
   float: left;
   margin-right: 8px;
 }
+
 .xproperty_number_input input {
   width: 2em;
 }
+
 .xproperty-title h2 {
   display: block;
   padding: 2px 20px 2px 18px;
@@ -129,18 +149,21 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   min-height: 16px;
   flex-grow: 1;
 }
-}
+
 .xproperty-title label {
   font-size: 60%;
   line-height: 1em;
 }
+
 .xproperty-content {
   clear: both;
 }
+
 .xproperty-title .xproperty-prettyName {
   float: none;
   clear: both;
 }
+
 .xobject-content xdt {
   font-size: 75%;
   font-weight: bold;
@@ -155,6 +178,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   gap: .5em;
   align-items: baseline;
 }
+
 #body .collapsable > .xobject-title > .toggle-collapsable,
 #body .collapsable > .xclass-title > .toggle-collapsable,
 #body .collapsable > .xproperty-title > .toggle-collapsable{
@@ -175,74 +199,99 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .disabled {
   opacity: 0.5;
 }
+
 .disabled * {
   font-style: italic;
 }
+
 .disabled .xproperty-title h2, #body #xwikiclassproperties .disabled dt label, #body #xwikiobjects dt.disabled label {
   color: $theme.textColor;
 }
+
 .syncProperties {
   font-weight: 900;
   display: inline-block;
   padding: 2px 0 2px 0;
+  color: $theme.notificationErrorColor;
 }
 /* XProperty tools */
 .disabletool label {
   font-weight: 900;
 }
+
 .xproperty-title .tools {
   align-self: center;
 }
+
 .xproperty-title .tools .tool {
   width: 16px;
   height: 16px;
   float: left;
   background: transparent none center no-repeat;
 }
+
 .xproperty-title .tools .move {
   cursor: move;
   color: $theme.linkColor;
 }
+
+.xproperty-title .tools .delete {
+  color: $theme.notificationErrorColor;
+}
+
 .dragged .xproperty-title {
   border: 1px solid $theme.borderColor;
 }
+
 /* Property type icons */
 .StringClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/string.png')");
 }
+
 .DateClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/calendar.png')");
 }
+
 .TextAreaClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/textarea.png')");
 }
+
 .NumberClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/number.png')");
 }
+
 .BooleanClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/boolean.png')");
 }
+
 .StaticListClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/staticlist.png')");
 }
+
 .GroupsClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/groups.png')");
 }
+
 .UsersClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/users.png')");
 }
+
 .LevelsClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/rights.png')");
 }
+
 .DBListClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/database.png')");
 }
+
 .DBTreeListClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/tree.png')");
 }
+
 .PasswordClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
 }
+
 #body #xwikiclassproperties #add_xproperty label,
 #body #xwikiobjects #add_xobject label {
   margin: 0;
@@ -281,37 +330,45 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   margin-top: 8px;
   border-top: 1px dotted $theme.borderColor;
 }
+
 .xclass-content .add_xobject-title {
   display: block;
 }
+
 .add_xobject-title a {
   color: $theme.linkColor;
   text-decoration: none;
   display: block;
   padding: 2px 0;
 }
+
 .add_xobject-title a:hover{
   text-decoration: underline;
   background-color: $theme.highlightColor;
 }
+
 #add_xobject .buttonwrapper input,
 #add_xproperty .buttonwrapper input {
   vertical-align: top;
   margin: 0;
 }
+
 #switch-xclass {
   text-align: right;
   margin: 4px 0 -16px;
 }
+
 #switch-xclass .suggest-classes {
   text-align: left;
 }
+
 .suggest-classes.selectize-control {
   /* Display on the same line as the Add button */
   display: inline-block;
   /* Align with the Add button */
   vertical-align: middle;
 }
+
 .suggest-classes > .selectize-dropdown > .selectize-dropdown-content,
 .suggest-classes.selectize-dropdown > .selectize-dropdown-content {
   /* Increase the max height because the drop down includes all the classes. */

@@ -972,9 +972,9 @@ public class EditIT
                 .contains("from the previous XWiki 2.1 syntax to the selected XHTML 1.0 syntax?"));
             confirmationModal.confirmSyntaxConversion();
 
-            String expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\">"
+            String expectedContent = "<h2 id=\"HFirstheading\" class=\"wikigeneratedid\">"
                 + "<span>First heading</span>"
-                + "</h1>"
+                + "</h2>"
                 + "<p>Paragraph containing some <strong>bold content</strong>.</p>"
                 + "<p>A new paragraph with some new content.</p>";
             assertEquals(expectedContent, wikiEditPage.getExactContent());

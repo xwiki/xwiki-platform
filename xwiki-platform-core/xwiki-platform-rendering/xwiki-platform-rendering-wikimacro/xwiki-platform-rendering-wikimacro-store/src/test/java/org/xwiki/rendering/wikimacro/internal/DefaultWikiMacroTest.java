@@ -252,7 +252,7 @@ class DefaultWikiMacroTest
         when(wikiModel.getDocumentViewURL(reference)).thenReturn("url");
 
         assertXHTML(
-            "<h1 id=\"Hheading\" class=\"wikigeneratedid\"><span>heading</span></h1>"
+            "<h2 id=\"Hheading\" class=\"wikigeneratedid\"><span>heading</span></h2>"
                 + "<ul class=\"wikitoc\">"
                 + "<li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li>"
                 + "</ul>",

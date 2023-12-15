@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.10-SNAPSHOT</version>
+    <version>16.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,10 +125,74 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>Those APIs are still available with legacy packages.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltipJS(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String, com.xpn.xwiki.api.Object)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.objects.BaseObject, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltip(java.lang.String, java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltip(java.lang.String, java.lang.String, java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltipJS()</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <criticality>allowed</criticality>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</old>
+                  <new>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</new>
+                  <superClass>org.xwiki.filter.instance.output.EntityInstanceOutputProperties</superClass>
+                  <justification>Not a breakage, the old DocumentInstanceOutputProperties content has been moved to the new EntityInstanceOutputProperties class and old class now inherits from the new one</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -246,6 +310,48 @@
     <profile>
       <id>docker</id>
       <build>
+        <plugins>
+          <!-- Dynamically generate a properties file containing all xwiki.test.ui.* system properties in it.
+               See the explanation on the failsafe maven plugin definition below -->
+          <plugin>
+            <groupId>org.codehaus.gmavenplus</groupId>
+            <artifactId>gmavenplus-plugin</artifactId>
+            <version>3.0.2</version>
+            <executions>
+              <execution>
+                <id>set-system-properties-file</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <scripts>
+                <script><![CDATA[
+                  def sysProps = System.getProperties().findAll({it.key.startsWith 'xwiki.test.ui.'})
+                  sysProps.storeToXML(new FileOutputStream(new File("${project.build.directory}/env-tests.xml")), null);
+             ]]></script>
+              </scripts>
+            </configuration>
+            <dependencies>
+              <!-- Avoid the following warning:
+                     [WARNING] Unable to initialize 'ant' with a new AntBuilder object. Is Groovy a dependency?
+                     If you are using Groovy >= 2.3.0-rc-1, remember to include groovy-ant as a dependency.
+               -->
+              <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-ant</artifactId>
+                <version>${groovy.version}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
         <pluginManagement>
           <plugins>
             <plugin>
@@ -262,6 +368,12 @@
                   -->
                   <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
                 </systemPropertyVariables>
+                <!-- Tell Failsafe to use the properties file generated by the gmavenplus maven plugin which will
+                     contain all the xwiki.test.ui.* system properties passed from the command line. This is needed
+                     for the Gradle Cache to recognize different inputs for two builds with different system properties.
+                     See https://tinyurl.com/2xkdzcpn
+                -->
+                <systemPropertiesFile>${project.build.directory}/env-tests.xml</systemPropertiesFile>
               </configuration>
             </plugin>
           </plugins>

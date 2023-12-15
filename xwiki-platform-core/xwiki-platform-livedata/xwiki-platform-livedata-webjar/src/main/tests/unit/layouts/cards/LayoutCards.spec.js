@@ -111,9 +111,12 @@ describe('LayoutCards.vue', () => {
     // Manual trigger of the afterEntryFetch event.
     afterEntryFetchWrapper.callback();
     await Vue.nextTick();
-    let cards = wrapper.findAllComponents(LayoutCardsCard);
+    const cards = wrapper.findAllComponents(LayoutCardsCard);
     expect(cards.length).toBe(1);
-    expect(cards.at(0).props()).toStrictEqual({entry: {id: 1}});
+    expect(cards.at(0).props()).toStrictEqual({
+      entry: {id: 1},
+      entryIdx: 0
+    });
     expect(wrapper.find('.noentries-card').exists()).toBe(false);
   })
 })

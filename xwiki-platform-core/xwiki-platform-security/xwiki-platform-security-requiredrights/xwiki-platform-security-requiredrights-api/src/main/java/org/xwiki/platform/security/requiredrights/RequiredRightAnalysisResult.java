@@ -22,6 +22,8 @@ package org.xwiki.platform.security.requiredrights;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
@@ -104,5 +106,37 @@ public class RequiredRightAnalysisResult
             .append("detailedMessageProvider", this.getDetailedMessage())
             .append("requiredRights", this.getRequiredRights())
             .toString();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        RequiredRightAnalysisResult that = (RequiredRightAnalysisResult) object;
+
+        return new EqualsBuilder()
+            .append(this.entityReference, that.entityReference)
+            .append(this.requiredRights, that.requiredRights)
+            .append(this.summaryMessageProvider, that.summaryMessageProvider)
+            .append(this.detailedMessageProvider, that.detailedMessageProvider)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.entityReference)
+            .append(this.requiredRights)
+            .append(this.summaryMessageProvider)
+            .append(this.detailedMessageProvider)
+            .toHashCode();
     }
 }

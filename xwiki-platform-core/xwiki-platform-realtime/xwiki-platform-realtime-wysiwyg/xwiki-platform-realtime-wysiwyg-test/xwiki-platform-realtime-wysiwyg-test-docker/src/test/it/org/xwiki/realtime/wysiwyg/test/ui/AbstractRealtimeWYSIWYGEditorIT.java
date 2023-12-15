@@ -21,6 +21,7 @@ package org.xwiki.realtime.wysiwyg.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.administration.test.po.WYSIWYGEditorAdministrationSectionPage;
 import org.xwiki.ckeditor.test.ui.AbstractCKEditorIT;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -33,6 +34,7 @@ import org.xwiki.test.ui.TestUtils;
  * @since 15.5.4
  * @since 15.9
  */
+@ExtendWith(RealtimeTestDebugger.class)
 abstract class AbstractRealtimeWYSIWYGEditorIT extends AbstractCKEditorIT
 {
     protected static String firstTabHandle;

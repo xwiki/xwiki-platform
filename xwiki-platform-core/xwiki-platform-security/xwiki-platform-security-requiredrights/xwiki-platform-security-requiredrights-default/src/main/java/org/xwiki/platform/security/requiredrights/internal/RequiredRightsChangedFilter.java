@@ -21,7 +21,7 @@ package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +33,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -53,6 +54,8 @@ import static org.xwiki.model.EntityType.OBJECT_PROPERTY;
 @Singleton
 public class RequiredRightsChangedFilter
 {
+    private static final Set<EntityType> OBJECT_ENTITY_TYPES = Set.of(OBJECT, OBJECT_PROPERTY);
+
     @Inject
     private AuthorizationManager authorizationManager;
 
@@ -71,8 +74,7 @@ public class RequiredRightsChangedFilter
      * @param resultList the list of required rights analysis result to filter
      * @return the filtered list of required rights results, according to the provided document authors
      */
-    public RequiredRightsChangedResult filter(DocumentAuthors authors,
-        List<RequiredRightAnalysisResult> resultList)
+    public RequiredRightsChangedResult filter(DocumentAuthors authors, List<RequiredRightAnalysisResult> resultList)
     {
         RequiredRightsChangedResult requiredRightsChangedResult = new RequiredRightsChangedResult();
         if (resultList == null || resultList.isEmpty()) {
@@ -82,42 +84,34 @@ public class RequiredRightsChangedFilter
         DocumentReference contentAuthorReference = this.userReferenceSerializer.serialize(authors.getContentAuthor());
         DocumentReference effectiveMetadataAuthorReference =
             this.userReferenceSerializer.serialize(authors.getEffectiveMetadataAuthor());
-        resultList.forEach(analysis -> {
+        for (RequiredRightAnalysisResult analysis : resultList) {
             EntityReference analyzedEntityReference = analysis.getEntityReference();
-            Optional<Boolean> first = analysis.getRequiredRights().stream().flatMap(requiredRight -> {
+            for (RequiredRight requiredRight : analysis.getRequiredRights()) {
                 Right right = requiredRight.getRight();
                 EntityType entityType = requiredRight.getEntityType();
-                EntityReference extractedEntityReference = analyzedEntityReference.extractReference(entityType);
+                EntityReference entityReference = analyzedEntityReference.extractReference(entityType);
                 DocumentReference authorReference;
-                if (analyzedEntityReference.getType() == OBJECT
-                    || analyzedEntityReference.getType() == OBJECT_PROPERTY)
-                {
+                if (OBJECT_ENTITY_TYPES.contains(analyzedEntityReference.getType())) {
                     authorReference = effectiveMetadataAuthorReference;
                 } else {
                     authorReference = contentAuthorReference;
                 }
-                if (Objects.equals(userReference, authorReference)) {
-                    return Optional.<Boolean>empty().stream();
-                }
-                boolean currentUserHasAccess =
-                    this.authorizationManager.hasAccess(right, userReference, extractedEntityReference);
-                boolean authorHasAccess =
-                    this.authorizationManager.hasAccess(right, authorReference, extractedEntityReference);
-                if (currentUserHasAccess != authorHasAccess) {
-                    return Optional.of(currentUserHasAccess).stream();
-                } else {
-                    return Optional.<Boolean>empty().stream();
-                }
-            }).findFirst();
-            if (first.isPresent()) {
-                if (Boolean.TRUE.equals(first.get())) {
-                    requiredRightsChangedResult.addToAdded(analysis);
-                } else {
-                    requiredRightsChangedResult.addToRemoved(analysis);
+                if (!Objects.equals(userReference, authorReference)) {
+                    boolean currentUserHasAccess = hasAccess(right, userReference, entityReference);
+                    boolean authorHasAccess = hasAccess(right, authorReference, entityReference);
+                    if (currentUserHasAccess != authorHasAccess) {
+                        requiredRightsChangedResult.add(analysis, right, currentUserHasAccess,
+                            requiredRight.isManualReviewNeeded());
+                    }
                 }
             }
-        });
+        }
 
         return requiredRightsChangedResult;
+    }
+
+    private boolean hasAccess(Right right, DocumentReference userReference, EntityReference extractedEntityReference)
+    {
+        return this.authorizationManager.hasAccess(right, userReference, extractedEntityReference);
     }
 }

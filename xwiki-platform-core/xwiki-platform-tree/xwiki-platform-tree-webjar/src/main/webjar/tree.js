@@ -454,6 +454,10 @@ define([
         })
       }
     };
+    if (!element.hasClass('jstree-no-links')) {
+      // If the tree is used for navigation (has links) then disable multiple selection by default.
+      defaultParams.core.multiple = false;
+    }
     if (element.attr('data-checkboxes') === 'true') {
       defaultParams.plugins.push('checkbox');
     }
@@ -513,8 +517,8 @@ define([
 
   $.fn.xtree = function(params) {
     return this.on('select_node.jstree', function(event, data) {
-      var tree = data.instance;
-      var selectedNode = data.node;
+      const tree = data.instance;
+      const selectedNode = data.node;
       // Load more child nodes when the pagination node is selected, if the selection is a result of an action performed
       // by the user (e.g click on the pagination node). We need to make this distinction because sometimes we want to
       // select the pagination node without activating it (i.e. without replacing it with the next child nodes).
@@ -522,12 +526,20 @@ define([
         addMoreChildren(tree, selectedNode);
       } else if (data.event && !$(data.event.target).hasClass('jstree-no-link') &&
           $(data.event.target).closest('.jstree-no-links').length === 0) {
-        // The node selection was triggered by an user event and links are enabled.
-        // When pressing Ctrl key and clicking on a tree node that has a link, open the link in new window / tab.
-        if (data.event.ctrlKey === true) {
-          window.open(selectedNode.a_attr.href, '_blank');
-        } else {
-          window.location.href = selectedNode.a_attr.href;
+        // The node selection was triggered by an user event and links are enabled. Follow the link.
+        const selectedNodeAnchor = tree.get_node(selectedNode, true).find('a.jstree-anchor')[0];
+        if (selectedNodeAnchor) {
+          // jsTree prevents the click event on the node anchor so we need to clone the anchor and dispatch the click to
+          // the clone instead (which doesn't have jsTree's click handler).
+          const selectedNodeAnchorClone = selectedNodeAnchor.cloneNode(true);
+          selectedNodeAnchor.replaceWith(selectedNodeAnchorClone);
+          selectedNodeAnchorClone.dispatchEvent(new MouseEvent('click', {
+            altKey: data.event.altKey,
+            ctrlKey: data.event.ctrlKey,
+            metaKey: data.event.metaKey,
+            shiftKey: data.event.shiftKey
+          }));
+          selectedNodeAnchorClone.replaceWith(selectedNodeAnchor);
         }
       }
 

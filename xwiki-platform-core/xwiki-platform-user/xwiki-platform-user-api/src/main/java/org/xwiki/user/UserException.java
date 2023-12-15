@@ -19,8 +19,6 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Generic exception for the user api module.
  *
@@ -29,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4.3
  * @since 13.10.8
  */
-@Unstable
 public class UserException extends Exception
 {
     private static final long serialVersionUID = 1L;

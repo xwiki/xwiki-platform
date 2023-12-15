@@ -33,7 +33,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,34 +40,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Verify the ability to change the language.
+ * Verify the ability to change the localization settings.
  *
  * @version $Id$
  * @since 13.4RC1
  * @since 12.10.8
  */
 @UITest
-class LanguageIT
+class LocalizationIT
 {
     @BeforeEach
-    void setUp(TestUtils testUtils)
+    void setUp(TestUtils setup)
     {
-        testUtils.loginAsSuperAdmin();
+        setup.loginAsSuperAdmin();
         // Reset default language configuration.
-        resetLanguageSettings();
-        // Reset current language.
-        testUtils.getDriver().manage().deleteCookieNamed("language");
+        resetLanguageSettings(setup);
     }
 
     @Test
     @Order(1)
-    void changeLanguageInMonolingualModeUsingTheAdministrationPreference(TestUtils testUtils)
+    void changeLanguageInMonolingualModeUsingTheAdministrationPreference(TestUtils setup, TestReference testReference)
     {
-        WikiEditPage edit = WikiEditPage.gotoPage("Test", "LanguageTest");
-        edit.setContent("{{velocity}}context = ($xcontext.locale), doc = ($doc.locale), "
+        ViewPage vp = setup.createPage(testReference,
+            "{{velocity}}context = ($xcontext.locale), doc = ($doc.locale), "
             + "default = ($doc.defaultLocale), tdoc = ($tdoc.locale), "
             + "tdocdefault = ($tdoc.defaultLocale){{/velocity}}");
-        ViewPage vp = edit.clickSaveAndView();
 
         // Current language must be "en".
         assertEquals(vp.getContent(), "context = (en), doc = (), default = (en), tdoc = (), tdocdefault = (en)",
@@ -81,7 +77,7 @@ class LanguageIT
         sectionPage.clickSave();
 
         // Now language must be "fr".
-        vp = testUtils.gotoPage("Test", "LanguageTest");
+        vp = setup.gotoPage(testReference);
         assertThat("Page not in French!", vp.getLastModifiedText(), containsStringIgnoringCase("modifié par"));
         assertEquals(vp.getContent(), "context = (fr), doc = (), default = (en), tdoc = (), tdocdefault = (en)",
             "Invalid content");
@@ -89,37 +85,36 @@ class LanguageIT
 
     @Test
     @Order(2)
-    void passingLanguageInRequestHasNoEffectInMonolingualMode(TestUtils testUtils, TestReference testReference)
+    void passingLanguageInRequestHasNoEffectInMonolingualMode(TestUtils setup, TestReference testReference)
     {
-        testUtils.createPage(testReference, "");
-        testUtils.gotoPage(testReference, "view", "language=fr");
+        setup.createPage(testReference, "");
+        setup.gotoPage(testReference, "view", "language=fr");
         ViewPage vp = new ViewPage();
         assertThat("Page not in English!", vp.getLastModifiedText(), containsStringIgnoringCase("last modified by"));
     }
 
     @Test
     @Order(3)
-    void changeLanguageInMultilingualModeUsingTheLanguageRequestParameter(TestUtils testUtils,
-        TestReference testReference)
+    void changeLanguageInMultilingualModeUsingTheLanguageRequestParameter(TestUtils setup, TestReference testReference)
     {
         setLanguageSettings(true, Arrays.asList("en", "fr"));
-        testUtils.createPage(testReference, "");
-        testUtils.gotoPage(testReference, "view", "language=fr");
+        setup.createPage(testReference, "");
+        setup.gotoPage(testReference, "view", "language=fr");
         ViewPage vp = new ViewPage();
         assertThat("Page not in French!", vp.getLastModifiedText(), containsStringIgnoringCase("modifié par"));
     }
 
     @Test
     @Order(4)
-    void headerCorrectLanguage(TestUtils testUtils)
+    void headerCorrectLanguage(TestUtils setup)
     {
         setLanguageSettings(true, Arrays.asList("en", "fr"));
 
-        testUtils.gotoPage("Main", "Test", "view");
-        assertLanguageTagsArePresent(testUtils, "en");
+        setup.gotoPage("Main", "Test", "view");
+        assertLanguageTagsArePresent(setup, "en");
 
-        testUtils.gotoPage("Main", "Test", "view", "language=fr");
-        assertLanguageTagsArePresent(testUtils, "fr");
+        setup.gotoPage("Main", "Test", "view", "language=fr");
+        assertLanguageTagsArePresent(setup, "fr");
     }
 
     /**
@@ -127,9 +122,9 @@ class LanguageIT
      *
      * @param language the language to use, should be a valid language, e.g. "en"
      */
-    private void assertLanguageTagsArePresent(TestUtils testUtils, String language)
+    private void assertLanguageTagsArePresent(TestUtils setup, String language)
     {
-        WebElement html = testUtils.getDriver().findElement(By.tagName("html"));
+        WebElement html = setup.getDriver().findElement(By.tagName("html"));
         assertEquals(language, html.getAttribute("lang"));
         assertEquals(language, html.getAttribute("xml:lang"));
 
@@ -137,13 +132,15 @@ class LanguageIT
         // For retro-compatibility only.
         assertEquals(language, vp.getHTMLMetaDataValue("language"));
 
-        String content = testUtils.getDriver().getPageSource();
+        String content = setup.getDriver().getPageSource();
         assertTrue(content.contains("language=" + language));
     }
 
-    private void resetLanguageSettings()
+    private void resetLanguageSettings(TestUtils setup)
     {
         setLanguageSettings(false, null);
+        // Reset current language.
+        setup.getDriver().manage().deleteCookieNamed("language");
     }
 
     private void setLanguageSettings(boolean isMultiLingual, List<String> supportedLanguages)

@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
-import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.NONE;
+import static org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration.RequiredRightDocumentProtection.WARNING;
 
 /**
  * Default implementation of {@link RequiredRightsConfiguration}.
@@ -47,6 +47,6 @@ public class DefaultRequiredRightsConfiguration implements RequiredRightsConfigu
     @Override
     public RequiredRightDocumentProtection getDocumentProtection()
     {
-        return this.configuration.getProperty(PREFIX + "protection", NONE);
+        return this.configuration.getProperty(PREFIX + "protection", WARNING);
     }
 }

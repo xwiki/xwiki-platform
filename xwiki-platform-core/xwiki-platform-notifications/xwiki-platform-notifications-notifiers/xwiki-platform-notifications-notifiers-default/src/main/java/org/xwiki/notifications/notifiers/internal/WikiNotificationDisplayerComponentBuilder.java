@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class WikiNotificationDisplayerComponentBuilder extends AbstractWikiNotificationRendererComponentBuilder
 {
+    @Inject
     private Provider<WikiNotificationDisplayer> displayerProvider;
 
     @Override

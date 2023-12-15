@@ -58,8 +58,8 @@ define('xwiki-realtime-toolbar', [
     return $('<div class="rt-user-list"></div>').attr('id', uid()).appendTo($container)[0];
   }
 
+  const userDisplayMode = Config.toolbarUserlist;
   function getOtherUsers(myUserId, userList, usersData) {
-    const displayConfig = Config.toolbarUserlist;
     return userList.map(function(userId) {
       // Collect the user data.
       const userData = usersData?.[userId];
@@ -85,7 +85,7 @@ define('xwiki-realtime-toolbar', [
       // Filter out users without data.
       return user;
     // Display each user. We don't need to separate the users with comma if the avatars are displayed.
-    }).map(displayUser).join((displayConfig === 'avatar' || displayConfig === 'both') ? '' : ', ');
+    }).map(displayUser).join((userDisplayMode === 'avatar' || userDisplayMode === 'both') ? '' : ', ');
   }
 
   function displayUser(user) {
@@ -95,10 +95,10 @@ define('xwiki-realtime-toolbar', [
       'data-id': user.id,
       'data-reference': user.reference
     });
-    if (displayConfig === undefined || displayConfig === 'name' || displayConfig === 'both') {
+    if (userDisplayMode === undefined || userDisplayMode === 'name' || userDisplayMode === 'both') {
       userDisplay.text(user.name);
     }
-    if (displayConfig === 'avatar' || displayConfig === 'both') {
+    if (userDisplayMode === 'avatar' || userDisplayMode === 'both') {
       if (user.avatar) {
         $('<img class="rt-user-avatar"/>').attr({
           src: user.avatar,
@@ -113,6 +113,8 @@ define('xwiki-realtime-toolbar', [
   }
 
   function updateUserList(myUserName, listElement, userList, userData, onUserNameClick) {
+    // Update the current user id on the tool bar (used by automated functional tests).
+    listElement.closest('.rt-toolbar').dataset.userId = myUserName;
     if (userList.indexOf(myUserName) < 0) {
       listElement.textContent = Messages.synchronizing;
       return;
@@ -146,7 +148,8 @@ define('xwiki-realtime-toolbar', [
   }
 
   function create({$container, myUserName, realtime, getLag, userList, config}) {
-    const toolbar = createRealtimeToolbar($container);
+    // Save the current user id on the tool bar to be used by automated functional tests.
+    const toolbar = createRealtimeToolbar($container).attr('data-user-id', myUserName);
     let userListElement = createUserList(toolbar.find('.rt-toolbar-leftside'));
     const spinner = createSpinner(toolbar.find('.rt-toolbar-rightside'));
     const lagElement = createLagElement(toolbar.find('.rt-toolbar-rightside'));

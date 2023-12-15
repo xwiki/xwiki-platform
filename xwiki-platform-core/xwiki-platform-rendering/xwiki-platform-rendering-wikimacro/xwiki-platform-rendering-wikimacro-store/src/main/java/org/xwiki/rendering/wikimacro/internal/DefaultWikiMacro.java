@@ -32,7 +32,6 @@ import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiCompo
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -41,7 +40,6 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import com.xpn.xwiki.objects.BaseObject;
@@ -189,15 +187,5 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     boolean isCacheAllowed()
     {
         return this.cacheAllowed;
-    }
-
-    XDOM getContent()
-    {
-        return this.xdom;
-    }
-
-    Syntax getSyntax()
-    {
-        return this.syntax;
     }
 }

@@ -20,7 +20,6 @@
 package org.xwiki.security.authentication;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.stability.Unstable;
 
 /**
  * Possible actions for {@link AuthenticationResourceReference}.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public enum AuthenticationAction
 {
     /**

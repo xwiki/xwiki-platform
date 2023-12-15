@@ -47,7 +47,6 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -185,10 +184,7 @@ class ScriptMacroAnalyzerTest
 
     private void registerMockMacro(String macroName, Macro<?> macro) throws MacroLookupException
     {
-        // Create a fake syntax to create the macro id.
-        Syntax syntax = mock();
-        when(this.macroContentParser.getCurrentSyntax(any())).thenReturn(syntax);
-        MacroId macroId = new MacroId(macroName, syntax);
+        MacroId macroId = new MacroId(macroName, null);
         // Use doReturn() as Mockito has problems with generics.
         doReturn(macro).when(this.macroManager).getMacro(macroId);
     }

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +16,40 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.evaluation;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>15.5.5-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-search</artifactId>
-  <name>XWiki Platform - Search - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Search - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-search-api</module>
-    <module>xwiki-platform-search-solr</module>
-    <module>xwiki-platform-search-ui</module>
-  </modules>
-</project>
+import org.xwiki.stability.Unstable;
+
+/**
+ * Exception raised during evaluation of XObjects properties.
+ *
+ * @version $Id$
+ * @since 14.10.21
+ * @since 15.5.5
+ * @since 15.10.2
+ */
+@Unstable
+public class ObjectEvaluatorException extends Exception
+{
+    /**
+     * Creates an instance of ObjectEvaluatorException with a message and a cause.
+     *
+     * @param message the message detailing the issue
+     * @param cause the cause of the exception
+     */
+    public ObjectEvaluatorException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    /**
+     * Creates an instance of ObjectEvaluatorException with a message.
+     *
+     * @param message the message detailing the issue
+     */
+    public ObjectEvaluatorException(String message)
+    {
+        this(message, null);
+    }
+}

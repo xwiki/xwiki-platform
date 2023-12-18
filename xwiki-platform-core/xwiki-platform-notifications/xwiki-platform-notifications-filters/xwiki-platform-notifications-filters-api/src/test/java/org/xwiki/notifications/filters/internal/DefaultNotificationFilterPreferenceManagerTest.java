@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -151,7 +152,7 @@ public class DefaultNotificationFilterPreferenceManagerTest
     {
         filterPreferenceManager.deleteFilterPreference(testUser, "myFilter");
 
-        verify(testProvider, times(1)).deleteFilterPreference(eq(testUser), eq("myFilter"));
+        verify(testProvider).deleteFilterPreferences(testUser, Set.of("myFilter"));
     }
 
     @Test

@@ -74,7 +74,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
 
     @Inject
     @Named("cached")
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @Override
     public Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException
@@ -211,7 +211,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user)
             throws NotificationException
     {
-        return modelBridge.getToggeableFilterActivations(user);
+        return filterPreferencesModelBridge.getToggeableFilterActivations(user);
     }
 
     @Override

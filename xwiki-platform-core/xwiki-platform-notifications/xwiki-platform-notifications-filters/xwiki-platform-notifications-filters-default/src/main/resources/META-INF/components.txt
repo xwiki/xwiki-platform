@@ -1,5 +1,5 @@
 org.xwiki.notifications.filters.internal.CachedModelBridgeInvalidatorListener
-org.xwiki.notifications.filters.internal.DefaultModelBridge
+org.xwiki.notifications.filters.internal.DefaultFilterPreferencesModelBridge
 org.xwiki.notifications.filters.internal.DocumentMovedListener
 org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration
 org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore
@@ -11,3 +11,4 @@ org.xwiki.notifications.filters.internal.migrators.NotificationFilterPreferences
 org.xwiki.notifications.filters.internal.migrators.ScopeNotificationFilterClassMigrator
 org.xwiki.notifications.filters.internal.UserAddedEventListener
 org.xwiki.notifications.filters.migration.R140401000XWIKI15460DataMigration
+org.xwiki.notifications.filters.migration.R151002000XWIKI21448DataMigration

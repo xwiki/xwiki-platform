@@ -53,7 +53,7 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
 
     @Inject
     @Named("cached")
-    private ModelBridge bridge;
+    private FilterPreferencesModelBridge bridge;
 
     @Inject
     private DocumentReferenceResolver<String> resolver;
@@ -78,16 +78,18 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
             if (owner != null) {
                 if (StringUtils.contains(owner, ':')) {
                     // Assume it's a document reference
-                    ((CachedModelBridge) this.bridge).invalidatePreferencefilter(this.resolver.resolve(owner));
+                    ((CachedFilterPreferencesModelBridge) this.bridge)
+                        .invalidatePreferencefilter(this.resolver.resolve(owner));
                 } else {
                     // Assume it's a wiki reference
-                    ((CachedModelBridge) this.bridge).invalidatePreferencefilter(new WikiReference(owner));
+                    ((CachedFilterPreferencesModelBridge) this.bridge)
+                        .invalidatePreferencefilter(new WikiReference(owner));
                 }
             }
         } else if (source instanceof DocumentReference) {
-            ((CachedModelBridge) this.bridge).invalidatePreferencefilter((DocumentReference) source);
+            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter((DocumentReference) source);
         } else if (source instanceof WikiReference) {
-            ((CachedModelBridge) this.bridge).invalidatePreferencefilter((WikiReference) source);
+            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter((WikiReference) source);
         }
     }
 }

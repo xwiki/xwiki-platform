@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -52,6 +53,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.internal.DeletedDocumentCleanUpFilterProcessingQueue;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
@@ -113,6 +115,9 @@ public class UserEventDispatcher
 
     @Inject
     private RemoteObservationManagerConfiguration remoteObservation;
+
+    @Inject
+    private DeletedDocumentCleanUpFilterProcessingQueue cleanUpFilterProcessingQueue;
 
     @Inject
     private Logger logger;
@@ -284,6 +289,11 @@ public class UserEventDispatcher
             && this.userEventManager.isListening(event, user, NotificationFormat.EMAIL)) {
             // Associate the event with the user
             result = saveMailEntityEvent(event, entityId);
+        }
+
+        // FIXME: reuse constant from EventType once it's moved (see https://jira.xwiki.org/browse/XWIKI-21669)
+        if (StringUtils.equals(event.getType(), "delete")) {
+            this.cleanUpFilterProcessingQueue.addCleanUpTask(user, event.getDocument());
         }
 
         return result;

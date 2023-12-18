@@ -50,12 +50,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Validate {@link CachedModelBridge}.
+ * Validate {@link CachedFilterPreferencesModelBridge}.
  * 
  * @version $Id$
  */
 @ComponentTest
-class CachedModelBridgeTest
+class CachedFilterPreferencesModelBridgeTest
 {
     private final static DocumentReference USER = new DocumentReference("wiki", "XWiki", "User");
 
@@ -64,10 +64,10 @@ class CachedModelBridgeTest
     private final static WikiReference WIKI = new WikiReference("wiki");
 
     @InjectMockComponents
-    private CachedModelBridge cachedModelBridge;
+    private CachedFilterPreferencesModelBridge cachedModelBridge;
 
     @MockComponent
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @MockComponent
     private DocumentReferenceResolver<String> resolver;
@@ -97,7 +97,7 @@ class CachedModelBridgeTest
         Date date = new Date();
         this.cachedModelBridge.setStartDateForUser(USER, date);
 
-        verify(this.modelBridge).setStartDateForUser(USER, date);
+        verify(this.filterPreferencesModelBridge).setStartDateForUser(USER, date);
     }
 
     @Test
@@ -105,7 +105,7 @@ class CachedModelBridgeTest
     {
         this.cachedModelBridge.setFilterPreferenceEnabled(USER, "filter1", true);
 
-        verify(this.modelBridge).setFilterPreferenceEnabled(USER, "filter1", true);
+        verify(this.filterPreferencesModelBridge).setFilterPreferenceEnabled(USER, "filter1", true);
     }
 
     @Test
@@ -113,7 +113,7 @@ class CachedModelBridgeTest
     {
         this.cachedModelBridge.setFilterPreferenceEnabled(WIKI, "filter2", false);
 
-        verify(this.modelBridge).setFilterPreferenceEnabled(WIKI, "filter2", false);
+        verify(this.filterPreferencesModelBridge).setFilterPreferenceEnabled(WIKI, "filter2", false);
     }
 
     @Test
@@ -124,7 +124,7 @@ class CachedModelBridgeTest
 
         this.cachedModelBridge.saveFilterPreferences(USER, filterPreferenceList);
 
-        verify(this.modelBridge).saveFilterPreferences(USER, filterPreferenceList);
+        verify(this.filterPreferencesModelBridge).saveFilterPreferences(USER, filterPreferenceList);
     }
 
     @Test
@@ -135,7 +135,7 @@ class CachedModelBridgeTest
 
         this.cachedModelBridge.saveFilterPreferences(WIKI, filterPreferenceList);
 
-        verify(this.modelBridge).saveFilterPreferences(WIKI, filterPreferenceList);
+        verify(this.filterPreferencesModelBridge).saveFilterPreferences(WIKI, filterPreferenceList);
     }
 
     @Test
@@ -193,7 +193,7 @@ class CachedModelBridgeTest
                 WIKI, Set.of(notificationFilterPreference2)),
             this.preferenceFilterCache);
 
-        verify(this.modelBridge).deleteFilterPreferences(wikiReference);
+        verify(this.filterPreferencesModelBridge).deleteFilterPreferences(wikiReference);
     }
 
     @Test
@@ -222,6 +222,6 @@ class CachedModelBridgeTest
         expected.put(new DocumentReference("xwiki", "XWiki", "OtherUser"), expectedOtherUserSet);
         assertEquals(expected, this.preferenceFilterCache);
 
-        verify(this.modelBridge).deleteFilterPreferences(deleteUserDocumentReference);
+        verify(this.filterPreferencesModelBridge).deleteFilterPreferences(deleteUserDocumentReference);
     }
 }

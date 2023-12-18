@@ -42,7 +42,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  * @since 9.2RC1
  */
 @Role
-public interface ModelBridge
+public interface FilterPreferencesModelBridge
 {
     /**
      * Get all the notification preferences that corresponds to the given user.
@@ -86,6 +86,17 @@ public interface ModelBridge
      * @since 9.8RC1
      */
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
+
+    /**
+     * Delete a set of filter preferences.
+     * @param user reference of the user concerned by the filter preference
+     * @param filterPreferenceIds the names of the filter preferences
+     * @throws NotificationException if an error happens
+     *
+     * @since 15.10.2
+     * @since 16.0.0RC1
+     */
+    void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds) throws NotificationException;
 
     /**
      * Delete all the filter preferences related to a given user.

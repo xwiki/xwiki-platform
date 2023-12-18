@@ -97,16 +97,22 @@ public class DocumentMovedListener extends AbstractEventListener
         DocumentReference targetLocation = renamedEvent.getTargetReference();
 
         try {
-            boolean isExecutedOnMainStore = false;
-            if (filterPreferenceConfiguration.useLocalStore()) {
-                updatePreferences(sourceLocation, targetLocation);
-                isExecutedOnMainStore = wikiDescriptorManager.isMainWiki(wikiDescriptorManager.getCurrentWikiId());
-            }
-            if (filterPreferenceConfiguration.useMainStore() && !isExecutedOnMainStore) {
+            if (filterPreferenceConfiguration.useMainStore()) {
                 namespaceContextExecutor.execute(new WikiNamespace(wikiDescriptorManager.getMainWikiId()), () -> {
                     updatePreferences(sourceLocation, targetLocation);
                     return null;
                 });
+            } else if (filterPreferenceConfiguration.useLocalStore()) {
+                // Filters are stored in the DB of the users, since each wiki could possibly contain a user
+                // we need to iterate over all DB to ensure we properly migrate the filters.
+                // We could have checked the configuration of the wiki to see if they are allowed to store user or not
+                // but this config might have changed over time...
+                for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                    namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
+                        updatePreferences(sourceLocation, targetLocation);
+                        return null;
+                    });
+                }
             }
 
         } catch (Exception e) {
@@ -128,14 +134,16 @@ public class DocumentMovedListener extends AbstractEventListener
                 session
                     .createQuery("update DefaultNotificationFilterPreference p set p.page = :newPage "
                         + "where p.page = :oldPage")
-                    .setString(NEW_PAGE, serializer.serialize(targetLocation.getLastSpaceReference()))
-                    .setString(OLD_PAGE, serializer.serialize(sourceLocation.getLastSpaceReference())).executeUpdate();
+                    .setParameter(NEW_PAGE, serializer.serialize(targetLocation.getLastSpaceReference()))
+                    .setParameter(OLD_PAGE, serializer.serialize(sourceLocation.getLastSpaceReference()))
+                    .executeUpdate();
             }
             session
                 .createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage "
                     + "where p.pageOnly = :oldPage")
-                .setString(NEW_PAGE, serializer.serialize(targetLocation))
-                .setString(OLD_PAGE, serializer.serialize(sourceLocation)).executeUpdate();
+                .setParameter(NEW_PAGE, serializer.serialize(targetLocation))
+                .setParameter(OLD_PAGE, serializer.serialize(sourceLocation))
+                .executeUpdate();
 
             return null;
         });

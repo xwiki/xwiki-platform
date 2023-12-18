@@ -19,6 +19,9 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import javax.inject.Provider;
 
 import org.hibernate.Session;
@@ -26,8 +29,6 @@ import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,6 +54,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -97,7 +99,6 @@ class DocumentMovedListenerTest
     @Mock
     private XWikiHibernateStore hibernateStore;
 
-    @Mock
     private Session session;
 
     @AfterComponent
@@ -113,15 +114,15 @@ class DocumentMovedListenerTest
         when(this.contextProvider.get()).thenReturn(this.xwikicontext);
         when(this.xwikicontext.getWiki()).thenReturn(this.xwiki);
         when(this.xwiki.getHibernateStore()).thenReturn(this.hibernateStore);
-        when(this.hibernateStore.executeWrite(same(this.xwikicontext), any())).thenAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable
-            {
-                invocation.<HibernateCallback<Void>>getArgument(1).doInHibernate(session);
-
-                return null;
-            }
+        when(this.hibernateStore.executeWrite(same(this.xwikicontext), any())).then(invocationOnMock -> {
+            HibernateCallback callback = invocationOnMock.getArgument(1);
+            callback.doInHibernate(session);
+            return null;
+        });
+        when(this.namespaceContextExecutor.execute(any(), any())).then(invocationOnMock -> {
+            Callable callable = invocationOnMock.getArgument(1);
+            callable.call();
+            return null;
         });
     }
 
@@ -138,8 +139,7 @@ class DocumentMovedListenerTest
         // Mock
         when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
         when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
-        when(wikiDescriptorManager.isMainWiki("mainWiki")).thenReturn(true);
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
 
         session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
@@ -147,12 +147,12 @@ class DocumentMovedListenerTest
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
                 .thenReturn(query);
-        when(query.setString(anyString(), anyString())).thenReturn(query);
+        when(query.setParameter(any(String.class), any())).thenReturn(query);
         Query query2 = mock(Query.class);
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))
                 .thenReturn(query2);
-        when(query2.setString(anyString(), anyString())).thenReturn(query2);
+        when(query2.setParameter(any(String.class), any())).thenReturn(query2);
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
@@ -160,13 +160,81 @@ class DocumentMovedListenerTest
 
         // Verify
         verify(cachedModelBridge).clearCache();
-        verify(query).setString("newPage", "xwiki:PageB");
-        verify(query).setString("oldPage", "xwiki:PageA");
+        verify(query).setParameter("newPage", "xwiki:PageB");
+        verify(query).setParameter("oldPage", "xwiki:PageA");
         verify(query).executeUpdate();
-        verify(query2).setString("newPage", "xwiki:PageB.WebHome");
-        verify(query2).setString("oldPage", "xwiki:PageA.WebHome");
+        verify(query2).setParameter("newPage", "xwiki:PageB.WebHome");
+        verify(query2).setParameter("oldPage", "xwiki:PageA.WebHome");
         verify(query2).executeUpdate();
-        verifyNoInteractions(namespaceContextExecutor);
+        verify(namespaceContextExecutor).execute(eq(new WikiNamespace("mainWiki")), any());
+    }
+
+    @Test
+    void onEventWhenNonTerminalDocumentOnMainWikiLocalStoreOnly() throws Exception
+    {
+        DocumentReference source = new DocumentReference("xwiki", "PageA", "WebHome");
+        DocumentReference target = new DocumentReference("xwiki", "PageB", "WebHome");
+        when(serializer.serialize(new SpaceReference("PageA", new WikiReference("xwiki")))).thenReturn("xwiki:PageA");
+        when(serializer.serialize(new SpaceReference("PageB", new WikiReference("xwiki")))).thenReturn("xwiki:PageB");
+        when(serializer.serialize(source)).thenReturn("xwiki:PageA.WebHome");
+        when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
+
+        // Mock
+        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
+        when(filterPreferencesConfiguration.useMainStore()).thenReturn(false);
+        when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("foo", "bar", "mainWiki"));
+
+        session = mock(Session.class);
+        when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
+        Query query = mock(Query.class);
+        when(session.createQuery(
+            "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
+            .thenReturn(query);
+        when(query.setParameter(any(String.class), any())).thenReturn(query);
+        Query query2 = mock(Query.class);
+        when(session.createQuery(
+            "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))
+            .thenReturn(query2);
+        when(query2.setParameter(any(String.class), any())).thenReturn(query2);
+
+        // Test
+        DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
+        this.listener.onEvent(event, null, null);
+
+        // Verify
+        verify(cachedModelBridge).clearCache();
+        verify(query, times(3)).setParameter("newPage", "xwiki:PageB");
+        verify(query, times(3)).setParameter("oldPage", "xwiki:PageA");
+        verify(query, times(3)).executeUpdate();
+        verify(query2, times(3)).setParameter("newPage", "xwiki:PageB.WebHome");
+        verify(query2, times(3)).setParameter("oldPage", "xwiki:PageA.WebHome");
+        verify(query2, times(3)).executeUpdate();
+        verify(namespaceContextExecutor).execute(eq(new WikiNamespace("mainWiki")), any());
+        verify(namespaceContextExecutor).execute(eq(new WikiNamespace("foo")), any());
+        verify(namespaceContextExecutor).execute(eq(new WikiNamespace("bar")), any());
+    }
+
+    @Test
+    void onEventWhenNonTerminalDocumentOnMainWikiNoStore() throws Exception
+    {
+        DocumentReference source = new DocumentReference("xwiki", "PageA", "WebHome");
+        DocumentReference target = new DocumentReference("xwiki", "PageB", "WebHome");
+        when(serializer.serialize(new SpaceReference("PageA", new WikiReference("xwiki")))).thenReturn("xwiki:PageA");
+        when(serializer.serialize(new SpaceReference("PageB", new WikiReference("xwiki")))).thenReturn("xwiki:PageB");
+        when(serializer.serialize(source)).thenReturn("xwiki:PageA.WebHome");
+        when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
+
+        // Mock
+        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(false);
+        when(filterPreferencesConfiguration.useMainStore()).thenReturn(false);
+
+        // Test
+        DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
+        this.listener.onEvent(event, null, null);
+
+        // Verify
+        verify(cachedModelBridge).clearCache();
+        verifyNoInteractions(hibernateStore);
     }
 
     @Test
@@ -182,9 +250,7 @@ class DocumentMovedListenerTest
         // Mock
         when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
         when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
-        when(wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
 
         session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
@@ -192,12 +258,12 @@ class DocumentMovedListenerTest
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
                 .thenReturn(query);
-        when(query.setString(anyString(), anyString())).thenReturn(query);
+        when(query.setParameter(any(String.class), any())).thenReturn(query);
         Query query2 = mock(Query.class);
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))
                 .thenReturn(query2);
-        when(query2.setString(anyString(), anyString())).thenReturn(query2);
+        when(query2.setParameter(any(String.class), any())).thenReturn(query2);
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
@@ -205,11 +271,11 @@ class DocumentMovedListenerTest
 
         // Verify
         verify(cachedModelBridge).clearCache();
-        verify(query).setString("newPage", "xwiki:PageB");
-        verify(query).setString("oldPage", "xwiki:PageA");
+        verify(query).setParameter("newPage", "xwiki:PageB");
+        verify(query).setParameter("oldPage", "xwiki:PageA");
         verify(query).executeUpdate();
-        verify(query2).setString("newPage", "xwiki:PageB.WebHome");
-        verify(query2).setString("oldPage", "xwiki:PageA.WebHome");
+        verify(query2).setParameter("newPage", "xwiki:PageB.WebHome");
+        verify(query2).setParameter("oldPage", "xwiki:PageA.WebHome");
         verify(query2).executeUpdate();
         verify(namespaceContextExecutor).execute(eq(new WikiNamespace("mainWiki")), any());
     }
@@ -225,8 +291,7 @@ class DocumentMovedListenerTest
         // Mock
         when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
         when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainWiki");
-        when(wikiDescriptorManager.isMainWiki("mainWiki")).thenReturn(true);
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
 
         session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
@@ -234,7 +299,7 @@ class DocumentMovedListenerTest
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))
                 .thenReturn(query);
-        when(query.setString(anyString(), anyString())).thenReturn(query);
+        when(query.setParameter(anyString(), anyString())).thenReturn(query);
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
@@ -242,9 +307,9 @@ class DocumentMovedListenerTest
 
         // Verify
         verify(cachedModelBridge).clearCache();
-        verify(query).setString("newPage", "xwiki:PageB.Terminal");
-        verify(query).setString("oldPage", "xwiki:PageA.Terminal");
+        verify(query).setParameter("newPage", "xwiki:PageB.Terminal");
+        verify(query).setParameter("oldPage", "xwiki:PageA.Terminal");
         verify(query).executeUpdate();
-        verifyNoInteractions(namespaceContextExecutor);
+        verify(namespaceContextExecutor).execute(eq(new WikiNamespace("mainWiki")), any());
     }
 }

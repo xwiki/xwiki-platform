@@ -533,13 +533,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Bridge to make notification use the preferences of the watchlist -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-filters-watchlistbridge</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- Image plugin -->
     <dependency>

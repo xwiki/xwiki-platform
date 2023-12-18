@@ -35,6 +35,5 @@
     <module>xwiki-platform-notifications-filters-api</module>
     <module>xwiki-platform-notifications-filters-default</module>
     <module>xwiki-platform-notifications-filters-watch</module>
-    <module>xwiki-platform-notifications-filters-watchlistbridge</module>
   </modules>
 </project>

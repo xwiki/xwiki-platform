@@ -462,7 +462,7 @@
         #if ("$!defaultValue" == '')
           #set ($defaultValue = 'Only inline links')
         #end
-        #displayField('underline'        , 'platform.core.profile.accessibility.underline'  , $defaultValue)
+        #displayField('underline', 'platform.core.profile.accessibility.underline', $defaultValue)
       &lt;/dl&gt;
       &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.localizationPreferences'))&lt;/h2&gt;
       &lt;dl&gt;

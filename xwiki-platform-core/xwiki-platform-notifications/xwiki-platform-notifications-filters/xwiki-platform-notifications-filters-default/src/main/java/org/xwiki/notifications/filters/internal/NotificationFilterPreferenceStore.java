@@ -224,11 +224,13 @@ public class NotificationFilterPreferenceStore
     }
 
     /**
-     * Delete a filter preference.
+     * Delete filter preferences.
      *
      * @param user reference of the user concerned by the filter preference
      * @param filterPreferenceIds name of the filter preferences
      * @throws NotificationException if an error happens
+     * @since 16.0.0RC1
+     * @since 15.10.2
      */
     public void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
         throws NotificationException

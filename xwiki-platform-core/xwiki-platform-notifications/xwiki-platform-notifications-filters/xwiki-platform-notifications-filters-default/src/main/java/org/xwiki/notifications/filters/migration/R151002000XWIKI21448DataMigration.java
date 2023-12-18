@@ -55,11 +55,12 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  *
  * @version $Id$
  * @since 16.0.0RC1
+ * @since 15.10.2
  */
 @Component
-@Named("R160000000XWIKI21448")
+@Named("R151002000XWIKI21448")
 @Singleton
-public class R160000000XWIKI21448DataMigration extends AbstractHibernateDataMigration
+public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigration
 {
     private static final int BATCH_SIZE = 100;
 
@@ -124,7 +125,7 @@ public class R160000000XWIKI21448DataMigration extends AbstractHibernateDataMigr
         Cache<Boolean> documentStatus;
         try {
             documentStatus = this.cacheManager.createNewLocalCache(
-                new LRUCacheConfiguration("migration.R160000000XWIKI21448.documentStatus"));
+                new LRUCacheConfiguration("migration.R151002000XWIKI21448.documentStatus"));
         } catch (CacheException e) {
             throw new DataMigrationException("Cannot create local cache for performing the migration", e);
         }

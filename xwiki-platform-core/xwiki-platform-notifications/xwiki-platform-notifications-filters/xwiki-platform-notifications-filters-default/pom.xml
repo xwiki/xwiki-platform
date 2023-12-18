@@ -31,8 +31,7 @@
   <name>XWiki Platform - Notifications - Filters - Default implementation</name>
   <description>Default bridge to oldcore for the notifications filters API module.</description>
   <properties>
-    <!-- FIXME: should be 0.50 -->
-    <xwiki.jacoco.instructionRatio>0.49</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.51</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     </properties>
   <dependencies>

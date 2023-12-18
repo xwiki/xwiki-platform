@@ -53,14 +53,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Default implementation for {@link ModelBridge}.
+ * Default implementation for {@link FilterPreferencesModelBridge}.
  *
  * @version $Id$
  * @since 9.7RC1
  */
 @Component
 @Singleton
-public class DefaultModelBridge implements ModelBridge
+public class DefaultFilterPreferencesModelBridge implements FilterPreferencesModelBridge
 {
     private static final LocalDocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS =
         new LocalDocumentReference(Arrays.asList("XWiki", "Notifications", "Code"), "ToggleableFilterPreferenceClass");
@@ -137,6 +137,13 @@ public class DefaultModelBridge implements ModelBridge
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
         notificationFilterPreferenceStore.deleteFilterPreference(user, filterPreferenceId);
+    }
+
+    @Override
+    public void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        notificationFilterPreferenceStore.deleteFilterPreferences(user, filterPreferenceIds);
     }
 
     @Override

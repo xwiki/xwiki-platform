@@ -158,7 +158,7 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
                 provider.saveFilterPreferences(user, preferencesMapping.get(providerHint));
 
             } catch (ComponentLookupException e) {
-                logger.error("Unable to retrieve the notification filter preference provider for hint [{}]: [{}]",
+                logger.error("Unable to retrieve the notification filter preference provider for hint [{}]:",
                         providerHint, e);
             } catch (NotificationException e) {
                 logger.warn("Unable save the filter preferences [{}] against the provider [{}]: [{}]",
@@ -170,15 +170,21 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
     @Override
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
+        deleteFilterPreferences(user, Set.of(filterPreferenceId));
+    }
+
+    @Override
+    public void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
         try {
             for (NotificationFilterPreferenceProvider provider
-                    : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
-                    NotificationFilterPreferenceProvider.class)) {
-                provider.deleteFilterPreference(user, filterPreferenceId);
+                : componentManager.<NotificationFilterPreferenceProvider>getInstanceList(
+                NotificationFilterPreferenceProvider.class)) {
+                provider.deleteFilterPreferences(user, filterPreferenceIds);
             }
-
         } catch (ComponentLookupException e) {
-            logger.info("Failed to remove the user filter preference [{}].", filterPreferenceId, e);
+            logger.info("Failed to remove the user filter preferences {}.", filterPreferenceIds, e);
         }
     }
 

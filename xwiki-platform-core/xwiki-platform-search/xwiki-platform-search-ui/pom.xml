@@ -41,6 +41,11 @@
       <artifactId>xwiki-platform-uiextension-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- JavaScript dependencies (for search suggest source management) -->
     <dependency>
       <groupId>org.webjars</groupId>
@@ -83,6 +88,18 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-feed-api</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

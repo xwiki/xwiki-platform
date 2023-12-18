@@ -17,14 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream.store.internal;
+package org.xwiki.eventstream;
+
+import org.xwiki.stability.Unstable;
 
 /**
- * The type of request. This list is extensible.
+ * Type of the events used for standard notifications related to documents.
  *
  * @version $Id$
+ * @since 16.0.0RC1
  */
-public interface EventType
+@Unstable
+public interface DocumentEventType
 {
     /**
      * Document creation.

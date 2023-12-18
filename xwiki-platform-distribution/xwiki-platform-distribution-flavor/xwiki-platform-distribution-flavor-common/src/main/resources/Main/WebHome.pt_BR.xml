@@ -35,13 +35,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>= Bem vindo ao seu wiki =
+  <content>== Bem vindo ao seu wiki ==
 
 XWiki é a melhor ferramenta para organizar seus conhecimentos. Um //wiki// está organizado em uma hierarquia de //páginas//. Você pode criar multiplos wikis, cada um com suas devidas páginas.
 
 XWiki pode ser usado como uma base de conhecimento (suporte, documentação, vendas, etc.), para espaços colaborativos ou até mesmo para uma completa intranet.
 
-= O básico =
+== O básico ==
 
 Para fazer a maioria de seus wikis, faça o login e:
 
@@ -59,7 +59,7 @@ Você pode também utilizar a  [[Sandbox&gt;&gt;Sandbox.WebHome]] para mais demo
 (((
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Amplie seu wiki =
+== Amplie seu wiki ==
 
 Para estender o poder e funcionalidades de seu XWiki com as características que //você// precisa, verifique o [[Gerenciador de extensões&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] onde você pode procurar e instalar complementos.
 
@@ -68,7 +68,7 @@ Para navegar através dos + de 900 complementos contribuidos pela comunidade, ve
 
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Crie sua aplicação =
+== Crie sua aplicação ==
 
 Vá além dos complementos disponívels e defina a //estrutura// de seus dados baseado nas //suas// necessidades, criando //suas// próprias aplicações com o [[App em Minutos&gt;&gt;AppWithinMinutes]] (AWM). 
 

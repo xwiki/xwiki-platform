@@ -114,7 +114,7 @@
   $response.setContentType('application/json')
 #else
   (% id="user.profile.groups.title" %)
-  = {{translation key="user.profile.groups.title"/}}
+  == {{translation key="user.profile.groups.title"/}}
 
   {{translation key="user.profile.groups.description"/}}
 

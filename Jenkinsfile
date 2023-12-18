@@ -96,7 +96,7 @@ def builds = [
     buildFunctionalTest(
       name: 'Flavor Test - Webstandards',
       pom: 'xwiki-platform-distribution-flavor-test-webstandards/pom.xml',
-      mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
+      mavenOpts: '-Xmx3076m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
   'Flavor Test - Security' : {
@@ -274,7 +274,7 @@ private void buildInsideNode(map)
     }
 
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
+      mavenOpts = map.mavenOpts ?: "-Xmx3076m -Xms512m ${heapDumpPath}"
       javadoc = false
       if (map.goals != null) {
         goals = map.goals

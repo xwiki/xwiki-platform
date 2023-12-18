@@ -934,7 +934,7 @@ public class EditIT
             "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0,xhtml/5,html/5.0");
         setup.deletePage(testReference);
 
-        String pageContent = "= First heading =\n"
+        String pageContent = "== First heading ==\n"
             + "\n"
             + "Paragraph containing some **bold content**.\n"
             + "\n"

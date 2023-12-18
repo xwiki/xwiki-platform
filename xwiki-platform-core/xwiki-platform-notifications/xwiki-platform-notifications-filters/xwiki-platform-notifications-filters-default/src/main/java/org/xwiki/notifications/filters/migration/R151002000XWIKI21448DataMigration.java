@@ -99,7 +99,7 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(160000000);
+        return new XWikiDBVersion(151002000);
     }
 
 

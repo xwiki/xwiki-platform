@@ -39,9 +39,12 @@ import XRow from "../vue/x-row.vue";
 import XImg from "../vue/x-img.vue";
 import XTextField from "../vue/x-textfield.vue";
 import XAvatar from "../vue/x-avatar.vue";
+import XMenu from "../vue/x-menu.vue";
+import XMenuItem from "../vue/x-menuitem.vue";
 
+import "@gouvfr/dsfr/dist/dsfr.min.css"; // Import des styles du DSFR
+import "@gouvminint/vue-dsfr/styles"; // Import des styles globaux propre à VueDSFR
 import VueDsfr from "@gouvminint/vue-dsfr";
-import "@gouvfr/dsfr/dist/dsfr.min.css";
 
 @injectable()
 export class DSFRDesignSystemLoader implements DesignSystemLoader {
@@ -59,5 +62,7 @@ export class DSFRDesignSystemLoader implements DesignSystemLoader {
     app.component("XRow", XRow);
     app.component("XCol", XCol);
     app.component("XTextField", XTextField);
+    app.component("XMenu", XMenu);
+    app.component("XMenuItem", XMenuItem);
   }
 }

@@ -39,6 +39,8 @@ import XTextField from "../vue/x-textfield.vue";
 import XAvatar from "../vue/x-avatar.vue";
 import XDivider from "../vue/x-divider.vue";
 import XDialog from "../vue/x-dialog.vue";
+import XMenu from "../vue/x-menu.vue";
+import XMenuItem from "../vue/x-menuitem.vue";
 
 import "@shoelace-style/shoelace/dist/themes/light.css";
 
@@ -56,5 +58,7 @@ export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
     app.component("XAlert", XAlert);
     app.component("XDivider", XDivider);
     app.component("XDialog", XDialog);
+    app.component("XMenu", XMenu);
+    app.component("XMenuItem", XMenuItem);
   }
 }

@@ -46,6 +46,8 @@ import XAlert from "../vue/x-alert.vue";
 import XDivider from "../vue/x-divider.vue";
 import XBtn from "../vue/x-btn.vue";
 import XDialog from "../vue/x-dialog.vue";
+import XMenu from "../vue/x-menu.vue";
+import XMenuItem from "../vue/x-menu-item.vue";
 
 @injectable()
 export class VuetifyDesignSystemLoader implements DesignSystemLoader {
@@ -90,5 +92,7 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
     app.component("XCard", XCard);
     app.component("XAlert", XAlert);
     app.component("XDialog", XDialog);
+    app.component("XMenu", XMenu);
+    app.component("XMenuItem", XMenuItem);
   }
 }

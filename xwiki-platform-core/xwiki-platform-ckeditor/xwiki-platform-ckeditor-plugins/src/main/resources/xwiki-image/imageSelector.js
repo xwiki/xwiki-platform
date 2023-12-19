@@ -128,7 +128,7 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
             // selenium).
             imageSelector.on('show.bs.tab', function (e) {
               // Retrieve the id of the to be shown tab.
-              const nextTabId = $(e.target).attr("aria-controls");
+              var nextTabId = $(e.target).attr("aria-controls");
               setImageReferenceValue(mapTabReference[nextTabId]);
             });
 

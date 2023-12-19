@@ -1,0 +1,29 @@
+{
+  "name": "@cristal/editors-wikitext",
+  "version": "1.0.0",
+  "types" : "dist/index.d.ts",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "directory": "editors/wikitext",
+    "url": "https://git.xwikisas.com/experiments/cristal/prototype2023/"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "prepack": "pnpm build",
+    "build": "pnpm compile",
+    "compile": "vite build",
+    "test": "echo 'no test'",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "vue": "^3.3.8",
+    "vue-i18n": "^9.2.2",
+    "inversify": "^6.0.2",
+    "@cristal/api": "workspace:^",
+    "@cristal/skin": "workspace:^"
+  }
+}

@@ -67,10 +67,11 @@ export class ContentTools {
             );
             if (!page.startsWith("#")) {
               ContentTools.logger?.debug("New page should be", page);
-              cristal?.setCurrentPage(page);
+              cristal?.setCurrentPage(page, "view");
               cristal?.loadPage().then();
             } else {
               ContentTools.logger?.debug("Leaving alone page", page);
+              location = page;
               return;
             }
           } else {

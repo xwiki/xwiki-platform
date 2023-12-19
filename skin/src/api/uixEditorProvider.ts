@@ -1,4 +1,4 @@
-<!--
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -21,38 +21,11 @@
  * @copyright  Copyright (c) 2023 XWiki SAS
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
--->
-<script lang="ts">
-import { inject, Component } from "vue";
-import { Logger, CristalApp } from "@cristal/api";
+ **/
 
-let comps: Array<Component>;
-let logger: Logger;
+import { CristalApp } from "@cristal/api";
+import { UIXTemplateProvider } from "./uixTemplateProvider";
 
-export default {
-  props: {
-    editorname: { type: String, required: true },
-  },
-  setup() {
-    let cristal = inject<CristalApp>("cristal");
-    if (cristal) {
-      comps = cristal.getUIXTemplates("editor");
-      logger = cristal.getLogger("skin.vue.editor");
-    }
-  },
-  data() {
-    logger?.debug("Editor UIX components are ", comps);
-    if (!comps || comps.length == 0) return {};
-    else {
-      logger?.debug("Using first editor UIX component ", comps[0]);
-      return {
-        component: comps[0],
-      };
-    }
-  },
-};
-</script>
-<template>
-  Hello
-  <component :is="component" />
-</template>
+export interface UIXEditorProvider extends UIXTemplateProvider {
+  isSupported(cristal: CristalApp): boolean;
+}

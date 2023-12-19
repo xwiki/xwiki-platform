@@ -1,4 +1,4 @@
-<!--
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,42 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * This file is part of the Cristal Wiki software prototype
+ * This file is part of the Cristal Wiki software prototypenx
  * @copyright  Copyright (c) 2023 XWiki SAS
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
--->
-<script lang="ts">
-import { inject, Component } from "vue";
-import { Logger, CristalApp } from "@cristal/api";
+ **/
 
-let comps: Array<Component>;
-let logger: Logger;
+import { DefaultVueTemplateProvider } from "@cristal/skin";
+import { Component } from "vue";
+import { injectable } from "inversify";
+import TextEditor from "../vue/edittext.vue";
+import { CristalApp } from "@cristal/api";
 
-export default {
-  props: {
-    editorname: { type: String, required: true },
-  },
-  setup() {
-    let cristal = inject<CristalApp>("cristal");
-    if (cristal) {
-      comps = cristal.getUIXTemplates("editor");
-      logger = cristal.getLogger("skin.vue.editor");
-    }
-  },
-  data() {
-    logger?.debug("Editor UIX components are ", comps);
-    if (!comps || comps.length == 0) return {};
-    else {
-      logger?.debug("Using first editor UIX component ", comps[0]);
-      return {
-        component: comps[0],
-      };
-    }
-  },
-};
-</script>
-<template>
-  Hello
-  <component :is="component" />
-</template>
+@injectable()
+export class UIXRemoteXWikiEditorProvider extends DefaultVueTemplateProvider {
+  public static cname = "cristal.editor.remotexwiki";
+  public static hint = "";
+  public static priority = 1000;
+  public static singleton = true;
+  public static extensionPoint = "editor";
+
+  registered = false;
+
+  getVueComponent(): Component {
+    return TextEditor;
+  }
+  getVueName(): string {
+    return "c-edit-xwikiremote";
+  }
+  isGlobal(): boolean {
+    return false;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isSupported(cristal: CristalApp): boolean {
+    return true;
+  }
+}

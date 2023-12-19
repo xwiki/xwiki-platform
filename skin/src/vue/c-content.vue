@@ -47,13 +47,16 @@ if (cristal != null) {
   logger = cristal.getLogger("skin.vue.content");
   logger?.debug("cristal object content ref set");
   cristal.setContentRef(pageStatus);
+  logger?.debug("Sheet is ", pageStatus.value.sheet);
+  logger?.debug("With Sheet is ", pageStatus.value.withSheet);
 } else {
   console.error("cristal object not injected properly in c-content.vue");
 }
-logger?.debug("Sheet is ", pageStatus.value.sheet);
-logger?.debug("With Sheet is ", pageStatus.value.withSheet);
 
 let link = "/" + cristal?.getCurrentPage() + "/edit";
+let linkXWiki = "/" + cristal?.getCurrentPage() + "/editxwiki";
+let linkText = "/" + cristal?.getCurrentPage() + "/edittext";
+let linkMilkdown = "/" + cristal?.getCurrentPage() + "/editmilkdown";
 let serverSideRendering = cristal?.getWikiConfig().serverRendering;
 
 onMounted(() => {
@@ -83,9 +86,25 @@ onUpdated(() => {
   <article id="content" ref="root">
     <UIX uixname="content.before" />
     <div class="pagemenu">
-      <router-link :to="link">
-        <x-btn class="pagemenu"> Edit</x-btn>
-      </router-link>
+      <x-menu title="Edit">
+        <template #activator="{ props }">
+          <span v-bind="props"> Edit </span>
+        </template>
+        <template #default>
+          <x-menu-item :link="link" title="Default Editor">
+            <router-link :to="link">Default Editor</router-link>
+          </x-menu-item>
+          <x-menu-item :link="linkText" title="Text Editor">
+            <router-link :to="linkText">Text Editor</router-link>
+          </x-menu-item>
+          <x-menu-item :link="linkXWiki" title="XWiki Editor">
+            <router-link :to="linkXWiki">XWiki Editor</router-link>
+          </x-menu-item>
+          <x-menu-item :link="linkMilkdown" title="Milkdown Editor">
+            <router-link :to="linkMilkdown">Milkdown Editor</router-link>
+          </x-menu-item>
+        </template>
+      </x-menu>
     </div>
     <template v-if="pageStatus.withSheet && !serverSideRendering">
       <CTemplate

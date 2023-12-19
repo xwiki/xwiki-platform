@@ -65,6 +65,7 @@ export class DefaultCristalApp implements CristalApp {
   public extensionManager: ExtensionManager;
   public app: App;
   public page: PageData;
+  public mode: string;
   public currentContentRef: Ref;
   public container: Container;
   public vueTemplateProviders: VueTemplateProvider[];
@@ -87,6 +88,7 @@ export class DefaultCristalApp implements CristalApp {
     this.skinManager = skinManager;
     this.vueTemplateProviders = vueTemplateProviders;
     this.page = new DefaultPageData();
+    this.mode = "view";
     this.logger = logger;
     this.logger.setModule("app.components.DefaultWikiApp");
     this.logger?.debug("Skin manager: ", skinManager);
@@ -105,14 +107,15 @@ export class DefaultCristalApp implements CristalApp {
     return this.page.name;
   }
 
-  setCurrentPage(newPage: string) {
+  setCurrentPage(newPage: string, mode: string = "view") {
+    this.mode = mode;
     if (this.page.name != newPage) {
       this.page.name = newPage;
       this.logger?.debug("Pushing state in history " + newPage);
       history.pushState(
         { page: newPage },
         newPage,
-        "/" + this.wikiConfig.name + "/#/" + newPage + "/view",
+        "/" + this.wikiConfig.name + "/#/" + newPage + "/" + mode,
       );
       // history.pushState({ page : newPage }, newPage, "#/" + newPage + "/view");
       this.page.source = "";
@@ -393,6 +396,18 @@ export class DefaultCristalApp implements CristalApp {
       } as RouteRecordRaw,
       {
         path: "/:page/edit",
+        component: this.skinManager.getTemplate("edit"),
+      } as RouteRecordRaw,
+      {
+        path: "/:page/edittext",
+        component: this.skinManager.getTemplate("edit"),
+      } as RouteRecordRaw,
+      {
+        path: "/:page/editxwiki",
+        component: this.skinManager.getTemplate("edit"),
+      } as RouteRecordRaw,
+      {
+        path: "/:page/editmilkdown",
         component: this.skinManager.getTemplate("edit"),
       } as RouteRecordRaw,
       {

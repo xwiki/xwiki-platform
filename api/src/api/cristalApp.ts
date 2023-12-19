@@ -62,7 +62,7 @@ export interface CristalApp {
 
   getCurrentPage(): string;
 
-  setCurrentPage(page: string): void;
+  setCurrentPage(page: string, mode: string): void;
 
   setContentRef(ref: Ref): void;
 

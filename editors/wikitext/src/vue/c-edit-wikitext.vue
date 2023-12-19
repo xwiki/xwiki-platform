@@ -22,37 +22,14 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
+<template>
+  <UIX uixname="editor.text.before" />
+  This is the wiki text editor
+  <v-textarea label="Label"> Hello </v-textarea>
+  <UIX uixname="editor.text.after" />
+</template>
 <script lang="ts">
-import { inject, Component } from "vue";
-import { Logger, CristalApp } from "@cristal/api";
-
-let comps: Array<Component>;
-let logger: Logger;
-
 export default {
-  props: {
-    editorname: { type: String, required: true },
-  },
-  setup() {
-    let cristal = inject<CristalApp>("cristal");
-    if (cristal) {
-      comps = cristal.getUIXTemplates("editor");
-      logger = cristal.getLogger("skin.vue.editor");
-    }
-  },
-  data() {
-    logger?.debug("Editor UIX components are ", comps);
-    if (!comps || comps.length == 0) return {};
-    else {
-      logger?.debug("Using first editor UIX component ", comps[0]);
-      return {
-        component: comps[0],
-      };
-    }
-  },
+  setup() {},
 };
 </script>
-<template>
-  Hello
-  <component :is="component" />
-</template>

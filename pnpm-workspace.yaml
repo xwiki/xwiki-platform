@@ -12,6 +12,8 @@ packages:
   - "sharedworker/api"
   - "sharedworker/impl"
   - "extensions/menubuttons"
+  - "editors/wikitext"
+  - "xwiki/remoteinlineeditor"
   - "lib"
   - "web"
   - "electron"

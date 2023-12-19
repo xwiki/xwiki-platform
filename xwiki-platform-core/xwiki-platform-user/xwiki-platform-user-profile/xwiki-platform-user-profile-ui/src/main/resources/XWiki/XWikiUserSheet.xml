@@ -575,7 +575,7 @@ div.userInfo input[type="text"], div.userInfo input[type="password"], div.userIn
 }
 
 div.editProfileCategory {
-  float:right;
+  float: right;
 }
 
 

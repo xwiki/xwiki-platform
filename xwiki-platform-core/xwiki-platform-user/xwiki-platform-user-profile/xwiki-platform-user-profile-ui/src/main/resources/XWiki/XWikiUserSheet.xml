@@ -578,21 +578,6 @@ div.editProfileCategory {
   float:right;
 }
 
-div.editProfileCategory {
-  float:right;
-  a.btn-xs {
-    background-color: @xwiki-page-content-bg;
-    border: 1px solid @xwiki-border-color;
-    .action-icon {
-      font-size: larger;
-      color: @btn-default-color;
-    }
-    &amp;:hover, &amp;:active, &amp;:focus {
-      border-color: darken(@dropdown-divider-bg, 10%);
-    }
-  }
-}
-
 
 /* Watchlist */
 

@@ -1,6 +1,24 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.notifications.filters.migration;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -10,13 +28,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.collections4.SetUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.index.TaskManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -45,6 +64,13 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 
+/**
+ * Migrate old WatchListClass xobjects to save them as proper notification filters. The migration doesn't directly
+ * remove the xobjects but asks {@link WatchListObjectsRemovalTaskConsumer} to do it.
+ *
+ * @version $Id$
+ * @since 16.0.0RC1
+ */
 @Component
 @Named("R160000000XWIKI17243")
 @Singleton
@@ -79,6 +105,9 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
+    private TaskManager taskManager;
+
+    @Inject
     private Logger logger;
 
     @Override
@@ -98,7 +127,7 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     {
         String statement = "from doc.object(XWiki.WatchListClass) as user";
         int offset = 0;
-        List<String> results = null;
+        List<String> results;
         do {
             try {
                 results = this.queryManager.createQuery(statement, Query.XWQL)
@@ -111,18 +140,20 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
                     DocumentReference userDocReference = this.documentReferenceResolver.resolve(result);
                     this.migrateUser(userDocReference);
                 }
+                offset += BATCH_SIZE;
             } catch (QueryException e) {
                 throw new DataMigrationException("Error while performing query to find users with WatchList objects",
                     e);
             }
-        } while (results != null && results.size() == BATCH_SIZE);
+        } while (results.size() == BATCH_SIZE);
     }
 
     private void migrateUser(DocumentReference userDocReference) throws DataMigrationException, XWikiException
     {
         XWikiContext context = getXWikiContext();
         XWikiDocument document = context.getWiki().getDocument(userDocReference, context);
-        EntityReference classReference = CLASS_REFERENCE.appendParent(userDocReference.getWikiReference());
+        WikiReference wikiReference = userDocReference.getWikiReference();
+        EntityReference classReference = CLASS_REFERENCE.appendParent(wikiReference);
         List<BaseObject> objects = document.getXObjects(classReference);
 
         Set<NotificationFilterPreference> results = new HashSet<>();
@@ -141,9 +172,9 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
             throw new DataMigrationException(String.format("Error while trying to save [%s] filter preferences",
                 results.size()), e);
         }
-        if (document.removeXObjects(classReference)) {
-            context.getWiki().saveDocument(document, "Migration of watchlist preferences", context);
-        }
+
+        this.taskManager.addTask(wikiReference.getName(), document.getId(),
+            WatchListObjectsRemovalTaskConsumer.TASK_NAME);
     }
 
     private void getValues(BaseObject obj, String fieldName, NotificationFilterProperty property,

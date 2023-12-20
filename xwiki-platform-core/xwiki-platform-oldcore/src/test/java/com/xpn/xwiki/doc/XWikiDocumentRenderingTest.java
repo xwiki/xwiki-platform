@@ -19,11 +19,9 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,9 +35,9 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.DefaultVelocityManager;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.api.Document;
@@ -95,18 +93,14 @@ public class XWikiDocumentRenderingTest
     private XWiki xwiki;
 
     @BeforeEach
-    public void setupComponents() throws Exception
+    public void setup() throws Exception
     {
+        this.xwiki = this.oldcore.getSpyXWiki();
+
         // Setup display configuration.
         this.displayConfiguration = this.componentManager.registerMockComponent(DisplayConfiguration.class);
         when(this.displayConfiguration.getDocumentDisplayerHint()).thenReturn("default");
         when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(2);
-    }
-
-    @BeforeEach
-    public void setup() throws Exception
-    {
-        this.xwiki = this.oldcore.getSpyXWiki();
 
         DocumentReference documentReference = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
         this.document = new XWikiDocument(documentReference);
@@ -326,16 +320,10 @@ public class XWikiDocumentRenderingTest
         VelocityContext vcontext = originalVelocityManager.getVelocityContext();
         vcontext.put("doc", new Document(this.document, this.oldcore.getXWikiContext()));
 
-        // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
-        VelocityManager velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
-        when(velocityManager.getCurrentVelocityContext()).thenReturn(vcontext);
-
-        VelocityFactory velocityFactory = this.componentManager.getInstance(VelocityFactory.class);
-        VelocityEngine vengine = velocityFactory.createVelocityEngine("default", new Properties());
-        when(velocityManager.getVelocityEngine()).thenReturn(vengine);
-        when(velocityManager.evaluate(any(), any(), any()))
-            .thenAnswer(invocation -> vengine.evaluate(vcontext, invocation.getArgument(0),
-                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
+        // Use the commons version of the VelocityManager to bypass skin APIs that we would need to mock otherwise.
+        this.componentManager.registerComponent(DefaultVelocityManager.class);
+        this.oldcore.getExecutionContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
+            vcontext);
 
         // Verify that the macro located inside the TextArea has been taken into account when executing the doc's
         // content.

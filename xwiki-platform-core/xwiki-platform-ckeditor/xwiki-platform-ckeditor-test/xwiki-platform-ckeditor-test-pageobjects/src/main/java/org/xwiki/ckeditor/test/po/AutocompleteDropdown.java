@@ -19,6 +19,7 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -66,6 +67,30 @@ public class AutocompleteDropdown extends BaseElement
             return getDriver()
                 .findElementWithoutWaiting(this.container, By.className("ckeditor-autocomplete-item-shortcut"))
                 .getText();
+        }
+        
+        /**
+         * Clicks on the item.
+         * @since 15.7RC1
+        */
+        public void click() {
+            container.click();
+        }
+
+        /**
+         * @return the list of badges of an item.
+         * @since 15.7RC1
+         */
+        public Iterable<String> getBadges() {
+            Iterable<WebElement> badgeElements = getDriver().findElementsWithoutWaiting(this.container, 
+                    By.className("ckeditor-autocomplete-item-badge"));
+            
+            ArrayList<String> badges = new ArrayList<>();
+            for (WebElement badge : badgeElements) {
+                badges.add(badge.getText());
+            }
+            
+            return badges;
         }
     }
 

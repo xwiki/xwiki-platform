@@ -22,7 +22,6 @@ package org.xwiki.tools.jetty.listener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListener;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  * @since 3.5M1
  */
-public class NotifyListener extends AbstractLifeCycleListener
+public class NotifyListener implements LifeCycle.Listener
 {
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyListener.class);

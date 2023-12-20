@@ -22,6 +22,7 @@ package org.xwiki.extension.security.internal.analyzer.osv;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.extension.index.security.ExtensionSecurityAnalysisResult;
@@ -64,19 +65,22 @@ class OsvResponseAnalyzerTest
 
         ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
         SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor0 = new SecurityVulnerabilityDescriptor();
-        securityVulnerabilityDescriptor0.setId("GHSA-4v38-964c-xjmw");
+        securityVulnerabilityDescriptor0.setId("CVE-2023-29510");
+        securityVulnerabilityDescriptor0.setAliases(Set.of("GHSA-4v38-964c-xjmw"));
         securityVulnerabilityDescriptor0.setURL(
             "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-4v38-964c-xjmw");
         securityVulnerabilityDescriptor0.setScore(9.9);
         securityVulnerabilityDescriptor0.setFixVersion(new DefaultVersion("14.10.2"));
         SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor1 = new SecurityVulnerabilityDescriptor();
-        securityVulnerabilityDescriptor1.setId("GHSA-9j36-3cp4-rh4j");
+        securityVulnerabilityDescriptor1.setId("CVE-2023-29514");
+        securityVulnerabilityDescriptor1.setAliases(Set.of("GHSA-9j36-3cp4-rh4j"));
         securityVulnerabilityDescriptor1.setURL(
             "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-9j36-3cp4-rh4j");
         securityVulnerabilityDescriptor1.setScore(9.9);
         securityVulnerabilityDescriptor1.setFixVersion(new DefaultVersion("13.10.11"));
         SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor2 = new SecurityVulnerabilityDescriptor();
-        securityVulnerabilityDescriptor2.setId("GHSA-rfh6-mg6h-h668");
+        securityVulnerabilityDescriptor2.setId("CVE-2023-29511");
+        securityVulnerabilityDescriptor2.setAliases(Set.of("GHSA-rfh6-mg6h-h668"));
         securityVulnerabilityDescriptor2.setURL(
             "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-rfh6-mg6h-h668");
         securityVulnerabilityDescriptor2.setScore(9.9);
@@ -99,7 +103,8 @@ class OsvResponseAnalyzerTest
 
         ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
         SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor = new SecurityVulnerabilityDescriptor();
-        securityVulnerabilityDescriptor.setId("VULN_ID");
+        securityVulnerabilityDescriptor.setId("CVE-1");
+        securityVulnerabilityDescriptor.setAliases(Set.of("A1", "VULN_ID"));
         securityVulnerabilityDescriptor.setURL("https://main.ref/");
         securityVulnerabilityDescriptor.setScore(7.5);
         securityVulnerabilityDescriptor.setFixVersion(new DefaultVersion("15.7"));

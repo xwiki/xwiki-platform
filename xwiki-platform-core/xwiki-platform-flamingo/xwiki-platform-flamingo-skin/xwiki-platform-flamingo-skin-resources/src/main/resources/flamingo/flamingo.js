@@ -40,14 +40,84 @@ require(['jquery', 'bootstrap'], function($) {
         }
       }
     });
-
-    // When the drawer is close, collapse sub items
-    $(body).on('drawer.closed', function() {
-      $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
-    });
-
     // Activate the popover when hovering the Translate button.
     var translateButton = $('#tmTranslate [data-toggle="popover"]');
     translateButton.attr('title', translateButton.attr('data-title')).popover();
   });
 });
+
+/*
+  Handle the behavior of all drawers on the page.
+  In order to create a drawer that is compatible with this script, two elements are necessary:
+  * A drawer opener button, that will have:
+   ** a reference to the drawer container in its attribute 'aria-control'
+   ** the class 'drawer-opener'
+  * A drawer container, that will have:
+   ** a unique ID
+   ** the class 'drawer-nav' (for style) 
+   ** an accessible name 
+   ** The content to display inside.
+  In addition, the drawer can contain a `.drawer-close` button that will close the drawer on click.
+  It's expected for the drawer containers not to be nested in each other, this might lead to inconsistencies 
+  when closing them with the ESC key, and inconsistencies on the behavior of subitems in different drawers.
+  For an example of drawer creation, see #tmDrawerActivator and #tmDrawer.
+ */
+require(['jquery'], function($) {
+  $(document).ready(function() {
+    $('.drawer-opener').each(function (index) {
+      // Setting up the drawer.
+      let drawerOpener = $(this);
+      let drawerId = drawerOpener.attr('aria-controls');
+      let drawerContainer = $(document.getElementById(drawerId));
+
+      let openDrawer = () => drawerContainer.trigger('drawer' + index + '.opened');
+      let closeDrawer = () => drawerContainer.trigger('drawer' + index + '.closed');
+      drawerOpener.on('click', openDrawer);
+      // Close drawer when clicking the backdrop (or any element outside of the drawer itself).
+      drawerContainer.on('click', (event) => {
+        let drawerzone = event.target.getBoundingClientRect();
+        if (event.target === drawerContainer.get(0) &&
+            (drawerzone.left > event.clientX || drawerzone.right < event.clientX ||
+            drawerzone.top > event.clientY || drawerzone.bottom < event.clientY)) {
+          closeDrawer();
+        }
+      });
+      // Close drawer when clicking on a close button inside it
+      drawerContainer.find('.drawer-close').on('click', closeDrawer);
+      
+      drawerContainer.on('drawer' + index + '.opened', function (event) {
+        // We use the drawer-transitioning class to make sure the transition to 
+        // slide in is not shortcut when showing the modal
+        drawerContainer.addClass('drawer-transitioning');
+        drawerContainer.get(0).showModal();
+        drawerContainer.removeClass('drawer-transitioning');
+        // The drawer can be closed by pressing the ESC key
+        drawerContainer.on('keydown.drawer' + index + 'Close', function (event) {
+          if (event.key === 'Escape') {
+            closeDrawer();
+          }
+        });
+        // At last, we indicate the new state of the drawer on the opener
+        drawerOpener.attr('aria-expanded', 'true');
+      }).on('drawer' + index + '.closed', function (event) {
+        // When the drawer is closed, collapse sub items
+        drawerContainer.find('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
+
+        function waitTransition() {
+          drawerContainer.get(0).close();
+          drawerContainer.removeClass('drawer-transitioning');
+          drawerContainer.get(0).removeEventListener('transitionend', waitTransition);
+          // At last, we indicate the new state of the drawer on the opener
+          drawerOpener.attr('aria-expanded', 'false');
+        }
+
+        // We use the drawer-transitioning class to give time for the hide modal transition to play.
+        drawerContainer.addClass('drawer-transitioning');
+        drawerContainer.get(0).addEventListener('transitionend', waitTransition);
+        // We remove the listener that was created when the drawer opened up
+        drawerContainer.off('keydown.drawer' + index + 'Close');
+      });
+    });
+  });
+});
+

@@ -303,9 +303,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public static final int HAS_CLASS = 4;
 
     /**
-     * The name of the key in the XWikiContext which contains the document used to check for programming rights.
+     * The name of the key in the {@link XWikiContext} which contains the document used to check for programming rights.
      */
     public static final String CKEY_SDOC = "sdoc";
+
+    /**
+     * The name of the key in the {@link XWikiContext} which contains the current content document.
+     * 
+     * @since 15.9RC1
+     */
+    public static final String CKEY_CDOC = "cdoc";
+
+    /**
+     * The name of the key in the {@link XWikiContext} which contains the current translation document.
+     * 
+     * @since 15.9RC1
+     */
+    public static final String CKEY_TDOC = "tdoc";
 
     /**
      * Separator string between database name and space name.
@@ -1621,7 +1635,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public String getRenderedContent(String text, Syntax sourceSyntaxId, boolean restrictedTransformationContext,
         XWikiDocument sDocument, boolean isolated, XWikiContext context)
     {
@@ -2538,7 +2551,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if ((this.archive == null || this.archive.get() == null)) {
             XWikiDocumentArchive arch;
-            // A document not comming from the database cannot have an archive stored in the database
+            // A document not coming from the database cannot have an archive stored in the database
             if (this.isNew()) {
                 arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             } else {
@@ -2578,7 +2591,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return arch;
         }
 
-        // A document not comming from the database cannot have an archive stored in the database
+        // A document not coming from the database cannot have an archive stored in the database
         if (this.isNew()) {
             arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             setDocumentArchive(arch);
@@ -3042,7 +3055,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If object creation failed.
      * @since 14.0RC1
      */
-    @Unstable
     public BaseObject getXObject(ObjectReference objectReference, boolean create, XWikiContext context)
         throws XWikiException
     {
@@ -3569,37 +3581,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public String displayTooltip(String fieldname, XWikiContext context)
-    {
-        try {
-            BaseObject object = getXObject();
-            if (object == null) {
-                object = getFirstObject(fieldname, context);
-            }
-            return displayTooltip(fieldname, object, context);
-        } catch (Exception e) {
-            return "";
-        }
-    }
 
-    public String displayTooltip(String fieldname, BaseObject obj, XWikiContext context)
-    {
-        String result = "";
-
-        try {
-            PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
-            String tooltip = pclass.getTooltip(context);
-            if ((tooltip != null) && (!tooltip.trim().equals(""))) {
-                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
-                    + "\" class=\"tooltip_image\" align=\"middle\" />";
-                result = context.getWiki().addTooltip(img, tooltip, context);
-            }
-        } catch (Exception e) {
-
-        }
-
-        return result;
-    }
 
     /**
      * @param fieldname the name of the field to display
@@ -4202,7 +4184,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public List<String> getTagsList(XWikiContext context)
     {
-        List<String> tagList = null;
+        List<String> tagList = List.of();
 
         BaseProperty prop = getTagProperty();
         if (prop != null) {
@@ -4363,7 +4345,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param editForm the form from which to read the list of files.
      * @since 14.3RC1
      */
-    @Unstable
     public void readTemporaryUploadedFiles(EditForm editForm)
     {
         getTemporaryAttachmentManager().attachTemporaryAttachmentsInDocument(this, editForm.getTemporaryUploadedFiles());
@@ -4377,7 +4358,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If an error occurs.
      * @since 14.0RC1
      */
-    @Unstable
     public void readAddedUpdatedAndRemovedObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         // We add the new objects that have been submitted in the form, before filling them with their values.
@@ -4844,7 +4824,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Same as {@link #equals(Object)} but only for actual datas of the document.
      * <p>
      * The goal being to compare two versions of the same document this method skip every version/reference/author
-     * related information. For example it allows to compare a document comming from a another wiki and easily check if
+     * related information. For example it allows to compare a document coming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      *
      * @param otherDocument the document to compare
@@ -5873,7 +5853,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the entity references pointing to either document or attachments. If {@code null}, an error happened
      * @since 14.2RC1
      */
-    @Unstable
     public Set<EntityReference> getUniqueLinkedEntities(XWikiContext context)
     {
         // Return both document and attachment references.
@@ -7117,7 +7096,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     List<ObjectDiff> dlist;
                     if (newObj == null) {
                         // The object was deleted.
-                        dlist = new BaseObject().getDiff(originalObj, context);
+                        newObj = new BaseObject();
+                        // We want the xclass reference to be set so that it can resolve the xclass properties.
+                        newObj.setXClassReference(originalObj.getXClassReference());
+                        dlist = newObj.getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
                             new ObjectDiff(originalObj.getXClassReference(), originalObj.getNumber(),
                                 originalObj.getGuid(), ObjectDiff.ACTION_OBJECTREMOVED, "", "", "", "");
@@ -7558,7 +7540,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         String language = "";
-        XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+        XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
         String realLang = tdoc.getRealLanguage(context);
         if ((xwiki.isMultiLingual(context) == true) && (!realLang.equals(""))) {
             language = realLang;
@@ -8810,8 +8792,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());
 
-        backup.put("cdoc", context.get("cdoc"));
-        backup.put("tdoc", context.get("tdoc"));
+        backup.put(CKEY_CDOC, context.get(CKEY_CDOC));
+        backup.put(CKEY_TDOC, context.get(CKEY_TDOC));
 
         // Backup the secure document
         backup.put(CKEY_SDOC, context.get(CKEY_SDOC));
@@ -8837,8 +8819,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Restore the current document on the XWiki Context.
         context.setDoc((XWikiDocument) backup.get("doc"));
 
-        context.put("cdoc", backup.get("cdoc"));
-        context.put("tdoc", backup.get("tdoc"));
+        context.put(CKEY_CDOC, backup.get(CKEY_CDOC));
+        context.put(CKEY_TDOC, backup.get(CKEY_TDOC));
 
         // Restore the secure document
         context.put(CKEY_SDOC, backup.get(CKEY_SDOC));
@@ -8847,8 +8829,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setAsContextDoc(XWikiContext context)
     {
         context.setDoc(this);
-        context.remove("cdoc");
-        context.remove("tdoc");
+        context.remove(CKEY_CDOC);
+        context.remove(CKEY_TDOC);
 
         // Get rid of secure document (so that it fallback on context document)
         context.remove(CKEY_SDOC);
@@ -9224,7 +9206,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
@@ -9244,7 +9226,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
@@ -9453,7 +9435,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.4
      * @since 13.10.10
      */
-    @Unstable
     public void initialize()
     {
         // There is no syntax by default in a new document and the default one is retrieved from the configuration

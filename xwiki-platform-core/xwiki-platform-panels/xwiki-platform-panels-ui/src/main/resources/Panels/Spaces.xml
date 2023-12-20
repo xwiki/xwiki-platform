@@ -120,7 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('xe.panels.spaces'))
+#navigationPanelHeader($services.localization.render('xe.panels.spaces'))
 #if ($hasAdmin)
   {{warning}}Deprecated: Replace with [[Navigation&gt;&gt;Panels.Navigation]] Panel{{/warning}}
 #end
@@ -128,7 +128,7 @@
 #foreach ($space in $services.query.xwql('SELECT DISTINCT doc.space FROM Document doc order by doc.space').addFilter('hidden').execute())
   #set ($spaceReference     = $services.model.resolveSpace($space))
   #set ($spaceHomeReference = $services.model.createDocumentReference($defaultSpaceHomePage, $spaceReference))
-  #if ($hasAdmin || ($services.security.authorization.hasAccess('view', $spaceHomeReference) &amp;&amp; !$blacklistedSpaces.contains($space)))
+  #if ($hasAdmin || ($services.security.authorization.hasAccess('view', $spaceHomeReference)))
     ## We use HTML here because we don't have a tool to escape wiki syntax in space name.
     * {{html}}&lt;a href="$xwiki.getURL($spaceHomeReference)"
         #if ($space == $doc.space)class="currentspace"#end&gt;$escapetool.xml($space)&lt;/a&gt;{{/html}}

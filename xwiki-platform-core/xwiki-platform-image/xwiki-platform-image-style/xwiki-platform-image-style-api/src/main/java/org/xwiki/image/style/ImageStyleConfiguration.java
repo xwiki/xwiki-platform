@@ -29,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.3RC1
  */
 @Role
-@Unstable
 public interface ImageStyleConfiguration
 {
     /**
@@ -41,4 +40,21 @@ public interface ImageStyleConfiguration
      * @return the identifier of the default image style (the empty string by default, i.e. no default image style)
      */
     String getDefaultStyle(String wikiName, String documentReference) throws ImageStyleException;
+
+    /**
+     * Resolve the force default style for a given wiki and, optionally a given document.
+     *
+     * @param wikiName the name of the wiki (e.g., "xwiki")
+     * @param documentReference the reference of the document for which we want to get the default style, ignored
+     *     when {@code null}
+     * @return the value of the force default style configuration option
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.8RC1
+     */
+    @Unstable
+    default boolean getForceDefaultStyle(String wikiName, String documentReference) throws ImageStyleException
+    {
+        return false;
+    }
 }

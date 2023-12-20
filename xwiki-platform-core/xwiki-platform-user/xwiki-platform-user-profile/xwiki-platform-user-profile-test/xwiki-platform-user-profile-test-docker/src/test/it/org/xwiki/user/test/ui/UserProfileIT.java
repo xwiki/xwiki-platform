@@ -56,14 +56,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // UserAddedEventListener is called and global default user notifications filters are copied for the new user,
     // requiring the notifications HBM mapping file.
     "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+    // Remove once https://jira.xwiki.org/browse/XWIKI-21238 is fixed. Right now XWikiUserProfileSheet requires
+    // Programming Rights to enable/disable a user.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet"
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-    })
+    }
+)
 class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";
@@ -300,7 +305,7 @@ class UserProfileIT
         assertFalse(userProfilePage.isDisableButtonAvailable());
         assertFalse(userProfilePage.isEnableButtonAvailable());
 
-        // Buttons should be available with super admin
+        // Buttons should be available with a user having admin rights (which is the case for superadmin)
         setup.loginAsSuperAdmin();
         userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         assertTrue(userProfilePage.isDisableButtonAvailable());

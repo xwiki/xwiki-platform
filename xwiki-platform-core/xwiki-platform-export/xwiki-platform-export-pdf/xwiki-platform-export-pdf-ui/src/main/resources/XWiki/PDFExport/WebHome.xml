@@ -431,9 +431,18 @@ require([
       const iframe = $('&lt;iframe/&gt;').css({
         // The load event is not fired if we hide it completely with display:none.
         'visibility': 'hidden',
+        // The iframe needs to be in the viewport otherwise Safari is very slow in rendering its document (it seems it
+        // applies some kind of lazy processing but we couldn't disable this using loading=eager on the iframe).
+        'position': 'fixed',
+        'top': 0,
         // Use the same width as the main window because the CSS or JavaScript code could rely on it (we want the result
         // to look exactly as if the user has opened the export URL directly).
-        'width': $(window).width()
+        'width': $(window).width(),
+        // Remove the borders in order to have exacly the same width as the window (viewport). See above.
+        'border': 0,
+        // Reduce a bit the height (to the height of the top bar). This is technically not needed, but we want to make
+        // sure the iframe doesn't cover something important.
+        'height': '50px'
       }).on('load', () =&gt; {
         iframe[0].contentWindow.require(['xwiki-page-ready'], function(pageReady) {
           setTimeout(() =&gt; {

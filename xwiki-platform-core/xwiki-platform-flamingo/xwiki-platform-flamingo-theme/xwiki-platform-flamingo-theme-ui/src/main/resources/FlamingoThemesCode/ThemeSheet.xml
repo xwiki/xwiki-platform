@@ -124,8 +124,7 @@
     "legend-border-color": "color"
    },
   "panels": {
-    "panel-bg" : "color",
-    "panel-default-text" : "color"
+    "panel-bg" : "color"
   },
   "breadcrumb": {
     "breadcrumb-bg": "color",

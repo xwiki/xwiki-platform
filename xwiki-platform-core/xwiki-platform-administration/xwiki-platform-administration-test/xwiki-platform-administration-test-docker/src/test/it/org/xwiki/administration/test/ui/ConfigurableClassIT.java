@@ -50,7 +50,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.3RC1
  */
-@UITest
+@UITest(properties = {
+    // Notes:
+    // - .*.testCodeToExecutionAndAutoSandboxing.WebHome is needed since this test verifies that even if user has
+    //   PR, if XWiki.ConfigurableClass is saved (thus with programming rights), it is resaved automatically to not
+    //   have them.
+    // - .*.testLockingAndUnlocking.* is needed because the test itself requires PR to call the
+    //   $doc.getDocument().getLock() API for lack of a public API doing the same.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*ConfigurableClassIT\\."
+        + "(testCodeToExecutionAndAutoSandboxing.WebHome"
+        + "|testLockingAndUnlocking.TestConfigurable1"
+        + "|testLockingAndUnlocking.TestConfigurable2)"
+})
 class ConfigurableClassIT
 {
     @BeforeEach
@@ -166,8 +177,9 @@ class ConfigurableClassIT
 
     /**
      * If CodeToExecute is defined in a configurable app, then it should be evaluated.
-     * Also header should be evaluated and not just printed.
-     * If XWiki.ConfigurableClass is saved with programming rights, it should resave itself so that it doesn't have them.
+     * Also, header should be evaluated and not just printed.
+     * We test with a user having Programming Rights, since if XWiki.ConfigurableClass is saved with programming
+     * rights, it should resave itself so that it doesn't have them, and we want to verify this.
      */
     @Test
     @Order(3)
@@ -204,6 +216,7 @@ class ConfigurableClassIT
             String content = viewPage.getContent();
             assertTrue(content.contains("This should be displayed."));
             assertTrue(content.contains("This should also be displayed."));
+            // Since the user has PR, the following is expected to be true
             assertTrue(content.contains("This should be displayed too."));
             // It's false because of the dropPermission in ConfigurableClass (but supposed to be fixed at some point)
             assertTrue(content.contains("Has Programming permission: false"));

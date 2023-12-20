@@ -172,3 +172,11 @@ select[size="0"], select[size="1"] {
 .input-group img {
   max-width: inherit;
 }
+
+// Use color theme defined variables instead of a hard coded color for the bootstrap select
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder,
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder:hover,
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder:focus,
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder:active {
+  .text-muted;
+}

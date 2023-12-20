@@ -52,14 +52,14 @@
 
 .ui-progress-background {
   background-color: transparent;
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 10px 10px 10px 10px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) inset, 0 1px 0 0 $theme.pageContentBackgroundColor;
   height: 8px;
 }
 
 .ui-progress-bar {
   background-color: $theme.backgroundSecondaryColor;
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 10px 10px 10px 10px;
   height: 8px;
 }
 

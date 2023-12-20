@@ -37,7 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @version $Id$
  */
-@UITest
+@UITest(
+    properties = {
+        // TODO: Find a way to avoid requiring PR in the test below (specifically "$xcontext.context" requires PR).
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*TextAreaIT\\.authors\\.WebHome"
+    }
+)
 class TextAreaIT
 {
     private static final String TEXTAREA_CLASS = "TextAreaIT.NestedSpace.TextAreaClass";

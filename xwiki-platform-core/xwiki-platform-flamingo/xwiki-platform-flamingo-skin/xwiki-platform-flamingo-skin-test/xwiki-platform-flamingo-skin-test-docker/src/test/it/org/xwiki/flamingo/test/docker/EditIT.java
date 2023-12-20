@@ -66,7 +66,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.2RC1
  */
-@UITest
+@UITest(
+    // Required so that calls to TestUtils#setPropertyInXWikiCfg() can succeed.
+    properties = {
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.XWikiConfigurationPageForTest"
+    }
+)
 public class EditIT
 {
     @BeforeAll
@@ -929,7 +934,7 @@ public class EditIT
             "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0,xhtml/5,html/5.0");
         setup.deletePage(testReference);
 
-        String pageContent = "= First heading =\n"
+        String pageContent = "== First heading ==\n"
             + "\n"
             + "Paragraph containing some **bold content**.\n"
             + "\n"
@@ -967,9 +972,9 @@ public class EditIT
                 .contains("from the previous XWiki 2.1 syntax to the selected XHTML 1.0 syntax?"));
             confirmationModal.confirmSyntaxConversion();
 
-            String expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\">"
+            String expectedContent = "<h2 id=\"HFirstheading\" class=\"wikigeneratedid\">"
                 + "<span>First heading</span>"
-                + "</h1>"
+                + "</h2>"
                 + "<p>Paragraph containing some <strong>bold content</strong>.</p>"
                 + "<p>A new paragraph with some new content.</p>";
             assertEquals(expectedContent, wikiEditPage.getExactContent());

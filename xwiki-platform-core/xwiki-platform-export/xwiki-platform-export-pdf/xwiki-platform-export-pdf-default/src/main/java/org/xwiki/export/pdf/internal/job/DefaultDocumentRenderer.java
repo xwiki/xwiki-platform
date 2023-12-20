@@ -19,11 +19,12 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -73,43 +74,39 @@ public class DefaultDocumentRenderer implements DocumentRenderer
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private DocumentMetadataExtractor metadataExtractor;
+
     /**
      * Used to generate unique identifiers across multiple rendered documents.
      */
     private PDFExportIdGenerator idGenerator = new PDFExportIdGenerator();
 
-    /**
-     * Renders the specified document.
-     * 
-     * @param documentReference the document to render
-     * @param withTitle {@code true} to render also the document title (before the document content), {@code false}
-     *            otherwise
-     * @return the rendering result
-     * @throws Exception if rendering the specified document fails
-     */
-    public DocumentRenderingResult render(DocumentReference documentReference, boolean withTitle) throws Exception
+    @Override
+    public DocumentRenderingResult render(DocumentReference documentReference,
+        DocumentRendererParameters rendererParameters) throws Exception
     {
         Syntax targetSyntax = this.renderingContext.getTargetSyntax();
 
-        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        DocumentDisplayerParameters displayerParameters = new DocumentDisplayerParameters();
         // Each document is rendered in a separate execution context, as if it was the current document on the context,
         // otherwise relative references used in the document content are badly resolved.
-        parameters.setExecutionContextIsolated(true);
-        parameters.setTransformationContextIsolated(true);
-        parameters.setTransformationContextRestricted(false);
-        parameters.setContentTranslated(false);
-        parameters.setTargetSyntax(targetSyntax);
+        displayerParameters.setExecutionContextIsolated(true);
+        displayerParameters.setTransformationContextIsolated(true);
+        displayerParameters.setTransformationContextRestricted(false);
+        displayerParameters.setContentTranslated(false);
+        displayerParameters.setTargetSyntax(targetSyntax);
         // Use the same id generator while rendering all the documents included in a PDF export in order to ensure that
         // the generated identifiers are unique across the aggregated content (as if all the exported documents are
         // included in the same parent document).
-        parameters.setIdGenerator(this.idGenerator);
+        displayerParameters.setIdGenerator(this.idGenerator);
 
-        XDOM xdom = display(getDocument(documentReference), parameters, withTitle);
+        XDOM xdom = display(getDocument(documentReference), displayerParameters, rendererParameters);
         String html = renderXDOM(xdom, targetSyntax);
         return new DocumentRenderingResult(documentReference, xdom, html, this.idGenerator.resetLocalIds());
     }
 
-    private DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception
+    private XWikiDocument getDocument(DocumentReference documentReference) throws Exception
     {
         // If the current document is included in the PDF export then we use the document instance from the XWiki
         // context in order to match what the user sees in view mode (e.g. the user might be looking at a document
@@ -123,19 +120,23 @@ public class DefaultDocumentRenderer implements DocumentRenderer
         }
     }
 
-    private XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters, boolean withTitle)
+    private XDOM display(XWikiDocument document, DocumentDisplayerParameters displayerParameters,
+        DocumentRendererParameters rendererParameters)
     {
-        XDOM xdom = this.documentDisplayer.display(document, parameters);
+        XDOM xdom = this.documentDisplayer.display(document, displayerParameters);
 
-        if (withTitle) {
-            parameters.setTitleDisplayed(true);
-            XDOM titleXDOM = this.documentDisplayer.display(document, parameters);
+        if (rendererParameters.isWithTitle()) {
+            displayerParameters.setTitleDisplayed(true);
+            XDOM titleXDOM = this.documentDisplayer.display(document, displayerParameters);
             String documentReference = this.entityReferenceSerializer.serialize(document.getDocumentReference());
             // Generate an id so that we can target this heading from the table of contents.
             String id = xdom.getIdGenerator().generateUniqueId("H", documentReference);
             HeaderBlock title = new HeaderBlock(titleXDOM.getChildren(), HeaderLevel.LEVEL1, id);
+            Map<String, String> metadata =
+                this.metadataExtractor.getMetadata(document, rendererParameters.getMetadataReference());
             // Mark the beginning of a new document when multiple documents are rendered.
-            title.setParameter(PARAMETER_DOCUMENT_REFERENCE, documentReference);
+            metadata.put(PARAMETER_DOCUMENT_REFERENCE, documentReference);
+            title.setParameters(metadata);
             if (xdom.getChildren().isEmpty()) {
                 xdom.addChild(title);
             } else {

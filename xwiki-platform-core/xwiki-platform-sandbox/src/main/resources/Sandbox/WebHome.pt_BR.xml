@@ -50,7 +50,7 @@ Aqui estão algumas páginas de teste que você pode usar:
 
 Abaixo uma demonstração da [[Sintaxe XWiki&gt;&gt;XWiki.XWikiSyntax]] que você pode usar nas suas páginas wiki (cabeçalhos, imagens, tabelas). 
 
-= Cabeçalhos =
+== Cabeçalhos ==
 
 A XWiki oferece 6 níveis de cabeçalhos. Você pode usá-los para estruturar suas páginas.
 
@@ -64,7 +64,7 @@ A XWiki oferece 6 níveis de cabeçalhos. Você pode usá-los para estruturar su
 
 ====== Cabeçalho Nível 6 ======
 
-= Estilos =
+== Estilos ==
 
 Estilos básicos são suportados pela XWiki:
 
@@ -75,11 +75,11 @@ Estilos básicos são suportados pela XWiki:
 * Texto em ,,subscrito,,
 * Texto em ^^sobrescrito^^
 
-= Listas =
+== Listas ==
 
 Você pode criar vários tipos de listas nas suas páginas wiki:
 
-== Lista não ordenada ==
+=== Lista não ordenada ===
 
 * Nível 1
 ** Nível 2
@@ -87,14 +87,14 @@ Você pode criar vários tipos de listas nas suas páginas wiki:
 ** Nível 2
 * Nível 1
 
-== Lista numerada ==
+=== Lista numerada ===
 
 1. Item
 11. Subitem
 111. Item
 1. Subitem
 
-== Lista mista ==
+=== Lista mista ===
 
 1. Item 1
 11. Item 2
@@ -102,23 +102,23 @@ Você pode criar vários tipos de listas nas suas páginas wiki:
 11*. Item 4
 1. Item 5
 
-= Tabelas =
+== Tabelas ==
 
 Você pode criar tabelas diretamente na sua wiki:
 
-== Tabela com cabeçalho na linha superior ==
+=== Tabela com cabeçalho na linha superior ===
 
 |= cabeçalho |= cabeçalho |= cabeçalho 
 | célula | célula | célula
 | célula | célula | célula
 
-== Tabela com cabeçalho na linha superior e na coluna mais à esquerda ==
+=== Tabela com cabeçalho na linha superior e na coluna mais à esquerda ===
 
 |= cabeçalho |= cabeçalho |= cabeçalho 
 |= cabeçalho | célula | célula
 |= cabeçalho | célula | célula
 
-= Links =
+== Links ==
 
 XWiki permite que você crie links para outras páginas na sua wiki on na web:
 
@@ -128,23 +128,23 @@ XWiki permite que você crie links para outras páginas na sua wiki on na web:
 * [[http://www.xwiki.org]] -&gt; você pode chamar páginas wiki ou a websites externos
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; texto descritivo funciona também para links externos
 
-= Imagens =
+== Imagens ==
 
 Você pode inserir imagens na sua página wiki:
 
 [[image:XWikiLogo.png]]
 
-= Macros =
+== Macros ==
 
 Macros permitem que você faça o conteúdo ter uma melhor aparência e adicionar novas funcionalidades à sua wiki. Aqui estão 2 exemplos de como macros podem ser usadas em páginas:
 
-== Macro Aviso ==
+=== Macro Aviso ===
 
 Essa macro permite que você chame a atenção do usuário pra uma informação:
 
 {{warning}}Alô mundo!{{/warning}}
 
-== Índice ==
+=== Índice ===
 
 Essa macro gera automaticamente o índice da sua página baseado na formatação dos cabeçalhos:
 

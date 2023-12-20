@@ -19,66 +19,67 @@
 ## ---------------------------------------------------------------------------
 #macro (getEditConfirmation)
   #set ($editConfirmation = $NULL)
-  ##
-  ## Check if edit is forced.
-  ##
-  #set ($session = $request.session)
-  #set ($sessionAttributeName = 'force_edit_' + $doc.prefixedFullName)
-  #set ($editForced = $session.getAttribute($sessionAttributeName))
-  #if (!$editForced && "$!request.get('force')" != '')
-    #set ($editForced = true)
-    #set ($discard = $session.setAttribute($sessionAttributeName, $editForced))
+  
+  ## Persist the results of the last analysis, and they will be ignored during the next check.
+  #set ($forced = "$!request.get('force')" != '')
+  #if ($forced)
+    $services.modelvalidation.edit.force()
   #end
   ##
-  ## Check if the document is protected and ask for confirmation if it is.
+  ## Calls the pre-edit checkers.
   ##
-  #set ($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference,
-    $tdoc.documentReferenceWithLocale))
-  #if ($protectionLevel.name() == 'DENY')
-    ## We cannot force the edit.
-    #set ($editConfirmation = {
-      'title': $services.localization.render('error'),
-      'message': "#documentProtectedMessage($protectionLevel)",
-      'reject': $services.localization.render('cancel')
-    })
-  #elseif ($protectionLevel.name() != 'NONE' && !$editForced)
-    #set ($editConfirmation = {
-      'title': $services.localization.render('warning'),
-      'message': "#documentProtectedMessage($protectionLevel)",
-      'reject': $services.localization.render('cancel'),
-      'confirm': $services.localization.render('forcelock')
-    })
-  ##
-  ## Check if the document is being edited by another user and ask for confirmation if it is.
-  ##
-  #elseif ($tdoc.getLocked() && !$editForced)
-    #define ($message)
-      #set ($lockingUser = "#displayUser($tdoc.lockingUser {'useInlineHTML': true})")
-      <p class="xwikimessage">
-        $escapetool.xml($services.localization.render('doclockedby')) ${lockingUser.trim()}.
-      </p>
-    #end
-    #set ($editConfirmation = {
-      'title': $services.localization.render('warning'),
-      'message': "$message",
-      'reject': $services.localization.render('cancel'),
-      'confirm': $services.localization.render('forcelock')
-    })
-  #end
-#end
+  #set ($checkResult = $services.modelvalidation.edit.check())
 
-#macro (documentProtectedMessage $protectionLevel)
-  #set ($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
-  <p class="xwikimessage">
-    $escapetool.xml($services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
-  </p>
-  <ul>
-    #foreach ($extension in $extensions)
-      <li>$escapetool.xml($extension.name) ($escapetool.xml($extension.id.version))</li>
+  #if (!$checkResult.errorMessages.isEmpty() || (!$forced && !$checkResult.warningMessages.isEmpty()))
+    #set ($editConfirmation = {})
+
+    #if ($checkResult.isError())
+      #set ($titleKey = 'error')
+    #else
+      #set ($titleKey = 'warning')
     #end
-  </ul>
-  <p>
-    $escapetool.xml($services.localization.render(
-      "extension.xar.edit${protectionLevel.name().toLowerCase()}.explanation"))
-  </p>
+    #set ($discard = $editConfirmation.put('title', $services.localization.render($titleKey)))
+    #define ($message)
+      #if ($checkResult.isError())
+        <div class="box errormessage">
+          #set ($messageKey = 'platform.core.editConfirmation.errors')
+          $escapetool.xml($services.localization.render($messageKey))
+        </div>
+      #else
+        <div class="box warningmessage">
+          #set ($messageKey = 'platform.core.editConfirmation.warnings')
+          $escapetool.xml($services.localization.render($messageKey))
+        </div>
+      #end
+      #if (!$checkResult.errorMessages.isEmpty())
+        #foreach ($block in $checkResult.errorMessages)
+          $services.rendering.render($block, 'html/5.0')
+          #if ($foreach.hasNext)
+            <hr/>
+          #end
+        #end
+      #end
+      #if (!$checkResult.warningMessages.isEmpty())
+        ## If we display warnings, in addition to the errors, a warning block is presented before the warnings list.
+        #if ($checkResult.isError())
+          <hr/>
+          <div class="box warningmessage">
+            #set ($messageKey = 'platform.core.editConfirmation.additionalWarnings')
+            $escapetool.xml($services.localization.render($messageKey))
+          </div>
+        #end
+        #foreach ($block in $checkResult.warningMessages)
+          $services.rendering.render($block, 'html/5.0')
+          #if ($foreach.hasNext)
+            <hr/>
+          #end
+        #end
+      #end
+    #end
+    #set ($discard = $editConfirmation.put('message', "$message"))
+    #set ($discard = $editConfirmation.put('reject', $services.localization.render('cancel')))
+    #if (!$checkResult.isError())
+      #set ($discard = $editConfirmation.put('confirm', $services.localization.render('forcelock')))
+    #end
+  #end
 #end

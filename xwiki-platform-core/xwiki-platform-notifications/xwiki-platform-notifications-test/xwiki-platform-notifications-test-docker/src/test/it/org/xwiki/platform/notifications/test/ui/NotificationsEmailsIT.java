@@ -19,8 +19,12 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Scanner;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.mail.internet.MimeMessage;
 
@@ -28,8 +32,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.simplejavamail.api.email.Email;
 import org.simplejavamail.converter.EmailConverter;
-import org.simplejavamail.email.Email;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
@@ -65,13 +69,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiCfgVirtualUsepath=0"
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // The Solr store is not ready yet to be installed as extension
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
@@ -185,22 +190,49 @@ public class NotificationsEmailsIT
         assertEquals(1, email.getRecipients().size());
         assertEquals(USER_EMAIL, email.getRecipients().get(0).getAddress());
 
-        assertNotNull(email.getText());
-        assertNotNull(email.getTextHTML());
+        assertNotNull(email.getPlainText());
+        assertNotNull(email.getHTMLText());
         assertNotNull(email.getAttachments());
         assertFalse(email.getAttachments().isEmpty());
 
         // Events inside an email comes in random order, so we just verify that all the expected content is there
-        String plainTextContent = prepareMail(email.getText());
+        String plainTextContent = prepareMail(email.getPlainText());
+
         String expectedContent;
-        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail1.txt")));
+        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedPlainTextMail1.txt")));
         assertTrue(plainTextContent.contains(expectedContent),
             String.format("Email is supposed to contain: [\n%s\n], but all we have is [\n%s\n].",
                 expectedContent, plainTextContent));
-        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedMail2.txt")));
+        expectedContent = prepareMail(IOUtils.toString(getClass().getResourceAsStream("/expectedPlainTextMail2.txt")));
         assertTrue(plainTextContent.contains(expectedContent),
             String.format("Email is supposed to contain: [\n%s\n], but all we we have is [\n%s\n].",
                 expectedContent, plainTextContent));
+
+        // We also check the html content, this time using Pattern to allow performing the checks while ignoring some
+        // elements such as random ids
+        String htmlTextContent = prepareMail(email.getHTMLText());
+
+        expectedContent = IOUtils.toString(getClass().getResourceAsStream("/expectedHtmlMail1.txt"),
+            StandardCharsets.UTF_8);
+        // We escape everything and we pay attention to ignore whitespaces on each lines
+        expectedContent = Arrays.stream(expectedContent.split("\n"))
+            .map(str -> String.format("\\Q%s\\E\\s*", str.trim()))
+            .collect(Collectors.joining());
+
+        Pattern pattern = Pattern.compile(expectedContent, Pattern.COMMENTS);
+        assertTrue(pattern.matcher(htmlTextContent).find(), String.format("Email is supposed to contain: [\n%s\n], "
+                + "but all we have is [\n%s\n].", expectedContent, htmlTextContent));
+
+        expectedContent = IOUtils.toString(getClass().getResourceAsStream("/expectedHtmlMail2.txt"),
+            StandardCharsets.UTF_8);
+        // We escape everything and we pay attention to ignore whitespaces on each lines
+        expectedContent = Arrays.stream(expectedContent.split("\n"))
+            .map(str -> String.format("\\Q%s\\E\\s*", str.trim()))
+            .collect(Collectors.joining());
+
+        pattern = Pattern.compile(expectedContent, Pattern.COMMENTS);
+        assertTrue(pattern.matcher(htmlTextContent).find(), String.format("Email is supposed to contain: [\n%s\n], "
+            + "but all we have is [\n%s\n].", expectedContent, htmlTextContent));
 
         testUtils.rest().delete(page1);
         testUtils.rest().delete(page2);
@@ -212,8 +244,7 @@ public class NotificationsEmailsIT
         Scanner scanner = new Scanner(email);
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if (!line.startsWith(String.format("  %d", Calendar.getInstance().get(Calendar.YEAR))) &&
-                !line.startsWith("  2017/06/27")) {
+            if (!line.startsWith(String.format("  %d", Calendar.getInstance().get(Calendar.YEAR)))) {
                 stringBuilder.append(line);
                 stringBuilder.append(System.lineSeparator());
             }

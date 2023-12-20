@@ -119,9 +119,6 @@ public class JettyStandaloneExecutor
                     writer.write(replaceProperty(content, velocityContext));
                 }
             }
-
-            // Step: Remove root webapp since we don't need it
-            FileUtils.forceDelete(new File(jettyDirectory, "jetty/contexts/root.xml"));
         }
 
         // Step: Remove data directory since we will provision again the extensions to account for source changes.

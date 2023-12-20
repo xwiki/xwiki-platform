@@ -8,6 +8,8 @@ org.xwiki.export.pdf.internal.docker.ContainerManager
 org.xwiki.export.pdf.internal.docker.DockerClientFactory
 org.xwiki.export.pdf.internal.job.DefaultDocumentRenderer
 org.xwiki.export.pdf.internal.job.DefaultPDFExportJobRequestFactory
+org.xwiki.export.pdf.internal.job.DocumentMetadataExtractor
+org.xwiki.export.pdf.internal.job.DocumentMetadataScriptContextInitializer
 org.xwiki.export.pdf.internal.DefaultPDFExportConfiguration
 org.xwiki.export.pdf.internal.DefaultRequiredSkinExtensionsRecorder
 org.xwiki.export.pdf.internal.PDFExportConfigurationSource

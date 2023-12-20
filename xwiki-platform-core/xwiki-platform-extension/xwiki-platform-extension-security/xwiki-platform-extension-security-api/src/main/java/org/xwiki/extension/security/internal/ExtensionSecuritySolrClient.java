@@ -36,11 +36,16 @@ import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.search.solr.SolrUtils;
 
+import static org.apache.solr.client.solrj.SolrQuery.ORDER;
+import static org.apache.solr.client.solrj.SolrQuery.ORDER.asc;
+import static org.apache.solr.client.solrj.SolrQuery.ORDER.desc;
 import static org.xwiki.extension.InstalledExtension.FIELD_INSTALLED_NAMESPACES;
-import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_FROM_ENVIRONMENT;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.IS_CORE_EXTENSION;
+import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_CVE_ID;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_FIX_VERSION;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SECURITY_MAX_CVSS;
 import static org.xwiki.extension.index.internal.ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID;
+import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.CVE_ID;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.EXTENSION_ID;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.FIX_VERSION;
 import static org.xwiki.extension.security.internal.livedata.ExtensionSecurityLiveDataConfigurationProvider.MAX_CVSS;
@@ -65,7 +70,16 @@ public class ExtensionSecuritySolrClient
         EXTENSION_ID, SOLR_FIELD_ID,
         MAX_CVSS, SECURITY_MAX_CVSS,
         FIX_VERSION, SECURITY_FIX_VERSION,
-        WIKIS, FIELD_INSTALLED_NAMESPACES
+        WIKIS, FIELD_INSTALLED_NAMESPACES,
+        CVE_ID, SECURITY_CVE_ID
+    );
+
+    /**
+     * Mapping between the solr properties and their corresponding types. When missing, the type is implicitly
+     * {@link String}. This mapping is used to convert parameters according to their types.
+     */
+    private static final Map<String, Class<?>> SOLR_PROPERTY_TO_TYPE = Map.of(
+        SECURITY_MAX_CVSS, Double.class
     );
 
     private static final String EXACT_MATCH_PATTERN = "%s:%s";
@@ -125,7 +139,8 @@ public class ExtensionSecuritySolrClient
         for (LiveDataQuery.Filter filter : liveDataQuery.getFilters()) {
             String field = mapPropertyToField(filter.getProperty());
             for (LiveDataQuery.Constraint constraint : filter.getConstraints()) {
-                String filterQueryString = this.solrUtils.toFilterQueryString(constraint.getValue());
+                String filterQueryString = this.solrUtils.toFilterQueryString(constraint.getValue(),
+                    SOLR_PROPERTY_TO_TYPE.getOrDefault(field, String.class));
                 if (StringUtils.isEmpty(filterQueryString)) {
                     continue;
                 }
@@ -144,11 +159,8 @@ public class ExtensionSecuritySolrClient
         }
 
         Map<String, Object> parametersMap = liveDataQuery.getSource().getParameters();
-        String isFromEnvironment = Boolean.TRUE.toString();
-        if (!Objects.equals(parametersMap.get("isFromEnvironment"), Boolean.TRUE.toString())) {
-            isFromEnvironment = Boolean.FALSE.toString();
-        }
-        solrQuery.addFilterQuery(String.format(EXACT_MATCH_PATTERN, IS_FROM_ENVIRONMENT, isFromEnvironment));
+        boolean isFromEnvironment = Objects.equals(parametersMap.get("isFromEnvironment"), Boolean.TRUE.toString());
+        solrQuery.addFilterQuery(String.format(EXACT_MATCH_PATTERN, IS_CORE_EXTENSION, isFromEnvironment));
     }
 
     private static void initFilter(SolrQuery solrQuery)
@@ -159,7 +171,8 @@ public class ExtensionSecuritySolrClient
         // Only include extensions with a computed CVSS score, meaning that they have at least one known security
         // vulnerability.
         solrQuery.addFilterQuery(String.format("%s:{0 TO 10]", SECURITY_MAX_CVSS));
-        solrQuery.addFilterQuery(String.format("(%s:[* TO *] OR is_installed:false)", FIELD_INSTALLED_NAMESPACES));
+        solrQuery.addFilterQuery(String.format("(%s:[* TO *] OR %s:true)",
+            FIELD_INSTALLED_NAMESPACES, IS_CORE_EXTENSION));
     }
 
     private static void initSort(LiveDataQuery liveDataQuery, SolrQuery solrQuery)
@@ -168,7 +181,13 @@ public class ExtensionSecuritySolrClient
         for (LiveDataQuery.SortEntry sortEntry : liveDataQuery.getSort()) {
             String property = sortEntry.getProperty();
             String field = mapPropertyToField(property);
-            solrQuery.addSort(field, sortEntry.isDescending() ? SolrQuery.ORDER.desc : SolrQuery.ORDER.asc);
+
+            ORDER order = sortEntry.isDescending() ? desc : asc;
+            solrQuery.addSort(field, order);
+            if (field.equals(NAME)) {
+                // If the name is null (and therefore always equals), also sort by extension id.
+                solrQuery.addSort(SOLR_FIELD_EXTENSIONID, order);
+            }
         }
     }
 

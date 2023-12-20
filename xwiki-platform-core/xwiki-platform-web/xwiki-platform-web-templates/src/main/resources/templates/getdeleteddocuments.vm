@@ -119,6 +119,8 @@ $response.setContentType("application/json")
     #set ($discard = $row.put('doc_name', $title))
     #set ($location = "#hierarchy($documentReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})")
     #set ($discard = $row.put('doc_location', $location))
+    ## Include fullName as it is used as the id of the entry in Live Data.
+    #set ($discard = $row.put('doc_fullName', $deletedDocument.fullName))
     #set ($discard = $row.put('doc_date', $xwiki.formatDate($deletedDocument.date)))
     #set ($discard = $row.put('doc_deleter', $xwiki.getUserName($deletedDocument.deleter, false)))
     #set ($discard = $row.put('doc_deleter_url', $xwiki.getURL($deletedDocument.deleter)))

@@ -22,6 +22,7 @@
   <img
     v-if="isImage"
     :src="url"
+    alt=""
   />
   <span
     v-else-if="isFont"

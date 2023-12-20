@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.po;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -31,33 +30,13 @@ import org.openqa.selenium.support.FindBy;
  * @since 7.4.1
  * @since 8.0M1
  */
-public class CopyOrRenameOrDeleteStatusPage extends BasePage
+public class CopyOrRenameOrDeleteStatusPage extends RefactoringStatusPage
 {
-    private static final String MESSAGE_CSS_SELECTOR =
-        ".xcontent.job-status .box.successmessage, .xcontent.job-status .box.errormessage";
-
     @FindBy(css = ".job-status .col-lg-6:first-child .breadcrumb > li:last-child a")
     private WebElement oldPage;
 
     @FindBy(css = ".job-status .col-lg-6:last-child .breadcrumb > li:last-child a")
     private WebElement newPage;
-
-    @FindBy(css = MESSAGE_CSS_SELECTOR)
-    private WebElement message;
-
-    /**
-     * Wait until the copy operation finishes.
-     * 
-     * @return this page
-     */
-    public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
-    {
-        // Waits for a success or error message to be displayed before continuing. Previously, this method was waiting 
-        // for the job progress bar to be "missing" before continuing, which could happen too early, before the bar was
-        // even displayed once.
-        getDriver().waitUntilElementIsVisible(By.cssSelector(MESSAGE_CSS_SELECTOR));
-        return this;
-    }
 
     public ViewPage gotoOriginalPage()
     {
@@ -71,8 +50,10 @@ public class CopyOrRenameOrDeleteStatusPage extends BasePage
         return new ViewPage();
     }
 
-    public String getInfoMessage()
+    @Override
+    public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
     {
-        return this.message.getText();
+        super.waitUntilFinished();
+        return this;
     }
 }

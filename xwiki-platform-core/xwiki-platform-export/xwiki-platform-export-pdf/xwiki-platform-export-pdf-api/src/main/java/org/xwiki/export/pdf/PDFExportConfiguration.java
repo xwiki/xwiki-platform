@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * PDF export configuration options.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.5
  */
 @Role
-@Unstable
 public interface PDFExportConfiguration
 {
     /**
@@ -74,6 +72,17 @@ public interface PDFExportConfiguration
      *         by {@link #getChromeHost()}; defaults to {@code 9222}
      */
     int getChromeRemoteDebuggingPort();
+
+    /**
+     * @return the number of seconds to wait for the Chrome remote debugging service to responde before giving up
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.7
+     */
+    default int getChromeRemoteDebuggingTimeout()
+    {
+        return 10;
+    }
 
     /**
      * @return the base URI that the headless Chrome browser should use to access the XWiki instance (i.e. the print

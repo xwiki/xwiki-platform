@@ -42,6 +42,10 @@
 #if($services.security.authorization.hasAccess('admin') &amp;&amp; $services.extension.index.security.isSecurityScanEnabled())
 #set($discard = $xwiki.ssx.use("XWiki.Extension.Security.Code.Admin"))
 
+{{warning}}
+  {{translation key="extension.security.experimental.warning" /}}
+{{/warning}}
+
 {{html clean='false' wiki='true'}}
 &lt;ul class="nav nav-tabs" role="tablist"&gt;
   &lt;li role="presentation" class="active"&gt;&lt;a href="#extension-vulnerabilities" aria-controls="extension-vulnerabilities" role="tab" data-toggle="tab"&gt;Extension Vulnerabilities&lt;/a&gt;&lt;/li&gt;
@@ -58,7 +62,8 @@
   source="extensionSecurity"
   sourceParameters="isFromEnvironment=false"
   properties="name,wikis,maxCVSS,cveID,fixVersion,advice"
-  showPageSizeDropdown="false"}}
+  showPageSizeDropdown="false"
+  sort="name:asc"}}
 {{/liveData}}
 
 &lt;/div&gt;
@@ -67,15 +72,16 @@
 
 (((&amp;nbsp;)))
 {{warning}}
-$escapetool.xml($services.localization.render('extension.security.admin.environment.explanation'))
+{{translation key='extension.security.admin.environment.explanation'/}}
 {{/warning}}
 
 {{liveData
   id="environment-vulnerabilities-list"
   source="extensionSecurity"
   sourceParameters="isFromEnvironment=true"
-  properties="name,wikis,maxCVSS,cveID,fixVersion"
-  showPageSizeDropdown="false"}}
+  properties="name,wikis,maxCVSS,cveID,fixVersion,advice"
+  showPageSizeDropdown="false"
+  sort="name:asc"}}
 {{/liveData}}
 
   &lt;/div&gt;
@@ -98,10 +104,10 @@ $escapetool.xml($services.localization.render('extension.security.admin.environm
       #else
         $escapetool.xml($services.localization.render('extension.security.indexed.on', [$xwiki.formatDate($indexJobStatus.startDate)]))
       #end
+&lt;/div&gt;
     #else
       &lt;div class="box warningmessage"&gt;$escapetool.xml($services.localization.render('extension.security.indexed.nojob'))&lt;/div&gt;
     #end
-  &lt;/div&gt;
   {{/html}}
 #end
 {{/velocity}}

@@ -52,14 +52,18 @@ import static org.xwiki.wiki.test.po.WikiIndexPage.WIKI_NAME_COLUMN_LABEL;
 @UITest(
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        // Deleting a wiki through a script service currently requires that the document hold the script
+        // has programming rights, see https://tinyurl.com/2p8u5mhu
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:WikiManager\\.DeleteWiki"
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
-        // Notifications, as otherwise even streams won't have a store.
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
+        // We need it since the Tag UI requires Notifications, as otherwise even streams won't have a store.
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",

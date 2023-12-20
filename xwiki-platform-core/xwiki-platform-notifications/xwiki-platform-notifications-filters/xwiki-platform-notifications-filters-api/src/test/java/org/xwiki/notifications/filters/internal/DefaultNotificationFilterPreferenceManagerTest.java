@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -151,7 +151,7 @@ public class DefaultNotificationFilterPreferenceManagerTest
     {
         filterPreferenceManager.deleteFilterPreference(testUser, "myFilter");
 
-        verify(testProvider, times(1)).deleteFilterPreference(eq(testUser), eq("myFilter"));
+        verify(testProvider).deleteFilterPreferences(testUser, Set.of("myFilter"));
     }
 
     @Test
@@ -185,5 +185,30 @@ public class DefaultNotificationFilterPreferenceManagerTest
         // Checks
         verify(provider1).setStartDateForUser(eq(user), eq(date));
         verify(provider2).setStartDateForUser(eq(user), eq(date));
+    }
+
+    @Test
+    void saveFilterPreferences() throws Exception
+    {
+        DocumentReference user = new DocumentReference("subwiki", "XWiki", "Foo");
+        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class, "pref1");
+        NotificationFilterPreference pref2 = mock(NotificationFilterPreference.class, "pref2");
+        NotificationFilterPreference pref3 = mock(NotificationFilterPreference.class, "pref3");
+
+        String providerName1 = "providerName1";
+        String providerName2 = "providerName2";
+
+        NotificationFilterPreferenceProvider provider1 =
+            this.componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
+        NotificationFilterPreferenceProvider provider2 =
+            this.componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
+
+        when(pref1.getProviderHint()).thenReturn(providerName1);
+        when(pref2.getProviderHint()).thenReturn(providerName2);
+        when(pref3.getProviderHint()).thenReturn(providerName1);
+
+        this.filterPreferenceManager.saveFilterPreferences(user, Set.of(pref1, pref2, pref3));
+        verify(provider1).saveFilterPreferences(user, Set.of(pref1, pref3));
+        verify(provider2).saveFilterPreferences(user, Set.of(pref2));
     }
 }

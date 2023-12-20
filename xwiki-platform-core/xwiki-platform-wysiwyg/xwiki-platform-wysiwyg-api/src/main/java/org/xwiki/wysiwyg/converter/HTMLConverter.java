@@ -22,7 +22,6 @@ package org.xwiki.wysiwyg.converter;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Converts HTML to/from a specified syntax.
@@ -70,7 +69,6 @@ public interface HTMLConverter
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     default String toHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
         return toHTML(source, syntax, sourceReference);
@@ -123,7 +121,6 @@ public interface HTMLConverter
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     default String parseAndRender(String html, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
         return parseAndRender(html, syntax, sourceReference);

@@ -51,12 +51,13 @@ image.lightbox.imageId.copy.copied=Скопійовано в буфер обмі
 image.lightbox.imageId.permalink=Постійне посилання
 image.lightbox.date.label=Дата
 image.lightbox.download.title=Скачати
-### Missing: image.lightbox.escape.title=Escape
+image.lightbox.escape.title=Уникнення
 image.lightbox.fileName.label=Ім'я файлу
 image.lightbox.fullscreen.title=Повноекранний
 image.lightbox.gallery.title=Галерея зображень
 image.lightbox.nextSlide.title=Наступне зображення
 image.lightbox.prevSlide.title=Попереднє зображення
 image.lightbox.publisher.label=Редактор зображення
+image.lightbox.toggler.label=Відкрити дії зображення
 </content>
-  </xwikidoc>
+</xwikidoc>

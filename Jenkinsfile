@@ -99,6 +99,12 @@ def builds = [
       mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
+  'Flavor Test - Security' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Security',
+      pom: 'xwiki-platform-distribution-flavor-test-security/pom.xml'
+    )
+  },
   'TestRelease': {
     build(
       name: 'TestRelease',
@@ -110,8 +116,7 @@ def builds = [
   'Quality' : {
     // Run the quality checks.
     // Sonar notes:
-    // - we need sonar:sonar to perform the analysis
-    // - we need sonar = true to push the analysis to Sonarcloud
+    // - we need sonar:sonar to perform the analysis and push the results to Sonarcloud
     // - we need jacoco:report to execute jacoco and compute test coverage
     // - we need -Pcoverage and -Dxwiki.jacoco.itDestFile to tell Jacoco to compute a single global Jacoco
     //   coverage for the full reactor (so that the coverage percentage computed takes into account module tests
@@ -120,8 +125,7 @@ def builds = [
       name: 'Quality',
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy,coverage',
-      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec',
-      sonar: true
+      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec'
     )
   }
 ]
@@ -210,6 +214,10 @@ private void buildStandardAll(builds)
             'flavor-test-upgrade': {
               // Run the Flavor Upgrade tests
               builds['Flavor Test - Upgrade'].call()
+            },
+            'flavor-test-security': {
+              // Run the Flavor Security tests
+              builds['Flavor Test - Security'].call()
             }
           )
         }

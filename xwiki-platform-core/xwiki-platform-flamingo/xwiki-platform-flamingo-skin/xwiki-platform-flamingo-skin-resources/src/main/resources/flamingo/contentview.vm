@@ -40,7 +40,8 @@ $services.progress.endStep()
 ## Display the title
 ## ----------------------------
 $services.progress.startStep('Display the title and content')
-<div class="xcontent">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea" class="xcontent">
   #template('contentheader.vm')
   #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.content.header.after'))
     $services.rendering.render($uix.execute(), 'xhtml/1.0')
@@ -62,7 +63,11 @@ $services.progress.startStep('Display the title and content')
       #end
     </div>
   </div>
-</div>
+  #if ($isPreview)
+    <hr />
+    <div class="bottombuttons sticky-buttons">#template("previewactions.vm")</div>
+  #end
+</main>
 $services.progress.endStep()
 
 ## -----------------------------------------------------------------------------------

@@ -85,6 +85,7 @@ Link to [[child page&gt;&gt;.Child.WebHome]].
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -149,6 +150,46 @@ Link to [[child page&gt;&gt;.Child.WebHome]].
     </property>
     <property>
       <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>PDFExportIT.Parent.WebHome</name>
+    <number>0</number>
+    <className>XWiki.TagClass</className>
+    <guid>135dad13-805c-404a-bd80-cf062a5e6af3</guid>
+    <class>
+      <name>XWiki.TagClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <tags>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>tags</name>
+        <number>1</number>
+        <prettyName>Tags</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator>|</separator>
+        <separators>|,</separators>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </tags>
+    </class>
+    <property>
+      <tags>
+        <value>science</value>
+        <value>technology</value>
+      </tags>
     </property>
   </object>
 </xwikidoc>

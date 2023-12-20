@@ -19,14 +19,20 @@
  */
 package org.xwiki.export.pdf.job;
 
+import java.io.Serializable;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.xwiki.job.Request;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a request to export multiple XWiki documents as PDF.
@@ -35,7 +41,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4.2
  * @since 14.5
  */
-@Unstable
 public class PDFExportJobRequest extends AbstractCheckRightsRequest
 {
     /**
@@ -62,6 +67,12 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     private static final String PROPERTY_FILE_NAME = "fileName";
 
     private static final String PROPERTY_BASE_URL = "baseURL";
+
+    private static final String CONTEXT_REQUEST_URL = "request.url";
+
+    private static final String CONTEXT_REQUEST_PARAMETERS = "request.parameters";
+
+    private static final String CONTEXT_SHEET = "sheet";
 
     /**
      * Default constructor.
@@ -273,6 +284,9 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
      * relative URLs are by default resolved relative to the print preview URL which uses the {@code export} action and
      * has a long query string that is specific to PDF export. This means relative URLs may be resolved using the
      * {@code export} action and some strange query string if the base URL is not set.
+     * <p>
+     * Note that the base URL is also used as the current request URL when rendering the documents server-side in the
+     * PDF export job.
      * 
      * @param baseURL the base URL used to resolve URLs in the exported content
      * @since 14.10.6
@@ -281,5 +295,43 @@ public class PDFExportJobRequest extends AbstractCheckRightsRequest
     public void setBaseURL(URL baseURL)
     {
         setProperty(PROPERTY_BASE_URL, baseURL);
+
+        Map<String, Serializable> context = getContext();
+        if (context != null) {
+            // Cleanup first.
+            context.keySet().removeAll(List.of(CONTEXT_REQUEST_URL, CONTEXT_REQUEST_PARAMETERS, CONTEXT_SHEET));
+
+            // Update the request URL and parameters used when rendering the documents in the PDF export job.
+            if (baseURL != null) {
+                context.put(CONTEXT_REQUEST_URL, baseURL);
+                Map<String, String[]> parameters = getRequestParameters(baseURL.getQuery());
+                context.put(CONTEXT_REQUEST_PARAMETERS, (Serializable) parameters);
+
+                // Overwrite the context sheet with the sheet specified in the base URL, because we want to apply the
+                // sheet that was used in view mode when the user asked for a PDF export.
+                if (parameters.containsKey(CONTEXT_SHEET)) {
+                    // If the sheet request parameter is present then it must have at least one value. The first value
+                    // is used.
+                    context.put(CONTEXT_SHEET, parameters.get(CONTEXT_SHEET)[0]);
+                }
+            }
+        }
+    }
+
+    private Map<String, String[]> getRequestParameters(String queryString)
+    {
+        Map<String, List<String>> params = new LinkedHashMap<>();
+        for (NameValuePair pair : URLEncodedUtils.parse(queryString, StandardCharsets.UTF_8)) {
+            List<String> values = params.getOrDefault(pair.getName(), new ArrayList<>());
+            values.add(pair.getValue());
+            params.put(pair.getName(), values);
+        }
+
+        Map<String, String[]> parameters = new LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> entry : params.entrySet()) {
+            parameters.put(entry.getKey(), entry.getValue().toArray(new String[entry.getValue().size()]));
+        }
+
+        return parameters;
     }
 }

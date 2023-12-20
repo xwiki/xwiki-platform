@@ -156,6 +156,10 @@ public class DefaultGroupManager implements GroupManager
     public Collection<DocumentReference> getGroups(DocumentReference reference, Object wikiTarget, boolean recurse)
         throws GroupException
     {
+        // Guest user never belongs to any group.
+        if (reference == null) {
+            return Collections.emptyList();
+        }
         return getGroups(reference, wikiTarget, recurse, null);
     }
 

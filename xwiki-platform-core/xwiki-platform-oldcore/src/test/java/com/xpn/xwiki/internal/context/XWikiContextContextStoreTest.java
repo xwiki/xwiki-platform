@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -150,9 +151,10 @@ class XWikiContextContextStoreTest
         Map<String, List<String>> headers = new LinkedHashMap<>();
         headers.put("User-Agent", Collections.singletonList("test"));
         headers.put("X-Color", Arrays.asList("blue", "green"));
+        HttpSession session = mock(HttpSession.class);
         XWikiServletRequestStub request = new XWikiServletRequestStub.Builder().setRequestURL(this.wikiURL)
             .setContextPath("/test").setRequestParameters(parameters).setCookies(cookies).setHeaders(headers)
-            .setRemoteAddr("172.12.0.2").build();
+            .setRemoteAddr("172.12.0.2").setHttpSession(session).build();
         this.oldcore.getXWikiContext().setRequest(request);
 
         Map<String, Serializable> contextStore = new HashMap<>();
@@ -161,7 +163,7 @@ class XWikiContextContextStoreTest
 
         this.store.save(contextStore, Arrays.asList(XWikiContextContextStore.PREFIX_PROP_REQUEST));
 
-        assertEquals(6, contextStore.size());
+        assertEquals(7, contextStore.size());
         assertEquals(this.wikiURL.toString(), contextStore.get(XWikiContextContextStore.PROP_REQUEST_URL).toString());
         assertEquals("/test", contextStore.get(XWikiContextContextStore.PROP_REQUEST_CONTEXTPATH));
 
@@ -179,6 +181,10 @@ class XWikiContextContextStoreTest
 
         assertEquals(headers, contextStore.get(XWikiContextContextStore.PROP_REQUEST_HEADERS));
         assertEquals("172.12.0.2", contextStore.get(XWikiContextContextStore.PROP_REQUEST_REMOTE_ADDR));
+
+        assertEquals(session,
+            ((SerializableHttpSessionWrapper) contextStore.get(XWikiContextContextStore.PROP_REQUEST_SESSION))
+                .getSession());
 
         // Restore
 
@@ -199,6 +205,7 @@ class XWikiContextContextStoreTest
         assertEquals("red", request.getCookie("color").getValue());
         assertEquals(1, request.getCookies().length);
         assertEquals("172.12.0.2", request.getRemoteAddr());
+        assertEquals(session, request.getSession());
     }
 
     @Test

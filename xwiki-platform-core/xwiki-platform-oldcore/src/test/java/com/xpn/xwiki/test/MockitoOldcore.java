@@ -20,7 +20,9 @@
 package com.xpn.xwiki.test;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -45,6 +47,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -108,6 +111,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
@@ -193,6 +197,8 @@ public class MockitoOldcore
     private ScriptContext scriptContext;
 
     private Environment environment;
+
+    private XWikiEngineContext engineContext;
 
     private DocumentAccessBridge documentAccessBridge;
 
@@ -349,9 +355,7 @@ public class MockitoOldcore
 
         // Make sure a "xwikicfg" ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT)) {
-            this.xwikicfgConfigurationSource = new MockConfigurationSource();
-            getMocker().registerComponent(MockConfigurationSource.getDescriptor(XWikiCfgConfigurationSource.ROLEHINT),
-                this.xwikicfgConfigurationSource);
+            registerMockXWikiCfg();
         }
         // Make sure a "wiki" ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class, "wiki")) {
@@ -366,6 +370,13 @@ public class MockitoOldcore
                 this.spaceConfigurationSource);
         }
 
+        // Make sure a CacheControl is available by default
+        if (!getMocker().hasComponent(CacheControl.class)) {
+            CacheControl cacheControl = getMocker().registerMockComponent(CacheControl.class);
+            // Allow caching by default since it's the most common case
+            when(cacheControl.isCacheReadAllowed((ChronoLocalDateTime) any())).thenReturn(true);
+        }
+
         // Expose a XWikiStubContextProvider if none is exist
         if (!getMocker().hasComponent(XWikiStubContextProvider.class)) {
             XWikiStubContextProvider conetxtProvider =
@@ -376,7 +387,9 @@ public class MockitoOldcore
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         if (getMocker().hasComponent(Environment.class)) {
-            if (getMocker().getInstance(Environment.class) instanceof ServletEnvironment) {
+            this.environment = getMocker().getInstance(Environment.class);
+
+            if (this.environment instanceof ServletEnvironment) {
                 ServletEnvironment servletEnvironment = getMocker().getInstance(Environment.class);
 
                 ServletContext servletContextMock = mock(ServletContext.class);
@@ -394,6 +407,29 @@ public class MockitoOldcore
         } else {
             // Automatically register an Environment when none is available since it's a very common need
             registerMockEnvironment();
+        }
+
+        // Provide a engineContext
+        this.engineContext = this.spyXWiki.getEngineContext();
+        if (this.engineContext == null) {
+            this.engineContext = mock();
+            this.spyXWiki.setEngineContext(this.engineContext);
+            when(this.engineContext.getResource(any())).thenAnswer(new Answer<URL>()
+            {
+                @Override
+                public URL answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return environment.getResource(invocation.getArgument(0));
+                }
+            });
+            when(this.engineContext.getResourceAsStream(any())).thenAnswer(new Answer<InputStream>()
+            {
+                @Override
+                public InputStream answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return environment.getResourceAsStream(invocation.getArgument(0));
+                }
+            });
         }
 
         // Initialize XWikiContext provider
@@ -1318,6 +1354,18 @@ public class MockitoOldcore
     public MemoryConfigurationSource getConfigurationSource()
     {
         return this.configurationSource;
+    }
+
+    /**
+     * @since 15.9RC1
+     */
+    public MemoryConfigurationSource registerMockXWikiCfg()
+    {
+        this.xwikicfgConfigurationSource = new MockConfigurationSource();
+        getMocker().registerComponent(MockConfigurationSource.getDescriptor(XWikiCfgConfigurationSource.ROLEHINT),
+            this.xwikicfgConfigurationSource);
+
+        return this.xwikicfgConfigurationSource;
     }
 
     /**

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.DefaultWYSIWYGEditorConfig" locale="">
+<xwikidoc version="1.5" reference="XWiki.DefaultWYSIWYGEditorConfig" locale="">
   <web>XWiki</web>
   <name>DefaultWYSIWYGEditorConfig</name>
   <language/>
@@ -66,18 +66,20 @@
 #end
 
 #macro (configureDefaultEditor $editors $defaultEditor)
+  #set ($escapedFieldName = $escapetool.xml($fieldName))
   &lt;dt&gt;
-    &lt;label for="$fieldName"&gt;
+    &lt;label for="$escapedFieldName"&gt;
       #set ($key = "edit.defaultEditor.$dataTypeValue.replace('#', '.')")
-      $services.localization.render($key)
+      $escapetool.xml($services.localization.render($key))
     &lt;/label&gt;
-    &lt;span class="xHint"&gt;$services.localization.render("${key}.hint")&lt;/span&gt;
+    &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("${key}.hint"))&lt;/span&gt;
   &lt;/dt&gt;
   &lt;dd&gt;
     ## Add the configuration object if it doesn't exist.
     &lt;input type="hidden" name="objectPolicy" value="updateOrCreate" /&gt;
-    &lt;input type="hidden" name="${editorBindingClassName}_${objectNumber}_dataType" value="$dataTypeValue" /&gt;
-    &lt;select id="$fieldName" name="$fieldName"&gt;
+    &lt;input type="hidden" name="$escapetool.xml("${editorBindingClassName}_${objectNumber}_dataType")"
+      value="$escapetool.xml($dataTypeValue)" /&gt;
+    &lt;select id="$escapedFieldName" name="$escapedFieldName"&gt;
       ## This option is needed in order to allow the user to reset the default editor and inherit the configuration from
       ## the parent configuration source.
       &lt;option value=""&gt;---&lt;/option&gt;
@@ -111,7 +113,7 @@
 {{html clean="false"}}
 &lt;!-- The tabs used to show the configuration properties for each editor. --&gt;
 &lt;ul class="nav nav-tabs" role="tablist"
-    data-defaultEditorId="$!services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id"&gt;
+    data-defaultEditorId="$!escapetool.xml($services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id)"&gt;
   &lt;li role="presentation" class="hidden"&gt;
     &lt;a href="#tab-pane-template" aria-controls="tab-pane-template" role="tab" data-toggle="tab"&gt;&lt;/a&gt;
   &lt;/li&gt;
@@ -429,6 +431,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -555,6 +558,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -623,7 +627,7 @@
       <code>/* Show only the generic form while the page is loading. The other forms, which have editor specific configuration
   properties, will be moved into tabs by the JavaScript code. */
 #admin-page-content .codeToExecute &gt; form,
-#admin-page-content &gt; h1.wikigeneratedheader {
+#admin-page-content &gt; h2.wikigeneratedheader {
   display: none;
 }
 #admin-page-content .codeToExecute &gt; form#wysiwyg {

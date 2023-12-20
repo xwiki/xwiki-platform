@@ -56,7 +56,7 @@ public class GroovyMacroPermissionPolicy extends AbstractScriptMacroPermissionPo
     public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
     {
         boolean hasPermission;
-        if (this.configuration.getCompilationCustomizerNames().contains("secure")) {
+        if (isSecureCompilationCustomizerEnabled()) {
             // If we are not running in a restricted context and we have the script right, the macro may run, but
             // security will be delegated to the Groovy Secure Customizer.
             hasPermission =
@@ -65,5 +65,24 @@ public class GroovyMacroPermissionPolicy extends AbstractScriptMacroPermissionPo
             hasPermission = super.hasPermission(parameters, context);
         }
         return hasPermission;
+    }
+
+    @Override
+    public Right getRequiredRight(ScriptMacroParameters parameters)
+    {
+        Right requiredRight;
+
+        if (isSecureCompilationCustomizerEnabled()) {
+            requiredRight = Right.SCRIPT;
+        } else {
+            requiredRight = super.getRequiredRight(parameters);
+        }
+
+        return requiredRight;
+    }
+
+    private boolean isSecureCompilationCustomizerEnabled()
+    {
+        return this.configuration.getCompilationCustomizerNames().contains("secure");
     }
 }

@@ -32,15 +32,31 @@ import org.xwiki.test.ui.po.Select;
  */
 public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectionPage
 {
+    private static final String SECTION_ID = "WYSIWYG";
+
     /**
      * The drop down used to select the default WYSIWYG editor.
      */
     @FindBy(name = "XWiki.EditorBindingClass_0_roleHint")
     private WebElement defaultWYSIWYGEditorSelect;
 
+    @FindBy(css = "form#wysiwyg input[name='formactionsac'][type='submit']")
+    private WebElement saveButton;
+
+    /**
+     * Open the WYSIWYG editor administration section.
+     * 
+     * @return the WYSIWYG editor administration section
+     */
+    public static WYSIWYGEditorAdministrationSectionPage gotoPage()
+    {
+        AdministrationSectionPage.gotoPage(SECTION_ID);
+        return new WYSIWYGEditorAdministrationSectionPage();
+    }
+
     public WYSIWYGEditorAdministrationSectionPage()
     {
-        super("WYSIWYG");
+        super(SECTION_ID);
     }
 
     /**
@@ -51,6 +67,14 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
     public Select getDefaultWYSIWYGEditorSelect()
     {
         return new Select(this.defaultWYSIWYGEditorSelect);
+    }
+
+    public WYSIWYGEditorAdministrationSectionPage setDefaultWYSIWYGEditor(String editorName)
+    {
+        getDefaultWYSIWYGEditorSelect().selectByVisibleText(editorName);
+        // The save action reloads the page.
+        this.saveButton.click();
+        return new WYSIWYGEditorAdministrationSectionPage();
     }
 
     /**

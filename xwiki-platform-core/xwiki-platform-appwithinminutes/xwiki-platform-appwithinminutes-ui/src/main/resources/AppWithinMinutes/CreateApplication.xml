@@ -57,7 +57,7 @@
     &lt;ul class="steps vertical"&gt;
       #foreach($step in $awmSteps)
         &lt;li&gt;
-          &lt;span class="number"&gt;$mathtool.add($foreach.index, 1)&lt;/span&gt;
+          &lt;span class="btn btn-xs number"&gt;$mathtool.add($foreach.index, 1)&lt;/span&gt;
           &lt;span class="name"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.name")&lt;/span&gt;
           &lt;span class="description"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.description")&lt;/span&gt;
         &lt;/li&gt;

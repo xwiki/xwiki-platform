@@ -25,11 +25,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.skin.ResourceRepository;
@@ -37,6 +41,7 @@ import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -49,23 +54,31 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public abstract class AbstractSkinResource extends AbstractResource<InputSource>
 {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinResource.class);
+
+    protected Environment environment;
+
     protected Provider<XWikiContext> xcontextProvider;
 
     protected URLConfiguration urlConfiguration;
 
     /**
      * Default constructor.
-     *
+     * 
+     * @param id the identifier of the resource
      * @param path the path of the resource in the skin (for instance, {@code "/templates/display.vm"})
      * @param resourceName the name of the resource (for instance, {@code "display.vm"})
      * @param repository the resource repository, used to access the respository's id
+     * @param environment the environment used to resolve the resources
      * @param xcontextProvider the context provider, used to access the context when resolving the resources URLs
      * @param urlConfiguration the url configuration, used when resolving the resources URLs
      */
-    public AbstractSkinResource(String path, String resourceName, ResourceRepository repository,
-        Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
+    protected AbstractSkinResource(String id, String path, String resourceName, ResourceRepository repository,
+        Environment environment, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
-        super(path, path, resourceName, repository);
+        super(id, path, resourceName, repository);
+
+        this.environment = environment;
         this.xcontextProvider = xcontextProvider;
         this.urlConfiguration = urlConfiguration;
     }
@@ -83,6 +96,12 @@ public abstract class AbstractSkinResource extends AbstractResource<InputSource>
     }
 
     @Override
+    public Instant getInstant() throws Exception
+    {
+        return InternalTemplateManager.getResourceInstant(this.environment, getPath());
+    }
+
+    @Override
     public String getURL(boolean forceSkinAction) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -90,7 +109,7 @@ public abstract class AbstractSkinResource extends AbstractResource<InputSource>
         Map<String, Object> parameters = new LinkedHashMap<>();
         if (getURLConfiguration().useResourceLastModificationDate()) {
             try {
-                URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());
+                URL resourceUrl = this.environment.getResource(this.getPath());
                 Path resourcePath = Paths.get(resourceUrl.toURI());
                 FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
                 parameters.put(XWiki.CACHE_VERSION, String.valueOf(lastModifiedTime.toMillis()));

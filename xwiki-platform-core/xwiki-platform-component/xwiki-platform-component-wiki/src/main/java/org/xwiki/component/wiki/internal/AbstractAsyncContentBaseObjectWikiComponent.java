@@ -20,14 +20,19 @@
 package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 
-import org.xwiki.component.manager.ComponentLookupException;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.Transformation;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -40,39 +45,89 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public abstract class AbstractAsyncContentBaseObjectWikiComponent extends AbstractAsyncBaseObjectWikiComponent
 {
-    protected final ContentParser parser;
+    @Inject
+    protected ContentParser parser;
 
-    protected final XDOM xdom;
+    @Inject
+    protected ComponentManager componentManager;
 
-    protected final Syntax syntax;
+    @Inject
+    protected BlockAsyncRendererExecutor executor;
 
-    protected final ComponentManager componentManager;
+    @Inject
+    @Named("macro")
+    protected Transformation macroTransformation;
 
-    protected final BlockAsyncRendererExecutor executor;
+    @Inject
+    protected CacheControl cacheControl;
 
-    /**
-     * @param baseObject the object containing ui extension setup
-     * @param roleType the role Type implemented
-     * @param roleHint the role hint for this role implementation
-     * @param componentManager The XWiki content manager
-     * @throws ComponentLookupException If module dependencies are missing
-     * @throws WikiComponentException When failing to parse content
-     */
-    public AbstractAsyncContentBaseObjectWikiComponent(BaseObject baseObject, Type roleType, String roleHint,
-        ComponentManager componentManager) throws ComponentLookupException, WikiComponentException
+    protected XDOM xdom;
+
+    protected Syntax syntax;
+
+    protected volatile XDOM preparedXDOM;
+
+    protected volatile LocalDateTime preparedXDOMDate;
+
+    @Override
+    protected void initialize(BaseObject baseObject, Type roleType, String roleHint) throws WikiComponentException
     {
-        super(baseObject, roleType, roleHint);
-
-        this.componentManager = componentManager;
-        this.executor = componentManager.getInstance(BlockAsyncRendererExecutor.class);
+        super.initialize(baseObject, roleType, roleHint);
 
         XWikiDocument ownerDocument = baseObject.getOwnerDocument();
 
-        this.parser = componentManager.getInstance(ContentParser.class);
-
         this.syntax = ownerDocument.getSyntax();
         String content = baseObject.getStringValue(getContentPropertyName());
-        this.xdom = this.parser.parse(content, syntax, ownerDocument.getDocumentReference());
+
+        // Parse the content
+        this.xdom = this.parser.parse(content, this.syntax, ownerDocument.getDocumentReference());
+    }
+
+    /**
+     * @return the content as {@link XDOM}
+     * @since 15.10RC1
+     */
+    public XDOM getSourceContent()
+    {
+        return this.xdom;
+    }
+
+    /**
+     * @return the syntax which was used to parse the content
+     * @since 15.10RC1
+     */
+    public Syntax getSourceSyntax()
+    {
+        return this.syntax;
+    }
+
+    /**
+     * Prepare (if not already prepared), cache and return a prepared version of the XDOM.
+     * 
+     * @return the prepared {@link XDOM}
+     * @since 15.10RC1
+     */
+    public XDOM getPreparedContent()
+    {
+        // If the block is not prepared yet or if cache reset has been requested, prepare it
+        if (this.preparedXDOMDate == null || !this.cacheControl.isCacheReadAllowed(this.preparedXDOMDate)) {
+            synchronized (this.xdom) {
+                if (this.preparedXDOMDate == null || this.cacheControl.isCacheReadAllowed(this.preparedXDOMDate)) {
+                    // Clone the source content in cache the cache reset is forced
+                    // TODO: might be better (mainly in term of retained memory) to reload the content from the
+                    // document, instead
+                    this.preparedXDOM = this.xdom.clone();
+
+                    // Prepare the content
+                    this.macroTransformation.prepare(this.preparedXDOM);
+
+                    // Remember when it was prepared
+                    this.preparedXDOMDate = LocalDateTime.now();
+                }
+            }
+        }
+
+        return this.preparedXDOM;
     }
 
     /**

@@ -753,19 +753,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>panel-default-text</name>
-        <number>46</number>
-        <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
       <table-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -881,7 +868,7 @@
       <btn-info-bg/>
     </property>
     <property>
-      <btn-info-color/>
+      <btn-info-color>#000000</btn-info-color>
     </property>
     <property>
       <btn-primary-bg>#386da7</btn-primary-bg>
@@ -984,6 +971,9 @@
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
 
+/* Headings */
+@headings-font-weight: 500;
+
 /* Other */
 @well-bg: @body-bg;
 
@@ -1024,9 +1014,6 @@
       <panel-bg>#fafafa</panel-bg>
     </property>
     <property>
-      <panel-default-text/>
-    </property>
-    <property>
       <table-bg/>
     </property>
     <property>
@@ -1036,7 +1023,7 @@
       <table-border-color/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#222222</text-color>
     </property>
     <property>
       <xwiki-page-content-bg/>

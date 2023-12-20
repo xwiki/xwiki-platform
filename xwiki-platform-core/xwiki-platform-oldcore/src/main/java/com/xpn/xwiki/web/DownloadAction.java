@@ -52,7 +52,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWiki;
@@ -96,7 +95,6 @@ public class DownloadAction extends XWikiAction
      * Key of the forceDownload list in xwiki.properties.
      * @since 12.10
      */
-    @Unstable
     public static final String FORCE_DOWNLOAD_PROPERTY = "attachment.download.forceDownload";
 
     /** The URL part separator. */

@@ -129,16 +129,12 @@ class AttachmentIT
         assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
 
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
         attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).click();
         assertEquals("This is another small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
 
         // Upload another version of the first attachment
@@ -153,8 +149,6 @@ class AttachmentIT
         attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).click();
         assertEquals("This is a small attachment v2.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 

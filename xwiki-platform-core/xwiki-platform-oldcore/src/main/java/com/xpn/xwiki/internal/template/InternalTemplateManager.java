@@ -19,18 +19,24 @@
  */
 package com.xpn.xwiki.internal.template;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +51,19 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheControl;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
@@ -102,7 +116,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  */
 @Component(roles = InternalTemplateManager.class)
 @Singleton
-public class InternalTemplateManager implements Initializable
+public class InternalTemplateManager implements Initializable, Disposable
 {
     /**
      * The reference of the superadmin user.
@@ -173,15 +187,25 @@ public class InternalTemplateManager implements Initializable
     private Provider<ErrorBlockGenerator> errorBlockGeneratorProvider;
 
     @Inject
+    private CacheManager cacheManager;
+
+    @Inject
+    private CacheControl cacheControl;
+
+    @Inject
     private Logger logger;
 
     private String templateRootURL;
 
-    private static abstract class AbtractTemplate<T extends TemplateContent, R extends Resource<?>> implements Template
+    private Cache<Template> templateCache;
+
+    private abstract static class AbtractTemplate<T extends TemplateContent, R extends Resource<?>> implements Template
     {
         protected R resource;
 
         protected T content;
+
+        protected Instant instant;
 
         public AbtractTemplate(R resource)
         {
@@ -204,31 +228,54 @@ public class InternalTemplateManager implements Initializable
         public TemplateContent getContent() throws Exception
         {
             if (this.content == null) {
-                // TODO: work with streams instead of forcing String
-                String strinContent;
-
-                try (InputSource source = this.resource.getInputSource()) {
-                    if (source instanceof StringInputSource) {
-                        strinContent = source.toString();
-                    } else if (source instanceof ReaderInputSource) {
-                        strinContent = IOUtils.toString(((ReaderInputSource) source).getReader());
-                    } else if (source instanceof InputStreamInputSource) {
-                        // It's impossible to know the real attachment encoding, but let's assume that they respect the
-                        // standard and use UTF-8 (which is required for the files located on the filesystem)
-                        strinContent = IOUtils.toString(((InputStreamInputSource) source).getInputStream(),
-                            StandardCharsets.UTF_8);
-                    } else {
-                        return null;
-                    }
+                try {
+                    this.instant = this.resource.getInstant();
+                } catch (Exception e) {
+                    // Failed to get the resource instant, it's unknown
                 }
-
-                this.content = getContentInternal(strinContent);
+                this.content = loadContent();
+            } else if (this.instant != null) {
+                // Check if the resource has been modified
+                Instant resourceInstant = this.resource.getInstant();
+                if (resourceInstant.isAfter(this.instant)) {
+                    // The resource changed, reload it
+                    this.instant = resourceInstant;
+                    this.content = loadContent();
+                }
             }
 
             return this.content;
         }
 
+        protected T loadContent() throws Exception
+        {
+            String strinContent;
+
+            try (InputSource source = this.resource.getInputSource()) {
+                if (source instanceof StringInputSource) {
+                    strinContent = source.toString();
+                } else if (source instanceof ReaderInputSource) {
+                    strinContent = IOUtils.toString(((ReaderInputSource) source).getReader());
+                } else if (source instanceof InputStreamInputSource) {
+                    // It's impossible to know the real attachment encoding, but let's assume that they respect the
+                    // standard and use UTF-8 (which is required for the files located on the filesystem)
+                    strinContent =
+                        IOUtils.toString(((InputStreamInputSource) source).getInputStream(), StandardCharsets.UTF_8);
+                } else {
+                    return null;
+                }
+            }
+
+            return getContentInternal(strinContent);
+        }
+
         protected abstract T getContentInternal(String content) throws Exception;
+
+        @Override
+        public Instant getInstant()
+        {
+            return this.instant;
+        }
 
         @Override
         public String toString()
@@ -287,10 +334,10 @@ public class InternalTemplateManager implements Initializable
 
     private class StringTemplate extends DefaultTemplate
     {
-        StringTemplate(String content, DocumentReference authorReference, DocumentReference documentReference)
+        StringTemplate(String id, String content, DocumentReference authorReference, DocumentReference documentReference)
             throws Exception
         {
-            super(new StringResource(content));
+            super(new StringResource(id, content));
 
             // As StringTemplate extends DefaultTemplate, the TemplateContent is DefaultTemplateContent
             ((DefaultTemplateContent) this.getContent()).setAuthorReference(authorReference);
@@ -298,9 +345,8 @@ public class InternalTemplateManager implements Initializable
         }
     }
 
-    private class DefaultTemplateContent implements RawProperties, TemplateContent
+    class DefaultTemplateContent implements RawProperties, TemplateContent
     {
-        // TODO: work with streams instead
         protected String content;
 
         protected boolean authorProvided;
@@ -324,6 +370,8 @@ public class InternalTemplateManager implements Initializable
         public UniqueContext unique;
 
         protected Map<String, Object> properties = new HashMap<>();
+
+        protected Object compiledContent;
 
         DefaultTemplateContent(String content)
         {
@@ -548,6 +596,21 @@ public class InternalTemplateManager implements Initializable
     public void initialize() throws InitializationException
     {
         getTemplateRootPath();
+
+        // Initialize the filesystem template cache
+        try {
+            this.templateCache = cacheManager.createNewCache(new LRUCacheConfiguration("templates", 500));
+        } catch (CacheException e) {
+            this.logger.error("Failed to create the filesystem template cache", e);
+        }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        if (this.templateCache != null) {
+            this.templateCache.dispose();
+        }
     }
 
     private void checkRequirements(Template template) throws Exception
@@ -599,15 +662,13 @@ public class InternalTemplateManager implements Initializable
         return this.templateRootURL;
     }
 
-    private String getTemplateResourcePath(String templateName)
+    private boolean checkFilesystemTemplate(String templatePath)
     {
-        String templatePath = TEMPLATE_RESOURCE_SUFFIX + templateName;
-
         URL templateURL = this.environment.getResource(templatePath);
 
         // Check if the resource exist
         if (templateURL == null) {
-            return null;
+            return false;
         }
 
         // Prevent inclusion of templates from other directories
@@ -618,11 +679,11 @@ public class InternalTemplateManager implements Initializable
                 this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
                     templateURLString);
 
-                return null;
+                return false;
             }
         }
 
-        return templatePath;
+        return true;
     }
 
     private void renderError(Throwable throwable, boolean inline, Writer writer)
@@ -950,12 +1011,93 @@ public class InternalTemplateManager implements Initializable
         return targetSyntax != null ? targetSyntax : Syntax.PLAIN_1_0;
     }
 
-    private EnvironmentTemplate getFileSystemTemplate(String templateName)
+    private Template getFileSystemTemplate(String templateName)
     {
-        String path = getTemplateResourcePath(templateName);
+        String templatePath = TEMPLATE_RESOURCE_SUFFIX + templateName;
 
-        return path != null ? new EnvironmentTemplate(new TemplateSkinResource(path, templateName, this.environment))
-            : null;
+        String templateId = TemplateSkinResource.createId(templatePath);
+
+        if (!checkFilesystemTemplate(templatePath)) {
+            // Force invalidating the potentially cached template since it's not valid anymore
+            this.templateCache.remove(templateId);
+
+            return null;
+        }
+
+        // Try the cache
+        Template template = getCachedTemplate(templateId, () -> getResourceInstant(this.environment, templatePath));
+
+        // Create a new instance if it could not be found in the cache
+        if (template == null) {
+            template = new EnvironmentTemplate(new TemplateSkinResource(templatePath, templateName, this.environment));
+
+            if (this.templateCache != null) {
+                this.templateCache.set(templateId, template);
+            }
+        }
+
+        return template;
+    }
+
+    private Template getTemplate(Resource<?> resource)
+    {
+        // Try the cache
+        Template template = getCachedTemplate(resource.getId(), resource::getInstant);
+
+        if (template == null) {
+            if (resource instanceof AbstractSkinResource) {
+                template = new EnvironmentTemplate((AbstractSkinResource) resource);
+            } else {
+                template = new DefaultTemplate(resource);
+            }
+
+            if (this.templateCache != null) {
+                this.templateCache.set(resource.getId(), template);
+            }
+        }
+
+        return template;
+    }
+
+    private Template getCachedTemplate(String id, Callable<Instant> resourceInstantProvider)
+    {
+        Template template = null;
+
+        if (this.templateCache != null) {
+            template = this.templateCache.get(id);
+
+            // Check if the cached template is older than the actual resource last modification
+            if (template != null) {
+                Instant instant = template.getInstant();
+
+                try {
+                    if (instant != null && instant.isBefore(resourceInstantProvider.call())) {
+                        template = null;
+                    }
+                } catch (Exception e) {
+                    this.logger.warn("Failed to get the instant for resource with idenfier [{}]: {}", id,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+
+            // Check if it's allowed to use the cached value
+            if (template != null) {
+                Instant templateInstant = template.getInstant();
+                if (templateInstant != null) {
+                    // The template date is known, compare it to the cache clean date
+                    if (!this.cacheControl.isCacheReadAllowed(Date.from(templateInstant))) {
+                        template = null;
+                    }
+                } else {
+                    // The template date is unknown
+                    if (this.cacheControl.isCacheReadAllowed()) {
+                        template = null;
+                    }
+                }
+            }
+        }
+
+        return template;
     }
 
     private Template getClassloaderTemplate(String prefixPath, String templateName)
@@ -981,24 +1123,11 @@ public class InternalTemplateManager implements Initializable
         return url != null ? new ClassloaderTemplate(new ClassloaderResource(url, templateName)) : null;
     }
 
-    private Template createTemplate(Resource<?> resource)
-    {
-        Template template;
-
-        if (resource instanceof AbstractSkinResource) {
-            template = new EnvironmentTemplate((AbstractSkinResource) resource);
-        } else {
-            template = new DefaultTemplate(resource);
-        }
-
-        return template;
-    }
-
     public Template getResourceTemplate(String templateName, ResourceRepository repository)
     {
         Resource<?> resource = repository.getLocalResource(templateName);
         if (resource != null) {
-            return createTemplate(resource);
+            return getTemplate(resource);
         }
 
         return null;
@@ -1008,10 +1137,38 @@ public class InternalTemplateManager implements Initializable
     {
         Resource<?> resource = repository.getResource(templateName);
         if (resource != null) {
-            return createTemplate(resource);
+            return getTemplate(resource);
         }
 
         return null;
+    }
+
+    /**
+     * Search for a template of a given name only in the configured skin (or it's skin parents).
+     * 
+     * @param templateName the name of the template to search
+     * @return the found {@link Template} or null if no template associated with the passed name could be found
+     * @since 15.10RC1
+     */
+    public Template getSkinTemplate(String templateName)
+    {
+        Template template = null;
+
+        // Try from skin
+        Skin skin = this.skins.getCurrentSkin(false);
+        if (skin != null) {
+            template = getTemplate(templateName, skin);
+        }
+
+        // Try from base skin if no skin is set
+        if (skin == null) {
+            Skin baseSkin = this.skins.getCurrentParentSkin(false);
+            if (baseSkin != null) {
+                template = getTemplate(templateName, baseSkin);
+            }
+        }
+
+        return template;
     }
 
     public Template getTemplate(String templateName)
@@ -1048,17 +1205,28 @@ public class InternalTemplateManager implements Initializable
     /**
      * Create a new template using a given content and a specific author and source document.
      *
+     * @param id the identifier of the template
      * @param content the template content
      * @param author the template author
      * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
      *            test the author right)
      * @return the template
      * @throws Exception if an error occurred during template instantiation
-     * @since 14.0RC1
+     * @since 14.9
      */
-    public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+    public Template createStringTemplate(String id, String content, DocumentReference author, DocumentReference sourceReference)
         throws Exception
     {
-        return new StringTemplate(content, author, sourceReference);
+        return new StringTemplate(id, content, author, sourceReference);
+    }
+
+    public static Instant getResourceInstant(Environment environment, String path)
+        throws URISyntaxException, IOException
+    {
+        URL resourceUrl = environment.getResource(path);
+        Path resourcePath = Paths.get(resourceUrl.toURI());
+        FileTime lastModifiedTime = Files.getLastModifiedTime(resourcePath);
+
+        return lastModifiedTime.toInstant();
     }
 }

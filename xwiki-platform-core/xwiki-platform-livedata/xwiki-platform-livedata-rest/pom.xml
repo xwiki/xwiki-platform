@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.0.0-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-livedata-rest</artifactId>
@@ -70,8 +70,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb2-plugin</artifactId>
+        <groupId>org.jvnet.jaxb</groupId>
+        <artifactId>jaxb-maven-plugin</artifactId>
         <configuration>
           <generatePackage>org.xwiki.livedata.rest.model.jaxb</generatePackage>
           <!-- Make sure we don't regenerate / duplicate the xwiki-platform-rest-model classes. -->

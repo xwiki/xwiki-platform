@@ -600,7 +600,7 @@ public class BasePage extends BaseElement
     public String getErrorContent()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
             .getText();
     }
 
@@ -612,7 +612,7 @@ public class BasePage extends BaseElement
     public boolean hasLeftPanel(String panelTitle)
     {
         return getDriver().hasElementWithoutWaiting(
-            By.xpath("//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle + "']"));
+            By.xpath("//div[@id = 'leftPanels']/div/h2[@class = 'xwikipaneltitle' and text() = '" + panelTitle + "']"));
     }
 
     public boolean isForbidden()
@@ -634,7 +634,7 @@ public class BasePage extends BaseElement
     public String getXWikiMessageContent()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
             .getText();
     }
 

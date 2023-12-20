@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -37,7 +39,9 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -66,6 +70,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
+@ComponentList(DefaultWikiMacro.class)
 class DefaultWikiMacroFactoryTest
 {
     private final static DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
@@ -82,6 +87,10 @@ class DefaultWikiMacroFactoryTest
 
     @MockComponent
     private ContentParser contentParser;
+
+    @MockComponent
+    @Named("macro")
+    protected Transformation macroTransformation;
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;

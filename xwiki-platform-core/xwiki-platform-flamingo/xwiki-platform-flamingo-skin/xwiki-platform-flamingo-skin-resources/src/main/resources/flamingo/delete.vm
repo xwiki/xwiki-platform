@@ -41,16 +41,17 @@
 #macro(displayContent $deletecontent)
 #template("startpage.vm")
 <div class="main">
-  <div id="mainContentArea">
-    #template("hierarchy.vm")
-    #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
-    #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
-    <div class="xcontent">
-      #template('contentheader.vm')
-      $deletecontent
-      <div class="clearfloats"></div>
-    </div> ## xcontent
-  </div>## mainContentArea
+  #template("hierarchy.vm")
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
+  #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
+  #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
+  <div class="xcontent">
+    #template('contentheader.vm')
+    $deletecontent
+    <div class="clearfloats"></div>
+  </div> ## xcontent
+  </main> ##mainContentArea
 </div>## main
 #template("endpage.vm")
 #end

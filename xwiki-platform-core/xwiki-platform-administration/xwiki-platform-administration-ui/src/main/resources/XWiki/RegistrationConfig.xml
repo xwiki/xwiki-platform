@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.RegistrationConfig" locale="">
+<xwikidoc version="1.5" reference="XWiki.RegistrationConfig" locale="">
   <web>XWiki</web>
   <name>RegistrationConfig</name>
   <language/>
@@ -338,35 +338,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </heading>
-      <liveValidation_defaultFieldOkMessage>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <hint/>
-        <name>liveValidation_defaultFieldOkMessage</name>
-        <number>4</number>
-        <picker>0</picker>
-        <prettyName>Default field okay message</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </liveValidation_defaultFieldOkMessage>
-      <liveValidation_enabled>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <hint/>
-        <name>liveValidation_enabled</name>
-        <number>3</number>
-        <prettyName>Enable Javascript field validation</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </liveValidation_enabled>
       <loginButton_autoLogin_enabled>
         <customDisplay/>
         <defaultValue/>
@@ -481,6 +452,7 @@
         <number>9</number>
         <picker>0</picker>
         <prettyName>Registration Successful Message</prettyName>
+        <restricted>0</restricted>
         <rows>12</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -513,6 +485,7 @@
         <number>2</number>
         <picker>0</picker>
         <prettyName>Welcome message</prettyName>
+        <restricted>0</restricted>
         <rows>12</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -526,12 +499,6 @@
     </property>
     <property>
       <heading>$services.localization.render('core.register.title')</heading>
-    </property>
-    <property>
-      <liveValidation_defaultFieldOkMessage>$services.localization.render('core.validation.valid.message')</liveValidation_defaultFieldOkMessage>
-    </property>
-    <property>
-      <liveValidation_enabled>1</liveValidation_enabled>
     </property>
     <property>
       <loginButton_autoLogin_enabled>0</loginButton_autoLogin_enabled>
@@ -555,8 +522,9 @@
       <passwordRuleOneUpperCaseEnabled>0</passwordRuleOneUpperCaseEnabled>
     </property>
     <property>
-      <registrationSuccessMessage>#set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
-{{info}}$services.localization.render('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}</registrationSuccessMessage>
+      <registrationSuccessMessage>#set($message = $services.localization.render('core.register.successful', 'xwiki/2.1', ['USERLINK', $userName]))
+#set($userLink = $xwiki.getUserName("$userSpace$userName"))
+{{info}}$message.replace('USERLINK', "{{html clean=false}}$userLink{{/html}}"){{/info}}</registrationSuccessMessage>
     </property>
     <property>
       <requireCaptcha>0</requireCaptcha>

@@ -55,7 +55,7 @@
     require(['imageWizard'], function(imageWizard) {
       imageWizard({
         editor: editor,
-        imageData: widget.data,
+        imageData: Object.assign({}, widget.data),
         isInsert: isInsert,
         setImageData: setImageData
       }).done(function(data) {
@@ -103,12 +103,12 @@
     },
     init: function(editor) {
 
-      // Register the the /img:: autocomplete using the ckeditor mentions plugin.
+      // Register the the img:: autocomplete using the ckeditor mentions plugin.
       editor.config.mentions = editor.config.mentions || [];
 
       editor.config.mentions.push({
-        marker: '/img::',
-        pattern: /\/img::\S{0,30}$/,
+        marker: 'img::',
+        pattern: /img::\S{0,30}$/,
         minChars: 0,
         itemsLimit: 5,
         itemTemplate: '<li data-id="{id}">' +
@@ -263,11 +263,11 @@
 
           // Do not do anything when the loading entry is submitted.
           if (item.id === "_loading") {
-            return "/img::" + item.query;
+            return "img::" + item.query;
           }
 
-          if (item.id === "_uploadImage") {
-            require(['jquery'], function ($) {
+          require(['jquery', 'resource'], function ($, resource) {
+            if (item.id === "_uploadImage") {
 
               // Reuse attachment suggest code to show the file picker.
               // Provides xwiki-attachments-store and xwiki-file-picker
@@ -275,7 +275,7 @@
                 `'${XWiki.contextPath}/${XWiki.servletpath}` +
                 `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
                 `defer='defer'></script>`;
-              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
+              $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
 
               require(['attachmentService',
                   'xwiki-attachments-store',
@@ -326,19 +326,18 @@
                       // Clear the cache so the new image can appear on next usage of the image quick action
                       attachmentService.clearCache();
 
+                      const resourceReference = {...resource.convertEntityReferenceToResourceReference(
+                        XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT),
+                        editor.config.sourceDocument.documentReference),
+                        // Image references are always attachments.
+                        typed: false
+                      };
+
                       // Insert the newly uploaded image
                       imageWidget.insert({
                         setImageData: {
-                          resourceReference: {
-                            type: "attach",
-                            typed: false,
-                            reference: attachment.id
-                          },
-                          src: CKEDITOR.plugins.xwikiResource.getResourceURL({
-                            type: "attach",
-                            typed: false,
-                            reference: attachment.id
-                          }, editor)
+                          resourceReference,
+                          src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor)
                         }
                       });
                     }).catch(() => {
@@ -351,26 +350,23 @@
                     });
                   });
                 });
-
-            });
-
-            return "";
-          }
-
-          // Insert the selected image
-          imageWidget.insert({
-            setImageData: {
-              resourceReference: {
-                type: "attach",
-                typed: false,
-                reference: item.reference
-              },
-              src: CKEDITOR.plugins.xwikiResource.getResourceURL({
-                type: "attach",
-                typed: false,
-                reference: item.reference
-              }, editor)
+              return;
             }
+
+            const resourceReference = {...resource.convertEntityReferenceToResourceReference(
+              XWiki.Model.resolve(item.reference, XWiki.EntityType.ATTACHMENT),
+              editor.config.sourceDocument.documentReference),
+              // Image references are always attachments.
+              typed: false
+            };
+
+            // Insert the selected image
+            imageWidget.insert({
+              setImageData: {
+                resourceReference,
+                src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor)
+              }
+            });
           });
 
           return "";

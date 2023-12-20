@@ -1,6 +1,7 @@
 #blueimp-gallery {
-  background-color: @panel-bg;
-  opacity: 0.9;
+  /* This breakage of the codestyle (no hard coded colors) is intended and
+      has been discussed in https://forum.xwiki.org/t/lightbox-modal-background/13114 */
+  background-color: rgba(0, 0, 0, 0.9);
 
   > div.slides {
     padding: 2% 0;
@@ -26,9 +27,10 @@
   }
 
   .lightboxDescription {
-    background-color: @panel-bg;
-    opacity: 0.6;
-    color: @panel-default-text;
+    /* This breakage of the codestyle (no hard coded colors) is intended and
+        has been discussed in https://forum.xwiki.org/t/lightbox-modal-background/13114 */
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
     overflow-wrap: break-word;
     display: flex;
     flex-direction: column;
@@ -53,14 +55,15 @@
   }
 }
 .blueimp-gallery {
-  .action:hover {
-    color: @panel-default-text;
-    opacity: 1;
+  .action:hover , span.btn:hover {
+    /* This breakage of the codestyle (no hard coded colors) is intended and
+        has been discussed in https://forum.xwiki.org/t/lightbox-modal-background/13114 */
+    border-color: #fff;
+    color: #fff;
   }
 
   .action {
-    color: @panel-default-text;
-    opacity: 0.8;
+    color: #fff;
     display: none;
   }
 

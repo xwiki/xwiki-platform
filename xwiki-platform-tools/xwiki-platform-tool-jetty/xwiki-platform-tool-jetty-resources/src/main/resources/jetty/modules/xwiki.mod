@@ -24,6 +24,7 @@ resources
 server
 logging
 http
+http-forwarded
 annotations
 deploy
 requestlog

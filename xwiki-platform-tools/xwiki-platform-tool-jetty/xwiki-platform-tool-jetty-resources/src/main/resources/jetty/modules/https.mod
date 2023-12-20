@@ -32,5 +32,8 @@ ssl
 [depend]
 ssl
 
+[after]
+http-forwarded
+
 [xml]
 etc/jetty-https.xml

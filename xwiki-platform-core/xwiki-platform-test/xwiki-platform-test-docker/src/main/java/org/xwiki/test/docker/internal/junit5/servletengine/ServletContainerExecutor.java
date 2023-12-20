@@ -179,9 +179,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
         // have been fixed.
-        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
-            addJava17AddOpens(javaOpts);
-        }
+//        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
+//            addJava17AddOpens(javaOpts);
+//        }
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:

@@ -205,6 +205,31 @@ importers:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
 
+  editors/wikitext:
+    dependencies:
+      '@cristal/api':
+        specifier: workspace:^
+        version: link:../../api
+      '@cristal/skin':
+        specifier: workspace:^
+        version: link:../../skin
+      inversify:
+        specifier: ^6.0.2
+        version: 6.0.2
+      vue:
+        specifier: 3.3.10
+        version: 3.3.10(typescript@5.3.2)
+      vue-i18n:
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
+      vuetify:
+        specifier: 3.4.5
+        version: 3.4.5(typescript@5.3.2)(vite-plugin-vuetify@1.0.2)(vue-i18n@9.8.0)(vue@3.3.10)
+    devDependencies:
+      rimraf:
+        specifier: 5.0.5
+        version: 5.0.5
+
   electron:
     dependencies:
       electron-updater:
@@ -364,6 +389,9 @@ importers:
       '@cristal/dsvuetify':
         specifier: workspace:^
         version: link:../ds/vuetify
+      '@cristal/editors-wikitext':
+        specifier: workspace:^
+        version: link:../editors/wikitext
       '@cristal/extension-manager':
         specifier: workspace:^
         version: link:../extension-manager
@@ -385,6 +413,9 @@ importers:
       '@cristal/storage':
         specifier: workspace:^
         version: link:../storage
+      '@cristal/xwiki-remoteinlineeditor':
+        specifier: workspace:^
+        version: link:../xwiki/remoteinlineeditor
       inversify:
         specifier: ^6.0.2
         version: 6.0.2
@@ -737,6 +768,28 @@ importers:
       vue-tsc:
         specifier: 1.8.25
         version: 1.8.25(typescript@5.3.2)
+
+  xwiki/remoteinlineeditor:
+    dependencies:
+      '@cristal/api':
+        specifier: workspace:^
+        version: link:../../api
+      '@cristal/skin':
+        specifier: workspace:^
+        version: link:../../skin
+      inversify:
+        specifier: ^6.0.2
+        version: 6.0.2
+      vue:
+        specifier: 3.3.10
+        version: 3.3.10(typescript@5.3.2)
+      vue-i18n:
+        specifier: 9.8.0
+        version: 9.8.0(vue@3.3.10)
+    devDependencies:
+      rimraf:
+        specifier: 5.0.5
+        version: 5.0.5
 
 packages:
 
@@ -2243,27 +2296,11 @@ packages:
       estree-walker: 2.0.2
       source-map-js: 1.0.2
 
-  /@vue/compiler-core@3.3.9:
-    resolution: {integrity: sha512-+/Lf68Vr/nFBA6ol4xOtJrW+BQWv3QWKfRwGSm70jtXwfhZNF4R/eRgyVJYoxFRhdCTk/F6g99BP0ffPgZihfQ==}
-    dependencies:
-      '@babel/parser': 7.23.5
-      '@vue/shared': 3.3.9
-      estree-walker: 2.0.2
-      source-map-js: 1.0.2
-    dev: true
-
   /@vue/compiler-dom@3.3.10:
     resolution: {integrity: sha512-NCrqF5fm10GXZIK0GrEAauBqdy+F2LZRt3yNHzrYjpYBuRssQbuPLtSnSNjyR9luHKkWSH8we5LMB3g+4z2HvA==}
     dependencies:
       '@vue/compiler-core': 3.3.10
       '@vue/shared': 3.3.10
-
-  /@vue/compiler-dom@3.3.9:
-    resolution: {integrity: sha512-nfWubTtLXuT4iBeDSZ5J3m218MjOy42Vp2pmKVuBKo2/BLcrFUX8nCSr/bKRFiJ32R8qbdnnnBgRn9AdU5v0Sg==}
-    dependencies:
-      '@vue/compiler-core': 3.3.9
-      '@vue/shared': 3.3.9
-    dev: true
 
   /@vue/compiler-sfc@3.3.10:
     resolution: {integrity: sha512-xpcTe7Rw7QefOTRFFTlcfzozccvjM40dT45JtrE3onGm/jBLZ0JhpKu3jkV7rbDFLeeagR/5RlJ2Y9SvyS0lAg==}
@@ -2333,8 +2370,8 @@ packages:
     dependencies:
       '@volar/language-core': 1.11.1
       '@volar/source-map': 1.11.1
-      '@vue/compiler-dom': 3.3.9
-      '@vue/shared': 3.3.9
+      '@vue/compiler-dom': 3.3.10
+      '@vue/shared': 3.3.10
       computeds: 0.0.1
       minimatch: 9.0.3
       muggle-string: 0.3.1
@@ -2401,10 +2438,6 @@ packages:
 
   /@vue/shared@3.3.10:
     resolution: {integrity: sha512-2y3Y2J1a3RhFa0WisHvACJR2ncvWiVHcP8t0Inxo+NKz+8RKO4ZV8eZgCxRgQoA6ITfV12L4E6POOL9HOU5nqw==}
-
-  /@vue/shared@3.3.9:
-    resolution: {integrity: sha512-ZE0VTIR0LmYgeyhurPTpy4KzKsuDyQbMSdM49eKkMnT5X4VfFBLysMzjIZhLEFQYjjOVVfbvUDHckwjDFiO2eA==}
-    dev: true
 
   /@vue/test-utils@2.4.3(vue@3.3.10):
     resolution: {integrity: sha512-F4K7mF+ad++VlTrxMJVRnenKSJmO6fkQt2wpRDiKDesQMkfpniGWsqEi/JevxGBo2qEkwwjvTUAoiGJLNx++CA==}
@@ -5650,6 +5683,7 @@ packages:
 
   /rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    hasBin: true
     dependencies:
       glob: 7.2.3
     dev: true
@@ -5657,6 +5691,7 @@ packages:
   /rimraf@5.0.5:
     resolution: {integrity: sha512-CqDakW+hMe/Bz202FPEymy68P+G50RfMQK+Qo5YUqc9SPipvbGjCGKd0RSKEelbsfQuw3g5NZDSrlZZAJurH1A==}
     engines: {node: '>=14'}
+    hasBin: true
     dependencies:
       glob: 10.3.10
     dev: true

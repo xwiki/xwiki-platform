@@ -1,7 +1,7 @@
 {
   "name": "@cristal/editors-wikitext",
   "version": "1.0.0",
-  "types" : "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -20,10 +20,14 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "vue": "^3.3.8",
-    "vue-i18n": "^9.2.2",
-    "inversify": "^6.0.2",
     "@cristal/api": "workspace:^",
-    "@cristal/skin": "workspace:^"
+    "@cristal/skin": "workspace:^",
+    "inversify": "^6.0.2",
+    "vue": "3.3.10",
+    "vue-i18n": "9.8.0",
+    "vuetify": "3.4.5"
+  },
+  "devDependencies": {
+    "rimraf": "5.0.5"
   }
 }

@@ -24,7 +24,7 @@
 -->
 <template>
   <template v-if="pageStatus.withSheet">
-    <Template
+    <c-template
       :name="pageStatus.sheet"
       :document="pageStatus.document"
       mode="edit"
@@ -45,6 +45,7 @@
 import { Logger, CristalApp } from "@cristal/api";
 import { inject } from "vue";
 import { ref } from "vue";
+import { CTemplate } from "@cristal/skin";
 
 const pageStatus = ref({
   currentContent: "Initial content",
@@ -58,6 +59,7 @@ const pageStatus = ref({
 let logger: Logger;
 
 export default {
+  components: { CTemplate },
   setup() {
     const cristal = inject<CristalApp>("cristal");
     if (cristal) {

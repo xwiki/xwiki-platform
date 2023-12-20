@@ -30,7 +30,7 @@ import type { Document } from "../api/document";
 export class DefaultPageData implements PageData {
   id: string;
   name: string;
-  mode: string
+  mode: string;
   source: string;
   syntax: string;
   html: string;

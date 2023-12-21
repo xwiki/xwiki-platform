@@ -19,6 +19,8 @@
  */
 package org.xwiki.ckeditor.test.po.image;
 
+import java.util.function.Supplier;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
@@ -70,8 +72,7 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogTreeSelectForm switchToTreeTab()
     {
-        this.container.findElement(By.cssSelector(".image-selector a[href='#documentTree-0']")).click();
-        return new ImageDialogTreeSelectForm();
+        return switchTab(".image-selector a[href='#documentTree-0']", ImageDialogTreeSelectForm::new);
     }
 
     /**
@@ -81,8 +82,7 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogIconSelectForm switchToIconTab()
     {
-        this.container.findElement(By.cssSelector(".image-selector a[href='#iconTab-0']")).click();
-        return new ImageDialogIconSelectForm();
+        return switchTab(".image-selector a[href='#iconTab-0']", ImageDialogIconSelectForm::new);
     }
 
     /**
@@ -92,7 +92,15 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogUrlSelectForm switchToUrlTab()
     {
-        this.container.findElement(By.cssSelector(".image-selector a[href='#urlTab-0']")).click();
-        return new ImageDialogUrlSelectForm();
+        return switchTab(".image-selector a[href='#urlTab-0']", ImageDialogUrlSelectForm::new);
+    }
+
+    private <T> T switchTab(String cssSelector, Supplier<T> supplier)
+    {
+        By selector = By.cssSelector(cssSelector);
+        this.container.findElement(selector).click();
+        // Prevent the test from continuing before the tab is fully switched.
+        getDriver().waitUntilElementContainsAttributeValue(selector, "aria-expanded", "true");
+        return supplier.get();
     }
 }

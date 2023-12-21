@@ -29,6 +29,8 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -40,6 +42,8 @@ import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 import org.xwiki.extension.security.analyzer.ReviewsFetcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.apache.http.HttpStatus.SC_OK;
 
 /**
  * Fetches the security vulnerabilities reviews from a remote source providing a json that can be parsed to a
@@ -70,8 +74,17 @@ public class DefaultReviewsFetcher implements ReviewsFetcher
         try (CloseableHttpClient httpClient = this.httpClientFactory.createHttpClientBuilder(Map.of()).build()) {
             HttpGet getMethod = new HttpGet(buildURI());
             CloseableHttpResponse execute = httpClient.execute(getMethod);
-            ReviewsMap reviewsMap = new ObjectMapper().readValue(execute.getEntity().getContent(), ReviewsMap.class);
-            return Optional.of(this.reviewMapFilter.filter(reviewsMap));
+            StatusLine statusLine = execute.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            if (statusCode == SC_OK) {
+                HttpEntity entity = execute.getEntity();
+                ReviewsMap reviewsMap = new ObjectMapper().readValue(entity.getContent(), ReviewsMap.class);
+                return Optional.of(this.reviewMapFilter.filter(reviewsMap));
+            } else {
+                throw new ExtensionSecurityException(String.format(
+                    "Review fetching failed with http code [%d] and message [%s].", statusCode,
+                    statusLine.getReasonPhrase()));
+            }
         } catch (IOException e) {
             throw new ExtensionSecurityException("Failed to fetch the reviews.", e);
         }

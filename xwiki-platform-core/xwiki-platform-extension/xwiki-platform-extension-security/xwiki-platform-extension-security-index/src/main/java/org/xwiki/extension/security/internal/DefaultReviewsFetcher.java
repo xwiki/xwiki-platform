@@ -65,6 +65,7 @@ public class DefaultReviewsFetcher implements ReviewsFetcher
     @Inject
     private Logger logger;
 
+    // TODO: replace with a more generic http client factory.
     @Inject
     private HttpClientFactory httpClientFactory;
 

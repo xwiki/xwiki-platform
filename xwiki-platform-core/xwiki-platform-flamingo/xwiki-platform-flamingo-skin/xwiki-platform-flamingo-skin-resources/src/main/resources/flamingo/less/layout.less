@@ -311,13 +311,6 @@
   }
 }
 
-#mainContentArea, #hierarchy_breadcrumb {
-  /* Add a border the same color as the background to preserve vertical alignment with the content of the extra panes,
-     despite the left and right border (instead of a shadow previously). */
-  //border-right: 1px solid @body-bg;
-  //border-left: 1px solid @body-bg;
-}
-
 /* Protect against nesting of the breadcrumb inside #mainContentArea, e.g., in AdminSheet and other containers that
 already take care of padding and shadow. */
 #mainContentArea #hierarchy_breadcrumb, #xwikieditor #hierarchy_breadcrumb {
@@ -344,11 +337,6 @@ already take care of padding and shadow. */
   flex-wrap: wrap;
   margin-bottom: floor((@grid-gutter-width / 2));
   padding-top: 0;
-  /* Add a border the same color as the background to preserve vertical alignment with the content of the extra panes,
-     despite the left and right border (instead of a shadow previously). */
-   //border-right: 1px solid @body-bg; 
-   //border-left: 1px solid @body-bg; 
-   //border-bottom: 1px solid @body-bg; 
 }
 
 // Tabbar =====================================================================

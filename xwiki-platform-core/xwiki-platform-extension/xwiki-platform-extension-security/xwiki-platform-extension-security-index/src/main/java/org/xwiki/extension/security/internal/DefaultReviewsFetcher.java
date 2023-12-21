@@ -22,7 +22,6 @@ package org.xwiki.extension.security.internal;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -70,7 +69,7 @@ public class DefaultReviewsFetcher implements ReviewsFetcher
     private HttpClientFactory httpClientFactory;
 
     @Override
-    public Optional<ReviewsMap> fetch() throws ExtensionSecurityException
+    public ReviewsMap fetch() throws ExtensionSecurityException
     {
         try (CloseableHttpClient httpClient = this.httpClientFactory.createHttpClientBuilder(Map.of()).build()) {
             HttpGet getMethod = new HttpGet(buildURI());
@@ -80,7 +79,7 @@ public class DefaultReviewsFetcher implements ReviewsFetcher
             if (statusCode == SC_OK) {
                 HttpEntity entity = execute.getEntity();
                 ReviewsMap reviewsMap = new ObjectMapper().readValue(entity.getContent(), ReviewsMap.class);
-                return Optional.of(this.reviewMapFilter.filter(reviewsMap));
+                return this.reviewMapFilter.filter(reviewsMap);
             } else {
                 throw new ExtensionSecurityException(String.format(
                     "Review fetching failed with http code [%d] and message [%s].", statusCode,

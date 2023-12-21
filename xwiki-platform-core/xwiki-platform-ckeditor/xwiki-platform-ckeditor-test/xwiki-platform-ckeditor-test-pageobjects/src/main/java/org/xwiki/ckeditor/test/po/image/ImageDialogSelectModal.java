@@ -19,11 +19,16 @@
  */
 package org.xwiki.ckeditor.test.po.image;
 
+import java.util.function.Supplier;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogTreeSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -65,9 +70,7 @@ public class ImageDialogSelectModal extends BaseElement
      */
     public ImageDialogTreeSelectForm switchToTreeTab()
     {
-        getDriver().findElement(By.cssSelector(".image-selector-modal .image-selector a[href='#documentTree-0']"))
-            .click();
-        return new ImageDialogTreeSelectForm();
+        return switchTab(".image-selector-modal .image-selector a[href='#documentTree-0']", ImageDialogTreeSelectForm::new);
     }
 
     /**
@@ -77,8 +80,7 @@ public class ImageDialogSelectModal extends BaseElement
      */
     public ImageDialogIconSelectForm switchToIconTab()
     {
-        getDriver().findElement(By.cssSelector(".image-selector-modal .image-selector a[href='#iconTab-0']")).click();
-        return new ImageDialogIconSelectForm();
+        return switchTab(".image-selector-modal .image-selector a[href='#iconTab-0']", ImageDialogIconSelectForm::new);
     }
 
     /**
@@ -88,7 +90,27 @@ public class ImageDialogSelectModal extends BaseElement
      */
     public ImageDialogUrlSelectForm switchToUrlTab()
     {
-        getDriver().findElement(By.cssSelector(".image-selector-modal .image-selector a[href='#urlTab-0']")).click();
-        return new ImageDialogUrlSelectForm();
+        return switchTab(".image-selector-modal .image-selector a[href='#urlTab-0']", ImageDialogUrlSelectForm::new);
+    }
+
+    private <T> T switchTab(String cssSelector, Supplier<T> supplier)
+    {
+        By selector = By.cssSelector(cssSelector);
+        getDriver().findElement(selector).click();
+        // Prevent the test from continuing before the tab is fully switched.
+        XWikiWebDriver xWikiWebDriver = getDriver();
+        xWikiWebDriver.waitUntilCondition(driver -> {
+            try {
+                WebElement element = driver.findElement(selector);
+                String attribute = element.getAttribute("aria-expanded");
+                return attribute == null || attribute.contains("true");
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
+            }
+        });
+        return supplier.get();
     }
 }

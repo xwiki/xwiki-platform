@@ -37,6 +37,8 @@ public interface ReviewsFetcher
     /**
      * @return the fetched {@link ReviewsMap}
      * @throws ExtensionSecurityException in case of issue when fetching the remote false-positive source
+     * @since 15.10.2
      */
+    @Unstable
     ReviewsMap fetch() throws ExtensionSecurityException;
 }

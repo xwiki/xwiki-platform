@@ -193,6 +193,18 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <differences>
+                <item>
+                  <criticality>documented</criticality>
+                  <ignore>true</ignore>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method java.util.Optional&lt;org.xwiki.extension.index.security.review.ReviewsMap&gt; org.xwiki.extension.security.analyzer.ReviewsFetcher::fetch() throws org.xwiki.extension.security.internal.ExtensionSecurityException</old>
+                  <new>method org.xwiki.extension.index.security.review.ReviewsMap org.xwiki.extension.security.analyzer.ReviewsFetcher::fetch() throws org.xwiki.extension.security.internal.ExtensionSecurityException</new>
+                  <justification>Unstable API. The Optional wrapper proved to be useless.</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

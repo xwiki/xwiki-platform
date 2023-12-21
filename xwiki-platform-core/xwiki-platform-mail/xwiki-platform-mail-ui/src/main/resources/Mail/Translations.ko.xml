@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.email=Mail
+  <content>admin.email=메일
 admin.email.description=메일 발송 매개변수를 구성하고 메일 상태를 봅니다.
 admin.emailgeneral=고급
 admin.emailgeneral.description=메일 주소 난독화와 같은 고급 메일 매개 변수를 구성합니다.

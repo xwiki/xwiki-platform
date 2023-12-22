@@ -19,11 +19,15 @@
  */
 package org.xwiki.notifications.filters.migration;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.index.IndexException;
 import org.xwiki.index.TaskConsumer;
@@ -34,10 +38,13 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Task for removing WatchListClass xobjects from page. This task should only be triggered when
  * {@link R160000000XWIKI17243DataMigration} has been done.
+ * Note that this task might also create an autowatch xobject to get the new property if it's not defined, as we use
+ * to fallback on the autowatch property defined in the WatchListClass xobject.
  *
  * @version $Id$
  * @since 16.0.0RC1
@@ -49,8 +56,15 @@ public class WatchListObjectsRemovalTaskConsumer implements TaskConsumer
 {
     static final String TASK_NAME = "watchlist-xobject-removal";
 
+    private static final String XWIKI_SPACE = "XWiki";
+
+    private static final List<String> NOTIFICATIONS_CODE_SPACE = Arrays.asList(XWIKI_SPACE, "Notifications", "Code");
+
     private static final LocalDocumentReference CLASS_REFERENCE =
-        new LocalDocumentReference("XWiki", "WatchListClass");
+        new LocalDocumentReference(XWIKI_SPACE, "WatchListClass");
+
+    private static final LocalDocumentReference AUTOMATIC_WATCH_CLASS_REFERENCE =
+        new LocalDocumentReference(NOTIFICATIONS_CODE_SPACE, "AutomaticWatchModeClass");
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -60,8 +74,22 @@ public class WatchListObjectsRemovalTaskConsumer implements TaskConsumer
     {
         XWikiContext context = this.contextProvider.get();
         EntityReference classReference = CLASS_REFERENCE.appendParent(documentReference.getWikiReference());
+        EntityReference autoWatchClassReference =
+            AUTOMATIC_WATCH_CLASS_REFERENCE.appendParent(documentReference.getWikiReference());
         try {
             XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+
+            // We use to fallback on the old WatchClass xobject automaticwatch property when it was defined, so we
+            // also take back this value and create the new autowatch xobject if needed.
+            BaseObject watchXObject = document.getXObject(classReference);
+            if (watchXObject != null && document.getXObject(autoWatchClassReference) == null) {
+                String automaticwatch = watchXObject.getStringValue("automaticwatch");
+                if (!StringUtils.isBlank(automaticwatch) && !"default".equals(automaticwatch)) {
+                    BaseObject autowatchXObject = document.newXObject(autoWatchClassReference, context);
+                    autowatchXObject.setStringValue("automaticWatchMode", automaticwatch);
+                }
+            }
+
             if (document.removeXObjects(classReference)) {
                 context.getWiki().saveDocument(document, "Migration of watchlist preferences", context);
             }

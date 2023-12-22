@@ -22,10 +22,13 @@ package org.xwiki.ckeditor.test.po.image;
 import java.util.function.Supplier;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogTreeSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseModal;
 
 /**
@@ -100,7 +103,19 @@ public class ImageDialogSelectModal extends BaseModal
         By selector = By.cssSelector(cssSelector);
         this.container.findElement(selector).click();
         // Prevent the test from continuing before the tab is fully switched.
-        getDriver().waitUntilElementContainsAttributeValue(selector, "aria-expanded", "true");
+        XWikiWebDriver xWikiWebDriver = getDriver();
+        xWikiWebDriver.waitUntilCondition(driver -> {
+            try {
+                WebElement element = driver.findElement(selector);
+                String attribute = element.getAttribute("aria-expanded");
+                return attribute == null || attribute.contains("true");
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
+            }
+        });
         return supplier.get();
     }
 }

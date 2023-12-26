@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -73,6 +74,7 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
     private Provider<XWikiContext> contextProvider;
 
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject
@@ -102,9 +104,11 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
     }
 
     @Override
-    public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user) throws NotificationException
+    public Map<String, Boolean> getToggleableFilterActivations(DocumentReference user) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
+        WikiReference currentWiki = context.getWikiReference();
+        context.setWikiReference(user.getWikiReference());
         XWiki xwiki = context.getWiki();
 
         Map<String, Boolean> filterStatus = new HashMap<>();
@@ -128,6 +132,8 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
             throw new NotificationException(
                     String.format("Failed to get the toggleable filters preferences for the user [%s].",
                             user), e);
+        } finally {
+            context.setWikiReference(currentWiki);
         }
 
         return filterStatus;

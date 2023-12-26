@@ -211,7 +211,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user)
             throws NotificationException
     {
-        return filterPreferencesModelBridge.getToggeableFilterActivations(user);
+        return filterPreferencesModelBridge.getToggleableFilterActivations(user);
     }
 
     @Override

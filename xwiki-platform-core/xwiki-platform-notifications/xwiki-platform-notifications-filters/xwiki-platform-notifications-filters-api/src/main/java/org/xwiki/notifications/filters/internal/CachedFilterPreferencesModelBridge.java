@@ -132,7 +132,7 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
     }
 
     @Override
-    public Map<String, Boolean> getToggeableFilterActivations(DocumentReference userReference)
+    public Map<String, Boolean> getToggleableFilterActivations(DocumentReference userReference)
         throws NotificationException
     {
         Map<String, Boolean> values = this.toggleCache.get(userReference);
@@ -140,7 +140,7 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
             return values;
         }
 
-        values = this.filterPreferencesModelBridge.getToggeableFilterActivations(userReference);
+        values = this.filterPreferencesModelBridge.getToggleableFilterActivations(userReference);
 
         this.toggleCache.put(this.referenceFactory.getReference(userReference), values);
 

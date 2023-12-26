@@ -224,7 +224,7 @@ public class LegacyDefaultNotificationFilterManagerTest
         filterActivations.put("filter6", false);
         // We don't put filter7 so it should default as being considered activated
 
-        when(this.filterPreferencesModelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
+        when(this.filterPreferencesModelBridge.getToggleableFilterActivations(testUser)).thenReturn(filterActivations);
         when(filter1.getFilteringPhases())
             .thenReturn(NotificationFilter.SUPPORT_ONLY_PRE_FILTERING_PHASE);
         when(filter2.getFilteringPhases())

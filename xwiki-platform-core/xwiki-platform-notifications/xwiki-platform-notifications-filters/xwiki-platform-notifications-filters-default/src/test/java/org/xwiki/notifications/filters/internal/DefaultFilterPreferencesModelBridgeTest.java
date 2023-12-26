@@ -22,16 +22,31 @@ package org.xwiki.notifications.filters.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -44,16 +59,35 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-class DefaultNotificationPreferenceFilterPreferencesModelBridgeTest
+class DefaultFilterPreferencesModelBridgeTest
 {
+    private static final LocalDocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS =
+        new LocalDocumentReference(Arrays.asList("XWiki", "Notifications", "Code"), "ToggleableFilterPreferenceClass");
+
+    private static final String FIELD_FILTER_NAME = "filterName";
+
+    private static final String FIELD_IS_ENABLED = "isEnabled";
+
     @InjectMockComponents
     private DefaultFilterPreferencesModelBridge defaultModelBridge;
 
     @MockComponent
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
 
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
     private final DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
     private final WikiReference wikiReference = new WikiReference("foo");
+
+    @BeforeComponent
+    void beforeComponent() throws Exception
+    {
+        this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
+    }
 
     @Test
     void saveFilterPreferencesForUser() throws NotificationException
@@ -146,5 +180,87 @@ class DefaultNotificationPreferenceFilterPreferencesModelBridgeTest
         DocumentReference deletedUserDocumentReference = new DocumentReference("xwiki", "wXWiki", "DeletedUser");
         this.defaultModelBridge.deleteFilterPreferences(deletedUserDocumentReference);
         verify(this.notificationFilterPreferenceStore).deleteFilterPreferences(deletedUserDocumentReference);
+    }
+
+    @Test
+    void getToggleableFilterActivations() throws Exception
+    {
+        DocumentReference user = new DocumentReference("subwiki", "XWiki", "Foo");
+        WikiReference currentWiki = mock(WikiReference.class, "currentWiki");
+        XWikiContext context = mock(XWikiContext.class);
+        when(context.getWikiReference()).thenReturn(currentWiki);
+        when(this.contextProvider.get()).thenReturn(context);
+        XWiki xwiki = mock(XWiki.class);
+        when(context.getWiki()).thenReturn(xwiki);
+
+        XWikiDocument userDoc = mock(XWikiDocument.class, "userDoc");
+        when(xwiki.getDocument(user, context)).thenReturn(userDoc);
+
+
+        NotificationFilter filter1 = mock(NotificationFilter.class, "filter1");
+        ToggleableNotificationFilter filter2 = mock(ToggleableNotificationFilter.class, "filter2");
+        ToggleableNotificationFilter filter3 = mock(ToggleableNotificationFilter.class, "filter3");
+        ToggleableNotificationFilter filter4 = mock(ToggleableNotificationFilter.class, "filter4");
+        ToggleableNotificationFilter filter5 = mock(ToggleableNotificationFilter.class, "filter5");
+        ToggleableNotificationFilter filter6 = mock(ToggleableNotificationFilter.class, "filter6");
+        ToggleableNotificationFilter filter7 = mock(ToggleableNotificationFilter.class, "filter7");
+
+        this.componentManager.registerComponent(NotificationFilter.class, "filter1", filter1);
+        this.componentManager.registerComponent(NotificationFilter.class, "filter2", filter2);
+        this.componentManager.registerComponent(NotificationFilter.class, "filter3", filter3);
+        this.componentManager.registerComponent(NotificationFilter.class, "filter4", filter4);
+        this.componentManager.registerComponent(NotificationFilter.class, "filter5", filter5);
+        this.componentManager.registerComponent(NotificationFilter.class, "filter6", filter6);
+        this.componentManager.registerComponent(NotificationFilter.class, "filter7", filter7);
+
+        when(filter2.getName()).thenReturn("filter2");
+        when(filter2.isEnabledByDefault()).thenReturn(true);
+
+        when(filter3.getName()).thenReturn("filter3");
+        when(filter3.isEnabledByDefault()).thenReturn(true);
+
+        when(filter4.getName()).thenReturn("filter4");
+        when(filter4.isEnabledByDefault()).thenReturn(true);
+
+        when(filter5.getName()).thenReturn("filter5");
+        when(filter5.isEnabledByDefault()).thenReturn(false);
+
+        when(filter6.getName()).thenReturn("filter6");
+        when(filter6.isEnabledByDefault()).thenReturn(false);
+
+        when(filter7.getName()).thenReturn("filter7");
+        when(filter7.isEnabledByDefault()).thenReturn(false);
+
+        BaseObject filter2Obj = mock(BaseObject.class, "filter2Obj");
+        BaseObject filter4Obj = mock(BaseObject.class, "filter4Obj");
+        when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
+            "filter2", false)).thenReturn(filter2Obj);
+        when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
+            "filter4", false)).thenReturn(filter4Obj);
+
+        when(filter2Obj.getIntValue(FIELD_IS_ENABLED, 1)).thenReturn(1);
+        when(filter4Obj.getIntValue(FIELD_IS_ENABLED, 1)).thenReturn(0);
+
+        BaseObject filter6Obj = mock(BaseObject.class, "filter6Obj");
+        BaseObject filter7Obj = mock(BaseObject.class, "filter7Obj");
+        when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
+            "filter6", false)).thenReturn(filter6Obj);
+        when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
+            "filter7", false)).thenReturn(filter7Obj);
+
+        when(filter6Obj.getIntValue(FIELD_IS_ENABLED, 0)).thenReturn(1);
+        when(filter7Obj.getIntValue(FIELD_IS_ENABLED, 0)).thenReturn(0);
+
+        Map<String, Boolean> expectedResult = Map.of(
+            "filter2", true,
+            "filter3", true,
+            "filter4", false,
+            "filter5", false,
+            "filter6", true,
+            "filter7", false
+        );
+        assertEquals(expectedResult, this.defaultModelBridge.getToggleableFilterActivations(user));
+        verify(context).setWikiReference(user.getWikiReference());
+        verify(context).setWikiReference(currentWiki);
     }
 }

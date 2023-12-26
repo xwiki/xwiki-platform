@@ -152,6 +152,7 @@ class LanguageIT
         LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
         sectionPage.setMultiLingual(isMultiLingual);
         sectionPage.setDefaultLanguage("en");
+        sectionPage.setTimezone("");
         if (supportedLanguages != null) {
             sectionPage.setSupportedLanguages(supportedLanguages);
         }

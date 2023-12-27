@@ -4,6 +4,7 @@ org.xwiki.notifications.filters.internal.DocumentMovedListener
 org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration
 org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore
 org.xwiki.notifications.filters.internal.ToggleableFilterPreferenceDocumentInitializer
+org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayer
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerComponentBuilder
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerDocumentInitializer
 org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceEventConverter

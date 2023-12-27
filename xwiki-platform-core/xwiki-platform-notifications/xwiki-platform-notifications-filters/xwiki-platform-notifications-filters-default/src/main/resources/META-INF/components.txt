@@ -1,7 +1,6 @@
 org.xwiki.notifications.filters.internal.CachedModelBridgeInvalidatorListener
 org.xwiki.notifications.filters.internal.DefaultFilterPreferencesModelBridge
 org.xwiki.notifications.filters.internal.DocumentMovedListener
-org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration
 org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore
 org.xwiki.notifications.filters.internal.ToggleableFilterPreferenceDocumentInitializer
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayer

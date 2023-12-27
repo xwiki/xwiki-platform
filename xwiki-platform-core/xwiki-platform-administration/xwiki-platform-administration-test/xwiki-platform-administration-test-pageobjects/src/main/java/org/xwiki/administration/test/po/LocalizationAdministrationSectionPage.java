@@ -46,10 +46,6 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
         + " and ../input[@id='XWiki.XWikiPreferences_0_languages']]")
     private WebElement supportedLanguagesSelect;
 
-    @FindBy(xpath = "//div[contains(@class, 'bootstrap-select')"
-        + " and ../input[@id='XWiki.XWikiPreferences_0_timezone']]")
-    private WebElement timezoneSelect;
-
     public LocalizationAdministrationSectionPage()
     {
         super("Localization");
@@ -80,11 +76,5 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     {
         BootstrapSelect select = new BootstrapSelect(this.supportedLanguagesSelect, getDriver());
         select.selectByValues(supportedLanguages);
-    }
-
-    public void setTimezone(String timezone)
-    {
-        BootstrapSelect select = new BootstrapSelect(this.timezoneSelect, getDriver());
-        select.selectByValue(timezone);
     }
 }

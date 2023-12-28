@@ -151,7 +151,7 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
                 String fetchFilterStatement = statement;
 
                 if (!StringUtils.isEmpty(latestExistingDocument)) {
-                    fetchFilterStatement += " AND nfp.pageOnly > " + latestExistingDocument;
+                    fetchFilterStatement += String.format(" AND nfp.pageOnly > '%s'", latestExistingDocument);
                 }
 
                 fetchFilterStatement += " group by nfp.pageOnly order by nfp.pageOnly";

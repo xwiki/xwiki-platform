@@ -189,18 +189,24 @@ var XWiki = (function (XWiki) {
         #end
         #set ($discard = $xwiki.getDocument('XWiki.SearchCode').getRenderedContent())
         #if ($engine == $searchEngine)
-          #set ($evaluatedSource = $source.evaluate())
+          #try("evaluateException")
+            #set ($evaluatedSource = $source.evaluate())
+          #end
+          #if ("$!evaluateException" != '')
+            #set ($discard = $logtool.error("Error when trying to evaluate XWiki.SearchSuggestSourceClass: $evaluateException"))
+            #set ($discard = $logtool.debug($exceptiontool.getStackTrace($evaluateException)))
+          #end
           #set ($name = $source.getProperty('name').value)
           #if ($services.localization.get($name))
             #set ($name = $services.localization.render($name))
-          #else
+          #elseif ("$!evaluatedSource" != '')
             ## Evaluate the Velocity code for backward compatibility.
             #set ($name =  $evaluatedSource.name)
           #end
           #set ($icon = $source.getProperty('icon').value)
           #if ($icon.startsWith('icon:'))
             #set ($icon = $xwiki.getSkinFile("icons/silk/${icon.substring(5)}.png"))
-          #else
+          #elseif ("$!evaluatedSource" != '')
             ## Evaluate the Velocity code for backward compatibility.
             #set ($icon = $evaluatedSource.icon)
           #end

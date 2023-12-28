@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Sandbox</title>
+  <title>샌드박스</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -65,6 +65,10 @@ XWiki는 6가지 수준의 제목을 제공합니다. 페이지를 구성하는 
 ===== Level 5 Heading 5 =====
 
 ====== Level 6 Heading 6 ======
+
+{{info title="접근성 권장사항"}}
+위키에서 보조 기술 사용자에게 최상의 경험을 제공하려면 페이지 콘텐츠에서 제목의 첫 번째 수준을 사용하지 않아야 합니다.
+{{/info}}
 
 == Styles ==
 

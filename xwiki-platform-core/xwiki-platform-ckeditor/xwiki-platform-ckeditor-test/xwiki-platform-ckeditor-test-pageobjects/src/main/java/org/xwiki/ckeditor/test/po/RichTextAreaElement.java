@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -200,7 +201,12 @@ public class RichTextAreaElement extends BaseElement
     {
         try {
             getDriver().switchTo().frame(this.iframe);
-            return supplier.get();
+            try {
+                return supplier.get();
+            } catch (StaleElementReferenceException e) {
+                // Try again in case the content of the iframe has been updated.
+                return supplier.get();
+            }
         } finally {
             getDriver().switchTo().defaultContent();
         }

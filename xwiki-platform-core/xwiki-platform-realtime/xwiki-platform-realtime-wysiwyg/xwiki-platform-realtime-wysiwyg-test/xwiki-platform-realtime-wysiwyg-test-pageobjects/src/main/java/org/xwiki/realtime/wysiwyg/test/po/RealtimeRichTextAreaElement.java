@@ -59,11 +59,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
             // Wait for the specified coeditor position to be available in the DOM.
             if (wait) {
                 getFromIFrame(() -> {
-                    // Make sure we don't scroll the page when locating the coeditor position. Note that we can't use
-                    // ExpectedConditions.presenceOfElementLocated() because it calls driver.findElement() which is
-                    // overwritten in XWikiWebDriver to scroll the page.
-                    getDriver()
-                        .waitUntilCondition(driver -> getDriver().findElementWithoutWaitingWithoutScrolling(By.id(id)));
+                    getDriver().waitUntilCondition(driver -> getContainer());
                     return null;
                 });
             }
@@ -124,6 +120,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         private WebElement getContainer()
         {
+            // Make sure we don't scroll the page when locating the coeditor position.
             return getDriver().findElementWithoutWaitingWithoutScrolling(By.id(this.id));
         }
     }

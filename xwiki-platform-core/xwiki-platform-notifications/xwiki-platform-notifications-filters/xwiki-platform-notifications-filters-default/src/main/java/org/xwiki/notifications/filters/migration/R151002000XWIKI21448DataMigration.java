@@ -129,9 +129,11 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
         } catch (CacheException e) {
             throw new DataMigrationException("Cannot create local cache for performing the migration", e);
         }
-        String statement = "select nfp.pageOnly "
+
+        // pageOnly property is not nullable and oracle is not happy when checking if it contains empty string
+        String statement = "select distinct nfp.pageOnly "
             + "from DefaultNotificationFilterPreference nfp "
-            + "where nfp.pageOnly IS NOT NULL AND nfp.pageOnly <> ''";
+            + "where length(nfp.pageOnly) > 0";
 
         String deletionStatement = "delete from DefaultNotificationFilterPreference "
             + "where pageOnly IN (:missingDocuments)";
@@ -151,13 +153,17 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
                 String fetchFilterStatement = statement;
 
                 if (!StringUtils.isEmpty(latestExistingDocument)) {
-                    fetchFilterStatement += String.format(" AND nfp.pageOnly > '%s'", latestExistingDocument);
+                    fetchFilterStatement += " AND nfp.pageOnly > :latestExistingDocument";
                 }
 
-                fetchFilterStatement += " group by nfp.pageOnly order by nfp.pageOnly";
+                fetchFilterStatement += " order by nfp.pageOnly";
 
-                queryResult = this.queryManager.createQuery(fetchFilterStatement, Query.HQL)
-                    .setLimit(BATCH_SIZE)
+                Query query = this.queryManager.createQuery(fetchFilterStatement, Query.HQL);
+                if (!StringUtils.isEmpty(latestExistingDocument)) {
+                    query = query.bindValue("latestExistingDocument", latestExistingDocument);
+                }
+
+                queryResult = query.setLimit(BATCH_SIZE)
                     .execute();
 
                 this.logger.info("Performing filters analysis for [{}] documents",
@@ -175,10 +181,12 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
                 this.logger.info("[{}] missing documents found, performing clean up of filters...",
                     deletedDocuments.size());
 
-                getXWikiContext().getWiki().getHibernateStore().executeWrite(getXWikiContext(),
-                    session -> session.createQuery(deletionStatement)
-                        .setParameter("missingDocuments", deletedDocuments)
-                        .executeUpdate());
+                if (!deletedDocuments.isEmpty()) {
+                    getXWikiContext().getWiki().getHibernateStore().executeWrite(getXWikiContext(),
+                        session -> session.createQuery(deletionStatement)
+                            .setParameter("missingDocuments", deletedDocuments)
+                            .executeUpdate());
+                }
 
             } while (queryResult.size() == BATCH_SIZE);
 

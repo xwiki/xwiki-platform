@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.UserDirectoryPreferencesClass_columns=표시할 열
-### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
+XWiki.UserDirectoryPreferencesClass_columns_hint=User 클래스의 속성에 해당하는 열 목록으로 사용자 디렉터리에 표시됩니다.
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=비활성화된 사용자 프로필 숨기기
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=프로필이 비활성화된 사용자를 사용자 디렉터리에서 제외합니다.
 userdirectory.userScopeFilter=사용자 범위:

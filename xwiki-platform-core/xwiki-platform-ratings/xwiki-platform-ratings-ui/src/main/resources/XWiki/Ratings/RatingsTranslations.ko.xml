@@ -1,1 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Ratings.RatingsTranslations" locale="ko">
+  <web>XWiki.Ratings</web>
+  <name>RatingsTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Ratings.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.ratings=평가
+### Missing: rating.rate=Rate!
+### Missing: rating.saveexception=Error when saving the rating.
+### Missing: rating.votenotvalid=You cannot vote with 0 value.
+### Missing: rating.voteoutofbounds=The vote is out of the scale limit.
+### Missing: rating.setvote.inprogress=Your vote is being saved...
+### Missing: rating.setvote.success=Your vote has been saved!
+### Missing: rating.setvote.error=Error when saving your vote.
+### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled=Enable Ratings
+### Missing: XWiki.Ratings.RatingsConfigurationClass_enabled.hint=Enabling ratings allows users to vote on pages and display the average votes. Disabling them doesn't remove the existing vote, it just hides the interface.
+
+#@deprecatedstart
+
+## until 12.9RC1
+### Missing: admin.ratings.activateratings=Activate the ratings on this wiki
+### Missing: admin.ratings.activateratingsinfo=Activating the ratings on this wiki will display a visual average rating (composed of stars) at the top right corner of each document of this wiki (except the ones in the *XWiki* space). Authenticated users will be able to rate documents by clicking on the stars. An alternative to this is to use the *Ratings Panel*, for example to only enable ratings in the desired spaces. To use the Ratings Panel, please visit the *Panel Wizard* administration section.
+### Missing: admin.ratings.resetratings=Reset all the ratings on this wiki. This will make all documents start over with no vote. Be aware that this operation is irreversible, besides on a document-per-document rollback basis. Resetting all ratings can take a while if the wiki has a large amount of documents already rated.
+### Missing: admin.ratings.uninstallratings=Uninstalling the ratings application will delete the documents that compose the application, but *all votes on rated document will be preserved*. If you reinstall the application later on, the documents will start over with the saved average rating they had before uninstalling the application. Finally, uninstalling the ratings application will *remove the ratings category* from the wiki administration.
+### Missing: admin.ratings.ratingsactivated=Ratings have been activated
+### Missing: admin.ratings.ratingsdeactivated=Ratings have been deactivated
+### Missing: admin.ratings.illegalrequest=Illegal request
+### Missing: rating.yourvote=Your vote
+### Missing: rating.logintorate=Login to rate
+### Missing: rating.novotes=No votes yet
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

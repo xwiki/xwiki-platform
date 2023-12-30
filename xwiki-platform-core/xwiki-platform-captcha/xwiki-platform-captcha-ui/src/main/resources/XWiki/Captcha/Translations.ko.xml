@@ -38,9 +38,9 @@
   <hidden>true</hidden>
   <content>admin.captcha=보안 문자
 ### Missing: captcha.admin.defaultCaptchaName.label=Default CAPTCHA
-### Missing: captcha.admin.defaultCaptchaName.hint=The default CAPTCHA implementation to use. Use the Extension Manager to search for other implementations that you can install and use.
-### Missing: captcha.admin.configure.title=Configure {0}
-### Missing: captcha.admin.sample.title=Sample CAPTCHA
-### Missing: captcha.admin.sample.description=How the configured CAPTCHA looks like when it will be displayed in a form, for example.
+captcha.admin.defaultCaptchaName.hint=사용할 기본 CAPTCHA 구현입니다. Extension Manager를 사용하여 설치하고 사용할 수 있는 다른 구현을 검색하십시오 .
+captcha.admin.configure.title={0} 구성
+captcha.admin.sample.title=샘플 보안 문자
+captcha.admin.sample.description=예를 들어 구성된 CAPTCHA가 양식에 표시될 때의 모습입니다.
 </content>
   </xwikidoc>

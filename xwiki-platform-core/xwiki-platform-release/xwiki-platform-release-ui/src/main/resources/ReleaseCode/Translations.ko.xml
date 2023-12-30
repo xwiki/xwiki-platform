@@ -42,9 +42,9 @@
   <hidden>true</hidden>
   <content>release.livetable.version=버전
 ### Missing: release.livetable.releaseManagers=Release Managers
-### Missing: release.livetable.releaseDate=Released on
-### Missing: release.livetable.releaseNotes=Release Notes
-### Missing: release.applicationsPanelEntryLabel=Release
+release.livetable.releaseDate=출시 날짜
+release.livetable.releaseNotes=릴리즈 노트
+release.applicationsPanelEntryLabel=풀어 주다
 ### Missing: release.livetable.emptyvalue=
 </content>
 </xwikidoc>

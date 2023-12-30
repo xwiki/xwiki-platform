@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content># Class fields
 Help.Applications.Movies.Code.MoviesClass_title1=제목
-### Missing: Help.Applications.Movies.Code.MoviesClass_longText1=Poster
+Help.Applications.Movies.Code.MoviesClass_longText1=포스터
 Help.Applications.Movies.Code.MoviesClass_staticList1=장르
 Help.Applications.Movies.Code.MoviesClass_staticList1_action=행동
 Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=코메디
@@ -54,40 +54,40 @@ Help.Applications.Movies.Code.MoviesClass_boolean1=본
 Help.Applications.Movies.Code.MoviesClass_databaseList1=감독
 Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=찰리 채플린
 Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=프랭크 카프라
-### Missing: Help.Applications.Movies.Code.MoviesClass_content1=Storyline
+Help.Applications.Movies.Code.MoviesClass_content1=줄거리
 
 # Live table generic keys
-### Missing: movies.livetable.doc.title=Page Title
-### Missing: movies.livetable.doc.name=Page Name
-### Missing: movies.livetable.doc.space=Space
-### Missing: movies.livetable.doc.fullname=Page full name
-### Missing: movies.livetable.doc.location=Location
-### Missing: movies.livetable.doc.author=Last Author
-### Missing: movies.livetable.doc.creator=Creator
-### Missing: movies.livetable.doc.date=Date
-### Missing: movies.livetable.doc.creationDate=Creation Date
-### Missing: movies.livetable._avatar=Avatar
-### Missing: movies.livetable._images=Images
-### Missing: movies.livetable._attachments=Attachments
-### Missing: movies.livetable._actions=Actions
-### Missing: movies.livetable._actions.edit=Edit
-### Missing: movies.livetable._actions.delete=Delete
-### Missing: movies.livetable.emptyvalue=-
+movies.livetable.doc.title=페이지 제목
+movies.livetable.doc.name=페이지 이름
+movies.livetable.doc.space=공간
+movies.livetable.doc.fullname=페이지 전체 이름
+movies.livetable.doc.location=위치
+movies.livetable.doc.author=마지막 저자
+movies.livetable.doc.creator=창조자
+movies.livetable.doc.date=날짜
+movies.livetable.doc.creationDate=생산 일
+movies.livetable._avatar=화신
+movies.livetable._images=이미지
+movies.livetable._attachments=첨부파일
+movies.livetable._actions=행위
+movies.livetable._actions.edit=편집하다
+movies.livetable._actions.delete=삭제
+movies.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: movies.livetable.title1=Title
-### Missing: movies.livetable.longText1=Poster
-### Missing: movies.livetable.staticList1=Genre
-### Missing: movies.livetable.date1=Release Date
-### Missing: movies.livetable.number1=Runtime (minutes)
-### Missing: movies.livetable.boolean1=Seen
-### Missing: movies.livetable.databaseList1=Director
-### Missing: movies.livetable.content1=Storyline
+movies.livetable.title1=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 콜론(:), 일치하지 않는 느낌표(!)
+movies.livetable.longText1=포스터
+movies.livetable.staticList1=장르
+movies.livetable.date1=출시일
+movies.livetable.number1=런타임(분)
+movies.livetable.boolean1=본
+movies.livetable.databaseList1=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+movies.livetable.content1=줄거리
 
 # Other keys
-### Missing: movies.entry.name=Movies
+movies.entry.name=영화 산업
 
 # Deprecated keys
-### Missing: movies.dataSpace.title=Data
+movies.dataSpace.title=데이터
 </content>
   </xwikidoc>

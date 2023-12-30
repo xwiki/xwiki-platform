@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.notifications.name=알림
-### Missing: rendering.macro.notifications.description=Display notifications about events happened on the wiki.
+rendering.macro.notifications.description=위키에서 발생한 이벤트에 대한 알림을 표시합니다.
 rendering.macro.notifications.parameter.count.name=세다
 rendering.macro.notifications.parameter.count.description=기본적으로 표시할 최대 이벤트 수
 rendering.macro.notifications.parameter.useUserPreferences.name=사용자의 선호도를 활용하세요
@@ -53,25 +53,25 @@ rendering.macro.notifications.parameter.displayReadEvents.description=true인 �
 rendering.macro.notifications.parameter.wikis.name=위키
 rendering.macro.notifications.parameter.wikis.description=고려해야 할 위키 목록(쉼표로 구분)입니다. useUserPreferences가 "true"로 설정된 경우 이 매개변수는 무시됩니다.
 rendering.macro.notifications.parameter.spaces.name=공백
-### Missing: rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-### Missing: rendering.macro.notifications.parameter.pages.name=Pages
-### Missing: rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
-### Missing: rendering.macro.notifications.parameter.displayReadStatus.name=Display "read" status
-### Missing: rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
-### Missing: rendering.macro.notifications.parameter.users.name=Users
-### Missing: rendering.macro.notifications.parameter.users.description=List of users to consider (comma-separated). Ignored if "useUserPreferences" is set to "true".
-### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display followed users only
-### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events performed by the given list of users (if empty, the list of followed users of the current user is used).
-### Missing: rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
-### Missing: rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
-### Missing: rendering.macro.notifications.parameter.tags.name=Tags
-### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
-### Missing: notifications.macro.noWatchedUsers=You are not following anybody.
-### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
-### Missing: notifications.macro.markEventAsRead=Mark event as read
-### Missing: notifications.macro.showEventDetails=Show event details
-### Missing: notifications.menu.nothing=No notifications available!
-### Missing: notifications.menu.more=Load older notifications
-### Missing: notifications.menu.details=Details ({0})
+rendering.macro.notifications.parameter.spaces.description=고려해야 할 공백 목록(쉼표로 구분)입니다. useUserPreferences가 "true"로 설정된 경우 이 매개변수는 무시됩니다.
+rendering.macro.notifications.parameter.pages.name=페이지
+rendering.macro.notifications.parameter.pages.description=고려해야 할 페이지 목록(전체 참조, 쉼표로 구분)입니다. useUserPreferences가 "true"로 설정된 경우 이 매개변수는 무시됩니다.
+rendering.macro.notifications.parameter.displayReadStatus.name="읽음" 상태 표시
+rendering.macro.notifications.parameter.displayReadStatus.description=이벤트 상태(읽음으로 표시되었는지 여부)가 표시되어야 하는지 여부
+rendering.macro.notifications.parameter.users.name=사용자
+rendering.macro.notifications.parameter.users.description=고려해야 할 사용자 목록(쉼표로 구분) "useUserPreferences"가 "true"로 설정된 경우 무시됩니다.
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=팔로우한 사용자만 표시
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=주어진 사용자 목록에 의해 수행된 이벤트만 표시합니다. (비어 있으면 현재 사용자의 팔로우된 사용자 목록이 사용됩니다.)
+rendering.macro.notifications.parameter.displayRSSLink.name=RSS 링크 표시
+rendering.macro.notifications.parameter.displayRSSLink.description=현재 매크로의 RSS 보기에 대한 링크를 표시합니다.
+rendering.macro.notifications.parameter.tags.name=태그
+rendering.macro.notifications.parameter.tags.description=고려해야 할 태그 목록(쉼표로 구분) 현재 위키에서만 작동합니다. "useUserPreferences"가 "true"로 설정된 경우 무시됩니다.
+notifications.macro.noWatchedUsers=당신은 누구도 팔로우하고 있지 않습니다.
+notifications.macro.whenNotView=알림 매크로. '보기' 모드에서 볼 수 있습니다.
+notifications.macro.markEventAsRead=이벤트를 읽은 상태로 표시
+notifications.macro.showEventDetails=이벤트 세부정보 표시
+notifications.menu.nothing=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 콜론(:), 일치하지 않는 느낌표(!)
+notifications.menu.more=이전 알림 로드
+notifications.menu.details=세부정보({0})
 </content>
   </xwikidoc>

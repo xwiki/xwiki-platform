@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>help.tipsPanel.title=팁
-### Missing: help.tipsPanel.noTipMessage=No Tip available!
+help.tipsPanel.noTipMessage=팁을 사용할 수 없습니다!
 help.tipsPanel.gettingStartedTip=새로운 XWiki 사용자 라면 [[시작 가이드&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ 문서 /UserGuide/GettingStarted/]].
 help.tipsPanel.jumpToPageTip=Ctrl+G 또는 Meta+G를 사용하여 Wiki의 어떤 페이지로든 이동할 수 있습니다.
 help.tipsPanel.improveXWikiTip=XWiki를 개선할 수 있다는 것을 알고 계셨습니까 ? 5분만 시간을 내어 [[이 설문조사 작성&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/Survey/ProductFeedback]] 이 오픈 소스 프로젝트를 도와주세요 !

@@ -52,8 +52,8 @@ skin.sheet.js.error.rights=권한이 부족하여 스킨을 저장하지 못했�
 skin.sheet.js.deleteConfirmationText=이 템플릿을 삭제하시겠습니까?
 skin.sheet.js.deleteConfirmationYes=응, 삭제해
 skin.sheet.js.deleteConfirmationNo=아니요, 취소합니다.
-### Missing: skin.sheet.js.adding=Adding...
-### Missing: skin.sheet.js.addingDone=The template has been added!
+skin.sheet.js.adding=첨가...
+skin.sheet.js.addingDone=템플릿이 추가되었습니다!
 
 ###############################################################################
 ## Deprecated
@@ -66,7 +66,7 @@ skin.sheet.js.deleteConfirmationNo=아니요, 취소합니다.
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=Overridden templates
+skin.sheet.overridedTemplates=재정의된 템플릿
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

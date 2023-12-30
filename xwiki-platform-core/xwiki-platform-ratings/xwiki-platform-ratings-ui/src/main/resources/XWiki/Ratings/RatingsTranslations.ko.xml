@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=평가
-### Missing: rating.rate=Rate!
+rating.rate=비율!
 rating.saveexception=평가를 저장하는 중에 오류가 발생했습니다.
 rating.votenotvalid=0 값으로 투표할 수 없습니다.
 rating.voteoutofbounds=투표 규모 제한을 벗어났습니다.
@@ -57,9 +57,9 @@ admin.ratings.uninstallratings=등급 애플리케이션을 제거하면 애플�
 admin.ratings.ratingsactivated=평가가 활성화되었습니다
 admin.ratings.ratingsdeactivated=평가가 비활성화되었습니다.
 admin.ratings.illegalrequest=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
-### Missing: rating.yourvote=Your vote
-### Missing: rating.logintorate=Login to rate
-### Missing: rating.novotes=No votes yet
+rating.yourvote=당신의 투표
+rating.logintorate=평가하려면 로그인하세요
+rating.novotes=아직 투표가 없습니다
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

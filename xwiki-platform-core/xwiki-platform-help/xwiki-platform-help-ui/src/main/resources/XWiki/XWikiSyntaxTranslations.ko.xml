@@ -41,8 +41,8 @@
   <hidden>true</hidden>
   <content>help.syntaxpage.title=XWiki 구문 가이드
 ### Missing: help.syntaxtitle=XWiki Syntax {0}
-### Missing: help.syntaxall=All
-### Missing: help.changesyntax=Change Syntax
-### Missing: help.choose_syntax=Select Syntax
+help.syntaxall=모두
+help.changesyntax=구문 변경
+help.choose_syntax=구문 선택
 </content>
 </xwikidoc>

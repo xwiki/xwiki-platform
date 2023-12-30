@@ -38,24 +38,24 @@
   <hidden>true</hidden>
   <content># Admin section
 admin.lightbox=라이트박스
-### Missing: admin.lightbox.description=Configure the image lightbox gallery
-### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=Enable the lightbox
-### Missing: XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Enable the possibility to open content images in a lightbox.
+admin.lightbox.description=이미지 라이트박스 갤러리 구성
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=라이트박스 활성화
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=라이트박스에서 콘텐츠 이미지를 열 수 있는 기능을 활성화합니다.
 
 # Gallery template
-### Missing: image.lightbox.autoPlay.title=Slideshow
-### Missing: image.lightbox.caption.label=Caption
-### Missing: image.lightbox.imageId.title=Image ID
-### Missing: image.lightbox.imageId.copy.title=Copy image ID
-### Missing: image.lightbox.imageId.copy.copied=Copied to clipboard
-### Missing: image.lightbox.imageId.permalink=Permalink
-### Missing: image.lightbox.date.label=Date
-### Missing: image.lightbox.download.title=Download
-### Missing: image.lightbox.escape.title=Escape
-### Missing: image.lightbox.fileName.label=File name
-### Missing: image.lightbox.fullscreen.title=Fullscreen
-### Missing: image.lightbox.gallery.title=Image gallery
-### Missing: image.lightbox.nextSlide.title=Next image
+image.lightbox.autoPlay.title=슬라이드쇼
+image.lightbox.caption.label=표제
+image.lightbox.imageId.title=이미지 ID
+image.lightbox.imageId.copy.title=이미지 ID 복사
+image.lightbox.imageId.copy.copied=클립보드에 복사됨
+image.lightbox.imageId.permalink=고유링크
+image.lightbox.date.label=새 공개 메시지가 수신되었습니다.
+image.lightbox.download.title=다운로드
+image.lightbox.escape.title=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+image.lightbox.fileName.label=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+image.lightbox.fullscreen.title=전체 화면
+image.lightbox.gallery.title=이미지 갤러리
+image.lightbox.nextSlide.title=다음 이미지
 ### Missing: image.lightbox.prevSlide.title=Previous image
 ### Missing: image.lightbox.publisher.label=Image publisher
 ### Missing: image.lightbox.toggler.label=Open the image actions

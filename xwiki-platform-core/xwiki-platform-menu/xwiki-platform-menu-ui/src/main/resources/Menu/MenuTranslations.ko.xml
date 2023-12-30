@@ -58,40 +58,40 @@ menu.livetable._actions.delete=삭제
 menu.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: menu.livetable.content1=Menu Structure
+menu.livetable.content1=메뉴 구조
 
 # Administration keys
-### Missing: admin.menu.name=Menus
+admin.menu.name=메뉴
 
 # UIX keys
-### Missing: menu.uix.extensionPoint.label=Menu Display Location
-### Missing: menu.uix.extensionPoint.hint=Specifies where to display the menu. The menu is displayed either horizontally or vertically, based on the chosen location.
-### Missing: menu.uix.extensionPoint.value.nowhere=Nowhere
-### Missing: menu.uix.extensionPoint.value.template.header.after=After the Page Header
-### Missing: menu.uix.extensionPoint.value.panels.rightPanels=Inside a Right Panel
-### Missing: menu.uix.extensionPoint.value.panels.leftPanels=Inside a Left Panel
-### Missing: menu.uix.content.label=UI Extension Content
-### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
-### Missing: menu.uix.scope.label=Menu Visibility Scope
-### Missing: menu.uix.scope.hint=Specifies in which context the menu is visible.
+menu.uix.extensionPoint.label=메뉴 표시 위치
+menu.uix.extensionPoint.hint=메뉴를 표시할 위치를 지정합니다. 메뉴는 선택한 위치에 따라 가로 또는 세로로 표시됩니다.
+menu.uix.extensionPoint.value.nowhere=아무데도
+menu.uix.extensionPoint.value.template.header.after=페이지 헤더 뒤
+menu.uix.extensionPoint.value.panels.rightPanels=오른쪽 패널 내부
+menu.uix.extensionPoint.value.panels.leftPanels=왼쪽 패널 내부
+menu.uix.content.label=UI 확장 콘텐츠
+menu.uix.content.hint=이 내용이 보이면 JavaScript가 비활성화되었음을 의미할 수 있습니다. 메뉴 표시 위치와 동일한 값을 선택해야 합니다.
+menu.uix.scope.label=메뉴 가시성 범위
+menu.uix.scope.hint=메뉴가 표시되는 컨텍스트를 지정합니다.
 
 # Menu Macro
-### Missing: rendering.macro.menu.name=Menu
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
-### Missing: rendering.macro.menu.parameter.id.name=Id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
-### Missing: rendering.macro.menu.parameter.label.name=Label
-### Missing: rendering.macro.menu.parameter.label.description=Optional menu label used to describe the content of the menu. Especially important for assistive technologies and accessibility of the menu.
-### Missing: rendering.macro.menu.parameter.type.name=Type
-### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+rendering.macro.menu.name=메뉴
+rendering.macro.menu.description=간단한 위키 구문(중첩 목록 및 링크)을 사용하여 생성된 메뉴를 표시합니다.
+rendering.macro.menu.parameter.id.name=ID
+rendering.macro.menu.parameter.id.description=메뉴를 래핑하는 HTML 요소 에 설정될 선택적 메뉴 식별자입니다 . JavaScript 코드에서 이 식별자를 사용하여 메뉴 DOM에 액세스하거나 기능 테스트에서 메뉴 항목을 어설션할 수 있습니다.
+rendering.macro.menu.parameter.label.name=상표
+rendering.macro.menu.parameter.label.description=메뉴 내용을 설명하는 데 사용되는 선택적 메뉴 레이블입니다. 보조 기술과 메뉴 접근성이 특히 중요합니다.
+rendering.macro.menu.parameter.type.name=삭제 단계가 완료되었습니다.
+rendering.macro.menu.parameter.type.description=선택적 메뉴 유형에 따라 메뉴 모양과 동작이 결정됩니다. 지원되는 값은 수평(기본값) 및 수직입니다.
+rendering.macro.menu.content.description=위키 구문을 사용하여 메뉴 구조를 정의합니다. 각 메뉴 항목은 목록 항목이어야 하며 메뉴 항목 레이블이나 링크를 포함해야 합니다. 하위 메뉴 항목에 대해 중첩된 목록을 사용할 수 있습니다.
 
 # Menu UI
-### Missing: menu.ui.openSubMenu=Open the submenu.
-### Missing: menu.ui.closeSubMenu=Close the submenu.
-### Missing: menu.ui.horizontal.toggler.description=Toggle the horizontal menu.
+menu.ui.openSubMenu=하위 메뉴를 엽니다.
+menu.ui.closeSubMenu=하위 메뉴를 닫습니다.
+menu.ui.horizontal.toggler.description=가로 메뉴를 전환합니다.
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.
+menu.description=이것은 페이지 헤더 뒤의 상단 표시줄로 가로로 표시되거나 측면 패널에 세로로 표시되는 탐색 메뉴를 만드는 데 도움이 되는 간단한 애플리케이션입니다.
 </content>
   </xwikidoc>

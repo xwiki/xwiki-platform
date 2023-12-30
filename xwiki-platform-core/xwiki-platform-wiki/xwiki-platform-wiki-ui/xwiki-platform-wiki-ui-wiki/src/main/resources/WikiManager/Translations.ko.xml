@@ -119,20 +119,20 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=위키의 표시 이름입니
 platform.wiki.currentwiki.prop.description.hint=위키와 그 목적에 대한 간략한 설명입니다.
 platform.wiki.currentwiki.prop.owner.hint=위키에 대한 모든 권리를 가진 사용자입니다.
 platform.wiki.currentwiki.prop.membershipType.hint=사용자가 이 위키에 참여할 수 있는 방법입니다.
-### Missing: platform.wiki.currentwiki.prop.secure.hint=If enabled, all this wiki''s generated externals URLs will start with {0}https:~/~/{1}.
-### Missing: platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.
-### Missing: platform.wiki.currentwiki.invite.message.hint=The message to send to the user.
-### Missing: platform.wiki.currentwiki.candidates.hint=Users who have requested or been invited to join the wiki.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.prop.secure.hint=사용하도록 설정하면 이 Wiki에서 생성된 모든 외부 URL이 {0}https:~/~/{1}로 시작됩니다.
+platform.wiki.currentwiki.invite.username.hint=Wiki에 추가할 사용자의 이름입니다.
+platform.wiki.currentwiki.invite.message.hint=사용자에게 보낼 메시지입니다.
+platform.wiki.currentwiki.candidates.hint=위키 가입을 요청했거나 초대받은 사용자입니다.
+platform.wiki.currentwiki.candidates.empty=위키에 가입하도록 요청하거나 초대받은 사용자가 없습니다.
 
 # ADMIN
-### Missing: admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
-### Missing: admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
-### Missing: admin.xwiki.usersconfiguration.title=Configuration
-### Missing: admin.xwiki.members.title=Current Members
-### Missing: admin.xwiki.users.title=All Users
+admin.xwiki.manageworkspace.description=위키 이름, 설명, 소유자, 회원 유형 등의 설정을 관리합니다.
+admin.xwiki.workspaceusers.description=위키 회원 관리: 위키 회원을 추가, 제거, 초대, 수락 또는 거부합니다.
+admin.xwiki.usersconfiguration.title=구성
+admin.xwiki.members.title=현재 회원
+admin.xwiki.users.title=모든 사용자들
 
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home
+platform.wiki.drawer.homeWiki=집
 </content>
   </xwikidoc>

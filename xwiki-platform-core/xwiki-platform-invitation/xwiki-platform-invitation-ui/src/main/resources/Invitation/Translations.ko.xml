@@ -40,10 +40,10 @@
 
 # Invitation Administration Section
 ### Missing: Invitation.WebHome_from_address.hint=The email address used to send the invitation emails from.
-### Missing: Invitation.WebHome_smtp_server_password.hint=The password to connect to the SMTP server, only when authentication is required.
-### Missing: Invitation.WebHome_smtp_server_username.hint=The username to connect to the SMTP server, only when authentication is required.
-### Missing: Invitation.WebHome_smtp_port.hint=The port of the SMTP server to use.
-### Missing: Invitation.WebHome_smtp_server.hint=The SMTP server to send to.
-### Missing: Invitation.WebHome_javamail_extra_props.hint=The list of additional JavaMail properties to use.
+Invitation.WebHome_smtp_server_password.hint=인증이 필요한 경우에만 SMTP 서버 에 연결하기 위한 비밀번호입니다 .
+Invitation.WebHome_smtp_server_username.hint=인증이 필요한 경우에만 SMTP 서버 에 연결하기 위한 사용자 이름입니다 .
+Invitation.WebHome_smtp_port.hint=사용할 SMTP 서버 의 포트입니다 .
+Invitation.WebHome_smtp_server.hint=보낼 SMTP 서버 입니다.
+Invitation.WebHome_javamail_extra_props.hint=사용할 추가 JavaMail 속성 목록입니다 .
 </content>
   </xwikidoc>

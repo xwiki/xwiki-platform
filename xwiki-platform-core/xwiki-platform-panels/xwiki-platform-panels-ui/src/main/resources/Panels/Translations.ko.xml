@@ -37,23 +37,23 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>panels.available=사용 가능한 패널
-### Missing: panels.name=Name
-### Missing: panels.description=Description
-### Missing: panels.type=Type
-### Missing: panels.category=Category
-### Missing: panels._actions=Actions
+panels.name=이름
+panels.description=설명
+panels.type=유형
+panels.category=범주
+panels._actions=행위
 ### Missing: panels.emptyvalue=
-### Missing: panels.children.title=Child Pages
-### Missing: panels.siblings.title=Sibling Pages
+panels.children.title=하위 페이지
+panels.siblings.title=형제 페이지
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 12.6.3, 12.9RC1
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
-### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.confirmChangeSyntax=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.failedSyntaxConversion=Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.
+panels.documentInformation.configureSyntaxes=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+panels.documentInformation.confirmChangeSyntaxWysiwyg=문서의 내용과 개체도 선택한 구문으로 변환하시겠습니까? '취소'를 선택하면 구문이 이전 구문으로 재설정되고 아무 작업도 수행되지 않습니다. '확인'을 선택하면 수정 사항이 손실되고 문서가 자동으로 저장됩니다. 문서 기록 인터페이스로 이동하여 이 수정 사항을 취소하고 마지막 버전으로 되돌릴 수 있습니다.
+panels.documentInformation.confirmChangeSyntax=문서의 내용과 개체도 선택한 구문으로 변환하시겠습니까? '취소'를 선택하면 문서 내용은 수정되지 않고 구문 식별자만 변경됩니다. '확인'을 선택하면 문서가 자동으로 저장됩니다. 문서 기록 인터페이스로 이동하여 이 수정 사항을 취소하고 마지막 버전으로 되돌릴 수 있습니다.
+panels.documentInformation.failedSyntaxConversion=선택한 구문으로 변환하지 못했습니다. 어쨌든 이 구문을 사용하려면 해당 구문을 다시 선택하고 변환을 수행하지 않도록 선택할 수 있습니다.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

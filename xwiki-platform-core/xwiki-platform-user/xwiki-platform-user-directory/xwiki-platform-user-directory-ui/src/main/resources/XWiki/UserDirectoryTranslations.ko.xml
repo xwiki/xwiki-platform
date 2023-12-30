@@ -38,17 +38,17 @@
   <hidden>true</hidden>
   <content>XWiki.UserDirectoryPreferencesClass_columns=표시할 열
 ### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Hide disabled user profiles
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclude from the user directory the users that have their profile disabled
-### Missing: userdirectory.userScopeFilter=User scope:
-### Missing: userdirectory.userScopeFilter.hint=Select the category of users you want to display.
-### Missing: userdirectory.userScopeFilter.local=Local users
-### Missing: userdirectory.userScopeFilter.global=Global users who are members of this wiki
-### Missing: userdirectory.configuration.title=Settings
-### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
-### Missing: platform.userdirectory.customizeNotAllowed=You are not allowed to customize this User Directory.
-### Missing: platform.userdirectory.configTitle=User Directory Configuration
-### Missing: platform.userdirectory.configSheetTitle=User Directory Configuration Sheet
-### Missing: platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=비활성화된 사용자 프로필 숨기기
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=프로필이 비활성화된 사용자를 사용자 디렉터리에서 제외합니다.
+userdirectory.userScopeFilter=사용자 범위:
+userdirectory.userScopeFilter.hint=표시하려는 사용자 카테고리를 선택하세요.
+userdirectory.userScopeFilter.local=로컬 사용자
+userdirectory.userScopeFilter.global=이 위키의 회원인 글로벌 사용자
+userdirectory.configuration.title=설정
+userdirectory.configuration.columns.editHint=열을 선택하려면 클릭하세요.
+platform.userdirectory.customizeNotAllowed=이 사용자 디렉토리를 사용자 정의할 수 없습니다.
+platform.userdirectory.configTitle=사용자 디렉터리 구성
+platform.userdirectory.configSheetTitle=사용자 디렉터리 구성 시트
+platform.userdirectory.configSheetApplyOnConfiguration=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
 </content>
   </xwikidoc>

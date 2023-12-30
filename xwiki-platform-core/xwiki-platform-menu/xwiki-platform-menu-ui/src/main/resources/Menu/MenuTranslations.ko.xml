@@ -40,22 +40,22 @@
 Menu.MenuClass_content1=메뉴 구조
 
 # Live table generic keys
-### Missing: menu.livetable.doc.title=Page title
-### Missing: menu.livetable.doc.name=Page name
-### Missing: menu.livetable.doc.location=Location
-### Missing: menu.livetable.doc.space=Space
-### Missing: menu.livetable.doc.fullname=Page full name
-### Missing: menu.livetable.doc.author=Last Author
-### Missing: menu.livetable.doc.creator=Creator
-### Missing: menu.livetable.doc.date=Update date
-### Missing: menu.livetable.doc.creationDate=Creation date
-### Missing: menu.livetable._avatar=Avatar
-### Missing: menu.livetable._images=Images
-### Missing: menu.livetable._attachments=Attachments
-### Missing: menu.livetable._actions=Actions
-### Missing: menu.livetable._actions.edit=Edit
-### Missing: menu.livetable._actions.delete=Delete
-### Missing: menu.livetable.emptyvalue=-
+menu.livetable.doc.title=페이지 제목
+menu.livetable.doc.name=페이지 이름
+menu.livetable.doc.location=위치
+menu.livetable.doc.space=공간
+menu.livetable.doc.fullname=페이지 전체 이름
+menu.livetable.doc.author=마지막 저자
+menu.livetable.doc.creator=창조자
+menu.livetable.doc.date=업데이트 날짜
+menu.livetable.doc.creationDate=생산 일
+menu.livetable._avatar=화신
+menu.livetable._images=이미지
+menu.livetable._attachments=첨부파일
+menu.livetable._actions=행위
+menu.livetable._actions.edit=편집하다
+menu.livetable._actions.delete=삭제
+menu.livetable.emptyvalue=-
 
 # Live table specific keys
 ### Missing: menu.livetable.content1=Menu Structure

@@ -53,15 +53,15 @@ like.button.title.unlike=현재 페이지를 취소하려면 클릭하세요. �
 like.likers.empty=아직 이 페이지를 좋아하는 사람이 없습니다.
 like.likers.number={0}명이 이 페이지를 좋아합니다:
 like.likers.title={0}을(를) 좋아하는 사람들
-### Missing: like.livetable.column.title=Title
-### Missing: like.livetable.column.location=Location
-### Missing: like.livetable.column.likes=Likes
-### Missing: like.configuration.heading=Like Preferences
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Always display Like button
-### Missing: XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Display the button even if the user doesn't have the rights to interact with it. Use it if you wish to always display the Likes counter.
-### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
-### Missing: XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.
-### Missing: XWiki.Like.LikeConfigurationClass_enabled=Enable Like feature
-### Missing: XWiki.Like.LikeConfigurationClass_enabled.hint=If unchecked this will disable the Like feature and hide information related to Likes.
+like.livetable.column.title=제목
+like.livetable.column.location=위치
+like.livetable.column.likes=좋아요
+like.configuration.heading=좋아요 환경설정
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=좋아요 버튼 항상 표시
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=사용자에게 버튼과 상호 작용할 권한이 없더라도 버튼을 표시합니다. 좋아요 카운터를 항상 표시하려면 이 옵션을 사용하세요.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=캐시 용량
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=캐시에 보관된 좋아요 정보의 수입니다. 이 옵션 변경 사항을 적용하려면 XWiki를 다시 시작해야 합니다 .
+XWiki.Like.LikeConfigurationClass_enabled=좋아요 기능 활성화
+XWiki.Like.LikeConfigurationClass_enabled.hint=선택을 취소하면 좋아요 기능이 비활성화되고 좋아요와 관련된 정보가 숨겨집니다.
 </content>
   </xwikidoc>

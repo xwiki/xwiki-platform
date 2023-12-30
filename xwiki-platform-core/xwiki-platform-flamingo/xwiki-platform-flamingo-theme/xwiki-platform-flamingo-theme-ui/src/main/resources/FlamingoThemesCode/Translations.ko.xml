@@ -40,7 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>platform.flamingo.themes.home.title=플라밍고 테마
-### Missing: platform.flamingo.themes.home.currenttheme=Current Theme
+platform.flamingo.themes.home.currenttheme=현재 테마
 platform.flamingo.themes.home.otherthemes=기타 사용 가능한 테마
 platform.flamingo.themes.home.warningOldColorThemeInstalled=Flamingo 테마를 관리하는 애플리케이션입니다. Flamingo 테마는 Flamingo를 기반으로 하는 모든 스킨의 사용자 정의 가능한 변형입니다. Colibri 기반 스킨의 색상 테마를 관리하려면 {0}Colibri 색상 테마 애플리케이션{1}으로 이동해야 합니다.
 platform.flamingo.themes.home.warningCurrentOldColorTheme=현재 테마는 Flamingo 기반 스킨에 최적화되어 있지 않은 Colibri 컬러 테마입니다. 우리는 호환되도록 최선을 다했지만 결과가 최적이 아닐 수도 있습니다.
@@ -56,23 +56,23 @@ platform.flamingo.themes.title.preview=시사
 platform.flamingo.themes.autorefresh=자동 새로고침
 platform.flamingo.themes.refresh=새로 고치다
 platform.flamingo.themes.refreshwarning=새로 고치는 데 몇 초 정도 걸릴 수 있습니다.
-### Missing: platform.flamingo.themes.preview.iframe.label=Preview of the color theme.
-### Missing: platform.flamingo.themes.loading=Loading...
-### Missing: platform.flamingo.themes.category.logos=Logos
-### Missing: platform.flamingo.themes.category.base-colors=Base colors
-### Missing: platform.flamingo.themes.category.typography=Typography
-### Missing: platform.flamingo.themes.category.forms=Forms
-### Missing: platform.flamingo.themes.category.buttons=Buttons
-### Missing: platform.flamingo.themes.category.tables=Tables
-### Missing: platform.flamingo.themes.category.navbar=Navigation Bar
-### Missing: platform.flamingo.themes.category.dropdowns=Drop downs
-### Missing: platform.flamingo.themes.category.panels=Panels
-### Missing: platform.flamingo.themes.category.breadcrumb=Breadcrumb
-### Missing: platform.flamingo.themes.category.advanced=Advanced
-### Missing: platform.flamingo.themes.defaultvalue=Default
-### Missing: platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
-### Missing: platform.flamingo.themes.local=Local
-### Missing: platform.flamingo.themes.global=Global
+platform.flamingo.themes.preview.iframe.label=색상 테마 미리보기
+platform.flamingo.themes.loading=로드 중...
+platform.flamingo.themes.category.logos=로고
+platform.flamingo.themes.category.base-colors=기본 색상
+platform.flamingo.themes.category.typography=타이포그래피
+platform.flamingo.themes.category.forms=양식
+platform.flamingo.themes.category.buttons=버튼
+platform.flamingo.themes.category.tables=테이블
+platform.flamingo.themes.category.navbar=네비게이션 바
+platform.flamingo.themes.category.dropdowns=드롭다운
+platform.flamingo.themes.category.panels=패널
+platform.flamingo.themes.category.breadcrumb=탐색경로
+platform.flamingo.themes.category.advanced=고급의
+platform.flamingo.themes.defaultvalue=기본
+platform.flamingo.themes.lessCode.description=이 필드에서는 스킨에 추가될 LESS 코드를 직접 작성할 수 있습니다.
+platform.flamingo.themes.local=현지의
+platform.flamingo.themes.global=글로벌
 
 ###############################################################################
 ## Deprecated
@@ -85,12 +85,12 @@ platform.flamingo.themes.refreshwarning=새로 고치는 데 몇 초 정도 걸�
 #######################################
 ## until 7.3M1
 #######################################
-### Missing: platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
+platform.flamingo.themes.lessCode.warning=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 콜론(:), 일치하지 않는 느낌표(!)
 
 #######################################
 ## until 12.9RC1
 #######################################
-### Missing: platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
+platform.flamingo.themes.incompatiblebrowser=죄송합니다. 이 버전의 Internet Explorer에서는 미리보기가 작동하지 않습니다. 최신 브라우저를 사용해야 합니다.
 
 #@deprecatedend
 </content>

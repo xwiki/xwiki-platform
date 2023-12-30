@@ -62,40 +62,40 @@ tour.livetable.targetClass=대상 클래스
 tour.popover.previous=« 이전
 tour.popover.next=다음 "
 tour.popover.end=투어 종료
-### Missing: tour.popover.quit=Quit tour
-### Missing: tour.popover.show=Show tour
-### Missing: tour.popover.show.hint=You can restart the tour by clicking this button at anytime
+tour.popover.quit=둘러보기 종료
+tour.popover.show=쇼 투어
+tour.popover.show.hint=언제든지 이 버튼을 클릭하여 둘러보기를 다시 시작할 수 있습니다.
 
 # Steps
-### Missing: TourCode.StepClass_order=Order
-### Missing: TourCode.StepClass_element=Element (CSS selector that identify an element)
-### Missing: TourCode.StepClass_title=Title
-### Missing: TourCode.StepClass_content=Content
-### Missing: TourCode.StepClass_backdrop=Backdrop
-### Missing: TourCode.StepClass_placement=Placement
-### Missing: TourCode.StepClass_targetPage=Target Page
-### Missing: TourCode.StepClass_action=Target Action
-### Missing: TourCode.StepClass_queryString=Query String
-### Missing: tour.steps=Steps
-### Missing: tour.steps.new_step=New step
-### Missing: tour.steps.add_step=Add step
-### Missing: tour.steps.edit_step=Edit step
-### Missing: tour.steps.save_step=Save
-### Missing: tour.steps.delete_confirm=Are you sure you want to delete the step?
-### Missing: tour.steps.delete_done=Delete step done!
-### Missing: tour.steps.deleting=Deleting step...
-### Missing: tour.steps.yes=Yes
-### Missing: tour.steps.no=No
-### Missing: tour.steps.edit=Edit
-### Missing: tour.steps.delete=Delete
+TourCode.StepClass_order=주문하다
+TourCode.StepClass_element=요소( 요소를 식별하는 CSS 선택기)
+TourCode.StepClass_title=제목
+TourCode.StepClass_content=콘텐츠
+TourCode.StepClass_backdrop=배경
+TourCode.StepClass_placement=놓기
+TourCode.StepClass_targetPage=대상 페이지
+TourCode.StepClass_action=타겟 액션
+TourCode.StepClass_queryString=쿼리 문자열
+tour.steps=단계
+tour.steps.new_step=새로운 단계
+tour.steps.add_step=단계 추가
+tour.steps.edit_step=단계 편집
+tour.steps.save_step=구하다
+tour.steps.delete_confirm=단계를 삭제하시겠습니까?
+tour.steps.delete_done=삭제 단계가 완료되었습니다.
+tour.steps.deleting=단계 삭제 중...
+tour.steps.yes=예
+tour.steps.no=아니요
+tour.steps.edit=편집하다
+tour.steps.delete=삭제
 
 # Upgrade
-### Missing: tour.upgrade.title=Upgrade
-### Missing: tour.upgrade.successList=Successfully converted the following pages:
-### Missing: tour.upgrade.successNothing=You have nothing to upgrade!
+tour.upgrade.title=업그레이드
+tour.upgrade.successList=다음 페이지를 성공적으로 변환했습니다:
+tour.upgrade.successNothing=업그레이드할 것이 없습니다!
 
 # Template
-### Missing: tour.template.name=Tour
-### Missing: tour.template.description=Step by step tour
+tour.template.name=관광
+tour.template.description=단계별 투어
 </content>
   </xwikidoc>

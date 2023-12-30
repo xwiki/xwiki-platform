@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>extension.security.admin.title=보안 취약점
-### Missing: extension.security.indexed.started=Index started on {0}.
+extension.security.indexed.started=색인은 {0}에 시작되었습니다.
 extension.security.indexed.on={0}에 색인이 생성되었습니다. 이 날짜 이후에 설치된 확장 프로그램이나 이 날짜 이후에 출시된 보안 취약점은 나타나지 않습니다. 새로운 보안 검색이 정기적으로 수행됩니다.
 extension.security.indexed.nojob=이전 색인화 처리를 찾을 수 없습니다.
 extension.security.admin.generalWarning=이 보안 검색에는 설치된 모든 확장 프로그램이 포함되지는 않습니다. Extension Manager를 통해 업데이트할 수 없는 확장은 현재 포함되지 않습니다.

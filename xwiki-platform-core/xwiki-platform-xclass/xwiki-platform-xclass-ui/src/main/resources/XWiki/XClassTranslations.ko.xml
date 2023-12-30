@@ -1,1 +1,109 @@
+<?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.XClassTranslations" locale="ko">
+  <web>XWiki</web>
+  <name>XClassTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>#
+# Default Class Sheet
+#
+
+platform.xclass.defaultClassSheet.title=기본 수업 시트
+### Missing: platform.xclass.defaultClassSheet.description=You can edit this page to change the default presentation of classes, or you can copy it to create a customized view just for one or several classes.
+### Missing: platform.xclass.defaultClassSheet.properties.heading=Class Properties
+### Missing: platform.xclass.defaultClassSheet.properties.empty=This class does not have any properties yet. You can use the {0}class editor{1} to define them.
+### Missing: platform.xclass.defaultClassSheet.properties.edit=You can use the {0}class editor{1} to add or modify the class properties.
+### Missing: platform.xclass.defaultClassSheet.createPage.heading=Create a new page
+### Missing: platform.xclass.defaultClassSheet.createPage.pageAlreadyExists=The target page already exists. Please choose a different name or {0}view{1} the existing page.
+### Missing: platform.xclass.defaultClassSheet.createPage.denied=You don't have permission to create that page
+### Missing: platform.xclass.defaultClassSheet.createPage.label=Create this page
+### Missing: platform.xclass.defaultClassSheet.pages.heading=Existing Pages
+### Missing: platform.xclass.defaultClassSheet.pages.description=The following pages have objects described by this class.
+### Missing: platform.xclass.defaultClassSheet.sheets.heading=Class Sheets
+### Missing: platform.xclass.defaultClassSheet.sheets.missing=Before using this class you must first create a sheet and a template for it. Follow the instructions below to do this.
+### Missing: platform.xclass.defaultClassSheet.sheets.description=The {0}sheet{1} allows you to control the presentation of pages of this type. You can use the default presentation, which enumerates all the available fields, or you can design your own presentation. You can also choose different presentations for the viewing and for the editing modes.
+### Missing: platform.xclass.defaultClassSheet.sheets.create=Create the sheet
+### Missing: platform.xclass.defaultClassSheet.sheets.notBound=The sheet is not bound to the class so it won't be applied automatically when a page that has an object of this class is displayed.
+### Missing: platform.xclass.defaultClassSheet.sheets.bind=Bind the sheet to the class
+### Missing: platform.xclass.defaultClassSheet.sheets.view=View the sheet page ({0})
+### Missing: platform.xclass.defaultClassSheet.sheets.list=The following class sheets are bound to this class:
+### Missing: platform.xclass.defaultClassSheet.template.heading=Class Template
+### Missing: platform.xclass.defaultClassSheet.template.description=The {0}template{1} is the page used as the model when creating a new page of this type. It contains an instance of your {0}class{1}.
+### Missing: platform.xclass.defaultClassSheet.template.create=Create the template
+### Missing: platform.xclass.defaultClassSheet.template.missingObject=The template does not contain an object of type {0}.
+### Missing: platform.xclass.defaultClassSheet.template.addObject=Add a {0} object to the template
+### Missing: platform.xclass.defaultClassSheet.template.view=View the template page ({0})
+### Missing: platform.xclass.defaultClassSheet.templateProvider.heading=Class Template Provider
+### Missing: platform.xclass.defaultClassSheet.templateProvider.description=The {0}template provider{0} allows to create wiki pages using an existing template. A template will be displayed in the {0}Create{0} menu.
+### Missing: platform.xclass.defaultClassSheet.templateProvider.create=Create the template provider
+### Missing: platform.xclass.defaultClassSheet.templateProvider.view=View the template provider page ({0})
+### Missing: platform.xclass.templateProvider.defaultDescription=Add a new {0} entry.
+
+#
+# Default Object Sheet
+#
+
+### Missing: xclass.defaultObjectSheet.noProperties=No properties
+
+#
+# Classes
+#
+
+### Missing: platform.xclass.classes.title=Data types
+### Missing: platform.xclass.classes.description=This tool allows to define structured data types (classes) in your wiki. Please consult the {0}developer''s guide{1} to get familiar with the XWiki data model and the public APIs.
+### Missing: platform.xclass.classes.templates.heading=Templates for new data types
+### Missing: platform.xclass.classes.templates.description=Here are the templates and sheets for creating new classes:
+### Missing: platform.xclass.classes.templates.classSheet=Default code for displaying a class
+### Missing: platform.xclass.classes.templates.classTemplate=Page template for new classes
+### Missing: platform.xclass.classes.templates.objectSheet=Default code for displaying class instances (objects)
+### Missing: platform.xclass.classes.createClass.heading=Create a new data type
+### Missing: platform.xclass.classes.createClass.description=Choose a simple title, such as {0}Article{1}, {0}Book{1}, {0}Employee{1}. ''{0}Class{1}'' will be appended at the end automatically.
+### Missing: platform.xclass.classes.createClass.denied=You don't have permission to create that class
+### Missing: platform.xclass.classes.createClass.title.hint=Title of the new class
+### Missing: platform.xclass.classes.createClass.title.placeholder=New Class
+### Missing: platform.xclass.classes.createClass.location.hint=Location in the page hierarchy where this new class will be created
+### Missing: platform.xclass.classes.createClass.parent.hint=Parent of the new class
+### Missing: platform.xclass.classes.createClass.parent.placeholder=Path.To.Class
+### Missing: platform.xclass.classes.createClass.name.hint=Name of the new class
+### Missing: platform.xclass.classes.createClass.label=Create this Class
+### Missing: platform.xclass.classes.livetable.heading=Data types defined in this wiki
+### Missing: platform.xclass.classes.livetable.doc.title=Class
+### Missing: platform.xclass.classes.livetable.doc.location=Location
+### Missing: platform.xclass.classes.livetable.doc.date=Date
+### Missing: platform.xclass.classes.livetable.doc.author=Last Author
+### Missing: platform.xclass.classes.livetable.pageCount=Page Count
+### Missing: platform.xclass.classes.livetable._actions=Actions
+</content>
+  </xwikidoc>

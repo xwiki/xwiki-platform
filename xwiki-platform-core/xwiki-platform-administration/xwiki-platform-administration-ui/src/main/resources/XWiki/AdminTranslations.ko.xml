@@ -121,67 +121,67 @@ administration.section.export.description.hint=패키지를 가져올 때 표시
 administration.section.export.author.hint=패키지를 가져올 때 표시되는 패키지 작성자입니다.
 administration.section.export.licence.hint=콘텐츠 라이선스입니다. 예: LGPL, GPLV2 등
 administration.section.export.version.hint=패키지 설명자에 저장된 패키지 버전입니다.
-### Missing: administration.section.export.backupPack.hint=Preserve the page author when importing the pages. This option has no effect on the exported content and can be changed before the import.
+administration.section.export.backupPack.hint=페이지를 가져올 때 페이지 작성자를 유지합니다. 이 옵션은 내보낸 콘텐츠에 영향을 주지 않으며 가져오기 전에 변경할 수 있습니다.
 
 # Users Section
-### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
-### Missing: administration.section.users.enableUser.done=User account enabled
-### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
-### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
-### Missing: administration.section.users.disableUser.done=User account disabled
-### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
-### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.newAuthor=New Author
-### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
-### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
-### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
-### Missing: administration.section.users.deleteUser.newAuthor.script=script
-### Missing: admin.usersgroups.extensionrights=Extension Rights
+administration.section.users.enableUser.inProgress=사용자 계정을 활성화하는 중...
+administration.section.users.enableUser.done=사용자 계정이 활성화되었습니다.
+administration.section.users.enableUser.failed=사용자 계정을 활성화하지 못했습니다.
+administration.section.users.disableUser.inProgress=사용자 계정을 비활성화하는 중...
+administration.section.users.disableUser.done=사용자 계정이 비활성화되었습니다.
+administration.section.users.disableUser.failed=사용자 계정을 비활성화하지 못했습니다.
+administration.section.users.deleteUser.confirmationMessage=사용자 {0}이(가) 삭제되고 자신이 속한 모든 {1}그룹{2}에서 제거됩니다. 계속하시겠습니까?
+administration.section.users.deleteUser.programmingRightsWarning=삭제하려는 사용자는 프로그래밍 권한이 있으며 {0}{1,choice,1#1 페이지|1&lt;{1} 페이지}{2}의 마지막 작성자입니다. 프로그래밍 권한이 필요한 {1,choice,1#이 페이지에는|1&lt;이 페이지에는} 스크립트가 있는 경우 작성자를 바꾸지 않고 사용자를 삭제하면 이러한 스크립트는 작동을 중지합니다.
+administration.section.users.deleteUser.scriptRightsWarning=삭제하려는 사용자는 스크립트 권한을 가지며 {0}{1,choice,1#1 페이지|1&lt;{1} 페이지}{2}의 마지막 작성자입니다. 작성자를 교체하지 않고 사용자를 삭제하면 {1,choice,1#이 페이지|1&lt;이 페이지}의 스크립트 작동이 중지될 수 있습니다.
+administration.section.users.deleteUser.newAuthor=새로운 저자
+administration.section.users.deleteUser.newAuthor.hint=0} 권한이 있는 사용자를 선택하거나 작성자를 바꾸지 않으려면 이 필드를 비워 두세요.
+administration.section.users.deleteUser.newAuthor.error=선택한 사용자에게는 {0} 권한이 없습니다!
+administration.section.users.deleteUser.newAuthor.programming=프로그램 작성
+administration.section.users.deleteUser.newAuthor.script=스크립트
+admin.usersgroups.extensionrights=확장 권한
 
 # Other Category
-### Missing: admin.other=Other
-### Missing: admin.other.description=Various configurations for extensions.
-### Missing: administration.section.analytics.status=Status
-### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+admin.other=다른
+admin.other.description=확장을 위한 다양한 구성.
+administration.section.analytics.status=상태
+administration.section.analytics.status.hint=Google Analytics™의 추적이 활성화되어 있는지 확인
 
 # Social category
-### Missing: admin.social=Social
-### Missing: admin.social.description=Configuration for social features.
+admin.social=사회의
+admin.social.description=소셜 기능에 대한 구성입니다.
 
 # Configurable Class
-### Missing: XWiki.ConfigurableClass_displayInSection=Display in section
-### Missing: XWiki.ConfigurableClass_heading=Heading
-### Missing: XWiki.ConfigurableClass_configurationClass=Configuration class
-### Missing: XWiki.ConfigurableClass_linkPrefix=Link prefix
-### Missing: XWiki.ConfigurableClass_propertiesToShow=Properties to show
-### Missing: XWiki.ConfigurableClass_codeToExecute=Code to execute
-### Missing: XWiki.ConfigurableClass_iconAttachment=Icon attachment
-### Missing: XWiki.ConfigurableClass_displayInCategory=Display in category
-### Missing: XWiki.ConfigurableClass_displayBeforeCategory=Display before category
-### Missing: XWiki.ConfigurableClass_categoryIcon=Category icon
-### Missing: XWiki.ConfigurableClass_scope=Scope
-### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
-### Missing: XWiki.ConfigurableClass_scope_SPACE=Current space
-### Missing: XWiki.ConfigurableClass_scope_ALL_SPACES=All spaces
-### Missing: XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki and all spaces
-### Missing: XWiki.ConfigurableClass_sectionOrder=Section order
+XWiki.ConfigurableClass_displayInSection=섹션에 표시
+XWiki.ConfigurableClass_heading=표제
+XWiki.ConfigurableClass_configurationClass=구성 클래스
+XWiki.ConfigurableClass_linkPrefix=링크 접두어
+XWiki.ConfigurableClass_propertiesToShow=표시할 속성
+XWiki.ConfigurableClass_codeToExecute=실행할 코드
+XWiki.ConfigurableClass_iconAttachment=아이콘 첨부
+XWiki.ConfigurableClass_displayInCategory=카테고리에 표시
+XWiki.ConfigurableClass_displayBeforeCategory=카테고리 앞에 표시
+XWiki.ConfigurableClass_categoryIcon=카테고리 아이콘
+XWiki.ConfigurableClass_scope=범위
+XWiki.ConfigurableClass_scope_WIKI=일주일
+XWiki.ConfigurableClass_scope_SPACE=현재 공간
+XWiki.ConfigurableClass_scope_ALL_SPACES=모든 공간
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki 및 모든 공간
+XWiki.ConfigurableClass_sectionOrder=섹션 순서
 
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
 ## Deprecated since 11.6RC1
-### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+XWiki.XWikiPreferences_auth_active_check.hint="예"로 설정하면 사용자가 이전에 이메일로 전송된 토큰을 입력하지 않고 로그인할 수 없습니다.
+administration.section.users.deleteUser.markInactiveMessage=사용자를 삭제하는 대신 해당 프로필을 비활성으로 표시할 수 있습니다. 이렇게 하면 해당 사용자가 로그인할 수 없으며 작성한 스크립트와 관련된 액세스 권한이 보존됩니다.
 
 ## Deprecated since 11.8RC1
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markDisabledMessage=사용자를 삭제하는 대신 해당 프로필을 비활성화된 것으로 표시할 수 있습니다. 이렇게 하면 해당 사용자가 로그인할 수 없으며 작성한 스크립트와 관련된 액세스 권한이 보존됩니다.
 
 ## Deprecated since 15.10RC1
-### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
+XWiki.Registration_liveValidation_enabled.hint=실시간 유효성 검사 JavaScript 코드를 비활성화하려면 이를 false로 설정합니다(필드는 여전히 서버 측에서 유효성이 검사됩니다).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=실시간 유효성 검사는 사용자가 필드를 만족스럽게 입력했음을 알리는 메시지를 표시합니다. 이는 특정 필드에 대해 재정의되지 않은 경우 받게 될 메시지입니다. 속도 코드를 사용할 수 있습니다.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

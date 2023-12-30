@@ -41,7 +41,7 @@
 #
 
 platform.xclass.defaultClassSheet.title=기본 수업 시트
-### Missing: platform.xclass.defaultClassSheet.description=You can edit this page to change the default presentation of classes, or you can copy it to create a customized view just for one or several classes.
+platform.xclass.defaultClassSheet.description=이 페이지를 편집하여 수업의 기본 표시를 변경하거나 복사하여 하나 또는 여러 수업에 대한 사용자 정의 보기를 만들 수 있습니다.
 platform.xclass.defaultClassSheet.properties.heading=클래스 속성
 platform.xclass.defaultClassSheet.properties.empty=이 클래스에는 아직 속성이 없습니다. {0}클래스 편집기{1}를 사용하여 정의할 수 있습니다.
 platform.xclass.defaultClassSheet.properties.edit={0}클래스 편집기{1}를 사용하여 클래스 속성을 추가하거나 수정할 수 있습니다.
@@ -57,53 +57,53 @@ platform.xclass.defaultClassSheet.sheets.description={0}시트{1}를 사용하�
 platform.xclass.defaultClassSheet.sheets.create=시트 만들기
 platform.xclass.defaultClassSheet.sheets.notBound=시트는 클래스에 바인딩되지 않으므로 이 클래스의 개체가 있는 페이지가 표시될 때 자동으로 적용되지 않습니다.
 platform.xclass.defaultClassSheet.sheets.bind=시트를 클래스에 바인딩
-### Missing: platform.xclass.defaultClassSheet.sheets.view=View the sheet page ({0})
-### Missing: platform.xclass.defaultClassSheet.sheets.list=The following class sheets are bound to this class:
-### Missing: platform.xclass.defaultClassSheet.template.heading=Class Template
-### Missing: platform.xclass.defaultClassSheet.template.description=The {0}template{1} is the page used as the model when creating a new page of this type. It contains an instance of your {0}class{1}.
-### Missing: platform.xclass.defaultClassSheet.template.create=Create the template
-### Missing: platform.xclass.defaultClassSheet.template.missingObject=The template does not contain an object of type {0}.
-### Missing: platform.xclass.defaultClassSheet.template.addObject=Add a {0} object to the template
-### Missing: platform.xclass.defaultClassSheet.template.view=View the template page ({0})
-### Missing: platform.xclass.defaultClassSheet.templateProvider.heading=Class Template Provider
-### Missing: platform.xclass.defaultClassSheet.templateProvider.description=The {0}template provider{0} allows to create wiki pages using an existing template. A template will be displayed in the {0}Create{0} menu.
-### Missing: platform.xclass.defaultClassSheet.templateProvider.create=Create the template provider
-### Missing: platform.xclass.defaultClassSheet.templateProvider.view=View the template provider page ({0})
-### Missing: platform.xclass.templateProvider.defaultDescription=Add a new {0} entry.
+platform.xclass.defaultClassSheet.sheets.view=시트 페이지 보기({0})
+platform.xclass.defaultClassSheet.sheets.list=다음 클래스 시트가 이 클래스에 바인딩되어 있습니다.
+platform.xclass.defaultClassSheet.template.heading=클래스 템플릿
+platform.xclass.defaultClassSheet.template.description={0}템플릿{1}은 이 유형의 새 페이지를 만들 때 모델로 사용되는 페이지입니다. 여기에는 {0}클래스{1}의 인스턴스가 포함되어 있습니다.
+platform.xclass.defaultClassSheet.template.create=템플릿 만들기
+platform.xclass.defaultClassSheet.template.missingObject=템플릿에 {0} 유형의 개체가 포함되어 있지 않습니다.
+platform.xclass.defaultClassSheet.template.addObject=템플릿에 {0} 객체를 추가합니다.
+platform.xclass.defaultClassSheet.template.view=템플릿 페이지 보기({0})
+platform.xclass.defaultClassSheet.templateProvider.heading=클래스 템플릿 제공자
+platform.xclass.defaultClassSheet.templateProvider.description={0}템플릿 제공자{0}를 사용하면 기존 템플릿을 사용하여 위키 페이지를 만들 수 있습니다. 템플릿이 {0}만들기{0} 메뉴에 표시됩니다.
+platform.xclass.defaultClassSheet.templateProvider.create=템플릿 공급자 만들기
+platform.xclass.defaultClassSheet.templateProvider.view=템플릿 제공자 페이지 보기({0})
+platform.xclass.templateProvider.defaultDescription=새 {0} 항목을 추가합니다 .
 
 #
 # Default Object Sheet
 #
 
-### Missing: xclass.defaultObjectSheet.noProperties=No properties
+xclass.defaultObjectSheet.noProperties=속성 없음
 
 #
 # Classes
 #
 
-### Missing: platform.xclass.classes.title=Data types
-### Missing: platform.xclass.classes.description=This tool allows to define structured data types (classes) in your wiki. Please consult the {0}developer''s guide{1} to get familiar with the XWiki data model and the public APIs.
-### Missing: platform.xclass.classes.templates.heading=Templates for new data types
-### Missing: platform.xclass.classes.templates.description=Here are the templates and sheets for creating new classes:
-### Missing: platform.xclass.classes.templates.classSheet=Default code for displaying a class
-### Missing: platform.xclass.classes.templates.classTemplate=Page template for new classes
-### Missing: platform.xclass.classes.templates.objectSheet=Default code for displaying class instances (objects)
-### Missing: platform.xclass.classes.createClass.heading=Create a new data type
-### Missing: platform.xclass.classes.createClass.description=Choose a simple title, such as {0}Article{1}, {0}Book{1}, {0}Employee{1}. ''{0}Class{1}'' will be appended at the end automatically.
-### Missing: platform.xclass.classes.createClass.denied=You don't have permission to create that class
-### Missing: platform.xclass.classes.createClass.title.hint=Title of the new class
-### Missing: platform.xclass.classes.createClass.title.placeholder=New Class
-### Missing: platform.xclass.classes.createClass.location.hint=Location in the page hierarchy where this new class will be created
-### Missing: platform.xclass.classes.createClass.parent.hint=Parent of the new class
-### Missing: platform.xclass.classes.createClass.parent.placeholder=Path.To.Class
-### Missing: platform.xclass.classes.createClass.name.hint=Name of the new class
-### Missing: platform.xclass.classes.createClass.label=Create this Class
-### Missing: platform.xclass.classes.livetable.heading=Data types defined in this wiki
-### Missing: platform.xclass.classes.livetable.doc.title=Class
-### Missing: platform.xclass.classes.livetable.doc.location=Location
-### Missing: platform.xclass.classes.livetable.doc.date=Date
-### Missing: platform.xclass.classes.livetable.doc.author=Last Author
-### Missing: platform.xclass.classes.livetable.pageCount=Page Count
-### Missing: platform.xclass.classes.livetable._actions=Actions
+platform.xclass.classes.title=데이터 유형
+platform.xclass.classes.description=이 도구를 사용하면 위키에서 구조화된 데이터 유형(클래스)을 정의할 수 있습니다. XWiki 데이터 모델과 공개 API 에 대해 알아보려면 {0}개발자 가이드{1}를 참조하세요 .
+platform.xclass.classes.templates.heading=새로운 데이터 유형을 위한 템플릿
+platform.xclass.classes.templates.description=번역 단어가 너무 깁니다!
+platform.xclass.classes.templates.classSheet=클래스를 표시하기 위한 기본 코드
+platform.xclass.classes.templates.classTemplate=새 수업을 위한 페이지 템플릿
+platform.xclass.classes.templates.objectSheet=클래스 인스턴스(객체)를 표시하기 위한 기본 코드
+platform.xclass.classes.createClass.heading=새 데이터 유형 만들기
+platform.xclass.classes.createClass.description={0}기사{1}, {0}도서{1}, {0}직원{1} 등 간단한 제목을 선택하세요. ''{0}클래스{1}''는 끝에 자동으로 추가됩니다.
+platform.xclass.classes.createClass.denied=해당 수업을 만들 권한이 없습니다.
+platform.xclass.classes.createClass.title.hint=새 수업의 제목
+platform.xclass.classes.createClass.title.placeholder=새로운 클래스
+platform.xclass.classes.createClass.location.hint=이 새 클래스가 생성될 페이지 계층 구조의 위치
+platform.xclass.classes.createClass.parent.hint=새 클래스의 부모
+platform.xclass.classes.createClass.parent.placeholder=경로.대상.클래스
+platform.xclass.classes.createClass.name.hint=새 클래스의 이름
+platform.xclass.classes.createClass.label=다음 픽스업이 번역에 적용되었습니다: 너비가 0인 공간
+platform.xclass.classes.livetable.heading=이 위키에 정의된 데이터 유형
+platform.xclass.classes.livetable.doc.title=수업
+platform.xclass.classes.livetable.doc.location=위치
+platform.xclass.classes.livetable.doc.date=날짜
+platform.xclass.classes.livetable.doc.author=마지막 저자
+platform.xclass.classes.livetable.pageCount=페이지 수
+platform.xclass.classes.livetable._actions=행위
 </content>
   </xwikidoc>

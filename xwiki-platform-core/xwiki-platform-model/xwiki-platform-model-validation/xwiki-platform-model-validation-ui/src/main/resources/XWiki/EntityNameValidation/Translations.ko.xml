@@ -1,1 +1,77 @@
+<?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EntityNameValidation.Translations" locale="ko">
+  <web>XWiki.EntityNameValidation</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.EntityNameValidation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>entitynamevalidation.currentStrategy.label=현재 명명 전략
+### Missing: entitynamevalidation.currentStrategy.hint=The name strategy will be used when creating, renaming, or saving documents.
+### Missing: entitynamevalidation.useTransformation.label=Transform names automatically
+### Missing: entitynamevalidation.useTransformation.hint=If enabled, the name strategy will be used to automatically adapt the name when possible.
+### Missing: entitynamevalidation.useValidation.label=Validate names before saving
+### Missing: entitynamevalidation.useValidation.hint=If enabled, the name strategy will validate the name before saving: use this feature with caution since it might prevent saving some existing documents.
+### Missing: entitynamevalidation.ReplaceCharacterEntityNameValidation.name=Character replacement
+### Missing: entitynamevalidation.SlugEntityNameValidation.name=Preformatted names (no accents, no space, no special characters)
+### Missing: entitynamevalidation.replacementCharacter.configuration=Character Replacement Strategy Configuration
+### Missing: entitynamevalidation.testStrategy.label=Test the strategy you selected
+### Missing: entitynamevalidation.testStrategy.hint=Allows you to check the behaviour of the name strategy you chose
+### Missing: entitynamevalidation.testStrategy.placeholder=Type here the name of a page to test it
+### Missing: entitynamevalidation.testStrategy.validName=Is this name valid with the selected strategy?
+### Missing: entitynamevalidation.testStrategy.transformedName=Name after transformation by the selected strategy:
+### Missing: entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=Forbidden characters
+### Missing: entitynamevalidation.replacementCharacter.livetable.replacementCharacter=Replacement characters
+### Missing: entitynamevalidation.replacementCharacter.livetable._actions=Actions
+### Missing: entitynamevalidation.replacementCharacter.add=Add new character
+### Missing: entitynamevalidation.replacementCharacter.addNewCharacter=Add new character to forbid or replace
+### Missing: entitynamevalidation.replacementCharacter.newForbiddenCharacter.label=New forbidden character
+### Missing: entitynamevalidation.replacementCharacter.newForbiddenCharacter.hint=This character will be forbidden in page names
+### Missing: entitynamevalidation.replacementCharacter.newForbiddenCharacter.placeholder=Type here the new forbidden character
+### Missing: entitynamevalidation.replacementCharacter.newReplacementCharacter.label=New replacement character
+### Missing: entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=This character will replace the forbidden character in page names. If not specified, the forbidden character will be removed from page names.
+### Missing: entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=Type here the new replacement character or leave empty
+### Missing: entitynamevalidation.replacementCharacter.create.inProgress=New forbidden character is being added...
+### Missing: entitynamevalidation.replacementCharacter.create.done=New forbidden character has been successfully added.
+### Missing: entitynamevalidation.replacementCharacter.create.failed=Error when adding the new forbidden character.
+### Missing: entitynamevalidation.replacementCharacter.removeCharacter=Deletion of a forbidden character
+### Missing: entitynamevalidation.replacementCharacter.removeCharacter.warning=Are you sure to delete this forbidden character?
+### Missing: entitynamevalidation.replacementCharacter.removeCharacter.remove=Delete
+### Missing: entitynamevalidation.replacementCharacter.remove.inProgress=The forbidden character is being deleted...
+### Missing: entitynamevalidation.replacementCharacter.remove.done=The forbidden character has been deleted.
+### Missing: entitynamevalidation.replacementCharacter.remove.failed=Error when deleting a forbidden character.
+### Missing: entitynamevalidation.replacementCharacter.emptyReplacementCharacter=None
+### Missing: entitynamevalidation.admin.heading=Name Strategies
+### Missing: admin.namestrategies=Name Strategies
+</content>
+  </xwikidoc>

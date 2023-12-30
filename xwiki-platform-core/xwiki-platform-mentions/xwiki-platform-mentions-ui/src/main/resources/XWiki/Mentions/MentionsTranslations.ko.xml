@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>rendering.macro.mention.name=사용자 언급
-### Missing: rendering.macro.mention.description=Insert a user mention.
+rendering.macro.mention.description=사용자 멘션을 삽입하세요.
 rendering.macro.mention.parameter.reference.name=참조
 rendering.macro.mention.parameter.reference.description=언급된 사용자 또는 그룹 참조입니다.
 rendering.macro.mention.parameter.style.name=디스플레이 스타일
@@ -53,8 +53,8 @@ XWiki.Mentions.MentionsConfigurationClass_mentionsColor=색상 언급
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=현재 사용자에 대한 멘션의 색상입니다(참고: background-color CSS 속성의 값으로 사용됨).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
 XWiki.Mentions.MentionsConfigurationClass_quoteActivated=따옴표를 활성화하세요
-### Missing: XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Defines if a quote of the text surrounding a mention is included in the user mention notifications.
-### Missing: mentions.tip=When editing in WYSIWYG, type @ and then start typing letters to get suggestions to mention a user.
-### Missing: mentions.configuration.heading=Mentions Preferences
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=사용자 멘션 알림에 멘션 주변 텍스트 인용문을 포함할지 여부를 정의합니다.
+mentions.tip=WYSIWYG에서 편집할 때 @를 입력한 다음 문자를 입력하기 시작하면 사용자를 언급하라는 제안이 표시됩니다.
+mentions.configuration.heading=멘션 환경설정
 </content>
   </xwikidoc>

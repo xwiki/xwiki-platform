@@ -37,7 +37,7 @@
   <hidden>true</hidden>
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=미리보기:
-### Missing: platform.icon.picker.loading=Loading
+platform.icon.picker.loading=로드 중
 rendering.macro.iconPicker.name=아이콘 선택기
 rendering.macro.iconPicker.description=XWiki 아이콘 세트 내에서 아이콘을 선택하십시오 .
 rendering.macro.iconPicker.parameter.id.name=ID

@@ -38,18 +38,18 @@
   <hidden>true</hidden>
   <content>## keys for the admin section navigation
 admin.indexinguser=인덱싱 사용자
-### Missing: admin.indexinguser.description=Choose a user with whom to index the content of the wiki.
+admin.indexinguser.description=위키 콘텐츠를 색인화할 사용자를 선택하세요.
 
 ## keys use on the admin "indexing user" page itself
-### Missing: admin.indexinguser.explanation.part1=The indexer runs as a background job, usually with no user associated with it. For pages whose title are computed by a "sheet" document the computed title will not show up if the sheet is not visible for anonymous users. This is especially the case if the wiki is closed. In that case e.g. search results for user profiles are not shown with their computed title «Profile of "firstname" "lastname"», but just their page name (usually «login»).
-### Missing: admin.indexinguser.explanation.part2=To be able to show the same title in the search results it is necessary to provide the indexer with a user who has access to the sheet pages. It is recommended to create a dedicated, locked user account without special rights.
-### Missing: admin.indexinguser.explanation.security.head=Security note:
-### Missing: admin.indexinguser.explanation.security.content=Using an account with more view rights than other users can cause leakage of page titles from pages that these users normally do not see.
-### Missing: admin.indexinguser.explanation.part3=Changes to this setting are applied only to pages indexed after the change; a full reindex is recommended for consistent application of the change.
-### Missing: admin.indexinguser.explanation.mainwikionly=This setting can only be done in the main wiki as the Solr indexer runs from the main wiki.
+admin.indexinguser.explanation.part1=인덱서는 일반적으로 연결된 사용자 없이 백그라운드 작업으로 실행됩니다. 제목이 "시트" 문서에 의해 계산된 페이지의 경우 시트가 익명 사용자에게 표시되지 않으면 계산된 제목이 표시되지 않습니다. 특히 위키가 닫혀 있는 경우에는 더욱 그렇습니다. 이 경우, 예를 들어 사용자 프로필에 대한 검색 결과는 계산된 제목인 "Profile of "firstname" "lastname""과 함께 표시되지 않고 해당 페이지 이름(일반적으로 "login")만 표시됩니다.
+admin.indexinguser.explanation.part2=검색 결과 에 동일한 제목을 표시하려면 시트 페이지에 액세스할 수 있는 사용자를 인덱서에 제공해야 합니다. 특별한 권한이 없는 전용, 잠긴 사용자 계정을 생성하는 것이 좋습니다.
+admin.indexinguser.explanation.security.head=보안 참고사항:
+admin.indexinguser.explanation.security.content=다른 사용자보다 더 많은 보기 권한을 가진 계정을 사용하면 해당 사용자가 일반적으로 볼 수 없는 페이지에서 페이지 제목이 유출될 수 있습니다.
+admin.indexinguser.explanation.part3=이 설정에 대한 변경 사항은 변경 후 색인이 생성된 페이지에만 적용됩니다. 변경 사항을 일관되게 적용하려면 전체 재색인을 수행하는 것이 좋습니다.
+admin.indexinguser.explanation.mainwikionly=Solr 인덱서는 기본 위키에서 실행되므로 이 설정은 기본 위키에서만 수행할 수 있습니다.
 
 ## keys used by the configuration class
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.description=Indexing User
-### Missing: XWiki.SolrSearchAdminIndexingUser_indexer.hint=The XWiki User Account used to index pages in the background.
+XWiki.SolrSearchAdminIndexingUser_indexer.description=인덱싱 사용자
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=백그라운드에서 페이지를 색인화하는 데 사용되는 XWiki 사용자 계정.
 </content>
   </xwikidoc>

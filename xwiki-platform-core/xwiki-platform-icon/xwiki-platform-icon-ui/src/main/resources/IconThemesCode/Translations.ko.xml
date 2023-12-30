@@ -38,13 +38,13 @@
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=미리보기:
 ### Missing: platform.icon.picker.loading=Loading
-### Missing: rendering.macro.iconPicker.name=Icon Picker
-### Missing: rendering.macro.iconPicker.description=Select an icon within the XWiki icon set.
-### Missing: rendering.macro.iconPicker.parameter.id.name=Id
-### Missing: rendering.macro.iconPicker.parameter.id.description=DOM id of the input field where the picker will apply to
-### Missing: rendering.macro.iconPicker.parameter.class.name=Class
-### Missing: rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply to
-### Missing: rendering.macro.iconPicker.parameter.prefix.name=Prefix
-### Missing: rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")
+rendering.macro.iconPicker.name=아이콘 선택기
+rendering.macro.iconPicker.description=XWiki 아이콘 세트 내에서 아이콘을 선택하십시오 .
+rendering.macro.iconPicker.parameter.id.name=ID
+rendering.macro.iconPicker.parameter.id.description=선택기가 적용될 입력 필드의 DOM ID
+rendering.macro.iconPicker.parameter.class.name=수업
+rendering.macro.iconPicker.parameter.class.description=선택기가 적용될 입력의 CSS 클래스
+rendering.macro.iconPicker.parameter.prefix.name=접두사
+rendering.macro.iconPicker.parameter.prefix.description=입력 필드의 아이콘 이름 앞에 추가할 접두어(기본값: "image:icon:")
 </content>
   </xwikidoc>

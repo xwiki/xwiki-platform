@@ -80,7 +80,7 @@ XWiki.XWikiPreferences_title.hint=브라우저에 표시되는 페이지 제목 
 XWiki.XWikiPreferences_meta.hint=페이지 설명, 작성자, 키워드 등을 지정하여 각 페이지에 추가되는 메타데이터를 정의합니다.
 XWiki.XWikiPreferences_webcopyright.hint=바닥글의 저작권 섹션에 표시되는 정보를 정의합니다.
 XWiki.XWikiPreferences_version.hint=바닥글의 버전 섹션에 표시되는 정보를 정의합니다.
-XWiki.XWikiPreferences_skin.hint=사용되는 기본 스킨을 지정합니다. 파일 시스템 스킨(예: "flamingo") 또는 사용자 정의 페이지 스킨(예: " XWiki .DefaultSkin") 일 수 있습니다.
+XWiki.XWikiPreferences_skin.hint=사용되는 기본 스킨을 지정합니다. 파일 시스템 스킨(예: "flamingo") 또는 사용자 정의 페이지 스킨(예: " XWiki .DefaultSkin") 일 수 있습니다
 XWiki.XWikiPreferences_iconTheme.hint=기본적으로 사용할 아이콘 테마를 지정합니다.
 XWiki.XWikiPreferences_colorTheme.hint=기본적으로 사용할 색상 테마를 지정합니다.
 
@@ -100,7 +100,7 @@ XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=새 위키 페이지를 �
 XWiki.XWikiPreferences_multilingual.hint=위키에 여러 언어로 된 콘텐츠가 있는 경우 다국어 모드를 활성화하세요. 이를 통해 사용자는 Wiki 페이지를 번역하고 선호하는 언어로 인터페이스를 볼 수 있습니다.
 XWiki.XWikiPreferences_languages.hint=인터페이스에서 사용할 수 있는 언어를 선택하세요. 사용자는 이러한 언어 중 하나로 위키 페이지를 번역할 수 있습니다(다국어 모드가 활성화된 경우).
 XWiki.XWikiPreferences_default_language.hint=위키의 기본 언어를 선택하세요
-XWiki.XWikiPreferences_dateformat.hint=날짜를 표시하는 데 사용되는 형식을 지정합니다(예: 페이지 생성 날짜).
+XWiki.XWikiPreferences_dateformat.hint=날짜를 표시하는 데 사용되는 형식을 지정합니다(예: 페이지 생성 날짜)
 XWiki.XWikiPreferences_timezone.hint=날짜의 시간대를 전역적으로 설정
 
 # Import Section
@@ -119,17 +119,17 @@ administration.section.export.moreOptions=추가 옵션
 administration.section.export.lessOptions=더 적은 옵션
 administration.section.export.description.hint=패키지를 가져올 때 표시되는 패키지 설명입니다.
 administration.section.export.author.hint=패키지를 가져올 때 표시되는 패키지 작성자입니다.
-administration.section.export.licence.hint=콘텐츠 라이선스입니다. 예: LGPL, GPLV2 등
+administration.section.export.licence.hint=콘텐츠 라이선스입니다. 예: LGPL, GPLV2 등.
 administration.section.export.version.hint=패키지 설명자에 저장된 패키지 버전입니다.
 administration.section.export.backupPack.hint=페이지를 가져올 때 페이지 작성자를 유지합니다. 이 옵션은 내보낸 콘텐츠에 영향을 주지 않으며 가져오기 전에 변경할 수 있습니다.
 
 # Users Section
 administration.section.users.enableUser.inProgress=사용자 계정을 활성화하는 중...
-administration.section.users.enableUser.done=사용자 계정이 활성화되었습니다.
-administration.section.users.enableUser.failed=사용자 계정을 활성화하지 못했습니다.
+administration.section.users.enableUser.done=사용자 계정이 활성화되었습니다
+administration.section.users.enableUser.failed=사용자 계정을 활성화하지 못했습니다
 administration.section.users.disableUser.inProgress=사용자 계정을 비활성화하는 중...
-administration.section.users.disableUser.done=사용자 계정이 비활성화되었습니다.
-administration.section.users.disableUser.failed=사용자 계정을 비활성화하지 못했습니다.
+administration.section.users.disableUser.done=사용자 계정이 비활성화되었습니다
+administration.section.users.disableUser.failed=사용자 계정을 비활성화하지 못했습니다
 administration.section.users.deleteUser.confirmationMessage=사용자 {0}이(가) 삭제되고 자신이 속한 모든 {1}그룹{2}에서 제거됩니다. 계속하시겠습니까?
 administration.section.users.deleteUser.programmingRightsWarning=삭제하려는 사용자는 프로그래밍 권한이 있으며 {0}{1,choice,1#1 페이지|1&lt;{1} 페이지}{2}의 마지막 작성자입니다. 프로그래밍 권한이 필요한 {1,choice,1#이 페이지에는|1&lt;이 페이지에는} 스크립트가 있는 경우 작성자를 바꾸지 않고 사용자를 삭제하면 이러한 스크립트는 작동을 중지합니다.
 administration.section.users.deleteUser.scriptRightsWarning=삭제하려는 사용자는 스크립트 권한을 가지며 {0}{1,choice,1#1 페이지|1&lt;{1} 페이지}{2}의 마지막 작성자입니다. 작성자를 교체하지 않고 사용자를 삭제하면 {1,choice,1#이 페이지|1&lt;이 페이지}의 스크립트 작동이 중지될 수 있습니다.

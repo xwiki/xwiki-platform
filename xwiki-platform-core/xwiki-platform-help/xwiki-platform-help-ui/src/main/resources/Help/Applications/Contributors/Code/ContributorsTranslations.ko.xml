@@ -56,30 +56,30 @@ contributors.livetable.doc.title=페이지 제목
 contributors.livetable.doc.name=페이지 이름
 contributors.livetable.doc.space=공간
 contributors.livetable.doc.fullname=페이지 전체 이름
-### Missing: contributors.livetable.doc.location=Location
-### Missing: contributors.livetable.doc.author=Last Author
-### Missing: contributors.livetable.doc.creator=Creator
-### Missing: contributors.livetable.doc.date=Date
-### Missing: contributors.livetable.doc.creationDate=Creation Date
-### Missing: contributors.livetable._avatar=Avatar
-### Missing: contributors.livetable._images=Images
-### Missing: contributors.livetable._attachments=Attachments
-### Missing: contributors.livetable._actions=Actions
-### Missing: contributors.livetable._actions.edit=Edit
-### Missing: contributors.livetable._actions.delete=Delete
-### Missing: contributors.livetable.emptyvalue=-
+contributors.livetable.doc.location=위치
+contributors.livetable.doc.author=마지막 저자
+contributors.livetable.doc.creator=창조자
+contributors.livetable.doc.date=날짜
+contributors.livetable.doc.creationDate=생산 일
+contributors.livetable._avatar=화신
+contributors.livetable._images=이미지
+contributors.livetable._attachments=첨부파일
+contributors.livetable._actions=행위
+contributors.livetable._actions.edit=편집하다
+contributors.livetable._actions.delete=삭제
+contributors.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: contributors.livetable.longText1=Picture
-### Missing: contributors.livetable.title1=Name
-### Missing: contributors.livetable.date1=Birthdate
-### Missing: contributors.livetable.staticList1=Type
-### Missing: contributors.livetable.content1=Bio
+contributors.livetable.longText1=그림
+contributors.livetable.title1=이름
+contributors.livetable.date1=생일
+contributors.livetable.staticList1=유형
+contributors.livetable.content1={0} 개 항목이 선택됨
 
 # Other keys
-### Missing: contributors.entry.name=Contributors
+contributors.entry.name=기여자
 
 # Deprecated keys
-### Missing: contributors.dataSpace.title=Data
+contributors.dataSpace.title=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
 </content>
   </xwikidoc>

@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>attachmentSelector.replace={0} 바꾸기
-### Missing: attachmentSelector.replace.hint=The effect may not be visible immediately due to browser caching.
+attachmentSelector.replace.hint=브라우저 캐싱으로 인해 효과가 즉시 표시되지 않을 수 있습니다.
 rendering.macro.attachmentSelector.parameter.versionSummary.name=버전 요약
 rendering.macro.attachmentSelector.parameter.versionSummary.description=사용자가 기록에 기록될 버전 요약을 입력하도록 허용할지 여부입니다. 버전 요약이 제공되지 않거나 버전 요약 입력이 표시되지 않는 경우 자동 메시지가 사용됩니다.
 attachment.attachmentSelector.temporaryUpload.success=첨부파일 업로드가 성공했습니다.

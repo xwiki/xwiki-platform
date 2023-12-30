@@ -39,21 +39,21 @@
   <content># Class fields
 Help.Applications.Movies.Code.MoviesClass_title1=제목
 ### Missing: Help.Applications.Movies.Code.MoviesClass_longText1=Poster
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1=Genre
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_action=Action
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=Comedy
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_drama=Drama
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_horror=Horror
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_musical=Musical
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_romance=Romance
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_sf=Sci-Fi
-### Missing: Help.Applications.Movies.Code.MoviesClass_staticList1_thriller=Thriller
-### Missing: Help.Applications.Movies.Code.MoviesClass_date1=Release Date
-### Missing: Help.Applications.Movies.Code.MoviesClass_number1=Runtime (minutes)
-### Missing: Help.Applications.Movies.Code.MoviesClass_boolean1=Seen
-### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1=Director
-### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=Charlie Chaplin
-### Missing: Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=Frank Capra
+Help.Applications.Movies.Code.MoviesClass_staticList1=장르
+Help.Applications.Movies.Code.MoviesClass_staticList1_action=행동
+Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=코메디
+Help.Applications.Movies.Code.MoviesClass_staticList1_drama=드라마
+Help.Applications.Movies.Code.MoviesClass_staticList1_horror=공포
+Help.Applications.Movies.Code.MoviesClass_staticList1_musical=뮤지컬
+Help.Applications.Movies.Code.MoviesClass_staticList1_romance=로맨스
+Help.Applications.Movies.Code.MoviesClass_staticList1_sf=SF
+Help.Applications.Movies.Code.MoviesClass_staticList1_thriller=스릴러
+Help.Applications.Movies.Code.MoviesClass_date1=출시일
+Help.Applications.Movies.Code.MoviesClass_number1=런타임(분)
+Help.Applications.Movies.Code.MoviesClass_boolean1=본
+Help.Applications.Movies.Code.MoviesClass_databaseList1=감독
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=찰리 채플린
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=프랭크 카프라
 ### Missing: Help.Applications.Movies.Code.MoviesClass_content1=Storyline
 
 # Live table generic keys

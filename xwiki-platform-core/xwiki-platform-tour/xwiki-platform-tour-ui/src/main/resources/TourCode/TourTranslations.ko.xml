@@ -40,28 +40,28 @@
 tour.app.name=관광
 
 # Class fields
-### Missing: TourCode.TourClass_description=Description
-### Missing: TourCode.TourClass_isActive=Active
-### Missing: TourCode.TourClass_targetPage=Target Page
+TourCode.TourClass_description=설명
+TourCode.TourClass_isActive=활동적인
+TourCode.TourClass_targetPage=대상 페이지
 
 # Live table generic keys
-### Missing: tour.livetable.doc.title=Tour name
-### Missing: tour.livetable._actions=Actions
-### Missing: tour.livetable._actions.edit=Edit
-### Missing: tour.livetable._actions.delete=Delete
-### Missing: tour.livetable._actions.launch=Launch
-### Missing: tour.livetable.emptyvalue=-
+tour.livetable.doc.title=투어명
+tour.livetable._actions=행위
+tour.livetable._actions.edit=편집하다
+tour.livetable._actions.delete=삭제
+tour.livetable._actions.launch=시작하다
+tour.livetable.emptyvalue=-
 
 # Live table specific keys
-### Missing: tour.livetable.description=Description
-### Missing: tour.livetable.isActive=Active
-### Missing: tour.livetable.targetPage=Target Page
-### Missing: tour.livetable.targetClass=Target Class
+tour.livetable.description=설명
+tour.livetable.isActive=활동적인
+tour.livetable.targetPage=대상 페이지
+tour.livetable.targetClass=대상 클래스
 
 # Tour popover
-### Missing: tour.popover.previous=« Prev
-### Missing: tour.popover.next=Next »
-### Missing: tour.popover.end=End tour
+tour.popover.previous=« 이전
+tour.popover.next=다음 "
+tour.popover.end=투어 종료
 ### Missing: tour.popover.quit=Quit tour
 ### Missing: tour.popover.show=Show tour
 ### Missing: tour.popover.show.hint=You can restart the tour by clicking this button at anytime

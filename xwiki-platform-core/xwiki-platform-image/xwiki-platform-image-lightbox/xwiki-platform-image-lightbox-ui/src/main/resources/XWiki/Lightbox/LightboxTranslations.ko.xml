@@ -56,8 +56,8 @@ image.lightbox.fileName.label=역이 저장되었지만, 일부 새롭게 실패
 image.lightbox.fullscreen.title=전체 화면
 image.lightbox.gallery.title=이미지 갤러리
 image.lightbox.nextSlide.title=다음 이미지
-### Missing: image.lightbox.prevSlide.title=Previous image
-### Missing: image.lightbox.publisher.label=Image publisher
-### Missing: image.lightbox.toggler.label=Open the image actions
+image.lightbox.prevSlide.title=이전 이미지
+image.lightbox.publisher.label=이미지 게시자
+image.lightbox.toggler.label=이미지 작업 열기
 </content>
   </xwikidoc>

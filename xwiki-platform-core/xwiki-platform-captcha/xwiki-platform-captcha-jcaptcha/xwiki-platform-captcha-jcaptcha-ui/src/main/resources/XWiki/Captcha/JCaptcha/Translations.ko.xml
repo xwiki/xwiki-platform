@@ -53,13 +53,13 @@ XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=선택한 유형의 CAPTCH
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=기본 Gimpy(Gmail)
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=단순 목록
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=비선형 텍스트 Gimpy
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simple List
-### Missing: captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math
-### Missing: captcha.jcaptcha.engine.custom=Custom:
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=핫메일
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=변형된 배플 목록 Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=배플 목록 짐피
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=핫메일 2008
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=철자
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=단순 목록
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=간단한 수학
+captcha.jcaptcha.engine.custom=관습:
 </content>
   </xwikidoc>

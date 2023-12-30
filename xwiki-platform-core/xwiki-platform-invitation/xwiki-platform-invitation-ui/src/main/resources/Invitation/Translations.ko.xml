@@ -39,7 +39,7 @@
   <content>invitation.applicationsPanelEntryLabel=초대
 
 # Invitation Administration Section
-### Missing: Invitation.WebHome_from_address.hint=The email address used to send the invitation emails from.
+Invitation.WebHome_from_address.hint=초대 이메일을 보내는 데 사용되는 이메일 주소입니다.
 Invitation.WebHome_smtp_server_password.hint=인증이 필요한 경우에만 SMTP 서버 에 연결하기 위한 비밀번호입니다 .
 Invitation.WebHome_smtp_server_username.hint=인증이 필요한 경우에만 SMTP 서버 에 연결하기 위한 사용자 이름입니다 .
 Invitation.WebHome_smtp_port.hint=사용할 SMTP 서버 의 포트입니다 .

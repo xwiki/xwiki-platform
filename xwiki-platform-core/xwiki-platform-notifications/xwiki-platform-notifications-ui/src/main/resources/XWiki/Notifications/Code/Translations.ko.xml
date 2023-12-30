@@ -56,7 +56,7 @@ notifications.filters.advanced.modal.close=닫다
 notifications.filters.name.systemUserNotificationFilter=시스템 필터
 notifications.filters.description.systemUserNotificationFilter=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
 notifications.filters.name.ownEventsNotificationFilter=자체 이벤트 필터
-notifications.filters.description.ownEventsNotificationFilter=이벤트가 특별히 귀하를 대상으로 하지 않는 한 귀하의 활동에 대한 알림을 숨깁니다.
+notifications.filters.description.ownEventsNotificationFilter=이벤트가 특별히 귀하를 대상으로 하지 않는 한 귀하의 활동에 대한 알림을 숨깁니다
 notifications.filters.name.eventReadAlertFilter=이벤트 필터 읽기(경고)
 notifications.filters.description.eventReadAlertFilter=읽음으로 표시한 알림 숨기기
 notifications.filters.name.eventReadEmailFilter=이벤트 필터 읽기(이메일)
@@ -73,7 +73,7 @@ notifications.filters.preferences.scopeNotificationFilter.space=페이지와 아
 notifications.filters.preferences.scopeNotificationFilter.wiki=일주일
 
 ## Notifications toggles
-notifications.toggle.disabled.hint=이 위치를 보려면 설정에서 알림을 활성화해야 합니다.
+notifications.toggle.disabled.hint=이 위치를 보려면 설정에서 알림을 활성화해야 합니다
 
 ## Notifications formats
 notifications.format.alert=알리다
@@ -81,11 +81,11 @@ notifications.format.email=이메일
 
 ## Filter preferences settings
 notifications.filters.preferences.delete.inProgress=삭제 중...
-notifications.filters.preferences.delete.done={0} 개 항목이 선택됨
-notifications.filters.preferences.delete.error=필터 환경설정을 삭제하지 못했습니다.
+notifications.filters.preferences.delete.done=필터 환경설정이 삭제되었습니다!
+notifications.filters.preferences.delete.error=필터 환경설정을 삭제하지 못했습니다
 notifications.filters.preferences.setEnabled.inProgress=절약...
 notifications.filters.preferences.setEnabled.done=필터 환경설정이 저장되었습니다!
-notifications.filters.preferences.setEnabled.error=필터 환경설정을 저장하지 못했습니다.
+notifications.filters.preferences.setEnabled.error=필터 환경설정을 저장하지 못했습니다
 notifications.filters.preferences.allEvents=모든 이벤트(비활성화된 경우도 포함)
 
 ## System Filter preferences settings
@@ -127,25 +127,25 @@ notifications.filters.preferences.custom.addFilter.eventType.hint=이 필터는 
 notifications.menu.header=알림
 notifications.menu.header.settings=설정
 notifications.menu.clear=모두 지우기
-notifications.menu.clearing=Clearing the notifications
+notifications.menu.clearing=알림 지우기
 notifications.menu.cleared=알림이 삭제되었습니다
 notifications.settings.title=알림 환경설정
 notifications.settings.error.notAdmin=이 내용을 보려면 관리자여야 합니다.
 notifications.settings.menu=알림 메뉴
-notifications.settings.menu.hint=알림 메뉴는 페이지 오른쪽 상단에 위치하며, 종 모양({0})을 클릭하면 볼 수 있습니다.
+notifications.settings.menu.hint=알림 메뉴는 페이지 오른쪽 상단에 위치하며, 종 모양({0})을 클릭하면 볼 수 있습니다
 notifications.settings.email=이메일
 notifications.settings.email.forGuest=알림 설정을 처리하려면 로그인하거나 등록하세요.
 notifications.settings.email.disabled=알림 이메일이 비활성화되었습니다. 관리자에게 문의하세요.
-notifications.settings.email.hint=위키에서 일어난 일에 대한 요약이 포함된 이메일이 정기적으로 귀하에게 전송됩니다.
+notifications.settings.email.hint=위키에서 일어난 일에 대한 요약이 포함된 이메일이 정기적으로 귀하에게 전송됩니다
 notifications.settings.email.title=이메일 환경설정
 notifications.settings.email.frequency=이메일 빈도
 notifications.settings.email.frequency.hint=위키에서 일어난 일에 대한 요약이 포함된 이메일을 얼마나 자주 받을지 선택하세요.
 notifications.settings.email.diffType.hint=이메일의 모든 변경 사항에 대해 받고 싶은 세부 정보 수준을 선택하세요.
 notifications.settings.saving=설정을 저장하는 중입니다...
 notifications.settings.saved=저장되었습니다!
-notifications.settings.savingfailed=설정을 저장하지 못했습니다.
+notifications.settings.savingfailed=설정을 저장하지 못했습니다
 notifications.settings.filters=필터({0})
-notifications.settings.errorFilterWiki=오류: 페이지가 아닌 Wiki를 선택해야 합니다.
+notifications.settings.errorFilterWiki=오류: 페이지가 아닌 Wiki를 선택해야 합니다
 notifications.settings.preferences=환경설정
 notifications.settings.preferences.hint=어떤 이벤트가 일어나고 있는지 캡처하고 스트림이나 이메일로 전달하세요.
 notifications.settings.applications.title=응용
@@ -156,7 +156,7 @@ notifications.settings.applications.table.dropdown.toggle.label=0} 애플리케�
 notifications.settings.events=이벤트
 notifications.settings.watch.title=본 페이지
 notifications.settings.watch.autowatchmode=자동 페이지 시청
-notifications.settings.watch.autowatchmode.hint=작업을 마친 후 페이지를 볼 것인지 결정하십시오.
+notifications.settings.watch.autowatchmode.hint=작업을 마친 후 페이지를 볼 것인지 결정하십시오
 notifications.settings.watch.forGuest=알림 설정을 처리하려면 로그인하거나 등록하세요.
 notifications.settings.watch.disabled=감시된 엔터티가 비활성화되었습니다. 관리자에게 문의하세요.
 notifications.events.by=0}님이 편집했습니다.
@@ -205,7 +205,7 @@ notifications.userprofile.follow=팔로우 시작
 notifications.userprofile.unfollow=팔로우 중지
 notifications.userprofile.done=완료
 notifications.userprofile.saving=절약...
-notifications.userprofile.error=알림 설정을 저장하는 중에 오류가 발생했습니다.
+notifications.userprofile.error=알림 설정을 저장하는 중에 오류가 발생했습니다
 
 ## Macros description
 rendering.macro.notificationsApplicationsPreferences.name=알림 애플리케이션 기본 설정

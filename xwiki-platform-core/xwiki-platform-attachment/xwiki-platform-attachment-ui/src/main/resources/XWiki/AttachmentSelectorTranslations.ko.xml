@@ -38,10 +38,10 @@
   <hidden>true</hidden>
   <content>attachmentSelector.replace={0} 바꾸기
 ### Missing: attachmentSelector.replace.hint=The effect may not be visible immediately due to browser caching.
-### Missing: rendering.macro.attachmentSelector.parameter.versionSummary.name=Version Summary
-### Missing: rendering.macro.attachmentSelector.parameter.versionSummary.description=Whether to allow the user to enter a version summary that will be recorded in the history. An automatic message is used when no version summary is provided or if the version summary input is not displayed.
-### Missing: attachment.attachmentSelector.temporaryUpload.success=Attachment upload succeeded.
-### Missing: attachment.attachmentSelector.temporaryUpload.failure=Attachment upload failed.
-### Missing: attachment.attachmentSelector.attachmentBox.temporaryAttachmentTitle=Temporary attachment
+rendering.macro.attachmentSelector.parameter.versionSummary.name=버전 요약
+rendering.macro.attachmentSelector.parameter.versionSummary.description=사용자가 기록에 기록될 버전 요약을 입력하도록 허용할지 여부입니다. 버전 요약이 제공되지 않거나 버전 요약 입력이 표시되지 않는 경우 자동 메시지가 사용됩니다.
+attachment.attachmentSelector.temporaryUpload.success=첨부파일 업로드가 성공했습니다.
+attachment.attachmentSelector.temporaryUpload.failure=첨부파일 업로드에 실패했습니다.
+attachment.attachmentSelector.attachmentBox.temporaryAttachmentTitle=임시 첨부
 </content>
   </xwikidoc>

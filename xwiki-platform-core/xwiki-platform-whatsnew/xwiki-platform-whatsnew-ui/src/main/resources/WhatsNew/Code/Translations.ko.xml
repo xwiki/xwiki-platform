@@ -37,6 +37,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>platform.whatsnew.drawer.text=새로운 소식
-### Missing: platform.whatsnew.title=What's new in XWiki
+platform.whatsnew.title=XWiki 의 새로운 기능
 </content>
   </xwikidoc>

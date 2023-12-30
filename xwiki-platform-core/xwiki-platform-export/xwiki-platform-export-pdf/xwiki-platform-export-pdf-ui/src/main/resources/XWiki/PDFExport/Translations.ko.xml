@@ -108,6 +108,6 @@ XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=시간이 초과되기 
 XWiki.PDFExport.ConfigurationClass_maxContentSize=최대 콘텐츠 크기
 XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
 XWiki.PDFExport.ConfigurationClass_replaceFOP=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
-### Missing: XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Replace the old PDF export based on Apache Formatting Objects Processor (FOP).
+XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Apache Formatting Objects Processor(FOP)를 기반으로 이전 PDF 내보내기를 대체합니다.
 </content>
   </xwikidoc>

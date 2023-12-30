@@ -52,14 +52,14 @@ office.import.terminalChildPages.hint=고급: 생성된 하위 페이지를 터�
 office.import.inProgress=Office 문서를 가져오는 중...
 office.import.done=Office 문서를 가져왔습니다.
 office.import.failed=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
-### Missing: office.config.serverType.hint=The Office server type. It can be internally managed (local) or external (remote).
-### Missing: office.config.serverPort.hint=The port number used for connecting to the Office server instance
-### Missing: office.config.autoStart.hint=Specify if the Office server should be started / connected automatically at XWiki startup
-### Missing: office.config.serverPath.hint=The path to the Office installation
-### Missing: office.config.serverState.connected=Connected
-### Missing: office.config.serverState.notConnected=Not Connected
-### Missing: office.config.serverState.confError=Invalid Configuration
-### Missing: office.config.serverState.error=Error
+office.config.serverType.hint=Office 서버 유형입니다. 내부적으로(로컬) 관리하거나 외부(원격)로 관리할 수 있습니다.
+office.config.serverPort.hint=Office 서버 인스턴스에 연결하는 데 사용되는 포트 번호
+office.config.autoStart.hint=XWiki 시작 시 Office 서버가 자동으로 시작/연결되어야 하는지 지정
+office.config.serverPath.hint=Office 설치 경로
+office.config.serverState.connected=연결됨
+office.config.serverState.notConnected=연결되지 않은
+office.config.serverState.confError=잘못된 구성
+office.config.serverState.error=오류
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
@@ -67,7 +67,7 @@ office.import.failed=역이 저장되었지만, 일부 새롭게 실패한 검�
 #######################################
 ## until 14.10.2, 15.0RC1
 #######################################
-### Missing: office.form.append.hint=The document already exists! Append the result to the existing wiki page
+office.form.append.hint=문서가 이미 존재합니다! 기존 위키 페이지에 결과를 추가합니다.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

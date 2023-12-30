@@ -39,7 +39,7 @@
   <content>help.tipsPanel.title=팁
 help.tipsPanel.noTipMessage=팁을 사용할 수 없습니다!
 help.tipsPanel.gettingStartedTip=새로운 XWiki 사용자 라면 [[시작 가이드&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ 문서 /UserGuide/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Ctrl+G 또는 Meta+G를 사용하여 Wiki의 어떤 페이지로든 이동할 수 있습니다.
+help.tipsPanel.jumpToPageTip=Ctrl+G 또는 Meta+G를 사용하여 Wiki의 어떤 페이지로든 이동할 수 있습니다.\n[[더 많은 단축키&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ 문서 /UserGuide/Features/KeyboardShortcuts]].
 help.tipsPanel.improveXWikiTip=XWiki를 개선할 수 있다는 것을 알고 계셨습니까 ? 5분만 시간을 내어 [[이 설문조사 작성&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/Survey/ProductFeedback]] 이 오픈 소스 프로젝트를 도와주세요 !
 help.tipsPanel.breadcrumbsTip=탐색경로 요소 옆에 있는 화살표를 클릭하면 형제 및 하위 페이지로 빠르게 이동할 수 있습니다.
 help.tipsPanel.advancedHiddenShortcutTip=x+x+x+a 키 콤보를 눌러 [[고급 모드&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ Documentation /UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] 및 x+x+x+h를 사용하여 [[숨겨진 페이지&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ 문서 /UserGuide/Features/PageEditing#HHidingPages]].

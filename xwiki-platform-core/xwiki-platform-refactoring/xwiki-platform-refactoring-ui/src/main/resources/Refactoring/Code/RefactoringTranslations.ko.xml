@@ -38,8 +38,8 @@
   <hidden>true</hidden>
   <content>refactoring.configuration.delete.heading=속성 삭제
 ### Missing: admin.delete=Delete
-### Missing: Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=Can skip the recycle bin
-### Missing: Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=When set to Yes, allows advanced users to choose whether they want to send pages to the recycle bin or delete them permanently when deleting pages. When set to No, pages are always sent to the recycle bin if it is active, otherwise they are always permanently deleted. The default value is No.
-### Missing: refactoring.configuration.delete.emptySection=Nothing to configure in this section.
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated=휴지통을 건너뛸 수 있음
+Refactoring.Code.RefactoringConfigurationClass_isRecycleBinSkippingActivated.hint=예로 설정하면 고급 사용자가 페이지를 삭제할 때 페이지를 휴지통으로 보낼지 아니면 영구적으로 삭제할지 선택할 수 있습니다. 아니요로 설정하면 페이지가 활성화된 경우 항상 휴지통으로 보내지고 그렇지 않은 경우 항상 영구적으로 삭제됩니다. 기본값은 아니요입니다.
+refactoring.configuration.delete.emptySection=이 섹션에서는 구성할 항목이 없습니다.
 </content>
   </xwikidoc>

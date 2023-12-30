@@ -38,24 +38,24 @@
   <hidden>true</hidden>
   <content># Class fields
 Help.Applications.Contributors.Code.ContributorsClass_longText1=그림
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_title1=Name
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_date1=Birthdate
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1=Type
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=Actor
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=Composer
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=Director
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=Editor
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=Hairdresser
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=Make-up Artist
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=Producer
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=Writer
-### Missing: Help.Applications.Contributors.Code.ContributorsClass_content1=Bio
+Help.Applications.Contributors.Code.ContributorsClass_title1=이름
+Help.Applications.Contributors.Code.ContributorsClass_date1=생일
+Help.Applications.Contributors.Code.ContributorsClass_staticList1=유형
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=배우
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=작곡가
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=감독
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=편집자
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=미용사
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=메이크업 아티스트
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=생산자
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=작가
+Help.Applications.Contributors.Code.ContributorsClass_content1=그는 ~였다
 
 # Live table generic keys
-### Missing: contributors.livetable.doc.title=Page Title
-### Missing: contributors.livetable.doc.name=Page Name
-### Missing: contributors.livetable.doc.space=Space
-### Missing: contributors.livetable.doc.fullname=Page full name
+contributors.livetable.doc.title=페이지 제목
+contributors.livetable.doc.name=페이지 이름
+contributors.livetable.doc.space=공간
+contributors.livetable.doc.fullname=페이지 전체 이름
 ### Missing: contributors.livetable.doc.location=Location
 ### Missing: contributors.livetable.doc.author=Last Author
 ### Missing: contributors.livetable.doc.creator=Creator

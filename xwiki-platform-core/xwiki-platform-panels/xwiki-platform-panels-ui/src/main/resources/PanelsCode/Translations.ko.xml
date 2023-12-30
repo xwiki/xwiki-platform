@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>platform.panels.applications.helper=여기에서 응용 프로그램 표시줄(기본적으로 왼쪽)에 표시되는 응용 프로그램을 선택할 수 있습니다. 새로운 응용 프로그램이 여기에 표시됩니다. 그 중 일부를 제거하려면 첫 번째 상자에서 다른 상자로 아이콘을 끌어다 놓으면 됩니다. 원하는 대로 애플리케이션을 다시 주문할 수도 있습니다. 변경 사항을 저장하는 것을 잊지 마세요!
-### Missing: platform.panels.applications.displayedapps=Applications in the bar
+platform.panels.applications.displayedapps=바의 애플리케이션
 platform.panels.applications.blacklistedapps=바에 없는 애플리케이션
 platform.panels.applications.save=구하다
 platform.panels.applications.revert=초기화
@@ -53,16 +53,16 @@ PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=최상위 
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=이 동적 필터는 설치된 확장 프로그램에 속한 최상위 페이지가 수정되지 않는 경우 탐색 트리에서 제거합니다.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=최상위 애플리케이션 페이지 제외
 PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=이 동적 필터는 App Within Minutes로 생성된 애플리케이션에 속하는 최상위 페이지를 탐색 트리에서 제거합니다.
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration
+PanelsCode.NavigationConfigurationClass_exclusions=제외
+PanelsCode.NavigationConfigurationClass_exclusions.hint=탐색 트리에서 제외할 페이지 목록입니다.
+PanelsCode.NavigationConfigurationClass_inclusions=포함사항
+PanelsCode.NavigationConfigurationClass_inclusions.hint=이전 필터에 의해 제외된 경우에도 탐색 트리에 포함할 페이지 목록입니다.
+platform.panels.navigation.configuration.excludedPages=제외된 페이지
+platform.panels.navigation.configuration.excludedPages.hint=페이지를 탐색 트리 밖으로 이동하거나 다시 넣으려면 끌어서 놓기를 사용하세요.
+platform.panels.navigation.configuration.excludedPages.empty=없음
+platform.panels.navigation.configuration.topLevelExtensionPages=최상위 확장 페이지
+platform.panels.navigation.configuration.topLevelApplicationPages=최상위 신청 페이지
+platform.panels.navigation.configuration.otherPages=다른 페이지
+platform.panels.navigation.configuration.saveComment=관리에서 탐색 패널 구성을 업데이트했습니다.
 </content>
   </xwikidoc>

@@ -57,78 +57,78 @@ notifications.filters.name.systemUserNotificationFilter=시스템 필터
 notifications.filters.description.systemUserNotificationFilter=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
 notifications.filters.name.ownEventsNotificationFilter=자체 이벤트 필터
 notifications.filters.description.ownEventsNotificationFilter=이벤트가 특별히 귀하를 대상으로 하지 않는 한 귀하의 활동에 대한 알림을 숨깁니다.
-### Missing: notifications.filters.name.eventReadAlertFilter=Read Event Filter (Alert)
-### Missing: notifications.filters.description.eventReadAlertFilter=Hide notifications that you have marked as read
-### Missing: notifications.filters.name.eventReadEmailFilter=Read Event Filter (Email)
-### Missing: notifications.filters.description.eventReadEmailFilter=Hide notifications that you have marked as read
-### Missing: notifications.filters.name.minorEventAlertNotificationFilter=Minor Event (Alert)
-### Missing: notifications.filters.description.minorEventAlertNotificationFilter=Hide notifications concerning minor changes on pages
-### Missing: notifications.filters.name.minorEventEmailNotificationFilter=Minor Event (Email)
-### Missing: notifications.filters.description.minorEventEmailNotificationFilter=Hide notifications concerning minor changes on pages
+notifications.filters.name.eventReadAlertFilter=이벤트 필터 읽기(경고)
+notifications.filters.description.eventReadAlertFilter=읽음으로 표시한 알림 숨기기
+notifications.filters.name.eventReadEmailFilter=이벤트 필터 읽기(이메일)
+notifications.filters.description.eventReadEmailFilter=읽음으로 표시한 알림 숨기기
+notifications.filters.name.minorEventAlertNotificationFilter=사소한 이벤트(경고)
+notifications.filters.description.minorEventAlertNotificationFilter=페이지의 사소한 변경 사항에 대한 알림 숨기기
+notifications.filters.name.minorEventEmailNotificationFilter=사소한 이벤트(이메일)
+notifications.filters.description.minorEventEmailNotificationFilter=페이지의 사소한 변경 사항에 대한 알림 숨기기
 
 ## Translation keys for the scopeNotificationFilter
-### Missing: notifications.filters.preferences.scopeNotificationFilter.name=Scope Notification Filter
-### Missing: notifications.filters.preferences.scopeNotificationFilter.page=Page only
-### Missing: notifications.filters.preferences.scopeNotificationFilter.space=Page and children
-### Missing: notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.name=범위 알림 필터
+notifications.filters.preferences.scopeNotificationFilter.page=페이지만
+notifications.filters.preferences.scopeNotificationFilter.space=페이지와 아이들
+notifications.filters.preferences.scopeNotificationFilter.wiki=일주일
 
 ## Notifications toggles
-### Missing: notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
+notifications.toggle.disabled.hint=이 위치를 보려면 설정에서 알림을 활성화해야 합니다.
 
 ## Notifications formats
-### Missing: notifications.format.alert=Alert
-### Missing: notifications.format.email=Email
+notifications.format.alert=알리다
+notifications.format.email=이메일
 
 ## Filter preferences settings
-### Missing: notifications.filters.preferences.delete.inProgress=Deleting...
-### Missing: notifications.filters.preferences.delete.done=Filter preference deleted!
-### Missing: notifications.filters.preferences.delete.error=Failed to delete the filter preference
-### Missing: notifications.filters.preferences.setEnabled.inProgress=Saving...
-### Missing: notifications.filters.preferences.setEnabled.done=Filter preference saved!
-### Missing: notifications.filters.preferences.setEnabled.error=Failed to save the filter preference
-### Missing: notifications.filters.preferences.allEvents=All events (even disabled)
+notifications.filters.preferences.delete.inProgress=삭제 중...
+notifications.filters.preferences.delete.done={0} 개 항목이 선택됨
+notifications.filters.preferences.delete.error=필터 환경설정을 삭제하지 못했습니다.
+notifications.filters.preferences.setEnabled.inProgress=절약...
+notifications.filters.preferences.setEnabled.done=필터 환경설정이 저장되었습니다!
+notifications.filters.preferences.setEnabled.error=필터 환경설정을 저장하지 못했습니다.
+notifications.filters.preferences.allEvents=모든 이벤트(비활성화된 경우도 포함)
 
 ## System Filter preferences settings
-### Missing: notifications.settings.filters.preferences.system.title=System Filters
-### Missing: notifications.settings.filters.preferences.system.hint=System filters that you can switches to have a more fine-grained control of the notifications you want to receive.
+notifications.settings.filters.preferences.system.title=시스템 필터
+notifications.settings.filters.preferences.system.hint=수신하려는 알림을 보다 세밀하게 제어하기 위해 전환할 수 있는 시스템 필터입니다.
 ## Header definition for notification filter preferences
-### Missing: notifications.settings.filters.preferences.system.table.name=Name
-### Missing: notifications.settings.filters.preferences.system.table.filterType=Description
-### Missing: notifications.settings.filters.preferences.system.table.notificationFormats=Formats
-### Missing: notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
+notifications.settings.filters.preferences.system.table.name=이름
+notifications.settings.filters.preferences.system.table.filterType=설명
+notifications.settings.filters.preferences.system.table.notificationFormats=형식
+notifications.settings.filters.preferences.system.table.isEnabled=사용 가능?
 
 ## Custom Filter preferences settings
-### Missing: notifications.settings.filters.preferences.custom.title=Custom Filters
-### Missing: notifications.settings.filters.preferences.custom.hint=Create filters to control the notifications you want to receive.
+notifications.settings.filters.preferences.custom.title=맞춤 필터
+notifications.settings.filters.preferences.custom.hint=받고 싶은 알림을 제어하려면 필터를 만드세요.
 ## Header definition for notification filter preferences
-### Missing: notifications.settings.filters.preferences.custom.table.name=Location
-### Missing: notifications.settings.filters.preferences.custom.table.filterType=Filter Action
-### Missing: notifications.settings.filters.preferences.custom.table.eventTypes=Events
-### Missing: notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
-### Missing: notifications.settings.filters.preferences.custom.table.isEnabled=Is enabled?
-### Missing: notifications.settings.filters.preferences.custom.table._actions=Actions
-### Missing: notifications.filters.type.custom.inclusive=Notify of the event
-### Missing: notifications.filters.type.custom.exclusive=Ignore the event
+notifications.settings.filters.preferences.custom.table.name=위치
+notifications.settings.filters.preferences.custom.table.filterType=필터 동작
+notifications.settings.filters.preferences.custom.table.eventTypes=이벤트
+notifications.settings.filters.preferences.custom.table.notificationFormats=형식
+notifications.settings.filters.preferences.custom.table.isEnabled=사용 가능?
+notifications.settings.filters.preferences.custom.table._actions=행위
+notifications.filters.type.custom.inclusive=이벤트를 알려드립니다
+notifications.filters.type.custom.exclusive=이벤트를 무시하세요
 
 
 ## Add filter modal
-### Missing: notifications.settings.addFilter=Add filter
-### Missing: notifications.settings.addFilter.hint=Create a filter for events happening on specific locations. The filter can trigger the sending of a notification or prevent one from being sent, depending on the event and the notification channel.
-### Missing: notifications.filters.preferences.custom.addFilter.location.label=Location
-### Missing: notifications.filters.preferences.custom.addFilter.location.hint=This filter applies on the events happening on the locations selected here. Select one or more locations.
-### Missing: notifications.filters.preferences.custom.addFilter.type.label=Action
-### Missing: notifications.filters.preferences.custom.addFilter.type.hint=This filter can either notify of or ignore the events happening on the selected locations. Choose the action you want to take for the events.
-### Missing: notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notify of the event
-### Missing: notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignore the event
-### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.label=Channel
-### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies only to the notifications sent on the communication channels selected below. Choose one or more communication channels.
-### Missing: notifications.filters.preferences.custom.addFilter.eventType.label=Events
-### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies to the events selected here, in the locations selected above. Choose one or more events.
-### Missing: notifications.menu.header=Notifications
-### Missing: notifications.menu.header.settings=Settings
-### Missing: notifications.menu.clear=Clear All
-### Missing: notifications.menu.clearing=Clearing the notifications
-### Missing: notifications.menu.cleared=Notifications have been cleared
+notifications.settings.addFilter=필터 추가
+notifications.settings.addFilter.hint=특정 위치에서 발생하는 이벤트에 대한 필터를 만듭니다. 필터는 이벤트 및 알림 채널에 따라 알림 전송을 트리거하거나 알림 전송을 방지할 수 있습니다.
+notifications.filters.preferences.custom.addFilter.location.label=위치
+notifications.filters.preferences.custom.addFilter.location.hint=이 필터는 여기에서 선택한 위치에서 발생하는 이벤트에 적용됩니다. 하나 이상의 위치를 선택하세요.
+notifications.filters.preferences.custom.addFilter.type.label=행동
+notifications.filters.preferences.custom.addFilter.type.hint=이 필터는 선택한 위치에서 발생하는 이벤트를 알리거나 무시할 수 있습니다. 이벤트에 대해 수행할 작업을 선택합니다.
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=이벤트를 알려드립니다
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=이벤트를 무시하세요
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=채널
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=이 필터는 아래에서 선택한 통신 채널을 통해 전송된 알림에만 적용됩니다. 하나 이상의 통신 채널을 선택하십시오.
+notifications.filters.preferences.custom.addFilter.eventType.label=이벤트
+notifications.filters.preferences.custom.addFilter.eventType.hint=이 필터는 위에서 선택한 위치에서 여기에서 선택한 이벤트에 적용됩니다. 하나 이상의 이벤트를 선택하세요.
+notifications.menu.header=알림
+notifications.menu.header.settings=설정
+notifications.menu.clear=모두 지우기
+notifications.menu.clearing=Clearing the notifications
+notifications.menu.cleared=알림이 삭제되었습니다
 ### Missing: notifications.settings.title=Notifications Preferences
 ### Missing: notifications.settings.error.notAdmin=You need to be administrator to see this.
 ### Missing: notifications.settings.menu=Notification menu

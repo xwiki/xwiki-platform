@@ -38,23 +38,23 @@
   <hidden>true</hidden>
   <content>administration.title=관리
 ### Missing: administration.title.page=Page Administration
-### Missing: administration.title.wiki=Wiki Administration
-### Missing: administration.title.global=Global Administration
-### Missing: administration.sectionTitle=Administration: {0}
-### Missing: administration.sectionTitle.page=Page Administration: {0}
-### Missing: administration.sectionTitle.wiki=Wiki Administration: {0}
-### Missing: administration.sectionTitle.global=Global Administration: {0}
-### Missing: administration.menu.label=Administration sections.
-### Missing: administration.menu.search.hint=Search for...
-### Missing: administration.menu.search.noResults=No results.
+administration.title.wiki=위키 관리
+administration.title.global=글로벌 관리
+administration.sectionTitle=관리: {0}
+administration.sectionTitle.page=페이지 관리: {0}
+administration.sectionTitle.wiki=위키 관리: {0}
+administration.sectionTitle.global=글로벌 관리: {0}
+administration.menu.label=관리 섹션.
+administration.menu.search.hint=검색 ...
+administration.menu.search.noResults=결과가 없습니다.
 
 # Registration Section
-### Missing: XWiki.XWikiPreferences_use_email_verification.hint=If set to "Yes" then an email will be sent to the email address provided when filling the registration form.
-### Missing: XWiki.XWikiPreferences_validation_email_content.hint=The email template that will be send to users in order to validate their email address.
-### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
-### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
-### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
-### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
+XWiki.XWikiPreferences_use_email_verification.hint="예"로 설정하면 등록 양식을 작성할 때 제공한 이메일 주소로 이메일이 전송됩니다.
+XWiki.XWikiPreferences_validation_email_content.hint=이메일 주소를 확인하기 위해 사용자에게 전송되는 이메일 템플릿입니다.
+XWiki.XWikiPreferences_confirmation_email_content.hint=사용자가 받은 첫 번째 이메일에 있는 확인 링크를 클릭하여 계정을 확인한 후 전송되는 메일에 해당하는 이메일 템플릿입니다.
+XWiki.XWikiPreferences_invitation_email_content.hint=등록하도록 초대된 사용자에게 전송될 이메일 템플릿입니다.
+XWiki.Registration_heading.hint=이것은 등록하는 사람들과 방금 등록한 사람들에게 표시되는 페이지 상단의 줄입니다. Velocity 및 wiki 구문을 사용할 수 있습니다.
+XWiki.Registration_welcomeMessage.hint=이는 사람들이 양식을 작성할 때만 표시됩니다. Velocity 및 wiki 구문 코드를 사용할 수 있습니다.
 ### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
 ### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
 ### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.

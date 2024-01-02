@@ -42,8 +42,8 @@ attachment.validation.mimetype.errorMessage=파일 {0}에 잘못된 MIME 유형 
 attachment.validation.mimetype.allowedMimetypes=허용된 MIME 유형: {0}
 attachment.validation.mimetype.blockerMimetypes=차단기 MIME 유형: {0}
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes=허용되는 MIME 유형
-XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=허용되는 첨부 파일 MIME 유형 목록을 정의합니다. 기본적으로 이 목록은 비어 있지만 허용되는 MIME 유형의 쉼표로 구분된 목록을 지정할 수 있습니다. 조커(*)를 사용하면 모든 미디어 유형을 사용할 수 있습니다. 이 목록이 비어 있지 않으면 목록에 없는 MIME 유형이 포함된 모든 첨부 파일이 거부됩니다. 예를 들어 일반 텍스트와 모든 종류의 이미지만 허용하려면 목록을 text/plain,image/*로 설정하면 됩니다.
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=허용되는 첨부 파일 MIME 유형 목록을 정의합니다. 기본적으로 이 목록은 비어 있지만 허용되는 MIME 유형의 쉼표로 구분된 목록을 지정할 수 있습니다. 조커(*)를 사용하면 모든 미디어 유형을 사용할 수 있습니다. 이 목록이 비어 있지 않으면 목록에 없는 MIME 유형이 포함된 모든 첨부 파일이 거부됩니다. 예를 들어 일반 텍스트와 모든 종류의 이미지만 허용하려면 목록을 text/plain,image/*로 설정하면 됩니다
 XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=차단된 마임타입 
-XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=거부된 첨부 파일 MIME 유형 목록을 정의합니다. 기본적으로 이 목록은 비어 있지만 차단된 MIME 유형의 쉼표로 구분된 목록을 지정할 수 있습니다. 조커(*)를 사용하면 모든 미디어 유형을 사용할 수 있습니다. 이 목록이 비어 있지 않으면 나열된 MIME 유형 중 하나와 일치하는 첨부 파일이 거부됩니다. 예를 들어 일반 텍스트와 모든 종류의 이미지를 거부하려면 목록을 text/plain,image/*로 설정하면 됩니다.
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=거부된 첨부 파일 MIME 유형 목록을 정의합니다. 기본적으로 이 목록은 비어 있지만 차단된 MIME 유형의 쉼표로 구분된 목록을 지정할 수 있습니다. 조커(*)를 사용하면 모든 미디어 유형을 사용할 수 있습니다. 이 목록이 비어 있지 않으면 나열된 MIME 유형 중 하나와 일치하는 첨부 파일이 거부됩니다. 예를 들어 일반 텍스트와 모든 종류의 이미지를 거부하려면 목록을 text/plain,image/*로 설정하면 됩니다
 </content>
   </xwikidoc>

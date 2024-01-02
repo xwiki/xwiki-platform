@@ -1,0 +1,158 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxTables</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWiki구문테이블</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 편집 중 =
+
+== 테이블 ==
+
+=== 1.0 테이블 ===
+
+테이블 형식의 콘텐츠를 쉽게 생성할 수 있습니다.
+
+|=기능|= XWiki 구문 1.0|=결과
+|표준 테이블|((({{{
+{테이블}
+제목 1 | 제목 2
+단어 1 | 단어 2
+{테이블}
+}}})))|(((
+|=제목 1|=제목 2
+|단어 1|단어 2
+)))
+|매개변수화된 테이블|(((
+&lt;테이블 스타일="배경색:빨간색;텍스트 정렬:중심"&gt;
+  &lt;몸&gt;
+    &lt;tr&gt;
+      &lt;TD&gt;제목 1&lt;/td&gt;
+      &lt;td 스타일="배경색:노란색"&gt;제목 2&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;TD&gt;단어 1&lt;/td&gt;
+      &lt;TD&gt;단어 2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+)))|(((
+(% 스타일="배경색:빨간색;텍스트 정렬:중심" %)
+|=제목 1|=(% style="배경-색상:노란색" %)제목 2
+|단어 1|단어 2
+)))
+|필터링 가능 정렬 가능 테이블|((({{{
+$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
+$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
+&lt;table id="table1id" class="그리드 정렬 가능 필터링 가능 doOddEven"&gt;
+  &lt;tr class="정렬헤더"&gt;
+    &lt;일&gt;제목 1&lt;/th&gt;
+    &lt;일&gt;제목 2&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;TD&gt;셀 11&lt;/td&gt;
+   &lt;TD&gt;셀 12&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;TD&gt;셀 21&lt;/td&gt;
+   &lt;TD&gt;셀 22&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+}}}
+
+{{info}}향상된 기능을 보려면 [[Livetable Macro&gt;&gt;https://extensions를 참조하세요. xwiki .org/ xwiki /bin/view/Extension/Livetable+Macro]].{{/info}}
+)))|(((
+{{속도}}
+$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
+$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
+{{/속도}}
+
+(% class="grid sortable filterable doOddEven" id="table1id" %)
+(% class="sortHeader" %)|=제목 1|=제목 2
+|셀 11|셀 12
+|셀 21|셀 22
+)))
+
+=== 2.0 테이블 ===
+
+테이블 형식의 콘텐츠를 쉽게 생성할 수 있습니다. 테이블, 행 또는 셀에 대한 매개변수는 XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}} 에서도 지원됩니다 .
+
+|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|표준 테이블|((({{{
+|=제목 1|=제목 2
+|단어 1|단어 2
+}}}))) 또는 ((({{{
+!=제목 1!=제목 2
+!!단어 1!!단어 2
+}}})))|(((
+|=제목 1|=제목 2
+|단어 1|단어 2
+)))
+|매개변수화된 테이블|((({{{
+(% 스타일="배경색:빨간색;텍스트 정렬:중심" %)
+|=제목 1|=(% style="배경-색상:노란색" %)제목 2
+|단어 1|단어 2
+}}})))|(((
+(% 스타일="배경색:빨간색;텍스트 정렬:중심" %)
+|=제목 1|=(% style="배경-색상:노란색" %)제목 2
+|단어 1|단어 2
+)))
+|필터링 가능 정렬 가능 테이블|((({{{
+{{속도}}
+$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
+$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
+{{/속도}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=제목 1|=제목 2
+|셀 11|셀 12
+|셀 21|셀 22
+}}}
+
+{{info}}향상된 기능을 보려면 [[Livetable Macro&gt;&gt;https://extensions를 참조하세요. xwiki .org/ xwiki /bin/view/Extension/Livetable+Macro]].{{/info}}
+)))|(((
+{{속도}}
+$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
+$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
+{{/속도}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=제목 1|=제목 2
+|셀 11|셀 12
+|셀 21|셀 22
+)))</content>
+</xwikidoc>

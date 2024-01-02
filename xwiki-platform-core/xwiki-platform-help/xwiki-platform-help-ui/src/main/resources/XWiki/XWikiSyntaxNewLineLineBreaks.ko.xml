@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxNewLineLineBreaks</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxNewLineLineBreaks</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 편집 중 =
+
+== 새 줄/줄 바꿈 ==
+
+=== 1.0 개행 줄 바꿈 ===
+
+새 줄은 캐리지 리턴입니다. 줄 바꿈은 텍스트의 어느 위치에나 나타날 수 있는 강제된 새 줄입니다.
+
+{{정보}}
+XWiki 구문 1.0 에서는 새 줄을 사용할 수 없습니다 . 대신 줄바꿈을 사용하세요.
+{{/정보}}
+
+|=기능|= XWiki 구문 1.0|=결과
+|줄 바꿈|{{{Line\\New line}}}|Line\\New line
+|새 줄|줄\\새 줄|줄 새 줄
+
+=== 2.0 개행 줄 바꿈 ===
+
+새 줄은 캐리지 리턴입니다. 줄 바꿈은 텍스트의 어느 위치에나 나타날 수 있는 강제된 새 줄입니다.
+
+|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|줄 바꿈|{{{Line\\New line}}}|Line\\New line
+|새 줄|줄\\새 줄|줄\\새 줄</content>
+</xwikidoc>

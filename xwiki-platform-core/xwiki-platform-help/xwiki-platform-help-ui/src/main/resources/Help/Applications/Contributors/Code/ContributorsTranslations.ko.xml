@@ -80,6 +80,6 @@ contributors.livetable.content1={0} 개 항목이 선택됨
 contributors.entry.name=기여자
 
 # Deprecated keys
-contributors.dataSpace.title=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+contributors.dataSpace.title=데이터
 </content>
   </xwikidoc>

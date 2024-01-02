@@ -39,27 +39,27 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= 편집 중 =
+  <content>= Editing =
 
-== 새 줄/줄 바꿈 ==
+== New Line/Line Breaks ==
 
-=== 1.0 개행 줄 바꿈 ===
+=== 1.0 New Line Line Breaks ===
 
-새 줄은 캐리지 리턴입니다. 줄 바꿈은 텍스트의 어느 위치에나 나타날 수 있는 강제된 새 줄입니다.
+A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 
-{{정보}}
-XWiki 구문 1.0 에서는 새 줄을 사용할 수 없습니다 . 대신 줄바꿈을 사용하세요.
-{{/정보}}
+{{info}}
+New lines are not honored in XWiki Syntax 1.0. Use line breaks instead.
+{{/info}}
 
-|=기능|= XWiki 구문 1.0|=결과
-|줄 바꿈|{{{Line\\New line}}}|Line\\New line
-|새 줄|줄\\새 줄|줄 새 줄
+|=Feature|=XWiki Syntax 1.0|=Result
+|Line break|{{{Line\\New line}}}|Line\\New line
+|New line|Line\\New line|Line New line
 
-=== 2.0 개행 줄 바꿈 ===
+=== 2.0 New Line Line Breaks ===
 
-새 줄은 캐리지 리턴입니다. 줄 바꿈은 텍스트의 어느 위치에나 나타날 수 있는 강제된 새 줄입니다.
+A new line is a carriage return. A line break is a forced new line that can appear anywhere in the text.
 
-|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
-|줄 바꿈|{{{Line\\New line}}}|Line\\New line
-|새 줄|줄\\새 줄|줄\\새 줄</content>
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Line break|{{{Line\\New line}}}|Line\\New line
+|New line|Line\\New line|Line\\New line</content>
 </xwikidoc>

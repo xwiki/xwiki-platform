@@ -154,7 +154,7 @@ public class BaseAttachmentsResource extends XWikiResource
             attachments.withAttachments(queryResults.stream().map(this::processAttachmentsQueryResult)
                 .filter(getFileTypeFilter(filters.getOrDefault(FILTER_FILE_TYPES, "")))
                 .map(xwikiAttachment -> toRestAttachment(xwikiAttachment, withPrettyNames))
-                .collect(Collectors.toList()));
+                .toList());
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {

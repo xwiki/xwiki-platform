@@ -20,7 +20,6 @@
 package org.xwiki.test.ui.po;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -83,7 +82,7 @@ public class DocumentSyntaxPicker extends BaseElement
 
     public List<String> getAvailableSyntaxes()
     {
-        return this.select.getOptions().stream().map(item -> item.getAttribute("value")).collect(Collectors.toList());
+        return this.select.getOptions().stream().map(item -> item.getAttribute("value")).toList();
     }
 
     public String getSelectedSyntax()

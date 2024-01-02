@@ -50,8 +50,8 @@ office.import.childPagesNaming.hint=가져온 콘텐츠가 분할될 때 생성�
 office.import.terminalChildPages=터미널 하위 페이지
 office.import.terminalChildPages.hint=고급: 생성된 하위 페이지를 터미널로 만듭니다. 터미널 페이지는 자식을 가질 수 없으며 일반적으로 응용 프로그램, 개발 또는 이전 버전의 XWiki 에서 사용됩니다 .
 office.import.inProgress=Office 문서를 가져오는 중...
-office.import.done=Office 문서를 가져왔습니다.
-office.import.failed=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+office.import.done=Office 문서를 가져왔습니다
+office.import.failed=Office 가져오기 실패
 office.config.serverType.hint=Office 서버 유형입니다. 내부적으로(로컬) 관리하거나 외부(원격)로 관리할 수 있습니다.
 office.config.serverPort.hint=Office 서버 인스턴스에 연결하는 데 사용되는 포트 번호
 office.config.autoStart.hint=XWiki 시작 시 Office 서버가 자동으로 시작/연결되어야 하는지 지정
@@ -67,7 +67,7 @@ office.config.serverState.error=오류
 #######################################
 ## until 14.10.2, 15.0RC1
 #######################################
-office.form.append.hint=문서가 이미 존재합니다! 기존 위키 페이지에 결과를 추가합니다.
+office.form.append.hint=문서가 이미 존재합니다! 기존 위키 페이지에 결과를 추가합니다
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

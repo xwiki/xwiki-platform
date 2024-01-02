@@ -37,18 +37,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.UserDirectoryPreferencesClass_columns=표시할 열
-XWiki.UserDirectoryPreferencesClass_columns_hint=User 클래스의 속성에 해당하는 열 목록으로 사용자 디렉터리에 표시됩니다.
+XWiki.UserDirectoryPreferencesClass_columns_hint=User 클래스의 속성에 해당하는 열 목록으로 사용자 디렉터리에 표시됩니다
 XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=비활성화된 사용자 프로필 숨기기
-XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=프로필이 비활성화된 사용자를 사용자 디렉터리에서 제외합니다.
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=프로필이 비활성화된 사용자를 사용자 디렉터리에서 제외합니다
 userdirectory.userScopeFilter=사용자 범위:
 userdirectory.userScopeFilter.hint=표시하려는 사용자 카테고리를 선택하세요.
 userdirectory.userScopeFilter.local=로컬 사용자
 userdirectory.userScopeFilter.global=이 위키의 회원인 글로벌 사용자
 userdirectory.configuration.title=설정
-userdirectory.configuration.columns.editHint=열을 선택하려면 클릭하세요.
+userdirectory.configuration.columns.editHint=열을 선택하려면 클릭하세요
 platform.userdirectory.customizeNotAllowed=이 사용자 디렉토리를 사용자 정의할 수 없습니다.
 platform.userdirectory.configTitle=사용자 디렉터리 구성
 platform.userdirectory.configSheetTitle=사용자 디렉터리 구성 시트
-platform.userdirectory.configSheetApplyOnConfiguration=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+platform.userdirectory.configSheetApplyOnConfiguration=이 시트는 UserDirectory 구성 문서에 적용되어야 합니다.
 </content>
   </xwikidoc>

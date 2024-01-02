@@ -32,59 +32,59 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWiki구문인용문</title>
+  <title>XWikiSyntaxQuotations</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= 고급 =
+  <content>= Advanced =
 
-== 인용문 ==
+== Quotations ==
 
-=== 1.0 인용문 ===
+=== 1.0 Quotations ===
 
-일부 텍스트를 인용할 수 있습니다.
+Allows to quote some text.
 
-|=기능|= XWiki 구문 1.0|=결과
-|간단한 인용문|(((
-&lt;인용문&gt;&lt;p&gt;존이 이렇게 말했어&lt;/p&gt;&lt;/blockquote&gt;
-난 알았어
+|=Feature|=XWiki Syntax 1.0|=Result
+|Simple quote|(((
+&lt;blockquote&gt;&lt;p&gt;john said this&lt;/p&gt;&lt;/blockquote&gt;
+I said ok
 )))|(((
-&gt; 존이 이렇게 말했어요
-난 알았어
+&gt; john said this
+I said ok
 )))
-|중첩된 따옴표|(((
-&lt;인용문&gt;&lt;p&gt;존이 이렇게 말했어&lt;/p&gt;
-  &lt;인용문&gt;&lt;p&gt;마리가 대답했어&lt;/p&gt;&lt;/blockquote&gt;
+|Nested quotes|(((
+&lt;blockquote&gt;&lt;p&gt;john said this&lt;/p&gt;
+  &lt;blockquote&gt;&lt;p&gt;marie answered that&lt;/p&gt;&lt;/blockquote&gt;
 &lt;/blockquote&gt;
-난 알았어 
+I said ok 
 )))|(((
-&gt; 존이 이렇게 말했어요
-&gt;&gt; 마리가 대답했어요
-난 알았어
+&gt; john said this
+&gt;&gt; marie answered that
+I said ok
 )))
 
-=== 2.0 인용문 ===
+=== 2.0 Quotations ===
 
-일부 텍스트를 인용할 수 있습니다.
+Allows to quote some text.
 
-|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
-|간단한 인용문|((({{{
-&gt; 존이 이렇게 말했어요
-난 알았어
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Simple quote|((({{{
+&gt; john said this
+I said ok
 }}})))|(((
-&gt; 존이 이렇게 말했어요
-난 알았어
+&gt; john said this
+I said ok
 )))
-|중첩된 따옴표|((({{{
-&gt; 존이 이렇게 말했어요
-&gt;&gt; 마리가 대답했어요
-난 알았어
+|Nested quotes|((({{{
+&gt; john said this
+&gt;&gt; marie answered that
+I said ok
 }}})))|(((
-&gt; 존이 이렇게 말했어요
-&gt;&gt; 마리가 대답했어요
-난 알았어
+&gt; john said this
+&gt;&gt; marie answered that
+I said ok
 )))</content>
 </xwikidoc>

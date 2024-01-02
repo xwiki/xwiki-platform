@@ -51,7 +51,7 @@ skin.sheet.js.error.csrf=저장 시 CSRF 검증에 실패했습니다. 다시 �
 skin.sheet.js.error.rights=권한이 부족하여 스킨을 저장하지 못했습니다.
 skin.sheet.js.deleteConfirmationText=이 템플릿을 삭제하시겠습니까?
 skin.sheet.js.deleteConfirmationYes=응, 삭제해
-skin.sheet.js.deleteConfirmationNo=아니요, 취소합니다.
+skin.sheet.js.deleteConfirmationNo=아니요, 취소합니다
 skin.sheet.js.adding=첨가...
 skin.sheet.js.addingDone=템플릿이 추가되었습니다!
 

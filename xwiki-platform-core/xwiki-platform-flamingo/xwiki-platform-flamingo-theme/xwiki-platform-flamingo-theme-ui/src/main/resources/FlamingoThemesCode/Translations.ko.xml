@@ -56,7 +56,7 @@ platform.flamingo.themes.title.preview=시사
 platform.flamingo.themes.autorefresh=자동 새로고침
 platform.flamingo.themes.refresh=새로 고치다
 platform.flamingo.themes.refreshwarning=새로 고치는 데 몇 초 정도 걸릴 수 있습니다.
-platform.flamingo.themes.preview.iframe.label=색상 테마 미리보기
+platform.flamingo.themes.preview.iframe.label=색상 테마 미리보기.
 platform.flamingo.themes.loading=로드 중...
 platform.flamingo.themes.category.logos=로고
 platform.flamingo.themes.category.base-colors=기본 색상
@@ -85,7 +85,7 @@ platform.flamingo.themes.global=글로벌
 #######################################
 ## until 7.3M1
 #######################################
-platform.flamingo.themes.lessCode.warning=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 콜론(:), 일치하지 않는 느낌표(!)
+platform.flamingo.themes.lessCode.warning=안타깝게도 이 필드는 실시간 미리 보기에서 고려되지 않습니다.
 
 #######################################
 ## until 12.9RC1

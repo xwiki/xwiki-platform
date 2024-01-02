@@ -40,7 +40,7 @@
 captcha.jcaptcha.displayer.image.alt=이미지 보안 문자
 captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=귀하의 브라우저는 오디오 요소를 지원하지 않습니다.
 captcha.jcaptcha.displayer.audio.play=듣다
-captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha가 제대로 구성되지 않았습니다.
+captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha가 제대로 구성되지 않았습니다
 captcha.jcaptcha.displayer.refresh=새로고침
 captcha.jcaptcha.displayer.answer.placeholder=답변
 XWiki.Captcha.JCaptcha.ConfigurationClass_type=유형

@@ -32,62 +32,62 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWiki구문제목</title>
+  <title>XWikiSyntaxHeadings</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= 편집 중 =
+  <content>= Editing =
 
-== 제목 ==
+== Headings ==
 
-=== 1.0 제목 ===
+=== 1.0 Headings ===
 
-|=기능|= XWiki 구문 1.0|=결과
-|표준 제목|(((
-레벨 1 1개
-1.1 레벨 2
-1.1.1 레벨 3
-1.1.1.1 레벨 4
-1.1.1.1.1 레벨 5
-1.1.1.1.1.1 레벨 6
+|=Feature|=XWiki Syntax 1.0|=Result
+|Standard headings|(((
+1 level 1
+1.1 level 2
+1.1.1 level 3
+1.1.1.1 level 4
+1.1.1.1.1 level 5
+1.1.1.1.1.1 level 6
 )))|(((
-= 레벨 1 = 
-== 레벨 2 ==
-=== 레벨 3 ===
-==== 레벨 4 ====
-===== 레벨 5 =====
-====== 레벨 6 ======
+= level 1 = 
+== level 2 ==
+=== level 3 ===
+==== level 4 ====
+===== level 5 =====
+====== level 6 ======
 )))
-|매개변수화된 제목|&lt;h1&gt;&lt;스팬 스타일="색상:블루"&gt;표제&lt;/span&gt;&lt;/h1&gt;|(((
-(% 스타일="색상:파란색" %)
-= 제목 =
+|Parameterized headings|&lt;h1&gt;&lt;span style="color:blue"&gt;Heading&lt;/span&gt;&lt;/h1&gt;|(((
+(% style="color:blue" %)
+= heading =
 )))
-| XWiki 구문을 사용한 제목 |1.1.1 *bold*를 사용한 제목|(((=== **bold**를 사용한 제목 ===)))
+|Headings with XWiki Syntax|1.1.1 Heading with *bold*|(((=== Heading with **bold** ===)))
 
-=== 2.0 제목 ===
+=== 2.0 Headings ===
 
-|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
-|표준 제목|((({{{
-= 레벨 1 = 
-== 레벨 2 ==
-=== 레벨 3 ===
-==== 레벨 4 ====
-===== 레벨 5 =====
-====== 레벨 6 ======
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Standard headings|((({{{
+= level 1 = 
+== level 2 ==
+=== level 3 ===
+==== level 4 ====
+===== level 5 =====
+====== level 6 ======
 }}})))|(((
-= 레벨 1 = 
-== 레벨 2 ==
-=== 레벨 3 ===
-==== 레벨 4 ====
-===== 레벨 5 =====
-====== 레벨 6 ======
+= level 1 = 
+== level 2 ==
+=== level 3 ===
+==== level 4 ====
+===== level 5 =====
+====== level 6 ======
 )))
-|매개변수화된 제목|{{{(% style="color:blue" %)}}}= 제목 =|(((
-(% 스타일="색상:파란색" %)
-= 제목 =
+|Parameterized headings|{{{(% style="color:blue" %)}}}= heading =|(((
+(% style="color:blue" %)
+= heading =
 )))
-| XWiki 구문을 사용한 제목 |{{{=== **굵게** 제목 ===}}}|(((=== **굵게** 제목 ===)))</content>
+|Headings with XWiki Syntax|{{{=== Heading with **bold** ===}}}|(((=== Heading with **bold** ===)))</content>
 </xwikidoc>

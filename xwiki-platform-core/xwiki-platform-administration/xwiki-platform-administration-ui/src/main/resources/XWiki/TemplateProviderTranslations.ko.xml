@@ -42,7 +42,7 @@ administration.templateProvider.icon=상
 administration.templateProvider.icon.hint=새 페이지가 생성될 때 템플릿 제공자에게 표시되는 아이콘입니다. {0}전체 아이콘 목록{1}에서 하나를 선택합니다.
 administration.templateProvider.creationRestrictions=생성 제한
 administration.templateProvider.creationRestrictions.hint=이 템플릿이 페이지를 생성할 수 있는 위치 목록(하위 항목 포함)
-administration.templateProvider.creationRestrictions.none=이 템플릿은 어디에서나 페이지를 만들 수 있습니다.
+administration.templateProvider.creationRestrictions.none=이 템플릿은 어디에서나 페이지를 만들 수 있습니다
 administration.templateProvider.creationRestrictionsAreSuggestions=제안사항에 따른 생성 제한
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=목록에서 템플릿을 선택할 때 미리 입력된 기본 위치로 첫 번째 생성 제한을 사용하여 사용자가 이 템플릿으로 페이지를 생성할 위치를 선택할 수 있습니다.
 </content>

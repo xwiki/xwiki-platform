@@ -32,127 +32,127 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWiki구문테이블</title>
+  <title>XWikiSyntaxTables</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= 편집 중 =
+  <content>= Editing =
 
-== 테이블 ==
+== Tables ==
 
-=== 1.0 테이블 ===
+=== 1.0 Tables ===
 
-테이블 형식의 콘텐츠를 쉽게 생성할 수 있습니다.
+Allows to easily create content in table format.
 
-|=기능|= XWiki 구문 1.0|=결과
-|표준 테이블|((({{{
-{테이블}
-제목 1 | 제목 2
-단어 1 | 단어 2
-{테이블}
+|=Feature|=XWiki Syntax 1.0|=Result
+|Standard table|((({{{
+{table}
+Title 1 | Title 2
+Word 1 | Word 2
+{table}
 }}})))|(((
-|=제목 1|=제목 2
-|단어 1|단어 2
+|=Title 1|=Title 2
+|Word 1|Word 2
 )))
-|매개변수화된 테이블|(((
-&lt;테이블 스타일="배경색:빨간색;텍스트 정렬:중심"&gt;
-  &lt;몸&gt;
+|Parametrized table|(((
+&lt;table style="background-color:red;text-align:center"&gt;
+  &lt;tbody&gt;
     &lt;tr&gt;
-      &lt;TD&gt;제목 1&lt;/td&gt;
-      &lt;td 스타일="배경색:노란색"&gt;제목 2&lt;/td&gt;
+      &lt;td&gt;Title 1&lt;/td&gt;
+      &lt;td style="background-color:yellow"&gt;Title 2&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;TD&gt;단어 1&lt;/td&gt;
-      &lt;TD&gt;단어 2&lt;/td&gt;
+      &lt;td&gt;Word 1&lt;/td&gt;
+      &lt;td&gt;Word 2&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
 )))|(((
-(% 스타일="배경색:빨간색;텍스트 정렬:중심" %)
-|=제목 1|=(% style="배경-색상:노란색" %)제목 2
-|단어 1|단어 2
+(% style="background-color:red;text-align:center" %)
+|=Title 1|=(% style="background-color:yellow" %)Title 2
+|Word 1|Word 2
 )))
-|필터링 가능 정렬 가능 테이블|((({{{
-$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
-$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
-&lt;table id="table1id" class="그리드 정렬 가능 필터링 가능 doOddEven"&gt;
-  &lt;tr class="정렬헤더"&gt;
-    &lt;일&gt;제목 1&lt;/th&gt;
-    &lt;일&gt;제목 2&lt;/th&gt;
+|Filterable Sortable table|((({{{
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
+  &lt;tr class="sortHeader"&gt;
+    &lt;th&gt;Title 1&lt;/th&gt;
+    &lt;th&gt;Title 2&lt;/th&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;TD&gt;셀 11&lt;/td&gt;
-   &lt;TD&gt;셀 12&lt;/td&gt;
+   &lt;td&gt;Cell 11&lt;/td&gt;
+   &lt;td&gt;Cell 12&lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;TD&gt;셀 21&lt;/td&gt;
-   &lt;TD&gt;셀 22&lt;/td&gt;
+   &lt;td&gt;Cell 21&lt;/td&gt;
+   &lt;td&gt;Cell 22&lt;/td&gt;
   &lt;/tr&gt;
 &lt;/table&gt;
 }}}
 
-{{info}}향상된 기능을 보려면 [[Livetable Macro&gt;&gt;https://extensions를 참조하세요. xwiki .org/ xwiki /bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}For improved features see the [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
 )))|(((
-{{속도}}
-$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
-$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
-{{/속도}}
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
 
 (% class="grid sortable filterable doOddEven" id="table1id" %)
-(% class="sortHeader" %)|=제목 1|=제목 2
-|셀 11|셀 12
-|셀 21|셀 22
+(% class="sortHeader" %)|=Title 1|=Title 2
+|Cell 11|Cell 12
+|Cell 21|Cell 22
 )))
 
-=== 2.0 테이블 ===
+=== 2.0 Tables ===
 
-테이블 형식의 콘텐츠를 쉽게 생성할 수 있습니다. 테이블, 행 또는 셀에 대한 매개변수는 XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}} 에서도 지원됩니다 .
+Allows to easily create content in table format. Parameters for table, row or cell are also supported in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}.
 
-|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
-|표준 테이블|((({{{
-|=제목 1|=제목 2
-|단어 1|단어 2
-}}}))) 또는 ((({{{
-!=제목 1!=제목 2
-!!단어 1!!단어 2
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Standard table|((({{{
+|=Title 1|=Title 2
+|Word 1|Word 2
+}}}))) or ((({{{
+!=Title 1!=Title 2
+!!Word 1!!Word 2
 }}})))|(((
-|=제목 1|=제목 2
-|단어 1|단어 2
+|=Title 1|=Title 2
+|Word 1|Word 2
 )))
-|매개변수화된 테이블|((({{{
-(% 스타일="배경색:빨간색;텍스트 정렬:중심" %)
-|=제목 1|=(% style="배경-색상:노란색" %)제목 2
-|단어 1|단어 2
+|Parametrized table|((({{{
+(% style="background-color:red;text-align:center" %)
+|=Title 1|=(% style="background-color:yellow" %)Title 2
+|Word 1|Word 2
 }}})))|(((
-(% 스타일="배경색:빨간색;텍스트 정렬:중심" %)
-|=제목 1|=(% style="배경-색상:노란색" %)제목 2
-|단어 1|단어 2
+(% style="background-color:red;text-align:center" %)
+|=Title 1|=(% style="background-color:yellow" %)Title 2
+|Word 1|Word 2
 )))
-|필터링 가능 정렬 가능 테이블|((({{{
-{{속도}}
-$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
-$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
-{{/속도}}
+|Filterable Sortable table|((({{{
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
 
 (% class="grid sortable filterable doOddEven" id="tableid" %)
-(% class="sortHeader" %)|=제목 1|=제목 2
-|셀 11|셀 12
-|셀 21|셀 22
+(% class="sortHeader" %)|=Title 1|=Title 2
+|Cell 11|Cell 12
+|Cell 21|Cell 22
 }}}
 
-{{info}}향상된 기능을 보려면 [[Livetable Macro&gt;&gt;https://extensions를 참조하세요. xwiki .org/ xwiki /bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}For improved features see the [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
 )))|(((
-{{속도}}
-$ xwiki .ssfx.use("js/ xwiki /table/table.css " )
-$ xwiki .jsfx.use("js/ xwiki /table/tablefilterNsort.js", true)
-{{/속도}}
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
 
 (% class="grid sortable filterable doOddEven" id="tableid" %)
-(% class="sortHeader" %)|=제목 1|=제목 2
-|셀 11|셀 12
-|셀 21|셀 22
+(% class="sortHeader" %)|=Title 1|=Title 2
+|Cell 11|Cell 12
+|Cell 21|Cell 22
 )))</content>
 </xwikidoc>

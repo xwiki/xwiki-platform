@@ -31,27 +31,27 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWiki구문HTML</title>
+  <title>XWikiSyntaxHTML</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= 프로그래밍 =
+  <content>= Programming =
 
 == HTML ==
 
-{{comment}}하위 헤드라인을 번역하지 마세요.{{/comment}}
+{{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 HTML ===
 
-{{info}} XWiki Syntax 1.0에서는 HTML 마크업을 텍스트에 직접 입력할 수 있습니다 .{{/info}}
+{{info}}It is possible to enter HTML markup directly in the text in XWiki Syntax 1.0.{{/info}}
 
-|= XWiki 구문 1.0|=결과
-|&lt;abbr title="하이퍼텍스트 마크업 언어"&gt;HTML&lt;/abbr&gt;|{{ HTML }}&lt;abbr title="하이퍼텍스트 마크업 언어"&gt;HTML&lt;/abbr&gt;{{/ HTML }}
+|=XWiki Syntax 1.0|=Result
+|&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}
 
 === 2.0 HTML ===
 
-{{info}} XWiki 구문에서 {{velocity}}$crtSyntaxVer{{/velocity}} HTML 또는 XHTML은 [[ HTML 매크로&gt;&gt;https://extensions를 사용하여 입력해야 합니다. xwiki .org/ xwiki /bin/view/Extension/ HTML %20Macro]].{{/info}}
+{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} HTML or XHTML must be entered by using the [[HTML macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/HTML%20Macro]].{{/info}}
 
-|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
-|{{{{{ HTML }}&lt;abbr title="하이퍼텍스트 마크업 언어"&gt;HTML&lt;/abbr&gt;{{/ html }} }}}|{{ html }}&lt;abbr title="하이퍼텍스트 마크업 언어"&gt;HTML&lt;/abbr&gt;{{/ HTML }}</content>
+|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|{{{{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}} }}}|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}</content>
   </xwikidoc>

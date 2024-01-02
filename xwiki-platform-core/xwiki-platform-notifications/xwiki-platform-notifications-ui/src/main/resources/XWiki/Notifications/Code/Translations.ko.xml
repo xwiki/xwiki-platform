@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>platform.core.profile.category.notifications=알림
 notifications.filters.cancel=취소
-notifications.filters.submit=구하다
+notifications.filters.submit=저장
 notifications.filters.type.label=필터 유형:
 notifications.filters.type.hint=필터가 특정 위치의 이벤트에 대해 어떻게 작동해야 하는지
 notifications.filters.location.label=필터 범위:
@@ -54,7 +54,7 @@ notifications.filters.advanced.modal.close=닫다
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=시스템 필터
-notifications.filters.description.systemUserNotificationFilter=역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+notifications.filters.description.systemUserNotificationFilter=이벤트가 특별히 귀하를 대상으로 하지 않는 한 시스템 사용자로부터 알림을 숨깁니다
 notifications.filters.name.ownEventsNotificationFilter=자체 이벤트 필터
 notifications.filters.description.ownEventsNotificationFilter=이벤트가 특별히 귀하를 대상으로 하지 않는 한 귀하의 활동에 대한 알림을 숨깁니다
 notifications.filters.name.eventReadAlertFilter=이벤트 필터 읽기(경고)

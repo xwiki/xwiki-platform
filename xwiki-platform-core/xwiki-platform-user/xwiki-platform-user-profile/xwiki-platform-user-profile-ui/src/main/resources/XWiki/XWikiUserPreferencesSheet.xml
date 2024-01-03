@@ -151,7 +151,7 @@
     text-decoration: underline;
   }
 #end
-#if ($underlining == 'Only inline links')
+#if ($underlining == 'OnlyInlineLinks')
   p, span, div {
     &amp; &gt; .wikilink,
     &amp; &gt; .wikiexternallink,
@@ -460,7 +460,7 @@
         #displayField('font_size', 'platform.core.profile.accessibility.fontSize', $defaultValue)
         #set ($defaultValue = $xwiki.getXWikiPreference('underline'))
         #if ("$!defaultValue" == '')
-          #set ($defaultValue = 'Only inline links')
+          #set ($defaultValue = 'OnlyInlineLinks')
         #end
         #displayField('underline', 'platform.core.profile.accessibility.underline', $defaultValue)
       &lt;/dl&gt;

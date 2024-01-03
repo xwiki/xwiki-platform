@@ -451,7 +451,7 @@
       &lt;dl&gt;
         #displayField('displayHiddenDocuments', 'platform.core.profile.displayHiddenDocuments', '0')
       &lt;/dl&gt;
-      &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h1&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h2&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('font_size'))
         #if ("$!defaultValue" == '')

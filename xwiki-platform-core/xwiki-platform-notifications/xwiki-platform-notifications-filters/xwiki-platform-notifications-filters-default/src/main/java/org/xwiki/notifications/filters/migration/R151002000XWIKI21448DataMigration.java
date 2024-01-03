@@ -205,27 +205,30 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
     {
         Boolean status = documentStatus.get(serializedDocument);
 
-        if (status != null) {
-            return status;
-        } else {
+        if (status == null) {
             DocumentReference documentReference = this.documentReferenceResolver.resolve(serializedDocument);
-            String compactSerialization = this.entityReferenceSerializer.serialize(documentReference);
-            String statement = "where doc.fullName = :docName";
-            try {
-                List<Long> result = this.queryManager.createQuery(statement, Query.XWQL)
-                    .bindValue("docName", compactSerialization)
-                    .setLimit(1)
-                    .setWiki(documentReference.getWikiReference().getName())
-                    .addFilter(countQueryFilter)
-                    .execute();
 
-                boolean exists = result.get(0) > 0;
-                documentStatus.set(serializedDocument, exists);
-                return exists;
-            } catch (QueryException e) {
+            try {
+                if (this.wikiDescriptorManager.exists(documentReference.getWikiReference().getName())) {
+                    String compactSerialization = this.entityReferenceSerializer.serialize(documentReference);
+                    String statement = "where doc.fullName = :docName";
+                    List<Long> result = this.queryManager.createQuery(statement, Query.XWQL)
+                        .bindValue("docName", compactSerialization).setLimit(1)
+                        .setWiki(documentReference.getWikiReference().getName()).addFilter(this.countQueryFilter)
+                        .execute();
+
+                    status = result.get(0) > 0;
+                } else {
+                    status = false;
+                }
+
+                documentStatus.set(serializedDocument, status);
+            } catch (Exception e) {
                 throw new DataMigrationException(
                     String.format("Error when trying to check if document [%s] exists", serializedDocument), e);
             }
         }
+
+        return status;
     }
 }

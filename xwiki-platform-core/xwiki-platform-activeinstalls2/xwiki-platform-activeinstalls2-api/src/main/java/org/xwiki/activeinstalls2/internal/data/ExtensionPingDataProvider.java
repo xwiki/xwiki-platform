@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -85,7 +84,7 @@ public class ExtensionPingDataProvider extends AbstractPingDataProvider
             extensionPing.setVersion(extension.getId().getVersion().toString());
             extensionPing.setFeatures(extension.getExtensionFeatures().stream()
                 .map(ExtensionId::toString)
-                .collect(Collectors.toList()));
+                .toList());
             pingExtensions.add(extensionPing);
         }
         ping.setExtensions(pingExtensions);

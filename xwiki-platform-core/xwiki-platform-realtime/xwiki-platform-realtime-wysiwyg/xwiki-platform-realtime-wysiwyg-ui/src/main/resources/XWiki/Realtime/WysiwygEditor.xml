@@ -338,7 +338,7 @@
     <property>
       <code>// TODO: Drop this JSX when XWIKI-12788 (Introduce skin extension plugins for webjar resources) gets implemented. We use
 // it only to load JavaScript code of the real-time WYSIWYG Editor from the WebJar.
-require(['xwiki-realtime-wysiwygEditor-loader'], function() {});</code>
+require(['xwiki-realtime-wysiwyg-loader'], function() {});</code>
     </property>
     <property>
       <name/>
@@ -482,12 +482,12 @@ require(['xwiki-realtime-wysiwygEditor-loader'], function() {});</code>
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.requirejs.module.realtime.wysiwygeditor-bundle</name>
+      <name>org.xwiki.platform.requirejs.module.realtime.wysiwyg-bundle</name>
     </property>
     <property>
-      <parameters>id=xwiki-realtime-wysiwygEditor-bundle
+      <parameters>id=xwiki-realtime-wysiwyg-bundle
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wysiwyg-webjar', 'webjar.bundle.min.js')
-bundles=xwiki-realtime-wysiwygEditor,xwiki-realtime-wysiwygEditor-loader,xwiki-realtime-wysiwygEditor-filters,xwiki-realtime-wysiwygEditor-patches</parameters>
+bundles=xwiki-realtime-wysiwyg,xwiki-realtime-wysiwyg-loader,xwiki-realtime-wysiwyg-filters,xwiki-realtime-wysiwyg-editor,xwiki-realtime-wysiwyg-patches</parameters>
     </property>
     <property>
       <scope>wiki</scope>

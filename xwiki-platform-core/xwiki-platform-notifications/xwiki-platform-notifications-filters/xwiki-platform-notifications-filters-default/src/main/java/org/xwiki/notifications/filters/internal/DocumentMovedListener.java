@@ -79,7 +79,7 @@ public class DocumentMovedListener extends AbstractEventListener
 
     @Inject
     @Named("cached")
-    private ModelBridge cachedModelBridge;
+    private FilterPreferencesModelBridge cachedFilterPreferencesModelBridge;
 
     /**
      * Guess what it does.
@@ -119,7 +119,7 @@ public class DocumentMovedListener extends AbstractEventListener
             logger.error("Failed to update the notification filter preference when [{}] has been moved to [{}].",
                 renamedEvent.getSourceReference(), renamedEvent.getTargetReference(), e);
         } finally {
-            ((CachedModelBridge) cachedModelBridge).clearCache();
+            ((CachedFilterPreferencesModelBridge) cachedFilterPreferencesModelBridge).clearCache();
         }
     }
 

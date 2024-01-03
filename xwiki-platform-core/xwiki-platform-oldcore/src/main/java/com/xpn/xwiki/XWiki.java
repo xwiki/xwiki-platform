@@ -5691,8 +5691,7 @@ public class XWiki implements EventListener
                 context.getDoc().getDocumentReference().getName());
         } else {
             ResourceReference resourceReference = getResourceReferenceManager().getResourceReference();
-            if (resourceReference instanceof EntityResourceReference) {
-                EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+            if (resourceReference instanceof EntityResourceReference entityResource) {
                 String action = entityResource.getAction().getActionName();
                 if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
                     reference = getCurrentMixedDocumentReferenceResolver().resolve(request.getParameter("topic"));
@@ -7845,8 +7844,8 @@ public class XWiki implements EventListener
 
             XWikiDocument doc = (XWikiDocument) source;
 
-            if (event instanceof XObjectPropertyEvent) {
-                EntityReference reference = ((XObjectPropertyEvent) event).getReference();
+            if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
+                EntityReference reference = xObjectPropertyEvent.getReference();
                 String modifiedProperty = reference.getName();
                 if ("backlinks".equals(modifiedProperty)) {
                     this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",

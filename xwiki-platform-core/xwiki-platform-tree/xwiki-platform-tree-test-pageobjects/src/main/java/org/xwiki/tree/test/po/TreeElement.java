@@ -22,7 +22,6 @@ package org.xwiki.tree.test.po;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -204,6 +203,6 @@ public class TreeElement extends BaseElement
             .findElementsWithoutWaiting(this.element,
                 By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
             .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
-            .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).collect(Collectors.toList());
+            .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).toList();
     }
 }

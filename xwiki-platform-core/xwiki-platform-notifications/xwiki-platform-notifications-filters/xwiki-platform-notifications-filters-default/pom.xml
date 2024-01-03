@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-filters</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-filters-default</artifactId>
   <name>XWiki Platform - Notifications - Filters - Default implementation</name>
   <description>Default bridge to oldcore for the notifications filters API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.50</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.51</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     </properties>
   <dependencies>

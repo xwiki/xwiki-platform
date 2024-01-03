@@ -428,8 +428,8 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             // StringListProperty instances are loaded instead of LargeStringProperty and, since we know our
             // classes well in this specific migration, we can just create the LargeStringProperty instances
             // ourselves from the loaded ones. It might be related to https://jira.xwiki.org/browse/XWIKI-4384
-            if (deletedProperty instanceof StringListProperty) {
-                // The "author" property was of type User List in AnnotationClass and now it is going to be
+            if (deletedProperty instanceof StringListProperty stringListProperty) {
+                // The "author" property was of type User List in AnnotationClass, and now it is going to be
                 // String in XWikiComments.
                 if ("author".equals(deletedProperty.getName())) {
                     newProperty = new StringProperty();
@@ -440,7 +440,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                 // Extract the value as first element in the internal list. If the list has 0 elements, then the value
                 // is null.
                 String deletedPropertyValue = null;
-                List<String> internalListValue = ((StringListProperty) deletedProperty).getList();
+                List<String> internalListValue = stringListProperty.getList();
                 if (!internalListValue.isEmpty()) {
                     deletedPropertyValue = internalListValue.get(0);
                 }

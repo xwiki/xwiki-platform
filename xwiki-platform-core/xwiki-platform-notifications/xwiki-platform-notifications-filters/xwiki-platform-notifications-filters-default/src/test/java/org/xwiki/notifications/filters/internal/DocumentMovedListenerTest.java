@@ -88,7 +88,7 @@ class DocumentMovedListenerTest
     @InjectMockComponents
     private DocumentMovedListener listener;
 
-    private CachedModelBridge cachedModelBridge;
+    private CachedFilterPreferencesModelBridge cachedModelBridge;
 
     @Mock
     private XWikiContext xwikicontext;
@@ -104,8 +104,8 @@ class DocumentMovedListenerTest
     @AfterComponent
     private void afterComponent() throws Exception
     {
-        this.cachedModelBridge = mock(CachedModelBridge.class);
-        this.componentManager.registerComponent(ModelBridge.class, "cached", this.cachedModelBridge);
+        this.cachedModelBridge = mock(CachedFilterPreferencesModelBridge.class);
+        this.componentManager.registerComponent(FilterPreferencesModelBridge.class, "cached", this.cachedModelBridge);
     }
 
     @BeforeEach

@@ -51,13 +51,7 @@ We brought the following changes from the default Jetty files obtained from the 
    Under `<welcome-file-list>` alors remove the `<welcome-file>index.jsp</welcome-file>` line.
 7. Remove alpn (we don't need TLS/SSL for a demo packaging) and http2 support by:
    1. Remove `lib/jetty-alpn-client-${jetty.version}.jar` from `modules/client.mod`
-   2. Remove the following from `modules/https.mod`:
-      ```
-      [after]
-      alpn
-      http2
-      http-forwarded
-      ```
+   2. Remove references to `alpn` and `http2` module from `modules/https.mod`:
 8. Addition of `modules/xwiki-logging.mod` to configure logging for XWiki (provides the Jetty `logging` module name)
 9. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely we wrapp:
    ```

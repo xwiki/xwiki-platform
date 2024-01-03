@@ -530,9 +530,16 @@ public class ExportURLFactory extends XWikiServletURLFactory
         if (!file.exists()) {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
-            file.getParentFile().mkdirs();
-            try (InputStream stream = attachment.getContentInputStream(context)) {
-                FileUtils.copyInputStreamToFile(stream, file);
+            if (attachment != null) {
+                file.getParentFile().mkdirs();
+                try (InputStream stream = attachment.getContentInputStream(context)) {
+                    FileUtils.copyInputStreamToFile(stream, file);
+                }
+            } else {
+                Object[] args = {filename,  documentReference};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+                    "Attachment [{0}] not found for document [{1}]", null, args);
             }
         }
 
@@ -556,7 +563,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
             return createAttachmentURL(filename, spaces, name, xwikidb, context);
         } catch (Exception e) {
             LOGGER.error("Failed to create attachment URL", e);
-
             return super.createAttachmentURL(filename, spaces, name, action, null, xwikidb, context);
         }
     }

@@ -1,0 +1,97 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>FlamingoThemesCode</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.flamingo.themes.home.title=플라밍고 테마
+platform.flamingo.themes.home.currenttheme=현재 테마
+platform.flamingo.themes.home.otherthemes=기타 사용 가능한 테마
+platform.flamingo.themes.home.warningOldColorThemeInstalled=Flamingo 테마를 관리하는 애플리케이션입니다. Flamingo 테마는 Flamingo를 기반으로 하는 모든 스킨의 사용자 정의 가능한 변형입니다. Colibri 기반 스킨의 색상 테마를 관리하려면 {0}Colibri 색상 테마 애플리케이션{1}으로 이동해야 합니다.
+platform.flamingo.themes.home.warningCurrentOldColorTheme=현재 테마는 Flamingo 기반 스킨에 최적화되어 있지 않은 Colibri 컬러 테마입니다. 우리는 호환되도록 최선을 다했지만 결과가 최적이 아닐 수도 있습니다.
+platform.flamingo.themes.home.useThisTheme=이 테마를 사용하세요
+platform.flamingo.themes.home.newThemeName=테마 이름…
+platform.flamingo.themes.home.create=새 테마 만들기
+platform.flamingo.themes.home.create.invalid=테마 이름이 잘못되었습니다!
+platform.flamingo.themes.home.create.csrf=보안상의 이유로 "{0}"이라는 테마를 생성할지 확인하세요.
+platform.flamingo.themes.home.create.confirm=확인하다
+platform.flamingo.themes.home.set.success=테마가 "{0}"으로 설정되었습니다.
+platform.flamingo.themes.title.variables=변수
+platform.flamingo.themes.title.preview=시사
+platform.flamingo.themes.autorefresh=자동 새로고침
+platform.flamingo.themes.refresh=새로 고치다
+platform.flamingo.themes.refreshwarning=새로 고치는 데 몇 초 정도 걸릴 수 있습니다.
+platform.flamingo.themes.preview.iframe.label=색상 테마 미리보기.
+platform.flamingo.themes.loading=로드 중...
+platform.flamingo.themes.category.logos=로고
+platform.flamingo.themes.category.base-colors=기본 색상
+platform.flamingo.themes.category.typography=타이포그래피
+platform.flamingo.themes.category.forms=양식
+platform.flamingo.themes.category.buttons=버튼
+platform.flamingo.themes.category.tables=테이블
+platform.flamingo.themes.category.navbar=네비게이션 바
+platform.flamingo.themes.category.dropdowns=드롭다운
+platform.flamingo.themes.category.panels=패널
+platform.flamingo.themes.category.breadcrumb=탐색경로
+platform.flamingo.themes.category.advanced=고급의
+platform.flamingo.themes.defaultvalue=기본
+platform.flamingo.themes.lessCode.description=이 필드에서는 스킨에 추가될 LESS 코드를 직접 작성할 수 있습니다.
+platform.flamingo.themes.local=현지의
+platform.flamingo.themes.global=글로벌
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.3M1
+#######################################
+platform.flamingo.themes.lessCode.warning=안타깝게도 이 필드는 실시간 미리 보기에서 고려되지 않습니다.
+
+#######################################
+## until 12.9RC1
+#######################################
+platform.flamingo.themes.incompatiblebrowser=죄송합니다. 이 버전의 Internet Explorer에서는 미리보기가 작동하지 않습니다. 최신 브라우저를 사용해야 합니다.
+
+#@deprecatedend
+</content>
+</xwikidoc>

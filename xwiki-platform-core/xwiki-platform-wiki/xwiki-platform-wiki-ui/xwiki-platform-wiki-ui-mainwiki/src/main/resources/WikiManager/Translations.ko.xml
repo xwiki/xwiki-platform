@@ -85,7 +85,7 @@ platform.wiki.create.button=위키 만들기
 platform.wiki.create.title=새 위키 만들기
 platform.wiki.create.members=회원
 platform.wiki.create.prettyname.empty=사용자 친화 이름은 비워둘 수 없습니다
-platform.wiki.create.error=Wiki "{0}" 생성에 실패했습니다: {1}
+platform.wiki.create.error=Wiki "{0}" 생성에 실패했습니다: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=이 식별자를 가진 데이터베이스가 이미 존재합니다
 platform.wiki.create.error.wikiname.wikialreadyexists=이 식별자는 이미 사용되었습니다
 platform.wiki.create.error.wikiname.empty=식별자는 비워둘 수 없습니다
@@ -94,178 +94,178 @@ platform.wiki.create.error.wikiname.empty=식별자는 비워둘 수 없습니�
 platform.wiki.error.wikidoesnotexist=위키 [{0}]이(가) 존재하지 않습니다
 platform.wiki.error.oneParameterNotSpecified=''{0}'' 매개변수가 지정되지 않았습니다.
 platform.wiki.error.parameterAcceptsMultipleValues=여러 값이 허용됩니다.
-### Missing: platform.wiki.error.exceptionWithMessage=Exception: {0}
-### Missing: platform.wiki.form.requiredField=Required
-### Missing: platform.wiki.csrf.error=Invalid security token. Please retry your operation.
+platform.wiki.error.exceptionWithMessage=예외: {0}
+platform.wiki.form.requiredField=필수의
+platform.wiki.csrf.error=보안 토큰이 잘못되었습니다. 작업을 다시 시도하십시오.
 
 ## Users
-### Missing: platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
-### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.
-### Missing: platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
-### Missing: platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.request.cancelYes=Yes
-### Missing: platform.wiki.users.join.request.cancelNo=No
-### Missing: platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
-### Missing: platform.wiki.users.join.yes=Yes
-### Missing: platform.wiki.users.join.no=No
-### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
-### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
-### Missing: platform.wiki.users.leave.confirmation=Are you sure you want to leave wiki {0}{1}{2}?
-### Missing: platform.wiki.users.leave.confirmation.yes=Yes
-### Missing: platform.wiki.users.leave.confirmation.no=No
-### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.title=Join Wiki
-### Missing: platform.wiki.users.leave.title=Leave Wiki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
-### Missing: platform.wiki.users.delete.title=Delete Wiki "{0}"
-### Missing: platform.wiki.users.delete.empty=Delete Wiki
-### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
-### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
-### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
-### Missing: platform.wiki.users.invitation.title=You have been invited to join the wiki {0}{1}{2}.
-### Missing: platform.wiki.users.invitation.message.label=Invitation message
-### Missing: platform.wiki.users.invitation.reply.title=Reply
-### Missing: platform.wiki.users.invitation.accept.label=Accept
-### Missing: platform.wiki.users.invitation.reject.label=Reject
-### Missing: platform.wiki.users.invitation.postpone.label=Later
-### Missing: platform.wiki.users.join.request.message.label=Message
-### Missing: platform.wiki.users.join.request.send.label=Send Request
-### Missing: platform.wiki.users.join.request.cancel.label=Back
+platform.wiki.users.userAlreadyMemberOfWiki=사용자 {0}{1}{2}은(는) 이미 위키 {3}{4}{5}의 회원입니다.
+platform.wiki.users.userNotMemberOfWiki=사용자 {0}{1}{2}은(는) Wiki {3}{4}{5}의 회원이 아닙니다.
+platform.wiki.users.logInToContinue=계속하려면 먼저 {0}로그인{1}해야 합니다.
+platform.wiki.users.invitation.userAcceptedNotification=사용자 ''{0}''({1})이 Wiki ''{2}''({3})에 가입하기 위한 초대를 수락했습니다.
+platform.wiki.users.invitation.userAcceptedSuccess=사용자 {0}{1}{2}이(가) 성공적으로 초대를 수락하고 Wiki {3}{4}{5}에 가입했습니다.
+platform.wiki.users.invitation.userRejectedSuccess=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5} 가입 초대를 성공적으로 거부했습니다.
+platform.wiki.users.join.error.needInvitation=이 위키는 초대받은 사람만 이용할 수 있습니다. 그렇게 하려면 관리자 중 한 명으로부터 초대를 받아야 합니다.
+platform.wiki.users.join.request.pendingRequestExists=사용자 {0}{1}{2}은(는) 이미 Wiki {3}{4}{5} 가입 요청을 보류하고 있습니다. 위키 관리자가 검토할 때까지 기다려 주십시오.
+platform.wiki.users.join.request.cancelConfirmation=Wiki {0}{1}{2} 가입 요청을 취소하시겠습니까?
+platform.wiki.users.join.request.cancelYes=예
+platform.wiki.users.join.request.cancelNo=아니요
+platform.wiki.users.join.request.cancelSuccess=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5} 가입 요청을 성공적으로 취소했습니다.
+platform.wiki.users.join.request.saveNotification=사용자 ''{0}''({1})이 Wiki ''{2}''({3})에 가입을 요청했습니다.
+platform.wiki.users.join.request.success=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5} 가입 요청을 성공적으로 보냈습니다.
+platform.wiki.users.join.confirmation=정말로 Wiki {0}{1}{2}에 참여하시겠습니까?
+platform.wiki.users.join.yes=예
+platform.wiki.users.join.no=아니요
+platform.wiki.users.join.success=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5}에 가입했습니다.
+platform.wiki.users.leave.error.userIsOwner=사용자 {0}{1}{2}은(는) Wiki {3}{4}{5}의 소유자입니다. 위키 소유자는 위키가 삭제되거나 소유자가 변경되지 않는 한 위키를 떠날 수 없습니다.
+platform.wiki.users.leave.confirmation=정말로 Wiki {0}{1}{2}에서 나가시겠습니까?
+platform.wiki.users.leave.confirmation.yes=예
+platform.wiki.users.leave.confirmation.no=아니요
+platform.wiki.users.leave.success=사용자 {0}{1}{2}이(가) 성공적으로 Wiki {3}{4}{5}을(를) 떠났습니다.
+platform.wiki.users.join.title=위키 가입
+platform.wiki.users.leave.title=Wiki "{0}" 나가기
+platform.wiki.users.leave.empty=위키 나가기
+platform.wiki.users.delete.title=위키 "{0}" 삭제
+platform.wiki.users.delete.empty=위키 삭제
+platform.wiki.users.invitation.reply.hint=보낼 응답 메시지로, 위키 관리자가 볼 수 있으며 이를 통해 결정에 동기를 부여할 수 있습니다.
+platform.wiki.users.join.request.hint=Wiki {0}{1}{2}에 가입하려면 먼저 가입 요청을 발행해야 합니다. 그렇게 하면 위키 관리자가 귀하의 요청을 검토하고 고려할 것입니다.
+platform.wiki.users.join.request.message.hint=이 가입 요청에 동기를 부여할 수 있는 위키 관리자가 볼 수 있는 보낼 메시지입니다.
+platform.wiki.users.invitation.title=귀하는 Wiki {0}{1}{2}에 가입하도록 초대되었습니다.
+platform.wiki.users.invitation.message.label=초대 메시지
+platform.wiki.users.invitation.reply.title=회신하다
+platform.wiki.users.invitation.accept.label=수용하다
+platform.wiki.users.invitation.reject.label=거부하다
+platform.wiki.users.invitation.postpone.label=나중에
+platform.wiki.users.join.request.message.label=메시지
+platform.wiki.users.join.request.send.label=요청 보내기
+platform.wiki.users.join.request.cancel.label=뒤쪽에
 
 ## User profile
-### Missing: platform.wiki.users.profile.joinedwikis.label=Joined wikis
-### Missing: platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.activity.title=Activity of wiki {0}
-### Missing: platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
-### Missing: platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
-### Missing: platform.wiki.users.profile.activity.show=show activity
+platform.wiki.users.profile.joinedwikis.label=가입한 위키
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=귀하는 아직 위키의 회원이 아닙니다.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=사용자는 아직 위키의 회원이 아닙니다.
+platform.wiki.users.profile.activity.title=위키 {0} 활동
+platform.wiki.users.profile.activity.hint=특정 위키에 대한 활동 스트림을 생성합니다.
+platform.wiki.users.profile.activity.multipletitle=위키 활동 {0}
+platform.wiki.users.profile.activity.show=활동 표시
 
 ## Wiki Deletion
-### Missing: platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
-### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
-### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
-### Missing: platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
+platform.wiki.delete.confirmation=위키 {0}{1}{2}을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다!
+platform.wiki.delete.confirmation.retypeWikiId=여기에 위키 식별자를 다시 입력해 주세요:
+platform.wiki.delete.error.wikiIdDoesNotMatch=삭제해야 하는 위키의 정확한 위키 식별자를 입력하세요.
+platform.wiki.delete.success=사용자 {0}{1}{2}이(가) ''{3}'' 위키를 삭제했습니다.
 
 ## Wiki macro
-### Missing: platform.wiki.macro.noWikis=There are currently no wikis created (except the main one).
-### Missing: rendering.macro.wikis.name=Wikis
-### Missing: rendering.macro.wikis.description=List all wikis
+platform.wiki.macro.noWikis=현재 생성된 위키가 없습니다(기본 위키 제외).
+rendering.macro.wikis.name=위키
+rendering.macro.wikis.description=모든 위키 나열
 
 ## LegacyWorkspaces macro
-### Missing: rendering.macro.workspaces.name=Workspaces (Legacy)
-### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
+rendering.macro.workspaces.name=작업공간(기존)
+rendering.macro.workspaces.description=호환성 문제로 인해 여기서는 사용하면 안 되는 매크로입니다. 대신 "위키" 매크로를 사용하세요.
 
 ## Browse
-### Missing: platform.wiki.browse=Browse Wikis
-### Missing: platform.wiki.browse.emptyvalue=N/A
-### Missing: platform.wiki.browse.wikiprettyname=Name
-### Missing: platform.wiki.browse.description=Description
-### Missing: platform.wiki.browse.owner=Owner
-### Missing: platform.wiki.browse.membershipType=Membership Type
-### Missing: platform.wiki.browse.doc.creationDate=Creation Date
-### Missing: platform.wiki.browse._actions=Actions
-### Missing: platform.wiki.browse._actions.join=Join
-### Missing: platform.wiki.browse._actions.requestJoin=Request Join
-### Missing: platform.wiki.browse._actions.viewInvitation=View Invitation
-### Missing: platform.wiki.browse._actions.cancelJoinRequest=Cancel Request
-### Missing: platform.wiki.browse._actions.leave=Leave
-### Missing: platform.wiki.browse._actions.delete=Delete
+platform.wiki.browse=위키 찾아보기
+platform.wiki.browse.emptyvalue=해당 없음
+platform.wiki.browse.wikiprettyname=이름
+platform.wiki.browse.description=설명
+platform.wiki.browse.owner=소유자
+platform.wiki.browse.membershipType=회원 유형
+platform.wiki.browse.doc.creationDate=생산 일
+platform.wiki.browse._actions=행위
+platform.wiki.browse._actions.join=가입하다
+platform.wiki.browse._actions.requestJoin=가입 요청
+platform.wiki.browse._actions.viewInvitation=초대장 보기
+platform.wiki.browse._actions.cancelJoinRequest=요청 취소
+platform.wiki.browse._actions.leave=떠나다
+platform.wiki.browse._actions.delete=삭제
 
 ## Classes
-### Missing: WikiManager.WikiUserClass_membershipType_open=Open for any user to join
-### Missing: WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept
-### Missing: WikiManager.WikiUserClass_membershipType_invite=Only an admin can send invitations to join this wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
-### Missing: WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
-### Missing: platform.wiki.prop.wikiname=Wiki Identifier
-### Missing: platform.wiki.prop.wikiprettyname=Pretty Name
-### Missing: platform.wiki.prop.wikialias=Alias
-### Missing: platform.wiki.prop.description=Description
-### Missing: platform.wiki.prop.owner=Owner
-### Missing: platform.wiki.prop.membershipType.label=Membership Type
-### Missing: platform.wiki.prop.membershipType.hint=The way users can join this wiki.
+WikiManager.WikiUserClass_membershipType_open=모든 사용자가 참여할 수 있도록 개방
+WikiManager.WikiUserClass_membershipType_request=모든 글로벌 사용자가 가입을 요청할 수 있지만 관리자가 수락해야 합니다
+WikiManager.WikiUserClass_membershipType_invite=관리자만이 이 위키에 가입하기 위한 초대장을 보낼 수 있습니다
+WikiManager.WikiUserClass_userScope_local_only=위키에서는 로컬 사용자만 사용할 수 있습니다
+WikiManager.WikiUserClass_userScope_global_only=위키에서는 글로벌 사용자만 사용할 수 있습니다
+WikiManager.WikiUserClass_userScope_local_and_global=×번
+platform.wiki.prop.wikiname=위키 식별자
+platform.wiki.prop.wikiprettyname=예쁜 이름
+platform.wiki.prop.wikialias=별명
+platform.wiki.prop.description=설명
+platform.wiki.prop.owner=소유자
+platform.wiki.prop.membershipType.label=회원 유형
+platform.wiki.prop.membershipType.hint=사용자가 이 위키에 참여할 수 있는 방법입니다.
 
 ## Wizard
-### Missing: platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
-### Missing: platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
-### Missing: platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
-### Missing: platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all pages will be cloned).
-### Missing: platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-### Missing: platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independent of the rights configured in the Administration.
-### Missing: platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
-### Missing: platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
-### Missing: platform.wiki.create.wizard.step.nameAndType.shortname=Name
-### Missing: platform.wiki.create.wizard.step.users=Step 2 — Choose members
-### Missing: platform.wiki.create.wizard.step.users.shortname=Users
-### Missing: platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
-### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete this wiki
-### Missing: platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirmmessage=You are about to delete wiki {0}. Please confirm.
-### Missing: platform.wiki.create.wizard.step.cleaningUp.confirm=Confirm
-### Missing: platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
-### Missing: platform.wiki.create.wizard.template.noTemplate=No template (default)
-### Missing: platform.wiki.create.wizard.userScope.label=User Scope
-### Missing: platform.wiki.create.wizard.userScope.hint=Select what kind of users can access the wiki
-### Missing: platform.wiki.create.wizard.template.label=Template
-### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
-### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
-### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
-### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
-### Missing: platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created and the Distribution Wizard will be started in order to help you initialize your wiki. If you skip the wizard, your wiki will be empty.
-### Missing: platform.wiki.create.wizard.step.previous=Previous Step
-### Missing: platform.wiki.create.wizard.step.next=Next step
-### Missing: platform.wiki.create.wizard.step.create=Create
-### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
-### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
-### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
-### Missing: platform.wiki.create.wizard.step.creation.error=The creation of the wiki {0} failed. It''s recommended to delete it.
-### Missing: platform.wiki.create.wizard.step.creation.go=Go to the wiki
+platform.wiki.create.wizard.desc.wikiname=새 위키의 고유 식별자입니다.
+platform.wiki.create.wizard.desc.wikiprettyname=위키의 표시 이름입니다.
+platform.wiki.create.wizard.desc.wikialias=위키를 가리키는 도메인 이름입니다.
+platform.wiki.create.wizard.desc.newTemplateHint=이 새 Wiki에 사용할 템플릿입니다(모든 페이지가 복제됩니다).
+platform.wiki.create.wizard.desc.description=위키와 그 목적에 대한 간략한 설명입니다.
+platform.wiki.create.wizard.desc.owner=관리에 구성된 권한과 관계없이 항상 이 Wiki에 대한 모든 권한을 갖는 사용자입니다.
+platform.wiki.create.wizard.desc.members=위키에 참여할 수 있는 사용자입니다.
+platform.wiki.create.wizard.step.nameAndType=1단계 - 이름 선택
+platform.wiki.create.wizard.step.nameAndType.shortname=이름
+platform.wiki.create.wizard.step.users=2단계 - 구성원 선택
+platform.wiki.create.wizard.step.users.shortname=사용자
+platform.wiki.create.wizard.step.cleaningUp=청소
+platform.wiki.create.wizard.step.provisioning.cleanUp=이 위키 정리 및 삭제
+platform.wiki.create.wizard.step.cleaningup.success=Wiki {0}이(가) 성공적으로 삭제되었습니다.
+platform.wiki.create.wizard.step.cleaningup.error=오류, Wiki {0}이(가) 삭제되지 않았습니다.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=위키 {0}을(를) 삭제하려고 합니다. 확인 해주세요.
+platform.wiki.create.wizard.step.cleaningUp.confirm=확인하다
+platform.wiki.create.wizard.setAsTemplate.label=이 위키는 템플릿이 될 것입니다
+platform.wiki.create.wizard.template.noTemplate=템플릿 없음(기본값)
+platform.wiki.create.wizard.userScope.label=사용자 범위
+platform.wiki.create.wizard.userScope.hint=위키에 액세스할 수 있는 사용자 유형을 선택하세요
+platform.wiki.create.wizard.template.label=주형
+platform.wiki.create.wizard.flavortemplate.label=기호 / 템플릿
+platform.wiki.create.wizard.flavortemplate.hint=새 위키의 초기 콘텐츠로 사용할 플레이버 또는 템플릿
+platform.wiki.create.wizard.flavortemplate.flavorTab=기호
+platform.wiki.create.wizard.flavortemplate.templateTab=주형
+platform.wiki.create.wizard.step.dw="만들기" 버튼을 클릭하면 위키가 생성되고 위키 초기화를 돕기 위해 배포 마법사가 시작됩니다 . 마법사를 건너뛰면 위키가 비어 있게 됩니다.
+platform.wiki.create.wizard.step.previous=이전 단계
+platform.wiki.create.wizard.step.next=다음 단계
+platform.wiki.create.wizard.step.create=만들기
+platform.wiki.create.wizard.step.creation=위키 생성
+platform.wiki.create.wizard.step.creation.wait=위키가 생성될 때까지 기다려 주세요.
+platform.wiki.create.wizard.step.creation.complete=Wiki {0}이(가) 성공적으로 생성되었습니다. 이제 액세스할 수 있습니다.
+platform.wiki.create.wizard.step.creation.errorlog=그러나 해당 프로세스 중에 오류가 발생했으며 이를 검토하는 것이 좋습니다.
+platform.wiki.create.wizard.step.creation.error=Wiki {0} 생성에 실패했습니다. 삭제하는 것이 좋습니다.
+platform.wiki.create.wizard.step.creation.go=위키로 이동
 
 ## Admin
-### Missing: admin.wikis.description=Wikis management.
-### Missing: admin.wikis.templates=Wiki Templates
-### Missing: admin.wikis.templates.description=Manage the wiki templates
-### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
-### Missing: admin.wikis.rights=Creation Right
+admin.wikis.description=위키 관리.
+admin.wikis.templates=위키 템플릿
+admin.wikis.templates.description=위키 템플릿 관리
+admin.wikis.templates.hint=템플릿은 새 위키를 생성하기 위한 모델로 간주되는 위키입니다. 사용자가 새 Wiki를 만들기 위해 템플릿을 선택하면 템플릿의 모든 콘텐츠가 새 Wiki에 복사됩니다.
+admin.wikis.rights=창조권
 
 ## XWikiServer Sheet
-### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
-### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
-### Missing: platform.wiki.sheet.title.settings=Wiki properties
-### Missing: platform.wiki.sheet.title.createnewalias=Create new alias
-### Missing: platform.wiki.sheet.title.viewaliases=View aliases
-### Missing: platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
-### Missing: platform.wiki.sheet.desc.owner=A user who will have all the rights on this wiki.
-### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
-### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.
-### Missing: platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
-### Missing: platform.wiki.sheet.desc.server=The alias used to access the wiki.
-### Missing: platform.wiki.sheet.desc.description=A brief wiki description.
-### Missing: platform.wiki.sheet.desc.homepage=The homepage of the wiki.
-### Missing: platform.wiki.sheet.prop.wikiprettyname=Pretty name
-### Missing: platform.wiki.sheet.prop.owner=Owner
-### Missing: platform.wiki.sheet.prop.secure=Secure (SSL)
-### Missing: platform.wiki.sheet.prop.port=Port
-### Missing: platform.wiki.sheet.prop.description=Description
-### Missing: platform.wiki.sheet.prop.server=Alias
-### Missing: platform.wiki.sheet.prop.homepage=Homepage
-### Missing: platform.wiki.sheet.prop.iswikitemplate=Wiki template
-### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
-### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
-### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
+platform.wiki.sheet.title=위키 "{0}"의 설명자
+platform.wiki.sheet.erroraliasalreadynotexists=Wiki 별칭 "{0}"이(가) 이미 존재합니다.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki 별칭 "{0}"이(가) 존재하지 않습니다.
+platform.wiki.sheet.title.settings=위키 속성
+platform.wiki.sheet.title.createnewalias=새 별칭 만들기
+platform.wiki.sheet.title.viewaliases=별칭 보기
+platform.wiki.sheet.desc.wikiprettyname=위키의 표시 이름입니다.
+platform.wiki.sheet.desc.owner=이 위키에 대한 모든 권리를 가지는 사용자입니다.
+platform.wiki.sheet.desc.secure=활성화되면 이 위키에서 생성된 모든 외부 URL은 "https"로 시작됩니다.
+platform.wiki.sheet.desc.port=이 위키에서 생성된 모든 외부 URL에 사용할 포트입니다. 설정하지 않으면 구성 및 기본 위키에서 상속됩니다. 도메인 기반 URL에 대해서만 고려됩니다.
+platform.wiki.sheet.desc.iswikitemplate=새 위키를 만들 때 이 위키를 템플릿으로 사용할 수 있는지 표시합니다.
+platform.wiki.sheet.desc.server=Wiki에 액세스하는 데 사용되는 별칭입니다.
+platform.wiki.sheet.desc.description=간략한 위키 설명입니다.
+platform.wiki.sheet.desc.homepage=위키 홈페이지입니다.
+platform.wiki.sheet.prop.wikiprettyname=친화적인 이름
+platform.wiki.sheet.prop.owner=소유자
+platform.wiki.sheet.prop.secure=보안(SSL)
+platform.wiki.sheet.prop.port=포트
+platform.wiki.sheet.prop.description=설명
+platform.wiki.sheet.prop.server=별명
+platform.wiki.sheet.prop.homepage=홈페이지
+platform.wiki.sheet.prop.iswikitemplate=위키 템플릿
+platform.wiki.sheet.descriptor=이 페이지는 "{0}" 위키에 액세스하는 방법과 이에 대한 일부 속성을 정의합니다. 더 많은 구성을 보려면 다음으로 이동하세요
+platform.wiki.sheet.descriptor.admin=위키의 관리 페이지입니다.
+platform.wiki.sheet.aliases=별칭은 위키의 또 다른 이름입니다. 별칭을 추가하여 위키에 대한 다양한 URL을 생성할 수 있습니다.
 
 ###############################################################################
 ## Deprecated
@@ -278,28 +278,28 @@ platform.wiki.error.parameterAcceptsMultipleValues=여러 값이 허용됩니다
 #######################################
 ## until 6.1
 #######################################
-### Missing: platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+platform.wiki.dependencies.applicationmanager.missing={0}애플리케이션 관리자 플러그인{1}이 설치되지 않았습니다. 설치한 후 다시 시도해 주세요.
 
 #######################################
 ## until 6.4RC1
 #######################################
-### Missing: admin.wikis=Wikis
-### Missing: admin.wikis.template=Wiki Template
+admin.wikis=위키
+admin.wikis.template=위키 템플릿
 
 #######################################
 ## until 7.0M2
 #######################################
-### Missing: platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-### Missing: platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-### Missing: platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the pages contained in the template have not been copied. You should probably delete it.
-### Missing: platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+platform.wiki.create.wizard.step.provisioning=시스템이 위키를 프로비저닝하고 있습니다.
+platform.wiki.create.wizard.step.provisioning.wait=시스템이 Wiki를 제공하는 동안 잠시 기다려 주십시오.
+platform.wiki.create.wizard.step.provisioning.complete=위키가 거의 준비되었습니다. 마지막 작업을 수행하려면 "완료"를 클릭하세요.
+platform.wiki.create.wizard.step.provisioning.error=Wiki {0}이(가) 생성되었지만 템플릿에 포함된 일부 페이지가 복사되지 않았습니다. 아마도 삭제해야 할 것입니다.
+platform.wiki.create.wizard.step.provisioning.finalize=마무리
 
 #######################################
 ## until 9.5-rc-1
 #######################################
-### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
-### Missing: platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.confirmation.yes=네, 이 위키를 삭제해주세요!
+platform.wiki.delete.confirmation.no=아니, 날 다시 데려가 주세요!
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

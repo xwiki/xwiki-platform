@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="Image.Style.Code.Translations" locale="ko">
+  <web>Image.Style.Code</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.image.style=이미지 스타일
+image.style.admin.heading=이미지 스타일 관리
+image.style.administration.imageStyleList.heading=이미지 스타일
+image.style.administation.newImageStyle.button=이미지 스타일 만들기
+image.style.administation.defaultImageStyle.button=기본 이미지 스타일 업데이트
+image.style.imageStyleSheet.backToAdministration.link=행정으로 돌아가기
+image.style.administration.liveData.doc.title=식별자
+image.style.administration.liveData._actions=행위
+image.style.administration.liveData.prettyName=예쁜 이름
+image.style.administration.liveData.prettyName.hint=열을 선택하려면 클릭하세요
+image.style.administration.liveData.type=유형
+image.style.administration.liveData.type.hint=이미지 스타일 유형( CSS 클래스로 사용됨)
+### Missing: image.style.administration.liveData.emptyvalue=
+image.style.administation.newImageStyle.label=새로운 이미지 스타일
+image.style.administation.newImageStyle.hint=새 이미지 스타일의 식별자입니다.
+image.style.administation.newImageStyle.placeHolder=식별자
+image.style.administation.newImageStyle.normalizedTitle=명명 규칙을 따르는 새로운 이미지 스타일은 [{0}]입니다.
+Image.Style.Code.ImageStyleClass_adjustableAlignment=조정 가능한 정렬
+Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=선택하면 사용자가 이미지 정렬을 사용자 정의할 수 있습니다.
+Image.Style.Code.ImageStyleClass_adjustableBorder=조정 가능한 테두리
+Image.Style.Code.ImageStyleClass_adjustableBorder_hint=선택하면 사용자가 이미지 테두리를 사용자 정의할 수 있습니다.
+Image.Style.Code.ImageStyleClass_adjustableSize=조정 가능한 크기
+Image.Style.Code.ImageStyleClass_adjustableSize_hint=선택하면 사용자가 이미지 크기를 사용자 정의할 수 있습니다.
+Image.Style.Code.ImageStyleClass_adjustableTextWrap=조정 가능한 텍스트 감싸기
+Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=선택하면 사용자가 이미지의 텍스트 줄 바꿈을 사용자 정의할 수 있습니다.
+Image.Style.Code.ImageStyleClass_defaultAlignment=기본 정렬
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=센터
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_default=
+Image.Style.Code.ImageStyleClass_defaultAlignment_hint=이미지의 기본 정렬입니다.
+Image.Style.Code.ImageStyleClass_defaultAlignment_none=없음
+Image.Style.Code.ImageStyleClass_defaultAlignment_start=시작
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=센터
+Image.Style.Code.ImageStyleClass_defaultAlignment_end=끝
+Image.Style.Code.ImageStyleClass_defaultBorder=기본 테두리
+Image.Style.Code.ImageStyleClass_defaultBorder_hint=선택하면 기본적으로 이미지에 테두리가 있습니다.
+Image.Style.Code.ImageStyleClass_defaultHeight=기본 높이
+Image.Style.Code.ImageStyleClass_defaultHeight_hint=이미지의 기본 높이입니다. 기본 너비가 비어 있으면 이미지 비율에 따라 계산됩니다. 그렇지 않으면 이미지의 크기가 고정됩니다.
+Image.Style.Code.ImageStyleClass_defaultTextWrap=기본 텍스트 줄 바꿈
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=선택하면 기본적으로 텍스트가 이미지 주위를 둘러쌉니다.
+Image.Style.Code.ImageStyleClass_defaultWidth=기본 너비
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=이미지의 기본 너비입니다. 기본 높이를 비워두면 이미지 비율에 따라 계산됩니다. 그렇지 않으면 이미지의 크기가 고정됩니다.
+Image.Style.Code.ImageStyleClass_prettyName=예쁜 이름
+Image.Style.Code.ImageStyleClass_prettyName_hint=사용자 중심의 이미지 스타일 이름입니다.
+Image.Style.Code.ImageStyleClass_type=유형
+Image.Style.Code.ImageStyleClass_type_hint=이미지 스타일의 유형입니다( CSS 클래스로 사용됨).
+Image.Style.Code.ConfigurationClass_defaultStyle=기본 스타일
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=이 위키의 기본 이미지 스타일입니다.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=강제 기본 스타일
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=선택하면 이미지 구성에서 기본 스타일의 제약이 강제 적용되며 사용자는 강제로 스타일을 선택해야 합니다.
+</content>
+  </xwikidoc>

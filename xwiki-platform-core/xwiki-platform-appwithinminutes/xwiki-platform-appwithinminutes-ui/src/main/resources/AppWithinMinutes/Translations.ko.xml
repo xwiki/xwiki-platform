@@ -55,7 +55,7 @@ platform.appwithinminutes.wizardStepHeading=단계 {0} - {1}
 appWithinMinutes.wizardStep.name.name=이름
 appWithinMinutes.wizardStep.name.title=애플리케이션 이름 지정
 appWithinMinutes.wizardStep.name.description=애플리케이션 이름을 선택하세요
-appWithinMinutes.wizardStep.structure.name=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+appWithinMinutes.wizardStep.structure.name=구조
 appWithinMinutes.wizardStep.structure.title=데이터 구조화
 appWithinMinutes.wizardStep.structure.description=애플리케이션 데이터 설명
 appWithinMinutes.wizardStep.entries.name=항목
@@ -74,7 +74,7 @@ platform.appwithinminutes.wizardStepHelpTitle=단계
 platform.appwithinminutes.wizardStepHelpDescription=이 마법사는 애플리케이션을 생성하는 과정을 안내합니다. 수행할 단계는 다음과 같습니다:
 
 ### Wizard Step 1: Application Name
-appWithinMinutes.createApp.location.label=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.), 일치하지 않는 콜론(:)
+appWithinMinutes.createApp.location.label=위치
 appWithinMinutes.createApp.location.hint=애플리케이션이 생성될 페이지 계층 구조의 위치입니다.
 appWithinMinutes.createApp.parent.label=부모의
 appWithinMinutes.createApp.parent.hint=새 애플리케이션의 상위입니다. 최상위 애플리케이션을 생성하려면 이 필드를 비워 두세요.
@@ -128,7 +128,7 @@ platform.appwithinminutes.classEditorPreviewFieldLabel=시사
 platform.appwithinminutes.classEditorPreviewFieldHint=구성 패널 숨기기 및 변경 사항 적용
 platform.appwithinminutes.classEditorMoveFieldLabel=이동하다
 platform.appwithinminutes.classEditorMoveFieldHint=드래그 앤 드롭하여 순서를 변경하세요
-platform.appwithinminutes.classEditorFieldDefaultValueToolTip=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=기본값
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=좋아요
@@ -179,12 +179,12 @@ platform.appwithinminutes.liveTableEditorImagesColumnName=이미지
 platform.appwithinminutes.liveTableEditorImagesColumnDescription=데이터 페이지에 첨부된 이미지를 표시하는 특수 열
 platform.appwithinminutes.liveTableEditorAvatarColumnName=화신
 platform.appwithinminutes.liveTableEditorAvatarColumnDescription=사용자 아바타를 표시하는 특수 열입니다. XWiki .XWikiUsers 클래스 에 바인딩된 테이블에 대해서만 작동합니다
-platform.appwithinminutes.liveTableEditorTitleHint=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표.
+platform.appwithinminutes.liveTableEditorTitleHint=애플리케이션 홈 페이지, 애플리케이션 패널 및 라이브 테이블, 이동 경로 등에 표시되는 애플리케이션 제목입니다.
 platform.appwithinminutes.liveTableEditorDescriptionHint=애플리케이션 데이터와 함께 라이브 테이블 위에 홈페이지에 표시될 콘텐츠입니다. 이를 사용하여 응용 프로그램을 설명합니다.
 platform.appwithinminutes.liveTableEditorColumnsHint=애플리케이션 홈 페이지에 표시되는 라이브 테이블에 포함할 열을 선택하세요.
-platform.appwithinminutes.liveTableEditorSaveComment=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+platform.appwithinminutes.liveTableEditorSaveComment=라이브테이블 업데이트
 platform.appwithinminutes.liveTableEditorMoveColumnHint=드래그 앤 드롭하여 순서를 변경하세요
-platform.appwithinminutes.liveTableEditorDeleteColumnHint=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=삭제
 platform.appwithinminutes.liveTableEditorAddColumnHint=선택한 열 추가
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=일부 열은 더 이상 사용되지 않습니다. 해당 응용 프로그램 필드가 삭제되었기 때문일 수 있습니다. 제거하시겠습니까?&lt;a href=""&gt;예&lt;/a&gt; / &lt;a href=""&gt;아니요&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=상
@@ -232,7 +232,7 @@ appWithinMinutes.renameApp.failed=애플리케이션 이름을 바꾸지 못했�
 
 ### Deprecated keys
 ### Since 8.4
-platform.appwithinminutes.appNamePreviewClassReferenceLabel=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=응용클래스
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=애플리케이션 데이터 위치
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=공간
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=애플리케이션 항목이 포함된 공간의 이름
@@ -246,7 +246,7 @@ platform.appwithinminutes.wizardStep1Title=애플리케이션 이름 지정
 #@deprecated appWithinMinutes.wizardStep.name.description
 platform.appwithinminutes.wizardStep1Description=애플리케이션 이름을 선택하세요
 #@deprecated appWithinMinutes.wizardStep.structure.name
-platform.appwithinminutes.wizardStep2Name=번역이 저장되었지만, 일부 새롭게 실패한 검사가 있습니다: 일치하지 않는 마침표(.)
+platform.appwithinminutes.wizardStep2Name=구조
 #@deprecated appWithinMinutes.wizardStep.structure.title
 platform.appwithinminutes.wizardStep2Title=데이터 구조화
 #@deprecated appWithinMinutes.wizardStep.structure.description

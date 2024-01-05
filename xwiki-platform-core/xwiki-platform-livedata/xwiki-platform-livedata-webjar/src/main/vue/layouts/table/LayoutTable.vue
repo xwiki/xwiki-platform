@@ -50,6 +50,7 @@
     <!-- Table layout root -->
     <div class="layout-table-wrapper">
       <table class="layout-table-root responsive-table">
+        <caption v-if="caption" class="sr-only">{{ caption }}</caption>
 
         <!--
           Table Header
@@ -134,6 +135,9 @@ export default {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
     canAddEntry () { return this.logic.canAddEntry(); },
+    caption() {
+      return this.data?.meta?.description;
+    }
   },
   
   mounted() {

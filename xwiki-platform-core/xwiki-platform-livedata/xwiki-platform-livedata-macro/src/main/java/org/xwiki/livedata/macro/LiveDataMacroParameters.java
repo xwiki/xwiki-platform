@@ -22,10 +22,11 @@ package org.xwiki.livedata.macro;
 import org.xwiki.livedata.internal.LiveDataRendererParameters;
 import org.xwiki.livedata.internal.macro.LiveDataMacro;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for {@link LiveDataMacro}.
- *
+ * 
  * @version $Id$
  * @since 12.10
  */
@@ -143,5 +144,15 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     public void setPageSizes(String pageSizes)
     {
         super.setPageSizes(pageSizes);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public void setDescription(String description)
+    {
+        super.setDescription(description);
     }
 }

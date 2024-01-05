@@ -262,9 +262,9 @@ Generates:
     #set ($discard = $properties.add($colname.trim()))
   #end
 #else
-  #set($properties = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
+  #set ($properties = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
 #end
-#set($sourceParameters = { 
+#set ($sourceParameters = { 
   'translationPrefix' : 'platform.index.',
   'description' : 'This table lists documents found on this wiki based on passed criteria. The columns can be sorted and some can be filtered.'
 })

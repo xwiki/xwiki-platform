@@ -147,7 +147,7 @@ administration.section.analytics.status=상태
 administration.section.analytics.status.hint=Google Analytics™의 추적이 활성화되어 있는지 확인
 
 # Social category
-admin.social=사회의
+admin.social=소셜
 admin.social.description=소셜 기능에 대한 구성입니다.
 
 # Configurable Class

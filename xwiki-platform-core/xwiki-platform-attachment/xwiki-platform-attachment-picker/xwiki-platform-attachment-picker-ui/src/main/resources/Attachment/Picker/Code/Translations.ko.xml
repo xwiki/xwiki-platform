@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>attachment.picker.ckeditor.pluginsImageSelector.title=갤러리
-attachment.picker.searchField.placeholder=찾다 ...
+attachment.picker.searchField.placeholder=찾기 ...
 attachment.picker.searchField.scope.currentPage=현재 페이지
 attachment.picker.searchField.scope.allPages=모든 페이지
 </content>

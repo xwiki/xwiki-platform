@@ -144,14 +144,16 @@
     </property>
     <property>
       <code>## Add extra style based on the preferences of the user
+# Get the legacy preference for backward compatibility
+#set ($a11y = "$!{xwiki.getUserPreference('accessibility')}")
 ## Underlining of links
 #set ($underlining = "$!{xwiki.getUserPreference('underline')}")
-#if ($underlining == 'Yes')
+#if ($underlining == 'Yes' || $a11y == '1')
   a {
     text-decoration: underline;
   }
 #end
-#if ($underlining == 'OnlyInlineLinks')
+#if ($underlining == 'OnlyInlineLinks' &amp;&amp; $a11y != '1')
   /* Rule for the whole UI.
     If there are multiple links in the same parents, we want to be able to separate them.
   */
@@ -191,7 +193,7 @@
     }
   }
 #end
-#if ($underlining == 'No')
+#if ($underlining == 'No' &amp;&amp; $a11y != '1')
   a {
     text-decoration: none;
   }
@@ -199,7 +201,7 @@
 
 #set ($fontSizePreference = $!{xwiki.getUserPreference('font_size')})
 ## Default font size is 14px, which is equivalent to 140%
-#if ($fontSizePreference == 'Large')
+#if ($fontSizePreference == 'Large' || $a11y == '1')
   .content {
     font-size: 160%;
   }

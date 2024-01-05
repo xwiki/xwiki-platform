@@ -152,13 +152,41 @@
   }
 #end
 #if ($underlining == 'OnlyInlineLinks')
-  p, span, div {
-    &amp; &gt; .wikilink,
-    &amp; &gt; .wikiexternallink,
-    &amp; &gt; .wikiinternallink,
-    &amp; &gt; .wikicreatelink {
-      &amp; &gt; a {
+  /* Rule for the whole UI.
+    If there are multiple links in the same parents, we want to be able to separate them.
+  */
+  a:not(:only-of-type):not(.button) {
+    text-decoration: underline;
+  }
+
+  .wikilink, .wikiexternallink, .wikiinternallink, .wikicreatelink {
+    :not(:only-of-type) &gt; a:not(.button) {
         text-decoration: underline;
+    }
+  }
+
+  /* Rule for the content.
+    We want to separate the link from the surrounding text. Usually those kind of inline link are found
+    as the only child in a macro generated span.
+    We check the type of the parent of this macro and underline the link in those parents where text is usually found.
+    This selector level is based on the list of HTML Text content elements available on MDN web docs.
+  */
+  #xwikicontent {
+    blockquote, dd, div, dl, dt, figcaption, figure, hr, li, menu, ol, p, pre, ul {
+      &amp; &gt; a:not(.button), &amp; &gt; * &gt; a:not(.button) {
+        text-decoration: underline;
+      }
+    }
+  }
+  /* Rule for panels.
+  It's a filtered down version of the content rule, which avoids underlining lists of anchors that were made using
+  xwiki syntax.
+  We need this to allow a more consistent looks, some panels generate HTML and others use xwiki syntax
+  */
+  #leftPanels, #rightPanels {
+    blockquote, div, figcaption, hr, menu, p, pre {
+      &amp; &gt; a:not(.button), &amp; &gt; * &gt; a:not(.button) {
+      text-decoration: underline;
       }
     }
   }

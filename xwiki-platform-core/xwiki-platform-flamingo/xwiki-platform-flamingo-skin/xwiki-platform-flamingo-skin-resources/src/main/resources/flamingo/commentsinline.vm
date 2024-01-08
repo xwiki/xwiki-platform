@@ -260,7 +260,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   </button>
   #if($isGuest)
     <a id='loginAndComment' class='btn btn-primary'
-      href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($doc.getURL('view', '#Comments'))")'>
+      href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($doc.getURL('view', 'viewer=comments'))")'>
       $services.localization.render('core.viewers.comments.add.loginAndComment.label')
     </a>
   #end

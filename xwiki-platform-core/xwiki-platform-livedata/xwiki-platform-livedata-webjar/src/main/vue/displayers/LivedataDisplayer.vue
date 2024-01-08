@@ -74,6 +74,7 @@ import DisplayerLink from "./DisplayerLink.vue"
 import DisplayerNumber from "./DisplayerNumber.vue"
 import DisplayerText from "./DisplayerText.vue"
 import DisplayerXObjectProperty from "./DisplayerXObjectProperty.vue"
+import DisplayerToggle from "./DisplayerToggle.vue";
 
 export default {
 
@@ -89,6 +90,8 @@ export default {
     DisplayerNumber,
     DisplayerText,
     DisplayerXObjectProperty,
+    // TODO: check if we can avoid having it bundled by default.
+    DisplayerToggle
   },
 
   inject: ["logic"],

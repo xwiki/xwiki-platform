@@ -122,7 +122,12 @@
         'notificationFormats' : "#displayNotificationFormatsList($filter.formats)",
         'isEnabled'           : $checkbox,
         'doc_viewable'        : true,
-        'doc_hasdelete'       : false
+        'doc_hasdelete'       : false,
+        'isEnabled_checked': $filter.isEnabledByDefault(),
+        'isEnabled_data': {
+          'objectNumber': $objectNumber,
+          'filtername':  $filter.name
+        }
       })
       #set ($discard = $elements.add($element))
     #end
@@ -184,7 +189,12 @@
             'eventTypes'          : "#displayNotificationsEventTypeList($preference.eventTypes)",
             'notificationFormats' : "#displayNotificationFormatsList($preference.notificationFormats)",
             'isEnabled'           : $isEnabled,
-            'doc_viewable'        : true
+            'doc_viewable'        : true,
+            'isEnabled_checked': $preference.isEnabled(),
+            'isEnabled_disabled': $preference.id.startsWith('watchlist_'),
+            'isEnabled_data': {
+              'preferenceId': $preference.id
+            }
           })
           #set ($discard = $elements.add($element))
         #end

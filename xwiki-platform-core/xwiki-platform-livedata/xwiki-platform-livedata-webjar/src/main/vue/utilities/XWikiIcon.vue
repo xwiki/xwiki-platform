@@ -125,6 +125,7 @@ export default {
         }
         // Set the icon to the resolved value of the promise.
         this.remoteIconDescriptor = await iconCache[iconName];
+        this.$emit('ready');
       },
       immediate: true
     },

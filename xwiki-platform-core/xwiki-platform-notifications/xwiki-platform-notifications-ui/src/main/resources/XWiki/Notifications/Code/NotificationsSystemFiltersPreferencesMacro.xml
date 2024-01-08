@@ -864,7 +864,7 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.system.hint'))
     &lt;/p&gt;
   &lt;/div&gt;
-  #set($collist  = ['name', 'filterType', 'notificationFormats', 'isEnabled'])
+  #set($properties  = ['name', 'filterType', 'notificationFormats', 'isEnabled'])
   #set($colprops = {
     'name':                { 'sortable': false, 'html': true, 'filterable': false },
     'filterType':          { 'sortable': false, 'filterable': false },
@@ -884,9 +884,39 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
     'outputOnlyHtml'    : true
   })
 
-  #livetable("notificationSystemFilterPreferencesLiveTable" $collist $colprops $options)
+  #livetable("notificationSystemFilterPreferencesLiveTable" $properties $colprops $options)
+  
+  #set ($sourceParameters = {
+    'translationPrefix': 'notifications.settings.filters.preferences.system.table.',
+    'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
+    'eventType': '',
+    'format': '',
+    'type': 'system'
+  })
+  #if ($wikimacro.parameters.target == 'user')
+    #set($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+  #end
+  ## TODO: description!
+
+  #set ($liveDataConfig = {
+    'meta': {
+      'propertyDescriptors': [
+        { 'id': 'notificationFormats', 'displayer': 'html' },
+        { 'id': 'isEnabled', 'displayer': 'html' }
+      ]
+    }
+  })
+
 &lt;/div&gt;
 {{/html}}
+
+  {{liveData
+    id='notificationSystemFilterPreferencesLiveData'
+    properties="$stringtool.join($properties, ',')"
+    source='liveTable'
+    sourceParameters="$escapetool.url($sourceParameters)"
+    limit='10'
+  }}$jsontool.serialize($liveDataConfig){{/liveData}}
 #end
 {{/velocity}}</code>
     </property>

@@ -498,7 +498,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>selectize.js</artifactId>
-        <version>0.13.3</version>
+        <version>0.15.2</version>
         <scope>runtime</scope>
       </dependency>
 

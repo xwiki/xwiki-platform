@@ -52,7 +52,7 @@ import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
  * Page test for the Live Data velocity macro.
  *
  * @version $Id$
- * @since 15.6RC1
+ * @since 16.0.0RC1
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList

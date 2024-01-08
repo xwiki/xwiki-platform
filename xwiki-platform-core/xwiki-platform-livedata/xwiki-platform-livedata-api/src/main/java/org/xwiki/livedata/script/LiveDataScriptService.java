@@ -43,6 +43,7 @@ import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
 
 /**
  * Scripting APIs for the Live Data component.
@@ -167,6 +168,7 @@ public class LiveDataScriptService implements ScriptService
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
+    @Unstable
     public List<Block> render(Map<String, Object> parameters) throws LiveDataException
     {
         return render(parameters, null);
@@ -179,6 +181,7 @@ public class LiveDataScriptService implements ScriptService
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
+    @Unstable
     public List<Block> render(Map<String, Object> parameters, String advancedParameters) throws LiveDataException
     {
         return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);

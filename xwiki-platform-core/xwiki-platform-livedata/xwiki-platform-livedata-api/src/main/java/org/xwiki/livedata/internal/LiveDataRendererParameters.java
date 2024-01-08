@@ -25,6 +25,7 @@ import org.xwiki.properties.annotation.PropertyDescription;
  * Parameters for {@link LiveDataRenderer}.
  *
  * @version $Id$
+ * @since 16.0.0RC1
  */
 public class LiveDataRendererParameters
 {

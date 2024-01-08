@@ -45,7 +45,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Selection of default components for the Live Data components.
  *
  * @version $Id$
- * @since 15.6RC1
+ * @since 16.0.0RC1
  */
 @Documented
 @Retention(RUNTIME)

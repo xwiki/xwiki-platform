@@ -309,22 +309,12 @@ Generates:
   #set ($discard = $options.put('selectedColumn','doc.location'))
 #end
 #if ("$!xcontext.macro.params.id" != "")
-  #set ($livedataId = $xcontext.macro.params.id)
+  #set ($livetableId = $xcontext.macro.params.id)
 #else
   ## TODO: Improve this since we could have several livetables on the same page with same ids
-  #set ($livedataId = "documents-$mathtool.random(1, 1000)")
+  #set ($livetableId = "documents-$mathtool.random(1, 1000)")
 #end
-#livetable($livetableId $collist $colprops $options)  
-
-livedataId $livedataId
-collist $collist
-colprops $colprops
-options $options
-
-{{liveData
-  id="$livedataId"
-  properties="$collist"
-}}
+#livetable($livetableId $collist $colprops $options)
 {{/velocity}}</code>
     </property>
     <property>

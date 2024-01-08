@@ -54,7 +54,7 @@
     <batik.version>1.17</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.1</tika.version>
-    <pdfbox.version>2.0.30</pdfbox.version>
+    <pdfbox.version>3.0.1</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <!-- We are stuck at version 9.x until we upgrade to a version of SolrJ which use a more recent version
          (or something else) -->

@@ -24,6 +24,7 @@ import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
+import org.xwiki.icon.macro.internal.DisplayIconMacro;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -65,6 +66,7 @@ public class XWikiIconProvider extends DefaultIconProvider
     public Block get(String iconName)
     {
         IconSet iconSet = null;
+        DisplayIconMacro iconMacro = new DisplayIconMacro();
         try {
             iconSet = getIconSet(iconName);
             String iconContent = this.iconRenderer.renderHTML(iconName, iconSet);

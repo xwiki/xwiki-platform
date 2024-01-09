@@ -265,8 +265,7 @@ Generates:
   #set ($properties = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
 #end
 #set ($sourceParameters = { 
-  'translationPrefix' : 'platform.index.',
-  'description' : 'This table lists documents found on this wiki based on passed criteria. The columns can be sorted and some can be filtered.'
+  'translationPrefix' : 'platform.index.'
 })
 #if ("$!xcontext.macro.params.space" != "") 
   #set ($discard = $sourceParameters.put('space', $xcontext.macro.params.space))
@@ -300,6 +299,7 @@ Generates:
   properties="$stringtool.join($properties, ',')"
   source="liveTable"
   sourceParameters="$escapetool.url($sourceParameters)"
+  description="This table lists documents found on this wiki based on passed criteria. The columns can be sorted and some can be filtered."
   #if ($properties.contains('doc.location'))sort="doc.location"#end
   #if ("$!xcontext.macro.params.count" != '')limit="$xcontext.macro.params.count"#end
 }}$jsontool.serialize($liveDataConfig){{/liveData}}

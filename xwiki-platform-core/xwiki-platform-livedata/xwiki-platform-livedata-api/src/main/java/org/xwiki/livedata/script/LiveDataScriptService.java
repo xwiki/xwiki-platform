@@ -206,7 +206,7 @@ public class LiveDataScriptService implements ScriptService
                 PropertyUtils.setProperty(liveDataRendererParameters, stringObjectEntry.getKey(),
                     stringObjectEntry.getValue());
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new LiveDataException(String.format("Failed to set property [%s] with value [%s in object [%s]",
+                throw new LiveDataException(String.format("Failed to set property [%s] with value [%s] in object [%s]",
                     stringObjectEntry.getKey(), stringObjectEntry.getValue(), liveDataRendererParameters), e);
             }
         }

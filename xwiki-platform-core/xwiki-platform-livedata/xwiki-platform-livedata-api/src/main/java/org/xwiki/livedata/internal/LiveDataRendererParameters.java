@@ -19,7 +19,8 @@
  */
 package org.xwiki.livedata.internal;
 
-import org.xwiki.properties.annotation.PropertyDescription;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Parameters for {@link LiveDataRenderer}.
@@ -64,7 +65,6 @@ public class LiveDataRendererParameters
      *
      * @param id the live data instance id
      */
-    @PropertyDescription("The live data instance id.")
     public void setId(String id)
     {
         this.id = id;
@@ -254,5 +254,51 @@ public class LiveDataRendererParameters
     public void setPageSizes(String pageSizes)
     {
         this.pageSizes = pageSizes;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataRendererParameters that = (LiveDataRendererParameters) o;
+
+        return new EqualsBuilder()
+            .append(this.id, that.id)
+            .append(this.properties, that.properties)
+            .append(this.source, that.source)
+            .append(this.sourceParameters, that.sourceParameters)
+            .append(this.sort, that.sort)
+            .append(this.filters, that.filters)
+            .append(this.limit, that.limit)
+            .append(this.offset, that.offset)
+            .append(this.layouts, that.layouts)
+            .append(this.showPageSizeDropdown, that.showPageSizeDropdown)
+            .append(this.pageSizes, that.pageSizes)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(this.id)
+            .append(this.properties)
+            .append(this.source)
+            .append(this.sourceParameters)
+            .append(this.sort)
+            .append(this.filters)
+            .append(this.limit)
+            .append(this.offset)
+            .append(this.layouts)
+            .append(this.showPageSizeDropdown)
+            .append(this.pageSizes)
+            .toHashCode();
     }
 }

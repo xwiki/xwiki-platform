@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -152,7 +152,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     /**
      * Open the Affect Children Panel.
      *
-     * @since 13.9RC1
+     * @since 16.0.0RC1
      */
     public void openAffectChildrenPanel()
     {
@@ -161,7 +161,7 @@ public class DeletePageConfirmationPage extends ConfirmationPage
         panelCollapseButton.click();
         getDriver().waitUntilCondition(input -> {
             String[] classes = panelCollapseButton.getAttribute("class").split("\\s+");
-            return !Arrays.asList(classes).contains("collapsed");
+            return !List.of(classes).contains("collapsed");
         });
     }
 }

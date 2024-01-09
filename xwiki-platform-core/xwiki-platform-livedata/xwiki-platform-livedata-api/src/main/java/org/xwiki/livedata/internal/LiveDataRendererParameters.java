@@ -53,7 +53,7 @@ public class LiveDataRendererParameters
     private String pageSizes;
 
     /**
-     * @return the live data instance id
+     * @return the Live Data instance id
      */
     public String getId()
     {
@@ -63,7 +63,7 @@ public class LiveDataRendererParameters
     /**
      * Sets the live data instance id.
      *
-     * @param id the live data instance id
+     * @param id the Live Data instance id
      */
     public void setId(String id)
     {
@@ -89,7 +89,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * @return the live data source component implementation hint
+     * @return the Live Data source component implementation hint
      */
     public String getSource()
     {
@@ -97,9 +97,9 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets the live data source component implementation hint.
+     * Sets the Live Data source component implementation hint.
      *
-     * @param source the live data source component implementation hint
+     * @param source the Live Data source component implementation hint
      */
     public void setSource(String source)
     {
@@ -107,7 +107,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * @return the live data source parameters, as an URL query string
+     * @return the Live Data source parameters, as an URL query string
      */
     public String getSourceParameters()
     {
@@ -115,9 +115,9 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets the live data source parameters.
+     * Sets the Live Data source parameters.
      *
-     * @param sourceParameters the live data source parameters, specified as an URL query string
+     * @param sourceParameters the Live Data source parameters, specified as an URL query string
      */
     public void setSourceParameters(String sourceParameters)
     {
@@ -125,7 +125,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * @return the properties to sort on the live data initially
+     * @return the properties to sort on the Live Data initially
      */
     public String getSort()
     {
@@ -133,10 +133,10 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets the properties to sort on the live data initially. The value is a comma-separated list of property names,
+     * Sets the properties to sort on the Live Data initially. The value is a comma-separated list of property names,
      * where each property name can optionally be suffixed with the sort order using {@code :asc} or {@code :desc}.
      *
-     * @param sort the properties to sort on the live data initially
+     * @param sort the properties to sort on the Live Data initially
      */
     public void setSort(String sort)
     {
@@ -144,7 +144,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * @return the initial filters to apply on the live data
+     * @return the initial filters to apply on the Live Data
      */
     public String getFilters()
     {
@@ -152,9 +152,9 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets the initial filters to apply on the live data, specified as an URL query string.
+     * Sets the initial filters to apply on the Live Data, specified as an URL query string.
      *
-     * @param filters the initial filters to apply on the live data
+     * @param filters the initial filters to apply on the Live Data
      */
     public void setFilters(String filters)
     {
@@ -162,7 +162,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * @return the maximum number of live data entries to show on a page
+     * @return the maximum number of Live Data entries to show on a page
      */
     public Integer getLimit()
     {
@@ -170,9 +170,9 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets the maximum number of live data entries to show on a page.
+     * Sets the maximum number of Live Data entries to show on a page.
      *
-     * @param limit the maximum number of live data entries to show on a page
+     * @param limit the maximum number of Live Data entries to show on a page
      */
     public void setLimit(Integer limit)
     {
@@ -180,7 +180,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * @return the index of the first live data entry to show
+     * @return the index of the first Live Data entry to show
      */
     public Long getOffset()
     {
@@ -188,9 +188,9 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets the index of the first live data entry to show.
+     * Sets the index of the first Live Data entry to show.
      *
-     * @param offset the index of the first live data entry to show
+     * @param offset the index of the first Live Data entry to show
      */
     public void setOffset(Long offset)
     {
@@ -199,7 +199,7 @@ public class LiveDataRendererParameters
 
     /**
      * @return a comma-separated list of layout identifiers, indicating the layouts the user can choose from to display
-     *     the live data
+     *     the Live Data
      */
     public String getLayouts()
     {
@@ -207,7 +207,7 @@ public class LiveDataRendererParameters
     }
 
     /**
-     * Sets the layouts that the user can choose from to display the live data. The first layout in the list will be
+     * Sets the layouts that the user can choose from to display the Live Data. The first layout in the list will be
      * loaded initially.
      *
      * @param layouts a comma-separated list of layout identifiers

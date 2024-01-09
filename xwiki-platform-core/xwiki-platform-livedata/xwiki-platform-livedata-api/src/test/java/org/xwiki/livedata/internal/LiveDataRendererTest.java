@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.internal;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;

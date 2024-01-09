@@ -46,7 +46,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Scripting APIs for the Live Data component.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -77,7 +77,7 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * Executes a live data query.
-     * 
+     *
      * @param queryConfig the live data query configuration
      * @return the live data entries that match the given query
      */
@@ -94,7 +94,7 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * Executes a live data query.
-     * 
+     *
      * @param queryConfigJSON the live data query configuration
      * @return the live data entries that match the given query
      */
@@ -127,7 +127,7 @@ public class LiveDataScriptService implements ScriptService
     /**
      * Computes the effective live data configuration by normalizing the given configuration (i.e. transforming it to
      * match the format expected by the live data widget) and adding the (missing) default values.
-     * 
+     *
      * @param liveDataConfig the live data configuration to start with
      * @return the effective live data configuration, using the standard format and containing the default values
      */
@@ -145,7 +145,7 @@ public class LiveDataScriptService implements ScriptService
     /**
      * Computes the effective live data configuration by normalizing the given configuration (i.e. transforming it to
      * match the format expected by the live data widget) and adding the (missing) default values.
-     * 
+     *
      * @param liveDataConfigJSON the live data configuration to start with
      * @return the effective live data configuration, using the standard format and containing the default values
      */
@@ -181,9 +181,34 @@ public class LiveDataScriptService implements ScriptService
      * @since 16.0.0RC1
      */
     @Unstable
-    public Block render(Map<String, Object> parameters, String advancedParameters) throws LiveDataException
+    public Block render(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
     {
         return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);
+    }
+
+    /**
+     * @param parameters the parameters to pass to the Live Data executor
+     * @return the result of {@link #render(Map)} in the current syntax
+     * @throws LiveDataException in case of error when rendering the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public String execute(Map<String, Object> parameters) throws LiveDataException
+    {
+        return execute(parameters, null);
+    }
+
+    /**
+     * @param parameters the parameters to pass to the Live Data executor
+     * @param advancedParameters the advanced parameters to pass to the Live Data executor
+     * @return the result of {@link #render(Map, Map)} in the current syntax
+     * @throws LiveDataException in case of error when rendering the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public String execute(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
+    {
+        return this.liveDataRenderer.execute(convertParams(parameters), advancedParameters, false);
     }
 
     /**

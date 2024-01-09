@@ -23,18 +23,26 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.skinx.SkinExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static java.util.Collections.singletonMap;
@@ -70,12 +78,42 @@ public class LiveDataRenderer
     @Named("jsfx")
     private SkinExtension jsfx;
 
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    private RenderingContext renderingContext;
+
+    /**
+     * Render the Live Data content.
+     *
+     * @param parameters the parameters used to render the Live Data
+     * @param advancedParameters a map containing the advanced parameters of the Live Data
+     * @param restricted when {@code true}, the Live Data is contained in a restricted environment, and its content
+     *     will be considered as untrusted
+     * @return the Live Data {@link Block}
+     * @throws LiveDataException in case of issue when resolving the Live Data configuration or when serializing the
+     *     advanced parameters to json
+     */
+    public Block render(LiveDataRendererParameters parameters, Map<?, ?> advancedParameters, boolean restricted)
+        throws LiveDataException
+    {
+        try {
+            return render(parameters, new ObjectMapper().writeValueAsString(advancedParameters), restricted);
+        } catch (JsonProcessingException e) {
+            throw new LiveDataException(
+                "Failed to to serialize the advanced parameters [%s] to json.".formatted(advancedParameters),
+                e);
+        }
+    }
+
     /**
      * Render the Live Data content.
      *
      * @param parameters the parameters used to render the Live Data
      * @param advancedParameters a json string containing the advanced parameters of the Live Data
-     * @param restricted when {@code true}, the Live Data is contained in a restricted environment and its content
+     * @param restricted when {@code true}, the Live Data is contained in a restricted environment, and its content
      *     will be considered as untrusted
      * @return the Live Data {@link Block}
      * @throws LiveDataException in case of issue when resolving the Live Data configuration
@@ -112,5 +150,31 @@ public class LiveDataRenderer
             throw new LiveDataException("Failed to generate live data configuration from macro parameters.", e);
         }
         return output;
+    }
+
+    /**
+     * Render the Live Data content in the current syntax.
+     *
+     * @param parameters the parameters used to render the Live Data
+     * @param advancedParameters a json string containing the advanced parameters of the Live Data
+     * @param restricted when {@code true}, the Live Data is contained in a restricted environment, and its content
+     *     will be considered as untrusted
+     * @return the Live Data {@link Block}
+     * @throws LiveDataException in case of issue when resolving the Live Data configuration or during rendering
+     */
+    public String execute(LiveDataRendererParameters parameters, Map<?, ?> advancedParameters, boolean restricted)
+        throws LiveDataException
+    {
+        String hint = this.renderingContext.getTargetSyntax().toIdString();
+        try {
+            BlockRenderer renderer = this.componentManagerProvider.get().getInstance(BlockRenderer.class, hint);
+            Block block = render(parameters, advancedParameters, restricted);
+            WikiPrinter printer = new DefaultWikiPrinter();
+            renderer.render(block, printer);
+            return printer.toString();
+        } catch (ComponentLookupException e) {
+            throw new LiveDataException("Failed to resolve [%s] with hint [%s]".formatted(BlockRenderer.class, hint),
+                e);
+        }
     }
 }

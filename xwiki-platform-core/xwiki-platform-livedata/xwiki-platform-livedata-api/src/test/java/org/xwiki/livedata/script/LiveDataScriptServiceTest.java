@@ -80,6 +80,6 @@ class LiveDataScriptServiceTest
         this.scriptService.render(parameters);
         LiveDataRendererParameters rendererParameters = new LiveDataRendererParameters();
         rendererParameters.setId(liveDataId);
-        verify(this.liveDataRenderer).render(rendererParameters, null, false);
+        verify(this.liveDataRenderer).render(rendererParameters, (Map<?, ?>) null, false);
     }
 }

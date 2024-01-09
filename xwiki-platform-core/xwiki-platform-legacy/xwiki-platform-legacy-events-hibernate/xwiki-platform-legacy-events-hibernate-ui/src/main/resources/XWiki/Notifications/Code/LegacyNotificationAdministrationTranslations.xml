@@ -41,7 +41,6 @@ legacy.event.count.store=Number of events in the standard store
 legacy.event.count.legacy=Number of events in the legacy store
 legacy.event.migration.alltime=All time
 legacy.event.migration.since=Since
-legacy.event.migration.since.picker.label=Date since which event migration should start.
 legacy.event.migration.start=Start migration</content>
   <object>
     <name>XWiki.Notifications.Code.LegacyNotificationAdministrationTranslations</name>

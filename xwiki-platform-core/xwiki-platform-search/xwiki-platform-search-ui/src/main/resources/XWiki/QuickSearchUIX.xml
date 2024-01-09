@@ -264,7 +264,7 @@
     &lt;li&gt;
       &lt;form class='navbar-form globalsearch globalsearch-close form-inline' id='globalsearch' action='$searchURL'
         role='search'&gt;
-        &lt;label class='sr-only' for='headerglobalsearchinput'&gt;$services.localization.render('search')&lt;/label&gt;
+        &lt;label class='hidden' for='headerglobalsearchinput'&gt;$services.localization.render('search')&lt;/label&gt;
         &lt;button type='submit' class='btn' title="$services.localization.render('search')"
         aria-expanded='false' aria-controls='headerglobalsearchinput'&gt;$services.icon.renderHTML('search')&lt;/button&gt;
         &lt;input type='text' name='text' placeholder="$services.localization.render('panels.search.inputText')" id='headerglobalsearchinput' disabled /&gt;

@@ -55,7 +55,7 @@
         #if ($request.section)
           <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
         #end
-        <label class="sr-only" for="extensionSearchInput">$services.localization.render('extensions.search.tip')</label>
+        <label class="hidden" for="extensionSearchInput">$services.localization.render('extensions.search.tip')</label>
         <input type="text" id="extensionSearchInput" name="search"
           #if ("$!request.search" != '') value="$escapetool.xml($request.search)"#{end}
           placeholder="$services.localization.render('extensions.search.tip')"/>

@@ -20,14 +20,21 @@
 package org.xwiki.livedata.internal;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -35,6 +42,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +57,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class LiveDataRendererTest
 {
+    private static final String ADVANCED_PARAMETERS_EMPTY = "{}";
+
     @InjectMockComponents
     private LiveDataRenderer renderer;
 
@@ -69,20 +81,21 @@ class LiveDataRendererTest
     @Named("jsfx")
     private SkinExtension jsfx;
 
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @MockComponent
+    private RenderingContext renderingContext;
+
     @Test
     void render() throws Exception
     {
-        String advancedParameters = "{}";
-        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
-        LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
-        when(this.liveDataRendererConfiguration.getLiveDataConfiguration(advancedParameters, parameters))
-            .thenReturn(liveDataConfig);
-        when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
-
-        Block block = this.renderer.render(parameters, advancedParameters, true);
+        LiveDataRendererParameters parameters = initParams();
+        Block block = this.renderer.render(parameters, ADVANCED_PARAMETERS_EMPTY, true);
         assertEquals(new GroupBlock(Map.of(
             "class", "liveData loading",
-            "data-config", "{}",
+            "data-config", ADVANCED_PARAMETERS_EMPTY,
             "data-config-content-trusted", "false"
         )), block);
 
@@ -92,23 +105,59 @@ class LiveDataRendererTest
     @Test
     void renderWithId() throws Exception
     {
-        String advancedParameters = "{}";
-        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
         String liveDataId = "ld-id";
-        parameters.setId(liveDataId);
-        LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
-        when(this.liveDataRendererConfiguration.getLiveDataConfiguration(advancedParameters, parameters))
-            .thenReturn(liveDataConfig);
-        when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
+        LiveDataRendererParameters parameters = initParams(params -> params.setId(liveDataId));
 
-        Block block = this.renderer.render(parameters, advancedParameters, true);
+        Block block = this.renderer.render(parameters, ADVANCED_PARAMETERS_EMPTY, true);
         assertEquals(new GroupBlock(Map.of(
             "class", "liveData loading",
-            "data-config", "{}",
+            "data-config", ADVANCED_PARAMETERS_EMPTY,
             "data-config-content-trusted", "false",
             "id", liveDataId
         )), block);
 
         verify(this.jsfx).use("uicomponents/widgets/liveData.js", Map.of("forceSkinAction", true));
+    }
+
+    @Test
+    void execute() throws Exception
+    {
+        Syntax html50 = Syntax.HTML_5_0;
+
+        ComponentManager componentManager = mock(ComponentManager.class);
+        BlockRenderer blockRenderer = mock(BlockRenderer.class);
+
+        initParams();
+        when(componentManager.getInstance(BlockRenderer.class, html50.toIdString()))
+            .thenReturn(blockRenderer);
+        when(this.componentManagerProvider.get()).thenReturn(componentManager);
+        when(this.renderingContext.getTargetSyntax()).thenReturn(html50);
+
+        this.renderer.execute(new LiveDataRendererParameters(), Map.of(), true);
+
+        verify(blockRenderer).render(eq(new GroupBlock(Map.of(
+            "class", "liveData loading",
+            "data-config", ADVANCED_PARAMETERS_EMPTY,
+            "data-config-content-trusted", "false"
+        ))), any(WikiPrinter.class));
+    }
+
+    private LiveDataRendererParameters initParams() throws Exception
+    {
+        return initParams(null);
+    }
+
+    private LiveDataRendererParameters initParams(
+        Consumer<LiveDataRendererParameters> liveDataRendererParametersConsumer) throws Exception
+    {
+        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
+        if (liveDataRendererParametersConsumer != null) {
+            liveDataRendererParametersConsumer.accept(parameters);
+        }
+        LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
+        when(this.liveDataRendererConfiguration.getLiveDataConfiguration(ADVANCED_PARAMETERS_EMPTY, parameters))
+            .thenReturn(liveDataConfig);
+        when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
+        return parameters;
     }
 }

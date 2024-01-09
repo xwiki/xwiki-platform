@@ -46,6 +46,7 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageRender
 import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageTypeRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkTypeRenderer;
+import org.xwiki.rendering.internal.transformation.DefaultRenderingContext;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -69,7 +70,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
 
 /**
  * Unit tests for {@link LiveDataMacro}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -90,7 +91,8 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
     SVGDefinitions.class,
     DefaultExecution.class,
     LiveDataRendererConfiguration.class,
-    LiveDataRenderer.class
+    LiveDataRenderer.class,
+    DefaultRenderingContext.class
 })
 class LiveDataMacroTest
 {

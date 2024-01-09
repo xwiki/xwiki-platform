@@ -162,6 +162,8 @@ public class LiveDataScriptService implements ScriptService
     }
 
     /**
+     * Renders a Live Data as a {@link Block}.
+     *
      * @param parameters the parameters to pass to the Live Data renderer
      * @return the Live Data {@link Block}
      * @throws LiveDataException in case of error when rendering the Live Data
@@ -174,6 +176,8 @@ public class LiveDataScriptService implements ScriptService
     }
 
     /**
+     * Renders a Live Data as a {@link Block}.
+     *
      * @param parameters the parameters to pass to the Live Data renderer
      * @param advancedParameters the advanced parameters to pass to the Live Data renderer
      * @return the Live Data {@link Block}
@@ -187,6 +191,8 @@ public class LiveDataScriptService implements ScriptService
     }
 
     /**
+     * Renders a Live Data as a {@link String}.
+     * 
      * @param parameters the parameters to pass to the Live Data executor
      * @return the result of {@link #render(Map)} in the current syntax
      * @throws LiveDataException in case of error when rendering the Live Data
@@ -199,6 +205,8 @@ public class LiveDataScriptService implements ScriptService
     }
 
     /**
+     * Renders a Live Data as a {@link String}.
+     * 
      * @param parameters the parameters to pass to the Live Data executor
      * @param advancedParameters the advanced parameters to pass to the Live Data executor
      * @return the result of {@link #render(Map, Map)} in the current syntax

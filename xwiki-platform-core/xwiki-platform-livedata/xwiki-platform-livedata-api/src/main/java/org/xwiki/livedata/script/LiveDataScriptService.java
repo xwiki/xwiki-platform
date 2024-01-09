@@ -162,7 +162,7 @@ public class LiveDataScriptService implements ScriptService
     }
 
     /**
-     * Renders a Live Data as a {@link Block}.
+     * Execute the Live Data and return a {@link Block}.
      *
      * @param parameters the parameters to pass to the Live Data renderer
      * @return the Live Data {@link Block}
@@ -170,13 +170,13 @@ public class LiveDataScriptService implements ScriptService
      * @since 16.0.0RC1
      */
     @Unstable
-    public Block render(Map<String, Object> parameters) throws LiveDataException
+    public Block execute(Map<String, Object> parameters) throws LiveDataException
     {
-        return render(parameters, null);
+        return execute(parameters, null);
     }
 
     /**
-     * Renders a Live Data as a {@link Block}.
+     * Execute the Live Data and return a {@link Block}.
      *
      * @param parameters the parameters to pass to the Live Data renderer
      * @param advancedParameters the advanced parameters to pass to the Live Data renderer
@@ -185,38 +185,38 @@ public class LiveDataScriptService implements ScriptService
      * @since 16.0.0RC1
      */
     @Unstable
-    public Block render(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
+    public Block execute(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
     {
-        return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);
+        return this.liveDataRenderer.execute(convertParams(parameters), advancedParameters, false);
     }
 
     /**
-     * Renders a Live Data as a {@link String}.
+     * Renders a Live Data.
      * 
      * @param parameters the parameters to pass to the Live Data executor
-     * @return the result of {@link #render(Map)} in the current syntax
+     * @return the result of {@link #execute(Map)} in the current syntax
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
     @Unstable
-    public String execute(Map<String, Object> parameters) throws LiveDataException
+    public String render(Map<String, Object> parameters) throws LiveDataException
     {
-        return execute(parameters, null);
+        return render(parameters, null);
     }
 
     /**
-     * Renders a Live Data as a {@link String}.
+     * Renders a Live Data.
      * 
      * @param parameters the parameters to pass to the Live Data executor
      * @param advancedParameters the advanced parameters to pass to the Live Data executor
-     * @return the result of {@link #render(Map, Map)} in the current syntax
+     * @return the result of {@link #execute(Map, Map)} in the current syntax
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
     @Unstable
-    public String execute(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
+    public String render(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
     {
-        return this.liveDataRenderer.execute(convertParams(parameters), advancedParameters, false);
+        return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);
     }
 
     /**

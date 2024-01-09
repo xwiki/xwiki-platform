@@ -89,10 +89,10 @@ class LiveDataRendererTest
     private RenderingContext renderingContext;
 
     @Test
-    void render() throws Exception
+    void execute() throws Exception
     {
         LiveDataRendererParameters parameters = initParams();
-        Block block = this.renderer.render(parameters, ADVANCED_PARAMETERS_EMPTY, true);
+        Block block = this.renderer.execute(parameters, ADVANCED_PARAMETERS_EMPTY, true);
         assertEquals(new GroupBlock(Map.of(
             "class", "liveData loading",
             "data-config", ADVANCED_PARAMETERS_EMPTY,
@@ -103,12 +103,12 @@ class LiveDataRendererTest
     }
 
     @Test
-    void renderWithId() throws Exception
+    void executeWithId() throws Exception
     {
         String liveDataId = "ld-id";
         LiveDataRendererParameters parameters = initParams(params -> params.setId(liveDataId));
 
-        Block block = this.renderer.render(parameters, ADVANCED_PARAMETERS_EMPTY, true);
+        Block block = this.renderer.execute(parameters, ADVANCED_PARAMETERS_EMPTY, true);
         assertEquals(new GroupBlock(Map.of(
             "class", "liveData loading",
             "data-config", ADVANCED_PARAMETERS_EMPTY,
@@ -120,7 +120,7 @@ class LiveDataRendererTest
     }
 
     @Test
-    void execute() throws Exception
+    void render() throws Exception
     {
         Syntax html50 = Syntax.HTML_5_0;
 
@@ -133,7 +133,7 @@ class LiveDataRendererTest
         when(this.componentManagerProvider.get()).thenReturn(componentManager);
         when(this.renderingContext.getTargetSyntax()).thenReturn(html50);
 
-        this.renderer.execute(new LiveDataRendererParameters(), Map.of(), true);
+        this.renderer.render(new LiveDataRendererParameters(), Map.of(), true);
 
         verify(blockRenderer).render(eq(new GroupBlock(Map.of(
             "class", "liveData loading",

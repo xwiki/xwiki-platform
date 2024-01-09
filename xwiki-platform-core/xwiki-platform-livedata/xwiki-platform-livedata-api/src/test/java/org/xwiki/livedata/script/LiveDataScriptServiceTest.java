@@ -62,24 +62,24 @@ class LiveDataScriptServiceTest
     private LiveDataRenderer liveDataRenderer;
 
     @Test
-    void renderUnknownParam()
+    void executeUnknownParam()
     {
         Map<String, Object> parameters = Map.of("a", "b");
         LiveDataException exception =
-            assertThrows(LiveDataException.class, () -> this.scriptService.render(parameters));
+            assertThrows(LiveDataException.class, () -> this.scriptService.execute(parameters));
         assertThat(exception.getMessage(), matchesPattern(
             "Failed to set property \\[a] with value \\[b] in object " 
                 + "\\[org.xwiki.livedata.internal.LiveDataRendererParameters@[^]]+]"));
     }
 
     @Test
-    void render() throws Exception
+    void execute() throws Exception
     {
         String liveDataId = "ld-id";
         Map<String, Object> parameters = Map.of("id", liveDataId);
-        this.scriptService.render(parameters);
+        this.scriptService.execute(parameters);
         LiveDataRendererParameters rendererParameters = new LiveDataRendererParameters();
         rendererParameters.setId(liveDataId);
-        verify(this.liveDataRenderer).render(rendererParameters, (Map<?, ?>) null, false);
+        verify(this.liveDataRenderer).execute(rendererParameters, (Map<?, ?>) null, false);
     }
 }

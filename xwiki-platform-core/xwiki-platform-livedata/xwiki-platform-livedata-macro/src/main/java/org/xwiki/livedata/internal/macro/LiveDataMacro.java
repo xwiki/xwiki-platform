@@ -67,8 +67,7 @@ public class LiveDataMacro extends AbstractMacro<LiveDataMacroParameters>
     {
         try {
             boolean restricted = context.getTransformationContext().isRestricted();
-            Block block = this.liveDataRenderer.render(parameters, content, restricted);
-            return List.of(block);
+            return List.of(this.liveDataRenderer.execute(parameters, content, restricted));
         } catch (LiveDataException e) {
             throw new MacroExecutionException("Failed to render the content of the LiveData macro.", e);
         }

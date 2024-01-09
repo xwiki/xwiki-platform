@@ -86,7 +86,7 @@ public class LiveDataRenderer
     private RenderingContext renderingContext;
 
     /**
-     * Render the Live Data content.
+     * Execute the Live Data and return a {@link Block}.
      *
      * @param parameters the parameters used to render the Live Data
      * @param advancedParameters a map containing the advanced parameters of the Live Data
@@ -96,11 +96,11 @@ public class LiveDataRenderer
      * @throws LiveDataException in case of issue when resolving the Live Data configuration or when serializing the
      *     advanced parameters to json
      */
-    public Block render(LiveDataRendererParameters parameters, Map<?, ?> advancedParameters, boolean restricted)
+    public Block execute(LiveDataRendererParameters parameters, Map<?, ?> advancedParameters, boolean restricted)
         throws LiveDataException
     {
         try {
-            return render(parameters, new ObjectMapper().writeValueAsString(advancedParameters), restricted);
+            return execute(parameters, new ObjectMapper().writeValueAsString(advancedParameters), restricted);
         } catch (JsonProcessingException e) {
             throw new LiveDataException(
                 "Failed to to serialize the advanced parameters [%s] to json.".formatted(advancedParameters),
@@ -109,7 +109,7 @@ public class LiveDataRenderer
     }
 
     /**
-     * Render the Live Data content.
+     * Execute the Live Data and return a {@link Block}.
      *
      * @param parameters the parameters used to render the Live Data
      * @param advancedParameters a json string containing the advanced parameters of the Live Data
@@ -118,7 +118,7 @@ public class LiveDataRenderer
      * @return the Live Data {@link Block}
      * @throws LiveDataException in case of issue when resolving the Live Data configuration
      */
-    public Block render(LiveDataRendererParameters parameters, String advancedParameters, boolean restricted)
+    public Block execute(LiveDataRendererParameters parameters, String advancedParameters, boolean restricted)
         throws LiveDataException
     {
         // Load the JavaScript code of the Live Data element.
@@ -162,13 +162,13 @@ public class LiveDataRenderer
      * @return the Live Data {@link Block}
      * @throws LiveDataException in case of issue when resolving the Live Data configuration or during rendering
      */
-    public String execute(LiveDataRendererParameters parameters, Map<?, ?> advancedParameters, boolean restricted)
+    public String render(LiveDataRendererParameters parameters, Map<?, ?> advancedParameters, boolean restricted)
         throws LiveDataException
     {
         String hint = this.renderingContext.getTargetSyntax().toIdString();
         try {
             BlockRenderer renderer = this.componentManagerProvider.get().getInstance(BlockRenderer.class, hint);
-            Block block = render(parameters, advancedParameters, restricted);
+            Block block = execute(parameters, advancedParameters, restricted);
             WikiPrinter printer = new DefaultWikiPrinter();
             renderer.render(block, printer);
             return printer.toString();

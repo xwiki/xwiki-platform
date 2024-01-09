@@ -53,6 +53,7 @@ import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
@@ -151,26 +152,30 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     private void migrateUser(DocumentReference userDocReference) throws DataMigrationException, XWikiException
     {
         XWikiContext context = getXWikiContext();
-        XWikiDocument document = context.getWiki().getDocument(userDocReference, context);
         WikiReference wikiReference = userDocReference.getWikiReference();
-        EntityReference classReference = CLASS_REFERENCE.appendParent(wikiReference);
-        List<BaseObject> objects = document.getXObjects(classReference);
+        XWikiDocument document = context.getWiki().getDocument(userDocReference, context);
 
-        Set<NotificationFilterPreference> results = new HashSet<>();
-        for (BaseObject obj : objects) {
-            if (obj == null) {
-                continue;
+        // If the document does contain a user xobject, we perform the migration, else we only remove the xobject.
+        if (document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null) {
+            EntityReference classReference = CLASS_REFERENCE.appendParent(wikiReference);
+            List<BaseObject> objects = document.getXObjects(classReference);
+
+            Set<NotificationFilterPreference> results = new HashSet<>();
+            for (BaseObject obj : objects) {
+                if (obj == null) {
+                    continue;
+                }
+                getValues(obj, FIELD_WIKIS, NotificationFilterProperty.WIKI, results);
+                getValues(obj, FIELD_SPACES, NotificationFilterProperty.SPACE, results);
+                getValues(obj, FIELD_DOCUMENTS, NotificationFilterProperty.PAGE, results);
             }
-            getValues(obj, FIELD_WIKIS, NotificationFilterProperty.WIKI, results);
-            getValues(obj, FIELD_SPACES, NotificationFilterProperty.SPACE, results);
-            getValues(obj, FIELD_DOCUMENTS, NotificationFilterProperty.PAGE, results);
-        }
 
-        try {
-            this.notificationFilterPreferenceStore.saveFilterPreferences(userDocReference, results);
-        } catch (NotificationException e) {
-            throw new DataMigrationException(String.format("Error while trying to save [%s] filter preferences",
-                results.size()), e);
+            try {
+                this.notificationFilterPreferenceStore.saveFilterPreferences(userDocReference, results);
+            } catch (NotificationException e) {
+                throw new DataMigrationException(String.format("Error while trying to save [%s] filter preferences",
+                    results.size()), e);
+            }
         }
 
         this.taskManager.addTask(wikiReference.getName(), document.getId(),

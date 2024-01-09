@@ -38,6 +38,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -82,7 +83,11 @@ public class WatchListObjectsRemovalTaskConsumer implements TaskConsumer
             // We use to fallback on the old WatchClass xobject automaticwatch property when it was defined, so we
             // also take back this value and create the new autowatch xobject if needed.
             BaseObject watchXObject = document.getXObject(classReference);
-            if (watchXObject != null && document.getXObject(autoWatchClassReference) == null) {
+
+            // watchlist xobject exists, and the doc is about a user profile and there's no autowatch xobject yet
+            if (watchXObject != null
+                && document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null
+                && document.getXObject(autoWatchClassReference) == null) {
                 String automaticwatch = watchXObject.getStringValue("automaticwatch");
                 if (!StringUtils.isBlank(automaticwatch) && !"default".equals(automaticwatch)) {
                     BaseObject autowatchXObject = document.newXObject(autoWatchClassReference, context);

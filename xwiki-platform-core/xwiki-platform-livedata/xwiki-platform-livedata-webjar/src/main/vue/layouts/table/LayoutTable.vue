@@ -50,7 +50,6 @@
     <!-- Table layout root -->
     <div class="layout-table-wrapper">
       <table class="layout-table-root responsive-table">
-        <caption v-if="caption">{{ caption }}</caption>
 
         <!--
           Table Header
@@ -135,10 +134,6 @@ export default {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
     canAddEntry () { return this.logic.canAddEntry(); },
-    caption() {
-      console.log("COMPUTE CAPTION", this.data?.meta?.description)
-      return this.data?.meta?.description;
-    }
   },
   
   mounted() {

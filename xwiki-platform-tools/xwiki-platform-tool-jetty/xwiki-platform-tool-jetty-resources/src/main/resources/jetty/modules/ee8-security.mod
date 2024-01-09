@@ -18,26 +18,18 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-[description]
-Base configuration for the jetty logging mechanism.
-Provides a ${jetty.base}/resources/jetty-logging.properties.
+# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
-[tags]
-logging
+[description]
+Adds servlet standard security handling to the classpath.
+
+[environment]
+ee8
 
 [depend]
-logging/slf4j
-resources
-
-[provides]
-logging|default
-
-[files]
-basehome:modules/logging/jetty
+server
+security
+ee8-servlet
 
 [lib]
-lib/logging/jetty-slf4j-impl-${jetty.version}.jar
-
-[ini]
-jetty.webapp.addServerClasses+=,org.eclipse.jetty.logging.
-jetty.webapp.addServerClasses+=,${jetty.home.uri}/lib/logging/
+lib/jetty-ee8-security-${jetty.version}.jar

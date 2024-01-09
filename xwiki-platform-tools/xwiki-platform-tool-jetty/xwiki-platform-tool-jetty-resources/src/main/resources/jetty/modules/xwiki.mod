@@ -21,6 +21,9 @@
 # This is the top level mod used when starting Jetty in start_xwiki.*
 # It's called with "--module=xwiki" on the command line to start Jetty.
 
+[environment]
+ee8
+
 [depend]
 ext
 resources
@@ -28,12 +31,14 @@ server
 logging
 http
 http-forwarded
-annotations
-deploy
+ee8-annotations
+ee8-deploy
 requestlog
-websocket
-apache-jsp
+ee8-websocket-javax
+ee8-websocket-jetty
+ee8-apache-jsp
 console-capture
+work
 
 [xml]
 etc/jetty-xwiki.xml

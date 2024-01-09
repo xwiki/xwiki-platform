@@ -21,7 +21,9 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Enables local JMX support for Jetty components.
+# tag::description[]
+This module enables local Java Management Extension (JMX) support for Jetty components.
+# end::description[]
 
 [depend]
 server

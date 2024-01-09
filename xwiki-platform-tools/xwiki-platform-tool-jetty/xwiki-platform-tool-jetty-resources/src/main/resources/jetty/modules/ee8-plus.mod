@@ -21,23 +21,18 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Enable the Jetty WebSocket API support for deployed web applications.
+Enables Servlet 3.1 resource injection.
 
-[tags]
-websocket
+[environment]
+ee8
 
 [depend]
-annotations
+server
+jndi
+plus
+ee8-security
+ee8-webapp
 
 [lib]
-lib/websocket/websocket-core-common-${jetty.version}.jar
-lib/websocket/websocket-core-server-${jetty.version}.jar
-lib/websocket/websocket-servlet-${jetty.version}.jar
-lib/websocket/websocket-jetty-api-${jetty.version}.jar
-lib/websocket/websocket-jetty-common-${jetty.version}.jar
-lib/websocket/websocket-jetty-server-${jetty.version}.jar
-
-[jpms]
-# The implementation needs to access method handles in
-# classes that are in the web application classloader.
-add-reads: org.eclipse.jetty.websocket.jetty.common=ALL-UNNAMED
+lib/jetty-ee8-plus-${jetty.version}.jar
+lib/jakarta.transaction-api-1.3.3.jar

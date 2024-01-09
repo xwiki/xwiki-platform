@@ -21,8 +21,9 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Adds the $JETTY_BASE/resources directory to the server classpath.
-Useful for configuration property files (eg jetty-logging.properties)
+# tag::description[]
+This module adds the `$JETTY_BASE/resources` directory to the server's classpath.
+# end::description[]
 
 [tags]
 classpath

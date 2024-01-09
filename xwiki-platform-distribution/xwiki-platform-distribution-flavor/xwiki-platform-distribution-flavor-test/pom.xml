@@ -249,19 +249,21 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Rights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=usersgroups.extensionrights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=UserProfile
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
+                <!--/xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
+                  TODO https://jira.xwiki.org/browse/XWIKI-21772 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Registration
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Invitation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Authentication
                 <!-- Extensions -->
                 <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.Extensions
-                  TODO: Remove the use of inline styling for ratings-->
+                  TODO https://jira.xwiki.org/browse/XWIKI-21778 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.ExtensionHistory
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.ExtensionUpdater
                 <!-- Look and feel -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Themes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=menu.name
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Panels.PanelWizard
+                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Panels.PanelWizard
+                  TODO https://jira.xwiki.org/browse/XWIKI-21774 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.applications
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.navigation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Presentation
@@ -272,7 +274,8 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Localization
                 /xwiki/bin/import/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Import
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Export
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=export.pdf
+                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=export.pdf
+                  TODO https://jira.xwiki.org/browse/XWIKI-21777 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Programming
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Annotations
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.OfficeImporterAdmin
@@ -282,9 +285,10 @@
                 <!-- Editing -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Editing
                 <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
-                  TODO: Properly link labels and inputs in the main form.-->
+                  TODO https://jira.xwiki.org/browse/XWIKI-21773 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Syntaxes
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
+                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
+                  TODO https://jira.xwiki.org/browse/XWIKI-21775 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=SyntaxHighlighting
                 <!-- Mail -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailSend
@@ -293,13 +297,14 @@
                 <!-- Search -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Search
                 <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=searchSuggest
-                  TODO: Remove the template for the list, that duplicates IDs, and have a dd in each dl.-->
+                  TODO https://jira.xwiki.org/browse/XWIKI-21779 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=IndexingUser
                 <!-- Social -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Likes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Mentions
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=MessageStream
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Notifications
+                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Notifications
+                  TODO https://jira.xwiki.org/browse/XWIKI-21776 -->
                 <!-- Wikis -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.descriptor
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.templates

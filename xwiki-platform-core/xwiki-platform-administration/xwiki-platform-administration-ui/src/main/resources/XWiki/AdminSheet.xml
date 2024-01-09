@@ -273,7 +273,7 @@
   &lt;nav id="$!options.id" class="panel-group $!options.cssClass"
     aria-label="$escapetool.xml($services.localization.render('administration.menu.label'))"&gt;
     &lt;div class="panel xform"&gt;
-      &lt;label for="adminsearchmenu" class="hidden"&gt;$services.localization.render('search')&lt;/label&gt;
+      &lt;label for="adminsearchmenu" class="sr-only"&gt;$services.localization.render('search')&lt;/label&gt;
       &lt;input type="text" class="form-control panel-group-filter" autocomplete="off" id="adminsearchmenu"
         placeholder="$escapetool.xml($services.localization.render('administration.menu.search.hint'))"
         ## Disable the search input initially until the JavaScript code that handles the search is ready.

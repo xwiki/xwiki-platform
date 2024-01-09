@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.livedata.internal.macro;
+package org.xwiki.livedata.internal;
 
 import java.net.URL;
 import java.net.URLDecoder;
@@ -42,20 +42,18 @@ import org.xwiki.livedata.LiveDataLayoutDescriptor;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataQuery;
-import org.xwiki.livedata.internal.JSONMerge;
-import org.xwiki.livedata.macro.LiveDataMacroParameters;
 
 /**
- * Provides services to manipulate configurations for the {@link LiveDataMacroConfiguration}.
+ * Provides services to manipulate configurations for the {@link LiveDataRendererConfiguration}.
  *
  * @version $Id$
  * @since 14.9
  * @since 14.4.7
  * @since 13.10.10
  */
-@Component(roles = LiveDataMacroConfiguration.class)
+@Component(roles = LiveDataRendererConfiguration.class)
 @Singleton
-public class LiveDataMacroConfiguration
+public class LiveDataRendererConfiguration
 {
     private static final String UTF8 = "UTF-8";
 
@@ -80,7 +78,7 @@ public class LiveDataMacroConfiguration
      * @return the complete Live Data configuration
      * @throws Exception in case of error when resolving the configuration
      */
-    public LiveDataConfiguration getLiveDataConfiguration(String content, LiveDataMacroParameters parameters)
+    public LiveDataConfiguration getLiveDataConfiguration(String content, LiveDataRendererParameters parameters)
         throws Exception
     {
         String json = StringUtils.defaultIfBlank(content, "{}");
@@ -91,7 +89,7 @@ public class LiveDataMacroConfiguration
         return this.jsonMerge.merge(advancedConfig, basicConfig);
     }
 
-    private LiveDataConfiguration getLiveDataConfiguration(LiveDataMacroParameters parameters) throws Exception
+    private LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
     {
         LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
         liveDataConfig.setId(parameters.getId());
@@ -100,7 +98,7 @@ public class LiveDataMacroConfiguration
         return liveDataConfig;
     }
 
-    private LiveDataQuery getQuery(LiveDataMacroParameters parameters) throws Exception
+    private LiveDataQuery getQuery(LiveDataRendererParameters parameters) throws Exception
     {
         LiveDataQuery query = new LiveDataQuery();
         query.setProperties(getProperties(parameters.getProperties()));
@@ -181,7 +179,7 @@ public class LiveDataMacroConfiguration
         return filter;
     }
 
-    private LiveDataMeta getMeta(LiveDataMacroParameters parameters)
+    private LiveDataMeta getMeta(LiveDataRendererParameters parameters)
     {
         LiveDataMeta meta = new LiveDataMeta();
         List<LiveDataLayoutDescriptor> layouts = getLayouts(parameters);
@@ -194,7 +192,7 @@ public class LiveDataMacroConfiguration
         return meta;
     }
 
-    private List<LiveDataLayoutDescriptor> getLayouts(LiveDataMacroParameters parameters)
+    private List<LiveDataLayoutDescriptor> getLayouts(LiveDataRendererParameters parameters)
     {
         if (parameters.getLayouts() == null) {
             return null;
@@ -205,7 +203,7 @@ public class LiveDataMacroConfiguration
         }
     }
 
-    private LiveDataPaginationConfiguration getPagination(LiveDataMacroParameters parameters)
+    private LiveDataPaginationConfiguration getPagination(LiveDataRendererParameters parameters)
     {
         LiveDataPaginationConfiguration pagination = new LiveDataPaginationConfiguration();
         pagination.setShowPageSizeDropdown(parameters.getShowPageSizeDropdown());

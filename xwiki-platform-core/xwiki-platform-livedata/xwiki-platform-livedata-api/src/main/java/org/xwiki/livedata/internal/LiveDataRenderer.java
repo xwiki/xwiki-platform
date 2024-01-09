@@ -79,10 +79,10 @@ public class LiveDataRenderer
      * @param advancedParameters a json string containing the advanced parameters of the Live Data
      * @param restricted when {@code true}, the Live Data is contained in a restricted environment and its content
      *     will be considered as untrusted
-     * @return the {@link Block}s to render for this Live Data
+     * @return the Live Data {@link Block}
      * @throws LiveDataException in case of issue when resolving the Live Data configuration
      */
-    public List<Block> render(LiveDataRendererParameters parameters, String advancedParameters, boolean restricted)
+    public Block render(LiveDataRendererParameters parameters, String advancedParameters, boolean restricted)
         throws LiveDataException
     {
         // Load the JavaScript code of the Live Data element.
@@ -113,6 +113,6 @@ public class LiveDataRenderer
         } catch (Exception e) {
             throw new LiveDataException("Failed to generate live data configuration from macro parameters.", e);
         }
-        return singletonList(output);
+        return output;
     }
 }

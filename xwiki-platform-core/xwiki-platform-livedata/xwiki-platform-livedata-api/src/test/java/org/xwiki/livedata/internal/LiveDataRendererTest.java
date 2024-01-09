@@ -80,12 +80,12 @@ class LiveDataRendererTest
             .thenReturn(liveDataConfig);
         when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
 
-        List<Block> render = this.renderer.render(parameters, advancedParameters, true);
-        assertEquals(List.of(new GroupBlock(Map.of(
+        Block block = this.renderer.render(parameters, advancedParameters, true);
+        assertEquals(new GroupBlock(Map.of(
             "class", "liveData loading",
             "data-config", "{}",
             "data-config-content-trusted", "false"
-        ))), render);
+        )), block);
 
         verify(this.jsfx).use("uicomponents/widgets/liveData.js", Map.of("forceSkinAction", true));
     }
@@ -102,13 +102,13 @@ class LiveDataRendererTest
             .thenReturn(liveDataConfig);
         when(this.defaultLiveDataConfigResolver.resolve(liveDataConfig)).thenReturn(liveDataConfig);
 
-        List<Block> render = this.renderer.render(parameters, advancedParameters, true);
-        assertEquals(List.of(new GroupBlock(Map.of(
+        Block block = this.renderer.render(parameters, advancedParameters, true);
+        assertEquals(new GroupBlock(Map.of(
             "class", "liveData loading",
             "data-config", "{}",
             "data-config-content-trusted", "false",
             "id", liveDataId
-        ))), render);
+        )), block);
 
         verify(this.jsfx).use("uicomponents/widgets/liveData.js", Map.of("forceSkinAction", true));
     }

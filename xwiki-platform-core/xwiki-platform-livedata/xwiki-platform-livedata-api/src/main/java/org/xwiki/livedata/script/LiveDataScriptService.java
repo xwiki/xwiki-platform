@@ -164,25 +164,25 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * @param parameters the parameters to pass to the Live Data renderer
-     * @return the list of {@link Block}s of the Live Data
+     * @return the Live Data {@link Block}
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
     @Unstable
-    public List<Block> render(Map<String, Object> parameters) throws LiveDataException
+    public Block render(Map<String, Object> parameters) throws LiveDataException
     {
         return render(parameters, null);
     }
 
     /**
      * @param parameters the parameters to pass to the Live Data renderer
-     * @param advancedParameters the advanced parameters to pass to the Live Data rendere
-     * @return the list of {@link Block}s of the Live Data
+     * @param advancedParameters the advanced parameters to pass to the Live Data renderer
+     * @return the Live Data {@link Block}
      * @throws LiveDataException in case of error when rendering the Live Data
      * @since 16.0.0RC1
      */
     @Unstable
-    public List<Block> render(Map<String, Object> parameters, String advancedParameters) throws LiveDataException
+    public Block render(Map<String, Object> parameters, String advancedParameters) throws LiveDataException
     {
         return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);
     }

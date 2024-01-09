@@ -26,7 +26,5 @@
   #if ("$!advancedParameters" != '')
     #set($advancedParametersSerialized = $jsontool.serialize($advancedParameters))
   #end
-  #foreach($block in $services.liveData.render($parameters, $advancedParametersSerialized))
-    $services.rendering.render($block, $syntax)
-  #end
+  $services.rendering.render($services.liveData.render($parameters, $advancedParametersSerialized), $syntax)
 #end

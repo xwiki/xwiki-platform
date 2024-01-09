@@ -19,7 +19,6 @@
  */
 package org.xwiki.livedata.internal;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -38,7 +37,6 @@ import org.xwiki.skinx.SkinExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.xwiki.security.authorization.Right.SCRIPT;
 

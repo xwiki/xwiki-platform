@@ -347,12 +347,18 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             } else {
                 Set<String> ignoredMigrations = new HashSet<>(this.hibernateConfiguration.getIgnoredMigrations());
                 for (DataMigration migrator : getAllMigrations()) {
+                    XWikiDBVersion migratorVersion = migrator.getVersion();
                     if (ignoredMigrations.contains(migrator.getClass().getName())
-                        || ignoredMigrations.contains(migrator.getVersion().toString())) {
+                        || ignoredMigrations.contains(migratorVersion.toString())) {
                         continue;
                     }
                     XWikiMigration migration = new XWikiMigration(migrator, false);
-                    availableMigrations.put(migrator.getVersion(), migration);
+                    if (!availableMigrations.containsKey(migratorVersion)) {
+                        availableMigrations.put(migratorVersion, migration);
+                    } else {
+                        throw new InitializationException(
+                            String.format("A migration with version [%s] already exists.", migratorVersion));
+                    }
                 }
             }
 

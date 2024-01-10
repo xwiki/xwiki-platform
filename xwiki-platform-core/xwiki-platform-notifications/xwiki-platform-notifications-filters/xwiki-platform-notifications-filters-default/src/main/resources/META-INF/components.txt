@@ -13,4 +13,5 @@ org.xwiki.notifications.filters.internal.UserAddedEventListener
 org.xwiki.notifications.filters.migration.R140401000XWIKI15460DataMigration
 org.xwiki.notifications.filters.migration.R151002000XWIKI21448DataMigration
 org.xwiki.notifications.filters.migration.R160000000XWIKI17243DataMigration
+org.xwiki.notifications.filters.migration.R160000001XWIKI21738DataMigration
 org.xwiki.notifications.filters.migration.WatchListObjectsRemovalTaskConsumer

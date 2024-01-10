@@ -19,44 +19,76 @@
  */
 package org.xwiki.notifications.filters.migration;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.query.QueryFilter;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
- * Migrate old WatchListClass xobjects to save them as proper notification filters. The migration doesn't directly
- * remove the xobjects but asks {@link WatchListObjectsRemovalTaskConsumer} to do it.
+ * Migrate filters to put them in the same DB than where the users are located.
  *
  * @version $Id$
  * @since 16.0.0RC1
  */
 @Component
-@Named("R160000000XWIKI17243")
+@Named("R160000001XWIKI21738")
 @Singleton
 public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigration
 {
     private static final int BATCH_SIZE = 100;
 
+    private static final String SEARCH_FILTERS_STATEMENT = "select nfp "
+        + "from DefaultNotificationFilterPreference nfp "
+        + "where nfp.owner not like :ownerLike and nfp.owner <> :mainWiki "
+        + "order by nfp.owner, nfp.internalId";
+
+    private static final String DELETE_FILTER_STATEMENT = "delete from DefaultNotificationFilterPreference nfp "
+        + "where nfp.internalId IN (:listIds)";
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Inject
     private QueryManager queryManager;
 
     @Inject
-    @Named("unique")
-    private QueryFilter uniqueFilter;
+    private NotificationFilterPreferenceStore filterPreferenceStore;
 
     @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    @Named("relative")
+    private EntityReferenceResolver<String> entityReferenceResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
     private Logger logger;
@@ -70,19 +102,100 @@ public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(160000000);
+        return new XWikiDBVersion(160000001);
     }
 
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         // This migration only needs to be performed on main wiki: if we have filters on local wikis it's because
-        // local filters was enabled.
+        // local filters was enabled and we don't support switching mainstore / localstore.
         // Migration steps:
-        //   - Retrieve all filters from main wiki where owner belongs to a subwiki
-        //   - Store that filter on the subwiki DB and remove it from main wiki
+        //   - Retrieve filters from main wiki where owner belongs to a subwiki
+        //   - Store the filters on the subwiki DB using standard storage component
+        //   - Remove the filters from main DB
 
-        String statement = "from doc.object(XWiki.WatchListClass) as user";
+        String mainWikiId = this.wikiDescriptorManager.getMainWikiId();
+
+        if (Objects.equals(this.wikiDescriptorManager.getCurrentWikiId(), mainWikiId)) {
+            List<DefaultNotificationFilterPreference> filters;
+            do {
+                try {
+                    filters = this.queryManager.createQuery(SEARCH_FILTERS_STATEMENT, Query.HQL)
+                        .bindValue("ownerLike")
+                        .literal(mainWikiId)
+                        .literal(":")
+                        .anyChars()
+                        .query()
+                        .bindValue("mainWiki", this.entityReferenceSerializer.serialize(new WikiReference(mainWikiId)))
+                        .setLimit(BATCH_SIZE)
+                        .execute();
+
+                    this.logger.info("Found [{}] filters to migrate...", filters.size());
+
+                    this.migrateFilters(filters);
+                } catch (QueryException e) {
+                    throw new DataMigrationException("Error when trying to retrieve filters to move", e);
+                }
+            } while (!filters.isEmpty());
+        }
     }
 
+    private void migrateFilters(List<DefaultNotificationFilterPreference> filters)
+        throws XWikiException, DataMigrationException
+    {
+        XWikiContext context = getXWikiContext();
+        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
+        List<Long> internalIds = new ArrayList<>();
+        Map<EntityReference, List<NotificationFilterPreference>> filtersToStore = new HashMap<>();
+
+        for (DefaultNotificationFilterPreference filter : filters) {
+            EntityReference entityReference = this.getOwnerEntityReference(filter);
+            List<NotificationFilterPreference> filterPreferenceList;
+            if (filtersToStore.containsKey(entityReference)) {
+                filterPreferenceList = filtersToStore.get(entityReference);
+            } else {
+                filterPreferenceList = new ArrayList<>();
+                filtersToStore.put(entityReference, filterPreferenceList);
+            }
+            filterPreferenceList.add(new DefaultNotificationFilterPreference(filter, false));
+            internalIds.add(filter.getInternalId());
+        }
+
+        this.logger.info("Migrating filters for [{}] entities", filtersToStore.size());
+
+        for (Map.Entry<EntityReference, List<NotificationFilterPreference>> entry
+            : filtersToStore.entrySet()) {
+            EntityReference entityReference = entry.getKey();
+            try {
+                if (entityReference.getType() == EntityType.DOCUMENT) {
+                    this.filterPreferenceStore
+                        .saveFilterPreferences((DocumentReference) entityReference, entry.getValue());
+                } else {
+                    this.filterPreferenceStore
+                        .saveFilterPreferences((WikiReference) entityReference, entry.getValue());
+                }
+            } catch (NotificationException e) {
+                throw new DataMigrationException(
+                    String.format("Error when trying to save filters to migrate for [%s]", entityReference), e);
+            }
+        }
+
+        if (!internalIds.isEmpty()) {
+            hibernateStore.executeWrite(context, session ->
+                session.createQuery(DELETE_FILTER_STATEMENT).setParameter("listIds", internalIds)
+                    .executeUpdate());
+        }
+    }
+
+    private EntityReference getOwnerEntityReference(DefaultNotificationFilterPreference filterPreference)
+    {
+        String owner = filterPreference.getOwner();
+        EntityReference reference = this.entityReferenceResolver.resolve(owner, EntityType.DOCUMENT);
+        if (reference.extractReference(EntityType.WIKI) == null) {
+            reference = this.entityReferenceResolver.resolve(owner, EntityType.WIKI);
+        }
+        return reference;
+    }
 }

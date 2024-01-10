@@ -100,6 +100,8 @@
         border-radius: 50%;
         height: 50px;
         width: 50px;
+        // We ovwerwrite the default and avoid squishing down the image when the account name next to it is too large
+        max-width: unset;
       }
 
       .brand-links {
@@ -121,6 +123,8 @@
         .brand-user {
           color: @xwiki-drawer-brand-user-color;
           font-weight: 400;
+          // Make sure we wrap the name whatever its length.
+          overflow-wrap: anywhere;
         }
       }
     }

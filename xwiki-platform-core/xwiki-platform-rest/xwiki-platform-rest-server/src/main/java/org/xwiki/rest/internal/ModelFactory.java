@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -1217,8 +1216,7 @@ public class ModelFactory
         Iterable<LogEvent> logs;
         if (level != null) {
             LogLevel logLevel = LogLevel.valueOf(level.toUpperCase());
-            logs = logQueue.getLogEvents(logLevel).stream().filter(log -> log.getLevel() == logLevel)
-                .collect(Collectors.toList());
+            logs = logQueue.getLogEvents(logLevel).stream().filter(log -> log.getLevel() == logLevel).toList();
         } else if (fromLevel != null) {
             logs = logQueue.getLogEvents(LogLevel.valueOf(fromLevel.toUpperCase()));
         } else {

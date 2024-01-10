@@ -832,14 +832,14 @@ $fn
 <div role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large #{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
 aria-label="$escapetool.xml($title)">
-<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
+<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>
 <div class="xwikipanelcontents">
 #else
 (% role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large#{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
 aria-label="$escapetool.xml($title)"
 %)(((
-{{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
+{{html}}<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end

@@ -23,14 +23,14 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.0.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
              workspace/xwiki-platform_Quality_Checks
          When the "xwiki-platform_Quality_Checks" module is built you definitely don't want its pom.xml to point to
-         workspace/xwiki-commons since that job may not have been built for some time (and thus it might not be up to
-         date with the latest code from the SCM, thus causing build failures that are hard to track.
+         workspace/xwiki-commons since that job may not have been built for some time (and thus, it might not be
+         up-to-date with the latest code from the SCM, thus causing build failures that are hard to track.
 
          By using an empty value we force Maven to resolve the parent from the Maven repositories,
          see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.0-SNAPSHOT</version>
+  <version>16.0.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -56,11 +56,12 @@
     <tika.version>2.9.1</tika.version>
     <pdfbox.version>2.0.30</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <!-- We are stuck at version 9.x until we upgrade to a version of SolrJ which use a more recent version (or something else) -->
+    <!-- We are stuck at version 9.x until we upgrade to a version of SolrJ which use a more recent version
+         (or something else) -->
     <jetty.client.version>9.4.53.v20231009</jetty.client.version>
-    <jetty.server.version>10.0.18</jetty.server.version>
+    <jetty.server.version>10.0.19</jetty.server.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.101.Final</netty.version>
+    <netty.version>4.1.104.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.4</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
@@ -108,7 +109,7 @@
     <mysql.version>8.2.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.3.1</mariadb.version>
+    <mariadb.version>3.3.2</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -133,7 +134,7 @@
     <module>xwiki-platform-tools</module>
     <module>xwiki-platform-core</module>
   </modules>
-  <!-- Dependency Management that are used in platform and in sub-projects too (like xwiki-enterprise) -->
+  <!-- Dependency Management that are used in platform and in subprojects too (like xwiki-enterprise) -->
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
@@ -172,7 +173,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.25.0</version>
+        <version>4.25.1</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -183,7 +184,8 @@
       </dependency>
 
       <!-- Jython engine -->
-      <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
+      <!-- We use a customized Jython JAR here because the standard one include many library we already get as
+           dependencies -->
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
@@ -430,7 +432,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.12.5</version>
+        <version>2.12.6</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -597,7 +599,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.17.1</version>
+        <version>1.17.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -755,12 +757,12 @@
             <groupId>javax.xml.stream</groupId>
             <artifactId>stax-api</artifactId>
           </exclusion>
-          <!-- We use a more accurate and up to date JSON framework version -->
+          <!-- We use a more accurate and up-to-date JSON framework version -->
           <exclusion>
             <artifactId>org.restlet.lib.org.json</artifactId>
             <groupId>org.restlet.jse</groupId>
           </exclusion>
-          <!-- The recent one have a different id so we can't rely on dependencyManagement -->
+          <!-- The recent one have a different id, so we can't rely on dependencyManagement -->
           <exclusion>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -799,9 +801,9 @@
       </dependency>
       <dependency>
       <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
-          above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not very
-          good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a dedicated
-          JAXB converter for XML representation. -->
+          above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not
+          very good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a
+          dedicated JAXB converter for XML representation. -->
         <groupId>org.restlet.jse</groupId>
         <artifactId>org.restlet.ext.jaxb</artifactId>
         <version>${restlet.version}</version>
@@ -1014,8 +1016,8 @@
             <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
           <!--
-            The version of the Jetty client libraries used by solrj often conflict with the version of Jetty used by XWiki.
-            The reason is generally that upgrading Jetty is always a pain and tend to lack behind.
+            The version of the Jetty client libraries used by solrj often conflict with the version of Jetty used by
+            XWiki. The reason is generally that upgrading Jetty is always a pain and tend to lack behind.
           -->
           <exclusion>
             <groupId>org.eclipse.jetty</groupId>
@@ -1565,7 +1567,8 @@
                 <bannedDependencyType>
                   <dependencyType>xar</dependencyType>
                   <projectPackaging>jar|webjar</projectPackaging>
-                  <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
+                  <!-- Integration test modules are never going to be installed as extension, and they need to depend
+                       on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
                 </bannedDependencyType>
               </rules>

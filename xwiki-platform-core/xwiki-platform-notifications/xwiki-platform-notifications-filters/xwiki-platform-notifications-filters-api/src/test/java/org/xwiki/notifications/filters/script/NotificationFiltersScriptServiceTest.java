@@ -36,7 +36,7 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -66,7 +66,7 @@ class NotificationFiltersScriptServiceTest
 
     @MockComponent
     @Named("cached")
-    private ModelBridge cachedModelBridge;
+    private FilterPreferencesModelBridge cachedFilterPreferencesModelBridge;
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;

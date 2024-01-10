@@ -297,7 +297,7 @@
       ######################################################
       ### TITLE
       ######################################################
-      = $services.localization.render('notifications.settings.title') =
+      == $services.localization.render('notifications.settings.title') ==
       ######################################################
       ### EMAIL PREFERENCES
       ######################################################
@@ -305,7 +305,7 @@
       (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
       (((
       (% id="Hnotifications.settings.email.title" %)
-      = {{translation key="notifications.settings.email.title" /}} =
+      === {{translation key="notifications.settings.email.title" /}} ===
       {{notificationsEmailPreferences user="$doc.documentReference" /}}
       )))
       #end
@@ -316,7 +316,7 @@
       (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
       (((
       (% id="Hnotifications.settings.watch.title" %)
-      = {{translation key="notifications.settings.watch.title" /}} =
+      === {{translation key="notifications.settings.watch.title" /}} ===
       {{notificationsAutoWatchPreferences user="$doc.documentReference" /}}
       )))
       #end
@@ -326,7 +326,7 @@
       (% class="profile-section highlighted-profile-section column full" %)
       (((
       (% id="Hnotifications.settings.applications.title" %)
-      = {{translation key="notifications.settings.applications.title" /}} =
+      === {{translation key="notifications.settings.applications.title" /}} ===
       {{notificationsApplicationsPreferences user="$doc.documentReference" /}}
       )))
       ######################################################
@@ -340,13 +340,13 @@
 (% class="profile-section highlighted-profile-section column full" %)
 (((
   (% id="Hnotifications.settings.filters.preferences.system.title" %)
-  = {{translation key="notifications.settings.filters.preferences.system.title" /}} =
+  === {{translation key="notifications.settings.filters.preferences.system.title" /}} ===
   {{notificationsSystemFiltersPreferences user="$doc.documentReference" /}}
 )))
 (% class="profile-section highlighted-profile-section column full" %)
 (((
   (% id="Hnotifications.settings.filters.preferences.custom.title" %)
-  = {{translation key="notifications.settings.filters.preferences.custom.title" /}} =
+  === {{translation key="notifications.settings.filters.preferences.custom.title" /}} ===
   {{notificationsCustomFiltersPreferences user="$doc.documentReference" /}}
 )))
 #end

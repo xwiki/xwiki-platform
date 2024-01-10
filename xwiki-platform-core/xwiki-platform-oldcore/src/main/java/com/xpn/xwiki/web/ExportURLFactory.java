@@ -530,9 +530,18 @@ public class ExportURLFactory extends XWikiServletURLFactory
         if (!file.exists()) {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
-            file.getParentFile().mkdirs();
-            try (InputStream stream = attachment.getContentInputStream(context)) {
-                FileUtils.copyInputStreamToFile(stream, file);
+            // If the attachment doesn't exist, then don't perform any action. It usually means that the
+            // createAttachmentURL() was called to get a URL, independently of whether it exists or not.
+            // This is the case for example in the Color Theme Sheet which uses:
+            //      $xwiki.getAttachmentURL($doc.fullName, '__tochange__')
+            // This clearly doesn't point to an existing attachment.
+            // In addition, it's possible that there's a link to a non-existing attachment and in this case we simply
+            // don't need to do anything (it'll lead to a broken link which is the correct outcome).
+            if (attachment != null) {
+                file.getParentFile().mkdirs();
+                try (InputStream stream = attachment.getContentInputStream(context)) {
+                    FileUtils.copyInputStreamToFile(stream, file);
+                }
             }
         }
 
@@ -556,7 +565,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
             return createAttachmentURL(filename, spaces, name, xwikidb, context);
         } catch (Exception e) {
             LOGGER.error("Failed to create attachment URL", e);
-
             return super.createAttachmentURL(filename, spaces, name, action, null, xwikidb, context);
         }
     }

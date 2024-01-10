@@ -76,8 +76,7 @@ public class ServletContainerPingDataProvider extends AbstractPingDataProvider
     @Override
     public void provideData(Ping ping)
     {
-        if (this.environment instanceof ServletEnvironment) {
-            ServletEnvironment servletEnvironment = (ServletEnvironment) this.environment;
+        if (this.environment instanceof ServletEnvironment servletEnvironment) {
             try {
                 ServletContext servletContext = servletEnvironment.getServletContext();
                 // Format of getServerInfo() is "name/version (text)" where " (text)" is optional.
@@ -91,7 +90,7 @@ public class ServletContainerPingDataProvider extends AbstractPingDataProvider
                 ping.setServletContainer(servletContainerPing);
             } catch (Exception e) {
                 // Ignore, we just don't save that information...
-                // However we log a warning since it's a problem that needs to be seen and looked at.
+                // However, we log a warning since it's a problem that needs to be seen and looked at.
                 logWarning("Failed to compute Servlet container information", e);
             }
         }

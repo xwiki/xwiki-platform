@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -62,10 +62,10 @@ class DeleteUserEventListenerTest
 
     @MockComponent
     @Named("cached")
-    private Provider<ModelBridge> modelBridgeProvider;
+    private Provider<FilterPreferencesModelBridge> modelBridgeProvider;
 
     @Mock
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -76,7 +76,7 @@ class DeleteUserEventListenerTest
     @BeforeEach
     void setUp()
     {
-        when(this.modelBridgeProvider.get()).thenReturn(this.modelBridge);
+        when(this.modelBridgeProvider.get()).thenReturn(this.filterPreferencesModelBridge);
         when(this.xWikiDocument.getDocumentReference()).thenReturn(REMOVED_USER_DOCUMENT_REFERENCE);
     }
 
@@ -84,13 +84,13 @@ class DeleteUserEventListenerTest
     void onEvent() throws Exception
     {
         this.listener.onEvent(null, this.xWikiDocument, null);
-        verify(this.modelBridge).deleteFilterPreferences(REMOVED_USER_DOCUMENT_REFERENCE);
+        verify(this.filterPreferencesModelBridge).deleteFilterPreferences(REMOVED_USER_DOCUMENT_REFERENCE);
     }
 
     @Test
     void onEventException() throws Exception
     {
-        doThrow(NotificationException.class).when(this.modelBridge)
+        doThrow(NotificationException.class).when(this.filterPreferencesModelBridge)
             .deleteFilterPreferences(REMOVED_USER_DOCUMENT_REFERENCE);
         this.listener.onEvent(null, this.xWikiDocument, null);
         assertEquals(1, this.logCapture.size());

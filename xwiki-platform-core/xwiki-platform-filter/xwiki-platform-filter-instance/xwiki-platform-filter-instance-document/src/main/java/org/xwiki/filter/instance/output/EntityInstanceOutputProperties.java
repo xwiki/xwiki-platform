@@ -56,17 +56,17 @@ public class EntityInstanceOutputProperties extends InstanceOutputProperties
 
 
     /**
-     * @return the comment to use when saving users
+     * @return the comment to use when saving documents
      */
     @PropertyName("Save comment")
-    @PropertyDescription("The comment to use when saving a user")
+    @PropertyDescription("The comment to use when saving a document")
     public String getSaveComment()
     {
         return this.saveComment;
     }
 
     /**
-     * @param saveComment the version comment to use when saving users
+     * @param saveComment the version comment to use when saving documents
      */
     public void setSaveComment(String saveComment)
     {
@@ -74,17 +74,17 @@ public class EntityInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return the author to use when saving users
+     * @return the author to use when saving documents
      */
     @PropertyName("Save author")
-    @PropertyDescription("The author to use when saving a user")
+    @PropertyDescription("The author to use when saving a document")
     public DocumentReference getAuthor()
     {
         return this.author;
     }
 
     /**
-     * @param author the author to use when saving users
+     * @param author the author to use when saving documents
      */
     public void setAuthor(DocumentReference author)
     {

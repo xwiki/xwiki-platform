@@ -99,7 +99,9 @@ public class WatchListObjectsRemovalTaskConsumer implements TaskConsumer
                 context.getWiki().saveDocument(document, "Migration of watchlist preferences", context);
             }
         } catch (XWikiException e) {
-            throw new RuntimeException(e);
+            throw new IndexException(
+                String.format("Error when trying to clean up watchlist object preferences in [%s]",
+                    documentReference), e);
         }
     }
 }

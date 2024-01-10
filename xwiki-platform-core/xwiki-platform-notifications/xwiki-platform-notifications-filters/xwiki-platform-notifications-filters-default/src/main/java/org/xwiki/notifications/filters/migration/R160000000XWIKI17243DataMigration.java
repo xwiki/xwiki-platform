@@ -126,7 +126,7 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        String statement = "from doc.object(XWiki.WatchListClass) as user";
+        String statement = "from doc.object(XWiki.WatchListClass) as watchListDoc";
         int offset = 0;
         List<String> results;
         do {
@@ -138,8 +138,8 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
 
                 this.logger.info("Found [{}] users with WatchListClass objects... migrating them.", results.size());
                 for (String result : results) {
-                    DocumentReference userDocReference = this.documentReferenceResolver.resolve(result);
-                    this.migrateUser(userDocReference);
+                    DocumentReference watchListDoc = this.documentReferenceResolver.resolve(result);
+                    this.migrateWatchListDoc(watchListDoc);
                 }
                 offset += BATCH_SIZE;
             } catch (QueryException e) {
@@ -149,11 +149,12 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
         } while (results.size() == BATCH_SIZE);
     }
 
-    private void migrateUser(DocumentReference userDocReference) throws DataMigrationException, XWikiException
+    private void migrateWatchListDoc(DocumentReference watchListDocReference)
+        throws DataMigrationException, XWikiException
     {
         XWikiContext context = getXWikiContext();
-        WikiReference wikiReference = userDocReference.getWikiReference();
-        XWikiDocument document = context.getWiki().getDocument(userDocReference, context);
+        WikiReference wikiReference = watchListDocReference.getWikiReference();
+        XWikiDocument document = context.getWiki().getDocument(watchListDocReference, context);
 
         // If the document does contain a user xobject, we perform the migration, else we only remove the xobject.
         if (document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null) {
@@ -171,11 +172,14 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
             }
 
             try {
-                this.notificationFilterPreferenceStore.saveFilterPreferences(userDocReference, results);
+                this.notificationFilterPreferenceStore.saveFilterPreferences(watchListDocReference, results);
             } catch (NotificationException e) {
                 throw new DataMigrationException(String.format("Error while trying to save [%s] filter preferences",
                     results.size()), e);
             }
+        } else {
+            this.logger.info("[{}] contained a watchlist object but is not a user profile, the object will be removed "
+                + "without migration", watchListDocReference);
         }
 
         this.taskManager.addTask(wikiReference.getName(), document.getId(),

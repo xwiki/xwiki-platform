@@ -17,23 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.transformation.icon;
+package org.xwiki.rendering.internal.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
-import org.xwiki.icon.macro.internal.DisplayIconMacro;
-import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.IconBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.syntax.Syntax;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Component to use the icon theme to provide a proper block for displaying an icon.
@@ -63,14 +61,13 @@ public class XWikiIconProvider extends DefaultIconProvider
      * @return the block containing an icon.
      */
     @Override
-    public Block get(String iconName)
+    public IconBlock get(String iconName)
     {
         IconSet iconSet = null;
-        DisplayIconMacro iconMacro = new DisplayIconMacro();
         try {
             iconSet = getIconSet(iconName);
             String iconContent = this.iconRenderer.renderHTML(iconName, iconSet);
-            return new RawBlock(iconContent, Syntax.HTML_5_0);
+            return new IconBlock(List.of(new RawBlock(iconContent, Syntax.HTML_5_0)));
         } catch (IconException e) {
             return super.get(iconName);
         }

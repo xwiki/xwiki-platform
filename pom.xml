@@ -1448,6 +1448,54 @@
                 <id>com.google.javascript:closure-compiler-unshaded</id>
                 <features>com.google.javascript:closure-compiler</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy</id>
+                <features>org.codehaus.groovy:groovy</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-datetime</id>
+                <features>org.codehaus.groovy:groovy-datetime</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-jmx</id>
+                <features>org.codehaus.groovy:groovy-jmx</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-json</id>
+                <features>org.codehaus.groovy:groovy-json</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-jsr223</id>
+                <features>org.codehaus.groovy:groovy-jsr223</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-macro</id>
+                <features>org.codehaus.groovy:groovy-macro</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-nio</id>
+                <features>org.codehaus.groovy:groovy-nio</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-servlet</id>
+                <features>org.codehaus.groovy:groovy-servlet</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-sql</id>
+                <features>org.codehaus.groovy:groovy-sql</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-templates</id>
+                <features>org.codehaus.groovy:groovy-templates</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-xml</id>
+                <features>org.codehaus.groovy:groovy-xml</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-dateutil</id>
+                <features>org.codehaus.groovy:groovy-dateutil</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

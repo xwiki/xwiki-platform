@@ -29,9 +29,9 @@ import type { CristalApp, Logger } from "@cristal/api";
 import { ContentTools } from "./contentTools";
 
 const root = ref(null);
-
+const cristal = inject<CristalApp>("cristal");
 const pageStatus = ref({
-  currentContent: "Initial content",
+  currentContent: cristal?.getCurrentContent(),
   css: [],
   js: [],
   html: "",
@@ -41,7 +41,6 @@ const pageStatus = ref({
 });
 let logger: Logger | undefined = undefined;
 
-const cristal = inject<CristalApp>("cristal");
 if (cristal != null) {
   ContentTools.init(cristal);
   logger = cristal.getLogger("skin.vue.content");

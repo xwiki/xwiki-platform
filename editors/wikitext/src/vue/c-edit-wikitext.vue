@@ -31,7 +31,7 @@ const cristal = inject<CristalApp>("cristal");
 let link = "/" + cristal?.getCurrentPage() + "/view";
 const pageStatus = ref({
   currentContent: "Initial content",
-  currentSource: "Initial source",
+  currentSource: cristal?.getCurrentSource(),
   css: [],
   js: [],
   html: "",

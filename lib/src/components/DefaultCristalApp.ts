@@ -341,6 +341,10 @@ export class DefaultCristalApp implements CristalApp {
     return this.page.html;
   }
 
+  getCurrentSource(): string {
+    return this.page.source;
+  }
+
   setContentRef(ref: Ref): void {
     this.currentContentRef = ref;
     this.logger?.debug("Received ref from VUE ", ref);

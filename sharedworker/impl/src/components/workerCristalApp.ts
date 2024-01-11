@@ -108,6 +108,12 @@ export class WorkerCristalApp implements CristalApp {
   getCurrentPage(): string {
     throw new Error("Method not implemented.");
   }
+  getCurrentContent(): string {
+    throw new Error("Method not implemented.");
+  }
+  getCurrentSource(): string {
+    throw new Error("Method not implemented.");
+  }
   setCurrentPage(): void {
     throw new Error("Method not implemented.");
   }

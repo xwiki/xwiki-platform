@@ -119,5 +119,5 @@
         'translationPrefix' : "xe.admin.users."
     })
 
-    #livetable("likers" $columns $columnsProperties $options)
+    #livetable("likersTable" $columns $columnsProperties $options)
 #end

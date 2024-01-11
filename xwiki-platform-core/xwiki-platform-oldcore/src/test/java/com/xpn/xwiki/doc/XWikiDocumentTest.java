@@ -623,8 +623,9 @@ public class XWikiDocumentTest
         "'An image:image.png', true",
         "'A (((group)))', true",
         "'Just (a) text', false",
+        "'Test~Entry', true",
     })
-    void display(String value, boolean htmlExpected)
+    void display(String value, boolean htmlMacroExpected)
     {
         when(this.xWiki.getCurrentContentSyntaxId(any())).thenReturn("xwiki/2.0");
 
@@ -633,7 +634,7 @@ public class XWikiDocumentTest
             this.baseObject.setStringValue("string", value);
         }
 
-        if (htmlExpected) {
+        if (htmlMacroExpected) {
             String expected =
                 "{{html clean=\"false\" wiki=\"false\"}}" + XMLUtils.escapeElementText(value) + "{{/html}}";
             assertEquals(expected, this.document.display("string", "view", this.oldcore.getXWikiContext()));

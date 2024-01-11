@@ -18,7 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /* this represent a triple state checkbox */
-
+/*!
+#set ($iconNames = ['check', 'cross'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(icons) {
+  "use strict";
 define('users-and-groups-translation-keys', {
   prefix: 'platform.core.rightsManagement.',
   keys: [
@@ -57,18 +66,11 @@ window.MSCheckbox = Class.create({
     this.state = defaultState;
     this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
     this.nrstates = this.states.length;
-    this.icons = [
-      "",
-      "$escapetool.javascript($services.icon.renderHTML('check'))",
-      "$escapetool.javascript($services.icon.renderHTML('cross'))"
-    ];
     this.stateClasses = [
       "none",
       "yes",
       "no"
     ];
-
-    
     
     this.button = document.createElement("button");
     this.button.className = "btn btn-default btn-xs rights-edit";
@@ -80,8 +82,17 @@ window.MSCheckbox = Class.create({
   
   draw: function()
   {
-    //Change display icon
-    this.button.innerHTML = this.icons[this.state];
+    //Change the display icon
+    if(this.state === 0) {
+      this.button.innerHTML = '';
+    }
+    if(this.state === 1) {
+      this.button.innerHTML = icons.check;
+    }
+    if(this.state === 2) {
+      this.button.innerHTML = icons.cross;
+    }
+
     this.button.classList.add(this.stateClasses[this.state]);
     
     //Update the description of the button for accessibility.
@@ -231,6 +242,7 @@ window.MSCheckbox = Class.create({
     }
   }
 });
+}).apply(']]#', $jsontool.serialize([$icons]));
 
 /**
   * user list element creator. Used in adminusers.vm.

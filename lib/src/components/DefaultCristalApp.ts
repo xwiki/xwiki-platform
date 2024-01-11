@@ -274,6 +274,7 @@ export class DefaultCristalApp implements CristalApp {
         if (this.currentContentRef != null) {
           console.log("Updating vueJS content field to ", this.page.html);
           this.currentContentRef.value.currentContent = this.page.html;
+          this.currentContentRef.value.currentSource = this.page.source;
           this.currentContentRef.value.css = pageContentData.css;
           this.currentContentRef.value.js = pageContentData.js;
           this.currentContentRef.value.document = this.page.document;
@@ -307,6 +308,7 @@ export class DefaultCristalApp implements CristalApp {
         }
         if (this.currentContentRef != null) {
           this.currentContentRef.value.currentContent = this.page.html;
+          this.currentContentRef.value.currentSource = this.page.source;
           this.currentContentRef.value.css = pageContentData.css;
           this.currentContentRef.value.js = pageContentData.js;
           this.currentContentRef.value.document = null;

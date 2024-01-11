@@ -22,14 +22,50 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
-  <UIX uixname="editor.text.before" />
-  This is the wiki text editor
-  <v-textarea label="Label"> Hello </v-textarea>
-  <UIX uixname="editor.text.after" />
-</template>
-<script lang="ts">
-export default {
-  setup() {},
-};
+
+<script lang="ts" setup>
+import { CristalApp } from "@cristal/api";
+import { inject, ref } from "vue";
+
+const cristal = inject<CristalApp>("cristal");
+let link = "/" + cristal?.getCurrentPage() + "/view";
+const pageStatus = ref({
+  currentContent: "Initial content",
+  currentSource: "Initial source",
+  css: [],
+  js: [],
+  html: "",
+  document: null,
+  withSheet: false,
+  sheet: "",
+});
+if (cristal) {
+  cristal.setContentRef(pageStatus);
+}
 </script>
+<template>
+  <div class="pagemenu">
+    <router-link :to="link">
+      <x-btn>Cancel</x-btn>
+    </router-link>
+    <x-btn>Save</x-btn>
+  </div>
+  <br />
+  <br />
+  <div id="xwikicontent">
+    <v-textarea
+      v-model="pageStatus.currentSource"
+      auto-grow
+      rows="25"
+      variant="outlined"
+      label="Editor"
+      width="100%"
+    />
+  </div>
+</template>
+<style>
+textarea {
+  border: 1px solid black;
+  width: 100%;
+}
+</style>

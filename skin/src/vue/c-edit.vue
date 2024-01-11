@@ -53,6 +53,14 @@ export default {
 };
 </script>
 <template>
-  Hello
-  <component :is="component" />
+  <article id="edit" ref="root">
+    <UIX uixname="edit.before" />
+    <component :is="component" />
+    <UIX uixname="edit.after" />
+  </article>
 </template>
+<style>
+.pagemenu {
+  float: right;
+}
+</style>

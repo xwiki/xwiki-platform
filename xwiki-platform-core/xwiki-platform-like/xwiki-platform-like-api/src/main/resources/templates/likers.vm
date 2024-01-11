@@ -99,7 +99,8 @@
     #livetable_filterObfuscated($map)
     $jsontool.serialize($map)
 #else
-    <h1>$escapetool.xml($services.localization.render('like.likers.title', [$doc.plainTitle]))</h1>
+    #set($titleToDisplay = $services.localization.render('like.likers.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+    #template('contentheader.vm')
     #set($columns = ["name", "first_name", "last_name"])
     #set($columnsProperties = {
         "name" : { "type" : "text", "sortable": false, "filterable": false, "html": true },

@@ -80,7 +80,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <artifactId>xwiki-platform-livedata-api</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

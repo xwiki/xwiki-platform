@@ -17,10 +17,8 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-##!source.syntax=xwiki/2.1
-{{velocity output='false'}}
 #if ($request.livetable == "true")
-  #macro (displayUserAliasWithAvatar $userReference $disabled)
+    #macro (displayUserAliasWithAvatar $userReference $disabled)
     <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($userReference $avatarURL 120)
@@ -28,106 +26,112 @@
     </span>
       <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
     </div>
-  #end
-  #set ($documentReference = $doc.documentReference)
-  ##==============================
-  ## Offset = item # at which to start displaying data
-  ##==============================
-  #set($offset = $numbertool.toNumber($request.get('offset')))
-  ## offset starts from 0 in velocity and 1 in javascript
-  #set($offset = $offset - 1)
-  #if($offset < 0)
-    #set($offset = 0)
-  #end
-  ##==================
-  ## Limit = # of items to display
-  ##==================
-  #set($limit = $numbertool.toNumber($request.get('limit')))
-  ##==========
-  ## Sort direction
-  ##==========
-  #set($order = "$!request.sort")
-  #if($order != '')
-    #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
-    #if("$!orderDirection" != '' && "$!orderDirection" != 'asc')
-      #set($orderDirection = 'desc')
     #end
-  #end
-  #set ($likeRecords = $services.like.getLikers($documentReference, $offset, $limit))
-  #set ($userRows = [])
-  #foreach($userReference in $likeRecords)
-    #set ($grayed = $xcontext.userReference == $userReference.reference)
-    #set ($userDoc = $xwiki.getDocument($userReference.reference))
-    #set ($userProperties = $services.user.getProperties($userReference))
-    #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
-    #if ($services.security.authorization.hasAccess('view', $userDoc.documentReference))
-      #set ($row = {
-        'grayed': $grayed,
-        'doc_fullName': $userDoc.fullName,
-        'doc_wiki': $userDoc.wiki,
-        'doc_url': $userDoc.getURL(),
-        'doc_viewable': true,
-        'name': "#displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
-        'first_name': $userProperties.firstName,
-        'last_name': $userProperties.lastName
-      })
+    $response.setContentType('application/json')
+    #set ($documentReference = $doc.documentReference)
+    ##==============================
+    ## Offset = item # at which to start displaying data
+    ##==============================
+    #set($offset = $numbertool.toNumber($request.get('offset')))
+    ## offset starts from 0 in velocity and 1 in javascript
+    #set($offset = $offset - 1)
+    #if($offset < 0)
+        #set($offset = 0)
+    #end
+    ##==================
+    ## Limit = # of items to display
+    ##==================
+    #set($limit = $numbertool.toNumber($request.get('limit')))
+    ##==========
+    ## Sort direction
+    ##==========
+    #set($order = "$!request.sort")
+    #if($order != '')
+        #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+        #if("$!orderDirection" != '' && "$!orderDirection" != 'asc')
+            #set($orderDirection = 'desc')
+        #end
+    #end
+    #set ($likeRecords = $services.like.getLikers($documentReference, $offset, $limit))
+    #set ($userRows = [])
+    #foreach($userReference in $likeRecords)
+        #set ($grayed = $xcontext.userReference == $userReference.reference)
+        #set ($userDoc = $xwiki.getDocument($userReference.reference))
+        #set ($userProperties = $services.user.getProperties($userReference))
+        #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
+        #if ($services.security.authorization.hasAccess('view', $userDoc.documentReference))
+            #set ($row = {
+                'grayed': $grayed,
+                'doc_fullName': $userDoc.fullName,
+                'doc_wiki': $userDoc.wiki,
+                'doc_url': $userDoc.getURL(),
+                'doc_viewable': true,
+                'name': "#displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
+                'first_name': $userProperties.firstName,
+                'last_name': $userProperties.lastName
+            })
+        #else
+            #set ($row = {
+                'doc_viewable': false,
+                'doc_fullName': 'obfuscated'
+            })
+        #end
+        #set ($discard = $userRows.add($row))
+    #end
+    ## ===
+    ## JSON
+    ## ===
+    #set ($newOffset = $offset + 1)
+    #set ($optLikesNumber = $services.like.getLikes($documentReference))
+    #if ($optLikesNumber.isPresent())
+      #set ($totalRows = $optLikesNumber.get())
     #else
-      #set ($row = {
-        'doc_viewable': false,
-        'doc_fullName': 'obfuscated'
-      })
+      #set ($totalRows = $likeRecords.size())
     #end
-    #set ($discard = $userRows.add($row))
-  #end
-  ## ===
-  ## JSON
-  ## ===
-  #set ($newOffset = $offset + 1)
-  #set ($optLikesNumber = $services.like.getLikes($documentReference))
-  #if ($optLikesNumber.isPresent())
-    #set ($totalRows = $optLikesNumber.get())
-  #else
-    #set ($totalRows = $likeRecords.size())
-  #end
-  
-  #set ($map = {
-    "totalrows": $totalRows,
-    "returnedrows": $likeRecords.size(),
-    "offset": $newOffset,
-    "reqNo": $numbertool.toNumber($request.reqNo),
-    "rows": $userRows
-  })
-  #livetable_filterObfuscated($map)
-  #jsonResponse($map)
-#end
-{{/velocity}}{{velocity}}##A line break is inserted if the two macro are not closing and opening on the same line.
-  #if ($request.livetable == "true")
-    #break
-  #end
-  = $services.rendering.escape($services.localization.render('like.likers.title', [$doc.plainTitle]), 'xwiki/2.1') =
-  
-  #set ($sourceParameters = $escapetool.url({
+    
+    #set ($map = {
+        "totalrows": $totalRows,
+        "returnedrows": $likeRecords.size(),
+        "offset": $newOffset,
+        "reqNo": $numbertool.toNumber($request.reqNo),
+        "rows": $userRows
+    })
+    #livetable_filterObfuscated($map)
+    $jsontool.serialize($map)
+#else
+  <h1>$escapetool.xml($services.localization.render('like.likers.title', [$doc.plainTitle]))</h1>
+  ## We rely on the same column name than the Users administration, so we use same translation prefix for now.
+  #set ($sourceParameters = {
     'template': 'likers.vm',
-    '$doc': $doc.documentReference,
     'livetable': 'true',
-    'xpage': 'likers',
     'outputSyntax': 'plain',
-   'translationPrefix' : 'xe.admin.users.' 
-  }))
-
-  #set ($liveDataConfig = {
+    '$doc': $doc.documentReference,
+    'translationPrefix' : 'xe.admin.users.'
+  })
+  $services.liveData.render({
+    'id': 'likersTable',
+    'properties': 'name,first_name,last_name',
+    'source': 'liveTable',
+    'sourceParameters': $escapetool.url($sourceParameters)
+  }, {
     'meta': {
       'propertyDescriptors': [
-        { 'id': 'name', 'displayer': { 'id': 'html' }, 'sortable': false, 'filterable': false, 'editable': false },
-       { 'id': 'first_name', 'sortable': false, 'filterable': false, 'editable': false},
-       { 'id': 'last_name', 'sortable': false, 'filterable': false, 'editable': false}
+        {
+          'id': 'name',
+          'displayer': 'html',
+          'sortable': false,
+          'filterable': false
+        },
+        {
+          'id': 'first_name',
+          'sortable': false,
+          'filterable': false
+        },{
+          'id': 'last_name',
+          'sortable': false,
+          'filterable': false
+        }
       ]
     }
   })
-
-  {{liveData id='likers' 
-    properties="name,first_name,last_name"
-    source='liveTable'
-    sourceParameters="$sourceParameters"
-  }}$jsontool.serialize($liveDataConfig){{/liveData}}
-{{/velocity}}
+#end

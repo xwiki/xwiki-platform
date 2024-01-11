@@ -21,60 +21,35 @@ package org.xwiki.like.test.po;
 
 import java.util.Map;
 
-import org.xwiki.livedata.test.po.TableLayoutElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Provide the operations to go to the likers page, and to access the likers UI elements.
+ * Likers page object.
  *
  * @version $Id$
- * @since 15.2RC1
+ * @since 16.0.0RC1
  */
-public final class LikersPage extends BaseElement
+public class LikersPage extends ViewPage
 {
-    private static final String LIKERS = "likers";
-
-    private TableLayoutElement likersLiveData;
-
-    private LikersPage()
-    {
-    }
-
     /**
-     * Access to the likers of a given page.
+     * Go to the likers page of a given page.
      *
-     * @param documentReference the document reference of a page
-     * @return the corresponding page object
+     * @param documentReference the document reference of the page for which likers are shown
+     * @return the likers page object for the given document reference
      */
     public static LikersPage goToLikers(DocumentReference documentReference)
     {
-        getUtil().gotoPage(documentReference, "view", Map.of("viewer", LIKERS));
+        getUtil().gotoPage(documentReference, "view", Map.of("viewer", "likers"));
         return new LikersPage();
     }
 
     /**
-     * @return the numbers of currently displayed likers
+     * @return the likers Live Data element
      */
-    public int countDisplayedLikers()
+    public LiveDataElement getLiveData()
     {
-        return getLiveData().countRows();
-    }
-
-    /**
-     * @param index the index of a liker in the Live Data (the first one is index 1)
-     * @return the username of the liker at the given index
-     */
-    public String getLikerUsername(int index)
-    {
-        return getLiveData().getCell("User", index).getText();
-    }
-
-    private TableLayoutElement getLiveData()
-    {
-        if (this.likersLiveData == null) {
-            this.likersLiveData = new TableLayoutElement(LIKERS);
-        }
-        return this.likersLiveData;
+        return new LiveDataElement("likersTable");
     }
 }

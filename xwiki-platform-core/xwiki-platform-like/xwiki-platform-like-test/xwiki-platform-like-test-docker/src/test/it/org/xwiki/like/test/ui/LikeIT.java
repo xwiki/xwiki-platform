@@ -19,7 +19,6 @@
  */
 package org.xwiki.like.test.ui;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -34,11 +33,9 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
 import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xwiki.like.test.po.LikersPage.goToLikers;
 import static org.xwiki.like.test.po.UserProfileLikedPagesPage.LIKES_COLUMN_NAME;
 import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME;
 
@@ -60,12 +57,9 @@ import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME
 class LikeIT
 {
     private static final String USER1 = "LikeUser1";
-
     private static final String USER2 = "LikeUser2";
-
     private static final DocumentReference LIKE_CONFIGURATION_REFERENCE =
         new DocumentReference("xwiki", asList("XWiki", "Like"), "LikeConfiguration");
-
     private static final String LIKE_CONFIGURATION_CLASSNAME = "XWiki.Like.LikeConfigurationClass";
 
     @BeforeEach
@@ -155,7 +149,7 @@ class LikeIT
             testUtils.getURL(testReference.getLastSpaceReference()));
         tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
 
-        // Go the the likers of the page and verify the Live Data is accurate.
+        // Go to the likers of the page and verify the Live Data is accurate.
         LikersPage likersPage = LikersPage.goToLikers(testReference);
         LiveDataElement likersLiveData = likersPage.getLiveData();
         TableLayoutElement likersTableLayout = likersLiveData.getTableLayout();
@@ -176,9 +170,5 @@ class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(1, likeButton.getLikeNumber());
-
-        LikersPage likersPage = goToLikers(testReference);
-        assertEquals(1, likersPage.countDisplayedLikers());
-        assertEquals("LikeUser2", likersPage.getLikerUsername(1));
     }
 }

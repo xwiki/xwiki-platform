@@ -2138,6 +2138,7 @@ div.main {
   box-shadow: none;
 }
 
+@xwiki-panel-header-text: @navbar-default-color;
 @panel-header-text: @navbar-default-color;
 @xwiki-page-content-bg:   @body-bg;
 @text-muted: @navbar-default-color;

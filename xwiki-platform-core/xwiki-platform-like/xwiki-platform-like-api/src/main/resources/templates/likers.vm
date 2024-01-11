@@ -119,5 +119,7 @@
         'translationPrefix' : "xe.admin.users."
     })
 
+    ## The id of the table needs to be complex in order to avoid the risk of 'id collision' that would break
+    ## the livetable.
     #livetable("likersTable" $columns $columnsProperties $options)
 #end

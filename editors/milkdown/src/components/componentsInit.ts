@@ -17,40 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * This file is part of the Cristal Wiki software prototypenx
+ * This file is part of the Cristal Wiki software prototype
  * @copyright  Copyright (c) 2023 XWiki SAS
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
 
-import { DefaultVueTemplateProvider } from "@cristal/skin";
-import type { Component } from "vue";
-import { injectable } from "inversify";
-import TextEditor from "../vue/c-edit-wikitext.vue";
-import { CristalApp } from "@cristal/api";
+import { Container } from "inversify";
+import { UIXTemplateProvider } from "@cristal/skin";
+import { UIXMilkdownEditorProvider } from "./uixMilkdownEditorProvider";
 
-@injectable()
-export class UIXTextEditorProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.editor.text";
-  public static hint = "";
-  public static priority = 1000;
-  public static singleton = true;
-  public static extensionPoint = "editor";
-
-  registered = false;
-
-  getVueComponent(): Component {
-    TextEditor.editorname = "wikitext";
-    return TextEditor;
-  }
-  getVueName(): string {
-    return "TextEditor";
-  }
-  isGlobal(): boolean {
-    return false;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isSupported(cristal: CristalApp): boolean {
-    return true;
+export default class ComponentInit {
+  constructor(container: Container) {
+    container
+      .bind<UIXTemplateProvider>("UIXTemplateProvider")
+      .to(UIXMilkdownEditorProvider)
+      .whenTargetNamed(UIXMilkdownEditorProvider.extensionPoint);
   }
 }

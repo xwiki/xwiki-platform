@@ -44,15 +44,30 @@ export default {
     logger?.debug("Editor UIX components are ", comps);
     if (!comps || comps.length == 0) return {};
     else {
-      logger?.debug("Using first editor UIX component ", comps[0]);
+      let editComponent = null;
+      logger?.debug("Using first editor UIX component ", comps);
+      if (comps != null) {
+        for (let i = 0; i < comps.length; i++) {
+          logger?.debug("Route name ", this.$route.name);
+          logger?.debug("Component name ", comps[i].editorname);
+          if ("edit" + comps[i].editorname == this.$route.name) {
+            editComponent = comps[i];
+          }
+        }
+      }
+      if (editComponent == null) {
+        editComponent = comps[0];
+      }
+      logger?.debug("Final component ", editComponent);
       return {
-        component: comps[0],
+        component: editComponent,
       };
     }
   },
 };
 </script>
 <template>
+  Here in edit
   <article id="edit" ref="root">
     <UIX uixname="edit.before" />
     <component :is="component" />

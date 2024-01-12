@@ -403,17 +403,21 @@ export class DefaultCristalApp implements CristalApp {
       {
         path: "/:page/edit",
         component: this.skinManager.getTemplate("edit"),
+        name: "edit",
       } as RouteRecordRaw,
       {
         path: "/:page/edittext",
+        name: "edittext",
         component: this.skinManager.getTemplate("edit"),
       } as RouteRecordRaw,
       {
         path: "/:page/editxwiki",
+        name: "editxwiki",
         component: this.skinManager.getTemplate("edit"),
       } as RouteRecordRaw,
       {
         path: "/:page/editmilkdown",
+        name: "editmilkdown",
         component: this.skinManager.getTemplate("edit"),
       } as RouteRecordRaw,
       {

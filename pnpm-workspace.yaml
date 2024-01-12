@@ -13,6 +13,7 @@ packages:
   - "sharedworker/impl"
   - "extensions/menubuttons"
   - "editors/wikitext"
+  - "editors/milkdown"
   - "xwiki/remoteinlineeditor"
   - "lib"
   - "web"

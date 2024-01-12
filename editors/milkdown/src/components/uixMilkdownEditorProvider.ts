@@ -26,12 +26,12 @@
 import { DefaultVueTemplateProvider } from "@cristal/skin";
 import type { Component } from "vue";
 import { injectable } from "inversify";
-import TextEditor from "../vue/c-edit-wikitext.vue";
+import MilkdownEditor from "../vue/c-edit-milkdown.vue";
 import { CristalApp } from "@cristal/api";
 
 @injectable()
-export class UIXTextEditorProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.editor.text";
+export class UIXMilkdownEditorProvider extends DefaultVueTemplateProvider {
+  public static cname = "cristal.editor.milkdown";
   public static hint = "";
   public static priority = 1000;
   public static singleton = true;
@@ -40,11 +40,11 @@ export class UIXTextEditorProvider extends DefaultVueTemplateProvider {
   registered = false;
 
   getVueComponent(): Component {
-    TextEditor.editorname = "wikitext";
-    return TextEditor;
+    MilkdownEditor.editorname = "milkdown";
+    return MilkdownEditor;
   }
   getVueName(): string {
-    return "TextEditor";
+    return "MilkdownEditor";
   }
   isGlobal(): boolean {
     return false;

@@ -33,6 +33,7 @@ import { ComponentInit as MenuButtonsComponentInit } from "@cristal/extension-me
 import { ComponentInit as QueueWorkerComponentInit } from "@cristal/sharedworker-impl";
 import { ComponentInit as RenderingComponentInit } from "@cristal/rendering";
 import { ComponentInit as EditorWikiTextComponentInit } from "@cristal/editors-wikitext";
+import { ComponentInit as EditorMilkdownComponentInit } from "@cristal/editors-milkdown";
 import { ComponentInit as XWikiRemoteEditorComponentInit } from "@cristal/xwiki-remoteinlineeditor";
 import type { Container } from "inversify";
 
@@ -52,6 +53,7 @@ export class StaticBuild {
       new QueueWorkerComponentInit(container);
       new RenderingComponentInit(container);
       new EditorWikiTextComponentInit(container);
+      new EditorMilkdownComponentInit(container);
       new XWikiRemoteEditorComponentInit(container);
     }
   }

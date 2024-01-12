@@ -6,14 +6,16 @@
         "cacheableOperations": [
           "build",
           "test",
-          "lint"
+          "lint",
+          "start"
         ]
       }
     }
   },
   "namedInputs": {
     "default": [
-      "{projectRoot}/**/*"
+      "{projectRoot}/**/*",
+      "!{projectRoot}/dist/**/*"
     ],
     "eslintconf": [
       "{workspaceRoot}/.eslintrc",
@@ -56,6 +58,18 @@
       ],
       "dependsOn": [
         "^compile"
+      ]
+    },
+    "start": {
+      "inputs": [
+        "default",
+        "^default",
+        {
+          "env": "API_KEY"
+        }
+      ],
+      "dependsOn": [
+        "build"
       ]
     }
   }

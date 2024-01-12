@@ -12,8 +12,8 @@
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
-    "start": "cd web && pnpm run start",
-    "quickstart": "cd web && pnpm run quickstart"
+    "start": "nx run @cristal/web:start",
+    "quickstart": "nx run @cristal/web:quickstart"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "6.13.2",

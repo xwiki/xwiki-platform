@@ -373,7 +373,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     </property>
     <property>
       <code>.xwiki-mention {
-  background-color: $services.mentions.mentionsBackground;
+  background-color: $services.mentions.mentionsColor;
   border-radius: 10px;
   padding: 1px 5px 1px 5px;
   border: 1px solid @dropdown-divider-bg;

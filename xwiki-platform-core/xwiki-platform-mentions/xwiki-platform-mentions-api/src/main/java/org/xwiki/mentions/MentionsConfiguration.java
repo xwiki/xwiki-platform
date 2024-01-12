@@ -48,7 +48,7 @@ public interface MentionsConfiguration
 
     /**
      * 
-     * @return the color for the mentions.
+     * @return the background color for the mentions.
      */
     String getMentionsColor();
 

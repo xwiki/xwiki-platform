@@ -232,6 +232,9 @@ importers:
 
   electron:
     dependencies:
+      '@cristal/lib':
+        specifier: workspace:^
+        version: link:../lib
       electron-updater:
         specifier: 6.1.7
         version: 6.1.7

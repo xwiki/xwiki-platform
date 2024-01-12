@@ -15,7 +15,8 @@
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*",
-      "!{projectRoot}/dist/**/*"
+      "!{projectRoot}/dist/**/*",
+      "!{projectRoot}/vite.config.ts.timestamp-*"
     ],
     "eslintconf": [
       "{workspaceRoot}/.eslintrc",

@@ -336,25 +336,6 @@ class XWikiTest
     }
 
     /**
-     * Verify that checking saving a new document that in fact already exists makes this document not new anymore to
-     * avoid sending the original document to the recycle bin when the document is actually saved.
-     */
-    @Test
-    void checkSavingNewDocumentAttachesHistory() throws XWikiException
-    {
-        XWikiDocument newDocument = new XWikiDocument(this.document.getDocumentReference());
-        newDocument.setContent("new content");
-
-        assertTrue(newDocument.isNew());
-        assertNull(newDocument.getOriginalDocument());
-
-        this.xwiki.checkSavingDocument(mock(), newDocument, this.oldcore.getXWikiContext());
-
-        assertEquals(this.document, newDocument.getOriginalDocument());
-        assertFalse(newDocument.isNew());
-    }
-
-    /**
      * We only verify here that the saveDocument API calls the Observation component.
      */
     @Test

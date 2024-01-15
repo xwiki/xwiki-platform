@@ -357,8 +357,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 }
             }
 
-            this.targetVersion =
-                (!availableMigrations.isEmpty()) ? availableMigrations.lastKey() : new XWikiDBVersion(0);
+            this.targetVersion = !availableMigrations.isEmpty() ? availableMigrations.lastKey() : new XWikiDBVersion(0);
             this.migrations = availableMigrations.values();
         } catch (Exception e) {
             throw new InitializationException("Migration Manager initialization failed", e);
@@ -375,6 +374,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Ensure we don't have two migrations with same DB version.
+     * Note that it's possible to use the ignored migrations feature to bypass this check: if two migrations has same
+     * version one can ignore them in which case there will be only a warning.
      *
      * @throws InitializationException in case we found same DB version or the list of migration cannot be obtained.
      */

@@ -80,7 +80,7 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
-    @Named("compactwiki")
+    @Named("local")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject

@@ -37,6 +37,8 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
 
     private List<WebElement> results;
 
+    private List<WebElement> titles;
+
     /**
      * @return the number of results displayed on the current pre-check page
      */
@@ -105,6 +107,17 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
     }
 
     /**
+     * @param index the index of the title (the first result is index 0)
+     * @return the href element of the title link
+     * @since 16.0.0RC1
+     * @since 15.10.5
+     */
+    public String getTitleHref(int index)
+    {
+        return getTitles().get(index).findElement(By.cssSelector("a")).getAttribute("href");
+    }
+
+    /**
      * Get the list of results and store them in {@link #results} the first time the method is called.
      *
      * @return the list of results
@@ -115,6 +128,14 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
             this.results = getRoot().findElements(By.className("panel-group"));
         }
         return this.results;
+    }
+
+    private List<WebElement> getTitles()
+    {
+        if (this.titles == null) {
+            this.titles = getRoot().findElements(By.cssSelector("h3.group-title"));
+        }
+        return this.titles;
     }
 
     /**

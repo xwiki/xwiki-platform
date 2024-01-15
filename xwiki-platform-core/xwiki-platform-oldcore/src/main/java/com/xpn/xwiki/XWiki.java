@@ -1909,6 +1909,15 @@ public class XWiki implements EventListener
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
+            // If the document is new but the original document is not, make it appear as if the document had
+            // been updated to avoid deleting the document's history.
+            // This can happen when the user has edit but not view right and the document in context is thus an empty
+            // document.
+            if (document.isNew() && !originalDocument.isNew()) {
+                document.setNew(false);
+                document.setRCSVersion(originalDocument.getRCSVersion());
+            }
+
             ObservationManager om = getObservationManager();
 
             // Notify listeners about the document about to be created or updated

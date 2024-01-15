@@ -171,10 +171,10 @@ public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigr
             try {
                 if (entityReference.getType() == EntityType.DOCUMENT) {
                     this.filterPreferenceStore
-                        .saveFilterPreferences((DocumentReference) entityReference, entry.getValue());
+                        .saveFilterPreferences(new DocumentReference(entityReference), entry.getValue());
                 } else {
                     this.filterPreferenceStore
-                        .saveFilterPreferences((WikiReference) entityReference, entry.getValue());
+                        .saveFilterPreferences(new WikiReference(entityReference.getName()), entry.getValue());
                 }
             } catch (NotificationException e) {
                 throw new DataMigrationException(

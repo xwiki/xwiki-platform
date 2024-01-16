@@ -249,8 +249,7 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Rights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=usersgroups.extensionrights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=UserProfile
-                <!--/xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
-                  TODO https://jira.xwiki.org/browse/XWIKI-21772 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Registration
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Invitation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Authentication

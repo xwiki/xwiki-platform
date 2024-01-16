@@ -34,9 +34,9 @@
 -->
 <template>
   <div class="livedata-layout">
-    <div class="description" :id="descriptionId" v-if="hasDescription">
+    <p class="livedata-layout-description" :id="descriptionId" v-if="hasDescription">
       {{ description }}
-    </div>
+    </p>
 
       <!--
         We are using the <keep-alive> tag in order to keep the layout mounted
@@ -169,7 +169,7 @@ export default {
 
 <style scoped lang="less">
 /* Reuse the caption style for the description. */
-.description {
+.livedata-layout-description {
   &:extend(caption);
 }
 </style>

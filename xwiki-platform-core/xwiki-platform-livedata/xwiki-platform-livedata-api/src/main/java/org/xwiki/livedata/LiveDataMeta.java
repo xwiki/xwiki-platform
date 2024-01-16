@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
+import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -293,6 +294,7 @@ public class LiveDataMeta
      * @return an optional textual description of the Live Data
      * @since 16.0.0RC1
      */
+    @Unstable
     public String getDescription()
     {
         return this.description;
@@ -302,6 +304,7 @@ public class LiveDataMeta
      * @param description an optional textual description of the Live Data
      * @since 16.0.0RC1
      */
+    @Unstable
     public void setDescription(String description)
     {
         this.description = description;

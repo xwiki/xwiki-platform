@@ -272,3 +272,4 @@ org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer
 org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
+org.xwiki.internal.document.DocumentOverrideListener

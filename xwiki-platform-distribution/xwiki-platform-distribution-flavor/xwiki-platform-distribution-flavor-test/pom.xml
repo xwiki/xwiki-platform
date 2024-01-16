@@ -287,8 +287,7 @@
                 <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
                   TODO https://jira.xwiki.org/browse/XWIKI-21773 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Syntaxes
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
-                  TODO https://jira.xwiki.org/browse/XWIKI-21775 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=SyntaxHighlighting
                 <!-- Mail -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailSend
@@ -337,15 +336,6 @@
                 /xwiki/bin/view/Main/AllDocs?view=deletedDocs
                 /xwiki/bin/view/Main/AllDocs?view=deletedAttachments
               </urlsToTestAsAdmin>
-              <urlsToTestAsGuest />
-              <rssUrlsToTestAsAdmin>
-                /xwiki/bin/view/Main/DatabaseSearch?xpage=plain&amp;outputSyntax=plain&amp;text=wiki
-                /xwiki/bin/get/Main/DatabaseSearch?outputSyntax=plain&amp;space=&amp;text=wiki
-              </rssUrlsToTestAsAdmin>
-              <rssUrlsToTestAsGuest>
-                /xwiki/bin/view/Main/DatabaseSearch?xpage=plain&amp;outputSyntax=plain&amp;text=wiki
-                /xwiki/bin/get/Main/DatabaseSearch?outputSyntax=plain&amp;space=&amp;text=wiki
-              </rssUrlsToTestAsGuest>
               <!-- Used only in office importer tests -->
               <openOfficeExecutable>${openOfficeExecutable}</openOfficeExecutable>
             </systemPropertyVariables>

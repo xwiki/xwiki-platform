@@ -278,3 +278,4 @@ org.xwiki.security.authservice.internal.StandardXWikiAuthServiceComponent
 org.xwiki.security.authservice.script.AuthServiceScriptService
 org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
+org.xwiki.internal.document.DocumentOverrideListener

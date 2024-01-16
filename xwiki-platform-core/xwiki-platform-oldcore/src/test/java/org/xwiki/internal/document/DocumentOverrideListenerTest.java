@@ -46,39 +46,39 @@ import static org.mockito.Mockito.mock;
 @ComponentList({ DefaultObservationManager.class, DocumentOverrideListener.class })
 class DocumentOverrideListenerTest
 {
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("wiki", "space", "page");
+
+    private static final DocumentReference USER_REFERENCE = new DocumentReference("wiki", "XWiki", "user");
+
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
     @Test
     void savingNewDocument() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        XWikiDocument document = new XWikiDocument(documentReference);
-        this.oldcore.getSpyXWiki().checkSavingDocument(mock(), document, this.oldcore.getXWikiContext());
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        this.oldcore.getSpyXWiki().checkSavingDocument(USER_REFERENCE, document, this.oldcore.getXWikiContext());
     }
 
     @Test
     void savingExistingDocument() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        XWikiDocument document = new XWikiDocument(documentReference);
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
-        document = this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext());
+        document = this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, this.oldcore.getXWikiContext());
         assertFalse(document.isNew());
-        this.oldcore.getSpyXWiki().checkSavingDocument(mock(), document, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().checkSavingDocument(USER_REFERENCE, document, this.oldcore.getXWikiContext());
     }
 
     @Test
     void savingOverridingExistingDocument() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");
-        XWikiDocument document = new XWikiDocument(documentReference);
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
         this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
-        XWikiDocument newDocument = new XWikiDocument(documentReference);
+        XWikiDocument newDocument = new XWikiDocument(DOCUMENT_REFERENCE);
         XWikiException exception = assertThrows(XWikiException.class,
             () -> this.oldcore.getSpyXWiki()
-                .checkSavingDocument(userReference, newDocument, this.oldcore.getXWikiContext()));
+                .checkSavingDocument(USER_REFERENCE, newDocument, this.oldcore.getXWikiContext()));
         assertEquals("Error number 9001 in 9: User [wiki:XWiki.user] has been denied the right to save the "
             + "document [wiki:space.page]. Reason: [The document already exists but the document to be saved is marked "
             + "as new.]", exception.getMessage());

@@ -34,6 +34,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The live data instance id.")
     public void setId(String id)
     {
@@ -43,6 +44,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The comma-separated list of properties to fetch and display.")
     public void setProperties(String properties)
     {
@@ -52,6 +54,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The live data source to use, specified as a component hint.")
     public void setSource(String source)
     {
@@ -61,6 +64,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The live data source parameters, specified as an URL query string.")
     public void setSourceParameters(String sourceParameters)
     {
@@ -70,6 +74,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The properties to sort on the live data initially, specified as a comma-separated list of "
         + "property names, where each property name can be optionally suffixed with the sort order using :asc or "
         + ":desc.")
@@ -81,6 +86,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The initial filters to apply on the live data, specified as an URL query string.")
     public void setFilters(String filters)
     {
@@ -90,6 +96,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The maximum number of live data entries to show on a page.")
     public void setLimit(Integer limit)
     {
@@ -99,6 +106,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The index of the first live data entry to show.")
     public void setOffset(Long offset)
     {
@@ -108,6 +116,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The comma-separated list of layouts the user can choose from to display the live data. "
         + "The first layout in the list will be loaded initially.")
     public void setLayouts(String layouts)
@@ -118,6 +127,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("Show or hide the page size drop down that allows the user to change "
         + "the number of entries displayed per page.")
     public void setShowPageSizeDropdown(Boolean showPageSizeDropdown)
@@ -128,6 +138,7 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     /**
      * {@inheritDoc}
      */
+    @Override
     @PropertyDescription("The comma-separated list of page sizes to display in the page size drop down.")
     public void setPageSizes(String pageSizes)
     {

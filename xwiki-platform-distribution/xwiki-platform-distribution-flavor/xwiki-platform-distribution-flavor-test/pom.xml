@@ -262,8 +262,7 @@
                 <!-- Look and feel -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Themes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=menu.name
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Panels.PanelWizard
-                  TODO https://jira.xwiki.org/browse/XWIKI-21774 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Panels.PanelWizard
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.applications
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.navigation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Presentation

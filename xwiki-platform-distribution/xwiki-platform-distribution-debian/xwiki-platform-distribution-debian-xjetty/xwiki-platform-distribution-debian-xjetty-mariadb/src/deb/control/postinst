@@ -7,8 +7,5 @@ set -e
 # Restart XWiki
 #########################
 
-# Restart XWiki service (only if it's active)
-if systemctl -q is-active xwiki.service
-then
- systemctl xwiki restart
-fi
+# Restart XWiki service
+deb-systemd-invoke restart xwiki.service

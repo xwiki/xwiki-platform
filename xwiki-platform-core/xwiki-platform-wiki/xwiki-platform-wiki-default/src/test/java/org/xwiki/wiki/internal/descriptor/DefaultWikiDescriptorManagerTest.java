@@ -22,6 +22,7 @@ package org.xwiki.wiki.internal.descriptor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -188,18 +189,19 @@ class DefaultWikiDescriptorManagerTest
         XWikiDocument maindocument = mock(XWikiDocument.class);
 
         DefaultWikiDescriptor descriptor3 = new DefaultWikiDescriptor("wikiid3", "wikialias3");
+        descriptor3.setPrettyName("alice");
 
         // Get documents
         when(this.descriptorDocumentHelper.getAllXWikiServerClassDocumentNames()).thenReturn(
             Arrays.asList("XWiki.XWikiServerWikiid1", "XWiki.XWikiServerWikiid2", "XWiki.XWikiServerWikiid3"));
         when(this.descriptorDocumentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerWikiid1"))
-            .thenReturn("wikiid1");
+            .thenReturn("dev_wikiid1");
         when(this.descriptorDocumentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerWikiid2"))
             .thenReturn("wikiid2");
         when(this.descriptorDocumentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerWikiid3"))
             .thenReturn("wikiid3");
         when(this.cache.getFromId("wikiid3")).thenReturn(descriptor3);
-        when(this.descriptorDocumentHelper.getDocumentFromWikiId("wikiid1")).thenReturn(document1);
+        when(this.descriptorDocumentHelper.getDocumentFromWikiId("dev_wikiid1")).thenReturn(document1);
         when(this.descriptorDocumentHelper.getDocumentFromWikiId("wikiid2")).thenReturn(document2);
         when(this.descriptorDocumentHelper.getDocumentFromWikiId("xwiki")).thenReturn(maindocument);
 
@@ -211,13 +213,18 @@ class DefaultWikiDescriptorManagerTest
         when(document2.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
         // Get a Wiki from the Wiki Descriptor Builder
-        DefaultWikiDescriptor descriptor1 = new DefaultWikiDescriptor("wikiid1", "wikialias1");
+        DefaultWikiDescriptor descriptor1 = new DefaultWikiDescriptor("dev_wikiid1", "wikialias1");
         DefaultWikiDescriptor descriptor2 = new DefaultWikiDescriptor("wikiid2", "wikialias2");
+        descriptor1.setPrettyName("John");
         when(this.wikiDescriptorBuilder.buildDescriptorObject(anyList(), any(XWikiDocument.class)))
             .thenReturn(descriptor1, descriptor2);
 
         Collection<WikiDescriptor> descriptors = this.descriptorManager.getAll();
         assertEquals(4, descriptors.size());
+
+        // The descriptors should be sorted by pretty name (with a fallback to wiki id).
+        assertEquals(Arrays.asList("wikiid3", "dev_wikiid1", "wikiid2", "xwiki"),
+            descriptors.stream().map(WikiDescriptor::getId).collect(Collectors.toList()));
 
         // Verify that XWiki.XWikiServerWikiid3 has not be loaded
         verify(this.descriptorDocumentHelper, never()).getDocumentFromWikiId("wikiid3");
@@ -236,7 +243,7 @@ class DefaultWikiDescriptorManagerTest
         // When the wiki exists
         assertTrue(this.descriptorManager.exists("wikiid1"));
 
-        // When the wiki does not exists
+        // When the wiki does not exist
         assertFalse(this.descriptorManager.exists("wikiid2"));
     }
 

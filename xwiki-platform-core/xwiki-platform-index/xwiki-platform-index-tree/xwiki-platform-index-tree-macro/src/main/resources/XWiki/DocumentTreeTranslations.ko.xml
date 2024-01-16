@@ -1,0 +1,94 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ko">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=페이지 트리
+rendering.macro.documentTree.description=XWiki 페이지 의 트리를 표시합니다 .
+rendering.macro.documentTree.parameter.readOnly.name=읽기 전용
+rendering.macro.documentTree.parameter.readOnly.description=사용자에게 필요한 권한이 있는 경우 트리 구조를 수정할 수 있어야 합니까?
+rendering.macro.documentTree.parameter.showWikis.name=위키 표시
+rendering.macro.documentTree.parameter.showWikis.description=위키 노드를 표시할지 여부. 이는 메인 위키에서만 사용할 수 있으며 트리 소스가 프로그래밍 권한으로 저장되어 있는 경우에만 사용할 수 있습니다.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=위키 예쁜 이름 표시
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=위키 노드를 표시할 때 위키 ID 대신 위키 예쁜 이름을 표시합니다.
+rendering.macro.documentTree.parameter.showSpaces.name=공간 표시
+rendering.macro.documentTree.parameter.showSpaces.description=공간 노드를 표시할지 여부입니다. 공간 노드가 표시되면 페이지는 공간별로 그룹화됩니다.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=페이지 제목 표시
+rendering.macro.documentTree.parameter.showDocumentTitle.description=페이지 노드를 표시할 때 페이지 이름 대신 페이지 제목을 표시할지 여부입니다.
+rendering.macro.documentTree.parameter.showTranslations.name=번역 표시
+rendering.macro.documentTree.parameter.showTranslations.description=페이지의 번역을 표시할지 여부입니다.
+rendering.macro.documentTree.parameter.showAttachments.name=첨부 파일 표시
+rendering.macro.documentTree.parameter.showAttachments.description=페이지의 첨부 파일을 표시할지 여부입니다.
+rendering.macro.documentTree.parameter.showObjects.name=객체 표시
+rendering.macro.documentTree.parameter.showObjects.description=페이지의 개체를 표시할지 여부입니다.
+rendering.macro.documentTree.parameter.showClassProperties.name=클래스 속성 표시
+rendering.macro.documentTree.parameter.showClassProperties.description=클래스를 정의하는 페이지에 대한 클래스 속성을 표시할지 여부입니다.
+rendering.macro.documentTree.parameter.root.name=뿌리
+rendering.macro.documentTree.parameter.root.description=루트 노드 ID입니다. 이는 특정 노드(지정된 루트)의 하위 항목만 표시하려는 경우에 유용합니다. 트리는 첫 번째 수준에 있는 루트 노드의 하위 항목을 표시하므로 루트 노드는 실제로 표시되지 않습니다. 루트 노드가 지정되지 않으면 전체 트리가 표시됩니다. 노드 식별자의 형식은 엔터티 유형:entityReference입니다. 여기서 엔터티 유형은 예를 들어 wiki, 공간, 문서일 수 있습니다. 예: wiki: xwiki , 공백: xwiki :Main, 문서: xwiki :Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=루트 표시
+rendering.macro.documentTree.parameter.showRoot.description=루트 노드를 표시할지 여부입니다. 루트 노드는 일반적으로 트리가 표시되는 컨텍스트(예: 트리 앞의 레이블)에서 암시되므로 기본적으로 표시되지 않습니다. 그러나 루트 노드를 표시하려는 경우가 있습니다. 루트 아래에 새 노드를 생성할 수 있기 위해서입니다.
+rendering.macro.documentTree.parameter.compact.name=콤팩트
+rendering.macro.documentTree.parameter.compact.description=사용 가능한 수평 공간이 제한되어 있다면 이를 true로 설정해야 할 것입니다. 그 결과 노드 아이콘과 이를 연결하는 가장자리가 숨겨집니다. 노드 레이블을 완전히 표시하면서 트리가 수평 공간을 덜 차지하도록 일부 특수 스타일도 적용됩니다.
+rendering.macro.documentTree.parameter.links.name=연결
+rendering.macro.documentTree.parameter.links.description=노드 레이블이 링크(앵커)로 보이고 작동해야 하는지 여부를 지정합니다.
+rendering.macro.documentTree.parameter.checkboxes.name=체크박스
+rendering.macro.documentTree.parameter.checkboxes.description=사용자가 여러 트리 노드를 선택할 수 있도록 각 트리 노드 앞에 확인란을 표시할지 여부입니다.
+rendering.macro.documentTree.parameter.openTo.name=에 열려있다
+rendering.macro.documentTree.parameter.openTo.description=트리를 열 노드의 ID입니다. 트리의 루트까지 지정된 노드의 모든 조상도 열립니다. 노드 ID의 형식은 루트 매개변수에 사용되는 형식입니다.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=볼 수 있는 것만 표시
+rendering.macro.documentTree.parameter.showOnlyViewable.description=현재 사용자에게 보기 권한이 있는 Wiki, 공간 및 페이지 노드만 표시합니다. 이것이 false로 설정되면 현재 사용자가 볼 수 없는 위키, 공간 및 페이지 노드가 해당 이름을 사용하여 트리에 나열됩니다. 하지만 사용자는 해당 링크를 따라가면서 자신의 콘텐츠를 볼 수 없습니다(사용자는 해당 링크의 존재만 인식하게 됩니다).
+rendering.macro.documentTree.parameter.filterByClass.name=클래스별로 필터링
+rendering.macro.documentTree.parameter.filterByClass.description=지정된 유형의 개체가 있는 페이지만 표시합니다. 이 매개변수의 값은 클래스 정의를 보유하는 XWiki 페이지 의 전체 이름입니다 . 예를 들어 'Blog.CategoryClass'를 사용하면 블로그 카테고리를 나타내는 페이지만 표시할 수 있습니다. 트리에 표시되는 페이지 유형을 제한하지 않으려면 이 매개변수를 비워 두세요.
+rendering.macro.documentTree.parameter.finder.name=파인더
+rendering.macro.documentTree.parameter.finder.description=트리 노드를 찾는 데 사용할 수 있는 텍스트 입력을 표시합니다. 입력 내용은 트리 위에 표시되며 입력할 때 트리의 내용을 기반으로 제안 사항을 제공합니다. 제안을 선택하면 트리가 해당 노드까지 확장됩니다.
+rendering.macro.documentTree.parameter.hierarchyMode.name=페이지 계층 모드
+rendering.macro.documentTree.parameter.hierarchyMode.description=페이지 간에 사용할 계층 구조를 지정합니다. 가능한 값은 "참조"(기본값) 및 "상위 하위"입니다. "참조"가 사용되면 페이지 계층 구조는 페이지 참조, 특히 페이지 참조의 중첩된 공백 구성 요소만 사용하여 정의됩니다. "상위 하위"가 사용되는 경우 계층 구조는 데이터베이스의 "상위" 페이지 필드에 의해 정의된 상위/하위 관계를 기반으로 합니다.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=숨겨진 문서 필터링
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=트리에 숨겨진 문서를 포함하려면 이 매개변수를 false로 설정하십시오. 그렇지 않고 값이 true이면 현재 사용자의 기본 설정에 따라 숨겨진 문서가 제외되거나 포함됩니다.
+rendering.macro.documentTree.parameter.limit.name=한계
+rendering.macro.documentTree.parameter.limit.description=처음으로 상위 노드를 확장할 때 표시할 최대 하위 노드 수입니다. 나머지 하위 노드는 "more ..." 링크를 통해 액세스할 수 있습니다. 이 매개변수는 기본적으로 자식 노드의 페이지를 매기는 데 사용되므로 자식 노드 수가 많을 때 트리 크기를 조정하는 데 도움이 됩니다.
+rendering.macro.documentTree.parameter.exclusions.name=제외
+rendering.macro.documentTree.parameter.exclusions.description=트리에서 제외할 노드 목록입니다. 노드는 해당 ID로 지정되며 쉼표로 구분됩니다.
+index.documentTree.empty=페이지를 찾을 수 없습니다
+index.documentTree.more={0}개 더 ...
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=하위 문서 표시
+rendering.macro.documentTree.parameter.showChildDocuments.description=문서 상위 필드를 기반으로 하위 문서를 표시할지 여부입니다.
+</content>
+  </xwikidoc>

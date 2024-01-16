@@ -34,7 +34,6 @@ import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotifi
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.Select;
 import org.xwiki.test.ui.po.ViewPage;
@@ -82,7 +81,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * Represents the available email changes settings values.
      * @since 13.2RC1
      */
-    @Unstable
     public enum EmailDiffType
     {
         /** Represents the standard diff. */
@@ -96,7 +94,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
      * Represents the available autowatch mode values.
      * @since 13.2RC1
      */
-    @Unstable
     public enum AutowatchMode
     {
         /** Never autowatch. */

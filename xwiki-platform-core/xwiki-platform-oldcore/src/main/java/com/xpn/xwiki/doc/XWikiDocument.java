@@ -164,7 +164,6 @@ import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.XMLUtils;
-import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -218,6 +217,32 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static final String TM_FAILEDDOCUMENTPARSE = "core.document.error.failedParse";
 
     private static final String CLOSE_HTML_MACRO = "{{/html}}";
+
+    /**
+     * A list of strings that are special in XWiki syntax or HTML. They don't contain strings that only have a
+     * special meaning at the start of a line.
+     */
+    private static final String[] SPECIAL_SYMBOLS = new String[] { "&", "<", "(%", "(((", "[[", "{", "**", "//", "--",
+        "__", "^^", ",,", "##", "image:", "attach:", "\\\\", "mailto:", "~" };
+
+    /**
+     * Pattern that matches special symbols that are special at the beginning of the line or the beginning of the
+     * string (as the string could be at the beginning of the line). As most of them also accept an arbitrary number of
+     * spaces, it is easier to match them using a regular expression. These are the starting characters of headings,
+     * lists, tables and quotes. Syntax for parameters and horizontal lines aren't included as they are already
+     * matched by the special symbols defined above.
+     */
+    private static final Pattern SPECIAL_SYMBOL_PATTERN = Pattern.compile("(\\n|^)"
+        // Syntax that allows an arbitrary number spaces at the beginning of the line.
+        + "(\\s*("
+        // Headings
+        + "="
+        // Lists - note that they need a space after the list symbol
+        + "|([*]+|[1*]+\\.|[:;])[:;]*\\s"
+        // Tables
+        + "|\\||![!=]"
+        // Quote doesn't allow spaces before the ">" symbol
+        + ")|>)");
 
     /**
      * An attachment waiting to be deleted at next document save.
@@ -1635,7 +1660,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public String getRenderedContent(String text, Syntax sourceSyntaxId, boolean restrictedTransformationContext,
         XWikiDocument sDocument, boolean isolated, XWikiContext context)
     {
@@ -2552,7 +2576,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if ((this.archive == null || this.archive.get() == null)) {
             XWikiDocumentArchive arch;
-            // A document not comming from the database cannot have an archive stored in the database
+            // A document not coming from the database cannot have an archive stored in the database
             if (this.isNew()) {
                 arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             } else {
@@ -2592,7 +2616,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return arch;
         }
 
-        // A document not comming from the database cannot have an archive stored in the database
+        // A document not coming from the database cannot have an archive stored in the database
         if (this.isNew()) {
             arch = new XWikiDocumentArchive(getDocumentReference().getWikiReference(), getId());
             setDocumentArchive(arch);
@@ -3056,7 +3080,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If object creation failed.
      * @since 14.0RC1
      */
-    @Unstable
     public BaseObject getXObject(ObjectReference objectReference, boolean create, XWikiContext context)
         throws XWikiException
     {
@@ -3583,37 +3606,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
-    public String displayTooltip(String fieldname, XWikiContext context)
-    {
-        try {
-            BaseObject object = getXObject();
-            if (object == null) {
-                object = getFirstObject(fieldname, context);
-            }
-            return displayTooltip(fieldname, object, context);
-        } catch (Exception e) {
-            return "";
-        }
-    }
 
-    public String displayTooltip(String fieldname, BaseObject obj, XWikiContext context)
-    {
-        String result = "";
-
-        try {
-            PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
-            String tooltip = pclass.getTooltip(context);
-            if ((tooltip != null) && (!tooltip.trim().equals(""))) {
-                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
-                    + "\" class=\"tooltip_image\" align=\"middle\" />";
-                result = context.getWiki().addTooltip(img, tooltip, context);
-            }
-        } catch (Exception e) {
-
-        }
-
-        return result;
-    }
 
     /**
      * @param fieldname the name of the field to display
@@ -3905,10 +3898,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // We test if we're inside the rendering engine since it's also possible that this display() method is
             // called directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
-            // Add the {{html}}{{/html}} only when result really contains html or { which could be part of an XWiki
-            // macro syntax since it's not needed for pure text
+            // Add the {{html}}{{/html}} only when result contains special characters from HTML or XWiki syntax since
+            // it's not needed for pure text
             if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
-                && (HTMLUtils.containsElementText(result) || result.indexOf("{") != -1))
+                && (StringUtils.containsAny(result, SPECIAL_SYMBOLS) || SPECIAL_SYMBOL_PATTERN.matcher(result).find()))
             {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 // Escape closing HTML macro syntax.
@@ -4216,7 +4209,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public List<String> getTagsList(XWikiContext context)
     {
-        List<String> tagList = null;
+        List<String> tagList = List.of();
 
         BaseProperty prop = getTagProperty();
         if (prop != null) {
@@ -4377,7 +4370,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param editForm the form from which to read the list of files.
      * @since 14.3RC1
      */
-    @Unstable
     public void readTemporaryUploadedFiles(EditForm editForm)
     {
         getTemporaryAttachmentManager().attachTemporaryAttachmentsInDocument(this, editForm.getTemporaryUploadedFiles());
@@ -4391,7 +4383,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException If an error occurs.
      * @since 14.0RC1
      */
-    @Unstable
     public void readAddedUpdatedAndRemovedObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         // We add the new objects that have been submitted in the form, before filling them with their values.
@@ -4858,7 +4849,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Same as {@link #equals(Object)} but only for actual datas of the document.
      * <p>
      * The goal being to compare two versions of the same document this method skip every version/reference/author
-     * related information. For example it allows to compare a document comming from a another wiki and easily check if
+     * related information. For example it allows to compare a document coming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      *
      * @param otherDocument the document to compare
@@ -5887,7 +5878,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the entity references pointing to either document or attachments. If {@code null}, an error happened
      * @since 14.2RC1
      */
-    @Unstable
     public Set<EntityReference> getUniqueLinkedEntities(XWikiContext context)
     {
         // Return both document and attachment references.
@@ -6807,11 +6797,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Return the document in the provided language.
      * <p>
-     * This method return this if the provided language does not exists. See
+     * This method return this if the provided language does not exist. See
      *
      * @param language the language of the document to return
      * @param context the XWiki Context
-     * @return the document in the provided language or this if the provided language does not exists
+     * @return the document in the provided language or this if the provided language does not exist
      * @throws XWikiException error when loading the document
      * @deprecated use {@link #getTranslatedDocument(Locale, XWikiContext)} instead
      */
@@ -6824,11 +6814,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Return the document in the provided language.
      * <p>
-     * This method return this if the provided language does not exists. See
+     * This method return this if the provided language does not exist. See
      *
      * @param locale the locale of the document to return
      * @param context the XWiki Context
-     * @return the document in the provided language or this if the provided language does not exists
+     * @return the document in the provided language or this if the provided language does not exist
      * @throws XWikiException error when loading the document
      */
     public XWikiDocument getTranslatedDocument(Locale locale, XWikiContext context) throws XWikiException
@@ -9241,7 +9231,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
@@ -9261,7 +9251,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Apply modification comming from provided document.
+     * Apply modification coming from provided document.
      * <p>
      * Thid method does not take into account versions and author related informations and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
@@ -9470,7 +9460,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.4.4
      * @since 13.10.10
      */
-    @Unstable
     public void initialize()
     {
         // There is no syntax by default in a new document and the default one is retrieved from the configuration

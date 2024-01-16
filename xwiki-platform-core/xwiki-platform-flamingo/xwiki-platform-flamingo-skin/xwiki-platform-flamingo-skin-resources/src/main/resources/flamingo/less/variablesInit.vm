@@ -261,6 +261,8 @@
   @state-danger-bg:                     #f8ecec;
   @state-success-bg:                    #e5f3df;
   @state-info-bg:                       #e1f1f9;
+  ## We override the @brand-danger value from bootstrap as it does not pass contrast checks on #fff
+  @brand-danger:                        #cc3333;
 #end
 
 ##############################################
@@ -271,10 +273,6 @@
 
 ## Fix font path
 @icon-font-path:                      "$services.webjars.url('bootstrap', 'fonts')/";
-
-## Compute the open sans webjar path using velocity here as it is not possible in the theme configurations.
-## Since 15.9RC1
-@open-sans-font-path:                  "$services.webjars.url('org.webjars.bower:open-sans', 'css/open-sans.min.css')";
 
 ##
 ## XWiki variables: LESS variables specific to XWiki

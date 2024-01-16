@@ -20,8 +20,11 @@
 package org.xwiki.platform.security.requiredrights.internal;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
@@ -35,7 +38,13 @@ import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.platform.security.requiredrights.internal.configuration.RequiredRightsConfiguration;
+import org.xwiki.platform.security.requiredrights.internal.editconfirmationchecker.RequiredRightAnalysisResultSkipValue;
+import org.xwiki.platform.security.requiredrights.internal.editconfirmationchecker.RequiredRightsChangedResultSkipValue;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -51,7 +60,7 @@ import static com.xpn.xwiki.doc.XWikiDocument.CKEY_TDOC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -106,6 +115,10 @@ class RequiredRightsEditConfirmationCheckerTest
 
     @Mock
     private ScriptContext scriptContext;
+
+    @Inject
+    @Named("html/5.0")
+    private BlockRenderer htmlBlockRender;
 
     @BeforeEach
     void setUp() throws Exception
@@ -168,12 +181,32 @@ class RequiredRightsEditConfirmationCheckerTest
     @Test
     void check()
     {
+        Block summary = new WordBlock("summary");
+        Block details = new WordBlock("details");
+
         when(this.requiredRightsConfiguration.getDocumentProtection()).thenReturn(WARNING);
+        doAnswer(invocation -> {
+            DefaultWikiPrinter printer = invocation.getArgument(1);
+            WordBlock wordBlock = invocation.getArgument(0);
+            printer.print(wordBlock.getWord());
+            return null;
+        }).when(this.htmlBlockRender).render(any(Block.class), any());
+
         RequiredRightsChangedResult result = new RequiredRightsChangedResult();
-        result.addToAdded(mock(RequiredRightAnalysisResult.class));
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        result.add(new RequiredRightAnalysisResult(documentReference,
+                () -> summary,
+                () -> details, List.of()),
+            Right.SCRIPT,
+            true,
+            false);
         when(this.requiredRightsChangedFilter.filter(any(), any())).thenReturn(result);
-        assertEquals(Optional.of(new EditConfirmationCheckerResult(XDOM, false)),
-            this.editConfirmationChecker.check());
+        Optional<EditConfirmationCheckerResult> expected = Optional.of(new EditConfirmationCheckerResult(XDOM, false,
+            new RequiredRightsChangedResultSkipValue(Map.of(Right.SCRIPT, false), Map.of(),
+                List.of(new RequiredRightAnalysisResultSkipValue(documentReference, List.of(), "summary", "details")),
+                List.of())));
+        Optional<EditConfirmationCheckerResult> check = this.editConfirmationChecker.check();
+        assertEquals(expected, check);
         verify(this.templateManager)
             .executeNoException("security/requiredrights/requiredRightsEditConfirmationChecker.vm");
     }

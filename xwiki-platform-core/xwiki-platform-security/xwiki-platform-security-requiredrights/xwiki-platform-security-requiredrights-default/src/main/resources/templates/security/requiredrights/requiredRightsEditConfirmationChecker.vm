@@ -26,10 +26,11 @@
 #macro (displayResults $analysis)
   #foreach ($entry in $analysis.entrySet())
 
-  {{html wiki='false'}}
+  {{html}}
     #set ($entityReference = $entry.key)
     #define($elementUrl)
       #getHierarchyPathData_url($entityReference)
+      $url
     #end
     #if ($entityReference.type == 'DOCUMENT')
       #set ($translatedDocument = $xwiki.getDocument($entityReference).translatedDocument)
@@ -37,7 +38,7 @@
     #else
       #set ($entityLabel = $entityReference.name)
     #end
-    <h3>
+    <h3 class="group-title">
       <a href="$escapetool.xml($elementUrl)">
         $escapetool.xml($entityLabel)
       </a>
@@ -71,26 +72,71 @@
   {{/html}}
   #end
 #end
+#macro(displayRightsSentence $rightsMap $translationKey)
+  #set ($footnoteChar = $services.localization.render('security.requiredrights.confirmationChecker.footnoteChar'))
+  #if(!$rightsMap.isEmpty())
+  {{html}}
+    <div>
+      #set ($translatedMessage = $services.localization.render($translationKey))
+      <p>$escapetool.xml($translatedMessage)</p>
+      <ul>
+      #foreach ($entry in $rightsMap.entrySet())
+        <li>$entry.key#if ($entry.value)<sup>$escapetool.xml($footnoteChar)</sup>#end</li>
+      #end
+      </ul>
+    </div>
+  {{/html}}
+
+  #end
+#end
 #set ($counter = 0)
 #initRequiredSkinExtensions()
-#set ($discard = $xwiki.ssfx.use('css/security/requiredrights/requiredRightsEditConfirmationChecker.css'))
-{{/velocity}}{{velocity}}
+#set ($discard = $xwiki.ssrx.use('css/security/requiredrights/requiredRightsEditConfirmationChecker.css'))
+#set ($discard = $xwiki.jsrx.use('js/security/requiredrights/requiredRightsEditConfirmationChecker.js'))
+{{/velocity}}
+
+{{velocity}}
+#displayRightsSentence($analysisResults.getAddedRights() 'security.requiredrights.confirmationChecker.addedRights')
+#displayRightsSentence($analysisResults.getRemovedRights() 'security.requiredrights.confirmationChecker.removedRights')
+#if ($analysisResults.hasRightWithManualReviewNeeded())
+  #set ($footnoteMessage = 
+    $services.localization.render( 'security.requiredrights.confirmationChecker.footnoteSentence', [
+      $services.localization.render('security.requiredrights.confirmationChecker.footnoteChar')
+    ]))
+  $services.rendering.escape($footnoteMessage, 'xwiki/2.1')
+
+#end
 #if ($analysisResults.hasAdded() || $analysisResults.hasRemoved())##
-(% id='requiredRightsResults' %)(((
-  ((({{translation key='security.requiredrights.confirmationChecker.explanations'/}})))
+{{html}}
+<a href="#" class="required-rights-advanced-toggle" aria-controls="requiredRightsResults" aria-expanded="false">
+  <span class="toggle-expand">
+    $services.icon.renderHTML('caret-right')
+    $escapetool.xml($services.localization.render('security.requiredrights.confirmationChecker.showDetails'))
+  </span>
+  <span class="toggle-collapse hidden">
+    $services.icon.renderHTML('caret-down')
+    $escapetool.xml($services.localization.render('security.requiredrights.confirmationChecker.hideDetails'))
+  </span>
+</a>
+{{/html}}
+
+(% class='hidden required-rights-results' aria-labelledby="advanced-toggle" aria-expanded="false" %)(((
   #if ($analysisResults.hasAdded())
-    \\
-    ((({{translation key='security.requiredrights.confirmationChecker.explanations.addedRights'/}})))
+    ((({{translation key='security.requiredrights.confirmationChecker.advanced.explanations.addedRights'/}})))
     #displayResults($analysisResults.getAddedAsMap())
   #end
-  #if($analysisResults.hasRemoved())
+  #if($analysisResults.hasAdded() && $analysisResults.hasRemoved())
     \\
-    ((({{translation key='security.requiredrights.confirmationChecker.explanations.removedRights'/}})))
+  #end
+  #if($analysisResults.hasRemoved())
+    ((({{translation key='security.requiredrights.confirmationChecker.advanced.explanations.removedRights'/}})))
     #displayResults($analysisResults.getRemovedAsMap())
   #end
   )))
 #end
-{{/velocity}}{{velocity output='false'}}
+{{/velocity}}
+
+{{velocity output='false'}}
 #getRequiredSkinExtensions($requiredSkinExtensions)
 #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 {{/velocity}}

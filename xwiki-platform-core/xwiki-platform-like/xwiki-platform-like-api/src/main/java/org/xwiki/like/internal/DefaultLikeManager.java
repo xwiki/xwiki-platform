@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -249,7 +248,7 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
                 limit,
                 RatingsManager.RatingQueryField.UPDATED_DATE,
                 false);
-            return ratings.stream().map(Rating::getReference).collect(Collectors.toList());
+            return ratings.stream().map(Rating::getReference).toList();
         } catch (RatingsException e) {
             throw new LikeException(
                 String.format("Error when trying to retrieve user likes for user [%s]", source), e);
@@ -351,7 +350,7 @@ public class DefaultLikeManager implements LikeManager, Initializable, Disposabl
         try {
             List<Rating> ratings = this.ratingsManager
                 .getRatings(queryMap, offset, limit, RatingsManager.RatingQueryField.UPDATED_DATE, false);
-            return ratings.stream().map(Rating::getAuthor).collect(Collectors.toList());
+            return ratings.stream().map(Rating::getAuthor).toList();
         } catch (RatingsException e) {
             throw new LikeException(String.format("Error while getting likers of [%s]", target), e);
         }

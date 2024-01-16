@@ -177,8 +177,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         List<String> javaOpts = new ArrayList<>();
 
-        // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
-        // have been fixed.
+        // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
+        // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
+        // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
+        // run on Java 17+.
+        // PS: We could check the tag and verify if it contains "jdkNN" or "jreNN" where NN >= 17 but the problem is
+        // that there are plenty of tags that don't mention the jdk or jre (like "10" for example which runs on Java 21
+        // ATM).
         if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
             addJava17AddOpens(javaOpts);
         }
@@ -424,8 +429,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private void addJava17AddOpens(List<String> list)
     {
-        list.add("--add-opens java.base/java.lang=ALL-UNNAMED");
-        list.add("--add-opens java.base/java.util=ALL-UNNAMED");
-        list.add("--add-opens java.base/java.concurrent=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.lang=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.io=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.util=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.util.concurrent=ALL-UNNAMED");
     }
 }

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 
 /**
  * This interface characterise a notification filter that can be enabled or disabled in the preferences of every user.
@@ -31,7 +32,7 @@ import org.xwiki.notifications.NotificationFormat;
  * @version $Id$
  * @since 10.1RC1
  */
-public interface ToggleableNotificationFilter
+public interface ToggleableNotificationFilter extends NotificationFilter
 {
     /**
      * @return either or not this filter should be enabled by default

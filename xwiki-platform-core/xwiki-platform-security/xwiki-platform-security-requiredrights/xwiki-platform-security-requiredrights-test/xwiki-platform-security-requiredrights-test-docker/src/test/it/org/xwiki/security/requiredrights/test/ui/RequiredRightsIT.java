@@ -34,8 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 15.9RC1
  */
 @UITest(properties = {
-    "xwikiPropertiesAdditionalProperties=security.requiredRights.protection=warning",
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
+        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
 class RequiredRightsIT
 {
@@ -53,12 +53,50 @@ class RequiredRightsIT
 
         setup.gotoPage(testReference, "edit");
 
-        RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement();
+        RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement()
+            .toggleDetails();
         assertEquals(1, requiredRightsPreEditCheckElement.count());
         assertEquals("The document's title contains \"#\" or \"$\" which might be executed as Velocity code "
                 + "if the document's author has script or programming rights.",
             requiredRightsPreEditCheckElement.getSummary(0));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
-        assertEquals("The title is [Hello $a].", requiredRightsPreEditCheckElement.getDetailedMessage(0));
+        requiredRightsPreEditCheckElement.waitForDetailedMessage(0, "The title is [Hello $a].");
+        assertEquals(setup.getURL(testReference.getLastSpaceReference()) + "/",
+            requiredRightsPreEditCheckElement.getTitleHref(0));
+    }
+
+    @Test
+    void checkContentWithVelocityMacro(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+
+        setup.deletePage(testReference);
+
+        setup.createUserAndLogin("U1", "U1p");
+
+        // Create a page with two velocity macros, by an user without script right.
+        setup.createPage(testReference, "{{velocity}}macro1{{/velocity}}\n"
+            + "{{velocity}}macro2{{/velocity}}", "");
+
+        setup.loginAsSuperAdmin();
+
+        setup.gotoPage(testReference, "edit");
+
+        RequiredRightsPreEditCheckElement requiredRightsPreEditCheckElement = new RequiredRightsPreEditCheckElement()
+            .toggleDetails();
+        assertEquals(2, requiredRightsPreEditCheckElement.count());
+        assertEquals("A [velocity] scripting macro requires script rights.",
+            requiredRightsPreEditCheckElement.getSummary(0));
+        requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
+        requiredRightsPreEditCheckElement.waitForDetailedMessage(0, "Content\n"
+            + "the velocity script to execute\n"
+            + "macro1");
+
+        assertEquals("A [velocity] scripting macro requires script rights.",
+            requiredRightsPreEditCheckElement.getSummary(1));
+        requiredRightsPreEditCheckElement.toggleDetailedMessage(1);
+        requiredRightsPreEditCheckElement.waitForDetailedMessage(1, "Content\n"
+            + "the velocity script to execute\n"
+            + "macro2");
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>15.10-SNAPSHOT</version>
+    <version>16.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -255,8 +255,8 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Annotations
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Invitation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Search
-                /xwiki/bin/import/XWiki/Import?editor=globaladmin&amp;section=Import
-                /xwiki/bin/admin/XWiki/Export?editor=globaladmin&amp;section=Export
+                /xwiki/bin/import/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Import
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Export
                 /xwiki/bin/edit/XWiki/XWikiPreferences?editor=wysiwyg
                 /xwiki/bin/edit/XWiki/XWikiPreferences?editor=wiki
                 /xwiki/bin/edit/XWiki/XWikiPreferences?editor=object

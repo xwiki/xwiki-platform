@@ -25,9 +25,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -207,18 +205,16 @@ public class TreeNodeElement extends BaseElement
      */
     public TreeNodeElement waitForIt()
     {
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                WebElement element = getElement();
-                try {
-                    return !Boolean.valueOf(element.getAttribute("aria-busy"));
-                } catch (StaleElementReferenceException e) {
-                    // The element has just been replaced. Try again.
-                    return false;
-                }
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                // The aria-busy attribute is not directly on the li element, but it's on the element located as a
+                // child of the li in the DOM.
+                WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.id(String.format("%s_anchor",
+                    getId())));
+                return !Boolean.parseBoolean(anchor.getAttribute("aria-busy"));
+            } catch (StaleElementReferenceException e) {
+                // The element has just been replaced. Try again.
+                return false;
             }
         });
         return this;

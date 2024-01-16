@@ -53,7 +53,7 @@
       &lt;span class="xHint"&gt;$services.localization.render('image.style.administation.newImageStyle.label')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
-      &lt;input id="targetTitle" placeholder="$services.localization.render('image.style.administation.newImageStyle.placeHolder')" type="text" value="" required&gt;
+      &lt;input id="targetTitle" placeholder="$services.localization.render('image.style.administation.newImageStyle.placeHolder')" type="text" value=""&gt;
       &lt;input id="targetTitleActual" type="hidden" name="docName" value=""/&gt;
       &lt;span id="targetTitleActualMessage " class="xHint"&gt;&lt;/span&gt;
     &lt;/dd&gt;
@@ -243,7 +243,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
     let timeout;
     return function (...args) {
       clearTimeout(timeout);
-      console.log(timeout)
       timeout = setTimeout(() =&gt; callback.apply(this, args), delay);
     };
   }
@@ -264,10 +263,15 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
     }).catch((error) =&gt; {
       console.log(error);
     }).finally(() =&gt; {
-      if(targetTitleActual.val() !== '') {
+      if (targetTitleActual.val() !== '') {
         submitButton.prop('disabled', false);
       }
-      $('#targetTitleActualMessage').text(l10n.get('newImageStyle.normalizedTitle', targetTitleActual.val()));
+      var message = '';
+      // The result message is only displayed if some content was entered in the name field.
+      if (targetTitle.val() !== '') {
+        message = l10n.get('newImageStyle.normalizedTitle', targetTitleActual.val());
+      }
+      $('#targetTitleActualMessage').text(message);
     });
   }, 500);
 

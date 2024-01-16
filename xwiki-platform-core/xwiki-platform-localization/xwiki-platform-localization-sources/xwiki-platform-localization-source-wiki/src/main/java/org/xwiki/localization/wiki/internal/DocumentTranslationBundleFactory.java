@@ -56,6 +56,7 @@ import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -301,7 +302,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         }
 
         if (document.isNew()) {
-            throw new TranslationBundleDoesNotExistsException(String.format("Document [%s] does not exists",
+            throw new TranslationBundleDoesNotExistsException(String.format("Document [%s] does not exist",
                 documentReference));
         }
 
@@ -324,7 +325,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         try {
             documentBundle =
                 new ComponentDocumentTranslationBundle(ID_PREFIX, document.getDocumentReference(),
-                    this.componentManagerProvider.get(), this.translationParser, descriptor);
+                    this.componentManagerProvider.get(), this.translationParser, descriptor, this);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
         }
@@ -435,6 +436,23 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     }
 
     /**
+     * Checks that the author of a document defining a translation bundle has the necessary rights to make it
+     * available, based on the scope of the default locale translation bundle.
+     *
+     * @param document the document defining the translation bundle to check
+     * @param defaultLocaleDocument the document containing the default locale translation bundle
+     * @throws AccessDeniedException when the document author does not have enough rights for the defined scope
+     */
+    protected void checkRegistrationAuthorizationForDocumentLocaleBundle(XWikiDocument document,
+        XWikiDocument defaultLocaleDocument) throws AccessDeniedException
+    {
+        Scope scope = getScope(defaultLocaleDocument);
+        if (scope != null && scope != Scope.ON_DEMAND) {
+            checkRegistrationAuthorization(document, scope);
+        }
+    }
+
+    /**
      * @param document the translation document
      * @param scope the scope
      * @throws AccessDeniedException thrown when the document author does not have enough right for the provided
@@ -442,18 +460,24 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     private void checkRegistrationAuthorization(XWikiDocument document, Scope scope) throws AccessDeniedException
     {
+        EntityReference entityReference;
         switch (scope) {
             case GLOBAL:
                 this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), null);
+                this.authorizationManager.checkAccess(Right.PROGRAM, document.getContentAuthorReference(), null);
                 break;
             case WIKI:
-                this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), document
-                    .getDocumentReference().getWikiReference());
+                entityReference = document.getDocumentReference().getWikiReference();
+                this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), entityReference);
+                this.authorizationManager.checkAccess(Right.ADMIN, document.getContentAuthorReference(),
+                    entityReference);
                 break;
             case USER:
                 if (this.configuration.isRestrictUserTranslations()) {
-                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getAuthorReference(),
-                        document.getDocumentReference());
+                    entityReference = document.getDocumentReference();
+                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getAuthorReference(), entityReference);
+                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getContentAuthorReference(),
+                        entityReference);
                 }
                 break;
             default:
@@ -482,7 +506,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      * 
      * @param document the translation document
      * @param scope the translation scope
-     * @param create true if the component manager should be created if it does not exists
+     * @param create true if the component manager should be created if it does not exist
      * @return the component manager corresponding to the provided {@link Scope}
      */
     private ComponentManager getComponentManager(XWikiDocument document, Scope scope, boolean create)

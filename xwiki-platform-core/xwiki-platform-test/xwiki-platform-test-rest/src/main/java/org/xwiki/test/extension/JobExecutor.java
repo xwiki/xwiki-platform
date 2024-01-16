@@ -41,7 +41,8 @@ import static org.restlet.data.MediaType.APPLICATION_XML;
  * Execute a Job to call the XWiki REST endpoint to install extensions.
  *
  * @version $Id$
- * @since 10.9
+ * @since 15.9-rc-1
+ * @since 15.5.4
  */
 public class JobExecutor
 {

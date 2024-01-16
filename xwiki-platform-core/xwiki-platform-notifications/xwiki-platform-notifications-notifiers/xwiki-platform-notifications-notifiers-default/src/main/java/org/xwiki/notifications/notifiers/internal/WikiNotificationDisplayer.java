@@ -20,20 +20,17 @@
 package org.xwiki.notifications.notifiers.internal;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.script.ScriptContext;
 
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
-import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -45,30 +42,24 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 9.5RC1
  */
+@Component(roles = WikiNotificationDisplayer.class)
 public class WikiNotificationDisplayer extends AbstractWikiNotificationRenderer implements NotificationDisplayer
 {
+    @Inject
+    private NotificationDisplayer notificationDisplayer;
+
     private Template notificationTemplate;
 
     private List<String> supportedEvents;
 
-    /**
-     * Constructs a new {@link WikiNotificationDisplayer}.
-     *
-     * @param authorReference the author reference of the document
-     * @param templateManager the {@link TemplateManager} to use
-     * @param scriptContextManager the {@link ScriptContextManager} to use
-     * @param componentManager the {@link ComponentManager} to use
-     * @param baseObject the XObject which has the required properties to instantiate the component
-     * @throws NotificationException if the properties of the given BaseObject could not be loaded
-     */
-    public WikiNotificationDisplayer(DocumentReference authorReference, TemplateManager templateManager,
-            ScriptContextManager scriptContextManager, ComponentManager componentManager, BaseObject baseObject)
-            throws NotificationException
+    @Override
+    public void initialize(BaseObject baseObject) throws NotificationException
     {
-        super(authorReference, templateManager, scriptContextManager, componentManager, baseObject);
-        this.supportedEvents = Arrays.asList(this.eventType);
-        this.notificationTemplate = extractTemplate(baseObject,
-                WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE);
+        super.initialize(baseObject);
+
+        this.supportedEvents = List.of(this.eventType);
+        this.notificationTemplate =
+            extractTemplate(baseObject, WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE);
     }
 
     @Override
@@ -85,8 +76,7 @@ public class WikiNotificationDisplayer extends AbstractWikiNotificationRenderer 
 
             // If we have no template defined, fallback on the default displayer
             if (this.notificationTemplate == null) {
-                return ((NotificationDisplayer) this.componentManager.getInstance(NotificationDisplayer.class))
-                        .renderNotification(eventNotification);
+                return this.notificationDisplayer.renderNotification(eventNotification);
             }
 
             return templateManager.execute(notificationTemplate);

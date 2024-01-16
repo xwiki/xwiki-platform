@@ -20,10 +20,12 @@
 package org.xwiki.component.wiki.internal;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
@@ -56,9 +58,16 @@ public abstract class AbstractAsyncContentBaseObjectWikiComponent extends Abstra
     @Named("macro")
     protected Transformation macroTransformation;
 
+    @Inject
+    protected CacheControl cacheControl;
+
     protected XDOM xdom;
 
     protected Syntax syntax;
+
+    protected volatile XDOM preparedXDOM;
+
+    protected volatile LocalDateTime preparedXDOMDate;
 
     @Override
     protected void initialize(BaseObject baseObject, Type roleType, String roleHint) throws WikiComponentException
@@ -72,9 +81,53 @@ public abstract class AbstractAsyncContentBaseObjectWikiComponent extends Abstra
 
         // Parse the content
         this.xdom = this.parser.parse(content, this.syntax, ownerDocument.getDocumentReference());
+    }
 
-        // Prepare the content
-        this.macroTransformation.prepare(this.xdom);
+    /**
+     * @return the content as {@link XDOM}
+     * @since 15.10RC1
+     */
+    public XDOM getSourceContent()
+    {
+        return this.xdom;
+    }
+
+    /**
+     * @return the syntax which was used to parse the content
+     * @since 15.10RC1
+     */
+    public Syntax getSourceSyntax()
+    {
+        return this.syntax;
+    }
+
+    /**
+     * Prepare (if not already prepared), cache and return a prepared version of the XDOM.
+     * 
+     * @return the prepared {@link XDOM}
+     * @since 15.10RC1
+     */
+    public XDOM getPreparedContent()
+    {
+        // If the block is not prepared yet or if cache reset has been requested, prepare it
+        if (this.preparedXDOMDate == null || !this.cacheControl.isCacheReadAllowed(this.preparedXDOMDate)) {
+            synchronized (this.xdom) {
+                if (this.preparedXDOMDate == null || this.cacheControl.isCacheReadAllowed(this.preparedXDOMDate)) {
+                    // Clone the source content in cache the cache reset is forced
+                    // TODO: might be better (mainly in term of retained memory) to reload the content from the
+                    // document, instead
+                    this.preparedXDOM = this.xdom.clone();
+
+                    // Prepare the content
+                    this.macroTransformation.prepare(this.preparedXDOM);
+
+                    // Remember when it was prepared
+                    this.preparedXDOMDate = LocalDateTime.now();
+                }
+            }
+        }
+
+        return this.preparedXDOM;
     }
 
     /**

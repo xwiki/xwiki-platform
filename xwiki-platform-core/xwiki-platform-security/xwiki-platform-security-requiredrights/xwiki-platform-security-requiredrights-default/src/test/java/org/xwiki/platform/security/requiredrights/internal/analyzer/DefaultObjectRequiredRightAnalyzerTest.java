@@ -26,6 +26,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
@@ -150,5 +151,22 @@ class DefaultObjectRequiredRightAnalyzerTest
         assertEquals(wikiResult, results.get(0));
         assertEquals(testObject.getField(velocityFieldName).getReference(), results.get(1).getEntityReference());
         assertEquals(testObject.getField(velocityWikiFieldName).getReference(), results.get(2).getEntityReference());
+    }
+
+    @Test
+    void analyzeWithCustomAnalyzerThrowsException() throws XWikiException, RequiredRightsException
+    {
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        BaseObject testObject = testDocument.newXObject(new DocumentReference("wiki", "XWiki", "TestClass"),
+            this.oldcore.getXWikiContext());
+
+        when(this.mockAnalyzer.analyze(testObject))
+            .thenThrow(new RequiredRightsException("Test exception", new Exception()));
+
+        List<RequiredRightAnalysisResult> results = this.analyzer.analyze(testObject);
+        verify(this.mockAnalyzer).analyze(testObject);
+        assertEquals(1, results.size());
+        assertEquals(List.of(RequiredRight.MAYBE_PROGRAM), results.get(0).getRequiredRights());
+        assertEquals(testObject.getReference(), results.get(0).getEntityReference());
     }
 }

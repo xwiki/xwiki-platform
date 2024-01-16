@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -57,10 +57,10 @@ class DeletedWikiEventListenerTest
 
     @Named("cached")
     @MockComponent
-    private Provider<ModelBridge> modelBridgeProvider;
+    private Provider<FilterPreferencesModelBridge> modelBridgeProvider;
 
     @Mock
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -68,20 +68,20 @@ class DeletedWikiEventListenerTest
     @BeforeEach
     void setUp()
     {
-        when(this.modelBridgeProvider.get()).thenReturn(this.modelBridge);
+        when(this.modelBridgeProvider.get()).thenReturn(this.filterPreferencesModelBridge);
     }
 
     @Test
     void onEvent() throws Exception
     {
         this.listener.onEvent(null, "wikiid", null);
-        verify(this.modelBridge).deleteFilterPreferences(new WikiReference("wikiid"));
+        verify(this.filterPreferencesModelBridge).deleteFilterPreferences(new WikiReference("wikiid"));
     }
 
     @Test
     void onEventException() throws Exception
     {
-        doThrow(NotificationException.class).when(this.modelBridge)
+        doThrow(NotificationException.class).when(this.filterPreferencesModelBridge)
             .deleteFilterPreferences(new WikiReference("wikiid"));
         this.listener.onEvent(null, "wikiid", null);
         assertEquals(1, this.logCapture.size());

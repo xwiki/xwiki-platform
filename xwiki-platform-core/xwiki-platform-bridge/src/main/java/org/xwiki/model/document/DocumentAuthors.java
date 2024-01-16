@@ -19,7 +19,6 @@
  */
 package org.xwiki.model.document;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -30,7 +29,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 14.0RC1
  */
-@Unstable
 public interface DocumentAuthors
 {
     /**

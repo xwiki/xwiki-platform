@@ -27,6 +27,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -62,6 +64,20 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
     @Inject
+    protected Provider<XWikiContext> contextProvider;
+
+    @Inject
+    protected VelocityDetector velocityDetector;
+
+    @Inject
+    @Named("translation")
+    protected BlockSupplierProvider<String> translationMessageSupplierProvider;
+
+    @Inject
+    @Named("stringCode")
+    protected BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
+
+    @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
@@ -69,24 +85,13 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Inject
-    @Named("translation")
-    private BlockSupplierProvider<String> translationMessageSupplierProvider;
-
-    @Inject
-    @Named("stringCode")
-    private BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
+    private BlockSupplierProvider<BaseObject> objectBlockSupplierProvider;
 
     @Inject
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
-
-    @Inject
     private ContentParser contentParser;
-
-    @Inject
-    private VelocityDetector velocityDetector;
 
     @Override
     public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
@@ -94,9 +99,25 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         if (object == null) {
             return List.of();
         }
+
+        try {
+            return analyzeWithException(object);
+        } catch (Exception e) {
+            return List.of(
+                new RequiredRightAnalysisResult(object.getReference(),
+                    this.translationMessageSupplierProvider.get("security.requiredrights.object.error",
+                        ExceptionUtils.getRootCauseMessage(e)),
+                    this.objectBlockSupplierProvider.get(object),
+                    List.of(RequiredRight.MAYBE_PROGRAM))
+            );
+        }
+    }
+
+    private List<RequiredRightAnalysisResult> analyzeWithException(BaseObject object)
+        throws RequiredRightsException
+    {
         EntityReference xClassReference = object.getRelativeXClassReference();
         String className = this.compactEntityReferenceSerializer.serialize(xClassReference);
-
         try {
             RequiredRightAnalyzer<BaseObject> analyzer =
                 this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,
@@ -141,7 +162,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         if (!textAreaClass.isRestricted() && field instanceof BaseStringProperty) {
             String value = ((BaseStringProperty) field).getValue();
 
-            if (contentType != null) {
+            if (contentType != null && StringUtils.isNotBlank(value)) {
                 switch (contentType) {
                     case VELOCITY_CODE:
                         result = analyzeVelocityScriptValue(value, field.getReference(),

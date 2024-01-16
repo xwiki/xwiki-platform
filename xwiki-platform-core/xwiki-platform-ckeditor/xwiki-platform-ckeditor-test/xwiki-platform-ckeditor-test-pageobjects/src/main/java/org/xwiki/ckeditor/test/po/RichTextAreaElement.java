@@ -20,10 +20,13 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.time.Duration;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -122,12 +125,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public Object executeScript(String script, Object... arguments)
     {
-        try {
-            getDriver().switchTo().frame(this.iframe);
-            return getDriver().executeScript(script, arguments);
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
+        return getFromIFrame(() -> getDriver().executeScript(script, arguments));
     }
 
     /**
@@ -176,9 +174,39 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentEditable()
     {
+        getFromIFrame(() -> {
+            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+            return null;
+        });
+    }
+
+    /**
+     * @param placeholder the expected placeholder text, {@code null} if no placeholder is expected
+     * @return this rich text area element
+     */
+    public RichTextAreaElement waitForPlaceholder(String placeholder)
+    {
+        try {
+            WebElement activeElement = getActiveElement();
+            getDriver().waitUntilCondition(
+                driver -> Objects.equals(placeholder, activeElement.getAttribute("data-cke-editorplaceholder")));
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
+
+        return this;
+    }
+
+    protected <T> T getFromIFrame(Supplier<T> supplier)
+    {
         try {
             getDriver().switchTo().frame(this.iframe);
-            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
+            try {
+                return supplier.get();
+            } catch (StaleElementReferenceException e) {
+                // Try again in case the content of the iframe has been updated.
+                return supplier.get();
+            }
         } finally {
             getDriver().switchTo().defaultContent();
         }

@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.model.validation.edit.EditConfirmationScriptService;
+import org.xwiki.model.validation.edit.internal.DefaultEditConfirmationCheckersManager;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
@@ -55,6 +56,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the {@code edit_macros.vm} template.
@@ -67,6 +69,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ComponentList({
     TemplateMacro.class,
     EditConfirmationScriptService.class,
+    DefaultEditConfirmationCheckersManager.class,
     ModelValidationScriptService.class,
     // Start - Required in addition of RenderingScriptServiceComponentList
     DefaultExtendedRenderingConfiguration.class,
@@ -115,10 +118,8 @@ class EditMacrosPageTest extends PageTest
         document.setSyntax(Syntax.XWIKI_2_1);
         this.context.setDoc(document);
         this.componentManager.registerComponent(EditConfirmationChecker.class, "testChecker",
-            (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Warning")),
-                    Map.of("id", "warning1")),
-                    false)));
+            (EditConfirmationChecker) () -> Optional.of(new EditConfirmationCheckerResult(
+                new GroupBlock(List.of(new WordBlock("Warning")), Map.of("id", "warning1")), false)));
         document.getRenderedContent(this.context);
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
@@ -141,25 +142,17 @@ class EditMacrosPageTest extends PageTest
         document.setSyntax(Syntax.XWIKI_2_1);
         this.context.setDoc(document);
         this.componentManager.registerComponent(EditConfirmationChecker.class, "warningChecker1",
-            (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Warning 1")),
-                    Map.of("id", "warning1")),
-                    false)));
+            (EditConfirmationChecker) () -> Optional.of(new EditConfirmationCheckerResult(
+                new GroupBlock(List.of(new WordBlock("Warning 1")), Map.of("id", "warning1")), false)));
         this.componentManager.registerComponent(EditConfirmationChecker.class, "warningChecker2",
-            (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Warning 2")),
-                    Map.of("id", "warning2")),
-                    false)));
+            (EditConfirmationChecker) () -> Optional.of(new EditConfirmationCheckerResult(
+                new GroupBlock(List.of(new WordBlock("Warning 2")), Map.of("id", "warning2")), false)));
         this.componentManager.registerComponent(EditConfirmationChecker.class, "errorChecker1",
-            (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Error 1")),
-                    Map.of("id", "error1")),
-                    true)));
+            (EditConfirmationChecker) () -> Optional.of(new EditConfirmationCheckerResult(
+                new GroupBlock(List.of(new WordBlock("Error 1")), Map.of("id", "error1")), true)));
         this.componentManager.registerComponent(EditConfirmationChecker.class, "errorChecker2",
-            (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Error 2")),
-                    Map.of("id", "error2")),
-                    true)));
+            (EditConfirmationChecker) () -> Optional.of(new EditConfirmationCheckerResult(
+                new GroupBlock(List.of(new WordBlock("Error 2")), Map.of("id", "error2")), true)));
         document.getRenderedContent(this.context);
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
@@ -184,10 +177,15 @@ class EditMacrosPageTest extends PageTest
         this.context.setDoc(document);
         this.componentManager.registerComponent(EditConfirmationChecker.class, "warningChecker1",
             (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new WordBlock("Warning 1"), false)));
-        this.request.put("force", "true");
+                new EditConfirmationCheckerResult(new WordBlock("Warning 1"), false, true)));
 
+        when(this.httpSession.getAttribute("force_edit_xwiki:Space.Page_forced_warningChecker1")).thenReturn(true);
+        
+        this.request.put("force", "true");
         document.getRenderedContent(this.context);
+        this.request.put("force", "");
+        document.getRenderedContent(this.context);
+
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
         assertNull(scriptContext.getAttribute("editConfirmation"));
@@ -203,12 +201,16 @@ class EditMacrosPageTest extends PageTest
         document.setSyntax(Syntax.XWIKI_2_1);
         this.context.setDoc(document);
         this.componentManager.registerComponent(EditConfirmationChecker.class, "errorChecker",
-            (EditConfirmationChecker) () -> Optional.of(
-                new EditConfirmationCheckerResult(new GroupBlock(List.of(new WordBlock("Error")),
-                    Map.of("id", "error1")), true)));
-        this.request.put("force", "true");
+            (EditConfirmationChecker) () -> Optional.of(new EditConfirmationCheckerResult(
+                new GroupBlock(List.of(new WordBlock("Error")), Map.of("id", "error1")), true)));
 
+        when(this.httpSession.getAttribute("force_edit_xwiki:Space.Page_forced_errorChecker")).thenReturn(true);
+        
+        this.request.put("force", "true");
         document.getRenderedContent(this.context);
+        this.request.put("force", "");
+        document.getRenderedContent(this.context);
+        
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");

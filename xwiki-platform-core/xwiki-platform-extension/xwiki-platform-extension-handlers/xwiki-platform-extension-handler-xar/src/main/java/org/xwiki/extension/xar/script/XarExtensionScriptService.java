@@ -239,8 +239,8 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
             // Update the existing job status if any
             if (jobId != null) {
                 JobStatus jobStatus = getJobStatus(jobId);
-                if (jobStatus != null && jobStatus instanceof DiffXarJobStatus) {
-                    ((DiffXarJobStatus) jobStatus).reset(reference);
+                if (jobStatus != null && jobStatus instanceof DiffXarJobStatus diffXarJobStatus) {
+                    diffXarJobStatus.reset(reference);
                 }
             }
 

@@ -32,6 +32,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
+import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
@@ -50,6 +51,7 @@ import org.xwiki.security.authorization.Right;
 @Singleton
 @Named(ScriptMacroAnalyzer.ID)
 public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
+    implements RequiredRightAnalyzer<MacroBlock>
 {
     /**
      * The id of this analyzer.
@@ -78,7 +80,7 @@ public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
     public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock)
     {
         Right requiredRight = Right.PROGRAM;
-        Macro<?> macro = getMacro(macroBlock, getTransformationContext(macroBlock));
+        Macro<?> macro = getMacro(macroBlock);
 
         try {
             Object macroParameters =

@@ -53,7 +53,6 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -297,7 +296,6 @@ public class RenderingScriptService implements ScriptService
      * @return the list of categories of the macro
      * @since 14.6RC1
      */
-    @Unstable
     public Set<String> getMacroCategories(MacroId macroId)
     {
         return this.macroCategoryManager.getMacroCategories(macroId);
@@ -307,7 +305,6 @@ public class RenderingScriptService implements ScriptService
      * @return the set of hidden macro categories
      * @since 14.8RC1
      */
-    @Unstable
     public Set<String> getHiddenMacroCategories()
     {
         return this.macroCategoryManager.getHiddenCategories();

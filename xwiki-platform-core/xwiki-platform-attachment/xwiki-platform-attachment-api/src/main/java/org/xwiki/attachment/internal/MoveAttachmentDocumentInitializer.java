@@ -85,9 +85,11 @@ public class MoveAttachmentDocumentInitializer extends AbstractMandatoryDocument
         boolean updated = super.updateDocument(document);
 
         List<BaseObject> uIExtensionObjects = document.getXObjects(UI_EXTENSION_CLASS);
-        BaseObject xObject = uIExtensionObjects.stream().filter(object ->
-            Objects.equals(object.getStringValue(EXTENSION_POINT_ID_PROPERTY), UIPX_ID)
-                && Objects.equals(object.getStringValue(ID_PROPERTY), UIX_ID))
+        BaseObject xObject = uIExtensionObjects.stream()
+            .filter(Objects::nonNull)
+            .filter(object ->
+                Objects.equals(object.getStringValue(EXTENSION_POINT_ID_PROPERTY), UIPX_ID)
+                    && Objects.equals(object.getStringValue(ID_PROPERTY), UIX_ID))
             .findFirst().orElse(null);
         if (xObject == null) {
             updated = true;

@@ -61,7 +61,7 @@
   #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
 #end
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale" $stringtool.join($metaAttributes, ' ')>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()" $stringtool.join($metaAttributes, ' ')>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Ensure that the Content-Type meta directive is the first one in the header.
@@ -115,7 +115,6 @@
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------
     <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
-    <link href="$services.webjars.url('drawer', 'css/drawer.min.css')" rel="stylesheet" type="text/css" />
     #template("stylesheets.vm")
     #template("javascript.vm")
   </head>
@@ -131,6 +130,6 @@
   #set($bodyAction = "view")
 #end
 ## These elements will be closed in the htmlfooter.vm file
-<$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} #if("$!doc.space" != "")space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1)content#end panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right drawer-close">
+<$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} #if("$!doc.space" != "")space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1)content#end panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right">
 <div id="xwikimaincontainer">
 <div id="xwikimaincontainerinner">

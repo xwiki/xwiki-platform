@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxMacros</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxMacros</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programming =
+
+== Macros ==
+
+=== 1.0 Macros ===
+
+XWiki 구문 1.0에는 두 종류의 매크로가 있습니다:
+
+* Velocity 매크로( ###macroname(param1 ... paramN)## 구문을 사용하여 호출됨)
+* Radeox 매크로( ##{macroname:param1=value1|...|paramN=valueN}## 구문을 사용하여 호출됨)
+
+{{info}}
+사용 가능한 매크로의 전체 목록을 보려면 [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]]를 확인하세요.
+{{/info}}
+
+|=Feature|=XWiki Syntax 1.0
+|Velocity Macro|(((
+{{{#info("Some text")}}}
+)))
+|Radeox Macro|(((
+{{{{code:java}
+java content
+{code}
+}}}
+)))
+
+=== 2.0 Macros ===
+
+XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}에는 구문에 의해 호출되는 매크로 종류가 한 가지뿐입니다. ##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##. 내용이 없는 매크로의 경우 짧은 표기가 있습니다: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|콘텐츠가 포함된 매크로 렌더링|(((
+{{{{{code language="java"}}
+System.out.println("Hello World!");
+{{/code}}
+}}}
+)))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
+|Rendering Macro without content|(((
+{{{{{include reference="Space.Page"/}}}}}
+)))|참조된 페이지가 현재 페이지에 포함되어 있습니다.
+
+{{info}}
+사용 가능한 매크로의 전체 목록을 보려면 [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]]를 확인하세요.
+{{/info}}
+
+==== Macros in this wiki ====
+
+{{include reference="XWiki.XWikiSyntaxMacrosList"/}}</content>
+</xwikidoc>

@@ -23,15 +23,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.validation.edit.internal.EditConfirmationCheckersManager;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
-
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * This class provides the script services for handling document edit confirmation.
@@ -51,11 +47,7 @@ public class EditConfirmationScriptService implements ScriptService
     public static final String ID = "edit";
 
     @Inject
-    @Named("context")
-    private ComponentManager componentManager;
-
-    @Inject
-    private Logger logger;
+    private EditConfirmationCheckersManager editConfirmationCheckersManager;
 
     /**
      * Performs a check by invoking the check method of all available {@link EditConfirmationChecker} components and
@@ -65,18 +57,18 @@ public class EditConfirmationScriptService implements ScriptService
      */
     public EditConfirmationCheckerResults check()
     {
-        try {
-            EditConfirmationCheckerResults result = new EditConfirmationCheckerResults();
-            // The list is ordered by the priority of the components.
-            this.componentManager.<EditConfirmationChecker>getInstanceList(EditConfirmationChecker.class)
-                .stream()
-                .flatMap(checker -> checker.check().stream())
-                .forEach(result::append);
-            return result;
-        } catch (ComponentLookupException e) {
-            this.logger.warn("Failed to resolve the list of [{}]. Cause: [{}]", EditConfirmationChecker.class,
-                getRootCauseMessage(e));
-            return new EditConfirmationCheckerResults();
-        }
+        return this.editConfirmationCheckersManager.check();
+    }
+
+    /**
+     * Force the last {@link EditConfirmationChecker} components checks. The results of the last call to
+     * {@link #check()} are persisted, and new checks are skipped as long as they match the persisted results.
+     *
+     * @since 15.10RC1
+     */
+    @Unstable
+    public void force()
+    {
+        this.editConfirmationCheckersManager.force();
     }
 }

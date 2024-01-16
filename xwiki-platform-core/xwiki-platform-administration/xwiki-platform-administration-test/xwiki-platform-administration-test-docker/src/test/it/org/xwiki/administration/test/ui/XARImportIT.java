@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.packaging.PackagePlugin"})
-public class XARImportIT
+class XARImportIT
 {
     private static final String PACKAGE_WITHOUT_HISTORY = "Main.TestPage-no-history.xar";
 
@@ -99,16 +99,8 @@ public class XARImportIT
         return new File(testConfiguration.getBrowser().getTestResourcesPath(), "XARImportIT/" + filename);
     }
 
-    /**
-     * Verify that the Import page doesn't list any package by default in default XE.
-     */
-    @Test
-    public void testImportHasNoPackageByDefault()
-    {
-        assertEquals(0, this.sectionPage.getPackageNames().size());
-    }
 
-    public void testImportWithHistory(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    private void assertImportWithHistory(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
         File file = getFileToUpload(testConfiguration, PACKAGE_WITH_HISTORY);
 
@@ -139,7 +131,17 @@ public class XARImportIT
         assertEquals("1.2", setup.getDriver().findElement(By.tagName("html")).getText());
     }
 
-    public void testImportWithHistory13(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    /**
+     * Verify that the Import page doesn't list any package by default in default XE.
+     */
+    @Test
+    void testImportHasNoPackageByDefault()
+    {
+        assertEquals(0, this.sectionPage.getPackageNames().size());
+    }
+
+    @Test
+    void testImportWithHistory13(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
         File file = getFileToUpload(testConfiguration, PACKAGE_WITH_HISTORY13);
 
@@ -171,14 +173,14 @@ public class XARImportIT
     }
 
     @Test
-    public void testImportWithHistoryWhenNoPage(TestUtils setup, TestReference testReference,
+    void testImportWithHistoryWhenNoPage(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration)
     {
-        testImportWithHistory(setup, testReference, testConfiguration);
+        assertImportWithHistory(setup, testReference, testConfiguration);
     }
 
     @Test
-    public void testImportWithHistoryWhenPage(TestUtils setup, TestReference testReference,
+    void testImportWithHistoryWhenPage(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration) throws Exception
     {
         Page page = setup.rest().page(TESTPAGE);
@@ -187,11 +189,11 @@ public class XARImportIT
         setup.rest().attachFile(new EntityReference("testattachment.txt", EntityType.ATTACHMENT, TESTPAGE),
             "previous attachment".getBytes(), true);
 
-        testImportWithHistory(setup, testReference, testConfiguration);
+        assertImportWithHistory(setup, testReference, testConfiguration);
     }
 
     @Test
-    public void testImportWithNewHistoryVersion(TestUtils setup, TestReference testReference,
+    void testImportWithNewHistoryVersion(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration)
     {
         File file = getFileToUpload(testConfiguration, PACKAGE_WITHOUT_HISTORY);
@@ -213,7 +215,7 @@ public class XARImportIT
     }
 
     @Test
-    public void testImportAsBackup(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    void testImportAsBackup(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
         File file = getFileToUpload(testConfiguration, BACKUP_PACKAGE);
 
@@ -235,7 +237,7 @@ public class XARImportIT
     }
 
     @Test
-    public void testImportWhenImportAsBackupIsNotSelected(TestUtils setup, TestReference testReference,
+    void testImportWhenImportAsBackupIsNotSelected(TestUtils setup, TestReference testReference,
         TestConfiguration testConfiguration)
     {
         File file = getFileToUpload(testConfiguration, BACKUP_PACKAGE);

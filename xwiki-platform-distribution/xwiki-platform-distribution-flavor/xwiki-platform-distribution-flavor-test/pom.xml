@@ -336,6 +336,15 @@
                 /xwiki/bin/view/Main/AllDocs?view=deletedDocs
                 /xwiki/bin/view/Main/AllDocs?view=deletedAttachments
               </urlsToTestAsAdmin>
+              <urlsToTestAsGuest />
+              <rssUrlsToTestAsAdmin>
+                /xwiki/bin/view/Main/DatabaseSearch?xpage=plain&amp;outputSyntax=plain&amp;text=wiki
+                /xwiki/bin/get/Main/DatabaseSearch?outputSyntax=plain&amp;space=&amp;text=wiki
+              </rssUrlsToTestAsAdmin>
+              <rssUrlsToTestAsGuest>
+                /xwiki/bin/view/Main/DatabaseSearch?xpage=plain&amp;outputSyntax=plain&amp;text=wiki
+                /xwiki/bin/get/Main/DatabaseSearch?outputSyntax=plain&amp;space=&amp;text=wiki
+              </rssUrlsToTestAsGuest>
               <!-- Used only in office importer tests -->
               <openOfficeExecutable>${openOfficeExecutable}</openOfficeExecutable>
             </systemPropertyVariables>

@@ -151,7 +151,9 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
      *
      * @since 16.0.0RC1
      */
+    @Override
     @Unstable
+    @PropertyDescription("An optional textual description of the Live Data.")
     public void setDescription(String description)
     {
         super.setDescription(description);

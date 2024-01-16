@@ -34,9 +34,9 @@
 -->
 <template>
   <div class="livedata-layout">
-    <span class="description" :id="descriptionId" v-if="hasDescription">
+    <div class="description" :id="descriptionId" v-if="hasDescription">
       {{ description }}
-    </span>
+    </div>
 
       <!--
         We are using the <keep-alive> tag in order to keep the layout mounted

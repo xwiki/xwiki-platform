@@ -147,12 +147,12 @@
 
   // Sub Item =============================================================
   .drawer-dropdown-menu {
-    &.collapsing {
-      /* Overwrite display:none from drawer.js in order to enable the collapse transition. */
-      display: block;
-    }
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 
-    a {
+    a.drawer-menu-item {
       padding-left: @xwiki-drawer-menu-subitem-indent;
     }
   }

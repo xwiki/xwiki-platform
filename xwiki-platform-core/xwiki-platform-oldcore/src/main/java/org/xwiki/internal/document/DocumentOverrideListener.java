@@ -33,10 +33,17 @@ import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 /**
  * Cancel any save that tries to save a new document if the document already exists.
  *
+ * <p>
+ *     This can happen when the context document is set to an empty document because the user doesn't have view right,
+ *     but the user still has, e.g., edit right. In this situation, the user would still be able to to save but it is
+ *     hard to imagine a scenario where this would make sense. This listener therefore cancels the save in this
+ *     situation.
+ * </p>
+ *
  * @version $Id$
  * @since 14.10.21
  * @since 15.5.5
- * @since 15.10.5
+ * @since 15.10.6
  */
 @Component
 @Singleton
@@ -60,12 +67,9 @@ public class DocumentOverrideListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
-
         XWikiDocument originalDocument = document.getOriginalDocument();
 
-        if (event instanceof CancelableEvent && document.isNew() && originalDocument != null
-            && !originalDocument.isNew())
-        {
+        if (document.isNew() && originalDocument != null && !originalDocument.isNew()) {
             ((CancelableEvent) event).cancel(
                 "The document already exists but the document to be saved is marked as new.");
         }

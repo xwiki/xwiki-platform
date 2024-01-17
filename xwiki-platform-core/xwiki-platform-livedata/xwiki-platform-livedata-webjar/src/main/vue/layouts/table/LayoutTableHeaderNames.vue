@@ -322,6 +322,7 @@ export default {
   color: currentColor;
   opacity: 0;
   padding-left: @table-cell-padding;
+  cursor: pointer;
 }
 
 .layout-table .property-name .sort-icon {

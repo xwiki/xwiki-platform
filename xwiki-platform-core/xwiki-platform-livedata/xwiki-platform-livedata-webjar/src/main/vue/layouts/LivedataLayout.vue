@@ -165,11 +165,3 @@ export default {
 
 };
 </script>
-
-
-<style scoped lang="less">
-/* Reuse the caption style for the description. */
-.livedata-layout-description {
-  &:extend(caption);
-}
-</style>

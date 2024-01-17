@@ -442,7 +442,7 @@
       &lt;div class="xform"&gt;
         &lt;dl&gt;
           &lt;dt&gt;&lt;label for='preference_notification_email_frequency'&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency'))&lt;/label&gt;
-            &lt;p id='preference_notification_email_frequency_hint'class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
+            &lt;p id='preference_notification_email_frequency_hint' class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
             #if ($wikimacro.parameters.target == 'user')

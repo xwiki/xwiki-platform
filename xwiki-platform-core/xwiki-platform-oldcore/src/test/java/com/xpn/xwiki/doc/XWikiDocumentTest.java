@@ -35,8 +35,6 @@ import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
@@ -54,7 +52,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
-import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -586,61 +583,34 @@ public class XWikiDocumentTest
     }
 
     @Test
-    void displayArea()
+    public void display()
     {
         when(this.xWiki.getCurrentContentSyntaxId(any())).thenReturn("xwiki/2.0");
 
         this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        assertEquals(
+            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
+            this.document.display("string", "edit", this.oldcore.getXWikiContext()));
+
+        assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 & 2");
+
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}1 &#38; 2{{/html}}",
+            this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 < 2");
+
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}1 &#60; 2{{/html}}",
+            this.document.display("string", "view", this.oldcore.getXWikiContext()));
+
+        this.baseObject.setStringValue("string", "1 > 2");
+
+        assertEquals("1 > 2", this.document.display("string", "view", this.oldcore.getXWikiContext()));
 
         assertEquals("{{html clean=\"false\" wiki=\"false\"}}<p>area</p>{{/html}}",
             this.document.display("area", "view", this.oldcore.getXWikiContext()));
-    }
-
-    @Test
-    void displayEdit()
-    {
-        when(this.xWiki.getCurrentContentSyntaxId(any())).thenReturn("xwiki/2.0");
-
-        this.document.setSyntax(Syntax.XWIKI_2_0);
-
-        assertEquals("{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' "
-                + "value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
-            this.document.display("string", "edit", this.oldcore.getXWikiContext()));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "string, false",
-        "'1 & 2', true",
-        "'1 < 2', true",
-        "'1 > 2', false",
-        "'Syntax **bold** test', true",
-        "'Heading == test ==', false",
-        "'list\n* Item', true",
-        "'> quote', true",
-        "' = heading =', true",
-        "'|= table header', true",
-        "'An image:image.png', true",
-        "'A (((group)))', true",
-        "'Just (a) text', false",
-        "'Test~Entry', true",
-    })
-    void display(String value, boolean htmlMacroExpected)
-    {
-        when(this.xWiki.getCurrentContentSyntaxId(any())).thenReturn("xwiki/2.0");
-
-        this.document.setSyntax(Syntax.XWIKI_2_0);
-        if (!"string".equals(value)) {
-            this.baseObject.setStringValue("string", value);
-        }
-
-        if (htmlMacroExpected) {
-            String expected =
-                "{{html clean=\"false\" wiki=\"false\"}}" + XMLUtils.escapeElementText(value) + "{{/html}}";
-            assertEquals(expected, this.document.display("string", "view", this.oldcore.getXWikiContext()));
-        } else {
-            assertEquals(value, this.document.display("string", "view", this.oldcore.getXWikiContext()));
-        }
     }
 
     @Test

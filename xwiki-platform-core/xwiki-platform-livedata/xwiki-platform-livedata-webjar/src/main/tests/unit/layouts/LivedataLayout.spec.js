@@ -44,12 +44,12 @@ function initWrapper(description) {
 describe('LivedataLayout.vue', () => {
   it('Without a description', () => {
     const wrapper = initWrapper();
-    expect(wrapper.find('.description').exists()).toBe(false);
+    expect(wrapper.find('.livedata-layout-description').exists()).toBe(false);
   })
 
   it('With a description', () => {
     const description = "A description";
     const wrapper = initWrapper(description);
-    expect(wrapper.find('.description').text()).toBe("A description");
+    expect(wrapper.find('.livedata-layout-description').text()).toBe("A description");
   })
 })

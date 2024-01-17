@@ -274,8 +274,7 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Localization
                 /xwiki/bin/import/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Import
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Export
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=export.pdf
-                  TODO https://jira.xwiki.org/browse/XWIKI-21777 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=export.pdf
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Programming
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Annotations
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.OfficeImporterAdmin

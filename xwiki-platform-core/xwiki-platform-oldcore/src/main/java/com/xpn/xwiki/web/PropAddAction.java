@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,9 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class PropAddAction extends XWikiAction
 {
+    private static final String PROPERTY_ERROR_ALREADY_EXISTS_ERROR_MESSAGE =
+        "action.addClassProperty.error.alreadyExists";
+
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
@@ -80,13 +84,19 @@ public class PropAddAction extends XWikiAction
         BaseClass bclass = doc.getXClass();
         bclass.setName(doc.getFullName());
         if (bclass.get(propName) != null) {
-            context.put("message", "action.addClassProperty.error.alreadyExists");
+            context.put("message", PROPERTY_ERROR_ALREADY_EXISTS_ERROR_MESSAGE);
             List<String> parameters = new ArrayList<String>();
             parameters.add(propName);
             context.put("messageParameters", parameters);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                localizePlainOrKey("action.addClassProperty.error.alreadyExists", parameters.toArray()));
-            return true;
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            try {
+                String localizedMessage =
+                    localizePlainOrReturnKey(PROPERTY_ERROR_ALREADY_EXISTS_ERROR_MESSAGE, propName);
+                response.getWriter().write(localizedMessage);
+            } catch (IOException e) {
+                throw new XWikiException("Failed to access the response writer", e);
+            }
+            return false;
         } else {
             MetaClass mclass = xwiki.getMetaclass();
             PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);

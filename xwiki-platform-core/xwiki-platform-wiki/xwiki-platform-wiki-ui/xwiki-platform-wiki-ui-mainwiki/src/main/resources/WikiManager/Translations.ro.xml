@@ -243,7 +243,7 @@ platform.wiki.create.wizard.step.create=Creează
 ## XWikiServer Sheet
 ### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
 ### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
 ### Missing: platform.wiki.sheet.title.settings=Wiki properties
 ### Missing: platform.wiki.sheet.title.createnewalias=Create new alias
 ### Missing: platform.wiki.sheet.title.viewaliases=View aliases

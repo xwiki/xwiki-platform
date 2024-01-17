@@ -20,8 +20,6 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -39,14 +37,13 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.util.Util;
 
+import static org.apache.http.protocol.HTTP.PLAIN_TEXT_TYPE;
+
 @Component
 @Named("propadd")
 @Singleton
 public class PropAddAction extends XWikiAction
 {
-    private static final String PROPERTY_ERROR_ALREADY_EXISTS_ERROR_MESSAGE =
-        "action.addClassProperty.error.alreadyExists";
-
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
@@ -84,15 +81,12 @@ public class PropAddAction extends XWikiAction
         BaseClass bclass = doc.getXClass();
         bclass.setName(doc.getFullName());
         if (bclass.get(propName) != null) {
-            context.put("message", PROPERTY_ERROR_ALREADY_EXISTS_ERROR_MESSAGE);
-            List<String> parameters = new ArrayList<String>();
-            parameters.add(propName);
-            context.put("messageParameters", parameters);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            String localizedMessage =
+                localizePlainOrReturnKey("action.addClassProperty.error.alreadyExists", propName);
             try {
-                String localizedMessage =
-                    localizePlainOrReturnKey(PROPERTY_ERROR_ALREADY_EXISTS_ERROR_MESSAGE, propName);
                 response.getWriter().write(localizedMessage);
+                response.setContentType(PLAIN_TEXT_TYPE);
             } catch (IOException e) {
                 throw new XWikiException("Failed to access the response writer", e);
             }

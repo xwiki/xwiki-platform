@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.internal.transformation;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
@@ -28,8 +26,7 @@ import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
-import org.xwiki.rendering.block.IconBlock;
-import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -37,19 +34,12 @@ import org.xwiki.rendering.syntax.Syntax;
  * Component to use the icon theme to provide a proper block for displaying an icon.
  *
  * @version $Id$
- * @since 15.10.2
+ * @since 15.10.5
  */
 @Component
 @Singleton
 public class XWikiIconProvider extends DefaultIconProvider
 {
-    /*
-    We need to update the icon class in order to take into account the situations
-    where we fall back on the default behaviour (the current icon theme does not have
-    the requested icon).
-     */
-    private static final List<Class> ICON_CLASS = new ArrayList<Class>(List.of(RawBlock.class, ImageBlock.class));
-
     @Inject
     private IconSetManager iconSetManager;
     @Inject
@@ -61,24 +51,16 @@ public class XWikiIconProvider extends DefaultIconProvider
      * @return the block containing an icon.
      */
     @Override
-    public IconBlock get(String iconName)
+    public Block get(String iconName)
     {
         IconSet iconSet = null;
         try {
             iconSet = getIconSet(iconName);
             String iconContent = this.iconRenderer.renderHTML(iconName, iconSet);
-            return new IconBlock(List.of(new RawBlock(iconContent, Syntax.HTML_5_0)));
+            return new RawBlock(iconContent, Syntax.HTML_5_0);
         } catch (IconException e) {
             return super.get(iconName);
         }
-    }
-
-    /**
-     * @return the java class of the icon block created.
-     */
-    public List<Class> getIconClass()
-    {
-        return ICON_CLASS;
     }
 
     private IconSet getIconSet(String iconName) throws IconException

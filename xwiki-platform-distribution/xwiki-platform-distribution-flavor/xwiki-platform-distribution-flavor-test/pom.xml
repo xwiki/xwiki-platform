@@ -287,8 +287,7 @@
                 <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
                   TODO https://jira.xwiki.org/browse/XWIKI-21773 -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Syntaxes
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
-                  TODO https://jira.xwiki.org/browse/XWIKI-21775 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=SyntaxHighlighting
                 <!-- Mail -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailSend

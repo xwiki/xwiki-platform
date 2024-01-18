@@ -107,7 +107,7 @@
 #end
 
 #macro(displayNotificationDescription $event)
-  #displayCompositeEventDescription($event)
+  #displayCompositeEventDescription($event true)
 #end
 
 

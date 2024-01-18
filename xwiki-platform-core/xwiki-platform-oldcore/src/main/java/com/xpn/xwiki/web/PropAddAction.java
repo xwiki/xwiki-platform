@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
@@ -36,8 +34,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.util.Util;
-
-import static org.apache.http.protocol.HTTP.PLAIN_TEXT_TYPE;
 
 @Component
 @Named("propadd")
@@ -81,15 +77,9 @@ public class PropAddAction extends XWikiAction
         BaseClass bclass = doc.getXClass();
         bclass.setName(doc.getFullName());
         if (bclass.get(propName) != null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             String localizedMessage =
                 localizePlainOrReturnKey("action.addClassProperty.error.alreadyExists", propName);
-            try {
-                response.getWriter().write(localizedMessage);
-                response.setContentType(PLAIN_TEXT_TYPE);
-            } catch (IOException e) {
-                throw new XWikiException("Failed to access the response writer", e);
-            }
+            writeAjaxErrorResponse(HttpServletResponse.SC_BAD_REQUEST, localizedMessage, context);
             return false;
         } else {
             MetaClass mclass = xwiki.getMetaclass();

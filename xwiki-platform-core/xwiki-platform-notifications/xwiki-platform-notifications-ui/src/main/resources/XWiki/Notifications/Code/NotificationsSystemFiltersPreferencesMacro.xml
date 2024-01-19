@@ -885,18 +885,19 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
   })
 
   #livetable("notificationSystemFilterPreferencesLiveTable" $properties $colprops $options)
-  
-  #set ($sourceParameters = {
-    'translationPrefix': 'notifications.settings.filters.preferences.system.table.',
-    'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
-    'eventType': '',
-    'format': '',
-    'type': 'system'
-  })
-  #if ($wikimacro.parameters.target == 'user')
-    #set($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
-  #end
-  ## TODO: description!
+&lt;/div&gt;
+{{/html}}
+#set ($sourceParameters = {
+  'translationPrefix': 'notifications.settings.filters.preferences.system.table.',
+  'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
+  'eventType': '',
+  'format': '',
+  'type': 'system'
+})
+#if ($wikimacro.parameters.target == 'user')
+#set($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+#end
+## TODO: description!
 
   #set ($liveDataConfig = {
     'meta': {
@@ -907,16 +908,13 @@ require(['jquery', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($
     }
   })
 
-&lt;/div&gt;
-{{/html}}
-
-  {{liveData
-    id='notificationSystemFilterPreferencesLiveData'
-    properties="$stringtool.join($properties, ',')"
-    source='liveTable'
-    sourceParameters="$escapetool.url($sourceParameters)"
-    limit='10'
-  }}$jsontool.serialize($liveDataConfig){{/liveData}}
+{{liveData
+  id='notificationSystemFilterPreferencesLiveData'
+  properties="$stringtool.join($properties, ',')"
+  source='liveTable'
+  sourceParameters="$escapetool.url($sourceParameters)"
+  limit='10'
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 #end
 {{/velocity}}</code>
     </property>

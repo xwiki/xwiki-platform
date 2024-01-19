@@ -278,6 +278,8 @@ export default {
 }
 
 .layout-table .resize-handle {
+  /* TODO: Discussion about the exact display of resize handles. */
+  opacity: 0;
   padding: 0;
   cursor: col-resize;
   min-width: 0;
@@ -289,6 +291,7 @@ export default {
 
 .layout-table .column-name:focus-within .resize-handle,
 .layout-table .column-name:hover .resize-handle {
+  opacity: 1;
   border-color: @text-muted;
   border-width: 3px;
   margin-left: 0;

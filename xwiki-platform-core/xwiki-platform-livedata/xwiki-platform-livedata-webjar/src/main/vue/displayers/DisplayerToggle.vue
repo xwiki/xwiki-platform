@@ -113,7 +113,7 @@ export default {
             labelText: this.$refs.icon.$el.outerHTML,
             onSwitchChange() {
               logic.triggerEvent("toggle", {
-                data: this.toggleData,
+                data: this.toggleData(),
                 checked: this.checked,
                 disabled: this.disabled,
                 callback: function (newData, newChecked, newDisabled) {

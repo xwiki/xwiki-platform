@@ -79,20 +79,19 @@
             :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
             :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
         </button>
-
-        <!--
+      </div>
+      <!--
           Specify the handle to resize properties
         -->
-        <button class="resize-handle btn btn-xs btn-default" :title="$t('livedata.action.resizeColumn.hint')"
-          v-mousedownmove="mouseResizeColumnInit"
-          @mousedownmove="mouseResizeColumn"
-          @keydown.left="keyboardResizeColumn($event, -10)"
-          @keydown.right="keyboardResizeColumn($event, 10)"
-          @dblclick="resetColumnSize"
-          @keydown.esc="resetColumnSize"
-        >
-        </button>
-      </div>
+      <button class="resize-handle btn btn-xs btn-default" :title="$t('livedata.action.resizeColumn.hint')"
+              v-mousedownmove="mouseResizeColumnInit"
+              @mousedownmove="mouseResizeColumn"
+              @keydown.left="keyboardResizeColumn($event, -10)"
+              @keydown.right="keyboardResizeColumn($event, 10)"
+              @dblclick="resetColumnSize"
+              @keydown.esc="resetColumnSize"
+      >
+      </button>
     </th>
 
   </XWikiDraggable>
@@ -277,8 +276,13 @@ export default {
   justify-content: space-between;
 }
 
-.layout-table .resize-handle {
-  /* TODO: Discussion about the exact display of resize handles. */
+.layout-table .draggable-item .resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  /* TODO: Discussion about the exact display of resize handles.
+      See https://jira.xwiki.org/browse/XWIKI-21816 */
   opacity: 0;
   padding: 0;
   cursor: col-resize;
@@ -289,8 +293,8 @@ export default {
   margin-left: 2px;
 }
 
-.layout-table .column-name:focus-within .resize-handle,
-.layout-table .column-name:hover .resize-handle {
+.layout-table .draggable-item:focus-within .resize-handle,
+.layout-table .draggable-item:hover .resize-handle {
   opacity: 1;
   border-color: @text-muted;
   border-width: 3px;
@@ -301,8 +305,8 @@ export default {
   margin-right: -2px;
 }
 
-.layout-table .draggable-item:not(:last-child) .column-name:focus-within .resize-handle,
-.layout-table .draggable-item:not(:last-child) .column-name:hover .resize-handle {
+.layout-table .draggable-item:not(:last-child):focus-within .resize-handle,
+.layout-table .draggable-item:not(:last-child):hover .resize-handle {
   margin-right: -3px;
 }
 

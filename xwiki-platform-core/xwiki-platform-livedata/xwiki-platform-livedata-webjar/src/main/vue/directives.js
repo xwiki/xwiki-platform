@@ -60,8 +60,6 @@ export const mousedownmove = {
       // Bind event listeners
       window.addEventListener("mousemove", mousemoveHandler);
       window.addEventListener("mouseup", removeMousemoveHandler);
-      // Stop propagation of the mousedown event
-      e.stopPropagation()
     });
   }
 };

@@ -46,7 +46,42 @@ define('xwiki-realtime-wysiwyg-patches', [
      */
     constructor(editor) {
       this._editor = editor;
-      this._diffDOM = new DiffDOM.DiffDOM();
+      this._diffDOM = Patches._createDiffDOM();
+    }
+
+    static _createDiffDOM() {
+      const diffDOM = new DiffDOM.DiffDOM({
+        preDiffApply: (change) => {
+          if (['replaceElement', 'removeElement', 'removeTextElement'].includes(change.diff.action)) {
+            diffDOM._updatedNodes.add(change.node.parentNode);
+          } else if (['addAttribute', 'modifyAttribute', 'removeAttribute', 'modifyTextElement', 'modifyValue',
+              'modifyComment', 'modifyChecked', 'modifySelected', 'relocateGroup'].includes(change.diff.action)) {
+            diffDOM._updatedNodes.add(change.node);
+          }
+        },
+
+        postDiffApply: (change) => {
+          if (['addTextElement', 'addElement'].includes(change.diff.action)) {
+            diffDOM._updatedNodes.add(change.newNode);
+          }
+        }
+      });
+
+      const originalApply = DiffDOM.DiffDOM.prototype.apply;
+      diffDOM.apply = function (...args) {
+        // Reset the list of updated nodes before applying a patch.
+        this._updatedNodes = new Set();
+
+        const result = originalApply.apply(this, args);
+
+        // Remove null and undefined values from the list of updated nodes.
+        this._updatedNodes.delete(null);
+        this._updatedNodes.delete(undefined);
+
+        return result;
+      };
+
+      return diffDOM;
     }
 
     /**
@@ -144,7 +179,7 @@ define('xwiki-realtime-wysiwyg-patches', [
         document: oldContent.ownerDocument
       });
 
-      this._editor.contentUpdated();
+      this._editor.contentUpdated(this._diffDOM._updatedNodes);
 
       // Restore the selection if the editor had a selection (i.e. if the selection was inside the editing area) before
       // the content update and it was affected by the content update. Note that the selection restore focuses the

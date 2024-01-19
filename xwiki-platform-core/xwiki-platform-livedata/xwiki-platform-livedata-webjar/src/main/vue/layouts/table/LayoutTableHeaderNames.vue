@@ -61,7 +61,7 @@
       <div class="column-name">
         <!-- Property Name -->
         <button 
-          class="property-name handle"
+          class="handle"
           @click="sort(property)"
           @keydown.left="keyboardDragNDrop($event, -1)"
           @keydown.right="keyboardDragNDrop($event, 1)"
@@ -69,7 +69,7 @@
             $t('livedata.action.columnName.sortable.hint') :
             $t('livedata.action.columnName.default.hint')"
         >
-          {{ property.name }}
+          <span class="property-name">{{ property.name }}</span>
           <!--
             Sort icon
             Only show the icon for the first-level sort property
@@ -273,7 +273,6 @@ export default {
 }
 
 .layout-table .column-name {
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
 }
@@ -304,18 +303,14 @@ export default {
   margin-right: -3px;
 }
 
-.layout-table .property-name {
+.layout-table .draggable-item .handle {
+  opacity: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   background: transparent;
   border: 0;
-  width: 100%;
   text-align: left;
-}
-
-.draggable-item .property-name.handle  {
-  opacity: 1;
 }
 
 .layout-table .sort-icon {
@@ -325,7 +320,7 @@ export default {
   cursor: pointer;
 }
 
-.layout-table .property-name .sort-icon {
+.layout-table .property-name + .sort-icon {
   vertical-align: baseline;
 }
 

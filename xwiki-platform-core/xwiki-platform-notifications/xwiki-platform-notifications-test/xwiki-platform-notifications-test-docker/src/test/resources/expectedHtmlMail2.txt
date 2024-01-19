@@ -10,13 +10,9 @@
       </div>
       <a color="#0088CC" style="color: #0088CC; text-decoration: none;" href="https://externaldomain:4242/xwiki/bin/view/NotificationsEmailTest/Page2">Title 2</a>
     </div>
-    created by
-    <span class="notification-event-user" data-xwiki-lightbox="false">
-      <img src="https://externaldomain:4242/xwiki/bin/skin/resources/icons/xwiki/noavatar.png?cache-version=\E[0-9]+\Q" alt="NotificationsEmailsITuser1"/>
-      <span class="wikilink">
-        <a href="https://externaldomain:4242/xwiki/bin/view/XWiki/NotificationsEmailsITuser1">NotificationsEmailsITuser1</a>
-      </span>
-    </span>
+    created by                       <img src="cid:NotificationsEmailsITuser1.jpg" alt="N" width="16" height="16" style="vertical-align: middle;"/>
+                                <a color="#0088CC" style="color: #0088CC; text-decoration: none;" href="https://externaldomain:4242/xwiki/bin/view/XWiki/NotificationsEmailsITuser1">NotificationsEmailsITuser1</a>
+
     <div>
       <small style="color: #777777; font-size: 0.8em;">
         moments ago

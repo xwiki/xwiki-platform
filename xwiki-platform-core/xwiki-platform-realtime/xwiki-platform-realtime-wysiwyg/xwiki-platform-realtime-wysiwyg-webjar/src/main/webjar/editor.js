@@ -90,10 +90,13 @@ define('xwiki-realtime-wysiwyg-editor', [
 
     /**
      * Notify the editor that its content has been updated as a result of a remote change.
+     *
+     * @param {Node[]} updatedNodes the DOM nodes that have been updated (added, modified directly or with removed
+     *   descendants)
      */
-    contentUpdated() {
+    contentUpdated(updatedNodes) {
       try {
-        this._initializeWidgets();
+        this._initializeWidgets(updatedNodes);
       } catch (e) {
         console.log("Failed to (re)initialize the widgets.", e);
       }
@@ -152,16 +155,56 @@ define('xwiki-realtime-wysiwyg-editor', [
       this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor);
     }
 
-    _initializeWidgets() {
-      const dataValues = {};
-      const widgetElements = this.getContent().querySelectorAll('[data-cke-widget-data]');
-      widgetElements.forEach((widgetElement, index) => {
-        dataValues[index] = widgetElement.getAttribute('data-cke-widget-data');
+    _initializeWidgets(updatedNodes) {
+      // Save the focused and selected widgets, as well as the widget holding the focused editable, so that we can
+      // restore them after (re)initializing the widgets (if possible).
+      const focusedWidgetWrapper = this._ckeditor.widgets.focused?.wrapper;
+      const selectedWidgetWrappers = this._ckeditor.widgets.selected.map(widget => widget.wrapper);
+      const widgetHoldingFocusedEditableWrapper = this._ckeditor.widgets.widgetHoldingFocusedEditable?.wrapper;
+
+      // Find the widgets that need to be reinitialized because some of their content was updated.
+      const updatedWidgets = new Set();
+      updatedNodes.forEach(updatedNode => {
+        if (updatedNode.nodeType === Node.ATTRIBUTE_NODE) {
+          // For attribute nodes we consider the owner element was updated.
+          updatedNode = updatedNode.ownerElement;
+        } else if (updatedNode.nodeType !== Node.ELEMENT_NODE) {
+          // The updated node is a text or comment, most probably, so it doesn't affect the widget.
+          return;
+        }
+        const updatedWidget = this._ckeditor.widgets.getByElement(new this._CKEDITOR.dom.element(updatedNode));
+        if (updatedWidget) {
+          updatedWidgets.add(updatedWidget);
+          // We also have to reinitialize the nested widgets.
+          updatedWidget.wrapper.find('.cke_widget_wrapper').toArray().forEach(nestedWidgetWrapper => {
+            const nestedWidget = this._ckeditor.widgets.getByElement(nestedWidgetWrapper, true);
+            updatedWidgets.add(nestedWidget);
+          });
+        }
       });
+
+      // Delete the updated widgets so that we can reinitialize them.
+      updatedWidgets.forEach(widget => {
+        delete this._ckeditor.widgets.instances[widget.id];
+      });
+
+      // Remove the widgets whose element was removed from the DOM and add widgets to match the widget elements found in
+      // the DOM.
       this._ckeditor.widgets.checkWidgets();
-      widgetElements.forEach((widgetElement, index) => {
-        widgetElement.setAttribute('data-cke-widget-data', dataValues[index]);
-      });
+
+      // Update the focused and selected widgets, as well as the widget holding the focused editable.
+      if (focusedWidgetWrapper) {
+        const focusedWidget = this._ckeditor.widgets.getByElement(focusedWidgetWrapper, true);
+        this._ckeditor.widgets.focused = focusedWidget;
+      }
+      this._ckeditor.widgets.selected = selectedWidgetWrappers.map(widgetWrapper =>
+        this._ckeditor.widgets.getByElement(widgetWrapper, true)
+      ).filter(widget => !!widget);
+      if (widgetHoldingFocusedEditableWrapper) {
+        const widgetHoldingFocusedEditable = this._ckeditor.widgets.getByElement(widgetHoldingFocusedEditableWrapper,
+          true);
+        this._ckeditor.widgets.widgetHoldingFocusedEditable = widgetHoldingFocusedEditable;
+      }
     }
 
     _onContentLoaded() {

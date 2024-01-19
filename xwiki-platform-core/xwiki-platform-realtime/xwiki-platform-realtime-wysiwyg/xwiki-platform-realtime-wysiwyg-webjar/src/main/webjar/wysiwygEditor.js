@@ -150,7 +150,6 @@ define('xwiki-realtime-wysiwyg', [
         // Re-initialize the editable content after it is reloaded.
         initEditableContent();
         initializing = false;
-        realtimeOptions.onLocal();
         afterRefresh.forEach(item => item());
         afterRefresh = [];
       });

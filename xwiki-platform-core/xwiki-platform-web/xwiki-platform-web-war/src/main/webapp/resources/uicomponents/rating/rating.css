@@ -127,20 +127,22 @@ ul.locked a {
   display: block;
   height: 100%;
   width: 100%;
+  /* Remove default background for Firefox */
   background: none;
 }
 
-/* Remove default background for */
+/* Remove default background for Chrome & Safari */
 .average-rating::-webkit-meter-bar {
   background: none;
   border: none;
 }
 
-
+/* Add the stars for Chrome & Safari */
 .average-rating::-webkit-meter-optimum-value {
   background: url("star.gif") left repeat-x;
 }
 
+/* Add the stars for Firefox */
 .average-rating:-moz-meter-optimum::-moz-meter-bar {
   background: url("star.gif") left repeat-x;
 }

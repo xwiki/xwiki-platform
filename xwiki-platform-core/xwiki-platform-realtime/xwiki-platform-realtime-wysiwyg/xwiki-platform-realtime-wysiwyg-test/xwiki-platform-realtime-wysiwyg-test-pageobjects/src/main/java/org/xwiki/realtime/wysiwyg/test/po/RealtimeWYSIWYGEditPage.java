@@ -19,6 +19,7 @@
  */
 package org.xwiki.realtime.wysiwyg.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.EntityReference;
@@ -71,7 +72,7 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     {
         if (isRealtimeEditing()) {
             this.allowRealtimeCheckbox.click();
-            // TODO: Handle the confirmation modal.
+            getDriver().findElement(By.cssSelector(".modal-popup .realtime-buttons .btn-primary")).click();
         }
     }
 

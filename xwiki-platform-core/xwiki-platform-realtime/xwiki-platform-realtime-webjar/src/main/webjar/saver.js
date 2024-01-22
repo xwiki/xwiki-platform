@@ -95,89 +95,6 @@ define('xwiki-realtime-saver', [
     return false;
   },
 
-  /**
-   * Retrieves attributes about the local document for the purposes of AJAX merge (just data-xwiki-document and
-   * lastSaved.version).
-   */
-  getDocumentStatistics = function() {
-    var $html = $('html'),
-      fields = [
-        'wiki',
-        'document' // includes space and page
-      ],
-      result = {};
-
-    // We can't rely on people pushing the new lastSaved.version. If they quit before ISAVED other clients won't get the
-    // new version. This isn't such an issue, because they _will_ converge eventually.
-    result.version = lastSaved.version;
-
-    fields.forEach(function (field) {
-      result[field] = $html.data('xwiki-' + field);
-    });
-
-    result.language = doc.language;
-
-    return result;
-  },
-
-  ajaxMerge = function(content, cb) {
-    // version, document
-    var stats = getDocumentStatistics();
-
-    stats.content = content;
-    if (mainConfig.isHTML) {
-      stats.convertHTML = 1;
-    }
-
-    verbose('Posting with the following stats:');
-    verbose(stats);
-
-    $.ajax({
-      url: new XWiki.Document('Ajax', 'RTFrontend').getURL('get', 'xpage=plain&outputSyntax=plain'),
-      method: 'POST',
-      dataType: 'json',
-      success: function (data) {
-        try {
-          // Data is already an "application/json".
-          var merge = data;
-          var error = merge.conflicts && merge.conflicts.length && merge.conflicts[0].formattedMessage;
-          if (error) {
-            merge.error = error;
-            cb(error, merge);
-          } else {
-            // Let the callback handle textarea writes.
-            cb(null, merge);
-          }
-        } catch (err) {
-          var debugLog = {
-            state: 'ajaxMerge/parseError',
-            lastSavedVersion: lastSaved.version,
-            lastSavedContent: lastSaved.content,
-            cUser: mainConfig.userName,
-            mergeData: data,
-            error: err
-          };
-          ErrorBox.show('parse', JSON.stringify(debugLog));
-          warn(err);
-          cb(err, data);
-        }
-      },
-      data: stats,
-      error: function (err) {
-        var debugLog = {
-          state: 'ajaxMerger/velocityError',
-          lastSavedVersion: lastSaved.version,
-          lastSavedContent: lastSaved.content,
-          cContent: content,
-          cUser: mainConfig.userName,
-          err: err
-        };
-        ErrorBox.show('velocity', JSON.stringify(debugLog));
-        warn(err);
-      },
-    });
-  },
-
   bumpVersion = function(callback, versionData) {
     var success = function(doc) {
       debug('Triggering lastSaved refresh on remote clients.');
@@ -246,22 +163,6 @@ define('xwiki-realtime-saver', [
     });
   },
 
-  presentMergeDialog = function(question, labelDefault, choiceDefault, labelAlternative, choiceAlternative) {
-    var behave = {
-      onYes: choiceDefault,
-      onNo: choiceAlternative
-    };
-
-    var param = {
-      confirmationText: question,
-      yesButtonText: labelDefault,
-      noButtonText: labelAlternative,
-      showCancelButton: true
-    };
-
-    new XWiki.widgets.ConfirmationBox(behave, param);
-  },
-
   destroyDialog = Saver.destroyDialog = function(callback) {
     var $box = $('.xdialog-box.xdialog-box-confirmation'),
       $content = $box.find('.xdialog-content');
@@ -281,154 +182,6 @@ define('xwiki-realtime-saver', [
   // Have rtwiki call this on local edits.
   setLocalEditFlag = Saver.setLocalEditFlag = function(condition) {
     lastSaved.wasEditedLocally = condition;
-  },
-
-  resolveMergeConflictsPromise = function(merge, deferred) {
-    // There was a merge conflict we'll need to resolve.
-    warn(merge.error);
-
-    // Halt the autosave cycle to give the user time. Don't halt forever though, because you might disconnect and hang.
-    mergeDialogCurrentlyDisplayed = true;
-
-    presentMergeDialog(
-      Messages['mergeDialog.prompt'],
-
-      Messages['mergeDialog.keepRealtime'],
-
-      function() {
-        debug('User chose to use the realtime version!');
-        // Unset the merge dialog flag.
-        mergeDialogCurrentlyDisplayed = false;
-        deferred.resolve();
-      },
-
-      Messages['mergeDialog.keepRemote'],
-
-      function() {
-        debug('User chose to use the remote version!');
-        // Unset the merge dialog flag.
-        mergeDialogCurrentlyDisplayed = false;
-        var restURL = XWiki.currentDocument.getRestURL();
-        if (doc.language && !/\/pages\/(.+)\/translations\//.test(restURL)) {
-          restURL = restURL + doc.language;
-        }
-
-        $.getJSON(restURL).then(data => {
-          mainConfig.setTextValue(data.content, true, function() {
-            debug("Overwrote the realtime session's content with the latest saved state.");
-            bumpVersion(function() {
-              lastSaved.mergeMessage('mergeOverwrite', []);
-            });
-            deferred.resolve();
-          });
-        }).catch(error => {
-          mainConfig.safeCrash('keepremote');
-          warn("Encountered an error while fetching remote content.");
-          warn(error);
-          deferred.reject();
-        });
-      }
-    );
-  },
-
-  resolveMergeConflicts = function(merge) {
-    return new Promise((resolve, reject) => resolveMergeConflictsPromise(merge, {resolve, reject}));
-  },
-
-  mergedWithoutConflicts = function(merge, preMergeContent) {
-    return new Promise((resolve, reject) => {
-      // The content was merged and there were no errors / conflicts.
-      if (preMergeContent !== mainConfig.getTextValue()) {
-        // There have been changes since merging. Don't overwrite if there have been changes while merging
-        // See http://jira.xwiki.org/browse/RTWIKI-37
-        // Try again in one cycle.
-        reject();
-      } else {
-        // Walk the tree of hashes and if merge.previousVersionContent exists, then this merge is quite possibly faulty.
-        if (mainConfig.realtime.getDepthOfState(merge.previousVersionContent) !== -1) {
-          debug("The server merged a version which already existed in the history. " +
-            "Reversions shouldn't merge. Ignoring merge.");
-          debug("waseverstate=true");
-          resolve();
-        } else {
-          debug("The latest version content does not exist anywhere in our history.");
-          debug("Continuing...");
-          // There were no errors or local changes. Push to the textarea.
-          mainConfig.setTextValue(merge.content, false, resolve);
-        }
-      }
-    });
-  },
-
-  // callback takes signature (error, shouldSave)
-  mergeContinuation = function(merge, callback) {
-    // Our continuation has three cases:
-    if (isaveInterrupt()) {
-      // 1. ISAVE interrupt error
-      callback('ISAVED interrupt', null);
-    } else if (merge.saveRequired) {
-      // 2. saveRequired
-      callback(null, true);
-    } else {
-      // 3. saveNotRequired
-      callback(null, false);
-    }
-  },
-
-  mergeCallback = function(preMergeContent, andThen, error, merge) {
-    if (error) {
-      if (!merge || typeof merge === 'undefined') {
-        warn('The ajax merge API did not return an object. Something went wrong');
-        warn(error);
-        return;
-      } else if (error === merge.error) {
-        // There was a merge error. Continue and handle elsewhere.
-        warn(error);
-      } else {
-        // It was some other kind of error... parsing? Complain and return. This means the script failed.
-        warn(error);
-        return;
-      }
-    }
-
-    if (isaveInterrupt()) {
-      andThen('ISAVED interrupt', null);
-
-    } else if (merge.content === lastSaved.content) {
-      // Don't dead end, but indicate that you shouldn't save.
-      andThen("Merging didn't result in a change.", false);
-      setLocalEditFlag(false);
-
-    // http://jira.xwiki.org/browse/RTWIKI-34
-    // Give Messages when merging.
-    } else if (merge.merged) {
-      // TODO update version field with merge.currentVersion
-      console.log("Force updating version to: " + merge.currentVersion);
-      if (xwikiMeta.setVersion) {
-        xwikiMeta.setVersion(merge.currentVersion);
-      }
-      // A merge took place.
-      if (merge.error) {
-        resolveMergeConflicts(merge).then(mergeContinuation.bind(null, merge, andThen));
-      } else {
-        mergedWithoutConflicts(merge, preMergeContent).then(() => {
-          mergeContinuation(merge, andThen);
-        }).catch(() => {
-          andThen("The realtime content changed while we were performing our asynchronous merge.", false);
-        });
-      }
-
-    } else {
-      // No merge was necessary, but you might still have to save.
-      mergeContinuation(merge, andThen);
-    }
-  },
-
-  mergeRoutine = function(andThen) {
-    // Post your current version to the server to see if it must merge. Remember the current state so you can check if
-    // it has changed.
-    var preMergeContent = mainConfig.getTextValue();
-    ajaxMerge(preMergeContent, mergeCallback.bind(null, preMergeContent, andThen));
   },
 
   onMessage = function(data) {
@@ -524,7 +277,7 @@ define('xwiki-realtime-saver', [
     rtData = data;
 
     return false;
-  },
+  };
 
   /**
    * This contains some of the more complicated logic in this script. Clients check for remote changes on random
@@ -535,7 +288,6 @@ define('xwiki-realtime-saver', [
    * their local state to match. During this process, a series of checks are made to reduce the number of unnecessary
    * saves, as well as the number of unnecessary merges.
    */
-  mergeDialogCurrentlyDisplayed = false;
   Saver.create = function(config) {
     $.extend(mainConfig, config);
     mainConfig.formId = mainConfig.formId || 'edit';
@@ -545,91 +297,6 @@ define('xwiki-realtime-saver', [
     lastSaved.time = now();
 
     var onOpen = function(chan) {
-      // Originally implemented as part of 'saveRoutine', abstracted logic such that the merge/save algorithm can
-      // terminate with different callbacks for different use cases.
-      var saveFinalizer = function(e, shouldSave) {
-        var toSave = mainConfig.getTextValue();
-        if (toSave === null) {
-          e = "Unable to get the content of the document. Don't save.";
-        }
-        if (e) {
-          warn(e);
-        } else if (shouldSave) {
-          saveDocument(mainConfig.getSaveValue()).then(doc => {
-            // Cache this because bumpVersion will increment it.
-            var lastVersion = lastSaved.version;
-
-            // Update values in lastSaved.
-            updateLastSaved(toSave);
-
-            // Get document version.
-            bumpVersion(function(doc) {
-              if (doc.version === '1.1') {
-                debug('Created document version 1.1');
-              } else {
-                debug(`Version bumped from ${lastVersion} to ${doc.version}.`);
-              }
-              lastSaved.mergeMessage('saved', [doc.version]);
-            }, doc);
-          });
-        } else {
-          // local content matches that of the latest version
-          verbose("No save was necessary");
-          lastSaved.content = toSave;
-          // didn't save, don't need a callback
-          bumpVersion();
-        }
-      };
-
-      function saveRoutine(andThen, force) {
-        // If this is ever true in your save routine, complain and abort.
-        lastSaved.receivedISAVE = false;
-
-        const toSave = mainConfig.getTextValue();
-        if (toSave === null) {
-          warn("Unable to get the content of the document. Don't save.");
-          return;
-        }
-
-        if (lastSaved.content === toSave && !force ) {
-          verbose("No changes made since last save. Avoiding unnecessary commits.");
-          return;
-        }
-
-        if (mainConfig.mergeContent) {
-          mergeRoutine(andThen);
-        } else {
-          andThen(null, true);
-        }
-      }
-
-      let preventDefaultSave = true;
-      function saveButtonAction(continueEditing) {
-        debug("Saver.create.saveand" + (continueEditing ? 'continue' : 'view'));
-
-        saveRoutine(function(e) {
-          if (e) {
-            warn(e);
-          }
-
-          lastSaved.shouldRedirect = !continueEditing;
-          preventDefaultSave = false;
-          // We use the Save & Continue button to trigger the save because we want to perform some action after the
-          // content is saved and we handle the redirect to view mode ourselves.
-          $(`#${config.formId} [name="action_saveandcontinue"]`).click();
-        }, /* force: */ true);
-      }
-
-      // Special handling of save action.
-      $(document).off('xwiki:actions:beforeSave.realtime-saver')
-        .on('xwiki:actions:beforeSave.realtime-saver', function(event) {
-          if (preventDefaultSave) {
-            event.preventDefault();
-            saveButtonAction($(event.target).attr('name') === 'action_saveandcontinue');
-          }
-          // Reset the flag for the next save.
-          preventDefaultSave = true;
-        });
 
       // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
       $('[name="action_preview"]').remove();
@@ -643,33 +310,28 @@ define('xwiki-realtime-saver', [
         updateLastSaved(toSave);
 
         doc.reload().then(doc => {
-          if (doc.isNew) {
-            // It didn't actually save?
-            ErrorBox.show('save');
-          } else {
-            lastSaved.onReceiveOwnIsave = function() {
-              // Once you get your isaved back, redirect.
-              debug("lastSaved.shouldRedirect " + lastSaved.shouldRedirect);
-              if (lastSaved.shouldRedirect) {
-                debug('Saver.create.saveandview.receivedOwnIsaved');
-                debug("redirecting!");
-                redirectToView();
-              } else {
-                debug('Saver.create.saveandcontinue.receivedOwnIsaved');
-              }
-              // Clean up after yourself..
-              lastSaved.onReceiveOwnIsave = null;
-            };
-            // Bump the version, fire your isaved.
-            bumpVersion(function(doc) {
-              if (doc.version === '1.1') {
-                debug('Created document version 1.1');
-              } else {
-                debug(`Version bumped from ${lastVersion} to ${doc.version}.`);
-              }
-              lastSaved.mergeMessage('saved', [doc.version]);
-            }, doc);
-          }
+          lastSaved.onReceiveOwnIsave = function() {
+            // Once you get your isaved back, redirect.
+            debug("lastSaved.shouldRedirect " + lastSaved.shouldRedirect);
+            if (lastSaved.shouldRedirect) {
+              debug('Saver.create.saveandview.receivedOwnIsaved');
+              debug("redirecting!");
+              redirectToView();
+            } else {
+              debug('Saver.create.saveandcontinue.receivedOwnIsaved');
+            }
+            // Clean up after yourself..
+            lastSaved.onReceiveOwnIsave = null;
+          };
+          // Bump the version, fire your isaved.
+          bumpVersion(function(doc) {
+            if (doc.version === '1.1') {
+              debug('Created document version 1.1');
+            } else {
+              debug(`Version bumped from ${lastVersion} to ${doc.version}.`);
+            }
+            lastSaved.mergeMessage('saved', [doc.version]);
+          }, doc);
         }).catch(error => {
           warn(error);
           ErrorBox.show('save');
@@ -695,37 +357,52 @@ define('xwiki-realtime-saver', [
          console.log(ev);
         }
       };
-      // FIXME: Find a way to remove the old listener without using Prototype.js API.
-      document.stopObserving('xwiki:document:saveFailed');
-      $(document).on('xwiki:document:saveFailed.realtime-saver', onSaveFailedHandler);
 
       // TimeOut
       var check = function() {
+        lastSaved.receivedISAVE = false;
+
+        const toSave = mainConfig.getTextValue();
+        if (toSave === null) {
+          warn("Unable to get the content of the document. Don't save.");
+          return;
+        }
+
+        if (lastSaved.content === toSave) {
+          verbose("No changes made since last save. Avoiding unnecessary commits.");
+          return;
+        }
+
         clearTimeout(mainConfig.autosaveTimeout);
         verbose("Saver.create.check");
         var periodDuration = Math.random() * SAVE_DOC_CHECK_CYCLE;
         mainConfig.autosaveTimeout = setTimeout(check, periodDuration);
 
         verbose(`Will attempt to save again in ${periodDuration} ms.`);
-
-        if (!lastSaved.wasEditedLocally) {
-          verbose("Skipping save routine because no changes have been made locally");
-          return;
-        } else {
-          verbose("There have been local changes!");
-        }
-        if (now() - lastSaved.time < SAVE_DOC_TIME) {
-          verbose("(Now - lastSaved.time) < SAVE_DOC_TIME");
-          return;
-        }
-        // Avoid queuing up multiple merge dialogs.
-        if (mergeDialogCurrentlyDisplayed) {
+        if (!lastSaved.wasEditedLocally || now() - lastSaved.time < SAVE_DOC_TIME) {
+          verbose("!lastSaved.wasEditedLocally || (Now - lastSaved.time) < SAVE_DOC_TIME");
           return;
         }
 
-        saveRoutine(saveFinalizer);
+        // The merge conflict modal is displayed after clicking on the save button when there is a merge conflict.
+        // Clicking the save button again would reopen the same modal and reset the fields the user did not submit yet.
+        if (!$('#previewDiffModal').is(':visible')) {
+          $(`#${config.formId} [name="action_saveandcontinue"]`).click();
+        }
       };
 
+      // Prevent the save buttons from reloading the page. Instead, reset the editor's content.'
+      var overrideAjaxSaveAndContinue = function() {
+        var originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
+        $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {
+          reloadEditor: function() {
+            // TODO: Handle the page title.
+            mainConfig.getTextAtCurrentRevision().then((data) => {mainConfig.setTextValue(data);});
+          }
+        });
+      };
+
+      overrideAjaxSaveAndContinue();
       check();
     };
 
@@ -797,12 +474,6 @@ define('xwiki-realtime-saver', [
     }
     clearTimeout(mainConfig.autosaveTimeout);
     rtData = {};
-    // Remove the merge routine from the save buttons.
-    $(document).off([
-      'xwiki:actions:beforeSave.realtime-saver',
-      'xwiki:document:saved.realtime-saver',
-      'xwiki:document:saveFailed.realtime-saver'
-    ].join(' '));
   };
 
   Saver.setLastSavedContent = function(content) {

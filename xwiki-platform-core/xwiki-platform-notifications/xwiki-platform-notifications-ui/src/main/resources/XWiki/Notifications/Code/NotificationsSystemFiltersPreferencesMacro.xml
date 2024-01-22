@@ -458,7 +458,7 @@
       <name>user</name>
     </property>
     <property>
-      <type/>
+      <type>org.xwiki.user.UserReference</type>
     </property>
   </object>
   <object>

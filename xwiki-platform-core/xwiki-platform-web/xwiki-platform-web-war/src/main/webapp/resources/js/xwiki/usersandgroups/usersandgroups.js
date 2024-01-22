@@ -555,20 +555,20 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     var saveURL = "$xwiki.getURL('XWiki.XWikiPreferences', 'save')";
     var config = "XWiki.XWikiPreferences";
     var objNum = "0";
-    if (saveDocumentURL != undefined && saveDocumentURL.length > 0) {
+    if (saveDocumentURL !== undefined && saveDocumentURL.length > 0) {
       saveURL = saveDocumentURL;
     }
-    if (configurationClassName != undefined && configurationClassName.length > 0) {
+    if (configurationClassName !== undefined && configurationClassName.length > 0) {
       config = configurationClassName;
     }
-    if (objectNumber != undefined) {
+    if (objectNumber !== undefined) {
       objNum = objectNumber;
     }
     var pivot = self;
-    var newAlt = "yes";
+    var newChecked = "checked";
     var setValue = "1";
-    if (self.getAttribute('alt') == "yes") {
-      newAlt = "no";
+    if (self.getAttribute('checked') === "checked") {
+      newChecked = "";
       setValue = "0";
     }
     var paramMap = {};
@@ -577,7 +577,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     paramMap["parameters"]["ajax"] = "1";
     paramMap["parameters"]["comment"] = "$services.localization.render('authenticate_viewedit_savecomment')";
     paramMap["onSuccess"] = function() {
-      pivot.alt = newAlt;
+      pivot.setAttribute('checked',newChecked);
     }
     new Ajax.Request(saveURL, paramMap);
   };

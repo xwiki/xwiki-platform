@@ -65,26 +65,22 @@ public class MimetypeAttachmentValidationStep implements AttachmentValidationSte
     @Override
     public void validate(AttachmentAccessWrapper wrapper) throws AttachmentValidationException
     {
-        InputStream inputStream;
-        try {
-            inputStream = wrapper.getInputStream();
-        } catch (IOException e) {
-            throw new AttachmentValidationException(
-                String.format("Failed to read the input stream for [%s]", wrapper), e,
-                SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
-        }
-        String mimeType = detectMimeType(inputStream, wrapper.getFileName()).toLowerCase();
-        List<String> allowedMimetypes = this.attachmentValidationConfiguration.getAllowedMimetypes();
-        List<String> blockerMimetypes = this.attachmentValidationConfiguration.getBlockerMimetypes();
-        boolean hasAllowedMimetypes = !allowedMimetypes.isEmpty();
-        boolean hasBlockerMimetypes = !blockerMimetypes.isEmpty();
+        try (InputStream inputStream = wrapper.getInputStream()) {
+            String mimeType = detectMimeType(inputStream, wrapper.getFileName()).toLowerCase();
+            List<String> allowedMimetypes = this.attachmentValidationConfiguration.getAllowedMimetypes();
+            List<String> blockerMimetypes = this.attachmentValidationConfiguration.getBlockerMimetypes();
+            boolean hasAllowedMimetypes = !allowedMimetypes.isEmpty();
+            boolean hasBlockerMimetypes = !blockerMimetypes.isEmpty();
 
-        if (hasAllowedMimetypes && !checkMimetype(allowedMimetypes, mimeType)
-            || hasBlockerMimetypes && checkMimetype(blockerMimetypes, mimeType))
-        {
-            throw new AttachmentValidationException(String.format("Invalid mimetype [%s]", mimeType),
-                SC_UNSUPPORTED_MEDIA_TYPE, "attachment.validation.mimetype.rejected", List.of(allowedMimetypes,
-                blockerMimetypes), null);
+            if (hasAllowedMimetypes && !checkMimetype(allowedMimetypes, mimeType)
+                || hasBlockerMimetypes && checkMimetype(blockerMimetypes, mimeType)) {
+                throw new AttachmentValidationException(String.format("Invalid mimetype [%s]", mimeType),
+                    SC_UNSUPPORTED_MEDIA_TYPE, "attachment.validation.mimetype.rejected",
+                    List.of(allowedMimetypes, blockerMimetypes), null);
+            }
+        } catch (IOException e) {
+            throw new AttachmentValidationException(String.format("Failed to read the input stream for [%s]", wrapper),
+                e, SC_INTERNAL_SERVER_ERROR, "attachment.validation.inputStream.error");
         }
     }
 

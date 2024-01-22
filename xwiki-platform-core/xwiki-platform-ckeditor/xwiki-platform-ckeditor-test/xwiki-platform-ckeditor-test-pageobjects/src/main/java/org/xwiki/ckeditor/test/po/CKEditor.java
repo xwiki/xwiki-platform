@@ -94,6 +94,16 @@ public class CKEditor extends BaseElement
     }
 
     /**
+     * @return the page object used to interact with the CKEditor balloon tool bar
+     * @since 15.10.6
+     * @since 16.0.0RC1
+     */
+    public CKEditorBalloonToolBar getBalloonToolBar()
+    {
+        return new CKEditorBalloonToolBar(this);
+    }
+
+    /**
      * @return the rich text area
      */
     public RichTextAreaElement getRichTextArea()

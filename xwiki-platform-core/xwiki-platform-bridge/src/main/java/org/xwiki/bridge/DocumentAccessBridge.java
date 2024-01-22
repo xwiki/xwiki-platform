@@ -195,7 +195,7 @@ public interface DocumentAccessBridge
     boolean exists(String documentReference) throws Exception;
 
     /**
-     * Updates the target document with the new content provided. If the target document does not exists, a new one will
+     * Updates the target document with the new content provided. If the target document does not exist, a new one will
      * be created.
      * 
      * @param documentReference the reference to the target document
@@ -209,7 +209,7 @@ public interface DocumentAccessBridge
         boolean isMinorEdit) throws Exception;
 
     /**
-     * Updates the target document with the new content provided. If the target document does not exists, a new one will
+     * Updates the target document with the new content provided. If the target document does not exist, a new one will
      * be created.
      * 
      * @param documentReference the reference to the target document
@@ -236,7 +236,7 @@ public interface DocumentAccessBridge
     String getDocumentContent(String documentReference) throws Exception;
 
     /**
-     * Get the syntax Id of the target document. If the target document does not exists, the default syntax of a new
+     * Get the syntax Id of the target document. If the target document does not exist, the default syntax of a new
      * document is returned.
      * 
      * @param documentReference the reference of the target document
@@ -249,7 +249,7 @@ public interface DocumentAccessBridge
     String getDocumentSyntaxId(String documentReference) throws Exception;
 
     /**
-     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exists, a new
+     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exist, a new
      * one will be created.
      * 
      * @param documentReference the reference of the target document
@@ -260,7 +260,7 @@ public interface DocumentAccessBridge
     void setDocumentSyntaxId(DocumentReference documentReference, String syntaxId) throws Exception;
 
     /**
-     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exists, a new
+     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exist, a new
      * one will be created.
      * 
      * @param documentReference the reference of the target document

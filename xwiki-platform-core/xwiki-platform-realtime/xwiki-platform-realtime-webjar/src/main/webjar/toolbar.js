@@ -113,6 +113,8 @@ define('xwiki-realtime-toolbar', [
   }
 
   function updateUserList(myUserName, listElement, userList, userData, onUserNameClick) {
+    // Update the current user id on the tool bar (used by automated functional tests).
+    listElement.closest('.rt-toolbar').dataset.userId = myUserName;
     if (userList.indexOf(myUserName) < 0) {
       listElement.textContent = Messages.synchronizing;
       return;
@@ -146,7 +148,8 @@ define('xwiki-realtime-toolbar', [
   }
 
   function create({$container, myUserName, realtime, getLag, userList, config}) {
-    const toolbar = createRealtimeToolbar($container);
+    // Save the current user id on the tool bar to be used by automated functional tests.
+    const toolbar = createRealtimeToolbar($container).attr('data-user-id', myUserName);
     let userListElement = createUserList(toolbar.find('.rt-toolbar-leftside'));
     const spinner = createSpinner(toolbar.find('.rt-toolbar-rightside'));
     const lagElement = createLagElement(toolbar.find('.rt-toolbar-rightside'));

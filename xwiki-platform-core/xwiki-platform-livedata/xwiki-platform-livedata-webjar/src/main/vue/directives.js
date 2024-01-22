@@ -50,7 +50,6 @@ export const mousedownmove = {
       const removeMousemoveHandler = () => {
         window.removeEventListener("mousemove", mousemoveHandler);
         window.removeEventListener("mouseup", removeMousemoveHandler);
-        window.removeEventListener("focusout", removeMousemoveHandler);
       };
 
       // If the "immediate" modifiers is set, dispatch the event immediately
@@ -61,7 +60,6 @@ export const mousedownmove = {
       // Bind event listeners
       window.addEventListener("mousemove", mousemoveHandler);
       window.addEventListener("mouseup", removeMousemoveHandler);
-      window.addEventListener("focusout", removeMousemoveHandler);
     });
   }
 };

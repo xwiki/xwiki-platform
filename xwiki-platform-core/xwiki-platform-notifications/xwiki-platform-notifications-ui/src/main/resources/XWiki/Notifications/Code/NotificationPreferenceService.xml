@@ -37,6 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set($isActionAllowed = false)
 #if ("$!request.user" != "")
     #if ($request.user.contains("."))
       #set ($targetUser = $request.user)
@@ -47,15 +48,17 @@
 #if ("$!request.target" == 'wiki')
   #set ($targetDoc = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
   #set ($targetRef = $services.wiki.getCurrentWikiReference())
+  #set($isActionAllowed = $hasAdmin)
 #elseif ("$!request.target" == 'user')
   #set ($targetDoc = $xwiki.getDocument($targetUser))
-  #set ($targetRef = $targetUser)
+  #set ($targetRef = $services.model.resolveDocument($targetUser))
+  #set($isActionAllowed = ("$!request.action" == 'watchUser' || "$!request.action" == 'unwatchUser' || $services.security.authorization.hasAccess('admin', $requestedUserDocRef) || $xcontext.userReference.equals($targetRef)))
 #end
 #if ("$!request.action" == "" &amp;&amp; $request.method.equalsIgnoreCase('get'))
   This is a technical page for Notifications macro.
 #elseif (!$services.csrf.isTokenValid($request.csrf))
   #set ($discard = $response.sendError(401, $services.localization.render('notifications.settings.error.badCSRF')))
-#elseif ("$!request.target" == 'wiki' &amp;&amp; !$hasAdmin)
+#elseif (!$isActionAllowed)
   #set ($discard = $response.sendError(401))
 #elseif ("$!request.action" == "" || "$!request.target" == "" || ("$!request.target" == 'user' &amp;&amp; "$!request.user" == ""))
   #set ($discard = $response.sendError(400, $services.localization.render('notifications.settings.error.badParameters')))

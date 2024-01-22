@@ -111,7 +111,7 @@ public class ExportAction extends XWikiAction
      * @return always return null.
      * @throws XWikiException error when exporting HTML ZIP package.
      * @throws IOException error when exporting HTML ZIP package.
-     * @since XWiki Platform 1.3M1
+     * @since 1.3M1
      */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {

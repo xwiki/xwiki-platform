@@ -23,7 +23,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -64,7 +63,7 @@ public class DurationImagePullPolicyTest
         try (Stream<String> lines = Files.lines(path)) {
             List<String> filteredLines = lines
                 .filter(s -> s.startsWith("something:latest|"))
-                .collect(Collectors.toList());
+                .toList();
             assertEquals(1, filteredLines.size());
         }
 
@@ -80,7 +79,7 @@ public class DurationImagePullPolicyTest
         try (Stream<String> lines = Files.lines(path)) {
             List<String> filteredLines = lines
                 .filter(s -> s.startsWith("something:latest|") || s.startsWith("something2:1.0"))
-                .collect(Collectors.toList());
+                .toList();
             assertEquals(2, filteredLines.size());
         }
     }

@@ -333,14 +333,14 @@
 #macro (createDocumentDiff $oldDoc $newDoc $return)
   #set ($objectDiffs = [])
   #set ($tagsDiff = $NULL)
-  #foreach ($objectDiff in $doc.getObjectDiff($oldDoc, $newDoc))
+  #foreach ($objectDiff in $oldDoc.getObjectDiff($oldDoc, $newDoc))
     #if ($objectDiff.get(0).className == 'XWiki.TagClass')
       #set ($tagsDiff = $objectDiff)
     #else
       #set ($discard = $objectDiffs.add($objectDiff))
     #end
   #end
-  #set ($classDiff = $doc.getClassDiff($oldDoc, $newDoc))
+  #set ($classDiff = $oldDoc.getClassDiff($oldDoc, $newDoc))
   #if ($classDiff && $classDiff.size() > 0)
     #set ($classDiff = $classDiff.get(0))
   #end
@@ -353,9 +353,9 @@
     'documentReference': $documentReference,
     'oldDoc': $oldDoc,
     'newDoc': $newDoc,
-    'metaData': $doc.getMetaDataDiff($oldDoc, $newDoc),
+    'metaData': $oldDoc.getMetaDataDiff($oldDoc, $newDoc),
     'tags': $tagsDiff,
-    'attachments': $doc.getAttachmentDiff($oldDoc, $newDoc),
+    'attachments': $oldDoc.getAttachmentDiff($oldDoc, $newDoc),
     'objects': $objectDiffs,
     'classProperties': $classDiff
   })

@@ -71,7 +71,7 @@ public class DefaultNotificationFilterManagerTest
 
     @MockComponent
     @Named("cached")
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @MockComponent
     private ModelContext modelContext;
@@ -220,7 +220,7 @@ public class DefaultNotificationFilterManagerTest
         filterActivations.put("filter6", false);
         // We don't put filter7 so it should default as being considered activated
 
-        when(this.modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
+        when(this.filterPreferencesModelBridge.getToggleableFilterActivations(testUser)).thenReturn(filterActivations);
         when(filter1.getFilteringPhases())
             .thenReturn(NotificationFilter.SUPPORT_ONLY_PRE_FILTERING_PHASE);
         when(filter2.getFilteringPhases())

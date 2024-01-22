@@ -778,7 +778,7 @@
       <messageBodyTemplate>{{velocity}}
 #set($discard = "#template('colorThemeInit.vm')")
 #if("$!theme" == "")
- #set($theme = {"linkColor":"#4791BC"})
+ #set($theme = {"linkColor":"#4791BC", "notificationErrorColor":"#ca302c"}})
 #end
 #set($userName = $xwiki.getUserName($xcontext.getUser(), false))
 #set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))
@@ -786,7 +786,8 @@
 #set($linkStyle = "color:$theme.get('linkColor');text-decoration:none;")
 #set($bigText = "font-size:130%;")
 #set($joinLink = "float:left;")
-#set($declineLink = "color:#f88;float:right;text-decoration:none;")
+#set($dangerColor = $theme.notificationErrorColor)
+#set($declineLink = "color:$dangerColor;float:right;text-decoration:none;")
 
 $services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])
 

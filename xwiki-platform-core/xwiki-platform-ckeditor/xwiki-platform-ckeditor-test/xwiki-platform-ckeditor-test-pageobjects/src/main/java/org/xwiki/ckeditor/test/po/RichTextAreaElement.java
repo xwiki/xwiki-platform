@@ -20,11 +20,13 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -179,22 +181,32 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
-     * @return the placeholder text, if present
+     * @param placeholder the expected placeholder text, {@code null} if no placeholder is expected
+     * @return this rich text area element
      */
-    public String getPlaceholder()
+    public RichTextAreaElement waitForPlaceholder(String placeholder)
     {
         try {
-            return getActiveElement().getAttribute("data-cke-editorplaceholder");
+            WebElement activeElement = getActiveElement();
+            getDriver().waitUntilCondition(
+                driver -> Objects.equals(placeholder, activeElement.getAttribute("data-cke-editorplaceholder")));
         } finally {
             getDriver().switchTo().defaultContent();
         }
+
+        return this;
     }
 
     protected <T> T getFromIFrame(Supplier<T> supplier)
     {
         try {
             getDriver().switchTo().frame(this.iframe);
-            return supplier.get();
+            try {
+                return supplier.get();
+            } catch (StaleElementReferenceException e) {
+                // Try again in case the content of the iframe has been updated.
+                return supplier.get();
+            }
         } finally {
             getDriver().switchTo().defaultContent();
         }

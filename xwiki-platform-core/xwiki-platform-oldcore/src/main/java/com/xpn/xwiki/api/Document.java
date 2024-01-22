@@ -1620,37 +1620,6 @@ public class Document extends Api
     }
 
     /**
-     * Displays the tooltip of the given field. This function uses the active object or will find the first object that
-     * has the given field.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname)
-    {
-        if (this.currentObj == null) {
-            return this.doc.displayTooltip(fieldname, getXWikiContext());
-        } else {
-            return this.doc.displayTooltip(fieldname, this.currentObj.getBaseObject(), getXWikiContext());
-        }
-    }
-
-    /**
-     * Displays the tooltip of the given field of the given object.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @param obj Object to find the class to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname, Object obj)
-    {
-        if (obj == null) {
-            return "";
-        }
-        return this.doc.displayTooltip(fieldname, obj.getBaseObject(), getXWikiContext());
-    }
-
-    /**
      * Displays the given field. The display mode will be decided depending on page context (edit or inline context will
      * display in edit, view context in view) This function uses the active object or will find the first object that
      * has the given field. This function can return html inside and html macro

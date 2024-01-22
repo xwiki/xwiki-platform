@@ -243,7 +243,7 @@ class DefaultWikiDescriptorManagerTest
         // When the wiki exists
         assertTrue(this.descriptorManager.exists("wikiid1"));
 
-        // When the wiki does not exists
+        // When the wiki does not exist
         assertFalse(this.descriptorManager.exists("wikiid2"));
     }
 

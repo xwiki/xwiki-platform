@@ -21,7 +21,6 @@ package org.xwiki.realtime.wysiwyg.test.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -32,6 +31,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WindowType;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
+import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.model.reference.AttachmentReference;
@@ -107,14 +107,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys("one");
 
         // Verify the cursor indicator on the left of the editing area.
-        List<CoeditorPosition> coeditorPositions = textArea.getCoeditorPositions();
-        assertEquals(1, coeditorPositions.size());
-
-        CoeditorPosition selfPosition = coeditorPositions.get(0);
+        CoeditorPosition selfPosition = textArea.getCoeditorPosition(editor.getToolBar().getUserId());
         assertEquals("John", selfPosition.getAvatarHint());
         assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + selfPosition.getAvatarURL());
         selfPosition.waitForLocation(new Point(3, 18));
+
+        assertEquals(1, textArea.getCoeditorPositions().size());
 
         // Verify that the cursor indicator is updated when typing.
         textArea.sendKeys(Keys.ENTER, "two");
@@ -163,7 +162,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        String firstCoeditorId = firstTextArea.getCoeditorPositions().get(0).getCoeditorId();
+        String firstCoeditorId = firstEditor.getToolBar().getUserId();
 
         //
         // Second Tab
@@ -175,10 +174,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
-
-        // FIXME: We need a simpler method to get the user ID in the real-time session.
-        String secondCoeditorId = secondTextArea.getCoeditorPositions().stream()
-            .filter(position -> !firstCoeditorId.equals(position.getCoeditorId())).findFirst().get().getCoeditorId();
+        String secondCoeditorId = secondEditor.getToolBar().getUserId();
 
         // Verify the list of coeditors.
         List<Coeditor> coeditors = secondEditor.getToolBar().waitForCoeditor(firstCoeditorId).getCoeditors();
@@ -191,7 +187,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("John", self.getAvatarHint());
 
         // Verify the placeholder text is present, because the content is empty.
-        assertEquals("Start typing here...", secondTextArea.getPlaceholder());
+        secondTextArea.waitForPlaceholder("Start typing here...");
 
         //
         // First Tab
@@ -220,7 +216,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilContentContains("three");
 
         // There should be no placeholder text anymore because the content is not empty.
-        assertNull(secondTextArea.getPlaceholder());
+        secondTextArea.waitForPlaceholder(null);
         assertEquals("one\ntwo\nthree", secondTextArea.getText());
 
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
@@ -375,7 +371,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("Start. ");
+        firstTextArea.sendKeys("Start.");
 
         //
         // Second Tab
@@ -388,7 +384,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         // Each user types in their own paragraph.
-        secondTextArea.waitUntilContentContains("Start. ");
+        secondTextArea.waitUntilContentContains("Start.");
         secondTextArea.sendKeys(Keys.END, Keys.ENTER);
 
         String firstUserText = "The five boxing wizards jump quickly. The quick brown fox jumps over the lazy dog. First";
@@ -402,7 +398,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
             // First Tab
             //
             setup.getDriver().switchTo().window(firstTabHandle);
-            firstTextArea.sendKeys(firstUserWords[i] + " ");
+            firstTextArea.sendKeys(" " + firstUserWords[i]);
 
             //
             // Second Tab
@@ -411,11 +407,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
             secondTextArea.sendKeys(secondUserWords[i] + " ");
         }
 
+        secondTextArea.sendKeys("End.");
+
         // Wait to receive all the content typed by the first user.
         secondTextArea.waitUntilContentContains("First");
 
         ViewPage viewPage = secondEditPage.clickSaveAndView();
-        assertEquals("Start. " + firstUserText + "\n" + secondUserText, viewPage.getContent());
+        assertEquals("Start. " + firstUserText + "\n" + secondUserText + " End.", viewPage.getContent());
     }
 
     @Test
@@ -432,7 +430,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("Separator. ", Keys.HOME);
+        firstTextArea.sendKeys("Separator.", Keys.HOME);
 
         //
         // Second Tab
@@ -445,7 +443,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         // Each user types in their own paragraph.
-        secondTextArea.waitUntilContentContains("Separator. ");
+        secondTextArea.waitUntilContentContains("Separator.");
         secondTextArea.sendKeys(Keys.END);
 
         String text = "The quick brown fox jumps over the lazy dog.";
@@ -462,7 +460,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
             // Second Tab
             //
             setup.getDriver().switchTo().window(secondTabHandle);
-            secondTextArea.sendKeys(words[i] + " ");
+            secondTextArea.sendKeys(" " + words[i]);
         }
 
         //
@@ -639,6 +637,107 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
         firstEditPage.clickSaveAndView();
         assertEquals("before\n\n[[Smallest **Tree**>>image:image.gif]]\n\n ",
+            WikiEditPage.gotoPage(testReference).getContent());
+    }
+
+    @Test
+    @Order(8)
+    void editSameMacro(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        firstTextArea.sendKeys("/info");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/info", "Info Box");
+        firstTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // The content is reloaded when a macro is inserted.
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilContentEditable();
+        // Replace the default message text.
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        firstTextArea.sendKeys("one");
+
+        MacroDialogEditModal firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
+        firstMacroEditModal.setMacroParameter("title", "Some");
+        firstMacroEditModal.setMacroParameter("cssClass", "foo");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilContentContains("one");
+        // Focus the rich text area.
+        secondTextArea.click();
+        // Move the caret inside the information box.
+        secondTextArea.sendKeys(Keys.ARROW_UP, "two ");
+
+        MacroDialogEditModal secondMacroEditModal = secondEditor.getBalloonToolBar().editMacro();
+        secondMacroEditModal.setMacroParameter("cssClass", "bar");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstMacroEditModal.clickSubmit();
+
+        // The content is reloaded when a macro is updated.
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilContentEditable();
+
+        // Move to the information box title field and type something.
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
+        firstTextArea.sendKeys(Keys.END, " title");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilContentContains("Some title");
+        secondMacroEditModal.clickSubmit();
+
+        // The content is reloaded when a macro is updated.
+        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilContentEditable();
+
+        // Move to the information box title field and type something.
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
+        secondTextArea.sendKeys(Keys.HOME);
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
+        secondTextArea.sendKeys(" cool");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.waitUntilContentContains("Some cool title");
+
+        // Edit again the macro an verify that we have the correct parameter value.
+        firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
+        assertEquals("bar", firstMacroEditModal.getMacroParameter("cssClass"));
+        firstMacroEditModal.clickCancel();
+
+        firstEditPage.clickSaveAndView();
+        assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}\n\n ",
             WikiEditPage.gotoPage(testReference).getContent());
     }
 }

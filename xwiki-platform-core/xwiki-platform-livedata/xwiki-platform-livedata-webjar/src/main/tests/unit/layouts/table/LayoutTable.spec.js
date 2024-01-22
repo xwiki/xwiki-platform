@@ -111,9 +111,12 @@ describe('LayoutTable.vue', () => {
     // Manual trigger of the afterEntryFetch event.
     afterEntryFetchWrapper.callback();
     await Vue.nextTick();
-    let rows = wrapper.findAllComponents(LayoutTableRow);
+    const rows = wrapper.findAllComponents(LayoutTableRow);
     expect(rows.length).toBe(1)
-    expect(rows.at(0).props()).toStrictEqual({entry: {id: 1}})
+    expect(rows.at(0).props()).toStrictEqual({
+      entry: {id: 1},
+      entryIdx: 0
+    })
     expect(wrapper.find('.noentries-card').exists()).toBe(false)
   })
 })

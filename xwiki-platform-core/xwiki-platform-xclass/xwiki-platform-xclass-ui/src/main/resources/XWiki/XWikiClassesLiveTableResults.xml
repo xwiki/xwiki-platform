@@ -50,7 +50,10 @@
   #foreach ($row in $output.rows)
     #set ($statement = ', BaseObject as obj where doc.translation = 0 and ' +
       'doc.fullName = obj.name and obj.className = :className')
-    #set ($row.pageCount = $services.query.hql($statement).bindValue('className', $row.doc_fullName).count())
+    ## Note: the unique filter is required as otherwise pages are returned once for each contained XObjects, leading
+    ## to larger counts than expected.
+    #set ($hqlQuery = $services.query.hql($statement).bindValue('className', $row.doc_fullName).addFilter('unique'))
+    #set ($row.pageCount = $hqlQuery.count())
   #end
   #jsonResponse($output)
 #end

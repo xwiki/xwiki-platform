@@ -93,8 +93,10 @@ define('xwiki-realtime-wysiwyg-editor', [
      *
      * @param {Node[]} updatedNodes the DOM nodes that have been updated (added, modified directly or with removed
      *   descendants)
+     *
+     * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    contentUpdated(updatedNodes) {
+    contentUpdated(updatedNodes, propagate) {
       try {
         this._initializeWidgets(updatedNodes);
       } catch (e) {
@@ -103,7 +105,7 @@ define('xwiki-realtime-wysiwyg-editor', [
 
       // Notify the content change (e.g. to update the empty line placeholders) without triggering our own change
       // handler (see #onChange()).
-      this._ckeditor.fire('change', {remote: true});
+      this._ckeditor.fire('change', {remote: !propagate});
     }
 
     /**
@@ -153,6 +155,16 @@ define('xwiki-realtime-wysiwyg-editor', [
      */
     restoreSelection() {
       this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor);
+    }
+
+    /**
+     * Converts input data accepted by the editor to html that can be directly inserted in the editor's DOM.
+     *
+     * @param {string} data the data to be converted
+     * @returns {string} html representation of the input data that can be inserted in the editor's DOM.
+     */
+    convertDataToHtml(data) {
+      return this._ckeditor.dataProcessor.toHtml(data);
     }
 
     _initializeWidgets(updatedNodes) {

@@ -31,6 +31,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WindowType;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
+import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.model.reference.AttachmentReference;
@@ -636,6 +637,107 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
         firstEditPage.clickSaveAndView();
         assertEquals("before\n\n[[Smallest **Tree**>>image:image.gif]]\n\n ",
+            WikiEditPage.gotoPage(testReference).getContent());
+    }
+
+    @Test
+    @Order(8)
+    void editSameMacro(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        firstTextArea.sendKeys("/info");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/info", "Info Box");
+        firstTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // The content is reloaded when a macro is inserted.
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilContentEditable();
+        // Replace the default message text.
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
+        firstTextArea.sendKeys("one");
+
+        MacroDialogEditModal firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
+        firstMacroEditModal.setMacroParameter("title", "Some");
+        firstMacroEditModal.setMacroParameter("cssClass", "foo");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilContentContains("one");
+        // Focus the rich text area.
+        secondTextArea.click();
+        // Move the caret inside the information box.
+        secondTextArea.sendKeys(Keys.ARROW_UP, "two ");
+
+        MacroDialogEditModal secondMacroEditModal = secondEditor.getBalloonToolBar().editMacro();
+        secondMacroEditModal.setMacroParameter("cssClass", "bar");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstMacroEditModal.clickSubmit();
+
+        // The content is reloaded when a macro is updated.
+        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilContentEditable();
+
+        // Move to the information box title field and type something.
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
+        firstTextArea.sendKeys(Keys.END, " title");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilContentContains("Some title");
+        secondMacroEditModal.clickSubmit();
+
+        // The content is reloaded when a macro is updated.
+        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilContentEditable();
+
+        // Move to the information box title field and type something.
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
+        secondTextArea.sendKeys(Keys.HOME);
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
+        secondTextArea.sendKeys(" cool");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.waitUntilContentContains("Some cool title");
+
+        // Edit again the macro an verify that we have the correct parameter value.
+        firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
+        assertEquals("bar", firstMacroEditModal.getMacroParameter("cssClass"));
+        firstMacroEditModal.clickCancel();
+
+        firstEditPage.clickSaveAndView();
+        assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}\n\n ",
             WikiEditPage.gotoPage(testReference).getContent());
     }
 }

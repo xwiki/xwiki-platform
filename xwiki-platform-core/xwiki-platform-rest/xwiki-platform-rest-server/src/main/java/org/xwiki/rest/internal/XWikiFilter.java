@@ -43,8 +43,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * The filter is called before serving any request and it is responsible to set in user in the response header. The user
- * is expected to be authenticate in a preceding filter along with the XWikiContext initialization.
+ * The filter is called before serving any request, and it is responsible to set in user in the response header. The
+ * user is expected to be authenticated in a preceding filter along with the XWikiContext initialization.
  * 
  * @version $Id$
  * @since 13.4RC1
@@ -100,7 +100,10 @@ public class XWikiFilter extends Filter
                 responseHeaders = new Series<>(Header.class);
                 response.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, responseHeaders);
             }
-            responseHeaders.add("XWiki-User", serializer.serialize(xwikiContext.getUserReference()));
+            // For the Guest user, don't set any XWiki-User header as null headers are not allowed.
+            if (xwikiContext.getUserReference() != null) {
+                responseHeaders.add("XWiki-User", serializer.serialize(xwikiContext.getUserReference()));
+            }
             responseHeaders.add("XWiki-Version", xwikiContext.getWiki().getVersion());
 
             if (csrfToken != null) {

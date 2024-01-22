@@ -46,4 +46,4 @@ administration.templateProvider.creationRestrictions.none=이 템플릿은 어�
 administration.templateProvider.creationRestrictionsAreSuggestions=제안사항에 따른 생성 제한
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=목록에서 템플릿을 선택할 때 미리 입력된 기본 위치로 첫 번째 생성 제한을 사용하여 사용자가 이 템플릿으로 페이지를 생성할 위치를 선택할 수 있습니다.
 </content>
-  </xwikidoc>
+</xwikidoc>

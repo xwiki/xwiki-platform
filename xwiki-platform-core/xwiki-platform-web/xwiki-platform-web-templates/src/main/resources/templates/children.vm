@@ -85,15 +85,17 @@
       'childrenOf': $doc.space,
       '$doc': $doc.documentReference
     }))
+    {{/html}}
 
-    $services.liveData.execute({
-      'id':'childrenIndex',
-      'source': 'liveTable',
-      'sourceParameters': $sourceParameters,
-      'properties': 'doc.title,doc.location,doc.date,doc.author,_actions',
-      'sort': 'doc.location:asc'
-    }, $liveDataConfig)
-
+    {{liveData
+      id='childrenIndex'
+      source='liveTable'
+      sourceParameters="$sourceParameters"
+      properties='doc.title,doc.location,doc.date,doc.author,_actions'
+      sort='doc.location:asc'
+      }}$jsontool.serialize($liveDataConfig){{/liveData}}
+    
+    {{html clean='false'}}
   #end
 #end
 #######################################################

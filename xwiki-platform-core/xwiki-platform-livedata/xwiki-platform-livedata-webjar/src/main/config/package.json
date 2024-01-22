@@ -9,8 +9,8 @@
     "test": "vue-cli-service test:unit"
   },
   "engines": {
-    "npm": "10.2.5",
-    "node": "20.10.0"
+    "npm": "10.3.0",
+    "node": "20.11.0"
   },
   "dependencies": {
     "vue": "2.7.16",
@@ -20,7 +20,7 @@
     "vuedraggable": "2.24.3",
     "vue-tippy": "4.16.0",
     "vue2-touch-events": "3.2.3",
-    "dompurify": "3.0.7"
+    "dompurify": "3.0.8"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "5.0.8",
@@ -29,7 +29,7 @@
     "@vue/cli-plugin-unit-jest": "5.0.8",
     "@babel/eslint-parser": "7.23.3",
     "eslint": "8.56.0",
-    "eslint-plugin-vue": "9.19.2",
+    "eslint-plugin-vue": "9.20.0",
     "less": "4.2.0",
     "less-loader": "11.1.4",
     "vue-template-compiler": "2.7.16",
@@ -38,7 +38,7 @@
     "@testing-library/jest-dom": "5.17.0",
     "flush-promises": "1.0.2",
     "@vue/vue2-jest": "29.2.6",
-    "eslint-plugin-jest": "27.6.1"
+    "eslint-plugin-jest": "27.6.2"
   },
   "overrides": {
     "@vue/cli-plugin-unit-jest": {

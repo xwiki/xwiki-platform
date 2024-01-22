@@ -353,12 +353,12 @@
                      If you are using Groovy >= 2.3.0-rc-1, remember to include groovy-ant as a dependency.
                -->
               <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy</artifactId>
                 <version>${groovy.version}</version>
               </dependency>
               <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-ant</artifactId>
                 <version>${groovy.version}</version>
               </dependency>

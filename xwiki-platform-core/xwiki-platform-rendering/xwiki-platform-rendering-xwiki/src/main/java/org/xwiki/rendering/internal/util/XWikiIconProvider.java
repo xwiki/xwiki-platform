@@ -26,16 +26,23 @@ import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.RawBlock;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.syntax.Syntax;
+
+import java.util.List;
 
 /**
  * Component to use the icon theme to provide a proper block for displaying an icon.
  *
  * @version $Id$
  * @since 15.10.6
- * @since 16.0.0RC1
+ * @since 16.1.0RC1
  */
 @Component
 @Singleton
@@ -45,6 +52,8 @@ public class XWikiIconProvider extends DefaultIconProvider
     private IconSetManager iconSetManager;
     @Inject
     private IconRenderer iconRenderer;
+    @Inject
+    private ContextualLocalizationManager l10n;
 
     /**
      * Uses the icon theme to provide the right block for displaying an icon.
@@ -58,7 +67,19 @@ public class XWikiIconProvider extends DefaultIconProvider
         try {
             iconSet = getIconSet(iconName);
             String iconContent = this.iconRenderer.renderHTML(iconName, iconSet);
-            return new RawBlock(iconContent, Syntax.HTML_5_0);
+            Block iconAlternative;
+            try {
+                // Try to retrieve a translation for the icon.
+                iconAlternative = new FormatBlock(List.of(l10n.getTranslation(
+                    String.format("rendering.icon.provider.icon.alternative.%s", iconName)).render()), Format.NONE);
+            } catch (Exception e) {
+                // As a fallback, we just get the english name of the icon as an alternative.
+                iconAlternative = new FormatBlock(List.of(new WordBlock(iconName)), Format.NONE);
+            }
+            iconAlternative.setParameter("class", "sr-only");
+            Block iconRaw = new RawBlock(iconContent, Syntax.HTML_5_0);
+            // We return a combination of the icon itself and its text alternative.
+            return new CompositeBlock(List.of(iconRaw, iconAlternative));
         } catch (IconException e) {
             return super.get(iconName);
         }

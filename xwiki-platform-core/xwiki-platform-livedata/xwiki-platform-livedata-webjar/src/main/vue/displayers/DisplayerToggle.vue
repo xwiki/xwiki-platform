@@ -105,22 +105,30 @@ export default {
   watch: {
     iconReady: function (val) {
       if (val) {
-        const logic = this.logic;
+        const component = this;
         // Wait for the icon component to be fully rendered before copying its content.
         this.$nextTick(() => {
           $(this.$refs.input).bootstrapSwitch({
             size: 'mini',
             labelText: this.$refs.icon.$el.outerHTML,
             onSwitchChange() {
-              logic.triggerEvent("toggle", {
-                data: this.toggleData(),
-                checked: this.checked,
-                disabled: this.disabled,
-                callback: function (newData, newChecked, newDisabled) {
+              const toggleData = component.toggleData;
+              const checkedVal = component.checked;
+              const disabledVal = component.disabled;
+              console.log("Before toggle", toggleData, checkedVal, disabledVal);
+              component.logic.triggerEvent("toggle", {
+                data: toggleData,
+                checked: checkedVal,
+                disabled: disabledVal,
+                callback: function ({
+                  data = toggleData,
+                  checked = checkedVal,
+                  disabled = disabledVal
+                }) {
                   // TODO: add callback handling on XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro
-                  this.data = newData;
-                  this.checked = newChecked;
-                  this.disabled = newDisabled;
+                  component.data = data;
+                  component.checked = checked;
+                  component.disabled = disabled;
                 }
               })
             }

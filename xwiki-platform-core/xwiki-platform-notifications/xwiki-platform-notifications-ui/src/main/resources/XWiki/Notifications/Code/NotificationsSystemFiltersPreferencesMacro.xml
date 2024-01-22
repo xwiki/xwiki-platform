@@ -284,29 +284,9 @@
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.system.hint'))
     &lt;/p&gt;
   &lt;/div&gt;
-  #set($properties  = ['name', 'filterType', 'notificationFormats', 'isEnabled'])
-  #set($colprops = {
-    'name':                { 'sortable': false, 'html': true, 'filterable': false },
-    'filterType':          { 'sortable': false, 'filterable': false },
-    'notificationFormats': { 'sortable': false, 'html': true, 'filterable': false },
-    'isEnabled':           { 'sortable': false, 'html' : true, 'filterable': false }
-  })
-  #set ($extraParams = "eventType=&amp;format=&amp;type=system")
-  #if ($wikimacro.parameters.target == 'user')
-    #set ($extraParams = "$extraParams&amp;user=${services.model.serialize($targetUser, 'default')}")
-  #end
-  #set($options  = {
-    'resultPage'        : 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
-    'rowCount'          : 10,
-    'description'       : 'This table lists every system filter registered in the wiki.',
-    'translationPrefix' : 'notifications.settings.filters.preferences.system.table.',
-    'extraParams'       : $extraParams,
-    'outputOnlyHtml'    : true
-  })
-
-  #livetable("notificationSystemFilterPreferencesLiveTable" $properties $colprops $options)
 &lt;/div&gt;
 {{/html}}
+#set($properties  = ['name', 'filterType', 'notificationFormats', 'isEnabled'])
 #set ($sourceParameters = {
   'translationPrefix': 'notifications.settings.filters.preferences.system.table.',
   'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
@@ -317,23 +297,24 @@
 #if ($wikimacro.parameters.target == 'user')
 #set($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
 #end
-## TODO: description!
 
-  #set ($liveDataConfig = {
-    'meta': {
-      'propertyDescriptors': [
-        { 'id': 'notificationFormats', 'displayer': 'html' },
-        { 'id': 'isEnabled', 'displayer': 'toggle' }
-      ]
-    }
-  })
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+      { 'id': 'notificationFormats', 'displayer': 'html' },
+      { 'id': 'isEnabled', 'displayer': 'toggle' }
+    ]
+  }
+})
 
+## TODO: localize the description.
 {{liveData
   id='notificationSystemFilterPreferencesLiveData'
   properties="$stringtool.join($properties, ',')"
   source='liveTable'
   sourceParameters="$escapetool.url($sourceParameters)"
   limit='10'
+  description='This table lists every system filter registered in the wiki.'
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 #end
 {{/velocity}}</code>

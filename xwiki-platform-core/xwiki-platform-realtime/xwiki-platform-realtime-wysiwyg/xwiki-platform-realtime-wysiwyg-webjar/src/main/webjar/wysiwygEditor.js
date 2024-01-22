@@ -191,39 +191,7 @@ define('xwiki-realtime-wysiwyg', [
           // Id of the wiki page form.
           formId: window.XWiki.editor === 'wysiwyg' ? 'edit' : 'inline',
           setTextValue: function(newText, toConvert, callback) {
-            function andThen(data) {
-              patchedEditor.setHTML(data);
-
-              // If available, transform the HTML comments for XWiki macros into macros before saving
-              // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
-              // CKEditor Integration application.
-              if (editor.plugins['xwiki-macro'] && findMacroComments(genericEditor.getContent()).length > 0) {
-                initializing = true;
-                editor.execCommand('xwiki-refresh');
-                afterRefresh.push(callback);
-              } else {
-                callback();
-                realtimeOptions.onLocal();
-              }
-            }
-            if (toConvert) {
-              const object = {
-                wiki: XWiki.currentWiki,
-                space: XWiki.currentSpace,
-                page: XWiki.currentPage,
-                convert: true,
-                text: newText
-              };
-              $.post(editorConfig.htmlConverterUrl, object).then(andThen).catch(() => {
-                const debugLog = {
-                  state: editorId + '/convertHTML',
-                  postData: object
-                };
-                module.onAbort(null, 'converthtml', JSON.stringify(debugLog));
-              });
-            } else {
-              andThen(newText);
-            }
+            patchedEditor.setHTML(newText, true);
           },
           getSaveValue: function() {
             return {
@@ -239,6 +207,13 @@ define('xwiki-realtime-wysiwyg', [
               editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
               return null;
             }
+          },
+          getTextAtCurrentRevision: function(revision) {
+            return $.get(XWiki.currentDocument.getURL('get', $.param({xpage:'get',
+                                                                      outputSyntax:'annotatedhtml',
+                                                                      outputSyntaxVersion:'5.0',
+                                                                      transformations:'macro',
+                                                                      rev:revision})));
           },
           realtime: info.realtime,
           userList: info.userList,

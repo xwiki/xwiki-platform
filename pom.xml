@@ -65,7 +65,7 @@
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.4</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
-    <solr.version>8.11.2</solr.version>
+    <solr.version>9.4.1</solr.version>
     <zookeeper.version>3.9.1</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->

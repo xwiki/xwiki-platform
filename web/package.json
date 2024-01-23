@@ -40,7 +40,7 @@
     "@vitejs/plugin-vue": "4.5.1",
     "npm-run-all2": "6.1.1",
     "rimraf": "5.0.5",
-    "vite": "4.5.2",
+    "vite": "5.0.12",
     "vite-plugin-comlink": "^3.0.5",
     "vite-plugin-dts": "3.6.4",
     "vite-plugin-inspect": "0.8.1",

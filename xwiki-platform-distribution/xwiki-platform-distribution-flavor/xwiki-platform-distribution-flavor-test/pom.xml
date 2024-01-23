@@ -293,8 +293,7 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailGeneral
                 <!-- Search -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Search
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=searchSuggest
-                  TODO https://jira.xwiki.org/browse/XWIKI-21779 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=searchSuggest
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=IndexingUser
                 <!-- Social -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Likes

@@ -57,7 +57,7 @@
     #if ($isCheckbox)
       $doc.display($property.name, 'edit', $object)
     #end
-    &lt;label#if ($editing) for="${prefix}$property.name"#end&gt;
+    &lt;label#if ($editing &amp;&amp; $object!={}) for="${prefix}$property.name"#end&gt;
       $property.translatedPrettyName
     &lt;/label&gt;
     {{/html}}##
@@ -72,6 +72,8 @@
       #else
         $services.rendering.escape($!object.getProperty($property.name).value, 'xwiki/2.1')
       #end
+  #else
+    :
   #end
 #end
 )))

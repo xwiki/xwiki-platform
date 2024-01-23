@@ -1,21 +1,20 @@
-import { defineConfig } from 'vite';
-import Inspect from 'vite-plugin-inspect';
+import { defineConfig } from "vite";
+import Inspect from "vite-plugin-inspect";
 import dts from "vite-plugin-dts";
 
-// import path from 'path';
-import { ModuleFormat } from 'rollup';
+import { ModuleFormat } from "rollup";
 
 export default defineConfig({
   build: {
     lib: {
-      entry: './src/index.ts',
-      name: 'menubuttons',
+      entry: "./src/index.ts",
+      name: "menubuttons",
       // the proper extensions will be added
-      fileName: (format : ModuleFormat) => { if (format=="es") 
-                                                return 'main.bundle.dev.js' 
-                                            else 
-                                                return 'main.bundle.js' },
-      formats : ["es", "iife"],
+      fileName: (format: ModuleFormat) => {
+        if (format == "es") return "main.bundle.dev.js";
+        else return "main.bundle.js";
+      },
+      formats: ["es", "iife"],
     },
   },
   plugins: [
@@ -25,8 +24,7 @@ export default defineConfig({
       enabled: true,
     }),
     dts({
-       insertTypesEntry: true,
-     }),
+      insertTypesEntry: true,
+    }),
   ],
 });
-

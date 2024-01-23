@@ -35,6 +35,16 @@ export default defineConfig({
     comlink(),
   ],
   worker: {
-    plugins: [comlink()],
+    plugins: () => [comlink()],
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      tsconfigRaw: {
+        compilerOptions: {
+          // Workaround for a vite bug (see https://github.com/vitejs/vite/issues/13736)
+          experimentalDecorators: true,
+        },
+      },
+    },
   },
 });

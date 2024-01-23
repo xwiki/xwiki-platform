@@ -13,7 +13,7 @@ export default mergeConfig(
       },
     },
     worker: {
-      plugins: [comlink()],
+      plugins: () => [comlink()],
     },
   }),
 );

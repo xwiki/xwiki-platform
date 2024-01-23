@@ -803,7 +803,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Second tab
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.waitUntilContentContains("First Second");
-
     }
     
     @Test

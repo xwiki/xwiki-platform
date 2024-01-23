@@ -391,7 +391,7 @@ define('xwiki-realtime-saver', [
         }
       };
 
-      // Prevent the save buttons from reloading the page. Instead, reset the editor's content.'
+      // Prevent the save buttons from reloading the page. Instead, reset the editor's content.
       var overrideAjaxSaveAndContinue = function() {
         var originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
         $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {

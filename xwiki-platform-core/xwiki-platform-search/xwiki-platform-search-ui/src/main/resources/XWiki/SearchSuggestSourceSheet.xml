@@ -54,10 +54,10 @@
   #set ($displayFormType = $property.getProperty('displayFormType'))
   #set ($isCheckbox = $editing &amp;&amp; $property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
   ; {{html wiki="true"}}
+    #if ($isCheckbox)
+      $doc.display($property.name, 'edit', $object)
+    #end
     &lt;label#if ($editing) for="${prefix}$property.name"#end&gt;
-      #if ($isCheckbox)
-        $doc.display($property.name, 'edit', $object)
-      #end
       $property.translatedPrettyName
     &lt;/label&gt;
     {{/html}}##

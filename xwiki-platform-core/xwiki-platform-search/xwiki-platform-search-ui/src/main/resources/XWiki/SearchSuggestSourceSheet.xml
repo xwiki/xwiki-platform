@@ -56,7 +56,7 @@
   ; {{html wiki="true"}}
     &lt;label#if ($editing) for="${prefix}$property.name"#end&gt;
       #if ($isCheckbox)
-        $doc.display($property.name, 'edit')
+        $doc.display($property.name, 'edit', $object)
       #end
       $property.translatedPrettyName
     &lt;/label&gt;

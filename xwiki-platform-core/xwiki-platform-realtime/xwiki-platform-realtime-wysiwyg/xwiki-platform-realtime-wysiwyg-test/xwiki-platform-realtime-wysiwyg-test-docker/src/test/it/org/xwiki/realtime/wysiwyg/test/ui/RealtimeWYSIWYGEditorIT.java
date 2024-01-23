@@ -806,7 +806,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
     }
     
     @Test
-    @Order(8)
+    @Order(10)
     void reloadEditorsSilentMergeConflictManualSave(TestReference testReference, TestUtils setup)
     {
         //

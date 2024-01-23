@@ -156,11 +156,11 @@ define('xwiki-realtime-wysiwyg-editor', [
     }
 
     _initializeWidgets(updatedNodes) {
-      // Save the focused and selected widgets, as well as the widget holding the focused editable, so that we can
-      // restore them after (re)initializing the widgets (if possible).
-      const focusedWidgetWrapper = this._ckeditor.widgets.focused?.wrapper;
-      const selectedWidgetWrappers = this._ckeditor.widgets.selected.map(widget => widget.wrapper);
-      const widgetHoldingFocusedEditableWrapper = this._ckeditor.widgets.widgetHoldingFocusedEditable?.wrapper;
+      // Reset the focused and selected widgets, as well as the widget holding the focused editable because they may
+      // have been invalidated by the DOM changes.
+      this._ckeditor.widgets.focused = null;
+      this._ckeditor.widgets.selected = [];
+      this._ckeditor.widgets.widgetHoldingFocusedEditable = null;
 
       // Find the widgets that need to be reinitialized because some of their content was updated.
       const updatedWidgets = new Set();
@@ -192,19 +192,9 @@ define('xwiki-realtime-wysiwyg-editor', [
       // the DOM.
       this._ckeditor.widgets.checkWidgets();
 
-      // Update the focused and selected widgets, as well as the widget holding the focused editable.
-      if (focusedWidgetWrapper) {
-        const focusedWidget = this._ckeditor.widgets.getByElement(focusedWidgetWrapper, true);
-        this._ckeditor.widgets.focused = focusedWidget;
-      }
-      this._ckeditor.widgets.selected = selectedWidgetWrappers.map(widgetWrapper =>
-        this._ckeditor.widgets.getByElement(widgetWrapper, true)
-      ).filter(widget => !!widget);
-      if (widgetHoldingFocusedEditableWrapper) {
-        const widgetHoldingFocusedEditable = this._ckeditor.widgets.getByElement(widgetHoldingFocusedEditableWrapper,
-          true);
-        this._ckeditor.widgets.widgetHoldingFocusedEditable = widgetHoldingFocusedEditable;
-      }
+      // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
+      // selection is restored.
+      setTimeout(() => this._ckeditor.widgets.checkSelection(), 0);
     }
 
     _onContentLoaded() {

@@ -179,16 +179,18 @@ define('xwiki-attachment-picker',
       initSelectedAttachment() {
         this.resultsBlock.on('click', 'a', (event) => {
           event.preventDefault();
-          const parent = $(event.currentTarget).parents('.attachmentGroup');
+          if (event.detail === 1) {
+            const parent = $(event.currentTarget).parents('.attachmentGroup');
 
-          if (this.selected !== undefined && parent.data('id') === this.selected) {
-            this.unselect(parent);
-          } else {
-            this.resultsBlock.find('.attachmentGroup').removeClass('selected');
-            parent.addClass('selected');
-            this.selected = parent.data('id');
-            this.attachmentPicker.trigger('xwiki:attachmentGalleryPicker:selected', this.selected);
-            this.updateGlobalSelectionWarning(parent);
+            if (this.selected !== undefined && parent.data('id') === this.selected) {
+              this.unselect(parent);
+            } else {
+              this.resultsBlock.find('.attachmentGroup').removeClass('selected');
+              parent.addClass('selected');
+              this.selected = parent.data('id');
+              this.attachmentPicker.trigger('xwiki:attachmentGalleryPicker:selected', this.selected);
+              this.updateGlobalSelectionWarning(parent);
+            }
           }
         });
       }

@@ -134,6 +134,29 @@
     picker.on('xwiki:attachmentGalleryPicker:unselected', function() {
       imageSelector.updateSelectedImageReferences([], $(this));
     });
+    // We extend the attachment picker to allow quick form submission
+    let results = picker.find('.attachmentPickerResults');
+    let selectButton = element.parents('.modal-content').find('.modal-footer .btn-primary');
+    function validateForm(event) {
+      event.preventDefault();
+      // Make sure we have a selected picture before going forward
+      let selected = $(event.currentTarget).parents('.attachmentGroup').data('id');
+      imageSelector.updateSelectedImageReferences([selected], picker);
+      // Validate the selection of the double click picture.
+      selectButton.trigger('click');
+    }
+    // Submit form on double click
+    results.on('click', 'a', (event) => {
+      if (event.detail === 2) {
+        validateForm(event);
+      }
+    });
+    // Submit form on Enter key pressed
+    results.on('keypress', 'a', function(event) {
+      if(event.which === 13) {
+        validateForm(event);
+      }
+    });
   }
 
   init($(document).find('.image-selector'));

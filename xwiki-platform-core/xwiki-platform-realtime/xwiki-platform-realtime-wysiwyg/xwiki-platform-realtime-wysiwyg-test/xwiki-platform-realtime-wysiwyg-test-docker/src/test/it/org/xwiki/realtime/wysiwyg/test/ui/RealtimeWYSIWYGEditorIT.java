@@ -34,6 +34,8 @@ import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.flamingo.skin.test.po.EditConflictModal;
+import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
@@ -739,5 +741,125 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstEditPage.clickSaveAndView();
         assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}\n\n ",
             WikiEditPage.gotoPage(testReference).getContent());
+    }
+    
+    @Test
+    @Order(9)
+    void reloadEditorsMergeConflictManualSave(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys("First");
+        firstEditPage.clickSaveAndContinue();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilContentContains("First");
+
+        //
+        // Third Tab
+        //
+
+        String thirdTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage thirdEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor thirdEditor = thirdEditPage.getContenEditor();
+        RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
+        thirdTextArea.waitUntilContentContains("First");
+
+        thirdEditPage.leaveRealtimeEditing();
+
+        thirdTextArea.sendKeys(Keys.END, " Second");
+        thirdEditPage.clickSaveAndContinue();
+
+        // First tab
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstTextArea.sendKeys(Keys.END, " First");
+        firstTextArea.waitUntilContentContains("First First");
+        firstEditPage.clickSaveAndContinue(false);
+
+        EditConflictModal editConflictModal = new EditConflictModal();
+        editConflictModal.makeChoiceAndSubmit(ConflictChoice.RELOAD, false);
+
+        firstTextArea.waitUntilContentContains("First Second");
+
+        // Second tab
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilContentContains("First Second");
+    }
+    
+    @Test
+    @Order(10)
+    void reloadEditorsSilentMergeConflictManualSave(TestReference testReference, TestUtils setup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.sendKeys("First");
+        firstEditPage.clickSaveAndContinue();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilContentContains("First");
+
+        //
+        // Third Tab
+        //
+
+        String thirdTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        RealtimeWYSIWYGEditPage thirdEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor thirdEditor = thirdEditPage.getContenEditor();
+        RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
+        thirdTextArea.waitUntilContentContains("First");
+
+        thirdEditPage.leaveRealtimeEditing();
+
+        thirdTextArea.sendKeys(Keys.END, Keys.ENTER, "Second");
+        thirdEditPage.clickSaveAndContinue();
+
+        // First tab
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstEditPage.clickSaveAndContinue();
+
+        firstTextArea.waitUntilContentContains("First");
+        firstTextArea.waitUntilContentContains("Second");
+
+        // Second tab
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilContentContains("First");
+        secondTextArea.waitUntilContentContains("Second");
     }
 }

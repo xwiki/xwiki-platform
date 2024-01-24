@@ -90,6 +90,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Used to handle the edit conflict modal.  -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Realtime synchronization is done through WebSockets. -->
     <dependency>
       <groupId>javax.websocket</groupId>

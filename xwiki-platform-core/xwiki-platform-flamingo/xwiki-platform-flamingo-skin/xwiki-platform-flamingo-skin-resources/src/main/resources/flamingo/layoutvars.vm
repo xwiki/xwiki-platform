@@ -84,9 +84,6 @@
        #set($leftPanels = $xwiki.getSpacePreference("leftPanels"))
     #end
   #end
-  #if($leftPanels == "")
-      #set($showLeftPanels = "0")
-  #end
 #end
 
 #if($showRightPanels)
@@ -99,9 +96,6 @@
     #if($rightPanels == "")
       #set($rightPanels = $xwiki.getSpacePreference("rightPanels"))
     #end
-  #end
-  #if($rightPanels == "")
-      #set($showRightPanels = "0")
   #end
 #end
 

@@ -158,8 +158,8 @@ importers:
         specifier: workspace:^
         version: link:../../api
       '@shoelace-style/shoelace':
-        specifier: 2.12.0
-        version: 2.12.0(@types/react@18.2.39)
+        specifier: 2.13.1
+        version: 2.13.1(@types/react@18.2.39)
       inversify:
         specifier: ^6.0.2
         version: 6.0.2
@@ -1823,9 +1823,10 @@ packages:
     resolution: {integrity: sha512-Hf45HeO+vdQblabpyZOTxJ4ZeZsmIUYXXPmoYrrR4OJ5OKxL+bhMz5mK8JXgl7HsoEowfz7+e248UGi861de9Q==}
     dev: false
 
-  /@shoelace-style/shoelace@2.12.0(@types/react@18.2.39):
-    resolution: {integrity: sha512-1Amirj0c5WLkymDcP6ZQmBfMC6zTNmGGK7/mjmGq4yhljrVaECVlBoKm0tfmo1jd3r8XJ8xYbQ8cxPAlwiDDvw==}
+  /@shoelace-style/shoelace@2.13.1(@types/react@18.2.39):
+    resolution: {integrity: sha512-QMMvq7xgKzZR5+HEgZvv82V1yDKxucsW3XTbF+Tl5ckkzyXlKtKdY1k0eK9EnWPK482JXjoKeeiBJnrx+h6i4Q==}
     engines: {node: '>=14.17.0'}
+    requiresBuild: true
     dependencies:
       '@ctrl/tinycolor': 4.0.2
       '@floating-ui/dom': 1.5.3

@@ -149,6 +149,25 @@ public class CKEditor extends BaseElement
         }
     }
 
+
+    /**
+     * Click the numbered list action, by first unfolding the list menu and selecting the numbered list item.
+     *
+     * @since 14.10.22
+     */
+    public void clickNumberedList()
+    {
+        getDriver().findElement(By.className("cke_button__lists")).click();
+        WebElement subMenuFrame = getDriver().findElement(By.cssSelector("iframe.cke_panel_frame"));
+
+        try {
+            getDriver().switchTo().frame(subMenuFrame);
+            getDriver().findElement(By.className("cke_menubutton__toolbar_numberedlist")).click();
+        } finally {
+            getDriver().switchTo().parentFrame();
+        }
+    }
+
     private void internalClickImageButton()
     {
         getDriver().findElement(By.className("cke_button__image_icon")).click();

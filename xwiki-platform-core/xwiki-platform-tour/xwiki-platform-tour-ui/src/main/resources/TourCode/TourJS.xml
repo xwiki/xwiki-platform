@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="TourCode.TourJS" locale="">
+<xwikidoc version="1.5" reference="TourCode.TourJS" locale="">
   <web>TourCode</web>
   <name>TourJS</name>
   <language/>
@@ -53,8 +53,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -74,6 +77,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -102,6 +106,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -405,28 +411,23 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
    * It's done asynchronously so it does not improve the page rendering time. It's important since this code is used
    * everywhere.
    */
-  $(function() {
+  $(function () {
 
     /**
      * The tour is not adapted for little screen sizes like mobile phones have.
-     * The value 768 is taken from bootstrap in order to be consistent with their media queries.
+     * The value 768 is taken from bootstrap to be consistent with their media queries.
      */
     if ($(window).innerWidth() &lt;= 768) {
       return;
     }
+    const json = JSON.parse($('#tour-config').text());
 
-    $.getJSON(new XWiki.Document('TourJson', 'TourCode').getURL('get'), {
-      xpage: 'plain',
-      outputSyntax: 'plain',
-      tourDoc: xm.document
-    }).done(function(json) {
-      for (var i = 0; i &lt; json.tours.length; ++i) {
-        var tour = json.tours[i];
-        if (tour.steps.length &gt; 0) {
-          createTour(tour);
-        }
+    for (let i = 0; i &lt; json.tours.length; ++i) {
+      const tour = json.tours[i];
+      if (tour.steps.length &gt; 0) {
+        createTour(tour);
       }
-    });
+    }
   });
 });</code>
     </property>
@@ -437,10 +438,14 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
+    <name>TourCode.TourJS</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4457314f-90d1-4678-af4c-399211bc3362</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -452,25 +457,31 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -480,13 +491,15 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -515,23 +528,21 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>TourCode.TourJS</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>4457314f-90d1-4678-af4c-399211bc3362</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -616,7 +627,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

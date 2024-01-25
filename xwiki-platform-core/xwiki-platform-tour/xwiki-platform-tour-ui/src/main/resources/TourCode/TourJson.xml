@@ -197,10 +197,10 @@ $xwiki.ssx.use('TourCode.TourJS')
 {{/velocity}}</content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.platform.html.head</extensionPointId>
+      <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.tour.html.head</name>
+      <name>org.xwiki.tour.template.header.after</name>
     </property>
     <property>
       <parameters/>

@@ -573,8 +573,8 @@ extension.repositories = $extensionRepository
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.
 #-#
-#-# The default is <environment.permanentDirectory path>/extension/repository.
-# extension.localRepository=extension/repository
+#-# The default is {environment.permanentDirectory}/extension/repository.
+# extension.localRepository=/var/lib/xwiki/data/extension/repository
 
 #-# [Since 3.4]
 #-# The user agent to use when communication with external services (generally repositories).

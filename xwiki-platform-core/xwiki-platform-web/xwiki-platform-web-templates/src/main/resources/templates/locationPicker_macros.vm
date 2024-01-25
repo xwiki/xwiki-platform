@@ -224,7 +224,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" title="Close">
-            $escapetool.javascript($services.icon.renderHTML('cross'))
+            $services.icon.renderHTML('cross')
           </button>
           <div class="modal-title">$services.localization.render('core.documentPicker.title')</div>
         </div>

@@ -40,6 +40,178 @@
   <object>
     <name>XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro</name>
     <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>2655cc69-aa63-4958-b919-91d15f6589c9</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('notifications-system-filters-preferences-macro', {
+  prefix: 'notifications.',
+  keys: [
+    'settings.saving',
+    'filters.preferences.setEnabled.done',
+    'filters.preferences.setEnabled.error',
+    'filters.preferences.setEnabled.done',
+    'filters.preferences.setEnabled.error'
+  ]
+});
+
+require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro'], function ($, l10n) {
+
+  function save(state, filterName, objectNumber, docURL) {
+    new Promise((resolve) =&gt; {
+      const notification = new XWiki.widgets.Notification(l10n['settings.saving'], 'inprogress');
+      if (objectNumber === '') {
+        // If the object does not exist yet, create it (make this change a minor edit so it's not displayed, by default,
+        // in notifications)
+        const restURL = docURL + '/objects?media=json&amp;amp;minorRevision=true';
+        const params = {
+          'className': 'XWiki.Notifications.Code.ToggleableFilterPreferenceClass',
+          'property#filterName': filterName,
+          'property#isEnabled': state ? '1' : '0'
+        };
+        $.post(restURL, params).then(data =&gt; {
+          notification.hide();
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
+          resolve({objectNumber: data.number})
+        }).catch(() =&gt; {
+          notification.hide();
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error');
+          resolve({});
+        });
+      } else if (objectNumber !== '') {
+        // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by
+        // default, in notifications)
+        const restURL = docURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
+          + '/properties/isEnabled?media=json&amp;minorRevision=true';
+        $.ajax(restURL, {
+          method: 'PUT',
+          contentType: 'text/plain',
+          data: state ? '1' : '0'
+        }).then(() =&gt; {
+          notification.hide();
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
+          resolve({state});
+        }).catch(() =&gt; {
+          notification.hide();
+          new XWiki.widgets.Notification(l10n['notifications.filters.preferences.setEnabled.error'], 'error');
+          resolve({});
+        });
+      }
+    })
+  }
+
+  const docURL = $('.systemFilterPreferences').attr('data-doc-url');
+
+  $(document).on('xwiki:livedata:toggle', '#notificationSystemFilterPreferencesLiveData', (event) =&gt; {
+    const detail = event.detail;
+    const data = detail.data
+    save(!detail.checked, data.filtername, data.objectNumber, docURL).then(({state, objectNumber}) =&gt; {
+      event.callback({
+        checked: state,
+        data: {
+          ...data,
+          objectNumber
+        }
+      })
+      ;
+    });
+  });
+})</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro</name>
+    <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>3ed9f676-5c82-48c0-9082-1305822ba742</guid>
     <class>
@@ -271,7 +443,6 @@
 ### CSS and JAVASCRIPTS
 ######################################################
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro'))
-#set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 ######################################################
@@ -303,7 +474,10 @@
     'propertyDescriptors': [
       { 'id': 'notificationFormats', 'displayer': 'html' },
       { 'id': 'isEnabled', 'displayer': 'toggle' }
-    ]
+    ],
+    'entryDescriptor': {
+        'idProperty': 'filterPreferenceId'
+    }
   }
 })
 

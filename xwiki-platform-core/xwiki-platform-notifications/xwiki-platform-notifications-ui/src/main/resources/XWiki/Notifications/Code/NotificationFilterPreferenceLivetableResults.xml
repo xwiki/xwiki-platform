@@ -107,6 +107,12 @@
         #set ($checked = $obj.getValue('isEnabled') != 0)
         #set ($objectNumber = $!obj.reference.objectNumber)
       #end
+      #if ($checked)
+        #set ($checked = 'checked = "checked"')
+      #else
+        #set ($checked = '')
+      #end
+      #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
       #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
       #set ($element = {
         'filterPreferenceId'  : $name,
@@ -114,6 +120,7 @@
         'filterType'          : $services.localization.render("notifications.filters.description.$filter.name"),
         'eventTypes'          : "#displayNotificationsEventTypeList($filter.eventTypes)",
         'notificationFormats' : "#displayNotificationFormatsList($filter.formats)",
+        'isEnabled'           : $checkbox,
         'doc_viewable'        : true,
         'doc_hasdelete'       : false,
         'isEnabled_checked': $checked,
@@ -164,12 +171,24 @@
         ## Optimization to render only displayed rows (between $offset and $limitOffset)
         #if ($index &gt; $offset and $index &lt;= $limitOffset)
           #set ($display = $services.rendering.render($services.notification.filters.displayFilterPreference($filter, $preference), 'html/5.0'))
+          #set ($isEnabled = '')
+          #set ($isDisabled = '')
+          ## The watchlist bridge does not handle disabling a specific filter
+          #if ($preference.id.startsWith('watchlist_'))
+            #set ($isDisabled = 'disabled = "disabled"')
+          #end
+          #if ($preference.isEnabled())
+            #set ($isEnabled = 'checked = "checked"')
+          #end
+          #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceId='${preference.id}' $isEnabled $isDisabled /&gt;")
+          
           #set ($element = {
             'filterPreferenceId'  : $preference.id,
             'name'                : $display,
             'filterType'          : $services.localization.render("$filterTypeTranslationPrefix$!preference.getFilterType().name().toLowerCase()"),
             'eventTypes'          : "#displayNotificationsEventTypeList($preference.eventTypes)",
             'notificationFormats' : "#displayNotificationFormatsList($preference.notificationFormats)",
+            'isEnabled'           : $isEnabled,
             'doc_viewable'        : true,
             'isEnabled_checked': $preference.isEnabled(),
             'isEnabled_disabled': $preference.id.startsWith('watchlist_'),

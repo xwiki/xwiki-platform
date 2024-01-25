@@ -22,7 +22,12 @@
   border: none;
   background: none no-repeat scroll 0.2em 0.3em transparent;
   margin: 0 0 0 -1.8em;
-  padding: 2px 0 2px 1.8em;
+  padding: 2px 0 2px 0;
+}
+
+/* Style the icon at the start of the title. */
+.extension-title > *:first-child{
+  margin-right: .8em;
 }
 
 .extension-version, .extension-namespace {
@@ -170,36 +175,17 @@ ul.dependencies li:hover {
   background: transparent none no-repeat left;
   border-bottom: 1px dotted #E8E8E8;
   border-right: 7px solid $theme.pageContentBackgroundColor;
-  padding: 0.3em 0 0.3em 20px;
+  padding: 0.3em 0 0.3em 0;
   position: relative;
-}
-.dependency-item {
   line-height: 1.4em;
 }
+
+.dependency-item > *:first-child {
+  margin-right: .3em;
+}
+
 .dependency-item .extension-status {
   margin: 0;
-}
-.extension-item-core .extension-title, .extension-item-remote-core .extension-title,
-.dependency-item.extension-item-core, .dependency-item.extension-item-remote-core, .dependency-item.extension-item-remote-core-incompatible {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
-}
-.extension-item-installed .extension-title, .extension-item-remote-installed .extension-title,
-.extension-item-installed-dependency .extension-title, .extension-item-remote-installed-dependency .extension-title,
-.extension-item-installed-invalid .extension-title, .extension-item-remote-installed-invalid .extension-title,
-.dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed,
-.dependency-item.extension-item-installed-invalid, .dependency-item.extension-item-remote-installed-invalid,
-.dependency-item.extension-item-installed-dependency, .dependency-item.extension-item-remote-installed-dependency,
-.dependency-item.extension-item-remote-installed-incompatible {
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
-}
-.extension-item-remote .extension-title, .dependency-item.extension-item-remote {
-  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
-}
-.extension-item-loading .extension-title, .dependency-item.extension-item-loading {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
-}
-.dependency-item.extension-item-unknown {
-  background-image: url("$xwiki.getSkinFile('icons/silk/plugin_error.png')");
 }
 
 .extension-item-core,

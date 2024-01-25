@@ -64,6 +64,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- The UserProfile sheet is used to disable/enable user profiles -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-profile-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

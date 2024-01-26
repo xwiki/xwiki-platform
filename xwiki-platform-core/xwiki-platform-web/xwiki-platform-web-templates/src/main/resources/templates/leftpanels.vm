@@ -17,6 +17,7 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+<button id="leftPanelsToggler" class="btn btn-default btn-xs">$services.icon.renderHTML('caret-right')</button>
 #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
 <div id="leftPanels" class="panels left panel-width-$!{leftPanelsWidth}"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
 ## Global Variable

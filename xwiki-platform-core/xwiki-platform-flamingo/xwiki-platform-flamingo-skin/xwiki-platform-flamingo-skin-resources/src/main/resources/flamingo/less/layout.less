@@ -13,10 +13,10 @@
 
 #body {
   // Both left and right panels are displayed
-  &.content {
+  &.content:not(.hideleft):not(.hideright):not(.hidelefthideright) {
     // Left panels are small
     &.panel-left-width-Small {
-      .main {
+      .main, #leftPanelsToggler {
         .make-md-column-push(1);
       }
       // Left panels are small and right panels are small
@@ -49,7 +49,7 @@
     }
     // Left panels are medium
     &.panel-left-width-Medium {
-      .main {
+      .main, #leftPanelsToggler {
         .make-md-column-push(2);
       }
       // Left panels are medium and right panels are small
@@ -82,7 +82,7 @@
     }
     // Left panels are large
     &.panel-left-width-Large {
-      .main {
+      .main, #leftPanelsToggler {
         .make-md-column-push(3);
       }
       // Left panels are large and right panels are small
@@ -117,6 +117,12 @@
 
   // Only right panels
   &.hideleft {
+    #leftPanels {
+      display: none;
+    }
+    .main, #leftPanelsToggler {
+      .make-md-column-push(0);
+    }
     &.panel-right-width-Small {
       .main {
         .make-md-column(11, @main-padding);
@@ -136,6 +142,9 @@
 
   // Only left panels
   &.hideright {
+    #rightPanels {
+      display: none;
+    }
     &.panel-left-width-Small {
       .main {
         .make-md-column(11, @main-padding);
@@ -167,6 +176,12 @@
 
   // No Panels
   &.hidelefthideright {
+    #leftPanels {
+      display: none;
+    }
+    #rightPanels {
+      display: none;
+    }
     .main {
       .make-md-column(12, @main-padding);
     }
@@ -251,6 +266,28 @@
 #docextrapanes {
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
+}
+
+#leftPanelsToggler, #rightPanelsToggler {
+  .panel;
+}
+
+#leftPanelsToggler {
+  position: absolute;
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  rotate: 180deg;
+  /* Merge the button with the panel. */
+  border-radius: @border-radius-small;
+}
+#rightPanelsToggler {
+  position: relative;
+  right: 24px;
+  /* Merge the button with the panel. */
+  border-radius: @border-radius-small;
+}
+
+#leftPanelsToggler {
+
 }
 
 #xwikicontent {

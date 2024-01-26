@@ -61,9 +61,7 @@
 </template>
 
 <script>
-import displayerMixin from "./displayerMixin.js";
-import BaseDisplayer from "./BaseDisplayer.vue";
-import XWikiIcon from "../utilities/XWikiIcon.vue";
+import {displayerMixin, BaseDisplayer, XWikiIcon} from "xwiki-platform-livedata-webjar";
 import $ from "jquery";
 
 export default {

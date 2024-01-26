@@ -35,7 +35,7 @@ define('xwiki-realtime-wysiwyg', [
 ], function (
   /* jshint maxparams:false */
   $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver,
-  Chainpad, Crypto, Editor, Patches
+  ChainPad, Crypto, Editor, Patches
 ) {
   'use strict';
 
@@ -145,13 +145,10 @@ define('xwiki-realtime-wysiwyg', [
       // Initialize the editable content when the editor is ready.
       initEditableContent();
 
-      let afterRefresh = [];
       genericEditor.onContentLoaded(function() {
         // Re-initialize the editable content after it is reloaded.
         initEditableContent();
         initializing = false;
-        afterRefresh.forEach(item => item());
-        afterRefresh = [];
       });
 
       const setEditable = module.setEditable = function(editable) {
@@ -170,18 +167,6 @@ define('xwiki-realtime-wysiwyg', [
       toolbar,
       // The editor wrapper used to update the edited content without losing the caret position.
       patchedEditor = new Patches(genericEditor),
-
-      findMacroComments = function(el) {
-        const arr = [];
-        for (const node of el.childNodes) {
-          if (node.nodeType === 8 && node.data && /startmacro/.test(node.data)) {
-            arr.push(node);
-          } else {
-            arr.push(...findMacroComments(node));
-          }
-        }
-        return arr;
-      },
 
       createSaver = function(info) {
         Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
@@ -209,11 +194,13 @@ define('xwiki-realtime-wysiwyg', [
             }
           },
           getTextAtCurrentRevision: function(revision) {
-            return $.get(XWiki.currentDocument.getURL('get', $.param({xpage:'get',
-                                                                      outputSyntax:'annotatedhtml',
-                                                                      outputSyntaxVersion:'5.0',
-                                                                      transformations:'macro',
-                                                                      rev:revision})));
+            return $.get(XWiki.currentDocument.getURL('get', $.param({
+              xpage:'get',
+              outputSyntax:'annotatedhtml',
+              outputSyntaxVersion:'5.0',
+              transformations:'macro',
+              rev:revision
+            })));
           },
           realtime: info.realtime,
           userList: info.userList,
@@ -354,7 +341,7 @@ define('xwiki-realtime-wysiwyg', [
         // Operational Transformation
         // The synchronization is done on JSON so we need to make sure the output of the synchronization is always
         // valid JSON.
-        patchTransformer: Chainpad.NaiveJSONTransformer,
+        patchTransformer: ChainPad.NaiveJSONTransformer,
 
         validateContent: function(content) {
           try {
@@ -384,7 +371,7 @@ define('xwiki-realtime-wysiwyg', [
             console.warn('Unexpected local content after synchronization: ', {
               expected: remoteContent,
               actual: localContent,
-              diff: Chainpad.Diff.diff(remoteContent, localContent)
+              diff: ChainPad.Diff.diff(remoteContent, localContent)
             });
           }
         },
@@ -543,7 +530,7 @@ define('xwiki-realtime-wysiwyg', [
             console.error('Unexpected remote content after synchronization: ', {
               expected: localContent,
               actual: remoteContent,
-              diff: Chainpad.Diff.diff(localContent, remoteContent)
+              diff: ChainPad.Diff.diff(localContent, remoteContent)
             });
           }
         }

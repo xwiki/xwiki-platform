@@ -19,14 +19,12 @@
 -->
 
 <!--
-  DisplayerToggle is a special custom displayer that displays actions
-  concerning the entry.
-  Actions are links to specific pages, whose url is a property of the entry.
+  DisplayerToggle is a special custom displayer that displays a toggle element supported by bootstrap-switch.
+  It is sending a "xwiki:livedata:toggle" even on state change, to be listen for by external scripts. 
 -->
 <template>
   <!--
-    Uses the BaseDisplayer as root element, as it handles for us
-    all the displayer default behavior
+    Uses the BaseDisplayer as root element, as it handles for us all the displayer default behavior.
   -->
   <BaseDisplayer
       class="displayer-toggle"
@@ -36,15 +34,13 @@
       :is-empty="false"
       :intercept-touch="false"
   >
-
-    <!-- Provide the Action Viewer widget to the `viewer` slot -->
     <template #viewer>
       <input
           type='checkbox'
           class='toggleableFilterPreferenceCheckbox'
           ref="input"
       />
-      <!-- We keep this section hidden as it is only there to be copied when initializing the toggle -->
+      <!-- We keep this section hidden as it is only there to be copied when initializing the toggle. -->
       <span v-show="false">
         <XWikiIcon
             :icon-descriptor="{name: iconName}"
@@ -52,7 +48,6 @@
             @ready="iconReady = true"
         />
       </span>
-
     </template>
 
     <!--
@@ -62,8 +57,6 @@
       so that user can't possibly switch to the Editor widget.
     -->
     <template #editor></template>
-
-
   </BaseDisplayer>
 </template>
 
@@ -86,6 +79,7 @@ export default {
   },
   data() {
     return {
+      // When this value changes to true following the ready from XWikiIcon, the toggle is initialized.
       iconReady: false,
       innerChecked: this.entry[`${this.propertyId}_checked`],
       innerDisabled: this.entry[`${this.propertyId}_disabled`],
@@ -133,7 +127,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -77,6 +77,15 @@ public class TableLayoutElement extends BaseElement
     private final LiveDataElement liveData;
 
     /**
+     * @return the list of rows Web Elements
+     * @since 16.1.0RC1
+     */
+    public List<WebElement> getRows()
+    {
+        return getRoot().findElements(By.cssSelector("tbody > tr"));
+    }
+
+    /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
      * tag with the expected text and link.
      */

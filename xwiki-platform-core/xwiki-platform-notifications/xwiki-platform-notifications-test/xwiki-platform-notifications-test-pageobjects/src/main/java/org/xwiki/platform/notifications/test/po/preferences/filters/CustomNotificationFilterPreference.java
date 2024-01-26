@@ -39,6 +39,7 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
 {
     /**
      * Represents the possible actions for such filter.
+     *
      * @version $Id$
      */
     public enum FilterAction
@@ -55,10 +56,12 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
     }
 
     private List<String> eventTypes = new ArrayList<>();
+
     private FilterAction filterAction;
 
     /**
      * Default constructor.
+     *
      * @param parentPage the page where the settings are displayed.
      * @param row the row of the livetable for this filter.
      * @param webDriver the webdriver to initialize the switches.
@@ -84,6 +87,24 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
         }
     }
 
+    @Override
+    protected WebElement getNameElement(WebElement row)
+    {
+        return row.findElement(By.className("name"));
+    }
+
+    @Override
+    protected WebElement getFormatsElement(WebElement row)
+    {
+        return row.findElement(By.className("notificationFormats"));
+    }
+
+    @Override
+    protected WebElement getBootstrapSwitchElement(WebElement row)
+    {
+        return row.findElement(By.className("isEnabled")).findElement(By.className("bootstrap-switch"));
+    }
+
     /**
      * @return the event types or an empty list in case of all events.
      */
@@ -97,7 +118,7 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
      */
     public String getLocation()
     {
-        return this.getLivetableRow().findElement(By.cssSelector("td.name ol")).getAttribute("data-entity");
+        return this.getRow().findElement(By.cssSelector("td.name ol")).getAttribute("data-entity");
     }
 
     /**
@@ -113,7 +134,7 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
      */
     public void delete()
     {
-        this.getLivetableRow().findElement(By.cssSelector("td.actions a.actiondelete")).click();
+        this.getRow().findElement(By.cssSelector("td.actions a.actiondelete")).click();
         ConfirmationBox confirmationBox = new ConfirmationBox();
         confirmationBox.clickYes();
         this.getParentPage().waitForNotificationSuccessMessage("Filter preference deleted!");

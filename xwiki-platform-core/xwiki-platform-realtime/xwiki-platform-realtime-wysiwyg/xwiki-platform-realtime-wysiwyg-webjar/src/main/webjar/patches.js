@@ -19,11 +19,15 @@
  */
 define('xwiki-realtime-wysiwyg-patches', [
   'xwiki-realtime-wysiwyg-filters',
+  'xwiki-realtime-wysiwyg-transformers',
   'hyper-json',
   'diff-dom',
   'json.sortify',
   'chainpad',
-], function (Filters, HyperJSON, DiffDOM, JSONSortify, ChainPad) {
+], function (
+  /* jshint maxparams:false */
+  Filters, Transformers, HyperJSON, DiffDOM, JSONSortify, ChainPad
+) {
   'use strict';
 
   // HTML block-level elements.
@@ -239,7 +243,7 @@ define('xwiki-realtime-wysiwyg-patches', [
       const localOperations = ChainPad.Diff.diff(localFilteredHyperJSON, localHyperJSON);
       const remoteOperations = ChainPad.Diff.diff(localFilteredHyperJSON, remoteFilteredHyperJSON);
       // Transform the local operations so that we can apply them on top of the remote content.
-      const updatedLocalOperations = ChainPad.NaiveJSONTransformer(localOperations, remoteOperations,
+      const updatedLocalOperations = Transformers.RebaseNaiveJSONTransformer(localOperations, remoteOperations,
         localFilteredHyperJSON);
       // Apply the updated operations to the remote content in order to perform the 3-way merge (rebase). This way we
       // integrate the local filtered content (user state, browser specific markup) into the remote content.

@@ -16,7 +16,7 @@
   &.content:not(.hideleft):not(.hideright):not(.hidelefthideright) {
     // Left panels are small
     &.panel-left-width-Small {
-      .main, #leftPanelsToggler {
+      .main {
         .make-md-column-push(1);
       }
       // Left panels are small and right panels are small
@@ -49,7 +49,7 @@
     }
     // Left panels are medium
     &.panel-left-width-Medium {
-      .main, #leftPanelsToggler {
+      .main {
         .make-md-column-push(2);
       }
       // Left panels are medium and right panels are small
@@ -82,7 +82,7 @@
     }
     // Left panels are large
     &.panel-left-width-Large {
-      .main, #leftPanelsToggler {
+      .main {
         .make-md-column-push(3);
       }
       // Left panels are large and right panels are small
@@ -120,7 +120,7 @@
     #leftPanels {
       display: none;
     }
-    .main, #leftPanelsToggler {
+    .main {
       .make-md-column-push(0);
     }
     &.panel-right-width-Small {
@@ -270,24 +270,37 @@
 
 #leftPanelsToggler, #rightPanelsToggler {
   .panel;
+  /* Smoothen out state transition when expanding and collapsing the panel. */
+  transition: transform .2s;
+  /* Make sure the toggler are displayed above the panels. */
+  z-index: 1;
 }
 
 #leftPanelsToggler {
   position: absolute;
-  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
-  rotate: 180deg;
-  /* Merge the button with the panel. */
-  border-radius: @border-radius-small;
+  left: 0;
+  transform: rotate(0);
+  border-radius: 0 @border-radius-small @border-radius-small 0;
 }
+#body.hideleft #leftPanelsToggler,
+#body.hidelefthideright #leftPanelsToggler {
+  transform: rotate(180deg);
+  border-radius: @border-radius-small 0 0 @border-radius-small;
+}
+
 #rightPanelsToggler {
-  position: relative;
-  right: 24px;
+  position: absolute;
+  right: 0;
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  transform: rotate(180deg);
   /* Merge the button with the panel. */
-  border-radius: @border-radius-small;
+  border-radius: 0 @border-radius-small @border-radius-small 0;
 }
 
-#leftPanelsToggler {
-
+#body.hideright #rightPanelsToggler,
+#body.hidelefthideright #rightPanelsToggler {
+  transform: rotate(0);
+  border-radius: @border-radius-small 0 0 @border-radius-small;
 }
 
 #xwikicontent {

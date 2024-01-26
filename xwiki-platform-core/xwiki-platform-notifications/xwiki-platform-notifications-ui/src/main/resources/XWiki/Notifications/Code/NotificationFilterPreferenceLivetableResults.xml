@@ -108,11 +108,11 @@
         #set ($objectNumber = $!obj.reference.objectNumber)
       #end
       #if ($checked)
-        #set ($checked = 'checked = "checked"')
+        #set ($checkedAttr = 'checked = "checked"')
       #else
-        #set ($checked = '')
+        #set ($checkedAttr = '')
       #end
-      #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
+      #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checkedAttr /&gt;")
       #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
       #set ($element = {
         'filterPreferenceId'  : $name,

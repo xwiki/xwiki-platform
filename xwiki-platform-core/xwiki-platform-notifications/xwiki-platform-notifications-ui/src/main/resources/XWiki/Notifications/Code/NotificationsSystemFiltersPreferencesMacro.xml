@@ -130,34 +130,32 @@
   keys: [
     'settings.saving',
     'filters.preferences.setEnabled.done',
-    'filters.preferences.setEnabled.error',
-    'filters.preferences.setEnabled.done',
     'filters.preferences.setEnabled.error'
   ]
 });
 
 require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro'], function ($, l10n) {
 
-  function save(state, filterName, objectNumber, docURL) {
-    new Promise((resolve) =&gt; {
+  function save(checked, filterName, objectNumber, docURL) {
+    return new Promise((resolve) =&gt; {
       const notification = new XWiki.widgets.Notification(l10n['settings.saving'], 'inprogress');
       if (objectNumber === '') {
         // If the object does not exist yet, create it (make this change a minor edit so it's not displayed, by default,
         // in notifications)
-        const restURL = docURL + '/objects?media=json&amp;amp;minorRevision=true';
+        const restURL = docURL + '/objects?media=json&amp;minorRevision=true';
         const params = {
           'className': 'XWiki.Notifications.Code.ToggleableFilterPreferenceClass',
           'property#filterName': filterName,
-          'property#isEnabled': state ? '1' : '0'
+          'property#isEnabled': checked ? '1' : '0'
         };
         $.post(restURL, params).then(data =&gt; {
           notification.hide();
           new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
-          resolve({objectNumber: data.number})
+          resolve({objectNumber: data.number, checked})
         }).catch(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error');
-          resolve({});
+          resolve({checked: !checked});
         });
       } else if (objectNumber !== '') {
         // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by
@@ -167,15 +165,15 @@ require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro'],
         $.ajax(restURL, {
           method: 'PUT',
           contentType: 'text/plain',
-          data: state ? '1' : '0'
+          data: checked ? '1' : '0'
         }).then(() =&gt; {
           notification.hide();
           new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
-          resolve({state});
+          resolve({checked});
         }).catch(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification(l10n['notifications.filters.preferences.setEnabled.error'], 'error');
-          resolve({});
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error');
+          resolve({checked: !checked});
         });
       }
     })
@@ -186,15 +184,15 @@ require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro'],
   $(document).on('xwiki:livedata:toggle', '#notificationSystemFilterPreferencesLiveData', (event) =&gt; {
     const detail = event.detail;
     const data = detail.data
-    save(!detail.checked, data.filtername, data.objectNumber, docURL).then(({state, objectNumber}) =&gt; {
-      event.callback({
-        checked: state,
+    save(detail.checked, data.filtername, data.objectNumber, docURL).then(({checked, objectNumber}) =&gt; {
+      detail.callback({
+        ...detail,
         data: {
           ...data,
-          objectNumber
-        }
-      })
-      ;
+          objectNumber: objectNumber !== undefined ? objectNumber : data.objectNumber
+        },
+        checked: checked
+      });
     });
   });
 })</code>
@@ -480,15 +478,16 @@ require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro'],
     }
   }
 })
-
-## TODO: localize the description.
+#set ($description = 
+    $services.localization.render('notifications.settings.filters.preferences.system.table.description'))
+#set ($description = $services.rendering.escape($description, 'xwiki/2.1'))
 {{liveData
   id='notificationSystemFilterPreferencesLiveData'
   properties="$stringtool.join($properties, ',')"
   source='liveTable'
   sourceParameters="$escapetool.url($sourceParameters)"
   limit='10'
-  description='This table lists every system filter registered in the wiki.'
+  description="$description"
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 #end
 {{/velocity}}</code>

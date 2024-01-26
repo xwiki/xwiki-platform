@@ -42,8 +42,6 @@
       <input
           type='checkbox'
           class='toggleableFilterPreferenceCheckbox'
-          :checked="checked"
-          :disabled="disabled"
           ref="input"
       />
       <!-- We keep this section hidden as it is only there to be copied when initializing the toggle -->
@@ -88,18 +86,12 @@ export default {
   },
   data() {
     return {
-      iconReady: false
-    }
-  },
-  computed: {
-    checked() {
-      return this.entry[`${this.propertyId}_checked`]
-    },
-    disabled() {
-      return this.entry[`${this.propertyId}_disabled`]
-    },
-    toggleData() {
-      return this.entry[`${this.propertyId}_data`]
+      iconReady: false,
+      innerChecked: this.entry[`${this.propertyId}_checked`],
+      innerDisabled: this.entry[`${this.propertyId}_disabled`],
+      innerData: {
+        ... this.entry[`${this.propertyId}_data`]
+      }
     }
   },
   watch: {
@@ -110,25 +102,27 @@ export default {
         this.$nextTick(() => {
           $(this.$refs.input).bootstrapSwitch({
             size: 'mini',
+            state: component.innerChecked,
+            disabled: component.innerDisabled,
             labelText: this.$refs.icon.$el.outerHTML,
-            onSwitchChange() {
-              const toggleData = component.toggleData;
-              const checkedVal = component.checked;
-              const disabledVal = component.disabled;
-              console.log("Before toggle", toggleData, checkedVal, disabledVal);
+            onSwitchChange(event, state) {
+              const toggleData = component.innerData;
+              const disabledVal = component.innerDisabled;
               component.logic.triggerEvent("toggle", {
                 data: toggleData,
-                checked: checkedVal,
+                checked: state,
                 disabled: disabledVal,
                 callback: function ({
                   data = toggleData,
-                  checked = checkedVal,
+                  checked = state,
                   disabled = disabledVal
                 }) {
-                  // TODO: add callback handling on XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro
-                  component.data = data;
-                  component.checked = checked;
-                  component.disabled = disabled;
+                  component.innerData = data;
+                  component.innerChecked = checked;
+                  component.innerDisabled = disabled;
+                  // The last parameter is skip, preventing to call onSwitchChange again.
+                  $(component.$refs.input).bootstrapSwitch('state', checked, true);
+                  $(component.$refs.input).bootstrapSwitch('disabled', disabled);
                 }
               })
             }

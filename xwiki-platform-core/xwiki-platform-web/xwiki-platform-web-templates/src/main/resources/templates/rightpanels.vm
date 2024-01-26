@@ -17,6 +17,7 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+<button id="rightPanelsToggler" class="btn btn-default btn-xs">$services.icon.renderHTML('caret-right')</button>
 #if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
 <div id="rightPanels" class="panels right panel-width-$!{rightPanelsWidth}"#if($showRightPanels != "1" && $request.getParameter("forceRightPanels")) style="display: none;"#end>
 #set($panelUixs = $services.uix.getExtensions('platform.panels.rightPanels'))

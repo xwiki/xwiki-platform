@@ -40,11 +40,13 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
+      <version>${vue.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-webjar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

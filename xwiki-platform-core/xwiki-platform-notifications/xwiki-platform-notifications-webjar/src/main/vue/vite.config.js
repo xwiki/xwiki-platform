@@ -29,11 +29,12 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/main.js"),
       fileName: "main",
+      name: 'xwiki-platform-notifications-webjar',
       formats: ['umd']
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled into your library
-      external: ["vue", "jquery", "xwiki-platform-livedata-webjar"],
+      external: ["vue", "jquery", "xwiki-livedata-vue"],
       output: {
         // Provide global variables to use in the UMD build for externalized deps
         globals: {

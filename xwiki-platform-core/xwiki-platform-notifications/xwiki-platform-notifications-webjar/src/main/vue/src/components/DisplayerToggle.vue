@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import {displayerMixin, BaseDisplayer, XWikiIcon} from "xwiki-platform-livedata-webjar";
+import {displayerMixin, BaseDisplayer, XWikiIcon} from "xwiki-livedata-vue";
 import $ from "jquery";
 
 export default {

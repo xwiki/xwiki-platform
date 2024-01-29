@@ -119,6 +119,9 @@
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.11.0.0</oracle.version>
+    
+    <!-- Vue JS -->
+    <vue.version>2.7.16</vue.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -1170,7 +1173,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>2.7.16</version>
+        <version>${vue.version}</version>
         <exclusions>
           <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
           not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->

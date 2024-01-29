@@ -5,6 +5,8 @@
 // Used by: Inline boxes
 span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
   padding: 0 floor(@font-size-base * 0.2);
+  border: none;
+  box-shadow: none;
   & > img {
     // Style the silk icons
     margin: 0 .6rem 0 .2rem;
@@ -20,10 +22,11 @@ span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
 // Used by: message boxes
 div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
   display: flex;
-  gap: .2rem .6rem;
+  gap: 2rem;
   justify-content: left;
   align-items: baseline;
-  padding: .5rem .8rem;
+  padding: 2rem;
+  box-shadow: none;
 
   & > img {
     // Improve alignment for silk icons
@@ -61,18 +64,30 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
 
 .successmessage {
   .alert-success;
+  background-color: @state-success-bg;
+  border:none;
+  border-left: 4px solid @brand-success;
 }
 
 .errormessage {
   .alert-danger;
+  background-color: @state-danger-bg;
+  border:none;
+  border-left: 4px solid @brand-danger;
 }
 
 .warningmessage {
   .alert-warning;
+  background-color: @state-warning-bg;
+  border:none;
+  border-left: 4px solid @brand-warning;
 }
 
 .infomessage {
   .alert-info;
+  background-color: @state-info-bg;
+  border:none;
+  border-left: 4px solid @brand-primary;
 }
 
 // --------------------------------------------------

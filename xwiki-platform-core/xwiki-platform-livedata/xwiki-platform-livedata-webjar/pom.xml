@@ -51,6 +51,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <!-- Used by the date filter. -->
     <dependency>

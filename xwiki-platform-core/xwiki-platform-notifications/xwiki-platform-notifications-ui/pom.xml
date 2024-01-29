@@ -146,7 +146,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- TODO: probably require another runtime dependency for xwiki-platform-notifications-webjar. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

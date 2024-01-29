@@ -26,6 +26,8 @@ div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
   justify-content: left;
   align-items: baseline;
   padding: 2rem;
+  border: none;
+  border-left: 4px solid;
   box-shadow: none;
 
   & > img {
@@ -65,29 +67,25 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
 .successmessage {
   .alert-success;
   background-color: @state-success-bg;
-  border:none;
-  border-left: 4px solid @brand-success;
+  border-color: @brand-success;
 }
 
 .errormessage {
   .alert-danger;
   background-color: @state-danger-bg;
-  border:none;
-  border-left: 4px solid @brand-danger;
+  border-color: @brand-danger;
 }
 
 .warningmessage {
   .alert-warning;
   background-color: @state-warning-bg;
-  border:none;
-  border-left: 4px solid @brand-warning;
+  border-color: @brand-warning;
 }
 
 .infomessage {
   .alert-info;
   background-color: @state-info-bg;
-  border:none;
-  border-left: 4px solid @brand-primary;
+  border-color: @brand-primary;
 }
 
 // --------------------------------------------------

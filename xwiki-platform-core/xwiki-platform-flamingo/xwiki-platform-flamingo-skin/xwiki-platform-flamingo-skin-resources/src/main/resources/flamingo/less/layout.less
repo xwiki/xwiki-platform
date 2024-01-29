@@ -221,6 +221,7 @@
 
 #leftPanels, #rightPanels {
   .make-xs-column(12);
+  transition: transform .2s;
 }
 
 .rightmenu {
@@ -270,37 +271,47 @@
 
 #leftPanelsToggler, #rightPanelsToggler {
   .panel;
-  /* Smoothen out state transition when expanding and collapsing the panel. */
-  transition: transform .2s;
   /* Make sure the toggler are displayed above the panels. */
   z-index: 1;
+  /* Smoothen out state transition when expanding and collapsing the panel. */
+  & > * {
+    transition: transform .2s;
+  }
 }
 
 #leftPanelsToggler {
   position: absolute;
   left: 0;
-  transform: rotate(0);
   border-radius: 0 @border-radius-small @border-radius-small 0;
+  & > * {
+    transform: rotate(0);
+  }
 }
 #body.hideleft #leftPanelsToggler,
 #body.hidelefthideright #leftPanelsToggler {
-  transform: rotate(180deg);
-  border-radius: @border-radius-small 0 0 @border-radius-small;
+  & > * {
+    transform: rotate(180deg);
+  }
 }
 
 #rightPanelsToggler {
   position: absolute;
   right: 0;
-  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
-  transform: rotate(180deg);
   /* Merge the button with the panel. */
-  border-radius: 0 @border-radius-small @border-radius-small 0;
+  border-radius: @border-radius-small 0 0 @border-radius-small;
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  & > * {
+    transform: rotate(180deg);
+  }
+
+  &[aria-expanded="false"]
 }
 
 #body.hideright #rightPanelsToggler,
 #body.hidelefthideright #rightPanelsToggler {
-  transform: rotate(0);
-  border-radius: @border-radius-small 0 0 @border-radius-small;
+  & > * {
+    transform: rotate(0);
+  }
 }
 
 #xwikicontent {

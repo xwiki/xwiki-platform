@@ -63,7 +63,7 @@ public class RichTextAreaElement extends BaseElement
     public String getText()
     {
         try {
-            return getActiveElement().getText();
+            return getRootEditableElement().getText();
         } finally {
             getDriver().switchTo().defaultContent();
         }
@@ -75,7 +75,7 @@ public class RichTextAreaElement extends BaseElement
     public void clear()
     {
         try {
-            getActiveElement().clear();
+            getRootEditableElement().clear();
         } finally {
             getDriver().switchTo().defaultContent();
         }
@@ -87,7 +87,7 @@ public class RichTextAreaElement extends BaseElement
     public void click()
     {
         try {
-            getActiveElement().click();
+            getRootEditableElement().click();
         } finally {
             getDriver().switchTo().defaultContent();
         }
@@ -158,12 +158,34 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
+     * Waits until the rich text area contains the specified plain text.
+     * 
+     * @param textFragment the text fragment to wait for
+     * @since 16.0
+     * @since 15.10.6
+     */
+    public void waitUntilTextContains(String textFragment)
+    {
+        new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout()))
+            .until((ExpectedCondition<Boolean>) d -> StringUtils.contains(getText(), textFragment));
+    }
+
+    /**
      * @return the HTML element that has the focus in the Rich editor
      */
     private WebElement getActiveElement()
     {
         getDriver().switchTo().frame(this.iframe);
         return getDriver().switchTo().activeElement();
+    }
+
+    /**
+     * @return the top most editable element in the rich text area (that includes all the editable content, including
+     *         nested editable areas)
+     */
+    private WebElement getRootEditableElement()
+    {
+        return getDriver().switchTo().frame(this.iframe).findElement(By.tagName("body"));
     }
 
     /**
@@ -187,9 +209,9 @@ public class RichTextAreaElement extends BaseElement
     public RichTextAreaElement waitForPlaceholder(String placeholder)
     {
         try {
-            WebElement activeElement = getActiveElement();
+            WebElement rootEditableElement = getRootEditableElement();
             getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, activeElement.getAttribute("data-cke-editorplaceholder")));
+                driver -> Objects.equals(placeholder, rootEditableElement.getAttribute("data-cke-editorplaceholder")));
         } finally {
             getDriver().switchTo().defaultContent();
         }

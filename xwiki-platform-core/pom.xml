@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.0.0-SNAPSHOT</version>
+    <version>16.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -125,87 +125,9 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Those APIs are still available with legacy packages.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltipJS(com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String, com.xpn.xwiki.api.Object)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.objects.BaseObject, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltip(java.lang.String, java.lang.String)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltip(java.lang.String, java.lang.String, java.lang.String)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltipJS()</old>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <differences>
-                <item>
-                  <criticality>allowed</criticality>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</old>
-                  <new>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</new>
-                  <superClass>org.xwiki.filter.instance.output.EntityInstanceOutputProperties</superClass>
-                  <justification>Not a breakage, the old DocumentInstanceOutputProperties content has been moved to the new EntityInstanceOutputProperties class and old class now inherits from the new one</justification>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.livedata.macro.LiveDataMacroParameters</old>
-                  <new>class org.xwiki.livedata.macro.LiveDataMacroParameters</new>
-                  <superClass>org.xwiki.livedata.internal.LiveDataRendererParameters</superClass>
-                  <justification>Not a runtime breaking change.</justification>
-                  <criticality>allowed</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

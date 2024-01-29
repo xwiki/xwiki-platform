@@ -19,11 +19,15 @@
  */
 define('xwiki-realtime-wysiwyg-patches', [
   'xwiki-realtime-wysiwyg-filters',
+  'xwiki-realtime-wysiwyg-transformers',
   'hyper-json',
   'diff-dom',
   'json.sortify',
   'chainpad',
-], function (Filters, HyperJSON, DiffDOM, JSONSortify, ChainPad) {
+], function (
+  /* jshint maxparams:false */
+  Filters, Transformers, HyperJSON, DiffDOM, JSONSortify, ChainPad
+) {
   'use strict';
 
   // HTML block-level elements.
@@ -112,8 +116,10 @@ define('xwiki-realtime-wysiwyg-patches', [
      * 
      * @param {string} remoteFilteredHyperJSON the new normalized (filtered) content (usually the result of a remote
      *   change), serialized as HyperJSON
+     *
+     * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    setHyperJSON(remoteFilteredHyperJSON) {
+    setHyperJSON(remoteFilteredHyperJSON, propagate) {
       let remoteHyperJSON;
       try {
         remoteHyperJSON = this._revertHyperJSONFilters(remoteFilteredHyperJSON);
@@ -137,32 +143,39 @@ define('xwiki-realtime-wysiwyg-patches', [
         return;
       }
 
-      this._updateContent(newContent);
+      this._updateContent(newContent, propagate);
     }
 
     /**
      * Update the editor content without affecting its caret / selection.
      * 
      * @param {string} html the new HTML content
+     * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    setHTML(html) {
+    setHTML(html, propagate) {
+      const fixedHtml = this._editor.convertDataToHtml(html);
+
       let doc;
       try {
-        doc = new DOMParser().parseFromString(html, 'text/html');
+        doc = new DOMParser().parseFromString(fixedHtml, 'text/html');
       } catch (e) {
         console.error('Failed to parse the given HTML string: ' + html, e);
         return;
       }
 
-      this._updateContent(doc.body);
+      // We convert to HyperJSON and set the HyperJSON so that we can use the same filters
+      // as when receiving content from coeditors.
+      const hjson = Patches._stringifyNode(this._normalizeContent(doc.body), false);
+      this.setHyperJSON(hjson, propagate);
     }
 
     /**
      * Update the editor content without affecting its caret / selection.
      * 
      * @param {Node} newContent the new content to set, as a DOM node
+     * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    _updateContent(newContent) {
+    _updateContent(newContent, propagate) {
       // Remember where the selection is, to be able to restore it in case the content update affects it.
       this._editor.saveSelection();
       const selection = this._editor.getSelection();
@@ -179,7 +192,7 @@ define('xwiki-realtime-wysiwyg-patches', [
         document: oldContent.ownerDocument
       });
 
-      this._editor.contentUpdated(this._diffDOM._updatedNodes);
+      this._editor.contentUpdated(this._diffDOM._updatedNodes, propagate);
 
       // Restore the selection if the editor had a selection (i.e. if the selection was inside the editing area) before
       // the content update and it was affected by the content update. Note that the selection restore focuses the
@@ -230,7 +243,7 @@ define('xwiki-realtime-wysiwyg-patches', [
       const localOperations = ChainPad.Diff.diff(localFilteredHyperJSON, localHyperJSON);
       const remoteOperations = ChainPad.Diff.diff(localFilteredHyperJSON, remoteFilteredHyperJSON);
       // Transform the local operations so that we can apply them on top of the remote content.
-      const updatedLocalOperations = ChainPad.NaiveJSONTransformer(localOperations, remoteOperations,
+      const updatedLocalOperations = Transformers.RebaseNaiveJSONTransformer(localOperations, remoteOperations,
         localFilteredHyperJSON);
       // Apply the updated operations to the remote content in order to perform the 3-way merge (rebase). This way we
       // integrate the local filtered content (user state, browser specific markup) into the remote content.

@@ -22,11 +22,11 @@ package org.xwiki.tour.test.ui;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tour.test.po.PageWithTour;
 import org.xwiki.tour.test.po.StepEditModal;
@@ -34,16 +34,17 @@ import org.xwiki.tour.test.po.TourEditPage;
 import org.xwiki.tour.test.po.TourFromLivetable;
 import org.xwiki.tour.test.po.TourHomePage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the Tour Application.
  *
  * @version $Id$
  */
-public class TourApplicationIT extends AbstractTest
+@UITest
+class TourApplicationIT
 {
     private static final LocalDocumentReference TOUR_REFERENCE_1 =
         new LocalDocumentReference(List.of("Tour", "Test"), "WebHome");
@@ -51,23 +52,35 @@ public class TourApplicationIT extends AbstractTest
     private static final LocalDocumentReference TOUR_REFERENCE_2 =
         new LocalDocumentReference(List.of("Tour", "NewTest"), "WebHome");
 
-    @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
+    @Test
+    @Order(1)
+    void verifyTourFeatures(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        // Use a scenario since it's a best practice but also because each tour test has consequences on the other one.
+        // For example, the second test binds to a TourClass and thus when displaying the first tour page (which also
+        // contains a TourClass) it would display the second tour...
 
-    private void setUpTour(TourEditPage tourEditPage, String description, boolean isActive, String targetPage,
-        String targetClass) throws Exception
+        setup.rest().delete(TOUR_REFERENCE_1);
+        setup.rest().delete(TOUR_REFERENCE_2);
+
+        tourBoundToPage();
+        tourBoundToClass();
+    }
+
+    private void setUpTour(TourEditPage tourEditPage, String description, String targetPage, String targetClass)
     {
         tourEditPage.setDescription(description);
-        tourEditPage.setIsActive(isActive);
+        tourEditPage.setIsActive(true);
         tourEditPage.setTargetPage(targetPage);
         tourEditPage.setTargetClass(targetClass);
     }
 
-    private void setUpStep(TourEditPage tourEditPage, String element, String title, String content, boolean backdrop,
+    private void setUpStep(TourEditPage tourEditPage, String title, String content, boolean backdrop,
         String targetPage)
     {
         StepEditModal stepEditModal = tourEditPage.newStep();
-        stepEditModal.setElement(element);
+        stepEditModal.setElement("body");
         stepEditModal.setTitle(title);
         stepEditModal.setContent(content);
         stepEditModal.setBackdrop(backdrop);
@@ -75,44 +88,30 @@ public class TourApplicationIT extends AbstractTest
         stepEditModal.save();
     }
 
-    private void deleteTour(String page) throws Exception
+    private void deleteTour()
     {
         TourHomePage tourHomePage = TourHomePage.gotoPage();
-        ViewPage tourPage = tourHomePage.getTourPage(page);
+        ViewPage tourPage = tourHomePage.getTourPage("Test");
         tourPage.delete().clickYes();
     }
 
-    @Test
-    public void verifyTourFeatures() throws Exception
-    {
-        // Use a scenario since it's a best practice but also because each tour test has consequences on the other one.
-        // For example, the second test binds to a TourClass and thus when displaying the first tour page (which
-        // also contains a TourClass) it would display the second tour...
-
-        getUtil().rest().delete(TOUR_REFERENCE_1);
-        getUtil().rest().delete(TOUR_REFERENCE_2);
-
-        tourBoundToPage();
-        tourBoundToClass();
-    }
-
-    private void tourBoundToPage() throws Exception
+    private void tourBoundToPage()
     {
         // First, we need to create a tour
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         TourEditPage tourEditPage = tourHomePage.addNewEntry("Test");
-        setUpTour(tourEditPage, "My nice description", true, "Tour.StartTour.WebHome", "");
+        setUpTour(tourEditPage, "My nice description", "Tour.StartTour.WebHome", "");
 
         // Test to put a translation key, use the translation macro
-        setUpStep(tourEditPage, "body", "tour.app.name", "{{translation key=\"TourCode.TourClass_description\" /}}",
+        setUpStep(tourEditPage, "tour.app.name", "{{translation key=\"TourCode.TourClass_description\" /}}",
             true, "");
         // I voluntary create the object 3 before the 2 to test the 'order' field
-        setUpStep(tourEditPage, "body", "Title 3", "Step 3", true, "");
-        setUpStep(tourEditPage, "body", "Title 2", "Step 2", true, "");
+        setUpStep(tourEditPage, "Title 3", "Step 3", true, "");
+        setUpStep(tourEditPage, "Title 2", "Step 2", true, "");
         // Add a step that will be removed
-        setUpStep(tourEditPage, "body", "to remove", "to remove", false, "");
+        setUpStep(tourEditPage, "to remove", "to remove", false, "");
         // Object 4 used to test the Multipage feature ('targetPage' field)
-        setUpStep(tourEditPage, "body", "Title 4", "Step 4", true, "TourCode.TourClass");
+        setUpStep(tourEditPage, "Title 4", "Step 4", true, "TourCode.TourClass");
 
         // Test that we can change the order of a step
         StepEditModal stepEditModal = tourEditPage.editStep(2);
@@ -283,16 +282,16 @@ public class TourApplicationIT extends AbstractTest
         homePage.close();
 
         // Verify that we can delete a tour in the LT UI
-        deleteTour("Test");
+        deleteTour();
     }
 
-    private void tourBoundToClass() throws Exception
+    private void tourBoundToClass()
     {
         // First, we need to create a tour
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         TourEditPage tourEditPage = tourHomePage.addNewEntry("NewTest");
-        setUpTour(tourEditPage, "Description", true, "", "TourCode.TourClass");
-        setUpStep(tourEditPage, "body", "Tour Title", "Tour Content", true, "");
+        setUpTour(tourEditPage, "Description", "", "TourCode.TourClass");
+        setUpStep(tourEditPage, "Tour Title", "Tour Content", true, "");
         tourEditPage.clickSaveAndView();
 
         tourHomePage = TourHomePage.gotoPage();

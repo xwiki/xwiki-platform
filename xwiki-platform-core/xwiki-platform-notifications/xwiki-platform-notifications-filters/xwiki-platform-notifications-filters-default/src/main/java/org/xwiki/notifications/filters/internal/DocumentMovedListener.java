@@ -30,7 +30,7 @@ import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -48,7 +48,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Component
 @Named(DocumentMovedListener.NAME)
 @Singleton
-public class DocumentMovedListener extends AbstractEventListener
+public class DocumentMovedListener extends AbstractLocalEventListener
 {
     /**
      * Name of the component.
@@ -90,7 +90,7 @@ public class DocumentMovedListener extends AbstractEventListener
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
         DocumentRenamedEvent renamedEvent = (DocumentRenamedEvent) event;
         DocumentReference sourceLocation = renamedEvent.getSourceReference();

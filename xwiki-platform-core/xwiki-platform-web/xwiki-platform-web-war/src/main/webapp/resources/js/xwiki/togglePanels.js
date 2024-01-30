@@ -69,10 +69,10 @@ require(['jquery'], function($) {
     if (newExpandedState) {
       // If we want to expand the panel, we first show it, then we slide it in view.
       updateBody(isRight, newExpandedState);
-      toggler.attr('aria-expanded', newExpandedState);
+      toggler.attr('aria-expanded', 'true');
     } else {
       // If we want to collapse the panel, we first slide it out of view and then we hide it.
-      toggler.attr('aria-expanded', newExpandedState);
+      toggler.attr('aria-expanded', 'false');
       let panels;
       if (isRight) {
         panels = $('#rightPanels');

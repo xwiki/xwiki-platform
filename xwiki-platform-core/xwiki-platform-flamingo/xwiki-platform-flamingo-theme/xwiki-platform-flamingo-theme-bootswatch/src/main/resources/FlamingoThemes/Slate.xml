@@ -753,6 +753,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
+      <panel-header-text>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>panel-header-text</name>
+        <number>46</number>
+        <picker>0</picker>
+        <prettyName>panel-header-text</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </panel-header-text>
       <text-color>
         <customDisplay/>
         <disabled>0</disabled>
@@ -2260,6 +2273,9 @@ ul.nav.nav-pills.nav-stacked li{
     </property>
     <property>
       <panel-bg>#272b30</panel-bg>
+    </property>
+    <property>
+      <panel-header-text/>
     </property>
     <property>
       <text-color>#c8c8c8</text-color>

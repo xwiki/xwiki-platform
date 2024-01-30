@@ -49,6 +49,7 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
+import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 /**
  * Template for {@link DataMigrationManager}.
@@ -338,32 +339,76 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     @Override
     public void initialize() throws InitializationException
     {
+        checkMigrationsVersions();
         try {
             SortedMap<XWikiDBVersion, XWikiMigration> availableMigrations = new TreeMap<>();
-
             Map<XWikiDBVersion, XWikiMigration> forcedMigrations = getForcedMigrations();
             if (!forcedMigrations.isEmpty()) {
                 availableMigrations.putAll(forcedMigrations);
             } else {
                 Set<String> ignoredMigrations = new HashSet<>(this.hibernateConfiguration.getIgnoredMigrations());
                 for (DataMigration migrator : getAllMigrations()) {
-                    if (ignoredMigrations.contains(migrator.getClass().getName())
-                        || ignoredMigrations.contains(migrator.getVersion().toString())) {
+                    XWikiDBVersion migratorVersion = migrator.getVersion();
+                    if (isMigrationIgnored(migrator, ignoredMigrations)) {
                         continue;
                     }
                     XWikiMigration migration = new XWikiMigration(migrator, false);
-                    availableMigrations.put(migrator.getVersion(), migration);
+                    availableMigrations.put(migratorVersion, migration);
                 }
             }
 
-            this.targetVersion =
-                (availableMigrations.size() > 0) ? availableMigrations.lastKey() : new XWikiDBVersion(0);
+            this.targetVersion = !availableMigrations.isEmpty() ? availableMigrations.lastKey() : new XWikiDBVersion(0);
             this.migrations = availableMigrations.values();
         } catch (Exception e) {
             throw new InitializationException("Migration Manager initialization failed", e);
         }
 
         this.observationManager.addListener(new WikiDeletedEventListener());
+    }
+
+    public boolean isMigrationIgnored(DataMigration migration, Set<String> ignoredMigrations)
+    {
+        return ignoredMigrations.contains(migration.getClass().getName())
+            || ignoredMigrations.contains(migration.getVersion().toString());
+    }
+
+    /**
+     * Ensure we don't have two migrations with same DB version.
+     * Note that it's possible to use the ignored migrations feature to bypass this check: if two migrations has same
+     * version one can ignore them in which case there will be only a warning.
+     *
+     * @throws InitializationException in case we found same DB version or the list of migration cannot be obtained.
+     */
+    private void checkMigrationsVersions() throws InitializationException
+    {
+        try {
+            List<HibernateDataMigration> migrationList =
+                this.componentManager.getInstanceList(HibernateDataMigration.class);
+            Set<String> ignoredMigrations = new HashSet<>(this.hibernateConfiguration.getIgnoredMigrations());
+            Map<XWikiDBVersion, String> hintMap = new HashMap<>();
+            for (HibernateDataMigration dataMigration : migrationList) {
+                XWikiDBVersion version = dataMigration.getVersion();
+                if (hintMap.containsKey(version)) {
+                    if (isMigrationIgnored(dataMigration, ignoredMigrations)) {
+                        this.logger.warn("Two migrations with same version [{}] were found: [{}] and [{}] but "
+                            + "migration [{}] is ignored.",
+                            version,
+                            hintMap.get(version),
+                            dataMigration.getClass().getName(),
+                            dataMigration.getClass().getName());
+                    } else {
+                        throw new InitializationException(
+                            String.format("Two migrations with same version [%s] were found: [%s] and [%s]",
+                                version,
+                                hintMap.get(version),
+                                dataMigration.getClass().getName()));
+                    }
+                }
+                hintMap.put(version, dataMigration.getClass().getName());
+            }
+        } catch (ComponentLookupException e) {
+            throw new InitializationException("Unable to retrieve the list of hibernate data migrations", e);
+        }
     }
 
     /**

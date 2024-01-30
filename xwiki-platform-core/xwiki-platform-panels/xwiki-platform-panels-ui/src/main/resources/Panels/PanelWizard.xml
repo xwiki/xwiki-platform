@@ -193,7 +193,7 @@
     #end
   #end
   #set ($panelsPerRow = 3)
-  (% id="dhtmltooltip" style="visibility: hidden;" %)((()))
+  (% id="dhtmltooltip" %)((()))
   #if ($request.place)
     #set ($ajaxurl = $xwiki.getDocument('Panels.PanelLayoutUpdate').getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;place=$!{escapetool.url($request.place)}&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
   #else
@@ -632,6 +632,7 @@
 }
 
 #dhtmltooltip {
+  display: none;
   background-color: $theme.highlightColor;
   border: 1px solid $theme.borderColor;
   padding: 2px 4px;

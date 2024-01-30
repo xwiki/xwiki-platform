@@ -539,7 +539,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         }
         if (trigger == null) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_DOES_NOT_EXITS,
-                "Job does not exists");
+                "Job does not exist");
         }
 
         return trigger;

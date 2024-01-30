@@ -209,15 +209,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         int size = 0;
         for (EventStoreTask<?, ?> task : this.queue) {
             switch (task.type) {
-                case DELETE_EVENT:
-                case DELETE_EVENT_BY_ID:
+                case DELETE_EVENT, DELETE_EVENT_BY_ID:
                     --size;
                     break;
-
                 case SAVE_EVENT:
                     ++size;
                     break;
-
                 default:
                     break;
             }

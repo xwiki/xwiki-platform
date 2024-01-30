@@ -122,7 +122,10 @@
     'meta': {
       'propertyDescriptors': [
         { 'id': 'group', 'displayer': { 'id': 'link', 'propertyHref': 'group_url' } }
-      ]
+      ],
+      'entryDescriptor': {
+        'idProperty': "group"
+      }
     }
   })
   #set ($sourceParameters = $escapetool.url({

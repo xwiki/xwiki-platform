@@ -410,9 +410,9 @@ public class HtmlPackager
         StringBuilder builder = new StringBuilder();
         builder.append("""
             <!DOCTYPE HTML>
-            <html lang=\"en-US\">
+            <html lang="en-US">
                 <head>
-                    <meta charset=\"UTF-8\">
+                    <meta charset="UTF-8">
                     <title>Export Index</title>
                 </head>
                 <body>

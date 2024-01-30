@@ -76,7 +76,7 @@ notifications.filters.preferences.scopeNotificationFilter.wiki=일주일
 notifications.toggle.disabled.hint=이 위치를 보려면 설정에서 알림을 활성화해야 합니다
 
 ## Notifications formats
-notifications.format.alert=알리다
+notifications.format.alert=알림
 notifications.format.email=이메일
 
 ## Filter preferences settings
@@ -260,4 +260,4 @@ notifications.filters.type.exclusive=독점적인
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>
-  </xwikidoc>
+</xwikidoc>

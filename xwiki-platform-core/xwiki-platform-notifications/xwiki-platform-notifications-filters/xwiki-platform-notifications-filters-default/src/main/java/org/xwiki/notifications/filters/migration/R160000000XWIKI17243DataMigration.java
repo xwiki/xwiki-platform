@@ -53,6 +53,7 @@ import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
@@ -125,7 +126,7 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        String statement = "from doc.object(XWiki.WatchListClass) as user";
+        String statement = "from doc.object(XWiki.WatchListClass) as watchListDoc";
         int offset = 0;
         List<String> results;
         do {
@@ -137,8 +138,8 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
 
                 this.logger.info("Found [{}] users with WatchListClass objects... migrating them.", results.size());
                 for (String result : results) {
-                    DocumentReference userDocReference = this.documentReferenceResolver.resolve(result);
-                    this.migrateUser(userDocReference);
+                    DocumentReference watchListDoc = this.documentReferenceResolver.resolve(result);
+                    this.migrateWatchListDoc(watchListDoc);
                 }
                 offset += BATCH_SIZE;
             } catch (QueryException e) {
@@ -148,29 +149,37 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
         } while (results.size() == BATCH_SIZE);
     }
 
-    private void migrateUser(DocumentReference userDocReference) throws DataMigrationException, XWikiException
+    private void migrateWatchListDoc(DocumentReference watchListDocReference)
+        throws DataMigrationException, XWikiException
     {
         XWikiContext context = getXWikiContext();
-        XWikiDocument document = context.getWiki().getDocument(userDocReference, context);
-        WikiReference wikiReference = userDocReference.getWikiReference();
-        EntityReference classReference = CLASS_REFERENCE.appendParent(wikiReference);
-        List<BaseObject> objects = document.getXObjects(classReference);
+        WikiReference wikiReference = watchListDocReference.getWikiReference();
+        XWikiDocument document = context.getWiki().getDocument(watchListDocReference, context);
 
-        Set<NotificationFilterPreference> results = new HashSet<>();
-        for (BaseObject obj : objects) {
-            if (obj == null) {
-                continue;
+        // If the document does contain a user xobject, we perform the migration, else we only remove the xobject.
+        if (document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null) {
+            EntityReference classReference = CLASS_REFERENCE.appendParent(wikiReference);
+            List<BaseObject> objects = document.getXObjects(classReference);
+
+            Set<NotificationFilterPreference> results = new HashSet<>();
+            for (BaseObject obj : objects) {
+                if (obj == null) {
+                    continue;
+                }
+                getValues(obj, FIELD_WIKIS, NotificationFilterProperty.WIKI, results);
+                getValues(obj, FIELD_SPACES, NotificationFilterProperty.SPACE, results);
+                getValues(obj, FIELD_DOCUMENTS, NotificationFilterProperty.PAGE, results);
             }
-            getValues(obj, FIELD_WIKIS, NotificationFilterProperty.WIKI, results);
-            getValues(obj, FIELD_SPACES, NotificationFilterProperty.SPACE, results);
-            getValues(obj, FIELD_DOCUMENTS, NotificationFilterProperty.PAGE, results);
-        }
 
-        try {
-            this.notificationFilterPreferenceStore.saveFilterPreferences(userDocReference, results);
-        } catch (NotificationException e) {
-            throw new DataMigrationException(String.format("Error while trying to save [%s] filter preferences",
-                results.size()), e);
+            try {
+                this.notificationFilterPreferenceStore.saveFilterPreferences(watchListDocReference, results);
+            } catch (NotificationException e) {
+                throw new DataMigrationException(String.format("Error while trying to save [%s] filter preferences",
+                    results.size()), e);
+            }
+        } else {
+            this.logger.info("[{}] contained a watchlist object but is not a user profile, the object will be removed "
+                + "without migration", watchListDocReference);
         }
 
         this.taskManager.addTask(wikiReference.getName(), document.getId(),

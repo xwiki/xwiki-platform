@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -38,9 +39,46 @@ public class MacroDialogEditModal extends BaseElement
     public MacroDialogEditModal waitUntilReady()
     {
         getDriver().waitUntilElementIsVisible(
-                // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
-                By.cssSelector("[class*=-editor-modal] .macro-name"));
+            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+            By.cssSelector("[class*=-editor-modal] .macro-name"));
         return this;
+    }
+
+    /**
+     * Set the value of a macro parameter.
+     *
+     * @param name the macro parameter name
+     * @param value the macro parameter value
+     * @return this modal
+     * @since 15.10.6
+     * @since 16.0.0RC1
+     */
+    public MacroDialogEditModal setMacroParameter(String name, String value)
+    {
+        WebElement parameterInput = getMacroParameterInput(name);
+        parameterInput.clear();
+        parameterInput.sendKeys(value);
+        return this;
+    }
+
+    /**
+     * Retrieves the value of a macro parameter from the macro editor modal.
+     * 
+     * @param name the macro parameter name
+     * @return the value of the specified macro parameter
+     * @since 15.10.6
+     * @since 16.0.0RC1
+     */
+    public String getMacroParameter(String name)
+    {
+        return getMacroParameterInput(name).getAttribute("value");
+    }
+
+    private WebElement getMacroParameterInput(String name)
+    {
+        return getDriver().findElementWithoutWaitingWithoutScrolling(
+            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+            By.cssSelector("[class*=-editor-modal] .macro-parameter-field input[name='" + name + "']"));
     }
 
     /**
@@ -49,7 +87,20 @@ public class MacroDialogEditModal extends BaseElement
     public void clickSubmit()
     {
         getDriver().findElement(
-             // We match *-editor-modal so the page object can be used in dashboard and ckeditor tests.
-                By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click();
+            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+            By.cssSelector("[class*=-editor-modal] .modal-footer .btn-primary")).click();
+    }
+
+    /**
+     * Click on the Cancel button to close the macro editor modal.
+     * 
+     * @since 15.10.6
+     * @since 16.0.0RC1
+     */
+    public void clickCancel()
+    {
+        getDriver().findElement(
+            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+            By.cssSelector("[class*=-editor-modal] .modal-footer button[data-dismiss='modal']")).click();
     }
 }

@@ -52,7 +52,7 @@ define('xwiki-livedata', [
   /**
    * The init function of the logic script
    * For each livedata element on the page, returns its corresponding data / API
-   * If the data does not exists yet, create it from the element
+   * If the data does not exist yet, create it from the element
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
    */
   const init = function (element) {
@@ -230,7 +230,8 @@ define('xwiki-livedata', [
         "pagination.last",
         "action.refresh",
         "action.addEntry",
-        "action.reorder.hint",
+        "action.columnName.sortable.hint",
+        "action.columnName.default.hint",
         "action.resizeColumn.hint",
         "panel.filter.title",
         "panel.filter.noneFilterable",
@@ -502,7 +503,7 @@ define('xwiki-livedata', [
       const propertyDescriptor = this.data.meta.propertyDescriptors
         .find(propertyDescriptor => propertyDescriptor.id === propertyId);
       if (!propertyDescriptor) {
-        console.error("Property descriptor of property `" + propertyId + "` does not exists");
+        console.error("Property descriptor of property `" + propertyId + "` does not exist");
       }
       return propertyDescriptor;
     },

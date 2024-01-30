@@ -306,9 +306,10 @@ Generates:
 #if ("$!xcontext.macro.params.count" != '')
   #set ($limit = $services.rendering.escape($xcontext.macro.params.count, 'xwiki/2.1'))
 #end
+#set ($properties = $services.rendering.escape($stringtool.join($properties, ','), 'xwiki/2.1'))
 {{liveData
   id="$livedataId"
-  properties="$stringtool.join($properties, ',')"
+  properties="$properties"
   source="liveTable"
   sourceParameters="$escapetool.url($sourceParameters)"
   #if ($description != '')description="$description"#end

@@ -20,7 +20,7 @@
 
 <!--
   DisplayerToggle is a special custom displayer that displays a toggle element supported by bootstrap-switch.
-  It is sending a "xwiki:livedata:toggle" even on state change, to be listen for by external scripts. 
+  It is sending a "xwiki:livedata:toggle" even on state change, to be listened for by external scripts.
 -->
 <template>
   <!--
@@ -51,10 +51,9 @@
     </template>
 
     <!--
-      The Action displayer does not have an Editor widget
-      So we leave the editor template empty
-      Moreover, we add the `view-only` property on the BaseDisplayer component
-      so that user can't possibly switch to the Editor widget.
+      The Toggle displayer does not have an Editor widget. Therefore, we leave the editor template empty.
+      Moreover, we add the `view-only` property on the BaseDisplayer component so that user can't possibly switch 
+      to the Editor widget.
     -->
     <template #editor></template>
   </BaseDisplayer>
@@ -67,7 +66,7 @@ import $ from "jquery";
 export default {
   name: "displayer-toggle",
   components: {BaseDisplayer, XWikiIcon},
-  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component
+  // Add the displayerMixin to get access to all the displayers methods and computed properties inside this component.
   mixins: [displayerMixin],
   props: {
     iconName: {
@@ -97,6 +96,14 @@ export default {
             state: component.innerChecked,
             disabled: component.innerDisabled,
             labelText: this.$refs.icon.$el.outerHTML,
+            /*
+             Send a xwiki:livedata:toggle event with the following event data:
+             - the data of the toggle
+             - the new state of the toggle
+             - the disabled status of the toggle
+             - a callback. When the callback is called, the toggle component is updated with the provided data, state, 
+                and disabled status. 
+            */
             onSwitchChange(event, state) {
               const toggleData = component.innerData;
               const disabledVal = component.innerDisabled;

@@ -146,6 +146,7 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides the DisplayerToggle Vue component. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-webjar</artifactId>

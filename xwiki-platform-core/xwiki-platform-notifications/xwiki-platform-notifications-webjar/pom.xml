@@ -40,13 +40,23 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
-      <version>${vue.version}</version>
+<!--      <version>${vue.version}</version>-->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-webjar</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-switch</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
@@ -132,16 +142,6 @@
               <arguments>run build</arguments>
             </configuration>
           </execution>
-<!--          <execution>-->
-<!--            <id>npm-run-test</id>-->
-<!--            <goals>-->
-<!--              <goal>npm</goal>-->
-<!--            </goals>-->
-<!--            <configuration>-->
-<!--              <arguments>run test</arguments>-->
-<!--            </configuration>-->
-<!--            <phase>test</phase>-->
-<!--          </execution>-->
           <execution>
             <id>npm-run-lint</id>
             <goals>

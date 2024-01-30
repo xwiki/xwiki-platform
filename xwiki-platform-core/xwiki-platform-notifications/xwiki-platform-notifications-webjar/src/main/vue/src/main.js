@@ -19,4 +19,5 @@
  */
 import DisplayerToggle from "./components/DisplayerToggle.vue";
 
+// Export the elements that are expected to be imported from other modules.
 export {DisplayerToggle}

@@ -77,7 +77,7 @@ public class TableLayoutElement extends BaseElement
     private final LiveDataElement liveData;
 
     /**
-     * @return the list of rows Web Elements
+     * @return the list of rows {@link WebElement}s
      * @since 16.1.0RC1
      */
     public List<WebElement> getRows()

@@ -154,43 +154,43 @@
   }
 #end
 #if ($underlining == 'OnlyInlineLinks' &amp;&amp; $a11y != '1')
-  /* Rule for the whole UI.
-    If there are multiple links in the same parents, we want to be able to separate them.
-  */
-  a:not(:only-of-type):not(.button) {
+  /* Rule for the content. */
+  #xwikicontent a {
     text-decoration: underline;
   }
 
-  .wikilink, .wikiexternallink, .wikiinternallink, .wikicreatelink {
-    :not(:only-of-type) &gt; a:not(.button) {
-        text-decoration: underline;
+  /* UIs where we want to underline outside of content. */
+  .xdocLastModification,
+  .panel.HelpTipsPanel,
+  .commentauthor {
+    &amp; a {
+      text-decoration: underline;
+    }
+  }
+  /* UIs in content where we want to not underline by default.
+  * Those elements usually contain only links that are not inline (and a lot of links). */
+  #xwikicontent {
+    &amp; .xwiki-livetable-container,
+    &amp; .xtree,
+    &amp; .xwikitabbar,
+    &amp; .buttonwrapper, {
+      &amp; a {
+      text-decoration: none;
+      /* Make sure we don't take over the default behaviour on hover with too much specificity. */
+      &amp;:hover, &amp;:focus{
+        text-decoration: underline
+        }
+      }
     }
   }
 
-  /* Rule for the content.
-    We want to separate the link from the surrounding text. Usually those kind of inline link are found
-    as the only child in a macro generated span.
-    We check the type of the parent of this macro and underline the link in those parents where text is usually found.
-    This selector level is based on the list of HTML Text content elements available on MDN web docs.
-  */
-  #xwikicontent {
-    blockquote, dd, div, dl, dt, figcaption, figure, hr, li, menu, ol, p, pre, ul {
-      &amp; &gt; a:not(.button), &amp; &gt; * &gt; a:not(.button) {
-        text-decoration: underline;
-      }
-    }
+  /* Helper classes for easier content customization. Note that those only work for this preference. */
+  #xwikicontent .force-no-underline a {
+    text-decoration: none;
   }
-  /* Rule for panels.
-  It's a filtered down version of the content rule, which avoids underlining lists of anchors that were made using
-  xwiki syntax.
-  We need this to allow a more consistent looks, some panels generate HTML and others use xwiki syntax
-  */
-  #leftPanels, #rightPanels {
-    blockquote, div, figcaption, hr, menu, p, pre {
-      &amp; &gt; a:not(.button), &amp; &gt; * &gt; a:not(.button) {
-      text-decoration: underline;
-      }
-    }
+
+  .force-underline a {
+    text-decoration: underline;
   }
 #end
 #if ($underlining == 'No' &amp;&amp; $a11y != '1')

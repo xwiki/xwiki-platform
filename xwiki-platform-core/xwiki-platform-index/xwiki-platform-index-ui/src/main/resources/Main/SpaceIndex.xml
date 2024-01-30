@@ -45,11 +45,13 @@
 ## Since we display the space index, we do not display page titles and locations, but the old columns name and space 
 ## (old behavior consistent with this old macro)...
 
+#set ($description = $services.localization.render('platform.index.spaceIndexDescription', [$space]))
+#set ($description = $services.rendering.escape($description, 'xwiki/2.1'))
 {{documents
-  space="$space.replaceAll('["~]', '~$0')"
+  space="$services.rendering.escape($space, 'xwiki/2.1')"
   id="spaceindex"
   columns="doc.name,doc.space,doc.date,doc.author"
-  description="$services.localization.render('platform.index.spaceIndexDescription', [$space])"
+  description="$description"
 /}}
 #set($docextras=[])
 {{/velocity}}

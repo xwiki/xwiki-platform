@@ -297,14 +297,23 @@ Generates:
   #set ($livedataId = "documents-$mathtool.random(1, 1000)")
 #end
 
+#set ($livedataId = $services.rendering.escape($livedataId, 'xwiki/2.1'))
+#set ($description = '')
+#if ("$!xcontext.macro.params.description" != '')
+  #set ($description = $services.rendering.escape($xcontext.macro.params.description, 'xwiki/2.1'))
+#end
+#set ($limit = '')
+#if ("$!xcontext.macro.params.count" != '')
+  #set ($limit = $services.rendering.escape($xcontext.macro.params.count, 'xwiki/2.1'))
+#end
 {{liveData
   id="$livedataId"
   properties="$stringtool.join($properties, ',')"
   source="liveTable"
   sourceParameters="$escapetool.url($sourceParameters)"
-  description="$!xcontext.macro.params.description"
+  #if ($description != '')description="$description"#end
   #if ($properties.contains('doc.location'))sort="doc.location"#end
-  #if ("$!xcontext.macro.params.count" != '')limit="$xcontext.macro.params.count"#end
+  #if ($limit != '')limit="$limit"#end
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</code>
     </property>
@@ -869,7 +878,7 @@ Generates:
       <defaultValue/>
     </property>
     <property>
-      <description>Specifies the list of properties (e.g., "doc.name,doc.space"). If not specified then the default properties list of used ("doc.name,doc.space,doc.date,doc.author")</description>
+      <description>Specifies the list of properties (e.g., "doc.name,doc.space"). If not specified then the default properties list is used ("doc.name,doc.space,doc.date,doc.author")</description>
     </property>
     <property>
       <mandatory>0</mandatory>

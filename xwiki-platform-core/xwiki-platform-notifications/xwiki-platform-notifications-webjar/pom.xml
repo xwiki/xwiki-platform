@@ -40,7 +40,6 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
-<!--      <version>${vue.version}</version>-->
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -96,7 +95,6 @@
               </resources>
             </configuration>
           </execution>
-
         </executions>
       </plugin>
       <!-- Skip jsHint because we use ESLint through the frontend-maven-plugin -->

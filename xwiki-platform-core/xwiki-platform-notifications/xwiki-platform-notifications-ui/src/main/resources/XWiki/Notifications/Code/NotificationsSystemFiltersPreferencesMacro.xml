@@ -598,7 +598,6 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
   &lt;/div&gt;
 &lt;/div&gt;
 {{/html}}
-#set($properties  = ['name', 'filterType', 'notificationFormats', 'isEnabled'])
 #set ($sourceParameters = {
   'translationPrefix': 'notifications.settings.filters.preferences.system.table.',
   'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
@@ -624,11 +623,12 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
 #set ($description = 
     $services.localization.render('notifications.settings.filters.preferences.system.table.description'))
 #set ($description = $services.rendering.escape($description, 'xwiki/2.1'))
+#set ($sourceParameters = $services.rendering.escape($escapetool.url($sourceParameters), 'xwiki/2.1'))
 {{liveData
   id='notificationSystemFilterPreferencesLiveData'
-  properties="$stringtool.join($properties, ',')"
+  properties="name,filterType,notificationFormats,isEnabled"
   source='liveTable'
-  sourceParameters="$escapetool.url($sourceParameters)"
+  sourceParameters="$sourceParameters"
   limit='10'
   description="$description"
 }}$jsontool.serialize($liveDataConfig){{/liveData}}

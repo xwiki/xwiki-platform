@@ -24,7 +24,7 @@
 -->
 
 <script lang="ts" setup>
-import Milkdown from "./milkdown.vue";
+import Milkdown from "./milkdown-editor.vue";
 import { MilkdownProvider } from "@milkdown/vue";
 import "@milkdown/theme-nord/style.css";
 </script>

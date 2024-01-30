@@ -66,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 14.7RC1
  */
 @UITest
-class ImagePluginIT extends AbstractCKEditorIT
+class ImageIT extends AbstractCKEditorIT
 {
     
     @BeforeAll

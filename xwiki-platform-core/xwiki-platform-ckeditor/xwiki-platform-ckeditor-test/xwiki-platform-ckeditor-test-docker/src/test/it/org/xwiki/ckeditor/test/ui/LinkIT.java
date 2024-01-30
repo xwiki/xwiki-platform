@@ -42,7 +42,7 @@ import org.xwiki.test.ui.po.ViewPage;
 @UITest(extraJARs = {
     "org.xwiki.platform:xwiki-platform-search-solr-query"
 })
-class LinkPluginIT extends AbstractCKEditorIT
+class LinkIT extends AbstractCKEditorIT
 {
     @BeforeAll
     void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception

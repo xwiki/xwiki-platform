@@ -81,7 +81,8 @@ import org.xwiki.test.ui.po.ViewPage;
         // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference).
         // Enabling debug logs also requires PR.
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
-            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)"
+            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)",
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.image.ImagePlugin",
     }
 )
 @ExtendWith(PDFExportExecutionCondition.class)
@@ -228,6 +229,9 @@ class PDFExportIT
             // The content of the child document shows an image.
             List<PDFImage> contentPageImages = pdf.getImagesFromPage(3);
             assertEquals(1, contentPageImages.size());
+
+            // Verify the image included in the PDF is not resized server-side (we know the image width is specified in
+            // the source wiki syntax and we enabled the server-side image resize by default).
             assertEquals(512, contentPageImages.get(0).getRawWidth());
             assertEquals(512, contentPageImages.get(0).getRawHeight());
         }

@@ -19,6 +19,10 @@
  */
 package org.xwiki.configuration.internal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -26,10 +30,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link AllConfigurationSource}.
@@ -50,6 +50,10 @@ class AllConfigurationSourceTest
     @MockComponent
     @Named("user")
     private ConfigurationSource userPreferencesSource;
+
+    @MockComponent
+    @Named("executionContext")
+    private ConfigurationSource executionContextSource;
 
     @InjectMockComponents
     private AllConfigurationSource configuration;
@@ -73,5 +77,10 @@ class AllConfigurationSourceTest
         when(this.userPreferencesSource.getProperty("key")).thenReturn("userPreferencesSource");
 
         assertEquals("userPreferencesSource", this.configuration.getProperty("key"));
+
+        when(this.executionContextSource.containsKey("key")).thenReturn(true);
+        when(this.executionContextSource.getProperty("key")).thenReturn("executionContextSource");
+
+        assertEquals("executionContextSource", this.configuration.getProperty("key"));
     }
 }

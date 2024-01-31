@@ -31,6 +31,7 @@ import org.xwiki.configuration.ConfigurationSource;
 /**
  * Composite Configuration Source that looks in the following sources in that order:
  * <ul>
+ * <li>execution context</li>
  * <li>user preferences wiki page</li>
  * <li>space preferences wiki page</li>
  * <li>wiki preferences wiki page</li>
@@ -58,10 +59,15 @@ public class AllConfigurationSource extends CompositeConfigurationSource impleme
     @Named("user")
     private ConfigurationSource userPreferencesSource;
 
+    @Inject
+    @Named("executionContext")
+    private ConfigurationSource executionContextSource;
+
     @Override
     public void initialize() throws InitializationException
     {
         // First source is searched first when a property value is requested.
+        addConfigurationSource(this.executionContextSource);
         addConfigurationSource(this.userPreferencesSource);
         addConfigurationSource(this.documentsPreferencesSource);
         addConfigurationSource(this.xwikiPropertiesSource);

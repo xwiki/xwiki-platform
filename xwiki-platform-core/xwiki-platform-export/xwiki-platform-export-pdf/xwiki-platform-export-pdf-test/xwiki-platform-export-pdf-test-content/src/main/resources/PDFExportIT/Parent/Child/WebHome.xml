@@ -40,7 +40,7 @@
 
 Content of first section.
 
-image:attach:xwiki-logo.png</content>
+[[image:attach:xwiki-logo.png||width="100"]]</content>
   <attachment>
     <filename>xwiki-logo.png</filename>
     <mimetype>image/png</mimetype>

@@ -82,7 +82,16 @@
   #else
     #set ($spanClass = "diff-decision")
   #end
-  <span class="$spanClass" id="$spanId">$stringtool.join($value, "<br/>")</span>
+
+## We do not want the renderer to add any extra spaces or linebreaks in this output.
+#* *#<span class="$spanClass" id="$spanId">##
+#*   *##foreach ($v in $value)
+#*     *#$escapetool.xml($v)##
+#*     *##if ($foreach.hasNext)
+#*       *#<br/>##
+#*     *##end
+#*   *##end
+#* *#</span>
 #end
 
 #macro (displayPropertyDiff $propertyName $previousValue $newValue $_obfuscate $conflicts $realPropertyName)

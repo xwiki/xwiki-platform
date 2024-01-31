@@ -386,6 +386,30 @@
       <values>Text|Wysiwyg</values>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </editor>
+    <font_size>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <freeText>forbidden</freeText>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>font_size</name>
+      <number>12</number>
+      <picker>1</picker>
+      <prettyName>Font size</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>Regular|Large|Larger|Largest</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </font_size>
     <guest_comment_requires_captcha>
       <customDisplay/>
       <defaultValue/>
@@ -1171,6 +1195,30 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </title>
+    <underline>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <freeText>forbidden</freeText>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>underline</name>
+      <number>12</number>
+      <picker>1</picker>
+      <prettyName>Underline links</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort>none</sort>
+      <tooltip/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values>OnlyInlineLinks|Yes|No</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </underline>
     <upload_maxsize>
       <customDisplay/>
       <disabled>0</disabled>
@@ -1867,6 +1915,30 @@
         <values>Text|Wysiwyg</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </editor>
+      <font_size>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>font_size</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>Font size</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>Regular|Large|Larger|Largest</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </font_size>
       <guest_comment_requires_captcha>
         <customDisplay/>
         <defaultValue/>
@@ -2652,6 +2724,30 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
+      <underline>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>underline</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>Underline links</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>OnlyInlineLinks|Yes|No</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </underline>
       <upload_maxsize>
         <customDisplay/>
         <disabled>0</disabled>
@@ -2798,6 +2894,9 @@ Your account on ${wikiname} has been successfully activated. You can now login a
     </property>
     <property>
       <editor>Wysiwyg</editor>
+    </property>
+    <property>
+      <font_size>Regular</font_size>
     </property>
     <property>
       <guest_comment_requires_captcha/>
@@ -2972,6 +3071,9 @@ Your account on ${wikiname} has been successfully activated. You can now login a
     </property>
     <property>
       <title>$tdoc.getRenderedTitle('plain/1.0') - XWiki</title>
+    </property>
+    <property>
+      <underline>OnlyInlineLinks</underline>
     </property>
     <property>
       <upload_maxsize>107374182400</upload_maxsize>

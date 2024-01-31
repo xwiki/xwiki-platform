@@ -677,7 +677,7 @@ public class EditIT
 
         wikiEditPageTab1.setContent(
               "First line."
-            + "\nSecond line."
+            + "\n<script>alert('Second line.')</script>"
             + "\nLine N°4"
             + "\nFifth line."
             + "\n6th line."
@@ -690,9 +690,9 @@ public class EditIT
         assertEquals(EditConflictModal.ConflictChoice.MERGE, editConflictModal.getCurrentChoice());
         assertEquals(Arrays.asList("@@ -1,6 +1,6 @@",
             " First line.",
-            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>L</del>i<del>n</del>e <del>N°2</del>",
             "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
-            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>&lt;scr</ins>i<ins>pt&gt;al</ins>e<ins>rt('Second</ins> <ins>line.')&lt;/script&gt;</ins>",
             "+<ins>L</ins>ine<ins> N°4</ins>",
             " Fifth line.",
             "-<del>Six</del>th line.",
@@ -705,9 +705,9 @@ public class EditIT
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@",
             " First line.",
             "@@ -2,2 +2,2 @@",
-            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>L</del>i<del>n</del>e <del>N°2</del>",
             "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
-            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>&lt;scr</ins>i<ins>pt&gt;al</ins>e<ins>rt('Second</ins> <ins>line.')&lt;/script&gt;</ins>",
             "+<ins>L</ins>ine<ins> N°4</ins>",
             "[Conflict Resolution]",
             "@@ -4,1 +4,1 @@",
@@ -727,7 +727,7 @@ public class EditIT
 
         assertEquals(Conflict.DecisionType.CURRENT, conflict.getCurrentDecision());
         assertFalse(conflict.isDecisionChangeEmpty());
-        assertEquals("Second line.\nLine N°4", conflict.getDecisionChange());
+        assertEquals("<script>alert('Second line.')</script>\nLine N°4", conflict.getDecisionChange());
         conflict.setDecision(Conflict.DecisionType.PREVIOUS);
         assertFalse(conflict.isDecisionChangeEmpty());
         assertEquals("Second line.\nThird line.", conflict.getDecisionChange());

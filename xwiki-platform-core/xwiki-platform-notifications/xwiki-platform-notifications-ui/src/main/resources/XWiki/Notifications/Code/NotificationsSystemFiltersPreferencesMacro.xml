@@ -612,8 +612,10 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
 #set ($liveDataConfig = {
   'meta': {
     'propertyDescriptors': [
-      { 'id': 'notificationFormats', 'displayer': 'html' },
-      { 'id': 'isEnabled', 'displayer': 'toggle' }
+      { 'id': 'notificationFormats', 'displayer': 'html', 'filterable': false, 'sortable': false },
+      { 'id': 'isEnabled', 'displayer': 'toggle', 'filterable': false, 'sortable': false },
+      { 'id': 'name', 'filterable': false, 'sortable': false},
+      { 'id': 'filterType', 'filterable': false, 'sortable': false}
     ],
     'entryDescriptor': {
         'idProperty': 'filterPreferenceId'

@@ -47,7 +47,7 @@ pnpm run build
 ### Run Unit Tests with [Vitest](https://vitest.dev/)
 
 ```sh
-npm run test
+pnpm run test
 ```
 
 ### Lint

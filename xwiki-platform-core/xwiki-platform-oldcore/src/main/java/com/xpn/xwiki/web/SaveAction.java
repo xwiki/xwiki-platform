@@ -49,7 +49,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
-import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
@@ -242,12 +241,10 @@ public class SaveAction extends EditAction
             Utils.getComponent(
                 new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
         UserReference userReference = userReferenceResolver.resolve(docUserReference);
-        DocumentAuthors authors = tdoc.getAuthors();
-        authors.setEffectiveMetadataAuthor(userReference);
-        authors.setOriginalMetadataAuthor(userReference);
+        tdoc.setAuthor(userReference);
 
         if (tdoc.isNew()) {
-            authors.setCreator(userReference);
+            tdoc.getAuthors().setCreator(userReference);
         }
 
         // Make sure we have at least the meta data dirty status

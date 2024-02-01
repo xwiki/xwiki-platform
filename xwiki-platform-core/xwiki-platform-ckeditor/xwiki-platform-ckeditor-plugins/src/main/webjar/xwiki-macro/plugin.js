@@ -655,6 +655,8 @@
     },
 
     insertOrUpdateMacroWidget: function(editor, data, widget, skipRefresh) {
+      // Save the editor state before inserting the macro in order to be able to undo the macro insertion.
+      editor.fire('saveSnapshot');
       // Prevent the editor from recording Undo/Redo history entries while the edited content is being refreshed:
       // * if the macro is inserted then we need to wait for the macro markers to be replaced by the actual macro output
       // * if the macro is updated then we need to wait for the macro output to be updated to match the new macro data
@@ -706,9 +708,15 @@
             // Clean up the inline enforcer to avoid duplicates for the next inline macro insertion.
             inlineEnforcer.remove();
           }
-          editor.fire('unlockSnapshot');
+          this.waitForWidgetsToBeReady(editor).then(() => {
+            editor.fire('unlockSnapshot');
+            // Save the editor state after the macro widget is inserted and initialized in order to be able to redo the
+            // macro insertion. This also triggers the 'change' event allowing others to react to the macro insertion
+            // (e.g. the real-time editing can propagate this change).
+            editor.fire('saveSnapshot');
+          });
         }
-      });
+      }, this);
 
       if (skipRefresh) {
         return;
@@ -728,6 +736,15 @@
       documentFragment.append(wrapper);
       editor.widgets.initOn(element, widgetDefinition, data);
       editor.widgets.finalizeCreation(documentFragment);
+    },
+
+    waitForWidgetsToBeReady: function(editor) {
+      const widgetsNotReady = Object.values(editor.widgets.instances).filter(widget => !widget.ready);
+      if (widgetsNotReady.length) {
+        return Promise.all(widgetsNotReady.map(widget => new Promise(resolve => widget.once('ready', resolve))));
+      } else {
+        return Promise.resolve();
+      }
     },
 
     maybeRegisterDedicatedInsertMacroButton: function(editor, definition) {

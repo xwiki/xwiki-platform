@@ -19,16 +19,21 @@
  */
 package org.xwiki.tour.test.ui;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.ui.PageObjectSuite;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * Runs all functional tests found in the classpath.
+ * All UI tests for the Tour feature.
  *
  * @version $Id$
  */
-@RunWith(PageObjectSuite.class)
-public class AllIT
+@UITest
+class AllIT
 {
-
+    @Nested
+    @DisplayName("Tour UI")
+    class NestedTourApplicationIT extends TourApplicationIT
+    {
+    }
 }

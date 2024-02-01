@@ -797,7 +797,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
  * Notifications Header
  ***********************************************/
 #tmNotifications {
-  &amp; > button {
+  &amp; &gt; button {
     background-color: @navbar-default-bg;
     color: @navbar-default-link-color;
     border: 0;

@@ -26,7 +26,7 @@ CKEDITOR.editorConfig = function(config) {
       '$1': {
         elements: {
           // Elements required because the editor input is a full HTML page.
-          html: true, head: true, link: true, script: true, body: true,
+          html: true, head: true, link: true, script: true, style: true, body: true,
           // Headings
           h1: true, h2: true, h3: true, h4: true, h5: true, h6: true,
           // Lists

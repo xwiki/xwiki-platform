@@ -5,3 +5,4 @@ org.xwiki.webjars.internal.FilesystemResourceReferenceSerializer
 org.xwiki.webjars.script.WebJarsScriptService
 org.xwiki.webjars.internal.filter.LessWebJarsResourceFilter
 org.xwiki.webjars.internal.filter.VelocityWebJarsResourceFilter
+org.xwiki.webjars.internal.WebjarUrlResolver

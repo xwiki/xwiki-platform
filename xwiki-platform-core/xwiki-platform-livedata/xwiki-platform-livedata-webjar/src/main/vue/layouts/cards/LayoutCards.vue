@@ -76,6 +76,7 @@
       <div v-if="entriesFetched && entries.length === 0" class="noentries-card">
         {{ $t('livedata.bottombar.noEntries') }}
       </div>
+      <LivedataPagination/>
     </LivedataBottombar>
 
   </div>

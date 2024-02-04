@@ -39,6 +39,6 @@
   <content>attachment.picker.ckeditor.pluginsImageSelector.title=Galerie
 attachment.picker.searchField.placeholder=Recherche...
 attachment.picker.searchField.scope.currentPage=Page Courante
-### Missing: attachment.picker.searchField.scope.allPages=All Pages
+attachment.picker.searchField.scope.allPages=Toutes les Pages
 </content>
 </xwikidoc>

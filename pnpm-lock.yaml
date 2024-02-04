@@ -18,10 +18,10 @@ importers:
         specifier: 4.5.1
         version: 4.5.1(vite@5.0.12)(vue@3.3.10)
       '@vue/eslint-config-prettier':
-        specifier: ^8.0.0
+        specifier: 8.0.0
         version: 8.0.0(eslint@8.55.0)(prettier@3.1.0)
       '@vue/eslint-config-typescript':
-        specifier: ^12.0.0
+        specifier: 12.0.0
         version: 12.0.0(eslint-plugin-vue@9.19.2)(eslint@8.55.0)(typescript@5.3.3)
       eslint:
         specifier: 8.55.0
@@ -63,7 +63,7 @@ importers:
   api:
     dependencies:
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -72,14 +72,14 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.3.10)
       vue-router:
-        specifier: ^4.2.4
-        version: 4.2.5(vue@3.3.10)
+        specifier: 4.2.4
+        version: 4.2.4(vue@3.3.10)
     devDependencies:
       '@cristal/dev-config':
         specifier: workspace:*
         version: link:../dev/config
       reflect-metadata:
-        specifier: ^0.1.13
+        specifier: 0.1.13
         version: 0.1.13
       rimraf:
         specifier: 5.0.5
@@ -110,9 +110,9 @@ importers:
         version: 1.11.0
       '@gouvminint/vue-dsfr':
         specifier: 5.8.0
-        version: 5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.5)(vue@3.3.10)
+        version: 5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.4)(vue@3.3.10)
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       oh-vue-icons:
         specifier: 1.0.0-rc3
@@ -124,8 +124,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.3.10)
       vue-router:
-        specifier: ^4.2.4
-        version: 4.2.5(vue@3.3.10)
+        specifier: 4.2.4
+        version: 4.2.4(vue@3.3.10)
       vuetify:
         specifier: 3.5.2
         version: 3.5.2(typescript@5.3.3)(vite-plugin-vuetify@2.0.1)(vue-i18n@9.8.0)(vue@3.3.10)
@@ -137,7 +137,7 @@ importers:
         specifier: 2.4.4
         version: 2.4.4(vue@3.3.10)
       happy-dom:
-        specifier: ^12.10.3
+        specifier: 12.10.3
         version: 12.10.3
       rimraf:
         specifier: 5.0.5
@@ -161,7 +161,7 @@ importers:
         specifier: 2.13.1
         version: 2.13.1(@types/react@18.2.39)
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -183,7 +183,7 @@ importers:
         specifier: workspace:^
         version: link:../../api
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -235,7 +235,7 @@ importers:
         specifier: 7.3.3
         version: 7.3.3(@milkdown/core@7.3.3)(@milkdown/ctx@7.3.3)(@milkdown/prose@7.3.3)(@milkdown/transformer@7.3.3)(vue@3.3.10)
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -260,7 +260,7 @@ importers:
         specifier: workspace:^
         version: link:../../skin
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -304,7 +304,7 @@ importers:
         specifier: 20.10.3
         version: 20.10.3
       cross-env:
-        specifier: ^7.0.3
+        specifier: 7.0.3
         version: 7.0.3
       electron:
         specifier: 28.2.1
@@ -334,7 +334,7 @@ importers:
         specifier: 5.3.3
         version: 5.3.3
       unplugin-auto-expose:
-        specifier: ^0.0.5
+        specifier: 0.0.5
         version: 0.0.5
       vite:
         specifier: 5.0.12
@@ -374,10 +374,10 @@ importers:
         specifier: workspace:^
         version: link:../api
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: ^0.1.13
+        specifier: 0.1.13
         version: 0.1.13
       vue:
         specifier: 3.3.10
@@ -402,10 +402,10 @@ importers:
         specifier: workspace:^
         version: link:../../skin
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: ^0.1.13
+        specifier: 0.1.13
         version: 0.1.13
       vue:
         specifier: 3.3.10
@@ -469,10 +469,10 @@ importers:
         specifier: workspace:^
         version: link:../xwiki/remoteinlineeditor
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: ^0.1.13
+        specifier: 0.1.13
         version: 0.1.13
       vue:
         specifier: 3.3.10
@@ -481,15 +481,15 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.3.10)
       vue-router:
-        specifier: ^4.2.4
-        version: 4.2.5(vue@3.3.10)
+        specifier: 4.2.4
+        version: 4.2.4(vue@3.3.10)
       vuetify:
         specifier: 3.5.2
         version: 3.5.2(typescript@5.3.3)(vite-plugin-vuetify@2.0.1)(vue-i18n@9.8.0)(vue@3.3.10)
     devDependencies:
       '@mdi/font':
-        specifier: ^7.2.96
-        version: 7.3.67
+        specifier: 7.2.96
+        version: 7.2.96
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -509,7 +509,7 @@ importers:
         specifier: workspace:^
         version: link:../skin
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -537,13 +537,13 @@ importers:
         specifier: workspace:^
         version: link:../wikimodel
       '@types/marked':
-        specifier: ^5.0.1
-        version: 5.0.2
+        specifier: 5.0.1
+        version: 5.0.1
       dompurify:
-        specifier: ^3.0.6
+        specifier: 3.0.6
         version: 3.0.6
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       marked:
         specifier: 11.0.0
@@ -553,8 +553,8 @@ importers:
         version: 1.1.2(marked@11.0.0)
     devDependencies:
       '@types/dompurify':
-        specifier: ^3.0.2
-        version: 3.0.5
+        specifier: 3.0.2
+        version: 3.0.2
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -590,7 +590,7 @@ importers:
   sharedworker/api:
     dependencies:
       comlink:
-        specifier: ^4.4.1
+        specifier: 4.4.1
         version: 4.4.1
       vue:
         specifier: 3.3.10
@@ -627,10 +627,10 @@ importers:
         specifier: workspace:^
         version: link:../../storage
       comlink:
-        specifier: ^4.4.1
+        specifier: 4.4.1
         version: 4.4.1
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -639,8 +639,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.3.10)
       vue-router:
-        specifier: ^4.2.4
-        version: 4.2.5(vue@3.3.10)
+        specifier: 4.2.4
+        version: 4.2.4(vue@3.3.10)
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -661,20 +661,20 @@ importers:
         specifier: workspace:^
         version: link:../api
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       pinia:
-        specifier: ^2.1.6
-        version: 2.1.7(typescript@5.3.3)(vue@3.3.10)
+        specifier: 2.1.6
+        version: 2.1.6(typescript@5.3.3)(vue@3.3.10)
       reflect-metadata:
-        specifier: ^0.1.13
+        specifier: 0.1.13
         version: 0.1.13
       vue-i18n:
         specifier: 9.8.0
         version: 9.8.0(vue@3.3.10)
       vue-router:
-        specifier: ^4.2.4
-        version: 4.2.5(vue@3.3.10)
+        specifier: 4.2.4
+        version: 4.2.4(vue@3.3.10)
       vuetify:
         specifier: 3.5.2
         version: 3.5.2(typescript@5.3.3)(vite-plugin-vuetify@2.0.1)(vue-i18n@9.8.0)(vue@3.3.10)
@@ -720,7 +720,7 @@ importers:
         specifier: 3.0.3
         version: 3.0.3
       ts-node:
-        specifier: ^10.9.2
+        specifier: 10.9.2
         version: 10.9.2(@types/node@20.10.3)(typescript@5.3.3)
       typescript:
         specifier: 5.3.3
@@ -735,13 +735,13 @@ importers:
         specifier: workspace:^
         version: link:../sharedworker/api
       dexie:
-        specifier: ^3.2.4
+        specifier: 3.2.4
         version: 3.2.4
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: ^0.1.13
+        specifier: 0.1.13
         version: 0.1.13
       vue:
         specifier: 3.3.10
@@ -751,8 +751,8 @@ importers:
         version: 9.8.0(vue@3.3.10)
     devDependencies:
       '@types/dompurify':
-        specifier: ^3.0.2
-        version: 3.0.5
+        specifier: 3.0.2
+        version: 3.0.2
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -769,7 +769,7 @@ importers:
         specifier: workspace:^
         version: link:../lib
       express:
-        specifier: ^4.18.2
+        specifier: 4.18.2
         version: 4.18.2
       vue:
         specifier: 3.3.10
@@ -778,17 +778,17 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.3.10)
       vue-router:
-        specifier: ^4.2.4
-        version: 4.2.5(vue@3.3.10)
+        specifier: 4.2.4
+        version: 4.2.4(vue@3.3.10)
       vuetify:
         specifier: 3.5.2
         version: 3.5.2(typescript@5.3.3)(vite-plugin-vuetify@2.0.1)(vue-i18n@9.8.0)(vue@3.3.10)
     devDependencies:
       '@mdi/font':
-        specifier: ^7.2.96
-        version: 7.3.67
+        specifier: 7.2.96
+        version: 7.2.96
       '@playwright/test':
-        specifier: ^1.40.1
+        specifier: 1.40.1
         version: 1.40.1
       '@types/node':
         specifier: 20.10.3
@@ -830,7 +830,7 @@ importers:
         specifier: workspace:^
         version: link:../../skin
       inversify:
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       vue:
         specifier: 3.3.10
@@ -1218,7 +1218,7 @@ packages:
     engines: {node: '>=18.16.1'}
     dev: false
 
-  /@gouvminint/vue-dsfr@5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.5)(vue@3.3.10):
+  /@gouvminint/vue-dsfr@5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.4)(vue@3.3.10):
     resolution: {integrity: sha512-op14Tq3+iXLl8XU9dAwvhT/yvZu74nKABOSDsHTlq5KUyqBYOk7v2egGOVtnnM8w3u+UchCdGbys6a7nN3fUgQ==}
     engines: {node: '>=18.x.x', npm: '>=8.x.x'}
     peerDependencies:
@@ -1231,7 +1231,7 @@ packages:
       focus-trap-vue: 4.0.3(focus-trap@7.5.4)(vue@3.3.10)
       oh-vue-icons: 1.0.0-rc3(vue@3.3.10)
       vue: 3.3.10(typescript@5.3.3)
-      vue-router: 4.2.5(vue@3.3.10)
+      vue-router: 4.2.4(vue@3.3.10)
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
@@ -1343,8 +1343,8 @@ packages:
       - supports-color
     dev: true
 
-  /@mdi/font@7.3.67:
-    resolution: {integrity: sha512-SWxvzRbUQRfewlIV+OF4/YF4DkeTjMWoT8Hh9yeU/5UBVdJZj9Uf4a9+cXjknSIhIaMxZ/4N1O/s7ojApOOGjg==}
+  /@mdi/font@7.2.96:
+    resolution: {integrity: sha512-e//lmkmpFUMZKhmCY9zdjRe4zNXfbOIJnn6xveHbaV2kSw5aJ5dLXUxcRt1Gxfi7ZYpFLUWlkG2MGSFAiqAu7w==}
     dev: true
 
   /@microsoft/api-extractor-model@7.28.2(@types/node@20.10.3):
@@ -1674,6 +1674,7 @@ packages:
   /@playwright/test@1.40.1:
     resolution: {integrity: sha512-EaaawMTOeEItCRvfmkI9v6rBkF1svM8wjl/YPRrg2N2Wmp+4qJYkWtJsbew1szfKKDm6fPLy4YAanBhIlf9dWw==}
     engines: {node: '>=16'}
+    hasBin: true
     dependencies:
       playwright: 1.40.1
     dev: true
@@ -1938,8 +1939,8 @@ packages:
     dependencies:
       '@types/ms': 0.7.34
 
-  /@types/dompurify@3.0.5:
-    resolution: {integrity: sha512-1Wg0g3BtQF7sSb27fJQAKck1HECM6zV1EB66j8JH9i3LCjYabJa0FSdiSgsD5K/RbrsR0SiraKacLB+T8ZVYAg==}
+  /@types/dompurify@3.0.2:
+    resolution: {integrity: sha512-YBL4ziFebbbfQfH5mlC+QTJsvh0oJUrWbmxKMyEdL7emlHJqGR2Qb34TEFKj+VCayBvjKy3xczMFNhugThUsfQ==}
     dependencies:
       '@types/trusted-types': 2.0.6
     dev: true
@@ -1990,8 +1991,8 @@ packages:
       '@types/node': 20.10.3
     dev: true
 
-  /@types/marked@5.0.2:
-    resolution: {integrity: sha512-OucS4KMHhFzhz27KxmWg7J+kIYqyqoW5kdIEI319hqARQQUTqhao3M/F+uFnDXD0Rg72iDDZxZNxq5gvctmLlg==}
+  /@types/marked@5.0.1:
+    resolution: {integrity: sha512-Y3pAUzHKh605fN6fvASsz5FDSWbZcs/65Q6xYRmnIP9ZIYz27T4IOmXfH9gWJV1dpi7f1e7z7nBGUTx/a0ptpA==}
     dev: false
 
   /@types/mdast@4.0.3:
@@ -3169,6 +3170,7 @@ packages:
   /cross-env@7.0.3:
     resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
     engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
+    hasBin: true
     dependencies:
       cross-spawn: 7.0.3
     dev: true
@@ -5716,8 +5718,8 @@ packages:
     hasBin: true
     dev: true
 
-  /pinia@2.1.7(typescript@5.3.3)(vue@3.3.10):
-    resolution: {integrity: sha512-+C2AHFtcFqjPih0zpYuvof37SFxMQ7OEG2zV9jRI12i9BOy3YQVAHwdKtyyc8pDcDyIc33WCIsZaCFWU7WWxGQ==}
+  /pinia@2.1.6(typescript@5.3.3)(vue@3.3.10):
+    resolution: {integrity: sha512-bIU6QuE5qZviMmct5XwCesXelb5VavdOWKWaB17ggk++NUwQWWbP5YnsONTk3b752QkW9sACiR81rorpeOMSvQ==}
     peerDependencies:
       '@vue/composition-api': ^1.4.0
       typescript: '>=4.4.4'
@@ -5745,11 +5747,13 @@ packages:
   /playwright-core@1.40.1:
     resolution: {integrity: sha512-+hkOycxPiV534c4HhpfX6yrlawqVUzITRKwHAmYfmsVreltEl6fAZJ3DPfLMOODw0H3s1Itd6MDCWmP1fl/QvQ==}
     engines: {node: '>=16'}
+    hasBin: true
     dev: true
 
   /playwright@1.40.1:
     resolution: {integrity: sha512-2eHI7IioIpQ0bS1Ovg/HszsN/XKNwEG1kbzSDDmADpclKc7CyqkHw7Mg2JCz/bbCxg25QUPcjksoMW7JcIFQmw==}
     engines: {node: '>=16'}
+    hasBin: true
     dependencies:
       playwright-core: 1.40.1
     optionalDependencies:
@@ -7181,8 +7185,8 @@ packages:
       '@vue/devtools-api': 6.5.1
       vue: 3.3.10(typescript@5.3.3)
 
-  /vue-router@4.2.5(vue@3.3.10):
-    resolution: {integrity: sha512-DIUpKcyg4+PTQKfFPX88UWhlagBEBEfJ5A8XDXRJLUnZOvcpMF8o/dnL90vpVkGaPbjvXazV/rC1qBKrZlFugw==}
+  /vue-router@4.2.4(vue@3.3.10):
+    resolution: {integrity: sha512-9PISkmaCO02OzPVOMq2w82ilty6+xJmQrarYZDkjZBfl4RvYAlt4PKnEX21oW4KTtWfa9OuO/b3qk1Od3AEdCQ==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:

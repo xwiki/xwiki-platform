@@ -22,14 +22,14 @@
   "dependencies": {
     "@cristal/api": "workspace:^",
     "@cristal/sharedworker-api": "workspace:^",
-    "dexie": "^3.2.4",
-    "inversify": "^6.0.2",
-    "reflect-metadata": "^0.1.13",
+    "dexie": "3.2.4",
+    "inversify": "6.0.2",
+    "reflect-metadata": "0.1.13",
     "vue": "3.3.10",
     "vue-i18n": "9.8.0"
   },
   "devDependencies": {
-    "@types/dompurify": "^3.0.2",
+    "@types/dompurify": "3.0.2",
     "rimraf": "5.0.5",
     "vite": "5.0.12",
     "vue-tsc": "1.8.27"

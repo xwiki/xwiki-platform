@@ -109,6 +109,7 @@ notifications.settings.filters.preferences.custom.table.eventTypes=Events
 notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
 notifications.settings.filters.preferences.custom.table.isEnabled=Is enabled?
 notifications.settings.filters.preferences.custom.table._actions=Actions
+notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
 notifications.filters.type.custom.inclusive=Notify of the event
 notifications.filters.type.custom.exclusive=Ignore the event
 

@@ -182,6 +182,7 @@
           #end
           #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceId='${preference.id}' $isEnabled $isDisabled /&gt;")
           
+          ## In case of backport of 15.10.x, isEnabled_disabled must be introduced to disabled legacy filters.
           #set ($element = {
             'filterPreferenceId'  : $preference.id,
             'name'                : $display,
@@ -191,7 +192,6 @@
             'isEnabled'           : $isEnabled,
             'doc_viewable'        : true,
             'isEnabled_checked': $preference.isEnabled(),
-            'isEnabled_disabled': $preference.id.startsWith('watchlist_'),
             'isEnabled_data': {
               'preferenceId': $preference.id
             }

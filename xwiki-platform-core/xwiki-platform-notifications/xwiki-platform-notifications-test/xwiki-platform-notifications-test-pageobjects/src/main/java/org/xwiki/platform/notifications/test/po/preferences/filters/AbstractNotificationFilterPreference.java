@@ -54,7 +54,7 @@ public abstract class AbstractNotificationFilterPreference
      * Default constructor.
      *
      * @param parentPage the page where the settings are displayed.
-     * @param row the row of the livetable for this filter.
+     * @param row the row of the Live Data for this filter
      * @param webDriver the webdriver to initialize the switches.
      */
     public AbstractNotificationFilterPreference(AbstractNotificationsSettingsPage parentPage, WebElement row,
@@ -81,18 +81,20 @@ public abstract class AbstractNotificationFilterPreference
     /**
      * @param row the row to get the formats from
      * @return the {@link WebElement} containing the formats of the row
-     * @since 16.1.0RC1
      */
-
-    protected abstract WebElement getFormatsElement(WebElement row);
+    private WebElement getFormatsElement(WebElement row)
+    {
+        return row.findElement(By.cssSelector("td[data-title='Formats'] .view"));
+    }
 
     /**
      * @param row the row to get the switch from
      * @return the {@link WebElement} containing the switch element of the row
-     * @since 16.1.0RC1
      */
-
-    protected abstract WebElement getBootstrapSwitchElement(WebElement row);
+    private WebElement getBootstrapSwitchElement(WebElement row)
+    {
+        return row.findElement(By.className("displayer-toggle")).findElement(By.className("bootstrap-switch"));
+    }
 
     /**
      * @return the filter name.

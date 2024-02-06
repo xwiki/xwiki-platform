@@ -53,18 +53,6 @@ public class SystemNotificationFilterPreference extends AbstractNotificationFilt
         return row.findElement(By.cssSelector("td[data-title='Name'] .view"));
     }
 
-    @Override
-    protected WebElement getFormatsElement(WebElement row)
-    {
-        return row.findElement(By.cssSelector("td[data-title='Formats'] .view"));
-    }
-
-    @Override
-    protected WebElement getBootstrapSwitchElement(WebElement row)
-    {
-        return row.findElement(By.className("displayer-toggle")).findElement(By.className("bootstrap-switch"));
-    }
-
     /**
      * @return the description of the filter.
      */

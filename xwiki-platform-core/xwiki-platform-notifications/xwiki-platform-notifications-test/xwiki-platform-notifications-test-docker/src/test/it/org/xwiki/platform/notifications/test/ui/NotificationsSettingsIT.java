@@ -697,7 +697,7 @@ class NotificationsSettingsIT
         customNotificationFilterModal.selectFormats(Set.of(CustomNotificationFilterModal.NotificationFormat.ALERT));
         customNotificationFilterModal.getEventsSelector().selectByValue(UPDATE);
         customNotificationFilterModal.getEventsSelector().selectByValue(DELETE);
-        customNotificationFilterModal.clickSubmit();
+        customNotificationFilterModal.clickSubmit(2);
 
         // check created filters
         customNotificationFilterPreferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();

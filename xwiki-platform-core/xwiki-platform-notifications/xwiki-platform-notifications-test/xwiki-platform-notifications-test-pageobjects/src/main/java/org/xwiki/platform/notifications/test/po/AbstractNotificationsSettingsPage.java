@@ -52,14 +52,7 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
 
     private static final String ALERT_FORMAT = "alert";
 
-    private static final String EMAIL_FORMAT = "email";
-
     private static final String VALUE_ATTRIBUTE = "value";
-
-    private static final String ROW_TAG = "tr";
-
-    @FindBy(id = "notificationCustomFilterPreferencesLiveTable-display")
-    protected WebElement notificationCustomFilterPreferencesLivetable;
 
     @FindBy(id = "notificationsPane")
     private WebElement notificationsPane;
@@ -73,7 +66,7 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     @FindBy(className = "btn-addfilter")
     private WebElement addFilterButton;
 
-    private Map<String, ApplicationPreferences> applicationPreferences = new HashMap<>();
+    private final Map<String, ApplicationPreferences> applicationPreferences = new HashMap<>();
 
     /**
      * Represents the available email changes settings values.
@@ -300,7 +293,9 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     public List<CustomNotificationFilterPreference> getCustomNotificationFilterPreferences()
     {
         List<CustomNotificationFilterPreference> preferences = new ArrayList<>();
-        for (WebElement row : this.notificationCustomFilterPreferencesLivetable.findElements(By.tagName(ROW_TAG))) {
+        LiveDataElement liveDataElement =
+            new LiveDataElement("notificationCustomFilterPreferencesLiveData");
+        for (WebElement row : liveDataElement.getTableLayout().getRows()) {
             preferences.add(new CustomNotificationFilterPreference(this, row, this.getDriver()));
         }
         return preferences;

@@ -47,5 +47,11 @@
       <artifactId>xwiki-platform-index-tree-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Required to test Live Data UIs. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

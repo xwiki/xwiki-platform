@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "vue-cli-service build --target lib --formats umd-min XWikiLivedata.vue",
+    "build": "vue-cli-service build --target lib --formats umd-min main.mjs",
     "inspect": "vue-cli-service inspect > inspection.js",
     "lint": "vue-cli-service lint . --no-fix",
     "test": "vue-cli-service test:unit"

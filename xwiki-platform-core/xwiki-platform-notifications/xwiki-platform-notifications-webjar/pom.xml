@@ -20,60 +20,44 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-livedata</artifactId>
+    <artifactId>xwiki-platform-notifications</artifactId>
     <version>16.1.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
-  <artifactId>xwiki-platform-livedata-webjar</artifactId>
-  <name>XWiki Platform - Live Data - WebJar</name>
+  <artifactId>xwiki-platform-notifications-webjar</artifactId>
+  <name>XWiki Platform - Notifications - WebJar</name>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Live Data WebJar</xwiki.extension.name>
+    <xwiki.extension.name>Notifications WebJar</xwiki.extension.name>
+    <!-- Vite is already taking care of minification and bundling in an efficient way. -->
+    <xwiki.minification.skip>true</xwiki.minification.skip>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>requirejs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>vue-i18n</artifactId>
-      <version>8.28.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- Used by the date filter. -->
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>momentjs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap-daterangepicker</artifactId>
-    </dependency>
-    <!-- Used by the suggest filter. -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>selectize.js</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-livedata-rest</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Used for the translations. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap-switch</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -81,8 +65,6 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <!-- We keep the Vue files and the build configuration files in separate folders in the source tree but
-              we need them in the same folder when building the Vue components. -->
             <id>copy-vue-resources</id>
             <phase>validate</phase>
             <goals>
@@ -93,25 +75,6 @@
               <resources>
                 <resource>
                   <directory>src/main/vue</directory>
-                </resource>
-                <resource>
-                  <directory>src/main/config</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- We need to copy the tests in the target directory. -->
-            <id>copy-vue-tests</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/vue/tests</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/main/tests</directory>
                 </resource>
               </resources>
             </configuration>
@@ -128,9 +91,6 @@
               <resources>
                 <resource>
                   <directory>${project.build.directory}/vue/dist</directory>
-                  <excludes>
-                    <exclude>demo.html</exclude>
-                  </excludes>
                 </resource>
               </resources>
             </configuration>
@@ -159,7 +119,7 @@
             </goals>
             <configuration>
               <nodeVersion>v20.11.0</nodeVersion>
-              <npmVersion>10.4.0</npmVersion>
+              <npmVersion>10.3.0</npmVersion>
             </configuration>
           </execution>
           <execution>
@@ -181,16 +141,6 @@
             </configuration>
           </execution>
           <execution>
-            <id>npm-run-test</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run test</arguments>
-            </configuration>
-            <phase>test</phase>
-          </execution>
-          <execution>
             <id>npm-run-lint</id>
             <goals>
               <goal>npm</goal>
@@ -204,19 +154,6 @@
         <configuration>
           <workingDirectory>${project.build.directory}/vue</workingDirectory>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.github.blutorange</groupId>
-        <artifactId>closure-compiler-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-minify-1</id>
-            <configuration>
-              <!-- Change the name of the aggregated JavaScript file. -->
-              <outputFilename>xwiki-livedata.min.js</outputFilename>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

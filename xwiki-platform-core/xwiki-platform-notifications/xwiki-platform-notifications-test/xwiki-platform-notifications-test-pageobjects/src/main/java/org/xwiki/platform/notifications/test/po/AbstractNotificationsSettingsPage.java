@@ -27,21 +27,22 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.platform.notifications.test.po.preferences.AbstractNotificationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterModal;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference;
-import org.xwiki.platform.notifications.test.po.preferences.filters.NotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.Select;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Represents a page for notification settings.
- * This kind of page can be seen in user profile or in global administration.
- * 
+ * Represents a page for notification settings. This kind of page can be seen in user profile or in global
+ * administration.
+ *
  * @version $Id$
  * @since 13.2RC1
  */
@@ -56,9 +57,6 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     private static final String VALUE_ATTRIBUTE = "value";
 
     private static final String ROW_TAG = "tr";
-
-    @FindBy(id = "notificationSystemFilterPreferencesLiveTable-display")
-    protected WebElement notificationSystemFilterPreferencesLivetable;
 
     @FindBy(id = "notificationCustomFilterPreferencesLiveTable-display")
     protected WebElement notificationCustomFilterPreferencesLivetable;
@@ -279,36 +277,18 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     }
 
     /**
-     * @return the notification filter preferences, as they are described in the corresponding livetable
-     *
-     * @since 10.8RC1
-     * @since 9.11.8
-     * @deprecated Since 13.2RC1 you should use
-     *              {@link #getSystemNotificationFilterPreferences()} or
-     *              {@link #getCustomNotificationFilterPreferences()}.
-     */
-    @Deprecated
-    public List<NotificationFilterPreference> getNotificationFilterPreferences()
-    {
-        List<NotificationFilterPreference> preferences = new ArrayList<>();
-        for (WebElement row : this.notificationSystemFilterPreferencesLivetable.findElements(By.tagName(ROW_TAG))) {
-            preferences.add(new NotificationFilterPreference(this, row, this.getDriver()));
-        }
-        for (WebElement row : this.notificationCustomFilterPreferencesLivetable.findElements(By.tagName(ROW_TAG))) {
-            preferences.add(new NotificationFilterPreference(this, row, this.getDriver()));
-        }
-        return preferences;
-    }
-
-    /**
      * @return the system notification filter preferences.
      * @since 13.2RC1
      */
     public List<SystemNotificationFilterPreference> getSystemNotificationFilterPreferences()
     {
+        LiveDataElement notificationSystemFilterPreferencesLiveData =
+            new LiveDataElement("notificationSystemFilterPreferencesLiveData");
+        TableLayoutElement tableLayout = notificationSystemFilterPreferencesLiveData.getTableLayout();
+
         List<SystemNotificationFilterPreference> preferences = new ArrayList<>();
-        for (WebElement row : this.notificationSystemFilterPreferencesLivetable.findElements(By.tagName(ROW_TAG))) {
-            preferences.add(new SystemNotificationFilterPreference(this, row, this.getDriver()));
+        for (WebElement row : tableLayout.getRows()) {
+            preferences.add(new SystemNotificationFilterPreference(this, row, getDriver()));
         }
         return preferences;
     }

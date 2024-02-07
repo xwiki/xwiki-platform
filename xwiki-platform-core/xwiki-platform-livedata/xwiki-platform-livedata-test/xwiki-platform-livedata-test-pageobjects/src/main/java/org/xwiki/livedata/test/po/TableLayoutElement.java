@@ -77,6 +77,15 @@ public class TableLayoutElement extends BaseElement
     private final LiveDataElement liveData;
 
     /**
+     * @return the list of rows {@link WebElement}s
+     * @since 16.1.0RC1
+     */
+    public List<WebElement> getRows()
+    {
+        return getRoot().findElements(By.cssSelector("tbody > tr"));
+    }
+
+    /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
      * tag with the expected text and link.
      */
@@ -688,8 +697,19 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        getRoot().findElement(By.cssSelector(
-            String.format("tbody tr:nth-child(%d) [name='%s']", rowNumber, actionName)))
+        clickAction(rowNumber, By.cssSelector(String.format(".actions-container .action.action_%s", actionName)));
+    }
+
+    /**
+     * Clicks on an action based on a row and the provided selector.
+     *
+     * @param rowNumber the row number, for instance 3 for the third row
+     * @param selector the selector to find the action element in the row
+     */
+    public void clickAction(int rowNumber, By selector)
+    {
+        getRowElement(rowNumber)
+            .findElement(selector)
             .click();
     }
 
@@ -732,8 +752,13 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement findElementInRow(int rowNumber, By by)
     {
-        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)))
+        return getRowElement(rowNumber)
             .findElement(by);
+    }
+
+    private WebElement getRowElement(int rowNumber)
+    {
+        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)));
     }
 
     /**

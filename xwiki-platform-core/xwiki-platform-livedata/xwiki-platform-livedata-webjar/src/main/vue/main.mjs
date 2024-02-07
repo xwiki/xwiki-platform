@@ -17,48 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.test.ui.docker;
+import displayerMixin from "./displayers/displayerMixin.js";
+import BaseDisplayer from "./displayers/BaseDisplayer.vue";
+import XWikiIcon from "./utilities/XWikiIcon.vue";
+import XWikiLivedata from "./XWikiLivedata.vue"
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
-
-/**
- * All UI tests for the Index feature.
- *
- * @version $Id$
- * @since 11.4RC1
- */
-@UITest
-public class AllIT
-{
-    @Nested
-    @DisplayName("AllDocs Page UI")
-    class NestedAllDocsIT extends AllDocsIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Deleted Attachment Page UI")
-    class NestedDeletedAttachmentsIT extends DeletedAttachmentsIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Orphaned Pages Page UI")
-    class NestedOrphanedPagesIT extends OrphanedPagesIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Documents Macro UI")
-    class NestedDocumentsMacroIT extends DocumentsMacroIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Spaces UI")
-    class NestedSpacesIT extends SpacesIT
-    {
-    }
+// Export the elements that are expected to be imported from other modules.
+export {
+  displayerMixin,
+  BaseDisplayer,
+  XWikiIcon,
+  XWikiLivedata
 }

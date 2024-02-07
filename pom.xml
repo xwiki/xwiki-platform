@@ -432,7 +432,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.12.6</version>
+        <version>2.12.7</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -1167,6 +1167,19 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>vue</artifactId>
+        <version>2.7.16</version>
+        <exclusions>
+          <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
+          not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
+          <exclusion>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>vue__compiler-sfc</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -1509,6 +1522,11 @@
             <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
             <options>esversion:11,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,camelcase,maxlen:120</options>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>1.15.0</version>
         </plugin>
       </plugins>
     </pluginManagement>

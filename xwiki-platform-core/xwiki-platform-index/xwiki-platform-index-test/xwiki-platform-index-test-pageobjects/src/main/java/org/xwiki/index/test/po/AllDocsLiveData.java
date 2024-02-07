@@ -19,34 +19,45 @@
  */
 package org.xwiki.index.test.po;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 
 /**
  * Represents the livetable for index all docs.
  *
+ * @version $Id$
  * @since 11.6RC1
  * @since 11.5
- * @version $Id$
  */
-public class AllDocsLivetable extends LiveTableElement
+public class AllDocsLiveData extends LiveDataElement
 {
-    public AllDocsLivetable()
+    /**
+     * Default constructor.
+     */
+    public AllDocsLiveData()
     {
         super("alldocs");
     }
 
-    public void filterColumn(int columnNumber, String filterValue)
+    /**
+     * Filter a column using the provided value.
+     *
+     * @param columnLabel the label of the column to filter
+     * @param filterValue the value to use to filter
+     */
+    public void filterColumn(String columnLabel, String filterValue)
     {
-        String columnId = String.format("xwiki-livetable-alldocs-filter-%s", columnNumber);
-        this.filterColumn(columnId, filterValue);
+        // TODO: replace column number with the column label.
+        getTableLayout().filterColumn(columnLabel, filterValue);
     }
 
+    /**
+     * Click on a Live Data action.
+     *
+     * @param rowNumber the number of the row of the action (start at 1 for the first row)
+     * @param actionName the name of the action to click (e.g., 'copy')
+     */
     public void clickAction(int rowNumber, String actionName)
     {
-        WebElement pageRow = this.getRow(rowNumber);
-        String xPathLocator = String.format("//a[contains(@class, 'action%s')]", actionName);
-        pageRow.findElement(By.xpath(xPathLocator)).click();
+        getTableLayout().clickAction(rowNumber, actionName);
     }
 }

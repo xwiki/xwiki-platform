@@ -97,6 +97,7 @@ notifications.settings.filters.preferences.system.table.name=Name
 notifications.settings.filters.preferences.system.table.filterType=Description
 notifications.settings.filters.preferences.system.table.notificationFormats=Formats
 notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
+notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=Custom Filters

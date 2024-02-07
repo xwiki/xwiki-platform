@@ -114,7 +114,7 @@ public class NotificationsEmailsIT
         p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
         p.disableAllParameters();
         // Enable own filter
-        p.getNotificationFilterPreferences().get(2).setEnabled(true);
+        p.getSystemNotificationFilterPreferences().get(2).setEnabled(true);
 
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         p = NotificationsUserProfilePage.gotoPage(SECOND_USER_NAME);

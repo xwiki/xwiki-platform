@@ -455,10 +455,8 @@ return XWiki;
 #avatar img {
   border: 1px solid $theme.borderColor;
   border-radius: 8px 8px 8px 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   margin: 0 auto;
   padding: 0.3em;
-  width: 95%;
 }
 
 .profile-menu .category-tab:before{
@@ -661,18 +659,27 @@ span#avatarUpload {
   margin: 0;
 }
 
-.attachment-picker-start {
-  background: url("$xwiki.getSkinFile('icons/silk/picture_edit.png')") no-repeat center center $theme.pageContentBackgroundColor !important;
-  border: 0 none !important;
-  border-bottom-left-radius: 8px;
-  height: 18px;
-  position: absolute;
-  right: 0;
-  text-align: left;
-  text-indent: -9999px;
-  top: 1px;
-  width: 18px !important;
-  z-index: 1;
+.attachment-picker {
+  .buttonwrapper {
+    a.button {
+      background-color: inherit;
+      background-image: none;
+      border-color: unset;
+      border-radius: unset;
+      border: unset;
+      color: @link-color;
+      cursor: pointer;
+      display: unset;
+      font-size: unset;
+      font-weight: normal;
+      line-height: unset;
+      margin: unset;
+      padding: unset;
+      text-align: center;
+      vertical-align: middle;
+      &amp;:hover{text-decoration: underline};
+    }
+  }
 }
 
 ## --------------------------------------

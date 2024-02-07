@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -32,6 +34,7 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.email.EmailTemplateRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -54,9 +57,9 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  * @since 9.11.1
  * @since 10.0
  */
-@Component(roles = EmailTemplateRenderer.class)
+@Component
 @Singleton
-public class EmailTemplateRenderer
+public class DefaultEmailTemplateRenderer implements EmailTemplateRenderer
 {
     private static final String EVENT_BINDING_NAME = "event";
 
@@ -89,18 +92,9 @@ public class EmailTemplateRenderer
     @Inject
     private ExecutionContextManager executionManager;
 
-    /**
-     * Execute a template.
-     *
-     * @param event composite event to render
-     * @param userId id of the user who will receive the email
-     * @param template the template to use
-     * @param syntax syntax of the template and of the output
-     * @return the rendered template
-     * @throws NotificationException if something wrong happens
-     */
-    public Block executeTemplate(CompositeEvent event, String userId, Template template, Syntax syntax)
-        throws NotificationException
+    @Override
+    public Block executeTemplate(CompositeEvent event, String userId, Template template, Syntax syntax,
+        Map<String, Object> customBindings) throws NotificationException
     {
         // Push a new execution context.
         try {
@@ -110,7 +104,7 @@ public class EmailTemplateRenderer
         }
 
         try {
-            return executeTemplateInContext(event, userId, template, syntax);
+            return executeTemplateInContext(event, userId, template, syntax, customBindings);
         } finally {
             // Restore parent execution context
             this.execution.popContext();
@@ -127,7 +121,8 @@ public class EmailTemplateRenderer
      * @return the rendered template
      * @throws NotificationException if something wrong happens
      */
-    private Block executeTemplateInContext(CompositeEvent event, String userId, Template template, Syntax syntax)
+    private Block executeTemplateInContext(CompositeEvent event, String userId, Template template, Syntax syntax,
+        Map<String, Object> customBindings)
         throws NotificationException
     {
         XWikiContext context = contextProvider.get();
@@ -143,6 +138,9 @@ public class EmailTemplateRenderer
             // Bind the event to some variable in the velocity context
             scriptContext.setAttribute(EVENT_BINDING_NAME, event, ScriptContext.ENGINE_SCOPE);
             scriptContext.setAttribute(USER_BINDING_NAME, userId, ScriptContext.ENGINE_SCOPE);
+            for (Map.Entry<String, Object> entry : customBindings.entrySet()) {
+                scriptContext.setAttribute(entry.getKey(), entry.getValue(), ScriptContext.ENGINE_SCOPE);
+            }
             // Use the external URL factory to generate full URLs
             context.setURLFactory(new ExternalServletURLFactory(context));
             // Set the given syntax in the rendering context
@@ -163,17 +161,15 @@ public class EmailTemplateRenderer
             // Cleaning the velocity context
             scriptContext.removeAttribute(EVENT_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
             scriptContext.removeAttribute(USER_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
+            for (String bindingName : customBindings.keySet()) {
+                scriptContext.removeAttribute(bindingName, ScriptContext.ENGINE_SCOPE);
+            }
             // Cleaning the current user
             context.setUserReference(currentUser);
         }
     }
 
-    /**
-     * Render a block to HTML syntax.
-     * 
-     * @param block block to render
-     * @return the HTML rendered version of the block
-     */
+    @Override
     public String renderHTML(Block block)
     {
         WikiPrinter printer = new DefaultWikiPrinter();
@@ -181,15 +177,9 @@ public class EmailTemplateRenderer
         return printer.toString();
     }
 
-    /**
-     * Render a block to plain text syntax.
-     * 
-     * @param block block to render
-     * @return the plain text rendered version of the block
-     */
+    @Override
     public String renderPlainText(Block block)
     {
-        // TODO: this does not work at all (templates enforce HTML syntax I guess)
         WikiPrinter printer = new DefaultWikiPrinter();
         plainTextBlockRenderer.render(block, printer);
         return printer.toString();

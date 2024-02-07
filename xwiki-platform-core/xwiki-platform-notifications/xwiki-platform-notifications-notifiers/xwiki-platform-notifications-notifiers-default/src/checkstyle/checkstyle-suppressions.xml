@@ -28,4 +28,5 @@
   <suppress checks="ClassFanOutComplexity" files="UserEventManager.java"/>
   <suppress checks="ClassFanOutComplexity" files="UserEventDispatcher.java"/>
   <suppress checks="ClassFanOutComplexity" files="AbstractMimeMessageIterator.java"/>
+  <suppress checks="ClassFanOutComplexity" files="DefaultEmailTemplateRenderer.java"/>
 </suppressions>

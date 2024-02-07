@@ -184,7 +184,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
         href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
         title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
-      #if ($hasAdmin || ($xwiki.hasAccessLevel('comment') && $isUserComment))
+      #if ($hasAdmin || $isUserComment))
         ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
         ## By providing an anchor this behavior is stoped, without altering the URL functionality.
         #set ($queryString = $escapetool.url({
@@ -193,7 +193,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           'classid': $comment.number,
           'xredirect': $doc.getURL('view')
         }))
-        #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
+        #set ($deleteURL = $xwiki.getURL($doc.fullName, 'commentdelete', $queryString, "xwikicomment_${comment.number}"))
         <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
           href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
           $services.icon.renderHTML('cross')

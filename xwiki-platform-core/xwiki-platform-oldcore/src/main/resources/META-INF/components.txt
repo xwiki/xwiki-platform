@@ -225,6 +225,7 @@ com.xpn.xwiki.web.AttachAction
 com.xpn.xwiki.web.CancelAction
 com.xpn.xwiki.web.CommentAddAction
 com.xpn.xwiki.web.CommentSaveAction
+com.xpn.xwiki.web.CommentDeleteAction
 com.xpn.xwiki.web.CreateAction
 com.xpn.xwiki.web.DeleteAction
 com.xpn.xwiki.web.DeleteAttachmentAction

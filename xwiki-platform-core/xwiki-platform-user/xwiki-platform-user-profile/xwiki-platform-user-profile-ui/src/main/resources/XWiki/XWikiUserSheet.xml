@@ -670,7 +670,7 @@ span#avatarUpload {
       color: @link-color;
       cursor: pointer;
       display: unset;
-      font-size: unset;
+      font-size: @font-size-small;
       font-weight: normal;
       line-height: unset;
       margin: unset;

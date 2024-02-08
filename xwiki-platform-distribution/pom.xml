@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>15.5.5</version>
+    <version>15.5.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -167,18 +167,18 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>15.5.5</version>
+        <version>15.5.6-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-authorization-script</artifactId>
-        <version>15.5.5</version>
+        <version>15.5.6-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-webjars-api</artifactId>
-        <version>15.5.5</version>
+        <version>15.5.6-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -189,7 +189,7 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tree-webjar</artifactId>
-        <version>15.5.5</version>
+        <version>15.5.6-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

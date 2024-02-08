@@ -1,0 +1,60 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsTranslations" locale="ko">
+  <web>XWiki.Mentions</web>
+  <name>MentionsTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MentionsTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.mention.name=사용자 언급
+rendering.macro.mention.description=사용자 멘션을 삽입하세요.
+rendering.macro.mention.parameter.reference.name=참조
+rendering.macro.mention.parameter.reference.description=언급된 사용자 또는 그룹 참조입니다.
+rendering.macro.mention.parameter.style.name=디스플레이 스타일
+rendering.macro.mention.parameter.style.description=멘션 스타일 선택(사용자 멘션에만 지원됨).
+rendering.macro.mention.parameter.anchor.name=닻
+rendering.macro.mention.parameter.anchor.description=해당 멘션에 연결하는 데 사용되는 앵커입니다(이 앵커는 가능한 한 문서에 고유해야 합니다).
+rendering.macro.mention.parameter.type.name=유형
+rendering.macro.mention.parameter.type.description=언급된 배우의 유형입니다.
+org.xwiki.mentions.DisplayStyle.FULL_NAME=사용자의 전체 이름
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=사용자의 이름만
+org.xwiki.mentions.DisplayStyle.LOGIN=사용자 이름
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=색상 언급
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=현재 사용자에 대한 멘션의 색상입니다(참고: background-color CSS 속성의 값으로 사용됨).
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=자기 언급 색상
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=따옴표를 활성화하세요
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=사용자 멘션 알림에 멘션 주변 텍스트 인용문을 포함할지 여부를 정의합니다.
+mentions.tip=WYSIWYG에서 편집할 때 @를 입력한 다음 문자를 입력하기 시작하면 사용자를 언급하라는 제안이 표시됩니다.
+mentions.configuration.heading=멘션 환경설정
+</content>
+  </xwikidoc>

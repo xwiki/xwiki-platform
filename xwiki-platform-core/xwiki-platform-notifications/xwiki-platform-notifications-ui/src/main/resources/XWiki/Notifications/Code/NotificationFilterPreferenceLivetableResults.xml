@@ -108,11 +108,11 @@
         #set ($objectNumber = $!obj.reference.objectNumber)
       #end
       #if ($checked)
-        #set ($checked = 'checked = "checked"')
+        #set ($checkedAttr = 'checked = "checked"')
       #else
-        #set ($checked = '')
+        #set ($checkedAttr = '')
       #end
-      #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
+      #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checkedAttr /&gt;")
       #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
       #set ($element = {
         'filterPreferenceId'  : $name,
@@ -122,7 +122,12 @@
         'notificationFormats' : "#displayNotificationFormatsList($filter.formats)",
         'isEnabled'           : $checkbox,
         'doc_viewable'        : true,
-        'doc_hasdelete'       : false
+        'doc_hasdelete'       : false,
+        'isEnabled_checked': $checked,
+        'isEnabled_data': {
+          'objectNumber': $objectNumber,
+          'filtername':  $filter.name
+        }
       })
       #set ($discard = $elements.add($element))
     #end
@@ -177,6 +182,7 @@
           #end
           #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceId='${preference.id}' $isEnabled $isDisabled /&gt;")
           
+          ## In case of backport of 15.10.x, isEnabled_disabled must be introduced to disabled legacy filters.
           #set ($element = {
             'filterPreferenceId'  : $preference.id,
             'name'                : $display,
@@ -184,7 +190,11 @@
             'eventTypes'          : "#displayNotificationsEventTypeList($preference.eventTypes)",
             'notificationFormats' : "#displayNotificationFormatsList($preference.notificationFormats)",
             'isEnabled'           : $isEnabled,
-            'doc_viewable'        : true
+            'doc_viewable'        : true,
+            'isEnabled_checked': $preference.isEnabled(),
+            'isEnabled_data': {
+              'preferenceId': $preference.id
+            }
           })
           #set ($discard = $elements.add($element))
         #end

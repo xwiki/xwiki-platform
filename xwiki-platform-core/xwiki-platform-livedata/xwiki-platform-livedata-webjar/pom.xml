@@ -51,15 +51,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
-      <version>2.7.16</version>
-      <exclusions>
-        <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
-        not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
-        <exclusion>
-          <groupId>org.webjars.npm</groupId>
-          <artifactId>vue__compiler-sfc</artifactId>
-        </exclusion>
-      </exclusions>
+      <scope>runtime</scope>
     </dependency>
     <!-- Used by the date filter. -->
     <dependency>
@@ -159,7 +151,6 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.15.0</version>
         <executions>
           <execution>
             <id>install-node-and-npm</id>

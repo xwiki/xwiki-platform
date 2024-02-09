@@ -200,30 +200,20 @@
 #end
 
 #set ($fontSizePreference = $!{xwiki.getUserPreference('font_size')})
-## We unset the value from bootstrap to allow XWiki to take into account user preferences.
-html {
-  font-size: unset;
-}
-
-## When everything is at defaults, we end up with regular content being slightly smaller than the user preferences.
-#if ($fontSizePreference == 'Regular')
-  .content {
-    font-size: 87.5%;
-  }
-#end
+## Default font size is 14px, which is equivalent to 140%
 #if ($fontSizePreference == 'Large' || $a11y == '1')
   .content {
-    font-size: 100%;
+    font-size: 160%;
   }
 #end
 #if ($fontSizePreference == 'Larger')
   .content {
-    font-size: 112.5%;
+    font-size: 180%;
   }
 #end
 #if ($fontSizePreference == 'Largest')
   .content {
-    font-size: 125%;
+    font-size: 200%;
   }
 #end</code>
     </property>

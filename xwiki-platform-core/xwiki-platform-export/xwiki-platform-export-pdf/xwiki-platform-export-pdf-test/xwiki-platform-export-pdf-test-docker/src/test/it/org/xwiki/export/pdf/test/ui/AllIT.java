@@ -45,7 +45,8 @@ import org.xwiki.test.docker.junit5.UITest;
         // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference).
         // Enabling debug logs also requires PR.
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
-            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)"
+            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)",
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.image.ImagePlugin",
     }
 )
 @ExtendWith(PDFExportExecutionCondition.class)

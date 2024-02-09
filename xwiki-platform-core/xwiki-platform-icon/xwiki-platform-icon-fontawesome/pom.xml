@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Font Awesome Icon Theme</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager -->
+    <xwiki.extension.category>icontheme</xwiki.extension.category>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
     <!-- only used in 6.2M1 -->

@@ -822,6 +822,38 @@ require([
     }).wrap("&lt;span&gt;&lt;/span&gt;");
   };
 
+  /**
+   * Removes the image size (width and height) from the image URL query string in order to prevent the server-side
+   * resize of the image, thus allowing the full size image to be included in the generated PDF.
+   */
+  async function disableServerSideImageResize() {
+    const imageLoadPromises = []
+    document.querySelectorAll('#xwikicontent img:not(.force-server-side-resize)').forEach(image =&gt; {
+      const imageURL = new URL(image.src);
+      const imageParams = imageURL.searchParams;
+      if (imageParams.has('width') || imageParams.has('height')) {
+        // Backup the original query string before we modify the image URL.
+        const oldImageQueryString = imageURL.search;
+        // The image size is specified in the URL which may trigger a server-side resize. We want the full image to be
+        // included in the PDF so let's remove these parameters.
+        imageParams.delete('width');
+        imageParams.delete('height');
+        const newImageQueryString = '?' + imageParams.toString();
+        const newImageSrc = image.getAttribute('src').replace(oldImageQueryString, newImageQueryString);
+        // Create a promise for when the full size image is loaded.
+        imageLoadPromises.push(new Promise((resolve, reject) =&gt; {
+          image.addEventListener('load', resolve);
+          image.addEventListener('error', reject);
+          image.addEventListener('abort', resolve);
+          image.setAttribute('src', newImageSrc);
+        }));
+      }
+    });
+    await Promise.allSettled(imageLoadPromises);
+  }
+
+  pageReady.delayPageReady(disableServerSideImageResize(), 'Disable server-side image resize.');
+
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
     refactorAnchors();

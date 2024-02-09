@@ -296,7 +296,7 @@ define('xwiki-livedata', [
         id: 'sortPanel',
         title: vue.$t('livedata.panel.sort.title'),
         name: vue.$t('livedata.dropdownMenu.panels.sort'),
-        icon: 'table_sort',
+        icon: 'table-sort',
         component: 'LivedataAdvancedPanelSort',
         order: 2000
       });

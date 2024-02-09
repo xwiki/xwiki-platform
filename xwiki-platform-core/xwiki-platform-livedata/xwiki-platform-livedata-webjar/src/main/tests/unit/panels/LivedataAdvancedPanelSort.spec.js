@@ -60,7 +60,7 @@ function initWrapper({provide} = {}) {
         id: 'sortPanel',
         title: 'Sort',
         component: 'LivedataAdvancedPanelSort',
-        icon: 'table_sort'
+        icon: 'table-sort'
       }
     },
     stubs: {XWikiIcon: iconComponent},
@@ -74,7 +74,7 @@ describe('LivedataAdvancedPanelSort.vue', () => {
   it('Displays the title and the icon', async () => {
     const wrapper = initWrapper();
     expect(wrapper.element.querySelector('.panel-heading .title')).toHaveTextContent('Sort');
-    expect(wrapper.element.querySelector('i')).toHaveTextContent('table_sort');
+    expect(wrapper.element.querySelector('i')).toHaveTextContent('table-sort');
   });
 
   it('Displays no message when sortable properties exist', async () => {

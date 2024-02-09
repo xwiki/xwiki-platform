@@ -69,6 +69,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to verify that image server-side resize is disabled while exporting to PDF. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-processing-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!--Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

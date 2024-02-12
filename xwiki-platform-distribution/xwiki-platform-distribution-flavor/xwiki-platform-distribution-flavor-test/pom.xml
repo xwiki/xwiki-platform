@@ -281,8 +281,7 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Delete
                 <!-- Editing -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Editing
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
-                  TODO https://jira.xwiki.org/browse/XWIKI-21773 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Syntaxes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=SyntaxHighlighting

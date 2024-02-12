@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,6 +44,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -57,12 +57,12 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Migrate filters to put them in the same DB than where the users are located.
  *
  * @version $Id$
- * @since 16.0.0RC1
+ * @since 16.1.0RC1
  */
 @Component
-@Named("R160000001XWIKI21738")
+@Named("R160100000XWIKI21738")
 @Singleton
-public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigration
+public class R160100000XWIKI21738DataMigration extends AbstractHibernateDataMigration
 {
     private static final int BATCH_SIZE = 100;
 
@@ -102,7 +102,14 @@ public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(160000001);
+        return new XWikiDBVersion(160100000);
+    }
+
+    @Override
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        return super.shouldExecute(startupVersion)
+            && this.wikiDescriptorManager.isMainWiki(this.wikiDescriptorManager.getCurrentWikiId());
     }
 
     @Override
@@ -117,28 +124,35 @@ public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigr
 
         String mainWikiId = this.wikiDescriptorManager.getMainWikiId();
 
-        if (Objects.equals(this.wikiDescriptorManager.getCurrentWikiId(), mainWikiId)) {
-            List<DefaultNotificationFilterPreference> filters;
-            do {
-                try {
-                    filters = this.queryManager.createQuery(SEARCH_FILTERS_STATEMENT, Query.HQL)
-                        .bindValue("ownerLike")
-                        .literal(mainWikiId)
-                        .literal(":")
-                        .anyChars()
-                        .query()
-                        .bindValue("mainWiki", this.entityReferenceSerializer.serialize(new WikiReference(mainWikiId)))
-                        .setLimit(BATCH_SIZE)
-                        .execute();
+        List<DefaultNotificationFilterPreference> filters = null;
+        List<DefaultNotificationFilterPreference> previousFilters;
+        do {
+            try {
+                previousFilters = filters;
+                filters = this.queryManager.createQuery(SEARCH_FILTERS_STATEMENT, Query.HQL)
+                    .bindValue("ownerLike")
+                    .literal(mainWikiId)
+                    .literal(":")
+                    .anyChars()
+                    .query()
+                    .bindValue("mainWiki", this.entityReferenceSerializer.serialize(new WikiReference(mainWikiId)))
+                    .setLimit(BATCH_SIZE)
+                    .execute();
 
-                    this.logger.info("Found [{}] filters to migrate...", filters.size());
+                this.logger.info("Found [{}] filters to migrate...", filters.size());
 
-                    this.migrateFilters(filters);
-                } catch (QueryException e) {
-                    throw new DataMigrationException("Error when trying to retrieve filters to move", e);
-                }
-            } while (!filters.isEmpty());
+                this.migrateFilters(filters);
+            } catch (QueryException e) {
+                throw new DataMigrationException("Error when trying to retrieve filters to move", e);
+            }
+        // We use previous filters as a security measure to ensure we won't loop forever if for some reason filters
+        // are not properly deleted.
+        } while (!filters.isEmpty() && (previousFilters == null || !previousFilters.equals(filters)));
+
+        if (previousFilters != null && previousFilters.equals(filters)) {
+            throw new DataMigrationException("Error while performing the migration: filters are not properly deleted.");
         }
+        this.logger.info("No more filters found to migrate.");
     }
 
     private void migrateFilters(List<DefaultNotificationFilterPreference> filters)
@@ -152,14 +166,25 @@ public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigr
 
         for (DefaultNotificationFilterPreference filter : filters) {
             EntityReference entityReference = this.getOwnerEntityReference(filter);
-            List<NotificationFilterPreference> filterPreferenceList;
-            if (filtersToStore.containsKey(entityReference)) {
-                filterPreferenceList = filtersToStore.get(entityReference);
-            } else {
-                filterPreferenceList = new ArrayList<>();
-                filtersToStore.put(entityReference, filterPreferenceList);
+            EntityReference wikiReference = entityReference.extractReference(EntityType.WIKI);
+            try {
+                if (this.wikiDescriptorManager.exists(wikiReference.getName())) {
+                    List<NotificationFilterPreference> filterPreferenceList;
+                    if (filtersToStore.containsKey(entityReference)) {
+                        filterPreferenceList = filtersToStore.get(entityReference);
+                    } else {
+                        filterPreferenceList = new ArrayList<>();
+                        filtersToStore.put(entityReference, filterPreferenceList);
+                    }
+                    filterPreferenceList.add(new DefaultNotificationFilterPreference(filter, false));
+                } else {
+                    this.logger.warn("Owner [{}] of some filter preferences belongs to a wiki that does not long exist"
+                        + ", preferences will be removed.", entityReference);
+                }
+            } catch (WikiManagerException e) {
+                throw new DataMigrationException(
+                    String.format("Error when checking existence of wiki [%s]", wikiReference), e);
             }
-            filterPreferenceList.add(new DefaultNotificationFilterPreference(filter, false));
             internalIds.add(filter.getInternalId());
         }
 
@@ -168,13 +193,14 @@ public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigr
         for (Map.Entry<EntityReference, List<NotificationFilterPreference>> entry
             : filtersToStore.entrySet()) {
             EntityReference entityReference = entry.getKey();
+            List<NotificationFilterPreference> notificationFilterPreferenceList = entry.getValue();
             try {
                 if (entityReference.getType() == EntityType.DOCUMENT) {
-                    this.filterPreferenceStore
-                        .saveFilterPreferences(new DocumentReference(entityReference), entry.getValue());
+                    this.filterPreferenceStore.saveFilterPreferences(new DocumentReference(entityReference),
+                        notificationFilterPreferenceList);
                 } else {
-                    this.filterPreferenceStore
-                        .saveFilterPreferences(new WikiReference(entityReference.getName()), entry.getValue());
+                    this.filterPreferenceStore.saveFilterPreferences(new WikiReference(entityReference.getName()),
+                        notificationFilterPreferenceList);
                 }
             } catch (NotificationException e) {
                 throw new DataMigrationException(
@@ -191,6 +217,7 @@ public class R160000001XWIKI21738DataMigration extends AbstractHibernateDataMigr
 
     private EntityReference getOwnerEntityReference(DefaultNotificationFilterPreference filterPreference)
     {
+        // if the owner is a document it's always a full reference containing the wiki part
         String owner = filterPreference.getOwner();
         EntityReference reference = this.entityReferenceResolver.resolve(owner, EntityType.DOCUMENT);
         if (reference.extractReference(EntityType.WIKI) == null) {

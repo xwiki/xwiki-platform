@@ -22,7 +22,6 @@ package org.xwiki.security.authentication;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -33,7 +32,6 @@ import org.xwiki.user.UserReference;
  * @since 14.4.6
  * @since 13.10.10
  */
-@Unstable
 @Role
 public interface RetrieveUsernameManager
 {

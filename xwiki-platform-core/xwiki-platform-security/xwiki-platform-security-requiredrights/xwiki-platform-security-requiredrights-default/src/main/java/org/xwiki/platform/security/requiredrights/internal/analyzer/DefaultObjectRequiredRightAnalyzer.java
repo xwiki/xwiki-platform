@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -63,19 +64,25 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
     @Inject
+    protected Provider<XWikiContext> contextProvider;
+
+    @Inject
+    protected VelocityDetector velocityDetector;
+
+    @Inject
+    @Named("translation")
+    protected BlockSupplierProvider<String> translationMessageSupplierProvider;
+
+    @Inject
+    @Named("stringCode")
+    protected BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
+
+    @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @Inject
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
-
-    @Inject
-    @Named("translation")
-    private BlockSupplierProvider<String> translationMessageSupplierProvider;
-
-    @Inject
-    @Named("stringCode")
-    private BlockSupplierProvider<String> stringCodeBlockSupplierProvider;
 
     @Inject
     private BlockSupplierProvider<BaseObject> objectBlockSupplierProvider;
@@ -84,16 +91,10 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
-
-    @Inject
     private ContentParser contentParser;
 
-    @Inject
-    private VelocityDetector velocityDetector;
-
     @Override
-    public List<RequiredRightAnalysisResult> analyze(BaseObject object)
+    public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
     {
         if (object == null) {
             return List.of();
@@ -161,7 +162,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         if (!textAreaClass.isRestricted() && field instanceof BaseStringProperty) {
             String value = ((BaseStringProperty) field).getValue();
 
-            if (contentType != null) {
+            if (contentType != null && StringUtils.isNotBlank(value)) {
                 switch (contentType) {
                     case VELOCITY_CODE:
                         result = analyzeVelocityScriptValue(value, field.getReference(),

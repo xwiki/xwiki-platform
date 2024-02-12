@@ -1,0 +1,109 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.realtime.wiki.test.ui;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WindowType;
+import org.xwiki.realtime.wiki.test.po.RealtimeWikiEditor;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
+
+/**
+ * Functional tests for the real-time Wiki editor.
+ * 
+ * @version $Id$
+ * @since 15.5.4
+ * @since 15.10
+ */
+@UITest(extraJARs = {
+    // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
+    "org.xwiki.platform:xwiki-platform-websocket",})
+class RealtimeWikiEditorIT
+{
+    protected static String firstTabHandle;
+
+    @BeforeAll
+    void beforeAll(TestUtils setup)
+    {
+        firstTabHandle = setup.getDriver().getWindowHandle();
+
+        setup.loginAsSuperAdmin();
+
+        // We need to set the realtime wiki editor as the default wiki editor.
+        setup.addObject("XWiki", "XWikiPreferences", "XWiki.EditorBindingClass", "dataType",
+            "org.xwiki.rendering.syntax.SyntaxContent#text", "roleHint", "realtime-wiki");
+
+        setup.createUserAndLogin("alice", "pa$$word", "editor", "Wiki", "usertype", "Advanced");
+    }
+
+    @AfterEach
+    void afterEach(TestUtils setup)
+    {
+        // Close all tabs except the first one.
+        setup.getDriver().getWindowHandles().stream().filter(handle -> !handle.equals(firstTabHandle))
+            .forEach(handle -> setup.getDriver().switchTo().window(handle).close());
+
+        // Switch back to the first tab.
+        setup.getDriver().switchTo().window(firstTabHandle);
+    }
+
+    @Test
+    @Order(1)
+    void toggleRealtimeWithSelf(TestReference testReference, TestUtils setup) throws Exception
+    {
+        // First tab
+        setup.gotoPage(testReference).editWiki();
+        RealtimeWikiEditor firstRtWikiEditor = new RealtimeWikiEditor();
+
+        // Second tab
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+        setup.gotoPage(testReference).editWiki();
+        RealtimeWikiEditor secondRtWikiEditor = new RealtimeWikiEditor();
+
+        // We need to wait until the two tabs are connected.
+        secondRtWikiEditor.waitUntilEditingWith("alice");
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstRtWikiEditor.waitUntilEditingWith("alice");
+
+        // Leave realtime editing on both tabs and then join again.
+        firstRtWikiEditor.leaveRealtimeEditing();
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondRtWikiEditor.leaveRealtimeEditing();
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstRtWikiEditor.joinRealtimeEditing();
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondRtWikiEditor.joinRealtimeEditing();
+
+        // The coeditors list should appear again.
+        secondRtWikiEditor.waitUntilEditingWith("alice");
+
+        setup.getDriver().switchTo().window(firstTabHandle);
+        firstRtWikiEditor.waitUntilEditingWith("alice");
+    }
+}

@@ -797,7 +797,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
  * Notifications Header
  ***********************************************/
 #tmNotifications {
-  &amp; > button {
+  &amp; &gt; button {
     background-color: @navbar-default-bg;
     color: @navbar-default-link-color;
     border: 0;
@@ -854,7 +854,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
 }
 
 .notifications-toggles .bootstrap-switch .bootstrap-switch-label {
-  background-image: linear-gradient($theme.buttonSecondaryGradientColor, $theme.buttonSecondaryBackgroundColor 50%);
+  background-color: $theme.buttonSecondaryBackgroundColor;
   color: $theme.buttonSecondaryTextColor;
 }
 

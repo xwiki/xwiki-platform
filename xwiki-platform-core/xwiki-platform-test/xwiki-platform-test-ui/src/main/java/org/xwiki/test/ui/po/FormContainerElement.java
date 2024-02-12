@@ -98,7 +98,7 @@ public class FormContainerElement extends BaseElement
 
     public void setFieldValue(By findElementBy, String value)
     {
-        setFieldValue(getDriver().scrollTo(getFormElement().findElement(findElementBy)), value);
+        setFieldValue(getFormElement().findElement(findElementBy), value);
     }
 
     public boolean hasField(By findFieldBy)
@@ -108,6 +108,7 @@ public class FormContainerElement extends BaseElement
 
     public void setFieldValue(WebElement fieldElement, String value)
     {
+        getDriver().scrollTo(fieldElement);
         if ("checkbox".equals(fieldElement.getAttribute("type"))) {
             setCheckBox(fieldElement, value.equals("true"));
         } else if ("select".equals(fieldElement.getTagName())) {

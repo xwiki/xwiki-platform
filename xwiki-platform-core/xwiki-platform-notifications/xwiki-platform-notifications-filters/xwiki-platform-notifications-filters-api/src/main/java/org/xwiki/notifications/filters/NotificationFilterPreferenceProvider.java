@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide {@link NotificationFilterPreference} from multiple sources.
@@ -85,6 +86,22 @@ public interface NotificationFilterPreferenceProvider
      * @since 9.11.9
      */
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
+
+    /**
+     * Delete a set of filter preferences.
+     * @param user the user for which to delete the notification preferences
+     * @param filterPreferenceIds ids of the filter preferences
+     * @throws NotificationException if an error happens
+     *
+     * @since 15.10.2
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    default void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        // Do nothing
+    }
 
     /**
      * Delete a filter preference.

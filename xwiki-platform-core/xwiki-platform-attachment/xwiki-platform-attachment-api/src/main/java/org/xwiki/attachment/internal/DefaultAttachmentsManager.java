@@ -79,7 +79,9 @@ public class DefaultAttachmentsManager implements AttachmentsManager
         if (document == null) {
             return Optional.empty();
         } else {
-            return document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE).stream()
+            return document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE)
+                .stream()
+                .filter(Objects::nonNull)
                 .filter(redirectObj -> Objects.equals(redirectObj.getStringValue(SOURCE_NAME_FIELD),
                     attachmentReference.getName()))
                 .findFirst()
@@ -99,7 +101,9 @@ public class DefaultAttachmentsManager implements AttachmentsManager
         List<BaseObject> targetRedirections =
             targetDocument.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE);
         for (BaseObject targetRedirection : targetRedirections) {
-            if (Objects.equals(targetRedirection.getStringValue(SOURCE_NAME_FIELD), attachmentName)) {
+            if (targetRedirection != null
+                && Objects.equals(targetRedirection.getStringValue(SOURCE_NAME_FIELD), attachmentName))
+            {
                 changed = true;
                 targetDocument.removeXObject(targetRedirection);
             }

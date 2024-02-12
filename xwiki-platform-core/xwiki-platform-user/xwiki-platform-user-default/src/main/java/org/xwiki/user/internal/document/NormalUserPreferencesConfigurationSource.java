@@ -29,6 +29,8 @@ import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
+
 /**
  * Configuration source for normal users (i.e. not superadmin, nor guest users) taking its data in the User Preferences
  * wiki document (the user profile page) using data from a XWikiUsers object attached to that document.
@@ -41,13 +43,6 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Singleton
 public class NormalUserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    static final String SPACE_NAME = "XWiki";
-
-    /**
-     * The local reference of the class containing user preferences.
-     */
-    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME, "XWikiUsers");
-
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -60,7 +55,7 @@ public class NormalUserPreferencesConfigurationSource extends AbstractDocumentCo
     @Override
     protected LocalDocumentReference getClassReference()
     {
-        return CLASS_REFERENCE;
+        return XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE;
     }
 
     @Override

@@ -54,6 +54,9 @@
 
 #-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
 #-# group's document?
+#-# 0: XWiki.XWikiAllGroup behaves like any other group and, by default, new users are added to it (you can change that using xwiki.users.initialGroups)
+#-# 1: All users are considered members of the XWiki.XWikiAllGroup group no matter what it actually contains
+#-# The default is 0.
 # xwiki.authentication.group.allgroupimplicit=0
 
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document
@@ -324,8 +327,8 @@ xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 #-# is set for the exact domain name of the wiki.
 #-#
 #-# For example, suppose the cookiedomains is set to "mydomain.net". If I log in
-#-# on wiki1.xwiki.com, then the cookie will be set for the entire mydomain.net
-#-# domain, and if I visit wiki2.xwiki.com I will still be authenticated. If I log
+#-# on wiki1.mydomain.net, then the cookie will be set for the entire mydomain.net
+#-# domain, and if I visit wiki2.mydomain.net I will still be authenticated. If I log
 #-# in on wiki1.otherdomain.net, then I will only be authenticated on
 #-# wiki1.otherdomain.net, and not on wiki2.otherdomain.net.
 #-#

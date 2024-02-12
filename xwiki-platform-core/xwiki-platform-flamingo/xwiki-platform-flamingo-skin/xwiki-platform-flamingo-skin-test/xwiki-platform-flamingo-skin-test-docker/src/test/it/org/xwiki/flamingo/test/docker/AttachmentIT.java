@@ -65,6 +65,8 @@ class AttachmentIT
 
     private static final String SECOND_ATTACHMENT = "SmallAttachment2.txt";
 
+    private static final String ESCAPED_ATTACHMENT = "<strong>EscapedAttachment.txt";
+
     private static final String IMAGE_ATTACHMENT = "image.gif";
 
     private static final String SMALL_SIZE_ATTACHMENT = "SmallSizeAttachment.png";
@@ -129,16 +131,12 @@ class AttachmentIT
         assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
 
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
         attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).click();
         assertEquals("This is another small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
 
         // Upload another version of the first attachment
@@ -153,8 +151,6 @@ class AttachmentIT
         attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).click();
         assertEquals("This is a small attachment v2.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
         viewPage.waitForDocExtraPaneActive("attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
@@ -445,6 +441,23 @@ class AttachmentIT
                 + "Failed to delete attachment %s\n"
                 + "This attachment does not exist.", attachmentName),
                 basePage.getXWikiMessageContent());
+    }
+
+    @Test
+    @Order(9)
+    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration)
+    {
+        setup.loginAsSuperAdmin();
+        setup.createPage(testReference, "Empty content");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, ESCAPED_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(ESCAPED_ATTACHMENT);
+        attachmentsPane.clickHideProgress();
+
+        assertTrue(attachmentsPane.attachmentExistsByFileName(ESCAPED_ATTACHMENT));
+        attachmentsPane.deleteAttachmentByFileByName(ESCAPED_ATTACHMENT);
     }
 
     private String getAttachmentsMacroContent(DocumentReference docRef)

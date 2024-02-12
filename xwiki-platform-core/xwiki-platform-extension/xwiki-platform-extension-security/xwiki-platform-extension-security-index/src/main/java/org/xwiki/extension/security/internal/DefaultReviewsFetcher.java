@@ -21,26 +21,28 @@ package org.xwiki.extension.security.internal;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Optional;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.index.security.review.ReviewsMap;
+import org.xwiki.extension.repository.http.internal.HttpClientFactory;
 import org.xwiki.extension.security.ExtensionSecurityConfiguration;
 import org.xwiki.extension.security.analyzer.ReviewsFetcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static java.net.http.HttpResponse.BodyHandlers.ofString;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.http.HttpStatus.SC_OK;
 
 /**
  * Fetches the security vulnerabilities reviews from a remote source providing a json that can be parsed to a
@@ -62,25 +64,29 @@ public class DefaultReviewsFetcher implements ReviewsFetcher
     @Inject
     private Logger logger;
 
-    @Override
-    public Optional<ReviewsMap> fetch() throws ExtensionSecurityException
-    {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(buildURI())
-            .GET()
-            .build();
+    // TODO: replace with a more generic http client factory.
+    @Inject
+    private HttpClientFactory httpClientFactory;
 
-        try {
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request, ofString());
-            ReviewsMap reviewsMap = new ObjectMapper().readValue(response.body(), ReviewsMap.class);
-            return Optional.of(this.reviewMapFilter.filter(reviewsMap));
+    @Override
+    public ReviewsMap fetch() throws ExtensionSecurityException
+    {
+        try (CloseableHttpClient httpClient = this.httpClientFactory.createHttpClientBuilder(Map.of()).build()) {
+            HttpGet getMethod = new HttpGet(buildURI());
+            CloseableHttpResponse execute = httpClient.execute(getMethod);
+            StatusLine statusLine = execute.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            if (statusCode == SC_OK) {
+                HttpEntity entity = execute.getEntity();
+                ReviewsMap reviewsMap = new ObjectMapper().readValue(entity.getContent(), ReviewsMap.class);
+                return this.reviewMapFilter.filter(reviewsMap);
+            } else {
+                throw new ExtensionSecurityException(String.format(
+                    "Review fetching failed with http code [%d] and message [%s].", statusCode,
+                    statusLine.getReasonPhrase()));
+            }
         } catch (IOException e) {
             throw new ExtensionSecurityException("Failed to fetch the reviews.", e);
-        } catch (InterruptedException e) {
-            this.logger.warn("Can't finish the reviews fetching as the thread was interrupted. Cause: [{}]",
-                getRootCauseMessage(e));
-            Thread.currentThread().interrupt();
-            return Optional.empty();
         }
     }
 

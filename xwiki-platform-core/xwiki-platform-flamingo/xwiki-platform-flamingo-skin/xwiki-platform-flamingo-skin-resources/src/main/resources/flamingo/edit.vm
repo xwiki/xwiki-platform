@@ -151,6 +151,9 @@
       </div>
     #end
     #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
+      <h1 class="sr-only">
+        $services.localization.render('core.editors.content.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+      </h1>
       <div id="editMeta" class="col-xs-12#if ($displayContentMenu) col-md-7#end">
         #template('editmeta.vm')
       </div>

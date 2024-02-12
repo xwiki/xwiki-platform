@@ -252,11 +252,11 @@ class DefaultWikiMacroTest
         when(wikiModel.getDocumentViewURL(reference)).thenReturn("url");
 
         assertXHTML(
-            "<h1 id=\"Hheading\" class=\"wikigeneratedid\"><span>heading</span></h1>"
-                + "<ul class=\"wikitoc\">"
+            "<h2 id=\"Hheading\" class=\"wikigeneratedid\"><span>heading</span></h2>"
+                + "<ul class=\"wikitoc\"><li class=\"nodirectchild\"><ul>"
                 + "<li><span class=\"wikilink\"><a href=\"#Hheading\">heading</a></span></li>"
-                + "</ul>",
-            "= heading\n\n{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
+                + "</ul></li></ul>",
+            "== heading\n\n{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
     }
 
     /**

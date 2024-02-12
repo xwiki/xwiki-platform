@@ -1245,4 +1245,45 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return hasProgrammingRights() ? this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext()) : null;
     }
+
+    /**
+     * Inserts a tooltip using toolTip.js
+     *
+     * @param html HTML viewed
+     * @param message HTML Tooltip message
+     * @param params Parameters in Javascropt added to the tooltip config
+     * @return HTML with working tooltip
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, String params)
+    {
+        return this.xwiki.addTooltip(html, message, params, getXWikiContext());
+    }
+
+    /**
+     * Inserts a tooltip using toolTip.js
+     *
+     * @param html HTML viewed
+     * @param message HTML Tooltip message
+     * @return HTML with working tooltip
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message)
+    {
+        return this.xwiki.addTooltip(html, message, getXWikiContext());
+    }
+
+    /**
+     * Inserts the tooltip Javascript
+     *
+     * @return
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltipJS()
+    {
+        return this.xwiki.addTooltipJS(getXWikiContext());
+    }
 }

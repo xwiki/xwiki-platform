@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.eventstream.DocumentEventType;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
@@ -141,8 +142,8 @@ public class CompositeEvent
             // We are most interested in "advanced" event that we are in "core" events such as "create" or "update",
             // which often are the technical consequences of the real event (ex: a comment has been added).
             // FIXME: this sounds really like a hack: we should probably instead allow to set the type.
-            if (StringUtils.isNotBlank(event.getType()) && !"create".equals(event.getType())
-                && !"update".equals(event.getType())) {
+            if (StringUtils.isNotBlank(event.getType()) && !DocumentEventType.CREATE.equals(event.getType())
+                && !DocumentEventType.UPDATE.equals(event.getType())) {
                 type = event.getType();
             }
         }

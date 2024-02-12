@@ -302,7 +302,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         }
 
         if (document.isNew()) {
-            throw new TranslationBundleDoesNotExistsException(String.format("Document [%s] does not exists",
+            throw new TranslationBundleDoesNotExistsException(String.format("Document [%s] does not exist",
                 documentReference));
         }
 
@@ -506,7 +506,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      * 
      * @param document the translation document
      * @param scope the translation scope
-     * @param create true if the component manager should be created if it does not exists
+     * @param create true if the component manager should be created if it does not exist
      * @return the component manager corresponding to the provided {@link Scope}
      */
     private ComponentManager getComponentManager(XWikiDocument document, Scope scope, boolean create)

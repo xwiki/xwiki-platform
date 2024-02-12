@@ -40,6 +40,9 @@ import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotifi
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.RenamePage;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeNodeElement;
 import org.xwiki.user.test.po.AbstractUserProfilePage;
 
@@ -61,10 +64,11 @@ import static org.xwiki.test.ui.po.BootstrapSwitch.State.UNDETERMINED;
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // The Solr store is not ready yet to be installed as extension
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
     }
 )
@@ -693,7 +697,7 @@ class NotificationsSettingsIT
         customNotificationFilterModal.selectFormats(Set.of(CustomNotificationFilterModal.NotificationFormat.ALERT));
         customNotificationFilterModal.getEventsSelector().selectByValue(UPDATE);
         customNotificationFilterModal.getEventsSelector().selectByValue(DELETE);
-        customNotificationFilterModal.clickSubmit();
+        customNotificationFilterModal.clickSubmit(2);
 
         // check created filters
         customNotificationFilterPreferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
@@ -716,5 +720,29 @@ class NotificationsSettingsIT
         assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
         assertEquals(List.of("Alert"), filterPreference.getFormats());
         assertEquals(List.of("A page is modified", "A page is deleted"), filterPreference.getEventTypes());
+    }
+
+    @Test
+    @Order(6)
+    void watchAndRename(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        ViewPage viewPage = testUtils.createPage(testReference, "Content", "Title");
+        NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
+        notificationsTrayPage.showNotificationTray();
+        // Autowatch is enabled for created page
+        assertTrue(notificationsTrayPage.isPageOnlyWatched());
+        RenamePage renamePage = viewPage.rename();
+        renamePage.getDocumentPicker().setTitle(testReference.getName() + "Renamed");
+        CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton().waitUntilFinished();
+        viewPage = statusPage.gotoNewPage();
+        notificationsTrayPage = new NotificationsTrayPage();
+        notificationsTrayPage.showNotificationTray();
+        assertTrue(notificationsTrayPage.isPageOnlyWatched());
+
+        viewPage = testUtils.gotoPage(testReference);;
+        notificationsTrayPage = new NotificationsTrayPage();
+        notificationsTrayPage.showNotificationTray();
+        assertFalse(notificationsTrayPage.isPageOnlyWatched());
     }
 }

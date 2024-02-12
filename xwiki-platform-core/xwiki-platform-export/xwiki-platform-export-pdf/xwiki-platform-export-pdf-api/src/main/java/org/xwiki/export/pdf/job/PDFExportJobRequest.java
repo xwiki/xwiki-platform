@@ -33,7 +33,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.xwiki.job.Request;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a request to export multiple XWiki documents as PDF.
@@ -42,7 +41,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4.2
  * @since 14.5
  */
-@Unstable
 public class PDFExportJobRequest extends AbstractCheckRightsRequest
 {
     /**

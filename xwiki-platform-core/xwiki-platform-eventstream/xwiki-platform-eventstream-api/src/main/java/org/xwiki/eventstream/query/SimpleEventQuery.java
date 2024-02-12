@@ -34,7 +34,6 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
 import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -412,7 +411,6 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      * @return this {@link SimpleEventQuery}
      * @since 14.4RC1
      */
-    @Unstable
     public SimpleEventQuery contains(String property, Object value)
     {
         addCompareCondition(property, value, CompareType.CONTAINS);

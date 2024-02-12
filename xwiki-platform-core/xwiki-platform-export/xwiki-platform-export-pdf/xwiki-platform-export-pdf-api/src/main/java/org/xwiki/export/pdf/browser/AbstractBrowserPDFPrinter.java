@@ -42,7 +42,6 @@ import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
-import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,7 +51,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @version $Id$
  * @since 14.8
  */
-@Unstable
 public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 {
     @Inject

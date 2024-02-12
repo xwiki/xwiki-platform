@@ -19,6 +19,10 @@
  */
 package org.xwiki.edit.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -29,10 +33,6 @@ import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests in-place page editing.
@@ -219,5 +219,23 @@ class InplaceEditIT
 
         setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
         new InplaceEditablePage().editInplace().saveAndView();
+    }
+
+    @Test
+    @Order(4)
+    void saveWithMergeReloadsEditor(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Enter in-place edit mode.
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+
+        // Save the page outside the in-place editor to increase the version and trigger a merge conflict on save.
+        setup.rest().savePage(testReference, "new content", "new title");
+
+        // Save the page inside the in-place editor.
+        viewPage.save();
+        assertEquals("new title", viewPage.getDocumentTitle());
+
+        viewPage.saveAndView();
+        assertEquals("new content", viewPage.getContent());
     }
 }

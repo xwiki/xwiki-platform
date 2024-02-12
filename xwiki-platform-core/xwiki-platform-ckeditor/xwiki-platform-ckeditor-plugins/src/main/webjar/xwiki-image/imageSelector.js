@@ -114,14 +114,22 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
           })).done(function (html, textState, jqXHR) {
             var imageSelector = modal.find('.image-selector');
             var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
-            $(document).loadRequiredSkinExtensions(requiredSkinExtensions);
+            // It's important to insert the html content before loading the corresponding scripts. Otherwise, it's 
+            // possible for scripts to be loaded too fast and to be unable to access the expected html.
             imageSelector.html(html);
+            $(document).loadRequiredSkinExtensions(requiredSkinExtensions);
             $(document).trigger('xwiki:dom:updated', {'elements': imageSelector.toArray()});
             imageSelector.removeClass('loading');
 
             // Update the selection with the value of the current tab on tab change.
-            imageSelector.on('shown.bs.tab', function () {
-              setImageReferenceValue(mapTabReference[getCurrentTabId()]);
+            // This needs to be done before the tab is actually switched as otherwise there is a risk that the saved
+            // value overrides a value updated in the short laps of time between the show.bs.tab and shown.bs.tab
+            // events. This is unlikely to happen in practice but happens quite often with automated tests (e.g.,
+            // selenium).
+            imageSelector.on('show.bs.tab', function (e) {
+              // Retrieve the id of the to be shown tab.
+              const nextTabId = $(e.target).attr("aria-controls");
+              setImageReferenceValue(mapTabReference[nextTabId]);
             });
 
             modal.data('initialized', true);

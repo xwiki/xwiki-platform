@@ -65,6 +65,7 @@
         v-for="(entry, idx) in entries"
         :key="`card-${logic.getEntryId(entry)}-${idx}`"
         :entry="entry"
+        :entry-idx="idx"
       />
 
       <!-- Component to create a new entry -->
@@ -75,6 +76,7 @@
       <div v-if="entriesFetched && entries.length === 0" class="noentries-card">
         {{ $t('livedata.bottombar.noEntries') }}
       </div>
+      <LivedataPagination/>
     </LivedataBottombar>
 
   </div>

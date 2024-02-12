@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxParameters</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWiki구문매개변수</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 고급 =
+
+== 매개변수 ==
+
+=== 1.0 매개변수 ===
+
+XWiki 구문 1.0 에는 매개변수 전달을 위한 구문이 없으며 이를 수행하는 유일한 방법은 아래 표에 표시된 대로 콘텐츠에 XHTML을 직접 작성하는 것이었습니다.
+
+|= XWiki 구문 1.0|=생성된 XHTML
+|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;표제&lt;/h1&gt;
+}}})))|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;표제&lt;/h1&gt;
+}}})))
+
+=== 2.0 매개변수 ===
+
+XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}} 를 사용하면 다양한 구문 요소와 텍스트 블록에 매개변수를 전달할 수 있습니다. 예를 들어 스타일을 지정하는 데 사용됩니다. 원하는 매개변수 키/값 쌍을 설정할 수 있습니다. XHTML 렌더러는 이러한 매개변수를 XHTML 속성으로 다양한 구문 요소의 기본 XHTML 표현에 전달합니다.
+
+|=(% style="width:60%" %) XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=생성된 XHTML
+|((({{{
+(% class="myClass" style="myStyle" id="myId" %)
+= 제목 =
+}}})))|((({{{
+&lt;h1 class="myClass" style="myStyle" id="myId"&gt;표제&lt;/h1&gt;
+}}})))</content>
+</xwikidoc>

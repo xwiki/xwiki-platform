@@ -129,7 +129,7 @@ public class UserAddedEventListenerTest
         when(obj1.duplicate()).thenReturn(obj1bis);
         when(obj2.duplicate()).thenReturn(obj2bis);
         when(wikiNotificationConfiguration.getXObjects(UserAddedEventListener.TOGGLEABLE_FILTER_PREFERENCE_CLASS))
-            .thenReturn(Arrays.asList(obj1, obj2));
+            .thenReturn(Arrays.asList(obj1, null, obj2, null));
 
         this.userAddedEventListener.onEvent(null, userDoc, null);
         verify(this.notificationFilterPreferenceManager).saveFilterPreferences(documentReference, expectedSet);

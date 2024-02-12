@@ -784,9 +784,9 @@ public abstract class ListClass extends PropertyClass
         }
 
         Map<String, ListItem> map = getMap(context);
-        if (prop instanceof ListProperty) {
+        if (prop instanceof ListProperty listProperty) {
             String separator = getSeparator();
-            List<String> selectlist = ((ListProperty) prop).getList();
+            List<String> selectlist = listProperty.getList();
             List<String> newlist = new ArrayList<>();
             for (String value : selectlist) {
                 newlist.add(XMLUtils.escapeElementText(getDisplayValue(value, name, map, context)));

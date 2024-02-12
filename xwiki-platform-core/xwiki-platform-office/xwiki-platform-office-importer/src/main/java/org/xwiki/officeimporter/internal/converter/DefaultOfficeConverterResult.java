@@ -59,7 +59,7 @@ public class DefaultOfficeConverterResult implements OfficeConverterResult
 
         if (!this.fileStorage.getOutputFile().exists()) {
             throw new OfficeConverterException(
-                String.format("Output file [%s] does not exists.", fileStorage.getOutputFile().getAbsolutePath()));
+                String.format("Output file [%s] does not exist.", fileStorage.getOutputFile().getAbsolutePath()));
         }
     }
 

@@ -276,3 +276,6 @@ org.xwiki.security.authservice.internal.AuthServiceManager
 org.xwiki.security.authservice.internal.StandardXWikiAuthServiceComponent
 org.xwiki.security.authservice.script.AuthServiceScriptService
 org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker
+org.xwiki.evaluation.internal.DefaultObjectEvaluator
+org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
+org.xwiki.internal.document.DocumentOverrideListener

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-wysiwygEditor', [
+define('xwiki-realtime-wysiwyg', [
   'jquery',
   'xwiki-realtime-config',
   'xwiki-l10n!xwiki-realtime-messages',
@@ -30,36 +30,16 @@ define('xwiki-realtime-wysiwygEditor', [
   'xwiki-realtime-saver',
   'chainpad',
   'xwiki-realtime-crypto',
-  'deferred!ckeditor',
-  'xwiki-realtime-wysiwygEditor-patches'
+  'xwiki-realtime-wysiwyg-editor',
+  'xwiki-realtime-wysiwyg-patches'
 ], function (
   /* jshint maxparams:false */
   $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver,
-  Chainpad, Crypto, ckeditorPromise, Patches
+  ChainPad, Crypto, Editor, Patches
 ) {
   'use strict';
 
   const editorId = 'wysiwyg', module = {};
-
-  function waitForEditorInstance(name) {
-    name = name || 'content';
-    return ckeditorPromise.then(ckeditor => new Promise((resolve, reject) => {
-      const editor = ckeditor.instances[name];
-      if (editor) {
-        if (editor.status === 'ready') {
-          resolve(editor);
-        } else {
-          editor.on('instanceReady', resolve.bind(null, editor));
-        }
-      } else {
-        ckeditor.on('instanceReady', function (event) {
-          if (event.editor.name === name) {
-            resolve(event.editor);
-          }
-        });
-      }
-    }));
-  }
 
   module.main = function(editorConfig, docKeys, useRt) {
     let channel = docKeys[editorId];
@@ -113,8 +93,8 @@ define('xwiki-realtime-wysiwygEditor', [
       // When someone is offline, they may have left their tab open for a long time and the lock may have disappeared.
       // We're refreshing it when the editor is focused so that other users will know that someone is editing the
       // document.
-      waitForEditorInstance().then(editor => {
-        editor.on('focus', function() {
+      Editor.waitForInstance().then(editor => {
+        editor._ckeditor.on('focus', function() {
           XWiki.EditLock = new XWiki.DocumentLock();
           XWiki.EditLock.lock();
         });
@@ -133,17 +113,6 @@ define('xwiki-realtime-wysiwygEditor', [
       isHTML: true,
       mergeContent: realtimeConfig.enableMerge !== 0
     });
-    
-    // Fix the magic line issue.
-    function fixMagicLine(editor) {
-      if (editor.plugins.magicline) {
-        const ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
-          editor._.magiclineBackdoor.that.line.$;
-        [ml, ml.parentElement].forEach(function(el) {
-          el.setAttribute('class', 'rt-non-realtime');
-        });
-      }
-    }
 
     // User position indicator style.
     const userIconStyle = [
@@ -165,36 +134,25 @@ define('xwiki-realtime-wysiwygEditor', [
       '</style>'
     ].join('\n');
 
-    function whenReady(editor) {
-      let initializing = true, editableContent,
+    function whenReady(genericEditor) {
+      const editor = genericEditor._ckeditor;
+      let initializing = true,
 
       initEditableContent = function() {
-        // Disable temporary attachment upload for now.
-        if (editor.config['xwiki-upload']) {
-          editor.config['xwiki-upload'].isTemporaryAttachmentSupported = false;
-        }
-        editableContent = editor.editable().$;
-        $('head', editableContent.ownerDocument).append(userIconStyle);
-        fixMagicLine(editor);
+        $('head', genericEditor.getContent().ownerDocument).append(userIconStyle);
       };
 
       // Initialize the editable content when the editor is ready.
       initEditableContent();
 
-      let afterRefresh = [];
-      editor.on('afterCommandExec', function(event) {
-        if (event?.data?.name === 'xwiki-refresh') {
-          // Re-initialize the editable content after it is refreshed.
-          initEditableContent();
-          initializing = false;
-          realtimeOptions.onLocal();
-          afterRefresh.forEach(item => item());
-          afterRefresh = [];
-        }
+      genericEditor.onContentLoaded(function() {
+        // Re-initialize the editable content after it is reloaded.
+        initEditableContent();
+        initializing = false;
       });
 
       const setEditable = module.setEditable = function(editable) {
-        editableContent.setAttribute('contenteditable', editable);
+        genericEditor.getContent().setAttribute('contenteditable', editable);
         $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
       };
 
@@ -208,19 +166,7 @@ define('xwiki-realtime-wysiwygEditor', [
       // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
       toolbar,
       // The editor wrapper used to update the edited content without losing the caret position.
-      patchedEditor = new Patches(editor),
-
-      findMacroComments = function(el) {
-        const arr = [];
-        for (const node of el.childNodes) {
-          if (node.nodeType === 8 && node.data && /startmacro/.test(node.data)) {
-            arr.push(node);
-          } else {
-            arr.push(...findMacroComments(node));
-          }
-        }
-        return arr;
-      },
+      patchedEditor = new Patches(genericEditor),
 
       createSaver = function(info) {
         Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
@@ -230,39 +176,7 @@ define('xwiki-realtime-wysiwygEditor', [
           // Id of the wiki page form.
           formId: window.XWiki.editor === 'wysiwyg' ? 'edit' : 'inline',
           setTextValue: function(newText, toConvert, callback) {
-            function andThen(data) {
-              patchedEditor.setHTML(data);
-
-              // If available, transform the HTML comments for XWiki macros into macros before saving
-              // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
-              // CKEditor Integration application.
-              if (editor.plugins['xwiki-macro'] && findMacroComments(editableContent).length > 0) {
-                initializing = true;
-                editor.execCommand('xwiki-refresh');
-                afterRefresh.push(callback);
-              } else {
-                callback();
-                realtimeOptions.onLocal();
-              }
-            }
-            if (toConvert) {
-              const object = {
-                wiki: XWiki.currentWiki,
-                space: XWiki.currentSpace,
-                page: XWiki.currentPage,
-                convert: true,
-                text: newText
-              };
-              $.post(editorConfig.htmlConverterUrl, object).then(andThen).catch(() => {
-                const debugLog = {
-                  state: editorId + '/convertHTML',
-                  postData: object
-                };
-                module.onAbort(null, 'converthtml', JSON.stringify(debugLog));
-              });
-            } else {
-              andThen(newText);
-            }
+            patchedEditor.setHTML(newText, true);
           },
           getSaveValue: function() {
             return {
@@ -278,6 +192,15 @@ define('xwiki-realtime-wysiwygEditor', [
               editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
               return null;
             }
+          },
+          getTextAtCurrentRevision: function(revision) {
+            return $.get(XWiki.currentDocument.getURL('get', $.param({
+              xpage:'get',
+              outputSyntax:'annotatedhtml',
+              outputSyntaxVersion:'5.0',
+              transformations:'macro',
+              rev:revision
+            })));
           },
           realtime: info.realtime,
           userList: info.userList,
@@ -360,7 +283,8 @@ define('xwiki-realtime-wysiwygEditor', [
         // If no new data (someone has just joined or left the channel), get the latest known values.
         const updatedData = newdata || userData;
 
-        $(editableContent.ownerDocument).find('.rt-user-position').remove();
+        const ownerDocument = genericEditor.getContent().ownerDocument;
+        $(ownerDocument).find('.rt-user-position').remove();
         const positions = {};
         const avatarWidth = 15, spacing = 3;
         let requiredPadding = 0;
@@ -368,8 +292,8 @@ define('xwiki-realtime-wysiwygEditor', [
           const data = updatedData[id];
           const name = getPrettyName(data.name);
           // Set the user position.
-          const element = editableContent.ownerDocument.evaluate(data['cursor_' + editorId],
-            editableContent.ownerDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+          const element = ownerDocument.evaluate(data['cursor_' + editorId], ownerDocument, null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
           if (!element) {
             return;
           }
@@ -397,10 +321,11 @@ define('xwiki-realtime-wysiwygEditor', [
             'left': posLeft + 'px',
             'top': posTop + 'px'
           });
-          $('html', editableContent.ownerDocument).append($indicator);
+          $('html', ownerDocument).append($indicator);
         });
 
-        $(editableContent).css('padding-left', requiredPadding === 0 ? '' : ((requiredPadding + avatarWidth) + 'px'));
+        $(genericEditor.getContent()).css('padding-left',
+          requiredPadding === 0 ? '' : ((requiredPadding + avatarWidth) + 'px'));
       }
 
       let isFirstOnReadyCall = true;
@@ -413,28 +338,41 @@ define('xwiki-realtime-wysiwygEditor', [
         crypto: Crypto,
         network: editorConfig.network,
 
-        // OT
-        //patchTransformer: Chainpad.NaiveJSONTransformer
+        // Operational Transformation
+        // The synchronization is done on JSON so we need to make sure the output of the synchronization is always
+        // valid JSON.
+        patchTransformer: ChainPad.NaiveJSONTransformer,
+
+        validateContent: function(content) {
+          try {
+            JSON.parse(content || '{}');
+            return true;
+          } catch (e) {
+            console.error("Failed to parse JSON content, rejecting patch.", {
+              content,
+              error: e
+            });
+            return false;
+          }
+        },
 
         onRemote: function(info) {
           if (initializing) {
             return;
           }
 
-          const shjson = info.realtime.getUserDoc();
+          const remoteContent = info.realtime.getUserDoc();
 
-          // Build a DOM from HJSON, diff, and patch the editor.
-          patchedEditor.setHyperJSON(shjson);
+          // Build a DOM from HyperJSON, diff and patch the editor.
+          patchedEditor.setHyperJSON(remoteContent);
 
-          const shjson2 = patchedEditor.getHyperJSON();
-          if (shjson2 !== shjson) {
-            console.error('shjson2 !== shjson');
-            const diff = Chainpad.Diff.diff(shjson, shjson2);
-            console.log(shjson, diff);
-            module.chainpad.contentUpdate(shjson2);
-          } else {
-            // Notify the content change.
-            editor.fire('change');
+          const localContent = patchedEditor.getHyperJSON();
+          if (localContent !== remoteContent) {
+            console.warn('Unexpected local content after synchronization: ', {
+              expected: remoteContent,
+              actual: localContent,
+              diff: ChainPad.Diff.diff(remoteContent, localContent)
+            });
           }
         },
 
@@ -443,7 +381,7 @@ define('xwiki-realtime-wysiwygEditor', [
           const config = {
             userData,
             onUsernameClick: function(id) {
-              const editableContentLocation = editableContent.ownerDocument.defaultView.location;
+              const editableContentLocation = genericEditor.getContent().ownerDocument.defaultView.location;
               const baseHref = editableContentLocation.href.split('#')[0] || '';
               editableContentLocation.href = baseHref + '#rt-user-' + id;
             }
@@ -494,15 +432,11 @@ define('xwiki-realtime-wysiwygEditor', [
               crypto: Crypto,
               editor: editorId,
               getCursor: function() {
-                const selection = editor.getSelection();
-                if (!selection) {
+                const selection = genericEditor.getSelection();
+                let node = selection?.rangeCount && selection.getRangeAt(0).startContainer;
+                if (!node) {
                   return '';
                 }
-                const ranges = selection.getRanges();
-                if (!ranges?.[0]?.startContainer?.$) {
-                  return '';
-                }
-                let node = ranges[0].startContainer.$;
                 node = (node.nodeName === '#text') ? node.parentNode : node;
                 const xpath = getXPath(node);
                 return xpath;
@@ -580,8 +514,6 @@ define('xwiki-realtime-wysiwygEditor', [
 
         // This function resets the realtime fields after coming back from source mode.
         onLocalFromSource: function() {
-          // Re-initialize the editable content when coming back from source mode because the WYSIWYG area is recreated.
-          initEditableContent();
           this.onLocal();
         },
 
@@ -590,11 +522,16 @@ define('xwiki-realtime-wysiwygEditor', [
             return;
           }
           // Stringify the JSON and send it into ChainPad.
-          const shjson = patchedEditor.getHyperJSON();
-          module.chainpad.contentUpdate(shjson);
+          const localContent = patchedEditor.getHyperJSON();
+          module.chainpad.contentUpdate(localContent);
 
-          if (module.chainpad.getUserDoc() !== shjson) {
-            console.error("realtime.getUserDoc() !== shjson");
+          const remoteContent = module.chainpad.getUserDoc();
+          if (remoteContent !== localContent) {
+            console.error('Unexpected remote content after synchronization: ', {
+              expected: localContent,
+              actual: remoteContent,
+              diff: ChainPad.Diff.diff(localContent, remoteContent)
+            });
           }
         }
       };
@@ -603,7 +540,7 @@ define('xwiki-realtime-wysiwygEditor', [
 
       module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
 
-      editor.on('change', function() {
+      genericEditor.onChange(function() {
         Saver.destroyDialog();
         if (!initializing) {
           Saver.setLocalEditFlag(true);
@@ -616,20 +553,21 @@ define('xwiki-realtime-wysiwygEditor', [
       // terminate the test like `test.cancel()`
       window.easyTest = function () {
         let container, offset;
-        const range = editor.getSelection()?.getRanges()?.[0];
+        const selection = genericEditor.getSelection();
+        const range = selection?.rangeCount && selection.getRangeAt(0);
         if (range) {
-          container = range.startContainer.$;
+          container = range.startContainer;
           offset = range.startOffset;
         }
-        const test = TypingTest.testInput(editableContent, container, offset, realtimeOptions.onLocal);
+        const test = TypingTest.testInput(genericEditor.getContent(), container, offset, realtimeOptions.onLocal);
         realtimeOptions.onLocal();
         return test;
       };
 
-      return editor;
+      return genericEditor;
     }
 
-    return waitForEditorInstance().then(whenReady);
+    return Editor.waitForInstance().then(whenReady);
   };
 
   return module;

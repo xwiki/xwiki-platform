@@ -1,0 +1,307 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="ko">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>###############################################################################
+# WikiManager Manager translation page
+#
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
+#
+# This contains the translations of the module in the default language
+# (generally English).
+# 
+# Translation key syntax:
+#   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
+#   where:
+#   * &lt;short top level project name&gt; = top level project name without the "xwiki-" prefix,
+#                                     for example: commons, rendering, platform, enterprise, manager, etc
+#   * &lt;short module name&gt; = the name of the Maven module without the &lt;short top level project name&gt; prefix,
+#                           for example: oldcore, scheduler, activitystream, etc
+#   * &lt;propertyName&gt; = the name of the property using camel case,
+#                      for example updateJobClassCommitComment
+#
+# Comments: it's possible to add some detail about a key to make easier to
+#   translate it by adding a comment before it. To make sure a comment is not
+#   assigned to the following key use at least three sharps (###) for the comment
+#   or after it.
+# 
+# Deprecated keys:
+#   * when deleting a key it should be moved to deprecated section at the end
+#     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
+#     first version in which it started to be deprecated
+#   * when renaming a key, it should be moved to the same deprecated section
+#     and a comment should be added with the following syntax:
+#     #@deprecated new.key.name
+#     old.key.name=Some translation
+###############################################################################
+
+## Menus
+platform.wiki.menu.wikiindex=위키 색인
+platform.wiki.menu.deletewiki=위키 삭제
+platform.wiki.menu.userwikis=위키
+
+## Dependencies
+platform.wiki.dependencies.wiki.missing="Wiki" Java 구성요소가 설치되지 않았습니다. 이 페이지는 제대로 작동하지 않습니다. "Wiki API" 및 "Wiki Script" 확장이 설치되어 있는지(확장 관리자 사용) 또는 파일 ' xwiki -platform-wiki-api-&lt;version&gt;. jar ' 및 ' xwiki -platform-wiki-script-&lt;버전&gt;. jar '는 'WEB-INF/lib/' 웹 애플리케이션 폴더 아래에 있습니다(수동 설치의 경우).
+platform.wiki.dependencies.template.missing="Wiki 템플릿" Java 구성요소가 설치되지 않았습니다. 이 페이지는 제대로 작동하지 않습니다. "Wiki 템플릿 API" 및 "Wiki 템플릿 스크립트" 확장이 설치되어 있는지(확장 관리자 사용) 또는 파일 ' xwiki -platform-wiki-template-api-&lt;version&gt;. jar ' 및 ' xwiki -platform-wiki-template-script-&lt;버전&gt;. jar '는 'WEB-INF/lib/' 웹 애플리케이션 폴더 아래에 있습니다(수동 설치의 경우).
+platform.wiki.dependencies.user.missing="Wiki 사용자" Java 구성요소가 설치되지 않았습니다. 이 페이지는 제대로 작동하지 않습니다. "Wiki User API" 및 "Wiki User Script" 확장이 설치되어 있는지(확장 관리자 사용) 또는 파일 ' xwiki -platform-wiki-user-api-&lt;version&gt;. jar ' 및 ' xwiki -platform-wiki-user-script-&lt;버전&gt;. jar '는 'WEB-INF/lib/' 웹 애플리케이션 폴더 아래에 있습니다(수동 설치의 경우).
+
+## Create
+platform.wiki.create.button=위키 만들기
+platform.wiki.create.title=새 위키 만들기
+platform.wiki.create.members=회원
+platform.wiki.create.prettyname.empty=사용자 친화 이름은 비워둘 수 없습니다
+platform.wiki.create.error=Wiki "{0}" 생성에 실패했습니다: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=이 식별자를 가진 데이터베이스가 이미 존재합니다
+platform.wiki.create.error.wikiname.wikialreadyexists=이 식별자는 이미 사용되었습니다
+platform.wiki.create.error.wikiname.empty=식별자는 비워둘 수 없습니다
+
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=위키 [{0}]이(가) 존재하지 않습니다
+platform.wiki.error.oneParameterNotSpecified=''{0}'' 매개변수가 지정되지 않았습니다.
+platform.wiki.error.parameterAcceptsMultipleValues=여러 값이 허용됩니다.
+platform.wiki.error.exceptionWithMessage=예외: {0}
+platform.wiki.form.requiredField=필수의
+platform.wiki.csrf.error=보안 토큰이 잘못되었습니다. 작업을 다시 시도하십시오.
+
+## Users
+platform.wiki.users.userAlreadyMemberOfWiki=사용자 {0}{1}{2}은(는) 이미 위키 {3}{4}{5}의 회원입니다.
+platform.wiki.users.userNotMemberOfWiki=사용자 {0}{1}{2}은(는) Wiki {3}{4}{5}의 회원이 아닙니다.
+platform.wiki.users.logInToContinue=계속하려면 먼저 {0}로그인{1}해야 합니다.
+platform.wiki.users.invitation.userAcceptedNotification=사용자 ''{0}''({1})이 Wiki ''{2}''({3})에 가입하기 위한 초대를 수락했습니다.
+platform.wiki.users.invitation.userAcceptedSuccess=사용자 {0}{1}{2}이(가) 성공적으로 초대를 수락하고 Wiki {3}{4}{5}에 가입했습니다.
+platform.wiki.users.invitation.userRejectedSuccess=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5} 가입 초대를 성공적으로 거부했습니다.
+platform.wiki.users.join.error.needInvitation=이 위키는 초대받은 사람만 이용할 수 있습니다. 그렇게 하려면 관리자 중 한 명으로부터 초대를 받아야 합니다.
+platform.wiki.users.join.request.pendingRequestExists=사용자 {0}{1}{2}은(는) 이미 Wiki {3}{4}{5} 가입 요청을 보류하고 있습니다. 위키 관리자가 검토할 때까지 기다려 주십시오.
+platform.wiki.users.join.request.cancelConfirmation=Wiki {0}{1}{2} 가입 요청을 취소하시겠습니까?
+platform.wiki.users.join.request.cancelYes=예
+platform.wiki.users.join.request.cancelNo=아니요
+platform.wiki.users.join.request.cancelSuccess=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5} 가입 요청을 성공적으로 취소했습니다.
+platform.wiki.users.join.request.saveNotification=사용자 ''{0}''({1})이 Wiki ''{2}''({3})에 가입을 요청했습니다.
+platform.wiki.users.join.request.success=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5} 가입 요청을 성공적으로 보냈습니다.
+platform.wiki.users.join.confirmation=정말로 Wiki {0}{1}{2}에 참여하시겠습니까?
+platform.wiki.users.join.yes=예
+platform.wiki.users.join.no=아니요
+platform.wiki.users.join.success=사용자 {0}{1}{2}이(가) Wiki {3}{4}{5}에 가입했습니다.
+platform.wiki.users.leave.error.userIsOwner=사용자 {0}{1}{2}은(는) Wiki {3}{4}{5}의 소유자입니다. 위키 소유자는 위키가 삭제되거나 소유자가 변경되지 않는 한 위키를 떠날 수 없습니다.
+platform.wiki.users.leave.confirmation=정말로 Wiki {0}{1}{2}에서 나가시겠습니까?
+platform.wiki.users.leave.confirmation.yes=예
+platform.wiki.users.leave.confirmation.no=아니요
+platform.wiki.users.leave.success=사용자 {0}{1}{2}이(가) 성공적으로 Wiki {3}{4}{5}을(를) 떠났습니다.
+platform.wiki.users.join.title=위키 가입
+platform.wiki.users.leave.title=Wiki "{0}" 나가기
+platform.wiki.users.leave.empty=위키 나가기
+platform.wiki.users.delete.title=위키 "{0}" 삭제
+platform.wiki.users.delete.empty=위키 삭제
+platform.wiki.users.invitation.reply.hint=보낼 응답 메시지로, 위키 관리자가 볼 수 있으며 이를 통해 결정에 동기를 부여할 수 있습니다.
+platform.wiki.users.join.request.hint=Wiki {0}{1}{2}에 가입하려면 먼저 가입 요청을 발행해야 합니다. 그렇게 하면 위키 관리자가 귀하의 요청을 검토하고 고려할 것입니다.
+platform.wiki.users.join.request.message.hint=이 가입 요청에 동기를 부여할 수 있는 위키 관리자가 볼 수 있는 보낼 메시지입니다.
+platform.wiki.users.invitation.title=귀하는 Wiki {0}{1}{2}에 가입하도록 초대되었습니다.
+platform.wiki.users.invitation.message.label=초대 메시지
+platform.wiki.users.invitation.reply.title=회신하다
+platform.wiki.users.invitation.accept.label=수용하다
+platform.wiki.users.invitation.reject.label=거부하다
+platform.wiki.users.invitation.postpone.label=나중에
+platform.wiki.users.join.request.message.label=메시지
+platform.wiki.users.join.request.send.label=요청 보내기
+platform.wiki.users.join.request.cancel.label=뒤쪽에
+
+## User profile
+platform.wiki.users.profile.joinedwikis.label=가입한 위키
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=귀하는 아직 위키의 회원이 아닙니다.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=사용자는 아직 위키의 회원이 아닙니다.
+platform.wiki.users.profile.activity.title=위키 {0} 활동
+platform.wiki.users.profile.activity.hint=특정 위키에 대한 활동 스트림을 생성합니다.
+platform.wiki.users.profile.activity.multipletitle=위키 활동 {0}
+platform.wiki.users.profile.activity.show=활동 표시
+
+## Wiki Deletion
+platform.wiki.delete.confirmation=위키 {0}{1}{2}을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다!
+platform.wiki.delete.confirmation.retypeWikiId=여기에 위키 식별자를 다시 입력해 주세요:
+platform.wiki.delete.error.wikiIdDoesNotMatch=삭제해야 하는 위키의 정확한 위키 식별자를 입력하세요.
+platform.wiki.delete.success=사용자 {0}{1}{2}이(가) ''{3}'' 위키를 삭제했습니다.
+
+## Wiki macro
+platform.wiki.macro.noWikis=현재 생성된 위키가 없습니다(기본 위키 제외).
+rendering.macro.wikis.name=위키
+rendering.macro.wikis.description=모든 위키 나열
+
+## LegacyWorkspaces macro
+rendering.macro.workspaces.name=작업공간(기존)
+rendering.macro.workspaces.description=호환성 문제로 인해 여기서는 사용하면 안 되는 매크로입니다. 대신 "위키" 매크로를 사용하세요.
+
+## Browse
+platform.wiki.browse=위키 찾아보기
+platform.wiki.browse.emptyvalue=해당 없음
+platform.wiki.browse.wikiprettyname=이름
+platform.wiki.browse.description=설명
+platform.wiki.browse.owner=소유자
+platform.wiki.browse.membershipType=회원 유형
+platform.wiki.browse.doc.creationDate=생산 일
+platform.wiki.browse._actions=행위
+platform.wiki.browse._actions.join=가입하다
+platform.wiki.browse._actions.requestJoin=가입 요청
+platform.wiki.browse._actions.viewInvitation=초대장 보기
+platform.wiki.browse._actions.cancelJoinRequest=요청 취소
+platform.wiki.browse._actions.leave=떠나다
+platform.wiki.browse._actions.delete=삭제
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=모든 사용자가 참여할 수 있도록 개방
+WikiManager.WikiUserClass_membershipType_request=모든 글로벌 사용자가 가입을 요청할 수 있지만 관리자가 수락해야 합니다
+WikiManager.WikiUserClass_membershipType_invite=관리자만이 이 위키에 가입하기 위한 초대장을 보낼 수 있습니다
+WikiManager.WikiUserClass_userScope_local_only=위키에서는 로컬 사용자만 사용할 수 있습니다
+WikiManager.WikiUserClass_userScope_global_only=위키에서는 글로벌 사용자만 사용할 수 있습니다
+WikiManager.WikiUserClass_userScope_local_and_global=×번
+platform.wiki.prop.wikiname=위키 식별자
+platform.wiki.prop.wikiprettyname=예쁜 이름
+platform.wiki.prop.wikialias=별명
+platform.wiki.prop.description=설명
+platform.wiki.prop.owner=소유자
+platform.wiki.prop.membershipType.label=회원 유형
+platform.wiki.prop.membershipType.hint=사용자가 이 위키에 참여할 수 있는 방법입니다.
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=새 위키의 고유 식별자입니다.
+platform.wiki.create.wizard.desc.wikiprettyname=위키의 표시 이름입니다.
+platform.wiki.create.wizard.desc.wikialias=위키를 가리키는 도메인 이름입니다.
+platform.wiki.create.wizard.desc.newTemplateHint=이 새 Wiki에 사용할 템플릿입니다(모든 페이지가 복제됩니다).
+platform.wiki.create.wizard.desc.description=위키와 그 목적에 대한 간략한 설명입니다.
+platform.wiki.create.wizard.desc.owner=관리에 구성된 권한과 관계없이 항상 이 Wiki에 대한 모든 권한을 갖는 사용자입니다.
+platform.wiki.create.wizard.desc.members=위키에 참여할 수 있는 사용자입니다.
+platform.wiki.create.wizard.step.nameAndType=1단계 - 이름 선택
+platform.wiki.create.wizard.step.nameAndType.shortname=이름
+platform.wiki.create.wizard.step.users=2단계 - 구성원 선택
+platform.wiki.create.wizard.step.users.shortname=사용자
+platform.wiki.create.wizard.step.cleaningUp=청소
+platform.wiki.create.wizard.step.provisioning.cleanUp=이 위키 정리 및 삭제
+platform.wiki.create.wizard.step.cleaningup.success=Wiki {0}이(가) 성공적으로 삭제되었습니다.
+platform.wiki.create.wizard.step.cleaningup.error=오류, Wiki {0}이(가) 삭제되지 않았습니다.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=위키 {0}을(를) 삭제하려고 합니다. 확인 해주세요.
+platform.wiki.create.wizard.step.cleaningUp.confirm=확인하다
+platform.wiki.create.wizard.setAsTemplate.label=이 위키는 템플릿이 될 것입니다
+platform.wiki.create.wizard.template.noTemplate=템플릿 없음(기본값)
+platform.wiki.create.wizard.userScope.label=사용자 범위
+platform.wiki.create.wizard.userScope.hint=위키에 액세스할 수 있는 사용자 유형을 선택하세요
+platform.wiki.create.wizard.template.label=주형
+platform.wiki.create.wizard.flavortemplate.label=기호 / 템플릿
+platform.wiki.create.wizard.flavortemplate.hint=새 위키의 초기 콘텐츠로 사용할 플레이버 또는 템플릿
+platform.wiki.create.wizard.flavortemplate.flavorTab=기호
+platform.wiki.create.wizard.flavortemplate.templateTab=주형
+platform.wiki.create.wizard.step.dw="만들기" 버튼을 클릭하면 위키가 생성되고 위키 초기화를 돕기 위해 배포 마법사가 시작됩니다 . 마법사를 건너뛰면 위키가 비어 있게 됩니다.
+platform.wiki.create.wizard.step.previous=이전 단계
+platform.wiki.create.wizard.step.next=다음 단계
+platform.wiki.create.wizard.step.create=만들기
+platform.wiki.create.wizard.step.creation=위키 생성
+platform.wiki.create.wizard.step.creation.wait=위키가 생성될 때까지 기다려 주세요.
+platform.wiki.create.wizard.step.creation.complete=Wiki {0}이(가) 성공적으로 생성되었습니다. 이제 액세스할 수 있습니다.
+platform.wiki.create.wizard.step.creation.errorlog=그러나 해당 프로세스 중에 오류가 발생했으며 이를 검토하는 것이 좋습니다.
+platform.wiki.create.wizard.step.creation.error=Wiki {0} 생성에 실패했습니다. 삭제하는 것이 좋습니다.
+platform.wiki.create.wizard.step.creation.go=위키로 이동
+
+## Admin
+admin.wikis.description=위키 관리.
+admin.wikis.templates=위키 템플릿
+admin.wikis.templates.description=위키 템플릿 관리
+admin.wikis.templates.hint=템플릿은 새 위키를 생성하기 위한 모델로 간주되는 위키입니다. 사용자가 새 Wiki를 만들기 위해 템플릿을 선택하면 템플릿의 모든 콘텐츠가 새 Wiki에 복사됩니다.
+admin.wikis.rights=창조권
+
+## XWikiServer Sheet
+platform.wiki.sheet.title=위키 "{0}"의 설명자
+platform.wiki.sheet.erroraliasalreadynotexists=Wiki 별칭 "{0}"이(가) 이미 존재합니다.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki 별칭 "{0}"이(가) 존재하지 않습니다.
+platform.wiki.sheet.title.settings=위키 속성
+platform.wiki.sheet.title.createnewalias=새 별칭 만들기
+platform.wiki.sheet.title.viewaliases=별칭 보기
+platform.wiki.sheet.desc.wikiprettyname=위키의 표시 이름입니다.
+platform.wiki.sheet.desc.owner=이 위키에 대한 모든 권리를 가지는 사용자입니다.
+platform.wiki.sheet.desc.secure=활성화되면 이 위키에서 생성된 모든 외부 URL은 "https"로 시작됩니다.
+platform.wiki.sheet.desc.port=이 위키에서 생성된 모든 외부 URL에 사용할 포트입니다. 설정하지 않으면 구성 및 기본 위키에서 상속됩니다. 도메인 기반 URL에 대해서만 고려됩니다.
+platform.wiki.sheet.desc.iswikitemplate=새 위키를 만들 때 이 위키를 템플릿으로 사용할 수 있는지 표시합니다.
+platform.wiki.sheet.desc.server=Wiki에 액세스하는 데 사용되는 별칭입니다.
+platform.wiki.sheet.desc.description=간략한 위키 설명입니다.
+platform.wiki.sheet.desc.homepage=위키 홈페이지입니다.
+platform.wiki.sheet.prop.wikiprettyname=친화적인 이름
+platform.wiki.sheet.prop.owner=소유자
+platform.wiki.sheet.prop.secure=보안(SSL)
+platform.wiki.sheet.prop.port=포트
+platform.wiki.sheet.prop.description=설명
+platform.wiki.sheet.prop.server=별명
+platform.wiki.sheet.prop.homepage=홈페이지
+platform.wiki.sheet.prop.iswikitemplate=위키 템플릿
+platform.wiki.sheet.descriptor=이 페이지는 "{0}" 위키에 액세스하는 방법과 이에 대한 일부 속성을 정의합니다. 더 많은 구성을 보려면 다음으로 이동하세요
+platform.wiki.sheet.descriptor.admin=위키의 관리 페이지입니다.
+platform.wiki.sheet.aliases=별칭은 위키의 또 다른 이름입니다. 별칭을 추가하여 위키에 대한 다양한 URL을 생성할 수 있습니다.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.1
+#######################################
+platform.wiki.dependencies.applicationmanager.missing={0}애플리케이션 관리자 플러그인{1}이 설치되지 않았습니다. 설치한 후 다시 시도해 주세요.
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wikis=위키
+admin.wikis.template=위키 템플릿
+
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=시스템이 위키를 프로비저닝하고 있습니다.
+platform.wiki.create.wizard.step.provisioning.wait=시스템이 Wiki를 제공하는 동안 잠시 기다려 주십시오.
+platform.wiki.create.wizard.step.provisioning.complete=위키가 거의 준비되었습니다. 마지막 작업을 수행하려면 "완료"를 클릭하세요.
+platform.wiki.create.wizard.step.provisioning.error=Wiki {0}이(가) 생성되었지만 템플릿에 포함된 일부 페이지가 복사되지 않았습니다. 아마도 삭제해야 할 것입니다.
+platform.wiki.create.wizard.step.provisioning.finalize=마무리
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=네, 이 위키를 삭제해주세요!
+platform.wiki.delete.confirmation.no=아니, 날 다시 데려가 주세요!
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

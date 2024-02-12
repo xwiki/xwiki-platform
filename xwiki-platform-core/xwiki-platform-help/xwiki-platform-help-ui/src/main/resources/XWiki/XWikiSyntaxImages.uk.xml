@@ -1,0 +1,139 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxImages" locale="uk">
+  <web>XWiki</web>
+  <name>XWikiSyntaxImages</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxImages</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Редагування =
+
+== Зображення ==
+
+=== 1.0 Images ===
+
+|=Функція|=Синтаксис XWiki 1.0|=Результат
+|Зображення з вкладення поточної сторінки|(((
+{{info}}Детальніше [[Image Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]]{{/info}}
+{{{{image:img.png}}}}
+)))|image:XWiki.XWikiSyntaxImages@img.png
+|Зображення з вкладення іншої сторінки|{{{{image:img.png|document=Space.Page}}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Зображення з параметрами|{{{{image:img.png|width=25|height=25}}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Зображення, розташовані за URL|{{{https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+
+=== 2.0 Images ===
+
+|=Функція|=Синтаксис XWiki 2.0|=Результат
+|Зображення з вкладення поточної сторінки|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Зображення з вкладення іншої сторінки|{{{image:Space.Page@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Зображення з параметрами|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Зображення з підписом|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] підтримує підписи.&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] підтримує підписи.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
+|Зображення, розташовані за URL|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+
+{{velocity}}$subHeading Специфікація зображення синтасксис XWiki 2.0 $subHeading{{/velocity}}
+
+{{info}}
+Частина в ##( )## є обов'язковою, тоді як частини в ##[ ]## необов'язкові.
+{{/info}}
+
+The full format of an image is either **##image~: (reference)##** or **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
+
+* **##caption##**: Необов'язковий підпис. Може містити довільний синтаксис XWiki 2.0, але синтаксис вкладеного посилання має бути екранований за допомогою ##~~##. Підпис підтримується, лише якщо синтаксис зображення є єдиним вмістом абзацу. Зображення з підписом також можна загорнути в посилання. У цьому випадку посилання міститиме зображення, але не підпис.
+* **##image~:##** Обов'язковий рядок, що визначає ресурс як зображення.
+* **##reference##**: Посилання на зображення, яке має відображатися в одній із таких форм:
+** **URL**: Будь-яка URL-адреса зображення у вигляді **##http:~/~/path/imageName##**. Наприклад: ##http:~/~/domain.org/path/img.png##
+** **Attachment**: Посилання у формі **##~{~{~{wikiName:} space.} page@} (imageName)##**
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання на зображення вказуватиме на зображення, прикріплене до сторінки цієї вікі. Наприклад: mywiki
+*** **##space##**: Необов'язкова назва простору вікі. Якщо не вказано простір, використовується поточний простір. Наприклад: Main
+*** **##page##**: Необов'язковий рядок, що містить назву вікі-сторінки, до якої прикріплено зображення, на яке посилається. Наприклад: WebHome
+*** **##imageName##**: Обов'язковий рядок, що містить назву зображення, доданого до сторінки, оскільки воно зберігається у вікі.
+* **##parameters##**: Необов'язковий список параметрів, відокремлених пробілами, які передаються до зображення. Наприклад: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTML attributes**: Усі атрибути, визначені стандартом HTML, будуть додані до візуалізованого HTML ##&lt;img&gt;## тегу.
+*** **##style##**: Інформація про стиль CSS, який потрібно застосувати до зображення. Приклади: ##style="float:right;height:50"## (image on right side, height 50 px), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (зображення по центру, ширина становить 80% ширини блоку), ##style="vertical-align:bottom"## (текст починається в нижній частині зображення)
+*** **##height##**: Параметр, який визначає висоту відображуваного зображення. Значення має бути подано або в пікселях (приклад: ##height="80"##), або в пікселях, пов'язаних із висотою блоку, що містить зображення (приклад: ##height="40%"##).
+*** **##width##**: Параметр, який визначає ширину відображеного зображення. Значення має бути подано або в пікселях (приклад: ##width="80"##), або в пікселях, пов'язаних із шириною блоку, що містить зображення (приклад: ##width="40%"##).
+*** **##title##**: Параметр, який визначає назву відображеного зображення, яке буде видно, наприклад, якщо навести на нього кнопку миші. Наприклад: ##title="My nice image"##
+*** **##alt##**: Параметр, який визначає, який текст має відображатися, якщо браузер не може відобразити зображення. Оскільки це обов'язковий HTML-атрибут, XWiki використовуватиме замість нього ім'я файлу, якщо параметр ##alt## не визначено. Наприклад: ##alt="img.png"##
+*** **More**: Детальніше пояснення HTML ##&lt;img&gt;## тегів, що містять більше атрибутів, можна переглянути [[HTML standard&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
+
+=== 2.1 Images ===
+
+|=Функція|=Синтаксис XWiki 2.1|=Результат
+|Зображення з вкладення поточної сторінки|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Зображення з вкладення іншої сторінки|{{{image:PageA.PageB@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Зображення з параметрами|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Зображення з підписом|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] підтримує підписи.&gt;&gt;image:img.png]]}}}|((([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] підтримує підписи.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
+|Зображення, розташовані за URL|{{{image:https://some/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
+|Prepackaged Icons|{{{image:icon:accept}}}|image:icon:accept
+
+{{velocity}}$subHeading Специфікація зображення синтасксис XWiki 2.1 $subHeading{{/velocity}}
+
+{{info}}
+Частина в ##( )## є обов'язковою, тоді як частини в ##[ ]## необов'язкові.
+{{/info}}
+
+The full format of an image is either **##image~: (reference)##** or **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]##**
+
+* **##caption##**: Необов'язковий підпис. Може містити довільний синтаксис XWiki 2.1, але синтаксис вкладеного посилання має бути екранований за допомогою ##~~##. Підпис підтримується, лише якщо синтаксис зображення є єдиним вмістом абзацу. Зображення з підписом також можна загорнути в посилання. У цьому випадку посилання міститиме зображення, але не підпис.
+* **##image~:##** Обов'язковий рядок, що визначає ресурс як зображення.
+* **##reference##**: Посилання на зображення, яке має відображатися в одній із таких форм:
+** **URL**: Будь-яка URL-адреса зображення у вигляді **##[url:](protocol:~/~/path/imageName)##**. Наприклад: ##http:~/~/domain.org/path/img.png##
+*** **##url:##** Необов'язковий рядок, що визначає зображення як URL-адресу.
+*** **##protocol:~/~/path/imageName##**: URL-адреса зображення
+** **Attachment**: Посилання у формі **##[attach~:]~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##**
+*** **##attach~:##** Необов'язковий рядок, що ідентифікує посилання як вкладення документа XWiki.
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання на зображення вказуватиме на зображення, прикріплене до сторінки цієї вікі. Якщо не вказано жодної вікі, використовується поточна вікі. Наприклад: ##mywiki##.
+*** **##spaceNameList##**: Необов'язковий список назв вікі-просторів, відокремлених крапками. Якщо не вказано простір, використовується поточний простір. Приклади ##Main##, ##A.B##, ##A.B.C##
+*** **##pageName##**: Необов'язковий рядок, що містить назву вікі-сторінки, до якої приєднано зображення, на яке посилається. Наприклад: ##Welcome##
+*** **##imageName##**: Обов'язковий рядок, що містить назву зображення, доданого до сторінки, оскільки воно зберігається у вікі. Наприклад: ##myImage.png##
+** **Page Attachment**: Посилання у формі **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##**
+*** **##pageAttach~:##** Обов'язковий рядок, що визначає посилання як вкладення сторінки XWiki.
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання на зображення вказуватиме на зображення, прикріплене до сторінки цієї вікі. Якщо не вказано жодної вікі, використовується поточна вікі. Наприклад: ##mywiki##.
+*** **##pageNameList##**: Необов'язковий список назв вікі-сторінок, відокремлених крапками. Якщо не вказано жодної сторінки, використовується поточна сторінка. Приклади: ##Main##, ##A/B##, ##A/B/C##
+*** **##imageName##**: Обов'язковий рядок, що містить назву зображення, доданого до сторінки, оскільки воно зберігається у вікі. Наприклад: ##myImage.png##
+** **Icon**: Посилання у формі **##icon{{{:(}}}iconName)##**. Наприклад: **##icon:accept##**
+*** **##icon:##** Обов'язковий рядок, що ідентифікує посилання на зображення як піктограму із [[XWiki Icon Set&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
+*** **##iconName##**: Обов'язковий рядок, що ідентифікує піктограму, на який посилається. Наприклад: ##accept##
+** **Data URI**: Посилання у формі **##(data{{{:)}}}(content)##**. Наприклад: **##{{{data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##**
+*** **##data:##** Обов'язковий рядок, який ідентифікує зображення як таке, що вказано всередині за допомогою [[Data URI scheme&gt;&gt;https://en.wikipedia.org/wiki/Data_URI_scheme]].
+*** **##content##**: Закодоване зображення. Наприклад: ##{{{image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##
+* **##parameters##**: Необов'язковий список параметрів, відокремлених пробілами, які передаються до зображення. приклад: ##width="800" height="600" alt="img.png" title="My nice image"##
+** **HTML attributes**: Усі атрибути, визначені стандартом HTML, будуть додані до візуалізованого HTML ##&lt;img&gt;## тегу.
+*** **##style##**: Інформація про стиль CSS, який потрібно застосувати до зображення. Приклади: ##style="float:right;height:50"## (image on right side, height 50 px), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (зображення по центру, ширина становить 80% ширини блоку), ##style="vertical-align:bottom"## (текст починається в нижній частині зображення)
+*** **##height##**: Параметр, який визначає висоту відображуваного зображення. Значення має бути подано або в пікселях (приклад: ##height="80"##), або в пікселях, пов'язаних із висотою блоку, що містить зображення (приклад: ##height="40%"##).
+*** **##width##**: Параметр, який визначає ширину відображеного зображення. Значення має бути подано або в пікселях (приклад: ##width="80"##), або в пікселях, пов'язаних із шириною блоку, що містить зображення (приклад: ##width="40%"##).
+*** **##title##**: Параметр, який визначає назву відображеного зображення, яке буде видно, наприклад, якщо навести на нього кнопку миші. Наприклад: ##title="My nice image"##
+*** **##alt##**: Параметр, який визначає, який текст має відображатися, якщо браузер не може відобразити зображення. Оскільки це обов'язковий HTML-атрибут, XWiki використовуватиме замість нього ім'я файлу, якщо параметр ##alt## не визначено. Наприклад: ##alt="img.png"##
+*** **More**: Детальніше пояснення HTML ##&lt;img&gt;## тегів, що містять більше атрибутів, можна переглянути [[HTML standard&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
+** **##queryString##**: Дозволяє надсилати запити на сервер під час створення посилання для завантаження зображення, на яке посилається. Наприклад: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## зазнає невдачі, якщо ##width## та ##height## параметри вказуються додатково до ##queryString##!**)</content>
+  </xwikidoc>

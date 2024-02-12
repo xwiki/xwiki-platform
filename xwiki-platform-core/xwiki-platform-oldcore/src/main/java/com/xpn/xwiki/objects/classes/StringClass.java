@@ -19,7 +19,12 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.ecs.xhtml.input;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -29,6 +34,8 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+
+import static org.apache.commons.lang.StringEscapeUtils.escapeJavaScript;
 
 public class StringClass extends PropertyClass
 {
@@ -89,7 +96,8 @@ public class StringClass extends PropertyClass
     }
 
     @Override
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         input.setAttributeFilter(new XMLAttributeValueFilter());
@@ -105,23 +113,9 @@ public class StringClass extends PropertyClass
         input.setDisabled(isDisabled());
 
         if (isPicker()) {
-            input.setClass("suggested");
-            String path = "";
-            XWiki xwiki = context.getWiki();
-            path = xwiki.getURL("Main.WebHome", "view", context);
-
-            String classname = this.getObject().getName();
-            String fieldname = this.getName();
-            String secondCol = "-", firstCol = "-";
-
-            String script =
-                "\"" + path + "?xpage=suggest&classname=" + classname + "&fieldname=" + fieldname + "&firCol="
-                    + firstCol + "&secCol=" + secondCol + "&\"";
-            String varname = "\"input\"";
-            input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + "} )");
+            displayPickerEdit(input);
         }
-
-        buffer.append(input.toString());
+        buffer.append(input);
     }
 
     @Override
@@ -132,5 +126,30 @@ public class StringClass extends PropertyClass
         if (property != null) {
             buffer.append(XMLUtils.escapeElementText(property.toText()));
         }
+    }
+
+    private void displayPickerEdit(input input)
+    {
+        input.setClass("suggested");
+        XWikiContext xWikiContext = getXWikiContext();
+        XWiki xwiki = xWikiContext.getWiki();
+        String path = xwiki.getURL(new LocalDocumentReference("Main", "WebHome"), "view", xWikiContext);
+        String stringBuilder = String.format("%s?%s&", path, new EscapeTool().url(getParametersMap()));
+        input.setOnFocus(String.format("new ajaxSuggest(this, {script:\"%s\", varname:\"input\"} )",
+            escapeJavaScript(stringBuilder)));
+    }
+
+    private Map<String, String> getParametersMap()
+    {
+        String dash = "-";
+        // Using a linked hash map to keep the order of the keys stable when generating the query parameters, which 
+        // is especially handy for testing, but could be useful in other scenarios.
+        Map<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("xpage", "suggest");
+        parameters.put("classname", getObject().getName());
+        parameters.put("fieldname", getName());
+        parameters.put("firCol", dash);
+        parameters.put("secCol", dash);
+        return parameters;
     }
 }

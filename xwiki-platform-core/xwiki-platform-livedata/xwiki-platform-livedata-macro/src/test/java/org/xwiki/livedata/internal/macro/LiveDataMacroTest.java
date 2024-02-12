@@ -175,7 +175,7 @@ class LiveDataMacroTest
         expectedConfig.append("    'pagination':{".trim());
         expectedConfig.append("      'pageSizes':[15,25,50],".trim());
         expectedConfig.append("      'showPageSizeDropdown':true".trim());
-        expectedConfig.append("    }".trim());
+        expectedConfig.append("    },'description':'A description'".trim());
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
@@ -194,6 +194,7 @@ class LiveDataMacroTest
         parameters.setLayouts("table, cards");
         parameters.setShowPageSizeDropdown(true);
         parameters.setPageSizes("15, 25, 50");
+        parameters.setDescription("A description");
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, null, this.context);
         assertBlocks(expected, blocks, this.rendererFactory);

@@ -8,7 +8,7 @@ org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerComponentBui
 org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerDocumentInitializer
 org.xwiki.notifications.notifiers.internal.email.DefaultNotificationEmailRenderer
 org.xwiki.notifications.notifiers.internal.email.DefaultPeriodicMimeMessageIterator
-org.xwiki.notifications.notifiers.internal.email.EmailTemplateRenderer
+org.xwiki.notifications.notifiers.internal.email.DefaultEmailTemplateRenderer
 org.xwiki.notifications.notifiers.internal.email.LogoAttachmentExtractor
 org.xwiki.notifications.notifiers.internal.email.MailTemplateImageAttachmentsExtractor
 org.xwiki.notifications.notifiers.internal.email.UserAvatarAttachmentExtractor

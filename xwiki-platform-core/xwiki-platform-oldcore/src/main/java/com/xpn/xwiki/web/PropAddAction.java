@@ -19,9 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
@@ -80,13 +77,10 @@ public class PropAddAction extends XWikiAction
         BaseClass bclass = doc.getXClass();
         bclass.setName(doc.getFullName());
         if (bclass.get(propName) != null) {
-            context.put("message", "action.addClassProperty.error.alreadyExists");
-            List<String> parameters = new ArrayList<String>();
-            parameters.add(propName);
-            context.put("messageParameters", parameters);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                localizePlainOrKey("action.addClassProperty.error.alreadyExists", parameters.toArray()));
-            return true;
+            String localizedMessage =
+                localizePlainOrReturnKey("action.addClassProperty.error.alreadyExists", propName);
+            writeAjaxErrorResponse(HttpServletResponse.SC_BAD_REQUEST, localizedMessage, context);
+            return false;
         } else {
             MetaClass mclass = xwiki.getMetaclass();
             PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);

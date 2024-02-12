@@ -76,8 +76,8 @@
 #-# The directory used to store persistent data (data that should persist across server restarts). This is an
 #-# important directory containing important data and thus it should never be deleted (it should be backed-up along
 #-# with the database).
-#-# For example this is where the Extension Manager stores downloaded extensions if the extension.localRepository
-#-# property isn't configured.
+#-# For example this is where the Extension Manager stores downloaded extensions (unless extension.localRepository
+#-# property is configured to a different location).
 #-#
 #-# You can set:
 #-# * an absolute path (recommended)
@@ -573,9 +573,8 @@ extension.repositories = $extensionRepository
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.
 #-#
-#-# The default is extension/repository in whatever is the general persistent directory.
-#-# See container.persistentDirectory.
-# extension.localRepository=extension/repository
+#-# The default is {environment.permanentDirectory}/extension/repository.
+# extension.localRepository=/var/lib/xwiki/data/extension/repository
 
 #-# [Since 3.4]
 #-# The user agent to use when communication with external services (generally repositories).

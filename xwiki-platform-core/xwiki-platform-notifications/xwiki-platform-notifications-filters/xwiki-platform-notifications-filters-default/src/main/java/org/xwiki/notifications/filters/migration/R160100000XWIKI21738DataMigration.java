@@ -46,9 +46,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
@@ -96,7 +94,7 @@ public class R160100000XWIKI21738DataMigration extends AbstractHibernateDataMigr
     @Override
     public String getDescription()
     {
-        return "Migrate filters next to users.";
+        return "Migrate filters in the same DB than their owners.";
     }
 
     @Override
@@ -140,8 +138,9 @@ public class R160100000XWIKI21738DataMigration extends AbstractHibernateDataMigr
                     .execute();
 
                 this.logger.info("Found [{}] filters to migrate...", filters.size());
-
-                this.migrateFilters(filters);
+                if (!filters.isEmpty()) {
+                    this.migrateFilters(filters);
+                }
             } catch (QueryException e) {
                 throw new DataMigrationException("Error when trying to retrieve filters to move", e);
             }
@@ -158,9 +157,6 @@ public class R160100000XWIKI21738DataMigration extends AbstractHibernateDataMigr
     private void migrateFilters(List<DefaultNotificationFilterPreference> filters)
         throws XWikiException, DataMigrationException
     {
-        XWikiContext context = getXWikiContext();
-        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-
         List<Long> internalIds = new ArrayList<>();
         Map<EntityReference, List<NotificationFilterPreference>> filtersToStore = new HashMap<>();
 
@@ -176,6 +172,7 @@ public class R160100000XWIKI21738DataMigration extends AbstractHibernateDataMigr
                         filterPreferenceList = new ArrayList<>();
                         filtersToStore.put(entityReference, filterPreferenceList);
                     }
+                    // We clone filter to ensure using new ids when storing.
                     filterPreferenceList.add(new DefaultNotificationFilterPreference(filter, false));
                 } else {
                     this.logger.warn("Owner [{}] of some filter preferences belongs to a wiki that does not long exist"
@@ -207,9 +204,8 @@ public class R160100000XWIKI21738DataMigration extends AbstractHibernateDataMigr
                     String.format("Error when trying to save filters to migrate for [%s]", entityReference), e);
             }
         }
-
         if (!internalIds.isEmpty()) {
-            hibernateStore.executeWrite(context, session ->
+            getStore().executeWrite(getXWikiContext(), session ->
                 session.createQuery(DELETE_FILTER_STATEMENT).setParameter("listIds", internalIds)
                     .executeUpdate());
         }

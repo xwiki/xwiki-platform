@@ -137,8 +137,8 @@ public class R160100000XWIKI21738DataMigration extends AbstractHibernateDataMigr
                     .setLimit(BATCH_SIZE)
                     .execute();
 
-                this.logger.info("Found [{}] filters to migrate...", filters.size());
-                if (!filters.isEmpty()) {
+                if (!filters.isEmpty() && (previousFilters == null || !previousFilters.equals(filters))) {
+                    this.logger.info("Found [{}] filters to migrate...", filters.size());
                     this.migrateFilters(filters);
                 }
             } catch (QueryException e) {

@@ -58,6 +58,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -92,7 +93,7 @@ class R160100000XWIKI21738DataMigrationTest
     private HibernateStore hibernateStore;
 
     @RegisterExtension
-    private static LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private XWikiHibernateStore hibernateBaseStore;
 
@@ -129,7 +130,7 @@ class R160100000XWIKI21738DataMigrationTest
         String mainWikiId = "mainWiki";
         when(this.wikiDescriptorManager.getMainWikiId()).thenReturn(mainWikiId);
 
-        // We simulate 2 loops
+        // We simulate 2 loops (3rd is just getting empty value)
         Query query1 = mock(Query.class, "query1");
         Query query2 = mock(Query.class, "query2");
         Query query3 = mock(Query.class, "query3");
@@ -238,7 +239,7 @@ class R160100000XWIKI21738DataMigrationTest
         when(sessionQuery2.setParameter("listIds", List.of(filterId4, filterId5, filterId6))).thenReturn(sessionQuery2);
 
         this.dataMigration.hibernateMigrate();
-        assertEquals(7, logCapture.size());
+        assertEquals(6, logCapture.size());
         // Loop 1
         assertEquals("Found [3] filters to migrate...", logCapture.getMessage(0));
         assertEquals("Migrating filters for [3] entities", logCapture.getMessage(1));
@@ -250,8 +251,7 @@ class R160100000XWIKI21738DataMigrationTest
         assertEquals("Migrating filters for [1] entities", logCapture.getMessage(4));
 
         // Loop 3
-        assertEquals("Found [0] filters to migrate...", logCapture.getMessage(5));
-        assertEquals("No more filters found to migrate.", logCapture.getMessage(6));
+        assertEquals("No more filters found to migrate.", logCapture.getMessage(5));
 
         verify(this.filterPreferenceStore).saveFilterPreferences(new WikiReference("foo"), List.of(
             new DefaultNotificationFilterPreference(filterPref1, false)
@@ -270,5 +270,93 @@ class R160100000XWIKI21738DataMigrationTest
         );
         verify(sessionQuery1).executeUpdate();
         verify(sessionQuery2).executeUpdate();
+    }
+
+    @Test
+    void hibernateMigrateDeletionError()
+        throws QueryException, NotificationException, XWikiException, WikiManagerException
+    {
+        String mainWikiId = "mainWiki";
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn(mainWikiId);
+
+        // We simulate 2 loops returning same values
+        Query query1 = mock(Query.class, "query1");
+        Query query2 = mock(Query.class, "query2");
+
+        when(this.queryManager.createQuery("select nfp "
+            + "from DefaultNotificationFilterPreference nfp "
+            + "where nfp.owner not like :ownerLike and nfp.owner <> :mainWiki "
+            + "order by nfp.owner, nfp.internalId", Query.HQL))
+            .thenReturn(query1)
+            .thenReturn(query2);
+
+        QueryParameter queryParameter1 = mock(QueryParameter.class, "queryParam1");
+        when(query1.bindValue("ownerLike")).thenReturn(queryParameter1);
+        when(queryParameter1.literal(any())).thenReturn(queryParameter1);
+        when(queryParameter1.anyChars()).thenReturn(queryParameter1);
+        when(queryParameter1.query()).thenReturn(query1);
+
+        QueryParameter queryParameter2 = mock(QueryParameter.class, "queryParam2");
+        when(query2.bindValue("ownerLike")).thenReturn(queryParameter2);
+        when(queryParameter2.literal(any())).thenReturn(queryParameter2);
+        when(queryParameter2.anyChars()).thenReturn(queryParameter2);
+        when(queryParameter2.query()).thenReturn(query2);
+
+        when(query1.bindValue("mainWiki", mainWikiId)).thenReturn(query1);
+        when(query2.bindValue("mainWiki", mainWikiId)).thenReturn(query2);
+
+        when(query1.setLimit(100)).thenReturn(query1);
+        when(query2.setLimit(100)).thenReturn(query2);
+
+        DefaultNotificationFilterPreference filterPref1 = mock(DefaultNotificationFilterPreference.class, "filter1");
+        DefaultNotificationFilterPreference filterPref2 = mock(DefaultNotificationFilterPreference.class, "filter2");
+        DefaultNotificationFilterPreference filterPref3 = mock(DefaultNotificationFilterPreference.class, "filter3");
+        when(query1.execute()).thenReturn(List.of(filterPref1, filterPref2, filterPref3));
+        when(query2.execute()).thenReturn(List.of(filterPref1, filterPref2, filterPref3));
+
+        XWikiContext context = mock(XWikiContext.class);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(this.execution.getContext()).thenReturn(executionContext);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(context);
+
+        String owner = "sub:XWiki.User1";
+        when(filterPref1.getOwner()).thenReturn(owner);
+        when(filterPref2.getOwner()).thenReturn(owner);
+        when(filterPref3.getOwner()).thenReturn(owner);
+
+        when(filterPref1.getInternalId()).thenReturn(1L);
+        when(filterPref2.getInternalId()).thenReturn(2L);
+        when(filterPref3.getInternalId()).thenReturn(3L);
+
+        when(this.wikiDescriptorManager.exists("sub")).thenReturn(true);
+
+        Session session1 = mock(Session.class, "session1");
+        when(this.hibernateBaseStore.executeWrite(eq(context), any())).then(invocationOnMock -> {
+            XWikiHibernateBaseStore.HibernateCallback callback = invocationOnMock.getArgument(1);
+            return callback.doInHibernate(session1);
+        });
+        org.hibernate.query.Query sessionQuery1 = mock(org.hibernate.query.Query.class, "sessionQuery1");
+        when(session1.createQuery("delete from DefaultNotificationFilterPreference nfp "
+            + "where nfp.internalId IN (:listIds)")).thenReturn(sessionQuery1);
+        when(sessionQuery1.setParameter("listIds", List.of(1L, 2L, 3L))).thenReturn(sessionQuery1);
+
+        DataMigrationException dataMigrationException =
+            assertThrows(DataMigrationException.class, () -> this.dataMigration.hibernateMigrate());
+        assertEquals("Error while performing the migration: filters are not properly deleted.",
+            dataMigrationException.getMessage());
+
+        assertEquals(2, logCapture.size());
+        // Loop 1
+        assertEquals("Found [3] filters to migrate...", logCapture.getMessage(0));
+        assertEquals("Migrating filters for [1] entities", logCapture.getMessage(1));
+
+        verify(this.filterPreferenceStore).saveFilterPreferences(new DocumentReference("sub", "XWiki", "User1"),
+            List.of(
+                new DefaultNotificationFilterPreference(filterPref1, false),
+                new DefaultNotificationFilterPreference(filterPref2, false),
+                new DefaultNotificationFilterPreference(filterPref3, false)
+            )
+        );
+        verify(sessionQuery1).executeUpdate();
     }
 }

@@ -20,7 +20,9 @@
 package org.xwiki.ckeditor.test.po;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +45,28 @@ import org.xwiki.test.ui.po.BaseElement;
 public class RichTextAreaElement extends BaseElement
 {
     /**
+     * Provides information about the content of the rich text area.
+     *
+     * @since 16.1.0RC1
+     * @since 15.10.7
+     */
+    public class RichTextAreaContent
+    {
+        /**
+         * @return the list of images included in the rich text area
+         */
+        public List<WebElement> getImages()
+        {
+            return getDriver().findElements(By.cssSelector("body img"));
+        }
+    }
+
+    /**
      * The in-line frame element.
      */
     private final WebElement iframe;
+
+    private final RichTextAreaContent content = new RichTextAreaContent();
 
     /**
      * Creates a new rich text area element.
@@ -232,5 +253,20 @@ public class RichTextAreaElement extends BaseElement
         } finally {
             getDriver().switchTo().defaultContent();
         }
+    }
+
+    /**
+     * Executes some code in the context of the rich text area content window.
+     * 
+     * @param verifier the code that verifies the content of the rich text area
+     * @since 16.1.0RC1
+     * @since 15.10.7
+     */
+    public void verifyContent(Consumer<RichTextAreaContent> verifier)
+    {
+        getFromIFrame(() -> {
+            verifier.accept(this.content);
+            return null;
+        });
     }
 }

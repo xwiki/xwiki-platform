@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WindowType;
@@ -36,7 +37,6 @@ import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
@@ -58,7 +58,9 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 @UITest(
     properties = {
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        // Required to upload files during the real-time editing session.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
     },
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
@@ -574,12 +576,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Start fresh.
         setup.deletePage(testReference);
 
-        // Upload an image to test with.
-        String attachmentName = "image.gif";
-        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-        setup.createPage(testReference, "", "");
-        setup.attachFile(testReference, attachmentName, getClass().getResourceAsStream("/" + attachmentName), false);
-
         //
         // First Tab
         //
@@ -593,6 +589,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Second Tab
         //
 
+        // TODO: Find a way to open an incognito window that would allow us to login with a different user. Temporary
+        // attachments are stored in the user session so using two tabs where the same user is logged in doesn't allow
+        // us to verify that images uploaded by one user are visible to the other coeditors in the real-time session.
         String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
 
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
@@ -603,7 +602,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Insert the image with caption.
         ImageDialogSelectModal imageDialogSelectModal = secondEditor.getToolBar().insertImage();
-        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        imageDialogSelectModal.switchToUploadTab().upload("/image.gif");
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
@@ -620,6 +619,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().switchTo().window(firstTabHandle);
         firstTextArea.waitUntilTextContains("Tree");
         firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ");
+
+        // Verify that the image uploaded from the second tab is visible in the first tab.
+        firstTextArea.verifyContent((content) -> {
+            Dimension imageSize = content.getImages().get(0).getSize();
+            assertEquals(20, imageSize.width);
+            assertEquals(20, imageSize.height);
+        });
 
         //
         // Second Tab

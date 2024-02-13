@@ -1,0 +1,6 @@
+{
+  "extends": "xwiki-platform-tool-node-tsconfig",
+  "include": [
+    "lib/**/*"
+  ]
+}

@@ -233,6 +233,8 @@
     <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-zipexplorer</module>
+    <module>xwiki-platform-lib-a</module>
+    <module>xwiki-platform-lib-b</module>
   </modules>
   <profiles>
     <!-- Profile to build Legacy modules -->

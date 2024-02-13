@@ -1,0 +1,18 @@
+{
+  "name": "xwiki-platform-lib-a",
+  "type": "module",
+  "types": "dist/main.d.ts",
+  "exports": {
+    ".": {
+      "default": "dist/main.umd.cjs",
+      "types": "dist/main.dts"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "20.11.17",
+    "typescript": "^5.3.3",
+    "vite": "5.1.1",
+    "xwiki-platform-tool-node-tsconfig": "workspace:*",
+    "xwiki-platform-tool-node-viteconfig": "workspace:*"
+  }
+}

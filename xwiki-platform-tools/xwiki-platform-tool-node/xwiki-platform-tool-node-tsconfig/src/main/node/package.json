@@ -1,0 +1,7 @@
+{
+  "name": "xwiki-platform-tool-node-tsconfig",
+  "main": "tsconfig.json",
+  "files": [
+    "tsconfig.json"
+  ]
+}

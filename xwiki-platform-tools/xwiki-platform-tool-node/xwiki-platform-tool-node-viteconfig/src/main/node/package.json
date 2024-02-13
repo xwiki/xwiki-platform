@@ -1,0 +1,13 @@
+{
+  "name": "xwiki-platform-tool-node-viteconfig",
+  "main": "vite.config.js",
+  "files": [
+    "vite.config.js"
+  ],
+  "type": "module",
+  "devDependencies": {
+    "rollup-plugin-peer-deps-external": "2.2.4",
+    "vite": "5.1.1",
+    "vite-plugin-dts": "3.7.2"
+  }
+}

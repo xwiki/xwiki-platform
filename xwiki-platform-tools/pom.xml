@@ -40,6 +40,7 @@
     <module>xwiki-platform-tool-rootwebapp</module>
     <module>xwiki-platform-tool-standards-validator</module>
     <module>xwiki-platform-tool-xmldoc-update-plugin</module>
+    <module>xwiki-platform-tool-node</module>
   </modules>
   <properties>
     <!-- Don't run backward-compatibility checks in tools modules since we don't consider them public API -->

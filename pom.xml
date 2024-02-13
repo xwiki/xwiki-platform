@@ -1190,6 +1190,11 @@
         <artifactId>xwiki-commons-tool-webjar-handlers</artifactId>
         <version>${commons.version}</version>
       </extension>
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-webjar-node-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
       <!-- Needed to add support for the "xar" packaging -->
       <extension>
         <groupId>org.xwiki.commons</groupId>

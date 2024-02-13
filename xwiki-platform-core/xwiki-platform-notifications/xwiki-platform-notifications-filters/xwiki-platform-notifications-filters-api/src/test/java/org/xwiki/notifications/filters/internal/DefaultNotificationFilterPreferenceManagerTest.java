@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
@@ -35,7 +34,6 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -71,12 +69,6 @@ public class DefaultNotificationFilterPreferenceManagerTest
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
-
-    @BeforeComponent
-    void beforeComponent() throws Exception
-    {
-        this.componentManager.registerComponent(ComponentManager.class, this.componentManager);
-    }
 
     @BeforeEach
     public void setUp() throws Exception

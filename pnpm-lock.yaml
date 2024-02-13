@@ -8,15 +8,12 @@ importers:
 
   xwiki-platform-core/xwiki-platform-lib-a/src/main/node:
     devDependencies:
-      '@types/node':
-        specifier: 20.11.17
-        version: 20.11.17
       typescript:
-        specifier: ^5.3.3
+        specifier: 5.3.3
         version: 5.3.3
       vite:
         specifier: 5.1.1
-        version: 5.1.1(@types/node@20.11.17)
+        version: 5.1.1
       xwiki-platform-tool-node-tsconfig:
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-tools/xwiki-platform-tool-node/xwiki-platform-tool-node-tsconfig/src/main/node
@@ -30,15 +27,12 @@ importers:
         specifier: workspace:*
         version: link:../../../../xwiki-platform-lib-a/src/main/node
     devDependencies:
-      '@types/node':
-        specifier: 20.11.17
-        version: 20.11.17
       typescript:
         specifier: 5.3.3
         version: 5.3.3
       vite:
         specifier: 5.1.1
-        version: 5.1.1(@types/node@20.11.17)
+        version: 5.1.1
       xwiki-platform-tool-node-tsconfig:
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-tools/xwiki-platform-tool-node/xwiki-platform-tool-node-tsconfig/src/main/node
@@ -55,7 +49,7 @@ importers:
         version: 2.2.4(rollup@4.9.6)
       vite:
         specifier: 5.1.1
-        version: 5.1.1(@types/node@20.11.17)
+        version: 5.1.1
       vite-plugin-dts:
         specifier: 3.7.2
         version: 3.7.2(rollup@4.9.6)(typescript@5.3.3)(vite@5.1.1)
@@ -499,12 +493,6 @@ packages:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
 
-  /@types/node@20.11.17:
-    resolution: {integrity: sha512-QmgQZGWu1Yw9TDyAP9ZzpFJKynYNeOvwMJmaxABfieQoVoiVOS6MN1WSpqpRcbeA5+RW82kraAVxCCJg+780Qw==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: true
-
   /@volar/language-core@1.11.1:
     resolution: {integrity: sha512-dOcNn3i9GgZAcJt43wuaEykSluAuOkQgzni1cuxLxTV0nJKanQztp7FxyswdRILaKH+P2XZMPRp2S4MV/pElCw==}
     dependencies:
@@ -910,10 +898,6 @@ packages:
     hasBin: true
     dev: true
 
-  /undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
-    dev: true
-
   /universalify@0.1.2:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
     engines: {node: '>= 4.0.0'}
@@ -946,7 +930,7 @@ packages:
       debug: 4.3.4
       kolorist: 1.8.0
       typescript: 5.3.3
-      vite: 5.1.1(@types/node@20.11.17)
+      vite: 5.1.1
       vue-tsc: 1.8.27(typescript@5.3.3)
     transitivePeerDependencies:
       - '@types/node'
@@ -954,7 +938,7 @@ packages:
       - supports-color
     dev: true
 
-  /vite@5.1.1(@types/node@20.11.17):
+  /vite@5.1.1:
     resolution: {integrity: sha512-wclpAgY3F1tR7t9LL5CcHC41YPkQIpKUGeIuT8MdNwNZr6OqOTLs7JX5vIHAtzqLWXts0T+GDrh9pN2arneKqg==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -982,7 +966,6 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.11.17
       esbuild: 0.19.12
       postcss: 8.4.35
       rollup: 4.9.6

@@ -1,26 +1,17 @@
 {
   "name": "xwiki-platform-lib-b",
-  "version": "1.0.0",
-  "description": "",
   "type": "module",
   "types": "dist/main.d.ts",
-  "scripts": {
-    "build": "tsc --noEmit && vite build"
-  },
   "exports": {
     ".": {
       "default": "dist/main.umd.cjs",
       "types": "dist/main.dts"
     }
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "peerDependencies": {
     "xwiki-platform-lib-a": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "20.11.17",
     "typescript": "5.3.3",
     "vite": "5.1.1",
     "xwiki-platform-tool-node-tsconfig": "workspace:*",

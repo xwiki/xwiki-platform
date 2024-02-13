@@ -95,24 +95,29 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
     {
         return String.format("%s - All providers called failed, see exceptions: [%s].",
             loggerMessage,
-            exceptions.stream().map(Exception::getMessage).collect(Collectors.joining(",")));
+            exceptions.stream().map(ExceptionUtils::getRootCauseMessage).collect(Collectors.joining(",")));
     }
 
     private void providerExceptionWrapper(ProviderCallable callable, String loggerMessage) throws NotificationException
     {
         boolean allFailing = true;
         List<NotificationException> exceptions = new ArrayList<>();
-        for (NotificationFilterPreferenceProvider provider : getProviderList()) {
-            try {
-                callable.doInProvider(provider);
-                allFailing = false;
-            } catch (NotificationException e) {
-                this.logger.debug(getProviderDebugMessage(loggerMessage, provider), e);
-                exceptions.add(e);
+        List<NotificationFilterPreferenceProvider> providerList = getProviderList();
+        if (providerList.size() > 1) {
+            for (NotificationFilterPreferenceProvider provider : providerList) {
+                try {
+                    callable.doInProvider(provider);
+                    allFailing = false;
+                } catch (NotificationException e) {
+                    this.logger.debug(getProviderDebugMessage(loggerMessage, provider), e);
+                    exceptions.add(e);
+                }
             }
-        }
-        if (allFailing) {
-            throw new NotificationException(getExceptionMessage(loggerMessage, exceptions));
+            if (allFailing) {
+                throw new NotificationException(getExceptionMessage(loggerMessage, exceptions));
+            }
+        } else {
+            callable.doInProvider(providerList.get(0));
         }
     }
 
@@ -122,17 +127,22 @@ public class DefaultNotificationFilterPreferenceManager implements NotificationF
         boolean allFailing = true;
         List<NotificationException> exceptions = new ArrayList<>();
         Set<E> result = new HashSet<>();
-        for (NotificationFilterPreferenceProvider provider : getProviderList()) {
-            try {
-                result.addAll(callable.retrieveWithProvider(provider));
-                allFailing = false;
-            } catch (NotificationException e) {
-                this.logger.debug(getProviderDebugMessage(loggerMessage, provider), e);
-                exceptions.add(e);
+        List<NotificationFilterPreferenceProvider> providerList = getProviderList();
+        if (providerList.size() > 1) {
+            for (NotificationFilterPreferenceProvider provider : getProviderList()) {
+                try {
+                    result.addAll(callable.retrieveWithProvider(provider));
+                    allFailing = false;
+                } catch (NotificationException e) {
+                    this.logger.debug(getProviderDebugMessage(loggerMessage, provider), e);
+                    exceptions.add(e);
+                }
             }
-        }
-        if (allFailing) {
-            throw new NotificationException(getExceptionMessage(loggerMessage, exceptions));
+            if (allFailing) {
+                throw new NotificationException(getExceptionMessage(loggerMessage, exceptions));
+            }
+        } else {
+            result.addAll(callable.retrieveWithProvider(providerList.get(0)));
         }
         return result;
     }

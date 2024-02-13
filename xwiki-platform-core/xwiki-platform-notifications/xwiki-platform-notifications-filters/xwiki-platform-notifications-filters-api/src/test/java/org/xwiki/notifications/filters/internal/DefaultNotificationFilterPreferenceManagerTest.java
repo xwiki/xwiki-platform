@@ -181,7 +181,8 @@ public class DefaultNotificationFilterPreferenceManagerTest
         NotificationException notificationException = assertThrows(NotificationException.class,
                 () -> filterPreferenceManager.deleteFilterPreference(testUser, filterId));
         assertEquals("Error when trying to remove filter preferences [filterId] for user [wiki:test.user] - "
-            + "All providers called failed, see exceptions: [error testprovider,error provider1,error provider2].",
+            + "All providers called failed, see exceptions: [NotificationException: error testprovider,"
+            + "NotificationException: error provider1,NotificationException: error provider2].",
             notificationException.getMessage());
     }
 

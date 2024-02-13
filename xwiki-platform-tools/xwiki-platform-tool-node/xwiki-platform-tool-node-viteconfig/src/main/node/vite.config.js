@@ -5,12 +5,11 @@ import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 
 export default defineConfig({
   build: {
+    sourcemap: true,
     lib: {
-      // Could also be a dictionary or array of multiple entry points
       entry: resolve(process.cwd(), 'lib/main.ts'),
-      name: 'xwiki-platform-lib-b',
       fileName: 'main',
-      formats: ['umd']
+      formats: ['amd']
     },
   },
   plugins: [

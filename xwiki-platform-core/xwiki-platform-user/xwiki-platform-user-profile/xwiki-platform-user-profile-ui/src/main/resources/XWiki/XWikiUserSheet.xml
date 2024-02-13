@@ -677,7 +677,9 @@ span#avatarUpload {
       padding: unset;
       text-align: center;
       vertical-align: middle;
-      &amp;:hover{text-decoration: underline};
+      &amp;:hover {
+        text-decoration: underline
+      };
     }
   }
 }

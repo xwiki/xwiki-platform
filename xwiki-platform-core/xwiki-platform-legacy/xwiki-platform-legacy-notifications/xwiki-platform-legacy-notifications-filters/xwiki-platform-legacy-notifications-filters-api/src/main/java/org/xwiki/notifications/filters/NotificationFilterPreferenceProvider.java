@@ -34,8 +34,10 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 9.8RC1
+ * @deprecated this interface is not used anywhere anymore in XWiki Standard.
  */
 @Role
+@Deprecated(since = "16.5.0RC1")
 public interface NotificationFilterPreferenceProvider
 {
     /**
@@ -73,7 +75,7 @@ public interface NotificationFilterPreferenceProvider
      * @since 9.11.9
      */
     void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> filterPreferences)
-            throws NotificationException;
+        throws NotificationException;
 
     /**
      * Delete a filter preference.
@@ -129,7 +131,7 @@ public interface NotificationFilterPreferenceProvider
      * @since 9.11.9
      */
     void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
-            throws NotificationException;
+        throws NotificationException;
 
     /**
      * Enable or disable a filter preference.

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.stability.Unstable;
 
 import static com.xpn.xwiki.doc.XWikiDocument.DB_SPACE_SEP;
 
@@ -48,6 +49,13 @@ import static com.xpn.xwiki.doc.XWikiDocument.DB_SPACE_SEP;
 public interface NotificationFilterPreference
 {
     /**
+     * Prefix to be used for the ID only when the preference is stored in database.
+     * @since 16.5.0RC1
+     */
+    @Unstable
+    String DB_STORED_FILTER_PREFIX = "NFP_";
+    
+    /**
      * @return the unique identifier of the filter preference.
      * @since 10.8RC1
      * @since 9.11.8
@@ -58,11 +66,6 @@ public interface NotificationFilterPreference
      * @return the name of the filter corresponding to this preference.
      */
     String getFilterName();
-
-    /**
-     * @return the name of the {@link NotificationFilterPreferenceProvider} associated with this preference.
-     */
-    String getProviderHint();
 
     /**
      * @return true if the current notification preference is enabled.

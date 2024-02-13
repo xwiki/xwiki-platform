@@ -80,12 +80,6 @@ public class TagNotificationFilterPreference implements NotificationFilterPrefer
     }
 
     @Override
-    public String getProviderHint()
-    {
-        return "FACTORY";
-    }
-
-    @Override
     public boolean isEnabled()
     {
         return true;

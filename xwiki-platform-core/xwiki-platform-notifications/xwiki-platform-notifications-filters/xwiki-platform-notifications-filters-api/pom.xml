@@ -35,6 +35,8 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Notifications Filters API</xwiki.extension.name>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <!-- Skip revapi since it's handled by the legacy module -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
   <dependencies>
     <dependency>

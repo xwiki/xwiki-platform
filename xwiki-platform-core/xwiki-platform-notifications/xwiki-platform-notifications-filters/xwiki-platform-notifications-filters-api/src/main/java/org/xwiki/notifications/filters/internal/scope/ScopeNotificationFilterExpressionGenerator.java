@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -39,8 +40,6 @@ import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
-import org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider;
-import org.xwiki.text.StringUtils;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
@@ -204,7 +203,6 @@ public class ScopeNotificationFilterExpressionGenerator
         // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
         //    NotificationFilterType type, DocumentReference user).
         return StringUtils.isNotBlank(pref.getPageOnly())
-            && UserProfileNotificationFilterPreferenceProvider.HINT.equals(pref.getProviderHint())
             && pref.getEventTypes().isEmpty();
     }
 
@@ -288,17 +286,18 @@ public class ScopeNotificationFilterExpressionGenerator
     private Predicate<NotificationFilterPreference> isAPageOnlyFilterPreferenceThatConcernAllEvents(
             NotificationFormat format, NotificationFilterType type)
     {
-        return nfp -> isEnabledScopeNotificationFilterPreference(nfp)
+        return nfp -> isEnabledAndStoredScopeNotificationFilterPreference(nfp)
                 && doesFilterTypeAndFormatMatch(nfp, format, type)
                 && StringUtils.isNotBlank(nfp.getPageOnly());
     }
 
-    private boolean isEnabledScopeNotificationFilterPreference(NotificationFilterPreference nfp)
+    private boolean isEnabledAndStoredScopeNotificationFilterPreference(NotificationFilterPreference nfp)
     {
-        // This optimization can only works on preferences stored by the user, that's why we add a condition
-        // on the provider hint.
+        // This optimization can only works on preferences stored by the user, that's why we add the final condition
         return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
-                && UserProfileNotificationFilterPreferenceProvider.HINT.equals(nfp.getProviderHint());
+            && (StringUtils.startsWith(nfp.getId(), NotificationFilterPreference.DB_STORED_FILTER_PREFIX)
+            // we also check for watchlist prefix in case of old migrated filters.
+            || StringUtils.startsWith(nfp.getId(), "watchlist_"));
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

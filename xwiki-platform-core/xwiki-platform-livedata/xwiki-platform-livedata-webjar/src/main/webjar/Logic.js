@@ -30,11 +30,12 @@ define('xwiki-livedata', [
 ], function(
   Vue,
   VueI18n,
-  XWikiLivedata,
+  xwikiLivedataVue,
   liveDataSourceModule,
   jsonMerge,
   editBus
 ) {
+  const XWikiLivedata = xwikiLivedataVue.XWikiLivedata;
   /**
    * Make vue use the i18n plugin
    */
@@ -230,7 +231,8 @@ define('xwiki-livedata', [
         "pagination.last",
         "action.refresh",
         "action.addEntry",
-        "action.reorder.hint",
+        "action.columnName.sortable.hint",
+        "action.columnName.default.hint",
         "action.resizeColumn.hint",
         "panel.filter.title",
         "panel.filter.noneFilterable",

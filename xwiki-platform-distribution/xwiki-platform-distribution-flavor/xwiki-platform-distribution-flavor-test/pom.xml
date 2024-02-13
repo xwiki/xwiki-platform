@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>16.0.0-SNAPSHOT</version>
+    <version>16.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -249,8 +249,7 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Rights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=usersgroups.extensionrights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=UserProfile
-                <!--/xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
-                  TODO https://jira.xwiki.org/browse/XWIKI-21772 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Registration
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Invitation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Authentication
@@ -262,8 +261,7 @@
                 <!-- Look and feel -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Themes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=menu.name
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Panels.PanelWizard
-                  TODO https://jira.xwiki.org/browse/XWIKI-21774 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Panels.PanelWizard
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.applications
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.navigation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Presentation
@@ -274,8 +272,7 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Localization
                 /xwiki/bin/import/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Import
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Export
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=export.pdf
-                  TODO https://jira.xwiki.org/browse/XWIKI-21777 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=export.pdf
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Programming
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Annotations
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.OfficeImporterAdmin
@@ -284,11 +281,9 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Delete
                 <!-- Editing -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Editing
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
-                  TODO https://jira.xwiki.org/browse/XWIKI-21773 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Syntaxes
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
-                  TODO https://jira.xwiki.org/browse/XWIKI-21775 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=SyntaxHighlighting
                 <!-- Mail -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailSend

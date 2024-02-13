@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.0.0-SNAPSHOT</version>
+    <version>16.1.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.0.0-SNAPSHOT</version>
+  <version>16.1.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -61,7 +61,7 @@
     <jetty.client.version>9.4.53.v20231009</jetty.client.version>
     <jetty.server.version>10.0.19</jetty.server.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.104.Final</netty.version>
+    <netty.version>4.1.105.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.4</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
@@ -69,7 +69,7 @@
     <zookeeper.version>3.9.1</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.19.3</testcontainers.version>
+    <testcontainers.version>1.19.4</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -106,7 +106,7 @@
     <hsqldb.version>2.7.2</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>8.2.0</mysql.version>
+    <mysql.version>8.3.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.3.2</mariadb.version>
@@ -432,7 +432,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.12.6</version>
+        <version>2.12.7</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -1167,6 +1167,19 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>vue</artifactId>
+        <version>2.7.16</version>
+        <exclusions>
+          <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
+          not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
+          <exclusion>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>vue__compiler-sfc</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -1509,6 +1522,11 @@
             <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
             <options>esversion:11,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,camelcase,maxlen:120</options>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>1.15.0</version>
         </plugin>
       </plugins>
     </pluginManagement>

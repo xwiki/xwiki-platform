@@ -33,6 +33,7 @@ import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.user.internal.group.UsersCache;
 
 /**
@@ -51,7 +52,8 @@ public class DeletedDocumentCleanUpFilterListener extends AbstractLocalEventList
 {
     static final String NAME = "org.xwiki.notifications.notifiers.internal.DeletedDocumentCleanUpFilterListener";
 
-    private static final BeginFoldEvent IGNORED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
+    private static final BeginFoldEvent FOLDED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
+    private static final DocumentRenamingEvent DOCUMENT_RENAMING_EVENT = new DocumentRenamingEvent();
 
     @Inject
     private ObservationContext observationContext;
@@ -73,7 +75,9 @@ public class DeletedDocumentCleanUpFilterListener extends AbstractLocalEventList
     @Override
     public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (this.observationContext.isIn(IGNORED_EVENTS)) {
+        // Document rename usecase is handled with its own listener.
+        if (this.observationContext.isIn(FOLDED_EVENTS) && !this.observationContext.isIn(DOCUMENT_RENAMING_EVENT))
+        {
             DocumentDeletedEvent documentDeletedEvent = (DocumentDeletedEvent) event;
             DocumentReference documentReference = documentDeletedEvent.getDocumentReference();
             List<DocumentReference> users =

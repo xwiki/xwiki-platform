@@ -53,6 +53,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -143,7 +144,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     private static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
 
-    private static final int MIGRATION_BATCH_ROWS = 100;
+    private static final int DEFAULT_MIGRATION_BATCH_ROWS = 100;
 
     @Inject
     protected ComponentDescriptor<SolrCoreInitializer> descriptor;
@@ -153,6 +154,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     protected XWikiSolrCore core;
 
+    /**
+     * @deprecated use {@link #core} instead
+     */
     @Deprecated(since = "16.1.0RC1")
     protected SolrClient client;
 
@@ -393,12 +397,24 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         }
     }
 
+    /**
+     * @return the number of document to retrieve at the same time when migrating the data
+     * @since 16.1.0RC1
+     */
+    @Unstable
+    protected int getMigrationBatchRows()
+    {
+        return DEFAULT_MIGRATION_BATCH_ROWS;
+    }
+
     private void migrateData(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
+        int batchSize = getMigrationBatchRows();
+
         int size = 0;
         do {
             SolrQuery solrQuery = new SolrQuery();
-            solrQuery.setRows(MIGRATION_BATCH_ROWS);
+            solrQuery.setRows(batchSize);
 
             QueryResponse response;
             try {
@@ -413,7 +429,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             if (size > 0) {
                 migrateData(response.getResults(), sourceCore, targetCore);
             }
-        } while (size == MIGRATION_BATCH_ROWS);
+        } while (size == batchSize);
     }
 
     private void migrateData(SolrDocumentList source, XWikiSolrCore sourceCore, XWikiSolrCore targetCore)
@@ -425,19 +441,19 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             // Convert the SolrDocument into a SolrInputDocument
             migrate(sourceDocument, targetDocument);
 
-            // Save the document
+            // Save the document in the target core
             try {
                 targetCore.getClient().add(targetDocument);
             } catch (Exception e) {
                 throw new SolrException("Failed to save the document", e);
             }
-
-            // Add it to the list of documents to delete
-            delete(source, sourceCore);
         }
 
-        // Delete the documents
-        delete(source, targetCore);
+        // Commit the new documents
+        commit(targetCore);
+
+        // Delete the migrated documents from the source
+        delete(source, sourceCore);
         commit(sourceCore);
     }
 

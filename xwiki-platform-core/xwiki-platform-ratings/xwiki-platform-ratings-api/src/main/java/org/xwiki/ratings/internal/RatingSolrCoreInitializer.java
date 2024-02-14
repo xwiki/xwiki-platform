@@ -127,4 +127,10 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
     {
         return CURRENT_VERSION;
     }
+
+    @Override
+    protected int getMigrationBatchRows()
+    {
+        return 10000;
+    }
 }

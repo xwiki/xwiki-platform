@@ -449,15 +449,17 @@ return XWiki;
 }
 
 #avatar {
+
   p {
     text-align: center;
   }
-  img{
-    border-radius: @border-radius-base @border-radius-base 0 0;
+
+  img {
     border-top: @border-width solid @list-group-border;
     border-left: @border-width solid @list-group-border;
     border-right: @border-width solid @list-group-border;
     border-bottom: 0;
+    border-radius: @border-radius-base @border-radius-base 0 0;
     margin: 0 auto;
   }
 
@@ -668,17 +670,20 @@ span#avatarUpload {
 }
 
 .attachment-picker {
+
   .buttonwrapper {
-    .wikilink{
+
+    .wikilink {
       display: flex;
       flex-flow: column;
     }
+
     a.button {
       .btn;
       .btn-default;
+      border-radius: 0 0 @border-radius-base @border-radius-base;
       flex-grow: 1;
       margin: 0;
-      border-radius: 0 0 @border-radius-base @border-radius-base;
     }
   }
 }

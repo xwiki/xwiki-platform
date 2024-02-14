@@ -39,7 +39,6 @@ import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
 import org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator;
-import org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider;
 import org.xwiki.text.StringUtils;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
@@ -204,7 +203,6 @@ public class ScopeNotificationFilterExpressionGenerator
         // filterExpression(Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format,
         //    NotificationFilterType type, DocumentReference user).
         return StringUtils.isNotBlank(pref.getPageOnly())
-            && UserProfileNotificationFilterPreferenceProvider.HINT.equals(pref.getProviderHint())
             && pref.getEventTypes().isEmpty();
     }
 
@@ -297,8 +295,7 @@ public class ScopeNotificationFilterExpressionGenerator
     {
         // This optimization can only works on preferences stored by the user, that's why we add a condition
         // on the provider hint.
-        return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
-                && UserProfileNotificationFilterPreferenceProvider.HINT.equals(nfp.getProviderHint());
+        return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName());
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

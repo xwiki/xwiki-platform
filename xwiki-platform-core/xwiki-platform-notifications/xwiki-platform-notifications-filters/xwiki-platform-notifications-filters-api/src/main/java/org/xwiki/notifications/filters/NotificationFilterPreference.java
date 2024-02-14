@@ -60,9 +60,14 @@ public interface NotificationFilterPreference
     String getFilterName();
 
     /**
-     * @return the name of the {@link NotificationFilterPreferenceProvider} associated with this preference.
+     * @return the name of the provider hint associated with this preference.
+     * @deprecated this information is now useless with support of a single location for storing preferences
      */
-    String getProviderHint();
+    @Deprecated(since = "16.2.0RC1")
+    default String getProviderHint()
+    {
+        return "";
+    }
 
     /**
      * @return true if the current notification preference is enabled.

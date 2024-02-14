@@ -31,7 +31,6 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 
 /**
  * Reference to a user to watch.
@@ -96,7 +95,6 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
-        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(true);
         filterPreference.setStartingDate(new Date());
         filterPreference.setUser(userId);
@@ -113,7 +111,6 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
-        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
         filterPreference.setStartingDate(new Date());
         filterPreference.setUser(userId);

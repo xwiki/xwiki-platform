@@ -179,7 +179,6 @@ class WatchedLocationReferenceTest
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Set.of(NotificationFormat.values()));
-        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
         filterPreference.setPageOnly(this.serializedReference);
 
@@ -216,7 +215,6 @@ class WatchedLocationReferenceTest
         filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Set.of(NotificationFormat.values()));
-        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
         filterPreference.setActive(false);
         filterPreference.setPage(this.serializedReference);
 

@@ -338,7 +338,5 @@ class NotificationFilterPreferenceStoreTest
             verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
         }
         verify(xwikiQuery).bindValue("owner", serializedRef);
-        verify(pref1).setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
-        verify(pref2).setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
     }
 }

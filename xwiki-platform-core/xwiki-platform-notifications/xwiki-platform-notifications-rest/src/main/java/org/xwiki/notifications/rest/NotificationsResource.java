@@ -128,7 +128,7 @@ public interface NotificationsResource
      * parameters. For example, the parameter "blackList" could be very long, and the associated URL with the GET method
      * would be too long (generating HTTP 414 error).
      * <p>
-     * While the signature of the method changed from Java point of view in 16.0.0, it's still exactly the same API from
+     * While the signature of the method changed from Java point of view in 16.1.0, it's still exactly the same API from
      * REST point of view so the same &#64;since has been kept.
      *
      * @return notifications

@@ -25,13 +25,40 @@ define('modalTranslationKeys', [], [
 
 define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations) {
   'use strict';
-  var modalTemplate = 
+  // Fetch the cross icon from the icon theme to fill up the modal template.
+  let iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=cross`;
+  let iconRequest = new XMLHttpRequest();
+  let iconMetadata;
+  // Default value taken until the fetch is fulfilled
+  var closeIconTemplate = `<span aria-hidden="true">&times;</span>`;
+  iconRequest.onreadystatechange = function() {
+    if (iconRequest.readyState === 4 && iconRequest.status === 200 ) {
+      let response = iconRequest.responseXML;
+      iconMetadata = response.getElementsByTagName('icon')[0];
+      if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'IMAGE') {
+        closeIconTemplate = '<img src="' + iconMetadata.getElementsByTagName('url')[0].textContent +
+          '" alt="" />';
+      }
+      else if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'FONT') {
+        closeIconTemplate = '<span class="' +
+          iconMetadata.getElementsByTagName('cssClass')[0].textContent +
+          '" aria-hidden="true"></span>';
+      }
+      console.log(closeIconTemplate);
+    }
+    // We update the places where the modalTemplate has already been instanced with the asynchronously retrieved value
+    $('.modal').find('.close').html(closeIconTemplate);
+  };
+  iconRequest.open('GET', iconURL);
+  iconRequest.send();
+
+  let modalTemplate =
     '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
       '<div class="modal-dialog" role="document">' +
         '<div class="modal-content">' +
           '<div class="modal-header">' +
             '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-              '<span aria-hidden="true">&times;</span>' +
+            closeIconTemplate +
             '</button>' +
             '<h4 class="modal-title"></h4>' +
           '</div>' +

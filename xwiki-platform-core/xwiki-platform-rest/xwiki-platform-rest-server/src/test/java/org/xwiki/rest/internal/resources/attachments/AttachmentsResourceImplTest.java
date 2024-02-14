@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.model.reference.AttachmentReference;
@@ -42,6 +43,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.rest.internal.resources.AbstractAttachmentsResourceTest;
 import org.xwiki.rest.model.jaxb.Attachment;
@@ -50,6 +52,8 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -75,6 +79,8 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 {
+    private static final DocumentReference USER_REFERENCE = new DocumentReference("test", "XWiki", "User");
+
     @InjectMockComponents
     AttachmentsResourceImpl attachmentsResource;
 
@@ -90,6 +96,17 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 
     @MockComponent
     private AttachmentValidator attachmentValidator;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @MockComponent
+    @Named("compactwiki")
+    EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @Mock
+    private UserReference userReference;
 
     @BeforeEach
     @Override
@@ -159,6 +176,13 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
     @Test
     void createAttachment() throws Exception
     {
+        this.xcontext.setMainXWiki("test");
+        this.xcontext.setWikiId("test");
+        this.xcontext.setUserReference(USER_REFERENCE);
+        when(this.documentReferenceUserReferenceResolver.resolve(USER_REFERENCE)).thenReturn(this.userReference);
+        when(this.compactWikiEntityReferenceSerializer.serialize(USER_REFERENCE, new WikiReference("test"))).thenReturn(
+            "XWiki.User");
+
         DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
         XWikiDocument cachedDocument = prepareXWikiDocument(documentReference, "test:Path.To.Page", true, true, false);
 
@@ -180,11 +204,12 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         // The cached document should not have been modified.
         assertNull(cachedDocument.getAttachment("myBio.txt"));
 
-        XWikiAttachment xwikiAttachment =
-            this.xwiki.getDocument(documentReference, this.xcontext).getAttachment("myBio.txt");
+        XWikiDocument xwikiDocument = this.xwiki.getDocument(documentReference, this.xcontext);
+        XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment("myBio.txt");
         assertEquals("myBio.txt", xwikiAttachment.getFilename());
         assertEquals("text/plain", xwikiAttachment.getMimeType());
         assertEquals("blah", IOUtils.toString(xwikiAttachment.getContentInputStream(this.xcontext)));
+        assertEquals(this.userReference, xwikiDocument.getAuthors().getCreator());
     }
 
     @Test
@@ -277,8 +302,9 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             this.xwiki.saveDocument(document, this.xcontext);
         }
 
-        when(this.oldCore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", serializedDocumentReference,
-            this.xcontext)).thenReturn(hasView);
+        when(this.oldCore.getMockRightService()
+            .hasAccessLevel("view", this.xcontext.getUser(), serializedDocumentReference, this.xcontext)).thenReturn(
+            hasView);
         when(this.authorization.hasAccess(Right.EDIT, documentReference)).thenReturn(hasEdit);
 
         return this.xwiki.getDocument(documentReference, this.xcontext);

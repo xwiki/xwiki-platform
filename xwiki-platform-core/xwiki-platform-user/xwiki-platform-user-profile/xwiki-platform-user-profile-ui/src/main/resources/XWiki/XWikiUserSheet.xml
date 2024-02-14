@@ -448,15 +448,21 @@ return XWiki;
   width: 13em;
 }
 
-#avatar p {
-  text-align: center;
-}
+#avatar {
+  p {
+    text-align: center;
+    }
 
-#avatar img {
-  border: 1px solid $theme.borderColor;
-  border-radius: 8px 8px 8px 8px;
-  margin: 0 auto;
-  padding: 0.3em;
+  img{
+    border-radius: @border-radius-base @border-radius-base 0 0;
+    margin: 0 auto;
+    padding: 0.3em;
+  }
+
+  .attachment-picker {
+    border: @border-width solid @list-group-border;
+    border-radius: @border-radius-base;
+  }
 }
 
 .profile-menu .category-tab:before{
@@ -662,24 +668,10 @@ span#avatarUpload {
 .attachment-picker {
   .buttonwrapper {
     a.button {
-      background-color: inherit;
-      background-image: none;
-      border-color: unset;
-      border-radius: unset;
-      border: unset;
-      color: @link-color;
-      cursor: pointer;
-      display: unset;
-      font-size: @font-size-small;
-      font-weight: normal;
-      line-height: unset;
-      margin: unset;
-      padding: unset;
-      text-align: center;
-      vertical-align: middle;
-      &amp;:hover {
-        text-decoration: underline
-      };
+        .btn;
+        .btn-default;
+        width: ~"calc(100% - 0.6em)";
+        margin: 0 0.3em 0.3em 0.3em;
     }
   }
 }

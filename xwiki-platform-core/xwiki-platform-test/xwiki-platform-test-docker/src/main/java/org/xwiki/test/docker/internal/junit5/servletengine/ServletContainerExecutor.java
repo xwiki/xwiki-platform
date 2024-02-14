@@ -333,7 +333,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
         // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
         return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
-            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9" : LATEST);
+            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
     }
 
     private GenericContainer<?> createServletContainer() throws Exception
@@ -344,9 +344,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
-            // So we provide a name to the image we will built and we check that the image does not exist yet.
+            // So we compute a name for the image we will build, and we check that the image does not exist yet.
             String imageName = String.format("xwiki-%s-office:%s",
-                this.testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
+                this.testConfiguration.getServletEngine().name().toLowerCase(),
+                getDockerImageTag(this.testConfiguration));
 
             // We rebuild every time the LibreOffice version changes
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");

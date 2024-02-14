@@ -46,7 +46,7 @@ public interface JAXRSUtils
      * Extract the charset from the media type.
      * 
      * @param mediaType the media type of the request
-     * @return the charset of the media type
+     * @return the charset of the media type or {@link java.nio.charset.StandardCharsets#UTF_8} if none is provided
      */
     Charset getCharset(MediaType mediaType);
 

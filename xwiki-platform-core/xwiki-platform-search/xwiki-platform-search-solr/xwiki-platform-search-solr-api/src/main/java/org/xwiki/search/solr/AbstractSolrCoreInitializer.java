@@ -402,7 +402,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     /**
      * @return the number of document to retrieve at the same time when migrating the data
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     @Unstable
     protected int getMigrationBatchRows()
@@ -1106,7 +1106,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     /**
      * @param core the client to commit
      * @throws SolrException when failing to commit
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     protected void commit(XWikiSolrCore core) throws SolrException
     {

@@ -87,7 +87,7 @@ public class SolrSchemaUtils
      * @param force if {@code true} reloads all information, else gets the information from the cache
      * @return the map of all fields
      * @throws SolrException in case of problem to request fields information
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     public Map<String, FieldTypeRepresentation> getFieldTypes(XWikiSolrCore core, boolean force) throws SolrException
     {
@@ -115,7 +115,7 @@ public class SolrSchemaUtils
      * @param force if {@code true} reloads all information, else gets the information from the cache
      * @return the map of all fields
      * @throws SolrException in case of problem to request fields information
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     public Map<String, Map<String, Object>> getFields(XWikiSolrCore core, boolean force) throws SolrException
     {
@@ -171,7 +171,7 @@ public class SolrSchemaUtils
      * @param definition the definition of the field to add
      * @param add true if the field type should be added, false for replace
      * @throws SolrException when failing to add the field
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     public void setFieldType(XWikiSolrCore core, FieldTypeDefinition definition, boolean add) throws SolrException
     {
@@ -225,7 +225,7 @@ public class SolrSchemaUtils
      * @param dynamic true to create a dynamic field
      * @param add true if the field type should be added, false for replace
      * @throws SolrException when failing to add the field
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     public void setField(XWikiSolrCore core, Map<String, Object> fieldAttributes, boolean dynamic, boolean add)
         throws SolrException
@@ -308,7 +308,7 @@ public class SolrSchemaUtils
      * @param name the name of the field to delete
      * @param dynamic true to delete a dynamic field
      * @throws SolrException when failing to delete the field
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     public void deleteField(XWikiSolrCore core, String name, boolean dynamic) throws SolrException
     {
@@ -333,7 +333,7 @@ public class SolrSchemaUtils
      * @param source the source field name
      * @param dest the collection of the destination field names
      * @throws SolrException when failing to add the field
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     public void addCopyField(XWikiSolrCore core, String source, String... dest) throws SolrException
     {

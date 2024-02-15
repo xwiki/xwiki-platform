@@ -39,7 +39,7 @@ import org.xwiki.component.manager.ComponentManager;
  * </ul>
  * 
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 16.2.0RC1
  */
 public class XWikiRESTServlet extends HttpServlet
 {

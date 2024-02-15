@@ -41,7 +41,7 @@ import org.xwiki.rest.XWikiRestComponent;
  * Reload Jersey when a XWikiResource component is uninstalled/installed.
  * 
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 16.2.0RC1
  */
 @Component
 @Named(JerseyReloadListener.HINT)

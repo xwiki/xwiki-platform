@@ -36,7 +36,7 @@ import org.xwiki.stability.Unstable;
  * Provider various tools to help implement {@link MessageBodyWriter} and {@link MessageBodyReader}.
  * 
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 16.2.0RC1
  */
 @Role
 @Unstable

@@ -48,7 +48,7 @@ public interface Solr
      *            solr core specific to the setup)
      * @return the cached {@link SolrCore} instance to use to manipulate the core
      * @throws SolrException when failing to create the solr client
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     @Unstable
     default XWikiSolrCore getCore(String name) throws SolrException

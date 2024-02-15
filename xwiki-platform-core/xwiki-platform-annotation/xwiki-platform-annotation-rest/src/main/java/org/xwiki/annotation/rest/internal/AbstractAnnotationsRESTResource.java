@@ -41,7 +41,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 16.2.0RC1
  */
 public abstract class AbstractAnnotationsRESTResource extends AbstractAnnotationRESTResource
 {

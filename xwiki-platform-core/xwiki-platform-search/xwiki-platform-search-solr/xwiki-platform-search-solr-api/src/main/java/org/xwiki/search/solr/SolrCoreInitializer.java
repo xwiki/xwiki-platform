@@ -52,7 +52,7 @@ public interface SolrCoreInitializer
      * 
      * @param core to manipulate the core
      * @throws SolrException when failing to initialize the core
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     default void initialize(XWikiSolrCore core) throws SolrException
     {
@@ -76,7 +76,7 @@ public interface SolrCoreInitializer
      * @param sourceCore the core to copy from
      * @param targetCore the core to copy to
      * @throws SolrException when failing to migrate the core
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     @Unstable
     default void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException

@@ -58,7 +58,7 @@ import org.xwiki.rest.XWikiRestComponent;
  * Wrap the regular Jersey {@link InjectionManager} to get some of the components as XWiki components.
  * 
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 16.2.0RC1
  */
 @Component(roles = XWikiInjectionManager.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

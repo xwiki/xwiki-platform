@@ -247,7 +247,7 @@ public abstract class AbstractSolr implements Solr, Disposable
     protected abstract SolrClient getInternalSolrClient(String solrCoreName) throws SolrException;
 
     /**
-     * @since 16.1.0RC1
+     * @since 16.2.0RC1
      */
     protected abstract SolrClient createSolrClient(String solrCoreName, boolean isCache) throws SolrException;
 }

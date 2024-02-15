@@ -56,7 +56,7 @@ import org.xwiki.rest.XWikiRestComponent;
  * </ul>
  * 
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 16.2.0RC1
  */
 @Component
 @Named("org.xwiki.rest.internal.PreMatchingRequestFilter")

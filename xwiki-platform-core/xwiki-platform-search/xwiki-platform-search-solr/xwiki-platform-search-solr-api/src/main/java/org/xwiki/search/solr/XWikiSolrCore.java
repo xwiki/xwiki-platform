@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * The main entry point to manipulate a Solr core in XWiki.
  * 
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 16.2.0RC1
  */
 @Unstable
 public interface XWikiSolrCore

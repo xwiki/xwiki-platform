@@ -79,40 +79,14 @@ public class CachedNotificationPreferenceModelBridge implements NotificationPref
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
         throws NotificationException
     {
-        if (userReference == null) {
-            return Collections.emptyList();
-        }
-
-        List<NotificationPreference> preferences = this.preferenceCache.get(userReference);
-        if (preferences != null) {
-            return preferences;
-        }
-
-        preferences = this.notificationPreferenceModelBridge.getNotificationsPreferences(userReference);
-
-        this.preferenceCache.put(this.referenceFactory.getReference(userReference), preferences);
-
-        return preferences;
+        return this.notificationPreferenceModelBridge.getNotificationsPreferences(userReference);
     }
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(WikiReference wikiReference)
         throws NotificationException
     {
-        if (wikiReference == null) {
-            return Collections.emptyList();
-        }
-
-        List<NotificationPreference> preferences = this.preferenceCache.get(wikiReference);
-        if (preferences != null) {
-            return preferences;
-        }
-
-        preferences = this.notificationPreferenceModelBridge.getNotificationsPreferences(wikiReference);
-
-        this.preferenceCache.put(this.referenceFactory.getReference(wikiReference), preferences);
-
-        return preferences;
+        return this.notificationPreferenceModelBridge.getNotificationsPreferences(wikiReference);
     }
 
     @Override
@@ -144,13 +118,6 @@ public class CachedNotificationPreferenceModelBridge implements NotificationPref
     public String getEventGroupingStrategyHint(DocumentReference userDocReference, String target)
         throws NotificationException
     {
-        Map<String, String> strategyHints =
-                this.eventGroupingStrategyCache.computeIfAbsent(userDocReference, reference -> new HashMap<>());
-        if (!strategyHints.containsKey(target)) {
-            String strategyHint =
-                this.notificationPreferenceModelBridge.getEventGroupingStrategyHint(userDocReference, target);
-            strategyHints.put(target, strategyHint);
-        }
-        return strategyHints.get(target);
+        return this.notificationPreferenceModelBridge.getEventGroupingStrategyHint(userDocReference, target);
     }
 }

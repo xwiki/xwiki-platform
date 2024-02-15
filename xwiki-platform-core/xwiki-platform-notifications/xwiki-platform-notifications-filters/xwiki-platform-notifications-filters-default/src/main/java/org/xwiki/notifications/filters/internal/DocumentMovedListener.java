@@ -98,7 +98,7 @@ public class DocumentMovedListener extends AbstractLocalEventListener
             // we need to iterate over all DB to ensure we properly migrate the filters.
             // We could have checked the configuration of the wiki to see if they are allowed to store user or not
             // but this config might have changed over time...
-            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
                 namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
                     updatePreferences(sourceLocation, targetLocation);
                     return null;

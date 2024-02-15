@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
@@ -58,7 +59,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(
     properties = {
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        "xwikiPropertiesAdditionalProperties=notifications.rest.cache=false"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
@@ -383,8 +385,8 @@ class NotificationsIT
         }
     }
 
-    @Test
     @Order(4)
+    @RepeatedTest(10)
     void ownEventNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
@@ -398,6 +400,9 @@ class NotificationsIT
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             preferences.get(2).setEnabled(false);
+            setup.gotoPage(page2);
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            assertFalse(p.getSystemNotificationFilterPreferences().get(2).isEnabled());
 
             // Watch the entire wiki so that we receive notifications
             NotificationsTrayPage tray = new NotificationsTrayPage();
@@ -430,8 +435,8 @@ class NotificationsIT
             assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
         } finally {
             // Clean up
-            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
-            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), "page2");
+            setup.rest().delete(testReference);
+            setup.rest().delete(page2);
         }
     }
 

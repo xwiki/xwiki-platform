@@ -62,6 +62,7 @@ import static org.xwiki.test.ui.po.BootstrapSwitch.State.UNDETERMINED;
 @UITest(
     properties = {
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        "xwikiPropertiesAdditionalProperties=notifications.rest.cache=false"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,

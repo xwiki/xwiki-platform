@@ -46,8 +46,8 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 
 /**
- * Wrap the default {@link FilterPreferencesModelBridge} to store in the execution context the notification preferences to avoid fetching
- * them several time during the same HTTP request.
+ * Wrap the default {@link FilterPreferencesModelBridge} to store in the execution context the notification preferences
+ * to avoid fetching them several time during the same HTTP request.
  *
  * @version $Id$
  * @since 9.5RC1
@@ -80,6 +80,7 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
     void invalidatePreferencefilter(EntityReference reference)
     {
         this.preferenceFilterCache.remove(reference);
+        this.toggleCache.remove(reference);
     }
 
     @Override
@@ -99,16 +100,7 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
             return Collections.emptySet();
         }
 
-        Set<NotificationFilterPreference> preferences = this.preferenceFilterCache.get(userReference);
-        if (preferences != null) {
-            return preferences;
-        }
-
-        preferences = this.filterPreferencesModelBridge.getFilterPreferences(userReference);
-
-        this.preferenceFilterCache.put(this.referenceFactory.getReference(userReference), preferences);
-
-        return preferences;
+        return this.filterPreferencesModelBridge.getFilterPreferences(userReference);
     }
 
     @Override
@@ -135,16 +127,7 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
     public Map<String, Boolean> getToggleableFilterActivations(DocumentReference userReference)
         throws NotificationException
     {
-        Map<String, Boolean> values = this.toggleCache.get(userReference);
-        if (values != null) {
-            return values;
-        }
-
-        values = this.filterPreferencesModelBridge.getToggleableFilterActivations(userReference);
-
-        this.toggleCache.put(this.referenceFactory.getReference(userReference), values);
-
-        return values;
+        return this.filterPreferencesModelBridge.getToggleableFilterActivations(userReference);
     }
 
     @Override
@@ -236,7 +219,7 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
 
     /**
      * Clear the whole cache.
-     * 
+     *
      * @since 11.3RC1
      */
     public void clearCache()

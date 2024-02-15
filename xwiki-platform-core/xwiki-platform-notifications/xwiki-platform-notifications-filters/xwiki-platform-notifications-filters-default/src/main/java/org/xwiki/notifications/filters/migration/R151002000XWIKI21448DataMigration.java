@@ -35,10 +35,10 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -68,7 +68,7 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
+    private ConfigurationSource configurationSource;
 
     @Inject
     private QueryManager queryManager;
@@ -112,11 +112,16 @@ public class R151002000XWIKI21448DataMigration extends AbstractHibernateDataMigr
         // Stop the execution early if the configuration uses the main store, and we are not upgrading the main wiki.
         // This check cannot be done in #shouldExecute because possibly missing columns are not yet added to the
         // database.
-        if (this.filterPreferenceConfiguration.useMainStore() && !isMainWiki) {
+        if (useMainStore() && !isMainWiki) {
             return;
         }
 
         internalHibernateMigrate();
+    }
+
+    private boolean useMainStore()
+    {
+        return this.configurationSource.getProperty("eventstream.usemainstore", true);
     }
 
     private void internalHibernateMigrate() throws DataMigrationException

@@ -443,7 +443,7 @@ return XWiki;
       <code>#template("colorThemeInit.vm")
 #set($tabswidth = "130px")
 /* ----- User menu ----- */
-#user-menu-col{
+#user-menu-col {
   float: left;
   width: 13em;
 }
@@ -469,32 +469,32 @@ return XWiki;
   }
 }
 
-.profile-menu .category-tab:before{
+.profile-menu .category-tab:before {
   float: left;
   margin: 5px 0 0 5px;
 }
 
-.profile-menu .user-menu-profile:before{
+.profile-menu .user-menu-profile:before {
   content: url("$xwiki.getSkinFile('icons/silk/vcard.png')");
 }
 
-.profile-menu .user-menu-preferences:before{
+.profile-menu .user-menu-preferences:before {
   content: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
-.profile-menu .user-menu-watchlist:before{
+.profile-menu .user-menu-watchlist:before {
   content: url("$xwiki.getSkinFile('icons/silk/star.png')");
 }
 
-.profile-menu .user-menu-network:before{
+.profile-menu .user-menu-network:before {
   content: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 
-.profile-menu .user-menu-dashboard:before{
+.profile-menu .user-menu-dashboard:before {
   content: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
 }
 
-.profile-menu .user-menu-wikis:before{
+.profile-menu .user-menu-wikis:before {
   content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
@@ -513,12 +513,12 @@ return XWiki;
   background-position: 7px 50%,top center;
 }
 
-.user-menu-title a:hover{
+.user-menu-title a:hover {
   color: $theme.panelHeaderTextColor !important;
 }
 
 /* ----- Page content ---- */
-#user-page-content{
+#user-page-content {
   margin-left: 14em;
 }
 
@@ -588,13 +588,16 @@ div.editProfileCategory {
 
 div.editProfileCategory {
   float:right;
+
   a.btn-xs {
     background-color: @xwiki-page-content-bg;
     border: 1px solid @xwiki-border-color;
+
     .action-icon {
       font-size: larger;
       color: @btn-default-color;
     }
+
     &amp;:hover, &amp;:active, &amp;:focus {
       border-color: darken(@dropdown-divider-bg, 10%);
     }
@@ -628,35 +631,44 @@ span#avatarUpload {
   margin: 0;
   padding: 0;
 }
+
 #networkPane .following li {
   padding: 2px 20px 2px 2px;
 }
+
 #networkPane .following li:hover {
   background-color: $theme.highlightColor;
 }
+
 #networkPane .following img {
   float: left;
   margin-right: 5px;
 }
+
 #networkPane .following .user-info {
   float: left;
 }
+
 #networkPane .following .user-id {
   font-size: .8em;
   font-weight: 900;
 }
+
 #networkPane .following .unfollow {
   float: right;
   margin-right: -16px;
   padding: 0;
 }
+
 ## --------------------------------------
 ## Picker style
+
 .attachment-picker {
   position: relative;
   margin: auto;
   width: 100%;
 }
+
 .attachment-picker p {
   padding: 0;
   margin: 0;
@@ -665,14 +677,13 @@ span#avatarUpload {
 .attachment-picker .picture {
   z-index: -1;
 }
+
 .attachment-picker .buttonwrapper {
   margin: 0;
 }
 
 .attachment-picker {
-
   .buttonwrapper {
-
     .wikilink {
       display: flex;
       flex-flow: column;

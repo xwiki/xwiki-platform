@@ -223,7 +223,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
             // Transform the image attachment before is it downloaded.
             return downloadImage(attachment, width, height, quality, context);
         } catch (Exception e) {
-            LOG.warn("Failed to transform image attachment.", e);
+            LOG.warn("Failed to transform image attachment {} for scaling, falling back to original attachment.",
+                attachment.getFilename());
+            LOG.debug("Full stack trace for image attachment scaling error: ", e);
             return attachment;
         }
     }

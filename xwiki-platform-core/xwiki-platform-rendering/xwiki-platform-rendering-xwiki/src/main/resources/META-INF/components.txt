@@ -1,6 +1,7 @@
 500:org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
 500:org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
 500:org.xwiki.rendering.internal.renderer.XWikiPageAttachmentURILabelGenerator
+500:org.xwiki.rendering.internal.util.XWikiIconProvider
 500:org.xwiki.rendering.internal.util.XWikiErrorBlockGenerator
 500:org.xwiki.rendering.internal.wiki.XWikiWikiModel
 500:org.xwiki.rendering.internal.macro.XWikiHTMLRawBlockFilter

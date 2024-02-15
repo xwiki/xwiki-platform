@@ -122,6 +122,13 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                     recreateSearchCore();
                 }
             } else {
+                // Remove search cores from previous locations
+                Path pre1601Path = this.solrHomePath.resolve(SolrClientInstance.CORE_NAME);
+                if (Files.exists(pre1601Path)) {
+                    FileUtils.deleteDirectory(pre1601Path.toFile());
+                }
+
+                // Create the new search core
                 createSearchCore();
             }
 

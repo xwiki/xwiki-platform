@@ -349,6 +349,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     @Override
     public void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
+        // Set the current core
+        this.core = targetCore;
+
         // Migrate the field types
         migrateFieldTypes(sourceCore, targetCore);
 
@@ -384,10 +387,10 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     private void migrateFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore, boolean dynamic) throws SolrException
     {
         Map<String, Map<String, Object>> sourceFields =
-            dynamic ? this.solrSchemaUtils.getDynamicFields(this.core, false)
+            dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
                 : this.solrSchemaUtils.getFields(sourceCore, false);
         Map<String, Map<String, Object>> targetFields =
-            dynamic ? this.solrSchemaUtils.getDynamicFields(this.core, false)
+            dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
                 : this.solrSchemaUtils.getFields(targetCore, false);
         for (Map.Entry<String, Map<String, Object>> entry : sourceFields.entrySet()) {
             if (!targetFields.containsKey(entry.getKey())) {
@@ -478,7 +481,14 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void migrate(SolrDocument sourceDocument, SolrInputDocument targetDocument)
     {
-        sourceDocument.getFieldValueMap().forEach(targetDocument::setField);
+        // The map returned by #getFieldValueMap() does not implement #entrySet
+        for (String fieldName : sourceDocument.getFieldNames()) {
+            // Fix special fields:
+            // * _version_: internal Solr field used for atomic updates
+            if (!fieldName.equals("_version_")) {
+                targetDocument.setField(fieldName, sourceDocument.getFieldValue(fieldName));
+            }
+        }
     }
 
     @Override

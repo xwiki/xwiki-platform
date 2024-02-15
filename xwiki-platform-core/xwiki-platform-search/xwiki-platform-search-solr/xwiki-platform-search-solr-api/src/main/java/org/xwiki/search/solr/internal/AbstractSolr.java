@@ -113,7 +113,7 @@ public abstract class AbstractSolr implements Solr, Disposable
         // Resolve the real Solr core name
         String solrCoreName = toSolrCoreName(xwikiCoreName, majorVersion);
 
-        // Create the client
+        // Get the existing client
         SolrClient solrClient = getInternalSolrClient(solrCoreName);
 
         // Initialize the client

@@ -17,7 +17,7 @@
 	.jstree-node,
 	.jstree-icon { background-image:url("@{image}"); }
 	.jstree-node { background-position:-(@image-height * 9 + @correction) -@correction; background-repeat:repeat-y; }
-	.jstree-last { background:transparent; }
+	.jstree-last { background-image:none; }
 
 	.jstree-open > .jstree-ocl { background-position:-(@image-height * 4 + @correction) -@correction; }
 	.jstree-closed > .jstree-ocl { background-position:-(@image-height * 3 + @correction) -@correction; }
@@ -67,7 +67,7 @@
 
 	&.jstree-rtl {
 		.jstree-node { background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAACAQMAAAB49I5GAAAABlBMVEUAAAAdHRvEkCwcAAAAAXRSTlMAQObYZgAAAAxJREFUCNdjAAMOBgAAGAAJMwQHdQAAAABJRU5ErkJggg=="); background-position: 100% 1px; background-repeat:repeat-y; }
-		.jstree-last { background:transparent; }
+		.jstree-last { background-image:none; }
 		.jstree-open > .jstree-ocl { background-position:-(@image-height * 4 + @correction) -(@image-height * 1 + @correction); }
 		.jstree-closed > .jstree-ocl { background-position:-(@image-height * 3 + @correction) -(@image-height * 1 + @correction); }
 		.jstree-leaf > .jstree-ocl { background-position:-(@image-height * 2 + @correction) -(@image-height * 1 + @correction); }
@@ -80,7 +80,8 @@
 	}
 	.jstree-themeicon-custom { background-color:transparent; background-image:none; background-position:0 0; }
 
-	> .jstree-container-ul .jstree-loading > .jstree-ocl { background:url("@{image-path}throbber.gif") center center no-repeat; }
+	// This line is commented out compared to upstream source as throbber.gif is not available in xwiki-platofrm-tree-webjar and this style is override in tree.less to use spinner.gif.
+	//> .jstree-container-ul .jstree-loading > .jstree-ocl { background:url("@{image-path}throbber.gif") center center no-repeat; }
 
 	.jstree-file { background:url("@{image}") -(@image-height * 3 + @correction) -(@image-height * 2 + @correction) no-repeat; }
 	.jstree-folder { background:url("@{image}") -(@image-height * 8 + @correction) -(@correction) no-repeat; }
@@ -101,5 +102,4 @@
 	.jstree-ellipsis { overflow: hidden; }
 	// base height + PADDINGS!
 	.jstree-ellipsis .jstree-anchor { width: calc(100% ~"-" (@base-height + 5px)); text-overflow: ellipsis; overflow: hidden; }
-	.jstree-ellipsis.jstree-no-icons .jstree-anchor { width: calc(100% ~"-" 5px); }
 }

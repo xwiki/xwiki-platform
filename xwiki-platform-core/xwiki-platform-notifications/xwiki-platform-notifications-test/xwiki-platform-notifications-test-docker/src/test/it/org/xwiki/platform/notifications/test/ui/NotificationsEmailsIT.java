@@ -66,8 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml,notification-filter-preferences.hbm.xml",
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin",
         // Switch to domain-based URL
-        "xwikiCfgVirtualUsepath=0",
-        "xwikiPropertiesAdditionalProperties=notifications.rest.cache=false"
+        "xwikiCfgVirtualUsepath=0"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,

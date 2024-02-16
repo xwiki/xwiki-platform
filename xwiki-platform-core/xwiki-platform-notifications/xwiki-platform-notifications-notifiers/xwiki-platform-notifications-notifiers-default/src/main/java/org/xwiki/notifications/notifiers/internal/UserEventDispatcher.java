@@ -325,6 +325,7 @@ public class UserEventDispatcher
             return result.getTotalHits() > 0;
         } catch (Exception e) {
             this.logger.error("Failed to check status for event [{}] and entity [{}]", event.getId(), entityId, e);
+            
             return false;
         }
     }

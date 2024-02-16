@@ -97,9 +97,7 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
 
   // Vue2TouchEvents needs to be explicitly registered because otherwise it is initialize by a parent component, hence
   // not initialized for the tests.
-  Vue.use(Vue2TouchEvents, {
-    disableClick: true
-  })
+  Vue.use(Vue2TouchEvents)
 
   return mount(displayer, {
     attachTo: elem,

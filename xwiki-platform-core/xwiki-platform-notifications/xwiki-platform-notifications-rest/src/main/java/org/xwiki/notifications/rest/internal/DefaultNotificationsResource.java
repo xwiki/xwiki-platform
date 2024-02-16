@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -85,6 +86,9 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     @Inject
     private RSSFeedRenderer rssFeedRenderer;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public Response getNotifications(String useUserPreferences, String userId, String untilDate,
@@ -148,8 +152,10 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             untilDateIncluded, blackList, pages, spaces, wikis, users, maxCount, displayOwnEvents, displayMinorEvents,
             displaySystemEvents, displayReadEvents, tags, currentWiki, onlyUnread);
 
+        this.logger.debug("Retrieving events for parameters [{}] async [{}]", notificationParameters, async);
+
         // 1. Check current asynchronous execution
-        if (asyncId != null) {
+        if (!StringUtils.isBlank(asyncId)) {
             result = this.executor.popAsync(asyncId);
 
             if (result == null) {

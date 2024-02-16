@@ -172,7 +172,7 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
             }
         }
 
-        return result;
+        return null;
     }
 
     /**

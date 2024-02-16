@@ -105,7 +105,7 @@ public class NotificationsTrayPage extends ViewPage
         URI baseNotificationResourcesURI = getUtil().rest().createUri(NotificationsResource.class, Map.of());
         // Note: This number of attempts should be enough, with 10 seconds of delay between the first and the last 
         // attempt.
-        int maxAttempts = 5;
+        int maxAttempts = 10;
         boolean success = false;
         long lastCount = -1;
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
@@ -147,7 +147,7 @@ public class NotificationsTrayPage extends ViewPage
             .queryParam("async", Boolean.FALSE.toString())
             .queryParam("_", System.currentTimeMillis())
             .build();
-        LOGGER.error("URI [" + uri + "]");
+        LOGGER.error("URI [" + attemptURI + "]");
         try {
             GetMethod getMethod = testUtils.rest().executeGet(attemptURI);
             if (Set.of(200, 202).contains(getMethod.getStatusCode())) {

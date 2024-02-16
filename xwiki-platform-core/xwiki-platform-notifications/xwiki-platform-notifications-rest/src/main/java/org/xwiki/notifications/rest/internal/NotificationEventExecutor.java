@@ -167,9 +167,11 @@ public class NotificationEventExecutor implements Initializable, Disposable
             } finally {
                 logger.debug("Finishing execution [{}]", this);
 
-                // Clean the queue
-                // "result" should never by null but just in case...
-                onFinish(result != null ? result : new NotificationException("No result"));
+                if (this.initialAsyncId != null) {
+                    // Clean the queue
+                    // "result" should never by null but just in case...
+                    onFinish(result != null ? result : new NotificationException("No result"));
+                }
 
                 // Restore the thread name
                 Thread.currentThread().setName(threadName);
@@ -334,8 +336,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
         }
     }
 
-    private void submit(String longCacheKey, Callable<List> callable, boolean count, String asyncId,
-        boolean composite)
+    private void submit(String longCacheKey, Callable<List> callable, boolean count, String asyncId, boolean composite)
     {
         synchronized (this.queue) {
             CallableEntry entry = this.queue.get(longCacheKey);
@@ -349,7 +350,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
                 this.logger.debug("Added [{}] in the queue", entry);
 
                 this.executor.submit(entry);
-            } else {
+            } else if (asyncId != null) {
                 entry.addAsyncId(asyncId);
             }
         }

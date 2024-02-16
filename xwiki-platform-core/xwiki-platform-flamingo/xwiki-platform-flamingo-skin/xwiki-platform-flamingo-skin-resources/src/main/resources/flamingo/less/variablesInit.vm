@@ -265,6 +265,7 @@
   ## from an orangish yellow to complete brown. Instead, we change the text color to black.
   @btn-warning-color:                   #000;
   ## The boxes should have enough contrast by default, we make it lighter than bootstrap.
+  ## @alert-warning-bg default value from bootstrap does not pose contrast issues, so we don't override it.
   @alert-danger-bg:                     #f8ecec;
   @alert-success-bg:                    #e5f3df;
   @alert-info-bg:                       #e1f1f9;

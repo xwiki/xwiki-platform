@@ -398,6 +398,9 @@ class NotificationsIT
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
             assertEquals("Own Events Filter", preferences.get(2).getFilterName());
             preferences.get(2).setEnabled(false);
+            setup.gotoPage(page2);
+            p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            assertFalse(p.getSystemNotificationFilterPreferences().get(2).isEnabled());
 
             // Watch the entire wiki so that we receive notifications
             NotificationsTrayPage tray = new NotificationsTrayPage();
@@ -430,8 +433,8 @@ class NotificationsIT
             assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
         } finally {
             // Clean up
-            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
-            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), "page2");
+            setup.rest().delete(testReference);
+            setup.rest().delete(page2);
         }
     }
 

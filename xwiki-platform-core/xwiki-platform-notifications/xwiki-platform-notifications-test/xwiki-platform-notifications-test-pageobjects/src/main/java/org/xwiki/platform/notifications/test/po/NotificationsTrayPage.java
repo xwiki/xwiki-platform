@@ -36,8 +36,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.notifications.rest.NotificationsResource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
@@ -55,8 +53,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class NotificationsTrayPage extends ViewPage
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationsTrayPage.class);
-
     private static final String CLASS = "class";
 
     @FindBy(css = "li#tmNotifications div.notifications-area")
@@ -120,7 +116,7 @@ public class NotificationsTrayPage extends ViewPage
             }
             try {
                 // A delay before the next attempt, to leave server-side processing the notifications asynchronously.
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -147,22 +143,16 @@ public class NotificationsTrayPage extends ViewPage
             .queryParam("async", Boolean.FALSE.toString())
             .queryParam("_", System.currentTimeMillis())
             .build();
-        LOGGER.error("URI [" + attemptURI + "]");
         try {
             GetMethod getMethod = testUtils.rest().executeGet(attemptURI);
             if (Set.of(200, 202).contains(getMethod.getStatusCode())) {
                 String responseBody = IOUtils.toString(getMethod.getResponseBodyAsStream(), UTF_8);
-                LOGGER.error("RESPONSE [" + responseBody + "]");
                 Map<?, ?> map = new ObjectMapper().readValue(responseBody, Map.class);
                 return getOptionalLong(String.valueOf(map.get("unread")), responseBody);
             } else {
-                LOGGER.error(String.format(
-                    "Network error when calling the notifications count rest endpoint code: [%s], text: [%s]",
-                    getMethod.getStatusCode(), getMethod.getStatusText()));
                 return Optional.empty();
             }
         } catch (Exception e) {
-            LOGGER.error("Unexpected error when fetching the notifications count", e);
             return Optional.empty();
         }
     }
@@ -172,7 +162,6 @@ public class NotificationsTrayPage extends ViewPage
         try {
             return Optional.of(Long.parseLong(str));
         } catch (NumberFormatException e) {
-            LOGGER.error(String.format("Failed to parse [%s] as a long value.", responseBody));
             return Optional.empty();
         }
     }
@@ -468,7 +457,7 @@ public class NotificationsTrayPage extends ViewPage
         return wikiWatchedSwitch.getState() == BootstrapSwitch.State.ON;
     }
 
-    private void waitUntilWatchedStateAreSaved()
+    private void waitUntilWatchedStateAreSaved() throws InterruptedException
     {
         waitForNotificationSuccessMessage("Saved!");
         getDriver().waitUntilCondition(driver ->

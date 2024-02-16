@@ -273,7 +273,6 @@ public class UserEventDispatcher
         // Get the entity id
         String entityId = this.entityReferenceSerializer.serialize(user);
         CompletableFuture<?> result = new CompletableFuture<>();
-        this.logger.debug("Dispatching event [{}] to user [{}]", event, user);
 
         // Make sure the event is not already pre filtered
         // Make sure the user asked to be alerted about this event
@@ -323,7 +322,6 @@ public class UserEventDispatcher
         }
 
         try (EventSearchResult result = this.events.search(eventQuery)) {
-            this.logger.debug("[{}] is prefiltered? [{}]", event, result.getTotalHits() > 0);
             return result.getTotalHits() > 0;
         } catch (Exception e) {
             this.logger.error("Failed to check status for event [{}] and entity [{}]", event.getId(), entityId, e);

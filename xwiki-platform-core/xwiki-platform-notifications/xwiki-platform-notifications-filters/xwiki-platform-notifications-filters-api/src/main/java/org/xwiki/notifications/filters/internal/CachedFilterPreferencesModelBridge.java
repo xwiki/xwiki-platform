@@ -100,7 +100,16 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
             return Collections.emptySet();
         }
 
-        return this.filterPreferencesModelBridge.getFilterPreferences(userReference);
+        Set<NotificationFilterPreference> preferences = this.preferenceFilterCache.get(userReference);
+        if (preferences != null) {
+            return preferences;
+        }
+
+        preferences = this.filterPreferencesModelBridge.getFilterPreferences(userReference);
+
+        this.preferenceFilterCache.put(this.referenceFactory.getReference(userReference), preferences);
+
+        return preferences;
     }
 
     @Override
@@ -127,7 +136,16 @@ public class CachedFilterPreferencesModelBridge implements FilterPreferencesMode
     public Map<String, Boolean> getToggleableFilterActivations(DocumentReference userReference)
         throws NotificationException
     {
-        return this.filterPreferencesModelBridge.getToggleableFilterActivations(userReference);
+        Map<String, Boolean> values = this.toggleCache.get(userReference);
+        if (values != null) {
+            return values;
+        }
+
+        values = this.filterPreferencesModelBridge.getToggleableFilterActivations(userReference);
+
+        this.toggleCache.put(this.referenceFactory.getReference(userReference), values);
+
+        return values;
     }
 
     @Override

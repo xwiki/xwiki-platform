@@ -128,7 +128,6 @@ public class UserEventManager implements Initializable
             this.logger.error("Failed to get event filters for user [{}]", user, e);
         }
 
-        this.logger.debug("event [{}] is listened by [{}] with format [{}]: [{}]", event, user, format, result);
         return result;
     }
 

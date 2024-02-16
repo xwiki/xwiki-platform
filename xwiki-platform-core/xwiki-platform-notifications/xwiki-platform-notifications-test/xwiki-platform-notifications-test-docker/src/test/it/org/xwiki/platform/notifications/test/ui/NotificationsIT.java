@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
@@ -59,8 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(
     properties = {
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
-        "xwikiPropertiesAdditionalProperties=notifications.rest.cache=false"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
@@ -385,8 +383,8 @@ class NotificationsIT
         }
     }
 
+    @Test
     @Order(4)
-    @RepeatedTest(10)
     void ownEventNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);

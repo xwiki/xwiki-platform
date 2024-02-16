@@ -70,6 +70,8 @@ public class InvitationFooterElement extends BaseElement
         }
         String message = getDriver().findElementsWithoutWaiting(this.footer,
             By.id("my-pending-invitations")).get(0).getText().trim();
+        // Remove the box header message
+        message = message.substring(message.lastIndexOf("\n"));
         return Integer.parseInt(message.substring(0, message.indexOf(" pending")));
     }
 

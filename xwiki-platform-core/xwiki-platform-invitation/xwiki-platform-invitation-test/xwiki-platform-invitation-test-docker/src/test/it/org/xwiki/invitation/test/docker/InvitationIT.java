@@ -299,7 +299,7 @@ class InvitationIT
             getGreenMail().waitForIncomingEmail(2000, 2);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             assertEquals(0, messages.length, "Messages were received when they shouldn't have been sent!");
-            assertEquals("Your message could not be sent because there were no valid email addresses to send to.",
+            assertEquals("Error\nYour message could not be sent because there were no valid email addresses to send to.",
                 sent.getMessageBoxContent(),
                 "User was not shown the correct error message.");
             stopGreenMail();

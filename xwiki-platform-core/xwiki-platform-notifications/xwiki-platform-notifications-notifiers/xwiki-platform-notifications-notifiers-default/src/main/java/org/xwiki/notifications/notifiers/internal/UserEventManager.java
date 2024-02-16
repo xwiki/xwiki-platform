@@ -111,6 +111,7 @@ public class UserEventManager implements Initializable
      */
     public boolean isListening(Event event, DocumentReference user, NotificationFormat format)
     {
+        boolean result = false;
         try {
             if (hasAccess(user, event) && isEventAfterUserCreationDate(event, user)
                 && (hasCorrespondingNotificationPreference(user, event, format)
@@ -121,13 +122,14 @@ public class UserEventManager implements Initializable
                     true, NotificationFilter.FilteringPhase.PRE_FILTERING));
                 filters.sort(null);
 
-                return !isEventFiltered(filters, event, user, format);
+                result = !isEventFiltered(filters, event, user, format);
             }
         } catch (NotificationException e) {
             this.logger.error("Failed to get event filters for user [{}]", user, e);
         }
 
-        return false;
+        this.logger.debug("event [{}] is listened by [{}] with format [{}]: [{}]", event, user, format, result);
+        return result;
     }
 
     private boolean hasAccess(DocumentReference user, Event event)

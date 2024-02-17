@@ -97,6 +97,7 @@ notifications.settings.filters.preferences.system.table.name=Название
 notifications.settings.filters.preferences.system.table.filterType=Описание
 notifications.settings.filters.preferences.system.table.notificationFormats=Форматы
 notifications.settings.filters.preferences.system.table.isEnabled=Включено?
+notifications.settings.filters.preferences.system.table.description=В этой таблице перечислены все системные фильтры, зарегистрированные в вики.
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=Пользовательские фильтры
@@ -108,6 +109,7 @@ notifications.settings.filters.preferences.custom.table.eventTypes=Событи�
 notifications.settings.filters.preferences.custom.table.notificationFormats=Форматы
 notifications.settings.filters.preferences.custom.table.isEnabled=Включено?
 notifications.settings.filters.preferences.custom.table._actions=Действия
+notifications.settings.filters.preferences.custom.table.description=В этой таблице перечислены все пользовательские фильтры, зарегистрированные для данного пользователя или текущей вики.
 notifications.filters.type.custom.inclusive=Уведомить о событии
 notifications.filters.type.custom.exclusive=Игнорировать событие
 notifications.settings.addFilter=Добавить фильтр

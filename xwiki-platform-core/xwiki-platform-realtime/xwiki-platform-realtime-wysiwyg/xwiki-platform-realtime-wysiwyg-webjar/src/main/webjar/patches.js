@@ -51,6 +51,8 @@ define('xwiki-realtime-wysiwyg-patches', [
     constructor(editor) {
       this._editor = editor;
       this._diffDOM = Patches._createDiffDOM();
+      this._filters = new Filters();
+      this._filters.filters.push(...editor.getCustomFilters());
     }
 
     static _createDiffDOM() {
@@ -95,10 +97,19 @@ define('xwiki-realtime-wysiwyg-patches', [
      *   content
      * @returns {string} the serialization of the given DOM node as HyperJSON
      */
-    static _stringifyNode(node, raw) {
-      const predicate = !raw && Filters.shouldSerializeNode.bind(Filters);
-      const filter = !raw && Filters.filterHyperJSON.bind(Filters);
-      return JSONSortify(HyperJSON.fromDOM(node, predicate, filter));
+    _stringifyNode(node, raw) {
+      const predicate = !raw && this._filters.shouldSerializeNode.bind(this._filters);
+      const filter = !raw && this._filters.filterHyperJSON.bind(this._filters);
+      const hyperJSON = HyperJSON.fromDOM(node, predicate, filter);
+      if (!raw) {
+        // The root node depends on the type of editor. For the classical iframe-based editor the root node is the BODY.
+        // For the in-place editor the root node may be a DIV. We have to normalize the root node in order to be able to
+        // synchronize the content between different types of editors.
+        hyperJSON[0] = 'xwiki-content';
+        // Ignore all root attributes because they normally store user preferences that shouldn't be shared.
+        hyperJSON[1] = {};
+      }
+      return JSONSortify(hyperJSON);
     }
 
     /**
@@ -108,7 +119,7 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @returns {string} the serialization of the editor content as HyperJSON
      */
     getHyperJSON(raw) {
-      return Patches._stringifyNode(this._normalizeContent(this._editor.getContent()), raw);
+      return this._stringifyNode(this._normalizeContent(this._editor.getContentWrapper()), raw);
     }
 
     /**
@@ -165,7 +176,7 @@ define('xwiki-realtime-wysiwyg-patches', [
 
       // We convert to HyperJSON and set the HyperJSON so that we can use the same filters
       // as when receiving content from coeditors.
-      const hjson = Patches._stringifyNode(this._normalizeContent(doc.body), false);
+      const hjson = this._stringifyNode(this._normalizeContent(doc.body), false);
       this.setHyperJSON(hjson, propagate);
     }
 
@@ -181,7 +192,7 @@ define('xwiki-realtime-wysiwyg-patches', [
       const selection = this._editor.getSelection();
       let rangeBefore = selection?.rangeCount && this._copyRangeBoundaryPoints(selection.getRangeAt(0));
 
-      const oldContent = this._editor.getContent();
+      const oldContent = this._editor.getContentWrapper();
       if (!oldContent.contains(rangeBefore?.startContainer) && !oldContent.contains(rangeBefore?.endContainer)) {
         rangeBefore = false;
       }
@@ -287,7 +298,7 @@ define('xwiki-realtime-wysiwyg-patches', [
       });
 
       // Add a BR element after text nodes that are followed by a block or that are the last leaf of a block.
-      const textIterator = document.createNodeIterator(node, NodeFilter.SHOW_TEXT,
+      const textIterator = node.ownerDocument.createNodeIterator(node, NodeFilter.SHOW_TEXT,
         text => (
           // Look for text nodes that either are the last child node of their parent or are followed by a block...
           (!text.nextSibling || blocks[text.nextSibling.nodeName.toLowerCase()]) &&

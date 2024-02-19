@@ -25,6 +25,9 @@ define('xwiki-realtime-wikiEditor-loader', [
 
   var editorId = 'wiki', info = {
     type: editorId,
+    // FIXME: Don't hard-code the field name. We should be able to edit any document field (e.g. TextArea xobject
+    // properties), not just the document content.
+    field: 'content',
     href: '&editor=wiki&force=1',
     name: 'Wiki',
     compatible: ['wiki', 'wysiwyg']
@@ -33,7 +36,7 @@ define('xwiki-realtime-wikiEditor-loader', [
   Loader.bootstrap(info).then(keys => {
     require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
       if (RealtimeWikiEditor && RealtimeWikiEditor.main) {
-        keys._update = Loader.updateKeys.bind(Loader, editorId);
+        keys._update = Loader.updateKeys.bind(Loader, info.field, editorId);
         var config = Loader.getConfig();
         config.rtURL = Loader.getEditorURL(window.location.href, info);
         RealtimeWikiEditor.main(config, keys);

@@ -77,8 +77,7 @@ public class XWikiGenericContainer<T extends GenericContainer<T>> extends Generi
             throw new IllegalStateException("copyFileToContainer can only be used with created / running container");
         }
         try {
-            Path targetDirectory = Path.of("target", "testcontainers");
-            Files.createDirectories(targetDirectory);
+            Path targetDirectory = Path.of("target");
             Path tarFile = Files.createTempFile(targetDirectory, "tc-tar-tmp", ".tar");
             try {
                 copyFileToContainer(transferable, containerPath, tarFile);
@@ -96,6 +95,7 @@ public class XWikiGenericContainer<T extends GenericContainer<T>> extends Generi
             TarArchiveOutputStream tarArchive = new TarArchiveOutputStream(outputStream))
         {
             tarArchive.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
+            tarArchive.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
             transferable.transferTo(tarArchive, containerPath);
             tarArchive.finish();
         }

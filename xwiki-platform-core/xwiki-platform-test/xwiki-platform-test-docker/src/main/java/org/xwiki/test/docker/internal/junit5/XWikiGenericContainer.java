@@ -33,12 +33,13 @@ import org.testcontainers.images.builder.Transferable;
 
 /**
  * To be used instead of {@link GenericContainer} to fix an OOM issue on TC side, see
- * <a href="OOM when executing the Docker-based test framework in DOOD situations">issue 4203</a>.
+ * <a href="https://github.com/testcontainers/testcontainers-java/issues/4203">issue 4203</a>.
  *
  * @param <T> the type of container
  * @version $Id$
  * @since 16.1.0RC1
  */
+// TODO: Remove this class when https://github.com/testcontainers/testcontainers-java/issues/4203 is fixed
 public class XWikiGenericContainer<T extends GenericContainer<T>> extends GenericContainer<T>
 {
     /**

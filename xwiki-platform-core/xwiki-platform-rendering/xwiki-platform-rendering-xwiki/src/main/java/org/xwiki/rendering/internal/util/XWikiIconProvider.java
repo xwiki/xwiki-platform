@@ -63,9 +63,8 @@ public class XWikiIconProvider extends DefaultIconProvider
     @Override
     public Block get(String iconName)
     {
-        IconSet iconSet = null;
         try {
-            iconSet = getIconSet(iconName);
+            IconSet iconSet = getIconSet(iconName);
             String iconContent = this.iconRenderer.renderHTML(iconName, iconSet);
             Block iconAlternative;
             try {

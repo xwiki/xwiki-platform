@@ -519,6 +519,7 @@ class DefaultResetPasswordManagerTest
         String symbolNumberNoSpace6Chars = "_/3434";
         String onlyUpper3Chars = "FOO";
         String onlyUpper6Chars = "FOOOOO";
+        String isolatedSymbol = "bar@bar";
 
         return Stream.of(
             // Length 3, no rules
@@ -536,6 +537,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(3, noRules, symbolNumberNoSpace6Chars, true),
             Arguments.of(3, noRules, onlyUpper3Chars, true),
             Arguments.of(3, noRules, onlyUpper6Chars, true),
+            Arguments.of(3, noRules, isolatedSymbol, true),
             // length 6, no rules
             Arguments.of(6, noRules, onlyLower3Chars, false),
             Arguments.of(6, noRules, onlyLower6Chars, true),
@@ -551,6 +553,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, noRules, symbolNumberNoSpace6Chars, true),
             Arguments.of(6, noRules, onlyUpper3Chars, false),
             Arguments.of(6, noRules, onlyUpper6Chars, true),
+            Arguments.of(6, noRules, isolatedSymbol, true),
             // length 6, lower mandatory
             Arguments.of(6, lowerMandatory, onlyLower3Chars, false),
             Arguments.of(6, lowerMandatory, onlyLower6Chars, true),
@@ -566,6 +569,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, lowerMandatory, symbolNumberNoSpace6Chars, false),
             Arguments.of(6, lowerMandatory, onlyUpper3Chars, false),
             Arguments.of(6, lowerMandatory, onlyUpper6Chars, false),
+            Arguments.of(6, lowerMandatory, isolatedSymbol, true),
             // length 6, upper mandatory
             Arguments.of(6, upperMandatory, onlyLower3Chars, false),
             Arguments.of(6, upperMandatory, onlyLower6Chars, false),
@@ -581,6 +585,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, upperMandatory, symbolNumberNoSpace6Chars, false),
             Arguments.of(6, upperMandatory, onlyUpper3Chars, false),
             Arguments.of(6, upperMandatory, onlyUpper6Chars, true),
+            Arguments.of(6, upperMandatory, isolatedSymbol, false),
             // length 6, number mandatory
             Arguments.of(6, numberMandatory, onlyLower3Chars, false),
             Arguments.of(6, numberMandatory, onlyLower6Chars, false),
@@ -596,6 +601,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, numberMandatory, symbolNumberNoSpace6Chars, true),
             Arguments.of(6, numberMandatory, onlyUpper3Chars, false),
             Arguments.of(6, numberMandatory, onlyUpper6Chars, false),
+            Arguments.of(6, numberMandatory, isolatedSymbol, false),
             // length 6, symbol mandatory
             Arguments.of(6, symbolMandatory, onlyLower3Chars, false),
             Arguments.of(6, symbolMandatory, onlyLower6Chars, false),
@@ -611,6 +617,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, symbolMandatory, symbolNumberNoSpace6Chars, true),
             Arguments.of(6, symbolMandatory, onlyUpper3Chars, false),
             Arguments.of(6, symbolMandatory, onlyUpper6Chars, false),
+            Arguments.of(6, symbolMandatory, isolatedSymbol, true),
             // length 6, upper and number mandatory
             Arguments.of(6, upperAndNumberMandatory, onlyLower3Chars, false),
             Arguments.of(6, upperAndNumberMandatory, onlyLower6Chars, false),
@@ -626,6 +633,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, upperAndNumberMandatory, symbolNumberNoSpace6Chars, false),
             Arguments.of(6, upperAndNumberMandatory, onlyUpper3Chars, false),
             Arguments.of(6, upperAndNumberMandatory, onlyUpper6Chars, false),
+            Arguments.of(6, upperAndNumberMandatory, isolatedSymbol, false),
             // length 6, upper and lower mandatory
             Arguments.of(6, lowerAndUpperMandatory, onlyLower3Chars, false),
             Arguments.of(6, lowerAndUpperMandatory, onlyLower6Chars, false),
@@ -641,6 +649,7 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, lowerAndUpperMandatory, symbolNumberNoSpace6Chars, false),
             Arguments.of(6, lowerAndUpperMandatory, onlyUpper3Chars, false),
             Arguments.of(6, lowerAndUpperMandatory, onlyUpper6Chars, false),
+            Arguments.of(6, lowerAndUpperMandatory, isolatedSymbol, false),
             // length 6, all rules
             Arguments.of(6, allRules, onlyLower3Chars, false),
             Arguments.of(6, allRules, onlyLower6Chars, false),
@@ -656,9 +665,11 @@ class DefaultResetPasswordManagerTest
             Arguments.of(6, allRules, symbolNumberNoSpace6Chars, false),
             Arguments.of(6, allRules, onlyUpper3Chars, false),
             Arguments.of(6, allRules, onlyUpper6Chars, false),
+            Arguments.of(6, allRules, isolatedSymbol, false),
             // length 13, all rules
             Arguments.of(13, allRules, lowerUpperSymbolNumberSpace12Chars, false),
-            Arguments.of(13, allRules, lowerUpperSymbolNumberSpaceAccents14Chars, true)
+            Arguments.of(13, allRules, lowerUpperSymbolNumberSpaceAccents14Chars, true),
+            Arguments.of(13, allRules, isolatedSymbol, false)
         );
     }
 }

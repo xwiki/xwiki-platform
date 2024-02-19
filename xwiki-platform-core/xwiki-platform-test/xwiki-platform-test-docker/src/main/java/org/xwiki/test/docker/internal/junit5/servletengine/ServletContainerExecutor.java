@@ -39,6 +39,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -403,7 +404,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 container = new XWikiLocalGenericContainer<>(imageName);
             }
         } else {
-            container = new GenericContainer<>(baseImageName);
+            container = new XWikiGenericContainer<>(baseImageName);
         }
 
         return container;

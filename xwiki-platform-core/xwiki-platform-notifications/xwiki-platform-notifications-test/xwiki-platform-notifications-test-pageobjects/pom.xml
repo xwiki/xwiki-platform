@@ -53,5 +53,11 @@
       <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Required to perform REST requests against the notifications rest API. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-rest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

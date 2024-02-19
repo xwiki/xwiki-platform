@@ -51,7 +51,15 @@ public class WatchedLocationState
     public WatchedLocationState(boolean isWatched, Date startingDate)
     {
         this.isWatched = isWatched;
-        this.startingDate = startingDate;
+        if (startingDate != null) {
+            this.startingDate = truncateMilliseconds(startingDate);
+        }
+    }
+
+    private Date truncateMilliseconds(Date startingDate)
+    {
+        long dateValue = startingDate.getTime() / 1000;
+        return new Date(dateValue * 1000);
     }
 
     /**

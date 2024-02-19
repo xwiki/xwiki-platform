@@ -278,7 +278,11 @@ public class XWikiDockerExtension extends AbstractExtension
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideo(extensionContext);
+        try {
+            saveScreenshotAndVideo(extensionContext);
+        } catch (Exception e) {
+            LOGGER.error("Failed to save the video", e);
+        }
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
         displayAgentName();

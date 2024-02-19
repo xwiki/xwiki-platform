@@ -89,10 +89,10 @@ define('xwiki-realtime-loader', [
     };
   },
 
-  // Returns a promise that resolves with the list of editor channels available for the content field of the current
+  // Returns a promise that resolves with the list of editor channels available for the specified field of the current
   // document in the current language.
-  checkSocket = function() {
-    const path = doc.language + '/content/';
+  checkSocket = function(field) {
+    const path = `${doc.language}/${field}/`;
     return doc.getChannels({path}).then(function(channels) {
       return channels.filter(channel => channel?.path?.length > 2 && channel?.userCount > 0)
         .map(channel => channel.path.slice(2).join('/'));
@@ -104,7 +104,7 @@ define('xwiki-realtime-loader', [
   module.checkSessions = function(info) {
     if (lock) {
       // Found an edit lock link.
-      checkSocket().then(types => {
+      checkSocket(info.field).then(types => {
         // Determine if it's a realtime session.
         if (types.length) {
           console.log('Found an active realtime session.');
@@ -746,11 +746,11 @@ define('xwiki-realtime-loader', [
     });
   },
 
-  parseKeyData = function(editorId, channels) {
+  parseKeyData = function(field, editorId, channels) {
     let keys = {};
     const eventsChannel = channels.getByPath([doc.language, 'events', '1.0']);
     const userDataChannel = channels.getByPath([doc.language, 'events', 'userdata']);
-    const editorChannel = channels.getByPath([doc.language, 'content', editorId]);
+    const editorChannel = channels.getByPath([doc.language, field, editorId]);
     if (!eventsChannel || !userDataChannel || !editorChannel) {
       console.error('Missing document channels.');
     } else {
@@ -761,9 +761,9 @@ define('xwiki-realtime-loader', [
         userdata: userDataChannel.key,
         active: {}
       });
-      // Collect the other active real-time editing session (for the document content field) that are using a different
-      // editor (e.g. the WYSIWYG editor).
-      channels.getByPathPrefix([doc.language, 'content']).forEach(channel => {
+      // Collect the other active real-time editing session (for the specified document field) that are using a
+      // different editor (e.g. the WYSIWYG editor).
+      channels.getByPathPrefix([doc.language, field]).forEach(channel => {
         if (channel.userCount > 0 && JSON.stringify(channel.path) !== JSON.stringify(editorChannel.path)) {
           keys.active[channel.path.slice(2).join('/')] = channel;
         }
@@ -773,17 +773,17 @@ define('xwiki-realtime-loader', [
   };
 
   $.extend(module, {
-    updateKeys: function(editorId) {
+    updateKeys: function(field, editorId) {
       return doc.getChannels({
         path: [
           doc.language + '/events/1.0',
           doc.language + '/events/userdata',
-          doc.language + '/content/' + editorId,
-          // Check also if the content is edited in real-time with other editors at the same time.
-          doc.language + '/content/',
+          `${doc.language}/${field}/${editorId}`,
+          // Check also if the field is edited in real-time with other editors at the same time.
+          `${doc.language}/${field}/`,
         ],
         create: true
-      }).then(parseKeyData.bind(module, editorId));
+      }).then(parseKeyData.bind(module, field, editorId));
     },
 
     requestRt: function(type, callback) {
@@ -832,8 +832,6 @@ define('xwiki-realtime-loader', [
     onKeysChanged: function() {
       // The channel keys have changed while we were offline. We may not have the latest version of the document. The
       // safest solution is to reload.
-      // FIXME: This module shouldn't know about CKEditor.
-      sessionStorage.refreshCk = 'true';
       displayCustomModal(getReloadContent());
     },
 
@@ -846,7 +844,7 @@ define('xwiki-realtime-loader', [
           reject(new Error('Lock detected'));
         } else if (window.XWiki.editor === info.type) {
           // No lock and we are using the right editor. Start realtime.
-          this.updateKeys(info.type).then(keys => {
+          this.updateKeys(info.field, info.type).then(keys => {
             if (!keys[info.type] || !keys.events || !keys.userdata) {
               ErrorBox.show('unavailable');
               const error = new Error('You are not allowed to create a new realtime session for that document.');

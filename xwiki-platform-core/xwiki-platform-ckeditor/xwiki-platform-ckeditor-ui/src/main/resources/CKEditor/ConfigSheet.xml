@@ -86,6 +86,12 @@
     'xwiki-office': {
       'enabled': $officeImportSupported
     },
+    'xwiki-realtime': {
+      'stylesheets': [
+        $services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-webjar', 'webjar.bundle.min.css'),
+        $services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wysiwyg-webjar', 'webjar.bundle.min.css')
+      ]
+    },
     'xwiki-upload': {
       'isTemporaryAttachmentSupported': $isTemporaryAttachmentSupported
     }

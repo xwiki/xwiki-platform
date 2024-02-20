@@ -8,10 +8,6 @@
     "lint": "vue-cli-service lint . --no-fix",
     "test": "vue-cli-service test:unit"
   },
-  "engines": {
-    "npm": "10.4.0",
-    "node": "20.11.0"
-  },
   "dependencies": {
     "vue": "2.7.16",
     "vue-i18n": "8.28.2",

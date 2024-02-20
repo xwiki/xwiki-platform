@@ -694,7 +694,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Focus the rich text area.
         secondTextArea.click();
         // Move the caret inside the information box.
-        secondTextArea.sendKeys(Keys.ARROW_UP, "two ");
+        secondTextArea.sendKeys(Keys.ARROW_UP, Keys.TAB, "two ");
 
         MacroDialogEditModal secondMacroEditModal = secondEditor.getBalloonToolBar().editMacro();
         secondMacroEditModal.setMacroParameter("cssClass", "bar");

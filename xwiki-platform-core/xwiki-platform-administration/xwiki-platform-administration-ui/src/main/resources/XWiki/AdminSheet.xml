@@ -886,9 +886,12 @@ require(['jquery'], function($) {
   margin-top: 0;
 }
 
-#admin-page-content label &gt; input[type="checkbox"],
-#admin-page-content label &gt; input[type="radio"] {
+#admin-page-content label &gt; input[type="checkbox"] {
   vertical-align: bottom;
+}
+
+#admin-page-content label &gt; input[type="radio"] {
+  vertical-align: baseline;
 }
 
 /**

@@ -83,7 +83,7 @@ define('xwiki-realtime-loader', [
       userAvatarURL: realtimeConfig.user.avatarURL,
       isAdvancedUser: realtimeConfig.user.advanced,
       network: allRt.network,
-      abort: module.onRealtimeAbort.bind(module),
+      setRealtimeEditing: module.setRealtimeEditing.bind(module),
       onKeysChanged: module.onKeysChanged.bind(module),
       displayDisableModal: module.displayDisableModal.bind(module),
     };
@@ -444,6 +444,21 @@ define('xwiki-realtime-loader', [
     resize();
   },
 
+  /**
+   * Hides the warning message and asks the other users is they are editing offline (i.e. outside the realtime session),
+   * in which case the warning message is displayed again (see onIsSomeoneOfflineMessage).
+   *
+   * @param {boolean} force whether to force the update even when the warning message is not visible
+   */
+  updateWarning = function(force) {
+    if (force || warningVisible) {
+      hideWarning();
+      allRt.wChan?.bcast(JSON.stringify({
+        cmd: 'isSomeoneOffline'
+      }));
+    }
+  },
+
   connectingVisible = false,
   displayConnecting = function() {
     const $after = getBoxPosition();
@@ -526,12 +541,7 @@ define('xwiki-realtime-loader', [
     const channel = allRt.wChan;
     const network = allRt.network;
     // Handle leave events.
-    channel.on('leave', function() {
-      hideWarning();
-      channel.bcast(JSON.stringify({
-        cmd: 'isSomeoneOffline'
-      }));
-    });
+    channel.on('leave', updateWarning);
     // Handle incoming messages.
     channel.on('message', function(msg, sender) {
       const data = tryParse(msg);
@@ -541,7 +551,7 @@ define('xwiki-realtime-loader', [
         // Receiving an answer to a realtime session request.
         case 'answer': return onAnswerMessage(data);
         // Someone is joining the channel while we're editing, check if they are using realtime and if we are.
-        case 'join': return onJoinMessage(data, sender, channel, network);
+        case 'join': return onJoinMessage(data, sender, network);
         // Someone wants to know if we're editing offline to know if the warning message should be displayed.
         case 'isSomeoneOffline': return onIsSomeoneOfflineMessage(sender, network);
       }
@@ -601,7 +611,7 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  onJoinMessage = function(data, sender, channel, network) {
+  onJoinMessage = function(data, sender, network) {
     if (lock) {
       return;
     } else if (!data.realtime || !module.isRt) {
@@ -609,11 +619,8 @@ define('xwiki-realtime-loader', [
       network.sendto(sender, JSON.stringify({
         cmd: 'displayWarning'
       }));
-    } else if (warningVisible) {
-      hideWarning();
-      channel.bcast(JSON.stringify({
-        cmd: 'isSomeoneOffline'
-      }));
+    } else {
+      updateWarning();
     }
   },
 
@@ -654,13 +661,6 @@ define('xwiki-realtime-loader', [
       allRt.userList = channel.members;
       allRt.wChan = channel;
       addMessageHandler();
-      // If we're in edit mode (not locked), tell the other users.
-      if (!lock) {
-        channel.bcast(JSON.stringify({
-          cmd: 'join',
-          realtime: module.isRt
-        }));
-      }
     };
     // Join the "all" channel.
     network.join(channelKey).then(onOpen, onError);
@@ -803,12 +803,18 @@ define('xwiki-realtime-loader', [
       }
     },
 
-    onRealtimeAbort: function() {
-      module.isRt = false;
+    /**
+     * Notify the other users that we're editing in realtime or not.
+     * 
+     * @param {boolean} isRealtimeEditing whether the user is editing in realtime or not
+     */
+    setRealtimeEditing: function(isRealtimeEditing) {
+      module.isRt = isRealtimeEditing;
       allRt.wChan?.bcast(JSON.stringify({
         cmd: 'join',
         realtime: module.isRt
       }));
+      updateWarning();
     },
 
     whenReady: function(callback) {

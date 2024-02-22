@@ -23,7 +23,7 @@ define('xwiki-realtime-wikiEditor-loader', [
 ], function($, Loader) {
   'use strict';
 
-  var editorId = 'wiki', info = {
+  const editorId = 'wiki', info = {
     type: editorId,
     // FIXME: Don't hard-code the field name. We should be able to edit any document field (e.g. TextArea xobject
     // properties), not just the document content.
@@ -35,28 +35,24 @@ define('xwiki-realtime-wikiEditor-loader', [
 
   Loader.bootstrap(info).then(keys => {
     require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
-      if (RealtimeWikiEditor && RealtimeWikiEditor.main) {
-        keys._update = Loader.updateKeys.bind(Loader, info.field, editorId);
-        var config = Loader.getConfig();
-        config.rtURL = Loader.getEditorURL(window.location.href, info);
-        RealtimeWikiEditor.main(config, keys);
-      } else {
-        console.error("Couldn't find RealtimeWikiEditor.main, aborting.");
-      }
+      keys._update = Loader.updateKeys.bind(Loader, info.field, editorId);
+      const config = Loader.getConfig();
+      config.rtURL = Loader.getEditorURL(window.location.href, info);
+      RealtimeWikiEditor.main(config, keys);
     });
   });
 
-  var getWikiLock = function() {
-    var force = document.querySelectorAll('a[href*="editor=wiki"][href*="force=1"][href*="/edit/"]');
+  function getWikiLock() {
+    const force = document.querySelectorAll('a[href*="editor=wiki"][href*="force=1"][href*="/edit/"]');
     return !!force.length;
-  };
+  }
 
-  var displayButtonModal = function() {
+  function displayButtonModal() {
     // TODO: This JavaScript code is not loaded anymore on the edit lock page so we need to decide what to do with it
     // (either drop it or find a clean way to load it on the edit lock page).
-    var lock = Loader.getDocLock();
-    var wikiLock = getWikiLock();
-    var button = $();
+    const lock = Loader.getDocLock();
+    const wikiLock = getWikiLock();
+    let button = $();
     if ($('.realtime-button-' + info.type).length) {
       button = $('<button class="btn btn-success"></button>').text(
         Loader.messages.get('redirectDialog.join', info.name));
@@ -69,7 +65,7 @@ define('xwiki-realtime-wikiEditor-loader', [
     button.on('click', function() {
       window.location.href = Loader.getEditorURL(window.location.href, info);
     });
-  };
+  }
 
   displayButtonModal();
   $(document).on('insertButton', displayButtonModal);

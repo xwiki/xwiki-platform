@@ -204,13 +204,13 @@ define('xwiki-realtime-wikiEditor', [
       // Don't let the user edit until the editor is ready.
       module.setEditable(false);
 
-      var initializing = true;
+      var initializing = true,
 
       // List of pretty name of all users (mapped with their server ID).
-      var userData;
+      userData,
 
       // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
-      var toolbar;
+      toolbar;
 
       var setValueWithCursor = function(newValue) {
         var oldValue = canonicalize(editor.getValue());
@@ -372,11 +372,14 @@ define('xwiki-realtime-wikiEditor', [
       module.onAbort = realtimeOptions.onAbort;
       module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
 
-      var onChangeHandler = function() {
+      // Notify the others that we're editing in realtime.
+      editorConfig.setRealtimeEditing(true);
+
+      function onChangeHandler() {
         // We can't destroy the dialog here because sometimes it's impossible to take an action during a merge conflict.
         Saver.setLocalEditFlag(true);
         realtimeOptions.onLocal();
-      };
+      }
       editor.onChange(onChangeHandler);
     };
 

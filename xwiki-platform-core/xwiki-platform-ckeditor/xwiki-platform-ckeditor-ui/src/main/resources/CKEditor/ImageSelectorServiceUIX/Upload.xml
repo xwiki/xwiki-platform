@@ -142,6 +142,8 @@
 
       uploadButton.on('click', function (event) {
         event.preventDefault();
+        
+        const buttonElement = $(this);
 
         const uploadedFile = element.find("input[type='file']").prop('files')[0];
 
@@ -155,8 +157,7 @@
           element.addClass('loading');
           imageSelector.createLoader(uploadedFile, {
             onSuccess: function (entityReference) {
-              imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)],
-                element);
+              imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)], buttonElement);
               element.removeClass('loading');
               new XWiki.widgets.Notification(translations.get('modal.fileUpload.success'), 'done');
             },

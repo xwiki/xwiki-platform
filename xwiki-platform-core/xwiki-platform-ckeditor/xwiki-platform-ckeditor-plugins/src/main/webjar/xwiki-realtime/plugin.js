@@ -99,9 +99,8 @@
             // When someone is offline, they may have left their tab open for a long time and the lock may have
             // disappeared. We're refreshing it when the editor is focused so that other users will know that someone is
             // editing the document.
-            editor.on('focus', function() {
-              XWiki.EditLock = new XWiki.DocumentLock();
-              XWiki.EditLock.lock();
+            editor.on('focus', () => {
+              editor._realtime.lockDocument();
             });
           }
 

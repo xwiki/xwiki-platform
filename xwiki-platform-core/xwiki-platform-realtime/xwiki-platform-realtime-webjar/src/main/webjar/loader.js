@@ -22,12 +22,13 @@ define('xwiki-realtime-loader', [
   'xwiki-meta',
   'xwiki-realtime-config',
   'xwiki-realtime-document',
+  'xwiki-realtime-interface',
   'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-errorBox',
   'xwiki-events-bridge'
 ], function(
   /* jshint maxparams:false */
-  $, xm, realtimeConfig, doc, Messages, ErrorBox
+  $, xm, realtimeConfig, doc, Interface, Messages, ErrorBox
 ) {
   'use strict';
 
@@ -735,6 +736,11 @@ define('xwiki-realtime-loader', [
 
   beforeLaunchRealtime = function(keys) {
     return new Promise((resolve, reject) => {
+      // When editing in-place the user can leave and re-enter the edit mode without reloading the page. Whenever the
+      // user leaves the edit mode isRt is set to false (because the user is not currently editing in realtime). When
+      // the user re-enters the edit mode we need to enable realtime if the "Allow realtime collaboration" checkbox was
+      // checked when the user left the edit mode.
+      module.isRt = module.isRt || Interface.realtimeAllowed();
       if (module.isRt) {
         module.whenReady(function(wsAvailable) {
           module.isRt = wsAvailable;

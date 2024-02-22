@@ -85,6 +85,19 @@ define('xwiki-realtime-wysiwyg', [
       $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
     }
 
+    async lockDocument() {
+      const getDocumentLock = new Promise((resolve, reject) => {
+        if (XWiki.DocumentLock) {
+          resolve(XWiki.DocumentLock);
+        } else {
+          require(['xwiki-document-lock'], resolve, reject);
+        }
+      });
+      XWiki.DocumentLock = await getDocumentLock;
+      XWiki.EditLock = new XWiki.DocumentLock();
+      return XWiki.EditLock.lock();
+    }
+
     _startRealtimeSync() {
       this._connection.status = ConnectionStatus.CONNECTING;
 
@@ -336,8 +349,7 @@ define('xwiki-realtime-wysiwyg', [
         if (info.userList.length) {
           // If someone has left, try to get the lock.
           if (oldUsers.some(user => info.userList.users.indexOf(user) === -1)) {
-            XWiki.EditLock = new XWiki.DocumentLock();
-            XWiki.EditLock.lock();
+            this.lockDocument();
           }
           oldUsers = JSON.parse(JSON.stringify(info.userList.users || []));
         }

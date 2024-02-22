@@ -64,6 +64,8 @@ public class TestConfiguration
 
     private boolean wcag;
 
+    private boolean wcagStopOnError;
+
     private Properties properties;
 
     private List<ExtensionOverride> extensionOverrides;
@@ -105,6 +107,7 @@ public class TestConfiguration
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
         mergeVNC(testConfiguration.vnc());
         mergeWCAG(testConfiguration.isWCAG());
+        mergeWCAGStopOnError(testConfiguration.shouldWCAGStopOnError());
         mergeProperties(testConfiguration.getProperties());
         mergeExtraJARs(testConfiguration.getExtraJARs());
         mergeResolveExtraJARs(testConfiguration.isResolveExtraJARs());
@@ -242,6 +245,11 @@ public class TestConfiguration
     private void mergeWCAG(boolean wcag)
     {
         this.wcag = isWCAG() || wcag;
+    }
+
+    private void mergeWCAGStopOnError(boolean wcagStopOnError)
+    {
+        this.wcagStopOnError = shouldWCAGStopOnError() || wcagStopOnError;
     }
 
     private void mergeOffice(boolean office)
@@ -511,6 +519,24 @@ public class TestConfiguration
     public void setWCAG(boolean wcag)
     {
         this.wcag = wcag;
+    }
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    public boolean shouldWCAGStopOnError()
+    {
+        return this.wcagStopOnError;
+    }
+
+    /**
+     * @param wcagStopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    public void setWCAGStopOnError(boolean wcagStopOnError)
+    {
+        this.wcagStopOnError = wcagStopOnError;
     }
 
     /**

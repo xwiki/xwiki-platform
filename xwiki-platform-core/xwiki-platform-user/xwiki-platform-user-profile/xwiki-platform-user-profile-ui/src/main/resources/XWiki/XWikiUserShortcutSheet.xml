@@ -20,133 +20,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.XWikiUserMembershipSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.XWikiUserShortcutSheet" locale="">
   <web>XWiki</web>
-  <name>XWikiUserMembershipSheet</name>
+  <name>XWikiUserShortcutSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>xwiki:XWiki.WebHome</parent>
+  <parent>XWiki.XWikiUserSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-      #set($obj = $doc.getObject('XWiki.XWikiUsers'))
-      #if(!$obj)
-      {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}##
-      #elseif ($xcontext.action == 'get')
-  #if ($xcontext.isMainWiki())
-    ## Main wiki users can be located in any wiki
-    #set($groups = $services.user.group.getGroupsFromAllWikis($doc.documentReference))
-  #else
-    ## Subwiki users are usually located only in the local wiki
-    #set($groups = $services.user.group.getGroupsFromMemberWiki($doc.documentReference))
-  #end
-  ## Filter
-  #set($filterValue = "$!{request.get('group')}")
-  #if ($filterValue != '')
-    #set ($filteredGroups = [])
-    #foreach($group in $groups)
-      #set($groupString = $services.model.serialize($group, 'default'))
-      #if ($groupString.toLowerCase().contains($filterValue.toLowerCase()))
-        #set($void = $filteredGroups.add($group))
-      #end
-    #end
-  #else
-    #set ($filteredGroups = $groups)
-  #end
-  #if ($filteredGroups.size() &gt; 0)
-    #set ($filteredGroups = $collectiontool.sort($filteredGroups))
-    #set($order = "$!request.sort")
-    #if ($order == 'group' &amp;&amp; $request.get('dir').toLowerCase() == 'desc')
-      ## Reverse order
-      #set($descGroups = [])
-      #set($max = $filteredGroups.size() - 1)
-      #foreach($i in [ $max ..  0 ])
-        #set($void = $descGroups.add($filteredGroups[$i]))
-      #end
-      #set($filteredGroups = $descGroups)
-    #end
-    #set($offset = $numbertool.toNumber($request.get('offset')).intValue())
-    ## Offset starts from 0 in velocity and 1 in javascript
-    #set($offset = $offset - 1)
-    #if (!$offset || $offset &lt; 0)
-      #set($offset = 0)
-    #end
-    #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
-    #if (!$limit || $limit &lt; 0)
-      #set ($limit = 15)
-    #end
-    #set($toIndex = $offset + $limit)
-    #if ($toIndex &gt; $filteredGroups.size())
-      #set($toIndex = $filteredGroups.size())
-    #end
-    #set($subGroups = $filteredGroups.subList($offset, $toIndex))
-  #else
-    #set($subGroups = [])
-  #end
-  #set($rows = [])
-  #foreach ($group in $subGroups)
-    #set ($title = $xwiki.getDocument($group).title)
-    #if ("$!title" == '')
-      #set ($title = $group.name)
-    #end
-    #set($void = $rows.add({
-        'doc_viewable' : true,
-        'group' : $title,
-        'group_url' : $xwiki.getURL($group)
-      }))
-  #end
-  #set($result = {
-      'totalrows' : $filteredGroups.size(),
-      'returnedrows' : $subGroups.size(),
-      'offset' : $mathtool.add($offset, 1),
-      'reqNo' : $numbertool.toNumber($request.reqNo),
-      'rows': $rows
-    })
-  $jsontool.serialize($result)
-  $response.setContentType('application/json')
-#else
-  (% id="user.profile.groups.title" %)
-  == {{translation key="user.profile.groups.title"/}}
-
-  {{translation key="user.profile.groups.description"/}}
-
-  #set ($liveDataConfig = {
-    'meta': {
-      'propertyDescriptors': [
-        { 'id': 'group', 'displayer': { 'id': 'link', 'propertyHref': 'group_url' } }
-      ],
-      'entryDescriptor': {
-        'idProperty': "group"
-      }
-    }
-  })
-  #set ($sourceParameters = $escapetool.url({
-    'translationPrefix' : 'user.profile.groups.table.',
-    '$doc' : $doc.fullName,
-    'resultPage': 'XWiki.XWikiUserMembershipSheet'
-  }))
-
-  {{liveData
-    id='user.profile.group.table'
-    source='liveTable'
-    sourceParameters="$sourceParameters"
-    properties="group"
-    }}$jsontool.serialize($liveDataConfig){{/liveData}}
-#end## User object exists
-{{/velocity}}</content>
+  <content/>
   <object>
-    <name>XWiki.XWikiUserMembershipSheet</name>
+    <name>XWiki.XWikiUserShortcutSheet</name>
     <number>0</number>
     <className>XWiki.UIExtensionClass</className>
-    <guid>0e8767e4-f4c9-4816-a903-5a32ef6a25bf</guid>
+    <guid>d3b30f9d-f441-4a7f-aee6-5eca30094ca2</guid>
     <class>
       <name>XWiki.UIExtensionClass</name>
       <customClass/>
@@ -182,7 +77,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -202,6 +97,7 @@
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -232,6 +128,7 @@
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -266,18 +163,64 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{include reference="XWiki.XWikiUserMembershipSheet"/}}</content>
+      <content>{{velocity}}
+#set($userObj = $doc.getObject("XWiki.XWikiUsers"))
+#if(!$userObj)
+  {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
+#else
+  #set($dashboardPrefs = $doc.getObject("Dashboard.UserDashboardPreferencesClass"))
+  #if(!$dashboardPrefs)
+    ## add the object to teh temporary document to reuse the displayer
+    #set($dashboardPrefs = $doc.newObject("Dashboard.UserDashboardPreferencesClass"))
+    ## get the default value of the property that we're interested in
+    #set($dbPrefsClass = $dashboardPrefs.xWikiClass)
+    #set($displayOnMainPageProp = $dbPrefsClass.get('displayOnMainPage'))
+    #set($defaultValue = $displayOnMainPageProp.getProperty('defaultValue').value)
+    #set($ok = $dashboardPrefs.set('displayOnMainPage', $defaultValue ))
+    #if ($xcontext.action == 'edit')
+#set($ok = $doc.save($services.localization.render('dashboard.initialization.saveMessage')))
+## Send the proper event when saving the profile
+#set ($discard = $xwiki.jsx.use('Dashboard.XWikiUserDashboardSheet'))
+#end
+  #end
+{{html clean="false" wiki="true"}}
+&lt;div class="full column xform"&gt;
+  &lt;div class="userDashboard"&gt;
+    #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
+      &lt;div class="editProfileCategory"&gt;
+        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.dashboard.edit'))"
+            href="$doc.getURL('edit', 'category=dashboard')" class="btn btn-xs"&gt;
+          &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
+          &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.dashboard.edit'))&lt;/span&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+    #end
+    &lt;h2&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h2&gt;
+    &lt;dl&gt;
+      &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.dashboard.user.displayOnMainPage')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;$doc.display('displayOnMainPage', $dashboardPrefs)&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+#if ("$!{request.xpage}" != 'edituser')
+{{dashboard/}}
+#end
+#end
+{{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.userMembership</name>
+      <name>org.xwiki.platform.user.profile.menu.userShortcut</name>
     </property>
     <property>
-      <parameters>id=groups
-icon=group
-priority=40</parameters>
+      <parameters>id=shortcuts
+icon=keyboard
+# isActive: The user is seeing her own profile or the user is an admin.
+isActive=#if ($xcontext.userReference == $doc.documentReference || $hasAdmin)true#{else}false#end
+priority=30</parameters>
     </property>
     <property>
       <scope>wiki</scope>

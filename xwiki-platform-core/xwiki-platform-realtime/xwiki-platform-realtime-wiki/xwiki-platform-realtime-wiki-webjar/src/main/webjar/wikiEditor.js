@@ -84,14 +84,6 @@ define('xwiki-realtime-wikiEditor', [
     // Disable while real-time framework is loading.
     allowRealtimeCheckbox.prop('disabled', true);
 
-    Saver.configure({
-      chainpad: ChainPad,
-      editorType: editorId,
-      editorName: 'Wiki',
-      isHTML: false,
-      mergeContent: realtimeConfig.enableMerge !== 0
-    });
-
     console.log("Creating realtime toggle");
 
     var whenReady = function() {
@@ -224,42 +216,42 @@ define('xwiki-realtime-wikiEditor', [
         editor.setCursor(selects[0], selects[1]);
       };
 
-      var createSaver = function(info) {
-        // This function displays a message notifying users that there was a merge.
-        Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
-          toolbar.toolbar.find('.rt-toolbar-rightside'));
-        Saver.setLastSavedContent(editor.getValue());
-        Saver.create({
-          // Id of the Wiki edit mode form.
-          formId: 'edit',
+      function createSaver(info) {
+        const saver = new Saver({
+          editorType: editorId,
+          editorName: 'Wiki',
+          userList: info.userList,
+          userName: editorConfig.userName,
+          network: info.network,
+          channel: eventsChannel,
           setTextValue: function(newText, toConvert, callback) {
             setValueWithCursor(newText);
             callback();
             realtimeOptions.onLocal();
+          },
+          getTextValue: function() {
+            return editor.getValue();
           },
           getSaveValue: function() {
             return {
               content: editor.getValue()
             };
           },
-          getTextValue: function() {
-            return editor.getValue();
-          },
           getTextAtCurrentRevision: function() {
             return $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'}))).then(data => {
               return data.content;
             });
           },
-          realtime: info.realtime,
-          userList: info.userList,
-          userName: editorConfig.userName,
-          network: info.network,
-          channel: eventsChannel,
           safeCrash: function(reason, debugLog) {
             module.onAbort(null, reason, debugLog);
           }
         });
-      };
+        // This function displays a message notifying users that there was a merge.
+        saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
+          toolbar.toolbar.find('.rt-toolbar-rightside'));
+        saver.setLastSavedContent(editor.getValue());
+        return saver;
+      }
 
       var realtimeOptions = {
         // Provide initial state...
@@ -308,7 +300,7 @@ define('xwiki-realtime-wikiEditor', [
           allowRealtimeCheckbox.prop('disabled', false);
 
           this.onLocal();
-          createSaver(info);
+          module.saver = createSaver(info);
         },
 
         onRemote: function(info) {
@@ -338,12 +330,10 @@ define('xwiki-realtime-wikiEditor', [
           module.chainpad.abort();
           module.leaveChannel();
           module.aborted = true;
-          Saver.stop();
+          module.saver.stop();
           toolbar.failed();
           toolbar.toolbar.remove();
-          if (typeof userData.leave === 'function') {
-            userData.leave();
-          }
+          userData.stop?.();
           if (reason || debug) {
             ErrorBox.show(reason || 'disconnected', debug);
           }
@@ -377,7 +367,7 @@ define('xwiki-realtime-wikiEditor', [
 
       function onChangeHandler() {
         // We can't destroy the dialog here because sometimes it's impossible to take an action during a merge conflict.
-        Saver.setLocalEditFlag(true);
+        module.saver.setLocalEditFlag(true);
         realtimeOptions.onLocal();
       }
       editor.onChange(onChangeHandler);

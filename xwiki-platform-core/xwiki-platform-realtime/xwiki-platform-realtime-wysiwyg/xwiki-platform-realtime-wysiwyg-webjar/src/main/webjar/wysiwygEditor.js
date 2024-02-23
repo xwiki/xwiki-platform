@@ -107,15 +107,6 @@ define('xwiki-realtime-wysiwyg', [
       // Don't let the user edit until the real-time framework is ready.
       this.setEditable(false);
 
-      // Start the auto-save.
-      Saver.configure({
-        chainpad: ChainPad,
-        editorType: EDITOR_TYPE,
-        editorName: 'WYSIWYG',
-        isHTML: true,
-        mergeContent: realtimeConfig.enableMerge !== 0
-      });
-
       this._connection.realtimeInput = ChainPadNetflux.start(this._getRealtimeOptions());
 
       // Notify the others that we're editing in realtime.
@@ -124,8 +115,8 @@ define('xwiki-realtime-wysiwyg', [
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
         if (this._connection.status === ConnectionStatus.CONNECTED) {
-          Saver.destroyDialog();
-          Saver.setLocalEditFlag(true);
+          this._saver.destroyDialog();
+          this._saver.setLocalEditFlag(true);
           this._onLocal();
         }
       });
@@ -180,27 +171,17 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     _createSaver(info, userName) {
-      Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
-        this._connection.toolbar.toolbar.find('.rt-toolbar-rightside'));
-      Saver.setLastSavedContent(this._editor.getOutputHTML());
-      const saverCreateConfig = {
+      const saverConfig = {
+        editorType: EDITOR_TYPE,
+        editorName: 'WYSIWYG',
         // Id of the wiki page form.
-        formId: window.XWiki.editor === 'wysiwyg' ? 'edit' : 'inline',
-        realtime: info.realtime,
+        formId: RealtimeEditor._getFormId(),
         userList: info.userList,
         userName,
         network: info.network,
         channel: this._eventsChannel,
         setTextValue: (newText) => {
           this._patchedEditor.setHTML(newText, true);
-        },
-        getSaveValue: () => {
-          const fieldName = this._editor.getFormFieldName();
-          return {
-            [fieldName]: this._editor.getOutputHTML(),
-            RequiresHTMLConversion: fieldName,
-            [`${fieldName}_syntax`]: 'xwiki/2.1'
-          };
         },
         getTextValue: () => {
           try {
@@ -209,6 +190,14 @@ define('xwiki-realtime-wysiwyg', [
             this._editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
             return null;
           }
+        },
+        getSaveValue: () => {
+          const fieldName = this._editor.getFormFieldName();
+          return {
+            [fieldName]: this._editor.getOutputHTML(),
+            RequiresHTMLConversion: fieldName,
+            [`${fieldName}_syntax`]: 'xwiki/2.1'
+          };
         },
         getTextAtCurrentRevision: (revision) => {
           return $.get(XWiki.currentDocument.getURL('get', $.param({
@@ -223,7 +212,22 @@ define('xwiki-realtime-wysiwyg', [
           this._onAbort(null, reason, debugLog);
         }
       };
-      Saver.create(saverCreateConfig);
+      this._saver = new Saver(saverConfig);
+      this._saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
+        this._connection.toolbar.toolbar.find('.rt-toolbar-rightside'));
+      this._saver.setLastSavedContent(this._editor.getOutputHTML());
+    }
+
+    static _getFormId() {
+      if (window.XWiki.editor === 'wysiwyg') {
+        if (window.XWiki.contextaction === 'view') {
+          return 'inplace-editing';
+        } else {
+          return 'edit';
+        }
+      } else {
+        return 'inline';
+      }
     }
 
     _changeUserIcons(newdata) {
@@ -488,15 +492,14 @@ define('xwiki-realtime-wysiwyg', [
       this._editorConfig.setRealtimeEditing(false);
 
       // Stop the autosave (and leave the events Netflux channel associated with the edited document).
-      Saver.stop();
+      this._saver.stop();
 
       // Remove the realtime toolbar.
       this._connection.toolbar.failed();
       this._connection.toolbar.toolbar.remove();
 
-      // Leave the user data Netflux channel associated with the edited document, in order to stop receiving user caret
-      // updates.
-      this._connection.userData.leave?.();
+      // Stop receiving user caret updates (leave the user data Netflux channel associated with the edited document).
+      this._connection.userData.stop?.();
       // And remove the user caret indicators.
       this._changeUserIcons({});
 

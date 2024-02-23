@@ -472,7 +472,9 @@
   <script>
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
-      shortcut.add("$services.localization.render('core.shortcuts.view.edit')", function() {
+      #set ($shortcut_view_edit = "$!{xwiki.getUserPreference('shortcut_view_edit')}")
+      shortcut.add("#if($shortcut_view_edit!='')$shortcut_view_edit#{else}" +
+        "$services.localization.render('core.shortcuts.view.edit')#end", function() {
         var editLink = $('tmEdit').down('a');
         // Make sure the shortcut doesn't work when the edit link is disabled.
         if (editLink && !editLink.classList.contains('disabled')) {
@@ -482,8 +484,10 @@
         }
       }, {'disable_in_input': true});
       #if($isAdvancedUser)
-        shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
-        shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });
+        #set ($shortcut_view_wiki = "$!{xwiki.getUserPreference('shortcut_view_wiki')}")
+        shortcut.add("#if($shortcut_view_wiki!='')$shortcut_view_wiki#{else}$services.localization.render('core.shortcuts.view.wiki')#end",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
+        #set ($shortcut_view_wysiwyg = "$!{xwiki.getUserPreference('shortcut_view_wysiwyg')}")
+        shortcut.add("#if($shortcut_view_wysiwyg!='')$shortcut_view_wysiwyg#{else}$services.localization.render('core.shortcuts.view.wysiwyg')#end",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.rights')",function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'disable_in_input':true });

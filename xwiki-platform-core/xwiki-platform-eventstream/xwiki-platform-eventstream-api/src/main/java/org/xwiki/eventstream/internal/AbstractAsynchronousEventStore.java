@@ -439,21 +439,25 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         task.future.complete(output);
 
         // Notify event listeners
+        Object notificationOuput = task.output;
+        if (task.output instanceof Optional<?>) {
+            notificationOuput = ((Optional<?>) task.output).orElse(null);
+        }
         switch (task.type) {
             case DELETE_EVENT:
-                this.observation.notify(new EventStreamDeletedEvent(), task.output);
+                this.observation.notify(new EventStreamDeletedEvent(), notificationOuput);
                 break;
 
             case DELETE_EVENT_BY_ID:
-                this.observation.notify(new EventStreamDeletedEvent(), task.output);
+                this.observation.notify(new EventStreamDeletedEvent(), notificationOuput);
                 break;
 
             case SAVE_EVENT:
-                this.observation.notify(new EventStreamAddedEvent(), task.output);
+                this.observation.notify(new EventStreamAddedEvent(), notificationOuput);
                 break;
 
             case DELETE_STATUS:
-                this.observation.notify(new EventStatusDeletedEvent(), task.output);
+                this.observation.notify(new EventStatusDeletedEvent(), notificationOuput);
                 break;
 
             case DELETE_STATUSES:
@@ -461,15 +465,15 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                 break;
 
             case SAVE_STATUS:
-                this.observation.notify(new EventStatusAddOrUpdatedEvent(), task.output);
+                this.observation.notify(new EventStatusAddOrUpdatedEvent(), notificationOuput);
                 break;
 
             case DELETE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityDeleteEvent(), task.output);
+                this.observation.notify(new MailEntityDeleteEvent(), notificationOuput);
                 break;
 
             case SAVE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityAddedEvent(), task.output);
+                this.observation.notify(new MailEntityAddedEvent(), notificationOuput);
                 break;
 
             default:

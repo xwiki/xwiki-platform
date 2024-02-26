@@ -33,6 +33,7 @@ import org.xwiki.component.manager.ComponentManager;
  * Replace the default {@link InjectionManagerFactory} by one able to create XWiki components.
  * 
  * @version $Id$
+ * @since 16.2.0RC1
  */
 @Priority(100)
 public class XWikiInjectionManagerFactory implements InjectionManagerFactory

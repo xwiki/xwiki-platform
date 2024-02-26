@@ -55,6 +55,38 @@ public interface XWikiVersioningStoreInterface
 
     Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
+    private Collection<String> getXWikiDocStringVersions(XWikiDocument doc, RevisionCriteria criteria,
+        XWikiContext context) throws XWikiException
+    {
+        List<String> results = new ArrayList<>();
+
+        Version[] revisions = getXWikiDocVersions(doc, context);
+        XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+
+        XWikiRCSNodeInfo nextNodeinfo = null;
+        XWikiRCSNodeInfo nodeinfo;
+        for (Version revision : revisions) {
+            nodeinfo = nextNodeinfo;
+            nextNodeinfo = archive.getNode(revision);
+
+            if (nodeinfo != null) {
+                // Minor/Major version matching
+                if (criteria.getIncludeMinorVersions() || nextNodeinfo == null || !nextNodeinfo.isMinorEdit()) {
+                    // Author matching
+                    if (criteria.getAuthor().isEmpty() || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
+                        // Date range matching
+                        Date versionDate = nodeinfo.getDate();
+                        if (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate())) {
+                            results.add(nodeinfo.getVersion().toString());
+                        }
+                    }
+                }
+            }
+        }
+
+        return criteria.getRange().subList(results);
+    }
+
     /**
      * Gets versions from a given document matching criteria like author, minimum creation date, etc.
      *
@@ -69,46 +101,9 @@ public interface XWikiVersioningStoreInterface
     default Collection<Version> getXWikiDocVersions(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
         throws XWikiException
     {
-        List<String> results = new ArrayList<>();
-
-        Version[] revisions = getXWikiDocVersions(doc, context);
-        XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
-
-        XWikiRCSNodeInfo nextNodeinfo = null;
-        XWikiRCSNodeInfo nodeinfo;
-        for (Version revision : revisions) {
-            nodeinfo = nextNodeinfo;
-            nextNodeinfo = archive.getNode(revision);
-
-            if (nodeinfo == null) {
-                continue;
-            }
-
-            // Minor/Major version matching
-            if (criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit()) {
-                // Author matching
-                if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
-                    // Date range matching
-                    Date versionDate = nodeinfo.getDate();
-                    if (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate())) {
-                        results.add(nodeinfo.getVersion().toString());
-                    }
-                }
-            }
-        }
-
-        nodeinfo = nextNodeinfo;
-        if (nodeinfo != null) {
-            if (criteria.getAuthor().isEmpty() || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
-                // Date range matching
-                Date versionDate = nodeinfo.getDate();
-                if (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate())) {
-                    results.add(nodeinfo.getVersion().toString());
-                }
-            }
-        }
-
-        return criteria.getRange().subList(results).stream().map(Version::new).toList();
+        return getXWikiDocStringVersions(doc, criteria, context).stream()
+            .map(Version::new)
+            .toList();
     }
 
     /**
@@ -125,7 +120,7 @@ public interface XWikiVersioningStoreInterface
     default long getXWikiDocVersionsCount(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
         throws XWikiException
     {
-        return getXWikiDocVersions(doc, criteria, context).size();
+        return getXWikiDocStringVersions(doc, criteria, context).size();
     };
 
     XWikiDocument loadXWikiDoc(XWikiDocument doc, String version, XWikiContext context) throws XWikiException;

@@ -2691,8 +2691,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public List<String> getRevisions(RevisionCriteria criteria, XWikiContext context) throws XWikiException
     {
+        // We collect explicitly into an ArrayList to ensure mutability of the resulting list.
         return getVersioningStore(context).getXWikiDocVersions(this, criteria, context).stream()
-            .map(Version::toString).collect(Collectors.toCollection(ArrayList::new));
+            .map(Version::toString)
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public XWikiRCSNodeInfo getRevisionInfo(String version, XWikiContext context) throws XWikiException

@@ -20,7 +20,6 @@
 package com.xpn.xwiki.store;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -119,7 +118,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         try {
             XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, criteria, context);
             if (archive == null) {
-                return Collections.emptyList();
+                return List.of();
             }
             Collection<XWikiRCSNodeInfo> nodes = archive.getNodes();
             Deque<Version> versions = new LinkedList<>();
@@ -338,10 +337,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
                 return nodes;
             } catch (IllegalArgumentException e) {
-                // This happens when the database has wrong values...
-                LOGGER.error("Invalid history for document [{}]", id, e);
-
-                return Collections.emptyList();
+                throw new XWikiException(
+                    String.format("Encountered invalid history when fetching archive for document [%s]", id), e);
             }
         });
     }
@@ -400,10 +397,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             try {
                 return VersioningStoreQueryFactory.getRCSNodeInfoCountQuery(session, id, criteria).getSingleResult();
             } catch (IllegalArgumentException e) {
-                // This happens when the database has wrong values...
-                LOGGER.error("Encountered invalid history when computing archive size for document [{}]", id, e);
-
-                return Long.valueOf(0);
+                throw new XWikiException(
+                    String.format("Encountered invalid history when computing archive size for document [%s]", id), e);
             }
         });
     }

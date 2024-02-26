@@ -27,6 +27,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -77,17 +78,12 @@ public final class VersioningStoreQueryFactory<T>
         this.root = this.criteriaQuery.from(XWikiRCSNodeInfo.class);
     }
 
-    private void filterByDocumentId(final long id)
-    {
-        this.criteriaQuery.where(
-            this.builder.equal(this.root.get(FIELD_ID).get(FIELD_DOCID), id),
-            this.builder.isNotNull(this.root.get(FIELD_DIFF))
-        );
-    }
-
-    private void applyCriteria(RevisionCriteria criteria)
+    private void applyCriteria(final long id, RevisionCriteria criteria)
     {
         List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(this.builder.equal(this.root.get(FIELD_ID).get(FIELD_DOCID), id));
+        predicates.add(this.builder.isNotNull(this.root.get(FIELD_DIFF)));
 
         if (!criteria.getAuthor().isEmpty()) {
             predicates.add(this.builder.equal(this.root.get(FIELD_AUTHOR), criteria.getAuthor()));
@@ -101,7 +97,14 @@ public final class VersioningStoreQueryFactory<T>
         predicates.add(this.builder.between(this.root.get(FIELD_DATE), minDate, criteria.getMaxDate()));
 
         if (!criteria.getIncludeMinorVersions()) {
-            predicates.add(this.builder.equal(this.root.get(FIELD_ID).get(FIELD_VERSION2), 1));
+            // In this case, we keep only the highest minor version for each major version.
+            Subquery<Integer> subQuery = this.criteriaQuery.subquery(Integer.class);
+            Root<XWikiRCSNodeInfo> subRoot = subQuery.from(XWikiRCSNodeInfo.class);
+            subQuery.select(this.builder.max(subRoot.get(FIELD_ID).get(FIELD_VERSION2)));
+            subQuery.where(this.builder.equal(subRoot.get(FIELD_ID).get(FIELD_VERSION1),
+                    this.root.get(FIELD_ID).get(FIELD_VERSION1)),
+                this.builder.equal(subRoot.get(FIELD_ID).get(FIELD_DOCID), this.root.get(FIELD_ID).get(FIELD_DOCID)));
+            predicates.add(this.builder.equal(this.root.get(FIELD_ID).get(FIELD_VERSION2), subQuery));
         }
 
         this.criteriaQuery.where(predicates.toArray(new Predicate[0]));
@@ -163,10 +166,9 @@ public final class VersioningStoreQueryFactory<T>
         VersioningStoreQueryFactory<Long> queryBuilder = new VersioningStoreQueryFactory<>(Long.class, session);
 
         queryBuilder.criteriaQuery.select(queryBuilder.builder.count(queryBuilder.root));
-        queryBuilder.filterByDocumentId(id);
 
         if (criteria != null) {
-            queryBuilder.applyCriteria(criteria);
+            queryBuilder.applyCriteria(id, criteria);
         }
 
         return session.createQuery(queryBuilder.criteriaQuery);
@@ -186,10 +188,9 @@ public final class VersioningStoreQueryFactory<T>
             new VersioningStoreQueryFactory<>(XWikiRCSNodeInfo.class, session);
 
         queryBuilder.criteriaQuery.select(queryBuilder.root);
-        queryBuilder.filterByDocumentId(id);
 
         if (criteria != null) {
-            queryBuilder.applyCriteria(criteria);
+            queryBuilder.applyCriteria(id, criteria);
             queryBuilder.applyRange(criteria.getRange());
             return queryBuilder.query;
         }

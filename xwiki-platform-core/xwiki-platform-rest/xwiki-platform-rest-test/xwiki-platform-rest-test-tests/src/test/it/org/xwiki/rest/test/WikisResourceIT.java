@@ -21,6 +21,7 @@ package org.xwiki.rest.test;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,10 +29,10 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.restlet.engine.io.ReaderInputStream;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
@@ -260,7 +261,7 @@ public class WikisResourceIT extends AbstractHttpIT
     {
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().attachFile(new AttachmentReference(getTestClassName() + ".txt", reference),
-            new ReaderInputStream(new StringReader("attachment content")), true);
+            new ReaderInputStream(new StringReader("attachment content"), StandardCharsets.UTF_8), true);
 
         // Verify there are attachments in the whole wiki
         GetMethod getMethod = executeGet(buildURI(WikiAttachmentsResource.class, getWiki()).toString());

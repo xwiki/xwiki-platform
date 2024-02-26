@@ -50,12 +50,13 @@ public class DocumentRestURLGenerator extends AbstractEntityRestURLGenerator<Doc
             URL url;
             // Get the URL of the translated document if the passed reference defines a Locale
             if (locale != null && !locale.toString().isEmpty()) {
-                url =  Utils.createURI(getBaseURI(), PageTranslationResource.class,
-                    reference.getWikiReference().getName(), getSpaceList(reference.getLastSpaceReference()),
-                    reference.getName(), reference.getLocale()).toURL();
+                url = Utils
+                    .createURI(getBaseURI(), PageTranslationResource.class, reference.getWikiReference().getName(),
+                        getRestSpaceList(reference.getLastSpaceReference()), reference.getName(), reference.getLocale())
+                    .toURL();
             } else {
                 url = Utils.createURI(getBaseURI(), PageResource.class, reference.getWikiReference().getName(),
-                        getSpaceList(reference.getLastSpaceReference()), reference.getName()).toURL();
+                    getRestSpaceList(reference.getLastSpaceReference()), reference.getName()).toURL();
             }
             return url;
         } catch (MalformedURLException e) {

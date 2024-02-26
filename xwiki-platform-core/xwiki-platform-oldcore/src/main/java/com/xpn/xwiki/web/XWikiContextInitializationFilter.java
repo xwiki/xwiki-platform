@@ -36,9 +36,6 @@ import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -140,11 +137,7 @@ public class XWikiContextInitializationFilter implements Filter
             // Initialize the current user.
             XWikiUser user = context.getWiki().checkAuth(context);
             if (user != null) {
-                DocumentReferenceResolver<String> documentReferenceResolver =
-                    Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-                SpaceReference defaultUserSpace =
-                    new SpaceReference(XWiki.SYSTEM_SPACE, new WikiReference(context.getWikiId()));
-                DocumentReference userReference = documentReferenceResolver.resolve(user.getUser(), defaultUserSpace);
+                DocumentReference userReference = user.getUserReference();
                 context.setUserReference(
                     XWikiRightService.GUEST_USER.equals(userReference.getName()) ? null : userReference);
             }

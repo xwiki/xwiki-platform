@@ -33,6 +33,10 @@
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-model</artifactId>
       <version>${project.version}</version>

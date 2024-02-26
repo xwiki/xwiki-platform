@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.UUID;
 
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -39,7 +40,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.restlet.data.MediaType;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionId;
@@ -203,13 +203,13 @@ public class InstallMojo extends AbstractMojo
         throws Exception
     {
         PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
         RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML.toString(), "UTF-8");
+            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
         putMethod.setRequestEntity(entity);
 
         httpClient.executeMethod(putMethod);

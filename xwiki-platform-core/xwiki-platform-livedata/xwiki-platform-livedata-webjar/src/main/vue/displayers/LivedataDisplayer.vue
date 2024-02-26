@@ -51,7 +51,7 @@
     the table is refreshed.
   -->
   <component
-    class="livedata-displayer"
+    :class="['livedata-displayer', propertyId]"
     :is="`Displayer${this.capitalize(this.displayerId)}`"
     :property-id="propertyId"
     :entry="entry"

@@ -719,7 +719,17 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        clickAction(rowNumber, By.cssSelector(String.format(".actions-container .action.action_%s", actionName)));
+        clickAction(rowNumber, getActionSelector(actionName));
+    }
+
+    private static By getActionSelector(String actionName)
+    {
+        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
+    }
+
+    public boolean hasAction(int rowNumber, String actionName)
+    {
+        return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
     }
 
     /**
@@ -730,9 +740,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, By selector)
     {
-        getRowElement(rowNumber)
-            .findElement(selector)
-            .click();
+        findElementInRow(rowNumber, selector).click();
     }
 
     /**
@@ -774,8 +782,13 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement findElementInRow(int rowNumber, By by)
     {
-        return getRowElement(rowNumber)
-            .findElement(by);
+        return getRowElement(rowNumber).findElement(by);
+    }
+
+
+    public List<WebElement> findElementsInRow(int rowNumber, By by)
+    {
+        return getRowElement(rowNumber).findElements(by);
     }
 
     private WebElement getRowElement(int rowNumber)

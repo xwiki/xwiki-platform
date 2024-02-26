@@ -86,7 +86,7 @@
 
 #macro (editGroupModal)
   &lt;div class="modal" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModal-label"
-      data-backdrop="static" data-keyboard="false" data-liveTable="#groupstable" data-liveTableAction="edit"&gt;
+      data-backdrop="static" data-keyboard="false" data-liveData="#groupstable" data-liveDataAction="edit"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -105,7 +105,7 @@
 
 #macro (deleteGroupModal)
   &lt;div class="modal" id="deleteGroupModal" tabindex="-1" role="dialog" aria-labelledby="deleteGroupModal-label"
-       data-liveTable="#groupstable" data-liveTableAction="delete"&gt;
+       data-liveData="#groupstable" data-liveDataAction="delete"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -132,66 +132,94 @@
     &lt;/div&gt;
   &lt;/div&gt;
 #end
-
-#macro (groupScopeFilter)
-  &lt;select name="wiki"&gt;
-    &lt;option selected="selected" value="local"&gt;
-      $escapetool.xml($services.localization.render('xe.admin.groups.local'))
-    &lt;/option&gt;
-    &lt;option value="global"&gt;
-      $escapetool.xml($services.localization.render('xe.admin.groups.global'))
-    &lt;/option&gt;
-    &lt;option value="both"&gt;
-      $escapetool.xml($services.localization.render('xe.admin.groups.both'))
-    &lt;/option&gt;
-  &lt;/select&gt;
-#end
 {{/velocity}}
 
 {{velocity}}
 {{html clean="false"}}
 #set ($discard = $xwiki.ssx.use('XWiki.AdminGroupsSheet'))
 #set ($discard = $xwiki.jsx.use('XWiki.AdminGroupsSheet'))
-## The following are needed when editing a group (e.g. for adding new members).
+## The following are needed when editing a group (e.g., for adding new members).
 #userPicker_import()
 #set ($discard = $xwiki.ssx.use('XWiki.XWikiGroupSheet'))
 #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
-#set ($columnOptions = {
-  'name': {'type': 'text', 'html': true, 'sortable': false},
-  'members': {'filterable': false, 'sortable': false},
-  'scope': {'type': 'list', 'sortable': false},
-  '_actions': {
-    'actions': ['edit', 'delete'],
-    'labels': {
-      'delete': $services.localization.render('platform.livetable._actions.delete')
-    },
-    'filterable': false
-   }
-})
-#set ($columns = ['name', 'members', '_actions'])
-#set ($liveTableOptions = {
-  'url': $doc.getURL('view', 'xpage=getgroups'),
-  'translationPrefix': 'xe.admin.groups.',
-  'outputOnlyHtml': true
-})
+#set ($properties = ['name', 'members', '_actions'])
 #if (!$xcontext.isMainWiki())
-  #set ($discard = $columns.add(2, 'scope'))
-  ## We use the top filters option to show only the local groups by default because the JavaScript code from the sheet
-  ## is executed after the livetable is loaded. The JavaScript code removes the top filters and updates the scope filter
-  ## afterwards.
-  #set ($liveTableOptions.topFilters = "#groupScopeFilter")
+  #set ($discard = $properties.add(2, 'scope'))
 #end
 &lt;div class="medium-avatars"&gt;
-  #livetable('groupstable' $columns $columnOptions $liveTableOptions)
+  #set ($sourceParameters = {
+      'template': 'getgroups.vm',
+      'translationPrefix': 'xe.admin.groups.'
+  })
+  $services.liveData.render({
+    'id': 'groupstable',
+    'source': 'liveTable',
+    'properties': $stringtool.join($properties, ','),
+    'sourceParameters': $escapetool.url($sourceParameters)
+  }, {
+    'query': {
+        'filters': [
+          {
+            'property': 'scope',
+            'constraints': [{
+              'operator': 'contains',
+              'value': 'local'
+            }]
+          }
+        ]
+      },
+    'meta': {
+      'propertyDescriptors': [
+        {
+          'id': 'name',
+          'displayer': 'html',
+          'sortable': false,
+          'editable': false
+        },
+        {
+          'id': 'members',
+          'sortable': false,
+          'filterable': false,
+          'editable': false
+        },
+        {
+          'id': 'scope',
+          'sortable': false,
+          'editable': false,
+          'filter': {
+            'id': 'list',
+            'options': [
+              {'value': 'local', 'label': $services.localization.render('xe.admin.groups.local')},
+              {'value': 'global', 'label': $services.localization.render('xe.admin.groups.global')},
+              {'value': 'both', 'label': $services.localization.render('xe.admin.groups.both')}
+            ]
+          }
+        },
+        {
+          'id': '_actions',
+          'displayer': {
+            'id': 'actions',
+            'actions': ['edit', 'delete']
+          }
+        }
+      ],
+      'actions': [
+        {
+          'id': 'delete',
+          'name': $services.localization.render('platform.livetable._actions.delete')
+        }
+      ]
+    }
+  })
 &lt;/div&gt;
 &lt;p&gt;
   &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createGroupModal"&gt;
     $escapetool.xml($services.localization.render('rightsmanager.creategroup'))
   &lt;/button&gt;
 &lt;/p&gt;
-#createGroupModal
-#editGroupModal
-#deleteGroupModal
+#createGroupModal()
+#editGroupModal()
+#deleteGroupModal()
 {{/html}}
 {{/velocity}}</content>
   <object>
@@ -276,211 +304,204 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>define('bootstrap-form-validation', ['jquery'], function($) {
-  return {
-    resetValidation: function(formControl) {
-      var formGroup = formControl.closest('.form-group');
-      formGroup.removeClass('has-success has-error has-warning');
-      formGroup.find('.form-control-feedback').addClass('hidden');
-      formGroup.find('.help-block').addClass('hidden').empty();
-    },
-    setLoading: function(formControl) {
-      this.resetValidation(formControl);
-      formControl.closest('.form-group').find('.form-control-feedback.loading').removeClass('hidden');
-    },
-    setSuccess: function(formControl) {
-      this.resetValidation(formControl);
-      formControl.closest('.form-group').addClass('has-success').find('.form-control-feedback.success')
-        .removeClass('hidden');
-    },
-    setError: function(formControl, message) {
-      this.resetValidation(formControl);
-      formControl.closest('.form-group').addClass('has-error')
-        .find('.form-control-feedback.error').removeClass('hidden').end()
-        .find('.help-block').removeClass('hidden').text(message);
-    }
-  };
-});
+      <code>define('bootstrap-form-validation', ['jquery'], function ($) {
+        return {
+          resetValidation: function (formControl) {
+            var formGroup = formControl.closest('.form-group');
+            formGroup.removeClass('has-success has-error has-warning');
+            formGroup.find('.form-control-feedback').addClass('hidden');
+            formGroup.find('.help-block').addClass('hidden').empty();
+          },
+          setLoading: function (formControl) {
+            this.resetValidation(formControl);
+            formControl.closest('.form-group').find('.form-control-feedback.loading').removeClass('hidden');
+          },
+          setSuccess: function (formControl) {
+            this.resetValidation(formControl);
+            formControl.closest('.form-group').addClass('has-success').find('.form-control-feedback.success')
+              .removeClass('hidden');
+          },
+          setError: function (formControl, message) {
+            this.resetValidation(formControl);
+            formControl.closest('.form-group').addClass('has-error')
+              .find('.form-control-feedback.error').removeClass('hidden').end()
+              .find('.help-block').removeClass('hidden').text(message);
+          }
+        };
+      });
 
-//
-// Group Creation
-//
-require(['jquery', 'bootstrap-form-validation'], function($, validation) {
-  var createGroupModal = $('#createGroupModal');
-  var createGroupButton = createGroupModal.find('button.btn-primary');
-  createGroupModal.on('shown.bs.modal', function() {
-    // Reset the form each time the modal is shown.
-    createGroupModal.find('form').trigger('reset');
-    createGroupModal.find('.form-control').each(function() {
-      validation.resetValidation($(this));
-    }).first().focus();
-    createGroupButton.prop('disabled', true);
-  });
+      //
+      // Group Creation
+      //
+      require(['jquery', 'bootstrap-form-validation'], function ($, validation) {
+        var createGroupModal = $('#createGroupModal');
+        var createGroupButton = createGroupModal.find('button.btn-primary');
+        createGroupModal.on('shown.bs.modal', function () {
+          // Reset the form each time the modal is shown.
+          createGroupModal.find('form').trigger('reset');
+          createGroupModal.find('.form-control').each(function () {
+            validation.resetValidation($(this));
+          }).first().focus();
+          createGroupButton.prop('disabled', true);
+        });
 
-  // Group name validation.
-  var groupNameTimeout;
-  var groupNameInput = createGroupModal.find('input[name="name"]');
-  groupNameInput.on('input', function() {
-    clearTimeout(groupNameTimeout);
-    createGroupButton.prop('disabled', true);
-    validation.resetValidation(groupNameInput);
-    if (groupNameInput.val() !== '') {
-      validation.setLoading(groupNameInput);
-      groupNameTimeout = setTimeout(function() {
-        var groupName = groupNameInput.val();
-        var groupURL = new XWiki.Document(groupName, 'XWiki').getRestURL();
-        $.get(groupURL).then(() =&gt; {
-          // A document with the specified name already exists.
-          var message = $jsontool.serialize($services.localization.render('rightsmanager.groupexist'))
-            .replace('__name__', groupName);
-          validation.setError(groupNameInput, message);
-        }).catch(response =&gt; {
-          if (response.status === 404) {
-            // The document does not exist, so we can use it.
-            validation.setSuccess(groupNameInput);
-            createGroupButton.prop('disabled', false);
-          } else {
-            // Something else happened. This was not intended.
-            var message = $jsontool.serialize($services.localization.render(
-              'platform.core.rightsManagement.ajaxFailure'));
-            validation.setError(groupNameInput, message);
+        // Group name validation.
+        var groupNameTimeout;
+        var groupNameInput = createGroupModal.find('input[name="name"]');
+        groupNameInput.on('input', function () {
+          clearTimeout(groupNameTimeout);
+          createGroupButton.prop('disabled', true);
+          validation.resetValidation(groupNameInput);
+          if (groupNameInput.val() !== '') {
+            validation.setLoading(groupNameInput);
+            groupNameTimeout = setTimeout(function () {
+              var groupName = groupNameInput.val();
+              var groupURL = new XWiki.Document(groupName, 'XWiki').getRestURL();
+              $.get(groupURL).then(() =&gt; {
+                // A document with the specified name already exists.
+                var message = $jsontool.serialize($services.localization.render('rightsmanager.groupexist'))
+                  .replace('__name__', groupName);
+                validation.setError(groupNameInput, message);
+              }).catch(response =&gt; {
+                if (response.status === 404) {
+                  // The document does not exist, so we can use it.
+                  validation.setSuccess(groupNameInput);
+                  createGroupButton.prop('disabled', false);
+                } else {
+                  // Something else happened. This was not intended.
+                  var message = $jsontool.serialize($services.localization.render(
+                    'platform.core.rightsManagement.ajaxFailure'));
+                  validation.setError(groupNameInput, message);
+                }
+              });
+            }, 500);
           }
         });
-      }, 500);
-    }
-  });
 
-  createGroupModal.on('submit', function(event) {
-    event.preventDefault();
-    var data = createGroupModal.find('form').serializeArray();
-    data.push({name: 'ajax', value: 1});
-    var groupName = groupNameInput.val();
-    var createGroupURL = new XWiki.Document(groupName, 'XWiki').getURL('save');
-    // Disable the form to prevent it from being submitted twice.
-    createGroupModal.find(':input').prop('disabled', true);
-    var notification = new XWiki.widgets.Notification(
-      $jsontool.serialize($services.localization.render('xe.admin.groups.create.inProgress')),
-      'inprogress'
-    );
-    Promise.resolve($.post(createGroupURL, data)).then(function() {
-      // Close the modal and refresh the groups live table.
-      createGroupModal.modal('hide');
-      window.livetable_groupstable.refresh();
-      notification.replace(new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('xe.admin.groups.create.done')),
-        'done'
-      ));
-    }).catch(function() {
-      notification.replace(new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('xe.admin.groups.create.failed')),
-        'error'
-      ));
-    }).finally(function() {
-      // Re-enable the form.
-      createGroupModal.find(':input').prop('disabled', false);
-    });
-  });
-});
-
-//
-// Scope Filtering
-//
-require(['jquery'], function($) {
-  var options = $('#groupstable').prev('.tipfilters').remove().find('select[name="wiki"]').html();
-  var scopeFilter = $('#groupstable .xwiki-livetable-display-filters select[name="scope"]')
-  scopeFilter.attr('name', 'wiki').html(options);
-});
-
-//
-// Live Table Modals
-//
-
-define('xwiki-livetable-modal', ['jquery', 'bootstrap'], function($) {
-  $.fn.bindActionToModal = function(action, modal) {
-    var actionToModal = action;
-    if (typeof action === 'string') {
-      var actionToModal = {};
-      actionToModal[action] = modal;
-    }
-    return this.each(function() {
-      var liveTableElement = $(this);
-      var liveTable = window['livetable_' + liveTableElement.attr('id')];
-      $.each(actionToModal, function(action, modal) {
-        liveTableElement.on('click', 'a.action' + action, function(event) {
+        createGroupModal.on('submit', function (event) {
           event.preventDefault();
-          var actionTrigger = $(this);
-          var row = actionTrigger.closest('tr');
-          var rowIndex = parseInt(row.attr('data-index'));
-          $(modal).data({
-            rowData: liveTable.fetchedRows[rowIndex],
-            rowIndex: rowIndex,
-            liveTable: liveTable,
-            liveTableElement: liveTableElement
-          }).modal('show');
+          var data = createGroupModal.find('form').serializeArray();
+          data.push({name: 'ajax', value: 1});
+          var groupName = groupNameInput.val();
+          var createGroupURL = new XWiki.Document(groupName, 'XWiki').getURL('save');
+          // Disable the form to prevent it from being submitted twice.
+          createGroupModal.find(':input').prop('disabled', true);
+          var notification = new XWiki.widgets.Notification(
+            $jsontool.serialize($services.localization.render('xe.admin.groups.create.inProgress')),
+            'inprogress'
+          );
+          Promise.resolve($.post(createGroupURL, data)).then(function () {
+            // Close the modal and refresh the groups live table.
+            createGroupModal.modal('hide');
+            $('#groupstable').data('liveData').updateEntries();
+            notification.replace(new XWiki.widgets.Notification(
+              $jsontool.serialize($services.localization.render('xe.admin.groups.create.done')),
+              'done'
+            ));
+          }).catch(function () {
+            notification.replace(new XWiki.widgets.Notification(
+              $jsontool.serialize($services.localization.render('xe.admin.groups.create.failed')),
+              'error'
+            ));
+          }).finally(function () {
+            // Re-enable the form.
+            createGroupModal.find(':input').prop('disabled', false);
+          });
         });
       });
-    });
-  };
 
-  $('.modal[data-liveTable]').each(function() {
-    var modal = $(this);
-    $(modal.attr('data-liveTable')).bindActionToModal(modal.attr('data-liveTableAction'), modal);
-  });
-});
+      //
+      // Live Data Modals
+      //
 
-require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
-  //
-  // Group Editing
-  //
-  var editGroupModal = $('#editGroupModal');
-  editGroupModal.on('show.bs.modal', function() {
-    var rowData = editGroupModal.data('rowData');
-    var groupReference = XWiki.Model.resolve(rowData.doc_fullName, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
-    var groupDocument = new XWiki.Document(groupReference);
-    var editGroupURL = groupDocument.getURL('edit', 'xpage=plain');
-    editGroupModal.find('.modal-body').empty().addClass('loading').load(editGroupURL, function() {
-      $(this).removeClass('loading');
-      $(document).trigger('xwiki:dom:updated', {'elements': $(this).toArray()});
-    });
-  }).on('hide.bs.modal', function() {
-    editGroupModal.data('liveTable').refresh();
-  });
+      define('xwiki-livedata-modal', ['jquery', 'bootstrap'], function ($) {
+        $.fn.bindActionToModal = function (action, modal) {
+          var actionToModal = action;
+          if (typeof action === 'string') {
+            var actionToModal = {};
+            actionToModal[action] = modal;
+          }
+          return this.each(function () {
+            const liveDataElement = $(this);
+            const liveData = liveDataElement.attr('id')
+            $.each(actionToModal, function (action, modal) {
+              const clickFilter = '#' + liveData + ' a.action.action_' + action;
+              $(document).on('click', clickFilter, function (event) {
+                event.preventDefault();
+                const actionTrigger = $(this);
+                const row = actionTrigger.closest('tr');
+                const rowIndex = parseInt(row.attr('data-livedata-entry-index'));
+                $(modal).data({
+                  rowData: liveDataElement.data('liveData').data.data.entries[rowIndex],
+                  rowIndex: rowIndex,
+                  liveData: liveData,
+                  liveDataElement: liveDataElement
+                }).modal('show');
+              });
+            });
+          });
+        };
 
-  //
-  // Group Deletion
-  //
-  var deleteGroupModal = $('#deleteGroupModal');
-  deleteGroupModal.on('show.bs.modal', function() {
-    var rowData = deleteGroupModal.data('rowData');
-    var groupReference = rowData.doc_fullName;
-    if (XWiki.currentWiki !== rowData.doc_wiki) {
-      groupReference = XWiki.Model.resolve(groupReference, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
-      groupReference = XWiki.Model.serialize(groupReference);
-    }
-    deleteGroupModal.find('.groupName').text(groupReference);
-  }).find('.btn-danger').on('click', function() {
-    var notification = new XWiki.widgets.Notification(
-      $jsontool.serialize($services.localization.render('xe.admin.groups.delete.inProgress')),
-      'inprogress'
-    );
-    $.post('', {
-      xpage: 'deleteuorg',
-      docname: deleteGroupModal.find('.groupName').text(),
-      form_token: xm.form_token
-    }).then(() =&gt; {
-      deleteGroupModal.data('liveTable').deleteRow(deleteGroupModal.data('rowIndex'));
-      notification.replace(new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('xe.admin.groups.delete.done')),
-        'done'
-      ));
-    }).catch(() =&gt; {
-      notification.replace(new XWiki.widgets.Notification(
-        $jsontool.serialize($services.localization.render('xe.admin.groups.delete.failed')),
-        'error'
-      ));
-    });
-  });
-});</code>
+        $('.modal[data-liveData]').each(function () {
+          var modal = $(this);
+          $(modal.attr('data-liveData')).bindActionToModal(modal.attr('data-liveDataAction'), modal);
+        });
+      });
+
+      require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal'], function ($, xm) {
+        //
+        // Group Editing
+        //
+        var editGroupModal = $('#editGroupModal');
+        editGroupModal.on('show.bs.modal', function () {
+          var rowData = editGroupModal.data('rowData');
+          var groupReference = XWiki.Model.resolve(rowData['doc.fullName'], XWiki.EntityType.DOCUMENT, 
+            [rowData['doc.wiki']]);
+          var groupDocument = new XWiki.Document(groupReference);
+          var editGroupURL = groupDocument.getURL('edit', 'xpage=plain');
+          editGroupModal.find('.modal-body').empty().addClass('loading').load(editGroupURL, function () {
+            $(this).removeClass('loading');
+            $(document).trigger('xwiki:dom:updated', {'elements': $(this).toArray()});
+          });
+        }).on('hide.bs.modal', function () {
+          editGroupModal.data('liveDataElement').data('liveData').updateEntries();
+        });
+
+        //
+        // Group Deletion
+        //
+        var deleteGroupModal = $('#deleteGroupModal');
+        deleteGroupModal.on('show.bs.modal', function () {
+          var rowData = deleteGroupModal.data('rowData');
+          var groupReference = rowData['doc.fullName'];
+          if (XWiki.currentWiki !== rowData['doc.wiki']) {
+            groupReference = XWiki.Model.resolve(groupReference, XWiki.EntityType.DOCUMENT, [rowData['doc.wiki']]);
+            groupReference = XWiki.Model.serialize(groupReference);
+          }
+          deleteGroupModal.find('.groupName').text(groupReference);
+        }).find('.btn-danger').on('click', function () {
+          var notification = new XWiki.widgets.Notification(
+            $jsontool.serialize($services.localization.render('xe.admin.groups.delete.inProgress')),
+            'inprogress'
+          );
+          $.post('', {
+            xpage: 'deleteuorg',
+            docname: deleteGroupModal.find('.groupName').text(),
+            form_token: xm.form_token
+          }).then(() =&gt; {
+            editGroupModal.data('liveDataElement').data('liveData').updateEntries();
+            notification.replace(new XWiki.widgets.Notification(
+              $jsontool.serialize($services.localization.render('xe.admin.groups.delete.done')),
+              'done'
+            ));
+          }).catch(() =&gt; {
+            notification.replace(new XWiki.widgets.Notification(
+              $jsontool.serialize($services.localization.render('xe.admin.groups.delete.failed')),
+              'error'
+            ));
+          });
+        });
+      });</code>
     </property>
     <property>
       <name/>
@@ -590,13 +611,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
       <cache>long</cache>
     </property>
     <property>
-      <code>/**
- * Groups Live Table
- */
-#groupstable td[data-title] {
-  vertical-align: middle;
-}
-
+      <code>
 /**
  * Create Group Modal
  */

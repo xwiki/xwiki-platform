@@ -29,6 +29,7 @@ import org.xwiki.administration.test.po.GroupEditPage;
 import org.xwiki.administration.test.po.GroupsPage;
 import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -49,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // Programming rights are required to disable/enable user profiles (cf. XWIKI-21238)
     "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet"
 })
-public class UsersGroupsRightsManagementIT
+class UsersGroupsRightsManagementIT
 {
     @BeforeEach
     public void setup(TestUtils setup)
@@ -67,7 +68,7 @@ public class UsersGroupsRightsManagementIT
      */
     @Test
     @Order(1)
-    public void createAndDeleteGroup(TestUtils setup, TestReference testReference)
+    void createAndDeleteGroup(TestUtils setup, TestReference testReference)
     {
         String groupName = testReference.getLastSpaceReference().getName();
 
@@ -123,7 +124,7 @@ public class UsersGroupsRightsManagementIT
      */
     @Test
     @Order(2)
-    public void editGroup(TestUtils setup, TestReference testReference) throws Exception
+    void editGroup(TestUtils setup, TestReference testReference) throws Exception
     {
         //
         // Setup
@@ -150,9 +151,10 @@ public class UsersGroupsRightsManagementIT
         groupsPage.addNewGroup(frontEndDevs).addNewGroup(backEndDevs).addNewGroup(devs);
 
         // Test that the groups have been successfully added.
-        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", devs), "devs group doesn't exist!");
-        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", frontEndDevs), "frontEndDevs group doesn't exist!");
-        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", backEndDevs), "backEndDevs group doesn't exist!");
+        TableLayoutElement tableLayout = groupsPage.getGroupsTable().getTableLayout();
+        tableLayout.assertRow("Group Name", devs);
+        tableLayout.assertRow("Group Name", frontEndDevs);
+        tableLayout.assertRow("Group Name", backEndDevs);
 
         //
         // Work with the group page directly.
@@ -208,7 +210,6 @@ public class UsersGroupsRightsManagementIT
 
         // Close the modal and wait for the groups live table to be reloaded.
         devsGroupModal.close();
-        groupsPage.getGroupsTable().waitUntilReady();
 
         // Check the new group member count.
         assertEquals("4", groupsPage.getMemberCount(devs));
@@ -227,7 +228,6 @@ public class UsersGroupsRightsManagementIT
 
         // Close the modal and check the updated member count.
         devsGroupModal.close();
-        groupsPage.getGroupsTable().waitUntilReady();
         assertEquals("2", groupsPage.getMemberCount(devs));
     }
 
@@ -236,7 +236,7 @@ public class UsersGroupsRightsManagementIT
      */
     @Test
     @Order(3)
-    public void createGroupWhenGroupAlreadyExists(TestUtils setup, TestReference testReference)
+    void createGroupWhenGroupAlreadyExists(TestUtils setup, TestReference testReference)
     {
         String testName = testReference.getLastSpaceReference().getName();
         setup.createPage("XWiki", testName, "", "");
@@ -258,7 +258,7 @@ public class UsersGroupsRightsManagementIT
      */
     @Test
     @Order(4)
-    public void createAndDeleteUser(TestUtils setup, TestReference testReference)
+    void createAndDeleteUser(TestUtils setup, TestReference testReference)
     {
         String userName = testReference.getLastSpaceReference().getName();
 
@@ -271,8 +271,7 @@ public class UsersGroupsRightsManagementIT
         registrationModal.fillRegisterForm("", "", userName, userName, userName, "");
         registrationModal.clickRegister();
         usersPage.waitForNotificationSuccessMessage("User created");
-        usersPage.getUsersLiveTable().waitUntilReady();
-        assertTrue(usersPage.getUsersLiveTable().hasRow("User", userName));
+        usersPage.getUsersLiveData().getTableLayout().assertRow("User", userName);
 
         // Verify that new users are automatically added to the XWikiAllGroup group.
         GroupsPage groupsPage = GroupsPage.gotoPage();
@@ -281,28 +280,27 @@ public class UsersGroupsRightsManagementIT
         usersPage = UsersAdministrationSectionPage.gotoPage();
 
         // Verify the user is enabled and can only be edited or disabled
-        assertFalse(usersPage.isUserDisabled(userName));
-        assertFalse(usersPage.canDeleteUser(userName));
-        assertFalse(usersPage.canEnableUser(userName));
-        assertTrue(usersPage.canDisableUser(userName));
-        assertTrue(usersPage.canEditUser(userName));
+        assertFalse(usersPage.isUserDisabled(1));
+        assertFalse(usersPage.canDeleteUser(1));
+        assertFalse(usersPage.canEnableUser(1));
+        assertTrue(usersPage.canDisableUser(1));
+        assertTrue(usersPage.canEditUser(1));
 
         // Verify that when the user is disabled it can be enabled back, deleted or edited
-        usersPage = usersPage.disableUser(userName);
-        assertTrue(usersPage.isUserDisabled(userName));
-        assertTrue(usersPage.canDeleteUser(userName));
-        assertTrue(usersPage.canEnableUser(userName));
-        assertFalse(usersPage.canDisableUser(userName));
-        assertTrue(usersPage.canEditUser(userName));
+        usersPage = usersPage.disableUser(1);
+        assertTrue(usersPage.isUserDisabled(1));
+        assertTrue(usersPage.canDeleteUser(1));
+        assertTrue(usersPage.canEnableUser(1));
+        assertFalse(usersPage.canDisableUser(1));
+        assertTrue(usersPage.canEditUser(1));
 
         // Delete the newly created user and see if groups are cleaned
-        ConfirmationModal confirmation = usersPage.clickDeleteUser(userName);
+        ConfirmationModal confirmation = usersPage.clickDeleteUser(1);
         assertTrue(confirmation.getMessage().contains("Are you sure you want to proceed?"));
         confirmation.clickOk();
-        usersPage.getUsersLiveTable().waitUntilReady();
-        assertFalse(usersPage.getUsersLiveTable().hasRow("User", userName));
-
-        // Verify that when a user is removed he's removed from the groups he belongs to.
+        usersPage.getUsersLiveData().getTableLayout().assertRow("User", userName);
+        
+        // Verify that when a user is removed, they are removed from the groups they belong to.
         groupsPage = GroupsPage.gotoPage();
         assertEquals(0, groupsPage.clickEditGroup("XWikiAllGroup").filterMembers(userName).getRowCount());
     }
@@ -312,11 +310,11 @@ public class UsersGroupsRightsManagementIT
      */
     @Test
     @Order(5)
-    public void createNonAsciiUser(TestUtils setup, TestReference testReference)
+    void createNonAsciiUser(TestUtils setup, TestReference testReference)
     {
         String userName = testReference.getLastSpaceReference().getName();
-        String firstName = "a\u00e9b";
-        String lastName = "c\u00e0d";
+        String firstName = "aéb";
+        String lastName = "càd";
 
         // ensure the user does not exist
         setup.deletePage("XWiki", userName);
@@ -327,10 +325,10 @@ public class UsersGroupsRightsManagementIT
         registrationModal.fillRegisterForm(firstName, lastName, userName, userName, userName, "");
         registrationModal.clickRegister();
         usersPage.waitForNotificationSuccessMessage("User created");
-        usersPage.getUsersLiveTable().waitUntilReady();
-        assertTrue(usersPage.getUsersLiveTable().hasRow("User", userName));
-        assertTrue(usersPage.getUsersLiveTable().hasRow("First Name", firstName));
-        assertTrue(usersPage.getUsersLiveTable().hasRow("Last Name", lastName));
+        TableLayoutElement tableLayout = usersPage.getUsersLiveData().getTableLayout();
+        tableLayout.assertRow("User", userName);
+        tableLayout.assertRow("First Name", firstName);
+        tableLayout.assertRow("Last Name", lastName);
     }
 
     /**
@@ -339,7 +337,7 @@ public class UsersGroupsRightsManagementIT
      */
     @Test
     @Order(6)
-    public void groupRights(TestUtils setup, TestReference testReference)
+    void groupRights(TestUtils setup, TestReference testReference)
     {
         String userName = testReference.getLastSpaceReference().getName();
         // Voluntarily put a space in the group name.
@@ -383,7 +381,7 @@ public class UsersGroupsRightsManagementIT
      */
     @Test
     @Order(7)
-    public void testFilteringOnGroupSheet(TestUtils setup, TestReference testReference)
+    void testFilteringOnGroupSheet(TestUtils setup, TestReference testReference)
     {
         String groupName = testReference.getLastSpaceReference().getName();
         String userName = groupName+"User";

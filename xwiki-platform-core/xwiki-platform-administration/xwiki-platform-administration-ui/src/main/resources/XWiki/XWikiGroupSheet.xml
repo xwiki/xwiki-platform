@@ -73,33 +73,41 @@
     &lt;/div&gt;
   &lt;/$wrapperTag&gt;
 #end
-#set ($columnOptions = {
-  'member': {'type': 'text', 'html': true},
-  'type': {'filterable': false, 'sortable': false},
-  'scope': {'filterable': false, 'sortable': false},
-  '_actions': {
-    'actions': [{
-      'id': 'delete',
-      'async': true,
-      'callback': 'table.deleteRow(i);'
-    }],
-    'filterable': false
-   }
-})
-#set ($columns = ['member', 'type'])
+#set ($properties = ['member', 'type'])
 #if (!$xcontext.isMainWiki() &amp;&amp; $services.wiki.user.userScope != 'LOCAL_ONLY')
-  #set ($discard = $columns.add('scope'))
+  #set ($discard = $properties.add('scope'))
 #end
 ## Keep testing the inline action for backward compatibility with existing groups.
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-  #set ($discard = $columns.add('_actions'))
+  #set ($discard = $properties.add('_actions'))
 #end
 &lt;div class="medium-avatars"&gt;
-  #livetable('groupusers' $columns $columnOptions {
-    'url': $doc.getURL('view', 'xpage=getgroupmembers'),
+  #set ($sourceParameters = {
+    'template': 'getgroupmembers.vm',
     'translationPrefix': 'xe.admin.groups.',
-    'javascriptName': 'editgrouptable',
-    'outputOnlyHtml': true
+    '$doc': $doc.documentReference
+  })
+  $services.liveData.render({
+    'id': 'groupusers',
+    'source': 'liveTable',
+    'properties': $stringtool.join($properties, ','),
+    'sourceParameters': $escapetool.url($sourceParameters)
+  }, {
+    'meta': {
+      'propertyDescriptors': [
+        {
+          'id': 'member',
+          'displayer': 'html',
+          'editable': false
+        }
+      ],
+      'actions': [
+        {
+          'id': 'edit',
+          'allowProperty': '-'
+        }
+      ]
+    }
   })
 &lt;/div&gt;
 {{/html}}
@@ -192,11 +200,11 @@
     </property>
     <property>
       <code>require(['jquery', 'xwiki-meta'], function($, xm) {
-  // The livetable is refreshed after each action (add/remove).
-  // Refresh the document version to avoid conflicts if we try to save afterwards
-  $(document).on('xwiki:livetable:displayComplete', function (event) {
-    xm.refreshVersion();
-  });
+  // // The livetable is refreshed after each action (add/remove).
+  // // Refresh the document version to avoid conflicts if we try to save afterwards
+  // $(document).on('xwiki:livetable:displayComplete', function (event) {
+  //   xm.refreshVersion();
+  // });
   $(document).on('click', '#addMembers', function(event) {
     event.preventDefault();
     var addMembersButton = $(event.target);
@@ -222,7 +230,7 @@
       $('#userInput')[0].selectize.clear(true);
       $('#groupInput')[0].selectize.clear(true);
       // Reload the live table.
-      editgrouptable.refresh();
+      $("#groupusers").data('liveData').updateEntries();
       // Show notification message.
       if(response.hasIgnored) {
         new XWiki.widgets.Notification(response.ignoredMessage, 'warning', {timeout: 5});
@@ -358,18 +366,6 @@
 /* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
 body &gt; .selectize-dropdown {
   z-index: 1051;
-}
-
-/**
- * Group members live table.
- */
-
-#groupusers {
-  margin-top: 20px;
-}
-
-#groupusers td[data-title] {
-  vertical-align: middle;
 }
 
 #groupusers td.type,

@@ -933,7 +933,7 @@ require(['jquery'], function($) {
 /* Override general table styles. */
 /* TODO: Move to livetable.css */
 
-#userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
+#usersandgroupstable td, #alldocstable td {
   border-color: transparent;
 }
 

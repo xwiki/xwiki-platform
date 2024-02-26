@@ -34,54 +34,92 @@
   <title>AdminUsersSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#macro (userScopeFilter)
-  &lt;select name="wiki"&gt;
-    &lt;option selected="selected" value="local"&gt;
-      $escapetool.xml($services.localization.render('rightsmanager.local'))
-    &lt;/option&gt;
-    &lt;option value="global"&gt;
-      $escapetool.xml($services.localization.render('rightsmanager.global'))
-    &lt;/option&gt;
-    &lt;option value="both"&gt;
-      $escapetool.xml($services.localization.render('rightsmanager.both'))
-    &lt;/option&gt;
-  &lt;/select&gt;
-#end
-
-#macro (displayUsersLiveTable)
-  #set ($columnOptions = {
-    'name': {'type': 'text', 'sortable': false, 'html': true},
-    'first_name': {'type': 'text', 'sortable': false},
-    'last_name': {'type': 'text', 'sortable': false},
-    'scope': {'type': 'list', 'sortable': false},
-    '_actions': {
-      'actions': [
-        'edit',
-        {'id': 'disable', 'icon': 'lock'},
-        {'id': 'enable', 'icon': 'unlock'},
-        'delete'
-      ],
-      'labels': false
-    }
-  })
-  #set ($columns = ['name', 'first_name', 'last_name', '_actions'])
-  #set ($liveTableOptions = {
-    'url': $doc.getURL('view', 'xpage=getusers'),
-    'translationPrefix': 'xe.admin.users.',
-    'outputOnlyHtml': true
+#macro (displayUsersLiveData)
+  #set ($properties = ['name', 'first_name', 'last_name', '_actions'])
+  #set ($sourceParameters = {
+    'template': 'getusers.vm',
+    'translationPrefix': 'xe.admin.users.'
   })
   #if (!$xcontext.isMainWiki())
-    #set ($discard = $columns.add(3, 'scope'))
-    ## We use the top filters option to show only the local users by default because the JavaScript code from the sheet
-    ## is executed after the livetable is loaded. The JavaScript code removes the top filters and updates the scope filter
-    ## afterwards.
-    #set ($liveTableOptions.topFilters = "#userScopeFilter")
+    #set ($discard = $properties.add(3, 'scope'))
   #end
   &lt;div class="medium-avatars"&gt;
-    #livetable('userstable' $columns $columnOptions $liveTableOptions)
+    $services.liveData.render({
+      'id': 'userstable',
+      'source': 'liveTable',
+      'properties': $stringtool.join($properties, ','),
+      'sourceParameters': $escapetool.url($sourceParameters)
+    }, {
+      'query': {
+        'filters': [
+          {
+            'property': 'scope',
+            'constraints': [{
+              'operator': 'contains',
+              'value': 'local'
+            }]
+          }
+        ]
+      },
+      'meta': {
+        'propertyDescriptors': [
+          {
+            'id': 'name',
+            'displayer': 'html',
+            'sortable': false,
+            'editable': false
+          },
+          {
+            'id': 'first_name',
+            'sortable': false,
+            'editable': false
+          },
+          {
+            'id': 'last_name',
+            'sortable': false,
+            'editable': false
+          },
+          {
+            'id': 'scope',
+            'sortable': false,
+            'editable': false,
+            'filter': {
+              'id': 'list',
+              'options': [
+                {'value': 'local', 'label': $services.localization.render('rightsmanager.local')},
+                {'value': 'global', 'label': $services.localization.render('rightsmanager.global')},
+                {'value': 'both', 'label': $services.localization.render('rightsmanager.both')}
+              ]
+            }
+          },
+          {
+            'id': '_actions',
+            'displayer': {
+              'id': 'actions',
+              'actions': ['edit', 'disable', 'enable', 'delete']
+            }
+          }
+        ],
+        'actions': [
+          {
+            'id': 'disable',
+            'icon': 'lock',
+            'allowProperty': 'doc.hasdisable',
+            'urlProperty': 'doc.disable_url'
+          },
+          {
+            'id': 'enable',
+            'icon': 'lock',
+            'allowProperty': 'doc.hasenable',
+            'urlProperty': 'doc.enable_url'
+          },
+          { 'id': 'delete', 'allowProperty': '-' }
+        ]
+      }
+    })
   &lt;/div&gt;
   &lt;p&gt;
     &lt;button type="button" class="btn btn-primary" data-toggle="modal" data-target="${escapetool.h}createUserModal"
@@ -121,7 +159,7 @@
 
 #macro (editUserModal)
   &lt;div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModal-label"
-      data-backdrop="static" data-keyboard="false" data-liveTable="#userstable" data-liveTableAction="edit"&gt;
+      data-backdrop="static" data-keyboard="false" data-liveData="#userstable" data-liveDataAction="edit"&gt;
     &lt;div class="modal-dialog modal-lg" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -151,7 +189,7 @@
   ## have script or programming rights.
   #userPicker_import
   &lt;div class="modal" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModal-label"
-      data-liveTable="#userstable" data-liveTableAction="delete"&gt;
+      data-liveData="#userstable" data-liveDataAction="delete"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -287,10 +325,10 @@
     #set ($discard = $xwiki.jsx.use("XWiki.AdminUsersSheet"))
 
     {{html clean="false"}}
-    #displayUsersLiveTable
-    #createUserModal
-    #editUserModal
-    #deleteUserModal
+    #displayUsersLiveData()
+    #createUserModal()
+    #editUserModal()
+    #deleteUserModal()
     {{/html}}
   #end
 #end
@@ -390,20 +428,11 @@
     <property>
       <code>require.config({
   paths: {
-    'xwiki-livetable-modal': new XWiki.Document('AdminGroupsSheet', 'XWiki').getURL('jsx', 'r=1')
+    'xwiki-livedata-modal': new XWiki.Document('AdminGroupsSheet', 'XWiki').getURL('jsx', 'r=1')
   }
 });
 
-//
-// Scope Filtering
-//
-require(['jquery'], function($) {
-  var options = $('#userstable').prev('.tipfilters').remove().find('select[name="wiki"]').html();
-  var scopeFilter = $('#userstable .xwiki-livetable-display-filters select[name="scope"]')
-  scopeFilter.attr('name', 'wiki').html(options);
-});
-
-require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge'], function($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'], function($, xm) {
   //
   // User Creation
   //
@@ -444,7 +473,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         notification.replace(new XWiki.widgets.Notification(errorMessage.text(), 'error'));
       } else {
         createUserModal.modal('hide');
-        window.livetable_userstable.refresh();
+        $('#userstable').data('liveData').updateEntries();
         $('#userstable').trigger('xwiki:user:created');
         notification.replace(new XWiki.widgets.Notification(
           $jsontool.serialize($services.localization.render('xe.admin.users.create.done')),
@@ -468,7 +497,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
   var loadEditForm = function(forceLock) {
     var saveButton = editUserModal.find('.btn-primary').prop('disabled', true);
     var rowData = editUserModal.data('rowData');
-    var userReference = XWiki.Model.resolve(rowData.doc_fullName, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
+    var userReference = XWiki.Model.resolve(rowData['doc.fullName'], XWiki.EntityType.DOCUMENT, [rowData['doc.wiki']]);
     var userDocument = new XWiki.Document(userReference);
     var editUserURL = userDocument.getURL('edit');
     var parameters = {xpage: 'edituser'};
@@ -502,7 +531,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     $(document).trigger('xwiki:actions:beforeSave');
     $.post(editForm.attr('action'), editForm.serialize()).then(() =&gt; {
       $(document).trigger('xwiki:document:saved');
-      editUserModal.modal('hide').data('liveTable').refresh();
+      editUserModal.modal('hide').data('liveDataElement').data('liveData').updateEntries();
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.done')),
         'done'
@@ -536,30 +565,32 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
         failed: $jsontool.serialize($services.localization.render('administration.section.users.disableUser.failed'))
       }
     }
-    var onToggleUser = function(event) {
-      event.preventDefault();
-      var actionTrigger = $(this);
-      if (actionTrigger.hasClass('pending')) {
-        // Another request is already in progress.
-        return;
-      }
-      actionTrigger.addClass('pending');
-      var action = event.data.action;
-      var notification = new XWiki.widgets.Notification(notificationMessage[action].inProgress, 'inprogress');
-      // The enable and disable actions redirect to the user profile by default which may take a lot of time to render so
-      // we redirect to a URL that doesn't render anything.
-      var emptyResponseURL = new XWiki.Document('AdminUsersSheet', 'XWiki').getURL('get', 'outputSyntax=plain');
-      Promise.resolve($.post(actionTrigger.attr('href'), {'xredirect': emptyResponseURL})).then(function() {
-        window['livetable_userstable'].refresh();
-        notification.replace(new XWiki.widgets.Notification(notificationMessage[action].done, 'done'));
-      }).catch(function() {
-        notification.replace(new XWiki.widgets.Notification(notificationMessage[action].failed, 'error'));
-      }).finally(function() {
-        actionTrigger.removeClass('pending');
-      });
-    };
-    $('#userstable').on('click', 'a.actionenable', {action: 'enable'}, onToggleUser);
-    $('#userstable').on('click', 'a.actiondisable', {action: 'disable'}, onToggleUser);
+
+    function onToggleUser(action) {
+      return function (event) {
+        event.preventDefault();
+        var actionTrigger = $(this);
+        if (actionTrigger.hasClass('pending')) {
+          // Another request is already in progress.
+          return;
+        }
+        actionTrigger.addClass('pending');
+        var notification = new XWiki.widgets.Notification(notificationMessage[action].inProgress, 'inprogress');
+        // The enable and disable actions redirect to the user profile by default which may take a lot of time to
+        // render so we redirect to a URL that doesn't render anything.
+        var emptyResponseURL = new XWiki.Document('AdminUsersSheet', 'XWiki').getURL('get', 'outputSyntax=plain');
+        Promise.resolve($.post(actionTrigger.attr('href'), {'xredirect': emptyResponseURL})).then(function () {
+          $('#userstable').data('liveData').updateEntries();
+          notification.replace(new XWiki.widgets.Notification(notificationMessage[action].done, 'done'));
+        }).catch(function () {
+          notification.replace(new XWiki.widgets.Notification(notificationMessage[action].failed, 'error'));
+        }).finally(function () {
+          actionTrigger.removeClass('pending');
+        });
+      };
+    }
+    $(document).on('click', '#userstable a.action_enable', onToggleUser('enable'));
+    $(document).on('click', '#userstable a.action_disable', onToggleUser('disable'));
   })();
 
   //
@@ -649,8 +680,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       newAuthor: deleteUserModal.find('#newAuthor').val(),
       form_token: xm.form_token
     }).then(() =&gt; {
-      deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
-      deleteUserModal.data('liveTableElement').trigger('xwiki:user:deleted', {reference: userReference});
+      deleteUserModal.data('liveData').deleteRow(deleteUserModal.data('rowIndex'));
+      deleteUserModal.data('liveDataElement').trigger('xwiki:user:deleted', {reference: userReference});
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),
         'done'
@@ -781,13 +812,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
 /**
  * Users Live Table
  */
-#userstable td[data-title] {
-  vertical-align: middle;
-}
-#userstable .actiondisable .action-icon {
+#userstable .action_disable {
   color: $theme.notificationWarningColor;
 }
-#userstable .actionenable .action-icon {
+#userstable .action_enable {
   color: $theme.notificationSuccessColor;
 }
 

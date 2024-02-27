@@ -472,7 +472,7 @@ public class TableLayoutElement extends BaseElement
 
     /**
      * Set the value in the filter of a column and wait for the filtered results to be displayed. See {@link
-     * #filterColumn(String, String, boolean)} to filter without waiting.
+     * {@link #filterColumn(String, String, boolean)} to filter without waiting.
      *
      * @param columnLabel the label of the column to filter, for instance {@code "Title"}
      * @param content the content to set on the filter
@@ -722,11 +722,6 @@ public class TableLayoutElement extends BaseElement
         clickAction(rowNumber, getActionSelector(actionName));
     }
 
-    private static By getActionSelector(String actionName)
-    {
-        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
-    }
-
     public boolean hasAction(int rowNumber, String actionName)
     {
         return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
@@ -785,7 +780,14 @@ public class TableLayoutElement extends BaseElement
         return getRowElement(rowNumber).findElement(by);
     }
 
-
+    /**
+     * Return a list of elements matching a given selector in a row.
+     *
+     * @param rowNumber the number of the row to search on (starting at index 1)
+     * @param by the selector of the elements to search for
+     * @return the list of matched elements
+     * @since 16.2RC1
+     */
     public List<WebElement> findElementsInRow(int rowNumber, By by)
     {
         return getRowElement(rowNumber).findElements(by);
@@ -1040,5 +1042,10 @@ public class TableLayoutElement extends BaseElement
             uri = initialUri;
         }
         return uri.toASCIIString();
+    }
+
+    private static By getActionSelector(String actionName)
+    {
+        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
     }
 }

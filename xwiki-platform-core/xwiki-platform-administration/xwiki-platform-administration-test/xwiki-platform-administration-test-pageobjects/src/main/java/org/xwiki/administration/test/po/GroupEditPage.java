@@ -20,12 +20,12 @@
 
 package org.xwiki.administration.test.po;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -36,11 +36,7 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  */
 public class GroupEditPage extends InlinePage
 {
-    private static final String MEMBER_ACTION_XPATH_FORMAT =
-        "//table[@id = 'groupusers']//td[contains(@class, 'member') and normalize-space(.) = '%s']"
-            + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
-
-    LiveTableElement membersLiveTable = new LiveTableElement("groupusers");
+    private final LiveDataElement membersLiveData = new LiveDataElement("groupusers");
 
     @FindBy(id = "addMembers")
     private WebElement addMemberButton;
@@ -50,6 +46,8 @@ public class GroupEditPage extends InlinePage
 
     @FindBy(id = "userInput")
     private WebElement userInput;
+
+    private TableLayoutElement tableLayout;
 
     public void clickAddMemberButton()
     {
@@ -88,9 +86,8 @@ public class GroupEditPage extends InlinePage
 
     public GroupEditPage removeMembers(String... members)
     {
-        for (String member : members) {
-            getDriver().findElementWithoutWaiting(By.xpath(String.format(MEMBER_ACTION_XPATH_FORMAT, member, "delete")))
-                .click();
+        for (String ignored : members) {
+            this.membersLiveData.getTableLayout().clickAction(1, "delete");
             waitForNotificationSuccessMessage("Done");
         }
         return this;
@@ -98,7 +95,7 @@ public class GroupEditPage extends InlinePage
 
     public void filterMembers(String member)
     {
-        membersLiveTable.filterColumn("xwiki-livetable-groupusers-filter-1", member);
+        this.membersLiveData.getTableLayout().filterColumn("Member", member);
     }
 
     /**
@@ -107,13 +104,14 @@ public class GroupEditPage extends InlinePage
     public static GroupEditPage gotoPage(DocumentReference groupReference)
     {
         getUtil().gotoPage(groupReference, "edit");
-        GroupEditPage groupEditPage = new GroupEditPage();
-        groupEditPage.getMembersTable().waitUntilReady();
-        return groupEditPage;
+        return new GroupEditPage();
     }
 
-    public LiveTableElement getMembersTable()
+    public TableLayoutElement getMembersTable()
     {
-        return membersLiveTable;
+        if (this.tableLayout != null) {
+            this.tableLayout = this.membersLiveData.getTableLayout();
+        }
+        return this.tableLayout;
     }
 }

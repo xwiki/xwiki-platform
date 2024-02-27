@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.BasePage;
 
 /**
@@ -40,6 +41,8 @@ public class GroupsPage extends BasePage
 
     @FindBy(css = ".btn[data-target='#createGroupModal']")
     private WebElement createGroupButton;
+
+    private TableLayoutElement tableLayout;
 
     /**
      * Method to create a new Group.
@@ -70,9 +73,12 @@ public class GroupsPage extends BasePage
         return groupsPage;
     }
 
-    public LiveDataElement getGroupsTable()
+    public TableLayoutElement getGroupsTable()
     {
-        return groupsLiveData;
+        if (this.tableLayout != null) {
+            this.tableLayout = this.groupsLiveData.getTableLayout();
+        }
+        return this.tableLayout;
     }
 
     public DeleteGroupConfirmationModal clickDeleteGroup(String groupName)

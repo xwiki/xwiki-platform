@@ -85,7 +85,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
 
     public UsersAdministrationSectionPage disableUser(int rowNumber)
     {
-        
+
         getUsersLiveData().getTableLayout().clickAction(rowNumber, "disable");
         this.waitForNotificationSuccessMessage("User account disabled");
         this.usersLiveData.getTableLayout().waitUntilReady();
@@ -104,17 +104,13 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
         return getUsersLiveData().getTableLayout().hasAction(rowNumber, "disable");
     }
 
-
     public boolean canEnableUser(int rowNumber)
     {
         return getUsersLiveData().getTableLayout().hasAction(rowNumber, "enable");
-
     }
 
     public boolean canEditUser(int rowNumber)
     {
         return getUsersLiveData().getTableLayout().hasAction(rowNumber, "edit");
     }
-
-    
 }

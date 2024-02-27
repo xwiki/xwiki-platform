@@ -100,16 +100,6 @@ export default {
       const {async} = action;
       if (async) {
         event.preventDefault();
-        const notif = new XWiki.widgets.Notification(async.loadingMessage, 'inprogress');
-        const resource = this.sanitizeUrl(this.entry[async.urlProperty]);
-        const options = {
-          "method": async.method
-        };
-
-        if (async.body) {
-          options.body = async.body;
-        }
-
         const confirmed = await new Promise((resolve) => {
           if (async.confirmationMessage) {
             new XWiki.widgets.ConfirmationBox({
@@ -122,8 +112,18 @@ export default {
             resolve(true)
           }
         })
-
         if (confirmed) {
+          const notif = new XWiki.widgets.Notification(async.loadingMessage, 'inprogress');
+          const resource = this.sanitizeUrl(this.entry[action.urlProperty]);
+
+          const options = {
+            "method": async.method
+          };
+          if (async.body) {
+            options.body = async.body;
+
+          }
+
           const response = await fetch(resource, options)
 
           if (response.ok) {

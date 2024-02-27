@@ -47,6 +47,7 @@
           :class="'action action_' + action.id"
           :title="action.description"
           :href="sanitizeUrl(entry[action.urlProperty]) || '#'"
+          @click="handleClick($event, action)"
         >
           <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
         </a>
@@ -93,7 +94,24 @@ export default {
         .map(action => this.logic.getActionDescriptor(action));
     },
   },
-
+  methods: {
+    async handleClick(event, action) {
+      if(action.async) {
+        event.preventDefault();
+        const notif = new XWiki.widgets.Notification(action.loadingMessage, 'inprogress');
+        const response = await fetch(this.sanitizeUrl(this.entry[action.urlProperty]), {
+          "method": "GET"
+        })
+        
+        if(response.ok) {
+          notif.replace(new XWiki.widgets.Notification(action.successMessage, 'done'));
+          this.logic.updateEntries();
+        } else {
+          notif.replace(new XWiki.widgets.Notification(action.failureMessage, 'error'));
+        }
+      }
+    }
+  }
 };
 </script>
 

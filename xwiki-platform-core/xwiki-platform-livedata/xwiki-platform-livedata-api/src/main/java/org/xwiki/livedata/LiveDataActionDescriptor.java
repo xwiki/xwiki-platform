@@ -22,6 +22,8 @@ package org.xwiki.livedata;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.stability.Unstable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -60,6 +62,18 @@ public class LiveDataActionDescriptor extends BaseDescriptor
      * Specifies the live data property that holds the URL that can be used to perform this action on a given entry.
      */
     private String urlProperty;
+
+    /**
+     * Async is a boolean object so that the field is not serialized when not explicitly defined. A {@code null} value
+     * is equivalent to a {@code false} value.
+     */
+    private Boolean async;
+
+    private String loadingMessage;
+
+    private String successMessage;
+
+    private String failureMessage;
 
     /**
      * Default constructor.
@@ -188,5 +202,87 @@ public class LiveDataActionDescriptor extends BaseDescriptor
         if (this.icon == null) {
             this.icon = new HashMap<>();
         }
+    }
+
+    /**
+     * @return {@code true} if the action is asynchronous, {@code false} otherwise. {@code null} is equivalent to
+     *     {@code false}
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public Boolean isAsync()
+    {
+        return this.async;
+    }
+
+    /**
+     * @param async {@code true} if the action is asynchronous, {@code false} otherwise
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public void setAsync(boolean async)
+    {
+        this.async = async;
+    }
+
+    /**
+     * @return the localized async action loading message, only used when {@link  #async} is {@code true}
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public String getLoadingMessage()
+    {
+        return this.loadingMessage;
+    }
+
+    /**
+     * @param loadingMessage the localized async action loading message, only used when {@link  #async} is
+     *     {@code true}
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public void setLoadingMessage(String loadingMessage)
+    {
+        this.loadingMessage = loadingMessage;
+    }
+
+    /**
+     * @return the localized async action success message, only used when {@link  #async} is {@code true}
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public String getSuccessMessage()
+    {
+        return this.successMessage;
+    }
+
+    /**
+     * @param successMessage the localized async action success message, only used when {@link  #async} is {@code true}
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public void setSuccessMessage(String successMessage)
+    {
+        this.successMessage = successMessage;
+    }
+
+    /**
+     * @return the localized async action error message, only used when {@link  #async} is {@code true}
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public String getFailureMessage()
+    {
+        return this.failureMessage;
+    }
+
+    /**
+     * @param failureMessage the localized async action error message, only used when {@link  #async} is {@code true}
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public void setFailureMessage(String failureMessage)
+    {
+        this.failureMessage = failureMessage;
     }
 }

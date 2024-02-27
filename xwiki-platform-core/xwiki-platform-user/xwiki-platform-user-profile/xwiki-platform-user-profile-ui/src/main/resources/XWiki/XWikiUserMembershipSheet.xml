@@ -277,7 +277,7 @@
     <property>
       <parameters>id=groups
 icon=group
-priority=40</parameters>
+priority=30</parameters>
     </property>
     <property>
       <scope>wiki</scope>

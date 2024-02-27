@@ -51,7 +51,6 @@
         >
           <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
         </a>
-        
       </div>
     </template>
 
@@ -125,7 +124,6 @@ export default {
           }
 
           const response = await fetch(resource, options)
-
           if (response.ok) {
             notif.replace(new XWiki.widgets.Notification(async.successMessage, 'done'));
             this.logic.updateEntries();

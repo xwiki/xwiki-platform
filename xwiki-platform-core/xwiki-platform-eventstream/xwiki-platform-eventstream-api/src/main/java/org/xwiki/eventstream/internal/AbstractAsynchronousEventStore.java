@@ -440,44 +440,52 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
         // Notify event listeners
         Object notificationOuput = task.output;
+        boolean skipNotify = false;
         if (task.output instanceof Optional<?>) {
-            notificationOuput = ((Optional<?>) task.output).orElse(null);
+            Optional<?> optionalOutput = (Optional<?>) task.output;
+            if (optionalOutput.isPresent()) {
+                notificationOuput = optionalOutput.get();
+            } else {
+                skipNotify = true;
+            }
         }
-        switch (task.type) {
-            case DELETE_EVENT:
-                this.observation.notify(new EventStreamDeletedEvent(), notificationOuput);
-                break;
+        if (!skipNotify) {
+            switch (task.type) {
+                case DELETE_EVENT:
+                    this.observation.notify(new EventStreamDeletedEvent(), notificationOuput);
+                    break;
 
-            case DELETE_EVENT_BY_ID:
-                this.observation.notify(new EventStreamDeletedEvent(), notificationOuput);
-                break;
+                case DELETE_EVENT_BY_ID:
+                    this.observation.notify(new EventStreamDeletedEvent(), notificationOuput);
+                    break;
 
-            case SAVE_EVENT:
-                this.observation.notify(new EventStreamAddedEvent(), notificationOuput);
-                break;
+                case SAVE_EVENT:
+                    this.observation.notify(new EventStreamAddedEvent(), notificationOuput);
+                    break;
 
-            case DELETE_STATUS:
-                this.observation.notify(new EventStatusDeletedEvent(), notificationOuput);
-                break;
+                case DELETE_STATUS:
+                    this.observation.notify(new EventStatusDeletedEvent(), notificationOuput);
+                    break;
 
-            case DELETE_STATUSES:
-                this.observation.notify(new EventStatusDeletedEvent(), null);
-                break;
+                case DELETE_STATUSES:
+                    this.observation.notify(new EventStatusDeletedEvent(), null);
+                    break;
 
-            case SAVE_STATUS:
-                this.observation.notify(new EventStatusAddOrUpdatedEvent(), notificationOuput);
-                break;
+                case SAVE_STATUS:
+                    this.observation.notify(new EventStatusAddOrUpdatedEvent(), notificationOuput);
+                    break;
 
-            case DELETE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityDeleteEvent(), notificationOuput);
-                break;
+                case DELETE_MAIL_ENTITY:
+                    this.observation.notify(new MailEntityDeleteEvent(), notificationOuput);
+                    break;
 
-            case SAVE_MAIL_ENTITY:
-                this.observation.notify(new MailEntityAddedEvent(), notificationOuput);
-                break;
+                case SAVE_MAIL_ENTITY:
+                    this.observation.notify(new MailEntityAddedEvent(), notificationOuput);
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
     }
 

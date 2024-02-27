@@ -537,12 +537,17 @@ define('imageEditor', [
         var searchedImageStyle = imageStyle;
         // Use the constraints of the default style when the style value is the empty string and forceDefaultStyle
         // is set to true, as the default style is not persisted (i.e., the empty string).
-        if(defaultStyleCache.forceDefaultStyle === "true" && imageStyle === '') {
-          searchedImageStyle = defaultStyleCache.defaultStyle;
+        const forceDefaultStyle = defaultStyleCache.forceDefaultStyle === "true";
+        if(forceDefaultStyle && imageStyle === '') {
+          // Convert the identifier to a type in case of default image style.
+          searchedImageStyle = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
+            return imageStyleConfig.type !== '' && imageStyleConfig.identifier === defaultStyleCache.defaultStyle;
+          }).type;
         }
         
+        // Search the image style config by its type.
         var config = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
-          return imageStyleConfig.type !== '' && imageStyleConfig.identifier === searchedImageStyle;
+          return imageStyleConfig.type !== '' && imageStyleConfig.type === searchedImageStyle;
         });
         var noStyle = false;
         if (config === undefined) {

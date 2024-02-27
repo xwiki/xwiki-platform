@@ -268,6 +268,7 @@
     {{html}}
       &lt;div class="theme-creation-form" &gt;
         &lt;form action="$doc.getURL()" method="post" class="form-inline"&gt;
+          $services.icon.renderHTML('add')
           &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
           &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
@@ -620,10 +621,8 @@
 }
 
 .theme-creation-form form {
-  background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat .2em center $theme.backgroundSecondaryColor;
-  border: 1px dotted $theme.borderColor;
   display: inline-block;
-  padding: .5em .5em .5em 22px;
+  padding: .5em;
   margin-bottom: 1em;
 }
 

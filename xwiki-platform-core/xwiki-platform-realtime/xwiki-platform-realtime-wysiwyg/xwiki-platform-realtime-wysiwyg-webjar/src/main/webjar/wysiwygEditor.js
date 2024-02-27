@@ -241,27 +241,21 @@ define('xwiki-realtime-wysiwyg', [
       const ownerDocument = this._editor.getContentWrapper().ownerDocument;
       $(ownerDocument).find('.rt-user-position').remove();
       const positions = {};
-      const avatarWidth = 15, spacing = 3;
-      let requiredPadding = 0;
       this._connection.userList.users.filter(id => updatedData[id]?.['cursor_' + EDITOR_TYPE]).forEach(id => {
         const data = updatedData[id];
         const name = RealtimeEditor._getPrettyName(data.name);
         // Set the user position.
-        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], ownerDocument, null,
+        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], this._editor.getContentWrapper(), null,
           XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         if (!element) {
           return;
         }
-        const pos = $(element).offset();
-        if (!positions[pos.top]) {
-          positions[pos.top] = [id];
+        const top = $(element).position().top;
+        if (!positions[top]) {
+          positions[top] = [id];
         } else {
-          positions[pos.top].push(id);
+          positions[top].push(id);
         }
-        const index = positions[pos.top].length - 1;
-        const posTop = pos.top + spacing;
-        const posLeft = spacing + index * (avatarWidth + spacing);
-        requiredPadding = Math.max(requiredPadding, (posLeft + 2 * spacing));
         let $indicator;
         if (data.avatar) {
           $indicator = $('<img alt=""/>').attr('src', data.avatar);
@@ -273,14 +267,13 @@ define('xwiki-realtime-wysiwyg', [
           title: name,
           contenteditable: 'false'
         }).css({
-          'left': posLeft + 'px',
-          'top': posTop + 'px'
+          // Use the default top value (which is normally the top padding of the rich text area) if the element holding
+          // the caret has 0 or negative top value (this can happen for instance if the caret is directly under the root
+          // element, e.g. the BODY element for the standalone edit mode).
+          'top': top > 0 ? top + 'px' : ''
         });
         $(this._editor.getContentWrapper()).after($indicator);
       });
-
-      $(this._editor.getContentWrapper()).css('padding-left',
-        requiredPadding === 0 ? '' : ((requiredPadding + avatarWidth) + 'px'));
     }
 
     _getRealtimeOptions() {
@@ -384,7 +377,7 @@ define('xwiki-realtime-wysiwyg', [
               return '';
             }
             node = (node.nodeName === '#text') ? node.parentNode : node;
-            return RealtimeEditor._getXPath(node);
+            return this._getXPath(node);
           }
         };
         if (!realtimeConfig.marginAvatar) {
@@ -529,14 +522,25 @@ define('xwiki-realtime-wysiwyg', [
       return test;
     }
 
-    static _getXPath(element) {
-      let xpath = '';
-      for ( ; element && element.nodeType == 1; element = element.parentNode ) {
-        let id = $(element.parentNode).children(element.tagName).index(element) + 1;
-        id = id > 1 ? '[' + id + ']' : '';
-        xpath = '/' + element.tagName.toLowerCase() + id + xpath;
+    _getXPath(element) {
+      let xpath = [];
+      const root = this._editor.getContentWrapper();
+      while (element && element.nodeType === Node.ELEMENT_NODE && element !== root) {
+        let index = $(element.parentNode).children(element.tagName).index(element) + 1;
+        // Specify the index only if it's not the first element of its kind.
+        index = index > 1 ? '[' + index + ']' : '';
+        xpath.push(element.tagName.toLowerCase() + index);
+        element = element.parentNode;
       }
-      return xpath;
+      // The returned XPath must be relative to the content wrapper because the HTML structure beyond that is different
+      // for different edit modes (e.g. the standalone edit mode uses an iframe where the content wrapper is the BODY
+      // element while the in-place edit mode uses a DIV element).
+      if (element === root) {
+        xpath.push('.');
+      }
+      // The path needs to start from the top-most element.
+      xpath = xpath.reverse();
+      return xpath.join('/');
     }
   
     static _getPrettyName(userName) {

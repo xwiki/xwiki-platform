@@ -19,12 +19,12 @@
  */
 package org.xwiki.netflux.internal;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -64,7 +64,7 @@ public class DefaultEntityChannelStore implements EntityChannelStore
                 } else {
                     return false;
                 }
-            }).collect(Collectors.toCollection(ArrayList::new));
+            }).collect(Collectors.toCollection(CopyOnWriteArrayList::new));
             if (availableChannels.isEmpty()) {
                 this.entityChannels.remove(entityReference);
             } else {
@@ -86,11 +86,8 @@ public class DefaultEntityChannelStore implements EntityChannelStore
 
         // Create new channel.
         EntityChannel channel = new EntityChannel(entityReference, path, this.channelStore.create().getKey());
-        List<EntityChannel> channels = this.entityChannels.get(entityReference);
-        if (channels == null) {
-            channels = new ArrayList<>();
-            this.entityChannels.put(entityReference, channels);
-        }
+        List<EntityChannel> channels =
+            this.entityChannels.computeIfAbsent(entityReference, key -> new CopyOnWriteArrayList<>());
         channels.add(channel);
 
         return channel;

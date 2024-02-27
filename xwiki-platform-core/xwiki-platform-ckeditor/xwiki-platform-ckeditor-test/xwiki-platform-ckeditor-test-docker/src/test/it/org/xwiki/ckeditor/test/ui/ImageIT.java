@@ -169,7 +169,8 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]",
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+                + "data-xwiki-image-style-border=\"true\"]]",
             savedPage.editWiki().getContent());
 
         // Re-edit the page.
@@ -739,7 +740,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -768,7 +769,8 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+            + "data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
 
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
@@ -789,7 +791,8 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+            + "data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
     }
 
     private ViewPage uploadAttachment(TestUtils setup, EntityReference entityReference, String attachmentName)
@@ -801,16 +804,19 @@ class ImageIT extends AbstractCKEditorIT
         return newPage;
     }
 
-    private static void createBorderedStyle(TestUtils setup) throws Exception
+    private static void createBorderedStyle(TestUtils setup)
     {
         DocumentReference borderedStyleDocumentReference =
-            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "borderedPage");
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"),
+                "borderedPage");
         // For a reason I can't explain, using the rest API lead to random 401 http response, making the tests using the
         // methods flickering. Using the UI based methods until I can understand the root cause.
         setup.deletePage(borderedStyleDocumentReference);
         setup.addObject(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass", Map.of(
             "prettyName", "Bordered",
-            "type", "bordered"
+            "type", "bordered",
+            "defaultBorder", "1",
+            "adjustableAlignment", "1"
         ));
     }
 

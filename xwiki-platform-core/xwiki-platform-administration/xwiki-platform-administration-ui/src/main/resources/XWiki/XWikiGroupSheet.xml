@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.XWikiGroupSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.XWikiGroupSheet" locale="">
   <web>XWiki</web>
   <name>XWikiGroupSheet</name>
   <language/>
@@ -105,6 +105,15 @@
         {
           'id': 'edit',
           'allowProperty': '-'
+        }, {
+          'id': 'delete',
+          'async': {
+            'httpMethod': 'POST',
+            'loadingMessage': 'loading',
+            'successMessage': 'success',
+            'failureMessage': 'failure',
+            'confirmationMessage': 'Are you sure you want to remove this user from the group?'
+          }
         }
       ]
     }

@@ -51,6 +51,7 @@
         >
           <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
         </a>
+        
       </div>
     </template>
 
@@ -96,18 +97,41 @@ export default {
   },
   methods: {
     async handleClick(event, action) {
-      if(action.async) {
+      const {async} = action;
+      if (async) {
         event.preventDefault();
-        const notif = new XWiki.widgets.Notification(action.loadingMessage, 'inprogress');
-        const response = await fetch(this.sanitizeUrl(this.entry[action.urlProperty]), {
-          "method": "GET"
+        const notif = new XWiki.widgets.Notification(async.loadingMessage, 'inprogress');
+        const resource = this.sanitizeUrl(this.entry[async.urlProperty]);
+        const options = {
+          "method": async.method
+        };
+
+        if (async.body) {
+          options.body = async.body;
+        }
+
+        const confirmed = await new Promise((resolve) => {
+          if (async.confirmationMessage) {
+            new XWiki.widgets.ConfirmationBox({
+              onYes: () => resolve(true),
+              onNo: () => resolve(false)
+            }, {
+              confirmationText: async.confirmationMessage
+            })
+          } else {
+            resolve(true)
+          }
         })
-        
-        if(response.ok) {
-          notif.replace(new XWiki.widgets.Notification(action.successMessage, 'done'));
-          this.logic.updateEntries();
-        } else {
-          notif.replace(new XWiki.widgets.Notification(action.failureMessage, 'error'));
+
+        if (confirmed) {
+          const response = await fetch(resource, options)
+
+          if (response.ok) {
+            notif.replace(new XWiki.widgets.Notification(async.successMessage, 'done'));
+            this.logic.updateEntries();
+          } else {
+            notif.replace(new XWiki.widgets.Notification(async.failureMessage, 'error'));
+          }
         }
       }
     }

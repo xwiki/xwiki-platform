@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Describes a live data action.
- * 
+ *
  * @version $Id$
  * @since 12.10.1
  * @since 13.0
@@ -67,13 +67,9 @@ public class LiveDataActionDescriptor extends BaseDescriptor
      * Async is a boolean object so that the field is not serialized when not explicitly defined. A {@code null} value
      * is equivalent to a {@code false} value.
      */
-    private Boolean async;
+    private LiveDataAsyncActionDescriptor async;
 
-    private String loadingMessage;
-
-    private String successMessage;
-
-    private String failureMessage;
+    
 
     /**
      * Default constructor.
@@ -84,7 +80,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
 
     /**
      * Creates a new descriptor for the specified action.
-     * 
+     *
      * @param id the action id
      */
     public LiveDataActionDescriptor(String id)
@@ -102,7 +98,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
 
     /**
      * Sets the action pretty name.
-     * 
+     *
      * @param name the new pretty name
      */
     public void setName(String name)
@@ -120,7 +116,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
 
     /**
      * Sets the action description.
-     * 
+     *
      * @param description the new action description
      */
     public void setDescription(String description)
@@ -138,7 +134,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
 
     /**
      * Sets the icon meta data.
-     * 
+     *
      * @param icon the new icon meta data
      */
     public void setIcon(Map<String, Object> icon)
@@ -148,7 +144,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
 
     /**
      * @return the live data property used to determine if the current user is allowed to perform this action on a given
-     *         live data entry
+     *     live data entry
      * @since 12.10.4
      * @since 13.0
      */
@@ -160,9 +156,9 @@ public class LiveDataActionDescriptor extends BaseDescriptor
     /**
      * Sets the live data property to be used to determine if the current user is allowed to perform this action on a
      * given live data entry.
-     * 
+     *
      * @param allowProperty the live data property used to determine if the current user is allowed to perform this
-     *            action on a given live data entry
+     *     action on a given live data entry
      * @since 12.10.4
      * @since 13.0
      */
@@ -183,9 +179,9 @@ public class LiveDataActionDescriptor extends BaseDescriptor
 
     /**
      * Sets the live data property that holds the URL that can be used to perform this action on a given entry.
-     * 
-     * @param urlProperty the live data property that holds the URL that can be used to perform this action on a given
-     *            entry
+     *
+     * @param urlProperty the live data property that holds the URL that can be used to perform this action on a
+     *     given entry
      * @since 12.10.4
      * @since 13.0
      */
@@ -205,84 +201,22 @@ public class LiveDataActionDescriptor extends BaseDescriptor
     }
 
     /**
-     * @return {@code true} if the action is asynchronous, {@code false} otherwise. {@code null} is equivalent to
-     *     {@code false}
+     * @return the descriptor for handling this action asynchronously
      * @since 16.2.0RC1
      */
     @Unstable
-    public Boolean isAsync()
+    public LiveDataAsyncActionDescriptor getAsync()
     {
         return this.async;
     }
 
     /**
-     * @param async {@code true} if the action is asynchronous, {@code false} otherwise
+     * @param async the descriptor for handling this action asynchronously
      * @since 16.2.0RC1
      */
     @Unstable
-    public void setAsync(boolean async)
+    public void setAsync(LiveDataAsyncActionDescriptor async)
     {
         this.async = async;
-    }
-
-    /**
-     * @return the localized async action loading message, only used when {@link  #async} is {@code true}
-     * @since 16.2.0RC1
-     */
-    @Unstable
-    public String getLoadingMessage()
-    {
-        return this.loadingMessage;
-    }
-
-    /**
-     * @param loadingMessage the localized async action loading message, only used when {@link  #async} is
-     *     {@code true}
-     * @since 16.2.0RC1
-     */
-    @Unstable
-    public void setLoadingMessage(String loadingMessage)
-    {
-        this.loadingMessage = loadingMessage;
-    }
-
-    /**
-     * @return the localized async action success message, only used when {@link  #async} is {@code true}
-     * @since 16.2.0RC1
-     */
-    @Unstable
-    public String getSuccessMessage()
-    {
-        return this.successMessage;
-    }
-
-    /**
-     * @param successMessage the localized async action success message, only used when {@link  #async} is {@code true}
-     * @since 16.2.0RC1
-     */
-    @Unstable
-    public void setSuccessMessage(String successMessage)
-    {
-        this.successMessage = successMessage;
-    }
-
-    /**
-     * @return the localized async action error message, only used when {@link  #async} is {@code true}
-     * @since 16.2.0RC1
-     */
-    @Unstable
-    public String getFailureMessage()
-    {
-        return this.failureMessage;
-    }
-
-    /**
-     * @param failureMessage the localized async action error message, only used when {@link  #async} is {@code true}
-     * @since 16.2.0RC1
-     */
-    @Unstable
-    public void setFailureMessage(String failureMessage)
-    {
-        this.failureMessage = failureMessage;
     }
 }

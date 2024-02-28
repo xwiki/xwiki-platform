@@ -47,6 +47,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -127,6 +128,12 @@ class ZipExplorerTest
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
         assertSame(originalAttachment, newAttachment);
+    }
+
+    @Test
+    void downloadAttachmentWhenNull()
+    {
+        assertNull(this.plugin.downloadAttachment(null, new XWikiContext()));
     }
 
     @Test

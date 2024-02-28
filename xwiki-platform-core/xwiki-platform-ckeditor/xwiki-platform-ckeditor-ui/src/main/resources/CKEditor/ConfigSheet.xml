@@ -218,12 +218,12 @@ require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPr
   var commaSeparator = /\s*,\s*/;
   var enhanceConfig = function(editor) {
     var availablePlugins = editor.config.plugins.split(commaSeparator);
-    enhanceList($('#CKEditor\\.ConfigClass_0_removePlugins'), availablePlugins, 'availablePluginsSelect');
+    enhanceList($('#CKEditor\\.ConfigClass_0_removePlugins'), availablePlugins, 'available-plugins-select');
 
     var availableButtons = Object.keys(editor.ui.items);
-    enhanceList($('#CKEditor\\.ConfigClass_0_removeButtons'), availableButtons, 'availableButtonsSelect');
+    enhanceList($('#CKEditor\\.ConfigClass_0_removeButtons'), availableButtons, 'available-buttons-select');
     
-    enhanceTextArea($('#CKEditor\\.ConfigClass_0_advanced'), 'advancedTextArea');
+    enhanceTextArea($('#CKEditor\\.ConfigClass_0_advanced'), 'advanced-text-area');
   };
 
   var enhanceList = function(input, allowedValues, selectId) {

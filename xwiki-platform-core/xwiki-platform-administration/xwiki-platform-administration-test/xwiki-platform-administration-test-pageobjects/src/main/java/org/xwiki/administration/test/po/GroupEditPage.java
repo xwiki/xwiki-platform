@@ -112,7 +112,13 @@ public class GroupEditPage extends InlinePage
             row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .user-name"));
         String rowUserName;
         if (elements.isEmpty()) {
-            rowUserName = null;
+            elements =
+                row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .group-name"));
+            if (elements.isEmpty()) {
+                rowUserName = null;
+            } else {
+                rowUserName = elements.get(0).getText();
+            }
         } else {
             rowUserName = elements.get(0).getText();
         }

@@ -19,7 +19,6 @@
  */
 package org.xwiki.administration.test.ui;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -221,8 +220,8 @@ class UsersGroupsRightsManagementIT
         TableLayoutElement tableLayoutElement = devsGroupModal.getMembersTable();
         tableLayoutElement.assertRow("Member", not(hasItem(tableLayoutElement.getWebElementTextMatcher(backEndDevs))));
         devsGroupModal.getMembersTable().assertRow("Member", alice);
-        devsGroupModal.getMembersTable().assertRow("Member",
-            not(CoreMatchers.hasItem(devsGroupModal.getMembersTable().getWebElementTextMatcher(bob))));
+        devsGroupModal.getMembersTable()
+            .assertRow("Member", not(hasItem(devsGroupModal.getMembersTable().getWebElementTextMatcher(bob))));
 
         // Close the modal and check the updated member count.
         devsGroupModal.close();

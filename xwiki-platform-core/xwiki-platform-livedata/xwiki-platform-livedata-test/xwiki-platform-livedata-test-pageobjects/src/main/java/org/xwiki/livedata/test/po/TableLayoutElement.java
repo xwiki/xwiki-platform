@@ -472,7 +472,7 @@ public class TableLayoutElement extends BaseElement
 
     /**
      * Set the value in the filter of a column and wait for the filtered results to be displayed. See {@link
-     * {@link #filterColumn(String, String, boolean)} to filter without waiting.
+     * #filterColumn(String, String, boolean)} to filter without waiting.
      *
      * @param columnLabel the label of the column to filter, for instance {@code "Title"}
      * @param content the content to set on the filter
@@ -722,6 +722,12 @@ public class TableLayoutElement extends BaseElement
         clickAction(rowNumber, getActionSelector(actionName));
     }
 
+    /**
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 16.2.0RC1
+     */
     public boolean hasAction(int rowNumber, String actionName)
     {
         return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
@@ -786,7 +792,7 @@ public class TableLayoutElement extends BaseElement
      * @param rowNumber the number of the row to search on (starting at index 1)
      * @param by the selector of the elements to search for
      * @return the list of matched elements
-     * @since 16.2RC1
+     * @since 16.2.0RC1
      */
     public List<WebElement> findElementsInRow(int rowNumber, By by)
     {

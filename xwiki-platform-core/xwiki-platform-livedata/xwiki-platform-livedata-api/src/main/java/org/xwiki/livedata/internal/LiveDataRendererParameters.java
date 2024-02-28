@@ -52,6 +52,8 @@ public class LiveDataRendererParameters
 
     private String pageSizes;
 
+    private String description;
+
     /**
      * @return the Live Data instance id
      */
@@ -256,6 +258,24 @@ public class LiveDataRendererParameters
         this.pageSizes = pageSizes;
     }
 
+    /**
+     * @return an optional textual description of the Live Data
+     * @since 16.0.0RC1
+     */
+    public String getDescription()
+    {
+        return this.description;
+    }
+
+    /**
+     * @param description an optional textual description of the Live Data
+     * @since 16.0.0RC1
+     */
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -281,6 +301,7 @@ public class LiveDataRendererParameters
             .append(this.layouts, that.layouts)
             .append(this.showPageSizeDropdown, that.showPageSizeDropdown)
             .append(this.pageSizes, that.pageSizes)
+            .append(this.description, that.description)
             .isEquals();
     }
 
@@ -299,6 +320,7 @@ public class LiveDataRendererParameters
             .append(this.layouts)
             .append(this.showPageSizeDropdown)
             .append(this.pageSizes)
+            .append(this.description)
             .toHashCode();
     }
 }

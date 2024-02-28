@@ -90,17 +90,22 @@ define('xwiki-realtime-wysiwyg-editor', [
 
     /**
      * Notify the editor that its content has been updated as a result of a remote change.
+     *
+     * @param {Node[]} updatedNodes the DOM nodes that have been updated (added, modified directly or with removed
+     *   descendants)
+     *
+     * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    contentUpdated() {
+    contentUpdated(updatedNodes, propagate) {
       try {
-        this._initializeWidgets();
+        this._initializeWidgets(updatedNodes);
       } catch (e) {
         console.log("Failed to (re)initialize the widgets.", e);
       }
 
       // Notify the content change (e.g. to update the empty line placeholders) without triggering our own change
       // handler (see #onChange()).
-      this._ckeditor.fire('change', {remote: true});
+      this._ckeditor.fire('change', {remote: !propagate});
     }
 
     /**
@@ -152,16 +157,58 @@ define('xwiki-realtime-wysiwyg-editor', [
       this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor);
     }
 
-    _initializeWidgets() {
-      const dataValues = {};
-      const widgetElements = this.getContent().querySelectorAll('[data-cke-widget-data]');
-      widgetElements.forEach((widgetElement, index) => {
-        dataValues[index] = widgetElement.getAttribute('data-cke-widget-data');
+    /**
+     * Converts input data accepted by the editor to html that can be directly inserted in the editor's DOM.
+     *
+     * @param {string} data the data to be converted
+     * @returns {string} html representation of the input data that can be inserted in the editor's DOM.
+     */
+    convertDataToHtml(data) {
+      return this._ckeditor.dataProcessor.toHtml(data);
+    }
+
+    _initializeWidgets(updatedNodes) {
+      // Reset the focused and selected widgets, as well as the widget holding the focused editable because they may
+      // have been invalidated by the DOM changes.
+      this._ckeditor.widgets.focused = null;
+      this._ckeditor.widgets.selected = [];
+      this._ckeditor.widgets.widgetHoldingFocusedEditable = null;
+
+      // Find the widgets that need to be reinitialized because some of their content was updated.
+      const updatedWidgets = new Set();
+      updatedNodes.forEach(updatedNode => {
+        if (updatedNode.nodeType === Node.ATTRIBUTE_NODE) {
+          // For attribute nodes we consider the owner element was updated.
+          updatedNode = updatedNode.ownerElement;
+        } else if (updatedNode.nodeType !== Node.ELEMENT_NODE) {
+          // The updated node is a text or comment, most probably, so it doesn't affect the widget.
+          return;
+        }
+        const updatedWidget = this._ckeditor.widgets.getByElement(new this._CKEDITOR.dom.element(updatedNode));
+        if (updatedWidget) {
+          updatedWidgets.add(updatedWidget);
+          // We also have to reinitialize the nested widgets.
+          updatedWidget.wrapper.find('.cke_widget_wrapper').toArray().forEach(nestedWidgetWrapper => {
+            const nestedWidget = this._ckeditor.widgets.getByElement(nestedWidgetWrapper, true);
+            if (nestedWidget) {
+              updatedWidgets.add(nestedWidget);
+            }
+          });
+        }
       });
+
+      // Delete the updated widgets so that we can reinitialize them.
+      updatedWidgets.forEach(widget => {
+        delete this._ckeditor.widgets.instances[widget.id];
+      });
+
+      // Remove the widgets whose element was removed from the DOM and add widgets to match the widget elements found in
+      // the DOM.
       this._ckeditor.widgets.checkWidgets();
-      widgetElements.forEach((widgetElement, index) => {
-        widgetElement.setAttribute('data-cke-widget-data', dataValues[index]);
-      });
+
+      // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
+      // selection is restored.
+      setTimeout(() => this._ckeditor.widgets.checkSelection(), 0);
     }
 
     _onContentLoaded() {

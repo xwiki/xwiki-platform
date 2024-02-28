@@ -128,9 +128,9 @@ public class ConfigurationFilesGenerator
         }
 
         // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
-        // tests. Only do this in the CI for now (or if debug is true) since this is currently used for debugging
+        // tests. Only do this in the CI for now (or if verbose is true) since this is currently used for debugging
         // problems.
-        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isDebug()) {
+        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isVerbose()) {
             copyLogbackConfigFile(configurationFileTargetDirectory);
         }
     }

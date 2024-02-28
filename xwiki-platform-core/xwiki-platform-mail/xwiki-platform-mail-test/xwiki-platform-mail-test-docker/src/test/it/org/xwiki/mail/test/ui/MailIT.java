@@ -264,7 +264,7 @@ class MailIT
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Status", "send_success");
         int count = tableLayout.countRows();
-        tableLayout.clickAction(1, "mailsendingaction_delete");
+        statusPage.clickAction(1, "mailsendingaction_delete");
 
         // Wait for the success message to be displayed
         statusPage.waitUntilContent("\\QThe mail has been deleted successfully\\E");
@@ -279,7 +279,7 @@ class MailIT
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Status", "send_error");
-        tableLayout.clickAction(1, "mailsendingaction_resend");
+        statusPage.clickAction(1, "mailsendingaction_resend");
 
         // Refresh the page and verify the mail to to@doe.com is in send_success state now
         statusPage = MailStatusAdministrationSectionPage.gotoPage();

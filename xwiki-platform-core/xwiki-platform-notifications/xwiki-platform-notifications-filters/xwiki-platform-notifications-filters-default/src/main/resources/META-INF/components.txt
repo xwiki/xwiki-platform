@@ -1,7 +1,6 @@
 org.xwiki.notifications.filters.internal.CachedModelBridgeInvalidatorListener
 org.xwiki.notifications.filters.internal.DefaultFilterPreferencesModelBridge
 org.xwiki.notifications.filters.internal.DocumentMovedListener
-org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration
 org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore
 org.xwiki.notifications.filters.internal.ToggleableFilterPreferenceDocumentInitializer
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayer
@@ -14,4 +13,5 @@ org.xwiki.notifications.filters.internal.UserAddedEventListener
 org.xwiki.notifications.filters.migration.R140401000XWIKI15460DataMigration
 org.xwiki.notifications.filters.migration.R151002000XWIKI21448DataMigration
 org.xwiki.notifications.filters.migration.R160000000XWIKI17243DataMigration
+org.xwiki.notifications.filters.migration.R160100000XWIKI21738DataMigration
 org.xwiki.notifications.filters.migration.WatchListObjectsRemovalTaskConsumer

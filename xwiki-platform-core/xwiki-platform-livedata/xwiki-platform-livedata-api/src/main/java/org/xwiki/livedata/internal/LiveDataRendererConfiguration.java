@@ -189,6 +189,10 @@ public class LiveDataRendererConfiguration
             .flatMap(ls -> ls.stream().findFirst().map(BaseDescriptor::getId))
             .ifPresent(meta::setDefaultLayout);
         meta.setPagination(getPagination(parameters));
+        String description = parameters.getDescription();
+        if (StringUtils.isNoneEmpty(description)) {
+            meta.setDescription(description);
+        }
         return meta;
     }
 

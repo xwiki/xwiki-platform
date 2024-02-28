@@ -27,14 +27,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -42,9 +41,12 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,12 +69,6 @@ public class DefaultNotificationFilterPreferenceManagerTest
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
-
-    @BeforeComponent
-    void beforeComponent() throws Exception
-    {
-        this.componentManager.registerComponent(ComponentManager.class, this.componentManager);
-    }
 
     @BeforeEach
     public void setUp() throws Exception
@@ -155,6 +151,42 @@ public class DefaultNotificationFilterPreferenceManagerTest
     }
 
     @Test
+    void deleteFilterPreferenceProviderException() throws Exception
+    {
+        String providerName1 = "providerName1";
+        String providerName2 = "providerName2";
+
+        NotificationFilterPreferenceProvider provider1 =
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
+        NotificationFilterPreferenceProvider provider2 =
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
+
+        String filterId = "filterId";
+        doThrow(new NotificationException("error provider1")).when(provider1).deleteFilterPreferences(testUser,
+            Set.of(filterId));
+        filterPreferenceManager.deleteFilterPreference(testUser, filterId);
+        verify(testProvider).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider1).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider2).deleteFilterPreferences(testUser, Set.of(filterId));
+
+        doThrow(new NotificationException("error provider2")).when(provider2).deleteFilterPreferences(testUser,
+            Set.of(filterId));
+        filterPreferenceManager.deleteFilterPreference(testUser, filterId);
+        verify(testProvider, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider1, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider2, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
+
+        doThrow(new NotificationException("error testprovider")).when(testProvider).deleteFilterPreferences(testUser,
+            Set.of(filterId));
+        NotificationException notificationException = assertThrows(NotificationException.class,
+                () -> filterPreferenceManager.deleteFilterPreference(testUser, filterId));
+        assertEquals("Error when trying to remove filter preferences [filterId] for user [wiki:test.user] - "
+            + "All providers called failed, see exceptions: [NotificationException: error testprovider,"
+            + "NotificationException: error provider1,NotificationException: error provider2].",
+            notificationException.getMessage());
+    }
+
+    @Test
     void setFilterPreferenceEnabled() throws Exception
     {
         filterPreferenceManager.setFilterPreferenceEnabled(testUser,"myFilter1", true);
@@ -199,9 +231,9 @@ public class DefaultNotificationFilterPreferenceManagerTest
         String providerName2 = "providerName2";
 
         NotificationFilterPreferenceProvider provider1 =
-            this.componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
         NotificationFilterPreferenceProvider provider2 =
-            this.componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
 
         when(pref1.getProviderHint()).thenReturn(providerName1);
         when(pref2.getProviderHint()).thenReturn(providerName2);

@@ -65,6 +65,8 @@ class AttachmentIT
 
     private static final String SECOND_ATTACHMENT = "SmallAttachment2.txt";
 
+    private static final String ESCAPED_ATTACHMENT = "<strong>EscapedAttachment.txt";
+
     private static final String IMAGE_ATTACHMENT = "image.gif";
 
     private static final String SMALL_SIZE_ATTACHMENT = "SmallSizeAttachment.png";
@@ -439,6 +441,23 @@ class AttachmentIT
                 + "Failed to delete attachment %s\n"
                 + "This attachment does not exist.", attachmentName),
                 basePage.getXWikiMessageContent());
+    }
+
+    @Test
+    @Order(9)
+    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration)
+    {
+        setup.loginAsSuperAdmin();
+        setup.createPage(testReference, "Empty content");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, ESCAPED_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(ESCAPED_ATTACHMENT);
+        attachmentsPane.clickHideProgress();
+
+        assertTrue(attachmentsPane.attachmentExistsByFileName(ESCAPED_ATTACHMENT));
+        attachmentsPane.deleteAttachmentByFileByName(ESCAPED_ATTACHMENT);
     }
 
     private String getAttachmentsMacroContent(DocumentReference docRef)

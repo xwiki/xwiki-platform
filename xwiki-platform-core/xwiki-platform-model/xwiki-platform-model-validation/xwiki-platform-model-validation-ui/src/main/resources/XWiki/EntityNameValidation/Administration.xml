@@ -72,7 +72,7 @@
           &lt;/dl&gt;
           &lt;dl&gt;
             &lt;dt&gt;
-              &lt;label for="newForbiddenCharacter"&gt;$services.localization.render('entitynamevalidation.replacementCharacter.newReplacementCharacter.label')&lt;/label&gt;
+              &lt;label for="newReplacementCharacter"&gt;$services.localization.render('entitynamevalidation.replacementCharacter.newReplacementCharacter.label')&lt;/label&gt;
               &lt;span class='xHint'&gt;$services.localization.render('entitynamevalidation.replacementCharacter.newReplacementCharacter.hint')&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;

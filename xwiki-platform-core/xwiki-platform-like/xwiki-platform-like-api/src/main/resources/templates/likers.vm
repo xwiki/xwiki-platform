@@ -109,6 +109,8 @@
     '$doc': $doc.documentReference,
     'translationPrefix' : 'xe.admin.users.'
   })
+  ## The id of the live data needs to be complex in order to avoid 'id collision' that would break
+  ## the liveData.
   $services.liveData.render({
     'id': 'likersTable',
     'properties': 'name,first_name,last_name',

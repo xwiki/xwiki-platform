@@ -125,6 +125,8 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
+      <!-- Marked as optional because realtime editing is currently disabled by default. -->
+      <optional>true</optional>
     </dependency>
     <!-- Test dependencies. -->
     <dependency>

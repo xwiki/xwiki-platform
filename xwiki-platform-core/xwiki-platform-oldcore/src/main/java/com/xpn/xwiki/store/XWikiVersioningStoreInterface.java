@@ -20,9 +20,12 @@
 package com.xpn.xwiki.store;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Role;
@@ -55,6 +58,17 @@ public interface XWikiVersioningStoreInterface
 
     Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
+    private boolean matchCriteria(XWikiRCSNodeInfo nodeinfo, RevisionCriteria criteria)
+    {
+        // Author matching
+        if (criteria.getAuthor().isEmpty() || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
+            // Date range matching
+            Date versionDate = nodeinfo.getDate();
+            return (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate()));
+        }
+        return false;
+    }
+
     private Collection<String> getXWikiDocStringVersions(XWikiDocument doc, RevisionCriteria criteria,
         XWikiContext context) throws XWikiException
     {
@@ -63,25 +77,28 @@ public interface XWikiVersioningStoreInterface
         Version[] revisions = getXWikiDocVersions(doc, context);
         XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
 
-        XWikiRCSNodeInfo nextNodeinfo = null;
-        XWikiRCSNodeInfo nodeinfo;
-        for (Version revision : revisions) {
-            nodeinfo = nextNodeinfo;
-            nextNodeinfo = archive.getNode(revision);
+        Iterator<Version> revisionsIterator = Arrays.stream(revisions).iterator();
+        if (!revisionsIterator.hasNext()) {
+            return List.of();
+        }
 
-            if (nodeinfo != null) {
-                // Minor/Major version matching
-                if (criteria.getIncludeMinorVersions() || nextNodeinfo == null || !nextNodeinfo.isMinorEdit()) {
-                    // Author matching
-                    if (criteria.getAuthor().isEmpty() || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
-                        // Date range matching
-                        Date versionDate = nodeinfo.getDate();
-                        if (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate())) {
-                            results.add(nodeinfo.getVersion().toString());
-                        }
-                    }
-                }
+        XWikiRCSNodeInfo nodeinfo = archive.getNode(revisionsIterator.next());
+        XWikiRCSNodeInfo nextNodeinfo;
+
+        while (revisionsIterator.hasNext()) {
+            nextNodeinfo = archive.getNode(revisionsIterator.next());
+
+            // Minor/Major version matching
+            if ((criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit())
+                && (matchCriteria(nodeinfo, criteria)))
+            {
+                results.add(nodeinfo.getVersion().toString());
             }
+            nodeinfo = nextNodeinfo;
+        }
+
+        if (matchCriteria(nodeinfo, criteria)) {
+            results.add(nodeinfo.getVersion().toString());
         }
 
         return criteria.getRange().subList(results);
@@ -103,7 +120,7 @@ public interface XWikiVersioningStoreInterface
     {
         return getXWikiDocStringVersions(doc, criteria, context).stream()
             .map(Version::new)
-            .toList();
+            .collect(Collectors.toList());
     }
 
     /**

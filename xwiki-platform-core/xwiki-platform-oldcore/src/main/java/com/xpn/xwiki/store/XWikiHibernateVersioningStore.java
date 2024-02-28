@@ -39,6 +39,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
+import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
@@ -108,7 +109,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     @Override
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        return getXWikiDocVersions(doc, new RevisionCriteria(null, null, null, true), context).toArray(new Version[0]);
+        return getXWikiDocVersions(doc, new RevisionCriteriaFactory().createRevisionCriteria(true), context)
+            .toArray(new Version[0]);
     }
 
     @Override
@@ -138,7 +140,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext inputxcontext)
         throws XWikiException
     {
-        return getXWikiDocumentArchive(doc, new RevisionCriteria(null, null, null, true), inputxcontext);
+        return getXWikiDocumentArchive(doc, new RevisionCriteriaFactory().createRevisionCriteria(true), inputxcontext);
     }
 
     private XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, RevisionCriteria criteria,
@@ -172,7 +174,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
-        loadXWikiDocArchive(archivedoc, new RevisionCriteria(null, null, null, true), context);
+        loadXWikiDocArchive(archivedoc, new RevisionCriteriaFactory().createRevisionCriteria(true), context);
     }
 
     private void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, RevisionCriteria criteria, XWikiContext context)
@@ -312,7 +314,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     protected List<XWikiRCSNodeInfo> loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
         throws XWikiException
     {
-        return loadRCSNodeInfo(context, id, new RevisionCriteria(null, null, null, true));
+        return loadRCSNodeInfo(context, id, new RevisionCriteriaFactory().createRevisionCriteria(true));
     }
 
     /**
@@ -324,7 +326,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
      * @return loaded RCS nodes content
      * @throws XWikiException if any error
      */
-    protected List<XWikiRCSNodeInfo> loadRCSNodeInfo(XWikiContext context, final long id, RevisionCriteria criteria)
+    private List<XWikiRCSNodeInfo> loadRCSNodeInfo(XWikiContext context, final long id, RevisionCriteria criteria)
         throws XWikiException
     {
         return executeRead(context, session -> {
@@ -390,7 +392,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
      * @return the number of matching RCS nodes
      * @throws XWikiException if any error
      */
-    protected long getRCSNodeInfoCount(XWikiContext context, final long id, RevisionCriteria criteria)
+    private long getRCSNodeInfoCount(XWikiContext context, final long id, RevisionCriteria criteria)
         throws XWikiException
     {
         return executeRead(context, session -> {

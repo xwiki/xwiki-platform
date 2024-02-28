@@ -31,6 +31,7 @@ import javax.persistence.criteria.Subquery;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.criteria.impl.Range;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * @since 15.10.7
  * @since 16.2.0RC1
  */
+@Unstable
 public final class VersioningStoreQueryFactory<T>
 {
     private static final String FIELD_ID = "id";
@@ -85,26 +87,30 @@ public final class VersioningStoreQueryFactory<T>
         predicates.add(this.builder.equal(this.root.get(FIELD_ID).get(FIELD_DOCID), id));
         predicates.add(this.builder.isNotNull(this.root.get(FIELD_DIFF)));
 
-        if (!criteria.getAuthor().isEmpty()) {
-            predicates.add(this.builder.equal(this.root.get(FIELD_AUTHOR), criteria.getAuthor()));
-        }
+        if (criteria != null) {
+            if (!criteria.getAuthor().isEmpty()) {
+                predicates.add(this.builder.equal(this.root.get(FIELD_AUTHOR), criteria.getAuthor()));
+            }
 
-        Date minDate = criteria.getMinDate();
-        // Hibernate requires positive timestamps.
-        if (minDate.getTime() < 0) {
-            minDate = new Date(0);
-        }
-        predicates.add(this.builder.between(this.root.get(FIELD_DATE), minDate, criteria.getMaxDate()));
+            Date minDate = criteria.getMinDate();
+            // Hibernate requires positive timestamps.
+            if (minDate.getTime() < 0) {
+                minDate = new Date(0);
+            }
+            predicates.add(this.builder.between(this.root.get(FIELD_DATE), minDate, criteria.getMaxDate()));
 
-        if (!criteria.getIncludeMinorVersions()) {
-            // In this case, we keep only the highest minor version for each major version.
-            Subquery<Integer> subQuery = this.criteriaQuery.subquery(Integer.class);
-            Root<XWikiRCSNodeInfo> subRoot = subQuery.from(XWikiRCSNodeInfo.class);
-            subQuery.select(this.builder.max(subRoot.get(FIELD_ID).get(FIELD_VERSION2)));
-            subQuery.where(this.builder.equal(subRoot.get(FIELD_ID).get(FIELD_VERSION1),
-                    this.root.get(FIELD_ID).get(FIELD_VERSION1)),
-                this.builder.equal(subRoot.get(FIELD_ID).get(FIELD_DOCID), this.root.get(FIELD_ID).get(FIELD_DOCID)));
-            predicates.add(this.builder.equal(this.root.get(FIELD_ID).get(FIELD_VERSION2), subQuery));
+            if (!criteria.getIncludeMinorVersions()) {
+                // In this case, we keep only the highest minor version for each major version.
+                Subquery<Integer> subQuery = this.criteriaQuery.subquery(Integer.class);
+                Root<XWikiRCSNodeInfo> subRoot = subQuery.from(XWikiRCSNodeInfo.class);
+                subQuery.select(this.builder.max(subRoot.get(FIELD_ID).get(FIELD_VERSION2)));
+                subQuery.where(
+                    this.builder.equal(subRoot.get(FIELD_ID).get(FIELD_VERSION1),
+                        this.root.get(FIELD_ID).get(FIELD_VERSION1)),
+                    this.builder.equal(subRoot.get(FIELD_ID).get(FIELD_DOCID),
+                        this.root.get(FIELD_ID).get(FIELD_DOCID)));
+                predicates.add(this.builder.equal(this.root.get(FIELD_ID).get(FIELD_VERSION2), subQuery));
+            }
         }
 
         this.criteriaQuery.where(predicates.toArray(new Predicate[0]));
@@ -167,9 +173,7 @@ public final class VersioningStoreQueryFactory<T>
 
         queryBuilder.criteriaQuery.select(queryBuilder.builder.count(queryBuilder.root));
 
-        if (criteria != null) {
-            queryBuilder.applyCriteria(id, criteria);
-        }
+        queryBuilder.applyCriteria(id, criteria);
 
         return session.createQuery(queryBuilder.criteriaQuery);
     }
@@ -189,8 +193,8 @@ public final class VersioningStoreQueryFactory<T>
 
         queryBuilder.criteriaQuery.select(queryBuilder.root);
 
-        if (criteria != null) {
-            queryBuilder.applyCriteria(id, criteria);
+        queryBuilder.applyCriteria(id, criteria);
+        if (criteria != null && criteria.getRange() != null) {
             queryBuilder.applyRange(criteria.getRange());
             return queryBuilder.query;
         }

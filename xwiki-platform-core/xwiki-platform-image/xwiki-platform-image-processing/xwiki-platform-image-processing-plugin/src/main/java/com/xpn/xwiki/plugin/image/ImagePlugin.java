@@ -189,7 +189,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
-        if (!this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
+        if (attachment == null || !this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
             return attachment;
         }
 

@@ -90,12 +90,9 @@ public class GroupEditPage extends InlinePage
 
     public GroupEditPage removeMembers(String... members)
     {
-
         for (String member : members) {
-            System.out.printf("Member: %s%n", member);
             int index = 1;
             for (WebElement row : getMembersTable().getRows()) {
-                System.out.printf("Username [%s] at index [%d]%n", getRowUserName(row), index);
                 if (Objects.equals(getRowUserName(row), member)) {
                     getMembersTable().clickAction(index, "delete");
                     break;
@@ -104,25 +101,6 @@ public class GroupEditPage extends InlinePage
             }
         }
         return this;
-    }
-
-    private static String getRowUserName(WebElement row)
-    {
-        List<WebElement> elements =
-            row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .user-name"));
-        String rowUserName;
-        if (elements.isEmpty()) {
-            elements =
-                row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .group-name"));
-            if (elements.isEmpty()) {
-                rowUserName = null;
-            } else {
-                rowUserName = elements.get(0).getText();
-            }
-        } else {
-            rowUserName = elements.get(0).getText();
-        }
-        return rowUserName;
     }
 
     public void filterMembers(String member)
@@ -145,5 +123,24 @@ public class GroupEditPage extends InlinePage
             this.tableLayout = this.membersLiveData.getTableLayout();
         }
         return this.tableLayout;
+    }
+
+    private static String getRowUserName(WebElement row)
+    {
+        List<WebElement> elements =
+            row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .user-name"));
+        String rowUserName;
+        if (elements.isEmpty()) {
+            elements =
+                row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .group-name"));
+            if (elements.isEmpty()) {
+                rowUserName = null;
+            } else {
+                rowUserName = elements.get(0).getText();
+            }
+        } else {
+            rowUserName = elements.get(0).getText();
+        }
+        return rowUserName;
     }
 }

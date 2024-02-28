@@ -50,10 +50,6 @@ public class GroupsPage extends BasePage
     public GroupsPage addNewGroup(String groupName)
     {
         clickCreateGroup().createGroup(groupName);
-
-        // The live data is refreshed.
-        this.groupsLiveData.getTableLayout();
-
         return this;
     }
 
@@ -84,22 +80,20 @@ public class GroupsPage extends BasePage
     public DeleteGroupConfirmationModal clickDeleteGroup(String groupName)
     {
         int rowNumber = getRowNumberByGroupName(groupName);
-        this.groupsLiveData.getTableLayout().clickAction(rowNumber, "delete");
+        getGroupsTable().clickAction(rowNumber, "delete");
         return new DeleteGroupConfirmationModal();
     }
 
     public GroupsPage deleteGroup(String groupName)
     {
         clickDeleteGroup(groupName).clickOk();
-        // The live data is refreshed.
-        this.groupsLiveData.getTableLayout();
         return this;
     }
 
     public EditGroupModal clickEditGroup(String groupName)
     {
         int rowNumber = getRowNumberByGroupName(groupName);
-        this.groupsLiveData.getTableLayout().clickAction(rowNumber, "edit");
+        getGroupsTable().clickAction(rowNumber, "edit");
 
         return new EditGroupModal().waitUntilReady();
     }
@@ -107,7 +101,7 @@ public class GroupsPage extends BasePage
     public String getMemberCount(String groupName)
     {
         int rowNumber = getRowNumberByGroupName(groupName);
-        return this.groupsLiveData.getTableLayout().getCell("Members", rowNumber).getText();
+        return getGroupsTable().getCell("Members", rowNumber).getText();
     }
 
     private int getRowNumberByGroupName(String groupName)

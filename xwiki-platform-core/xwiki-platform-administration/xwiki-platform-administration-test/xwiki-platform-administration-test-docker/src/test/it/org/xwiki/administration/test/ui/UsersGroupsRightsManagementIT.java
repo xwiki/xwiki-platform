@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.ui;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ import org.xwiki.test.ui.po.EditRightsPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -295,7 +297,8 @@ class UsersGroupsRightsManagementIT
         ConfirmationModal confirmation = usersPage.clickDeleteUser(1);
         assertTrue(confirmation.getMessage().contains("Are you sure you want to proceed?"));
         confirmation.clickOk();
-        usersPage.getUsersLiveData().getTableLayout().assertRow("User", userName);
+        usersPage.getUsersLiveData().getTableLayout().assertRow("User",
+            not(hasItem(usersPage.getUsersLiveData().getTableLayout().getWebElementTextMatcher(userName))));
 
         // Verify that when a user is removed, they are removed from the groups they belong to.
         groupsPage = GroupsPage.gotoPage();

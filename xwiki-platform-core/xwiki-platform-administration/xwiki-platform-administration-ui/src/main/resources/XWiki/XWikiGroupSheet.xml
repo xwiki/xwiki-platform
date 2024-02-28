@@ -364,21 +364,36 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
+      <code>/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
+body &gt; .selectize-dropdown {
+  z-index: 1051;
+}
 
-#groupusers .type,
-#groupusers .scope {
-  color: $theme.textSecondaryColor;
+/**
+ * Group members live table.
+ */
+
+#groupusers {
+  margin-top: 20px;
+
+  td.cell div.view {
+    vertical-align: middle;
+  }
+
+  [data-livedata-property-id="type"],
+  [data-livedata-property-id="scope"] {
+    color: @text-muted;   
+  }
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

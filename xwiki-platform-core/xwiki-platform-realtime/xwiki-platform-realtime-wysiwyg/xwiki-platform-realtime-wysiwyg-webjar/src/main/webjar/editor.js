@@ -190,7 +190,9 @@ define('xwiki-realtime-wysiwyg-editor', [
           // We also have to reinitialize the nested widgets.
           updatedWidget.wrapper.find('.cke_widget_wrapper').toArray().forEach(nestedWidgetWrapper => {
             const nestedWidget = this._ckeditor.widgets.getByElement(nestedWidgetWrapper, true);
-            updatedWidgets.add(nestedWidget);
+            if (nestedWidget) {
+              updatedWidgets.add(nestedWidget);
+            }
           });
         }
       });

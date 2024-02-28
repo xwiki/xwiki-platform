@@ -45,7 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UITest(properties = {
     // Add the RightsManagerPlugin needed by the test
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin",
+    // Programming rights are required to disable/enable user profiles (cf. XWIKI-21238)
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet"
 })
 public class UsersGroupsRightsManagementIT
 {

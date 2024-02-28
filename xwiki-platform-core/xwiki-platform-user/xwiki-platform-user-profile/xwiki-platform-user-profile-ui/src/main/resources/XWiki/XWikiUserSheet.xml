@@ -103,8 +103,7 @@
       ## By specifying the image width we enable server side resizing. The width value we use is greater than the
       ## available space because we don't want to loose too much of the image quality (we rely on the browser to fit the
       ## image in the available space).
-      #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
-      {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="180" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,jpeg,gif"/}}
+      {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($hasEdit) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="180" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,jpeg,gif"/}}
     #end
   )))
   ##########
@@ -515,8 +514,8 @@ return XWiki;
 }
 
 .column h1, .column h2 {
-  font-size:115%;
-  margin:10px 0;
+  font-size: 115%;
+  margin: 10px 0;
 }
 
 .column h3 {
@@ -537,7 +536,7 @@ div.userDashboard, #dashboardPane .dashboard {
 
 /* ----- Profile ----- */
 td.recentChangesLeft, .recentChangesMoreActions {
-  display:none;
+  display: none;
 }
 
 td.recentChangesRight {
@@ -575,22 +574,7 @@ div.userInfo input[type="text"], div.userInfo input[type="password"], div.userIn
 }
 
 div.editProfileCategory {
-  float:right;
-}
-
-div.editProfileCategory {
-  float:right;
-  a.btn-xs {
-    background-color: @xwiki-page-content-bg;
-    border: 1px solid @xwiki-border-color;
-    .action-icon {
-      font-size: larger;
-      color: @btn-default-color;
-    }
-    &amp;:hover, &amp;:active, &amp;:focus {
-      border-color: darken(@dropdown-divider-bg, 10%);
-    }
-  }
+  float: right;
 }
 
 
@@ -603,9 +587,9 @@ div.editProfileCategory {
 }
 
 span#avatarUpload {
-  display:block;
-  width:$tabswidth;
-  position:absolute;
+  display: block;
+  width: $tabswidth;
+  position: absolute;
   font-size: 10px;
   font-weight: bold;
   background-color: white;
@@ -620,28 +604,35 @@ span#avatarUpload {
   margin: 0;
   padding: 0;
 }
+
 #networkPane .following li {
   padding: 2px 20px 2px 2px;
 }
+
 #networkPane .following li:hover {
   background-color: $theme.highlightColor;
 }
+
 #networkPane .following img {
   float: left;
   margin-right: 5px;
 }
+
 #networkPane .following .user-info {
   float: left;
 }
+
 #networkPane .following .user-id {
   font-size: .8em;
   font-weight: 900;
 }
+
 #networkPane .following .unfollow {
   float: right;
   margin-right: -16px;
   padding: 0;
 }
+
 ## --------------------------------------
 ## Picker style
 .attachment-picker {
@@ -649,6 +640,7 @@ span#avatarUpload {
   margin: auto;
   width: 100%;
 }
+
 .attachment-picker p {
   padding: 0;
   margin: 0;
@@ -657,6 +649,7 @@ span#avatarUpload {
 .attachment-picker .picture {
   z-index: -1;
 }
+
 .attachment-picker .buttonwrapper {
   margin: 0;
 }

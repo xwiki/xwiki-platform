@@ -30,7 +30,6 @@ import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.ratings.internal.migration.SolrDocumentMigration120900000;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
-import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 
 /**
@@ -50,12 +49,6 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
     public static final String DEFAULT_RATINGS_SOLR_CORE = "ratings";
 
     private static final long CURRENT_VERSION = 120900000;
-
-    /**
-     * Needed for migrating likes.
-     */
-    @Inject
-    private Solr solr;
 
     @Inject
     private SolrDocumentMigration120900000 solrDocumentMigration120900000;
@@ -116,7 +109,7 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
         // were done with a scale of 5.
         int scaleUpperBound = 5;
         this.solrDocumentMigration120900000
-            .migrateAllDocumentsFrom1207000000(this.client, scaleUpperBound, RatingsManagerFactory.DEFAULT_APP_HINT);
+            .migrateAllDocumentsFrom1207000000(this.core, scaleUpperBound, RatingsManagerFactory.DEFAULT_APP_HINT);
 
         // Step 3: Remove old fields (only on the old ratings core, we don't need to perform that change
         this.deleteField("date", false);
@@ -133,5 +126,11 @@ public class RatingSolrCoreInitializer extends AbstractSolrCoreInitializer
     protected long getVersion()
     {
         return CURRENT_VERSION;
+    }
+
+    @Override
+    protected int getMigrationBatchRows()
+    {
+        return 10000;
     }
 }

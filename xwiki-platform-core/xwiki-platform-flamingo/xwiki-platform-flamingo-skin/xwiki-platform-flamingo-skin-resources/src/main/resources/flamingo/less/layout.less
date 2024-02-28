@@ -233,7 +233,6 @@
 
 #xwikieditor .main {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @input-border;
 }
 
 #xwikieditcontent .main {
@@ -300,7 +299,6 @@
 #xdocFooter,
 #docextrapanes {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @xwiki-border-color;
   margin: 0 -@grid-gutter-width;
   padding: @line-height-computed @grid-gutter-width;
 }
@@ -323,10 +321,12 @@ already take care of padding and shadow. */
 }
 
 #docextrapanes {
-  border-top: 1px solid @xwiki-border-color;
+  border: 1px solid @xwiki-border-color;
   border-top-left-radius: @border-radius-base;
   border-top-right-radius: @border-radius-base;
   margin-top: -1px;
+  /* Makes the bottom border hidden below the footer on pages with a long content (longer than the viewport height). */
+  margin-bottom: -1px;
 }
 
 #xdocFooter {
@@ -345,6 +345,12 @@ already take care of padding and shadow. */
   .nav;
   .nav-tabs;
   margin: 0;
+
+  > li.active > a:focus {
+    border-top-color: @xwiki-border-color;
+    border-left-color: @xwiki-border-color;
+    border-right-color: @xwiki-border-color;
+  }
 }
 
 #docExtrasTabsUl {

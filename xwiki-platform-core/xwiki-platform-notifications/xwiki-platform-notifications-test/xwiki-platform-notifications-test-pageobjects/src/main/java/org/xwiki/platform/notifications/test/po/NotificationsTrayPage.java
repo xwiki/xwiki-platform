@@ -19,23 +19,35 @@
  */
 package org.xwiki.platform.notifications.test.po;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+import javax.ws.rs.core.UriBuilder;
+
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.notifications.rest.NotificationsResource;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.ViewPage;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Represents the user Notifications tab.
- * 
+ *
  * @version $Id$
  * @since 9.4RC1
  */
@@ -75,9 +87,9 @@ public class NotificationsTrayPage extends ViewPage
     }
 
     /**
-     * Wait until the given number of unread notification is received.
-     * This method uses an AJAX request to the REST notification endpoint to compute how many unread notification
-     * the given user has on the given wiki, using user preferences.
+     * Wait until the given number of unread notification is received. This method uses a request to the REST
+     * notification endpoint to compute how many unread notifications the given user has on the given wiki, using user
+     * preferences.
      *
      * @param userId the serialized user reference for which to get notifications
      * @param wiki the wiki on which to get notifications
@@ -86,58 +98,72 @@ public class NotificationsTrayPage extends ViewPage
      */
     public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread)
     {
-        // TODO: Wait twice the default timeout since it seems that the REST endpoint for notifications count can take
-        // a lot of time on slow CI agents, leading to flickers. We need to check if there's a performance issue at
-        // heart.
-        waitOnNotificationCount(userId, wiki, expectedUnread, getUtil().getDriver().getTimeout() * 2);
-    }
-
-    /**
-     * Wait until the given number of unread notification is received.
-     * This method uses an AJAX request to the REST notification endpoint to compute how many unread notification
-     * the given user has on the given wiki, using user preferences.
-     *
-     * @param userId the serialized user reference for which to get notifications
-     * @param wiki the wiki on which to get notifications
-     * @param expectedUnread the number of expected unread notifications to wait for
-     * @param timeout the time delay in seconds before stopping the notifications count
-     * @since 12.8RC1
-     */
-    public static void waitOnNotificationCount(String userId, String wiki, int expectedUnread, int timeout)
-    {
-        String notificationCountAjaxURL = String.format("/xwiki/rest/notifications/count?media=json&userId=%s"
-            + "&useUserPreferences=true&currentWiki=%s&async=true", userId, wiki);
-
-        final List<Object> responses = new ArrayList<>();
-        try {
-            getUtil().getDriver().waitUntilCondition(driver -> {
-                // Execute AJAX request to wait until the number of unread notification match the expectation.
-                Object response = ((JavascriptExecutor) driver).executeAsyncScript(
-                    "var callback = arguments[arguments.length - 1];"
-                        + "new Ajax.Request('" + notificationCountAjaxURL
-                        + "&_='+new Date().getTime(), {method: 'GET', "
-                        + "   onSuccess: function(response) {"
-                        + "      callback(response.responseJSON.unread);"
-                        + "   },"
-                        + "   onFailure: function(response) { console.error(response); callback(-1); }"
-                        + "});");
-                responses.add(response);
-                return response != null && Integer.valueOf(response.toString()).equals(expectedUnread);
-            }, timeout);
-        } catch (TimeoutException e) {
-            String latestResponse = null;
-            if (!responses.isEmpty()) {
-                Object response = responses.get(responses.size() - 1);
-                if (response != null) {
-                    latestResponse = response.toString();
+        URI baseNotificationResourcesURI = getUtil().rest().createUri(NotificationsResource.class, Map.of());
+        // Note: This number of attempts should be enough, with 10 seconds of delay between the first and the last
+        // attempt.
+        int maxAttempts = 10;
+        boolean success = false;
+        long lastCount = -1;
+        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+            Optional<Long> optionalCount = attemptCount(userId, wiki, baseNotificationResourcesURI, getUtil());
+            if (optionalCount.isPresent()) {
+                Long count = optionalCount.get();
+                lastCount = count;
+                if (count == expectedUnread) {
+                    success = true;
+                    break;
                 }
             }
-            throw new TimeoutException(String.format(
-                "Timeout while waiting [%s] sec on notification count. Expected: [%s] - Latest value received: [%s].",
-                timeout, expectedUnread, latestResponse), e);
+            try {
+                // A delay before the next attempt, to leave server-side processing the notifications asynchronously.
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Throw an exception if despite all attempts, the expected notifications count is never reached.
+        if (!success) {
+            throw new TimeoutException(
+                String.format("Failed after [%s] attempts. Expected: [%s] - Latest value received: [%s].", maxAttempts,
+                    expectedUnread, lastCount));
         }
         // Ensure to refresh the page after calling this wait, so the notification tray is updated.
         getUtil().getDriver().navigate().refresh();
+    }
+
+    private static Optional<Long> attemptCount(String userId, String wiki, URI uri, TestUtils testUtils)
+    {
+        URI attemptURI = UriBuilder.fromUri(uri)
+            .segment("count")
+            .queryParam("media", "json")
+            .queryParam("userId", userId)
+            .queryParam("useUserPreferences", Boolean.TRUE.toString())
+            .queryParam("currentWiki", wiki)
+            .queryParam("async", Boolean.FALSE.toString())
+            .queryParam("_", System.currentTimeMillis())
+            .build();
+        try {
+            GetMethod getMethod = testUtils.rest().executeGet(attemptURI);
+            if (Set.of(200, 202).contains(getMethod.getStatusCode())) {
+                String responseBody = IOUtils.toString(getMethod.getResponseBodyAsStream(), UTF_8);
+                Map<?, ?> map = new ObjectMapper().readValue(responseBody, Map.class);
+                return getOptionalLong(String.valueOf(map.get("unread")), responseBody);
+            } else {
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<Long> getOptionalLong(String str, String responseBody)
+    {
+        try {
+            return Optional.of(Long.parseLong(str));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -164,7 +190,7 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * Test if the text "No notification available!" is displayed in the notification tray.
-     * 
+     *
      * @return true if the text is not displayed
      */
     public boolean areNotificationsAvailable()
@@ -176,7 +202,7 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * Get the number of available notifications.
-     * 
+     *
      * @return Number of unread notifications, 0 if no notification available and MAX_INT if 20+ notifications
      */
     public int getNotificationsCount()
@@ -216,7 +242,7 @@ public class NotificationsTrayPage extends ViewPage
             getDriver().waitUntilElementIsVisible(By.className("xdialog-content"));
             // Enter is like clicking on "yes"
             WebElement yesButton = getDriver().findElement(
-                    By.cssSelector(".xdialog-content input.button[value='Yes']"));
+                By.cssSelector(".xdialog-content input.button[value='Yes']"));
             yesButton.click();
             this.waitForNotificationSuccessMessage("Notifications have been cleared");
         }
@@ -277,7 +303,7 @@ public class NotificationsTrayPage extends ViewPage
     public int getUnreadNotificationsCount()
     {
         return getDriver().findElementsWithoutWaiting(By.cssSelector(
-                "li#tmNotifications div.notification-event-unread")).size();
+            "li#tmNotifications div.notification-event-unread")).size();
     }
 
     /**
@@ -288,7 +314,7 @@ public class NotificationsTrayPage extends ViewPage
     public int getReadNotificationsCount()
     {
         return getDriver().findElementsWithoutWaiting(By.cssSelector(
-                "li#tmNotifications div.notification-event:not(.notification-event-unread)")).size();
+            "li#tmNotifications div.notification-event:not(.notification-event-unread)")).size();
     }
 
     /**
@@ -329,7 +355,7 @@ public class NotificationsTrayPage extends ViewPage
         }
 
         return this.getNotifications().get(notificationNumber).findElement(
-                By.cssSelector(".notification-content")).getText();
+            By.cssSelector(".notification-content")).getText();
     }
 
     /**
@@ -345,7 +371,7 @@ public class NotificationsTrayPage extends ViewPage
         }
 
         return this.getNotifications().get(notificationNumber).findElement(
-                By.cssSelector(".notification-page")).getText();
+            By.cssSelector(".notification-page")).getText();
     }
 
     /**
@@ -361,7 +387,7 @@ public class NotificationsTrayPage extends ViewPage
         }
 
         return this.getNotifications().get(notificationNumber).findElement(
-                By.cssSelector(".notification-description")).getText();
+            By.cssSelector(".notification-description")).getText();
     }
 
     /**
@@ -400,7 +426,6 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * @return either or not the page is watched
-     *
      * @since 10.8RC1
      * @since 9.11.8
      */
@@ -412,7 +437,6 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * @return either or not the "space" is watched
-     *
      * @since 10.8RC1
      * @since 9.11.8
      */
@@ -424,7 +448,6 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * @return either or not the wiki is watched
-     *
      * @since 10.8RC1
      * @since 9.11.8
      */
@@ -434,11 +457,11 @@ public class NotificationsTrayPage extends ViewPage
         return wikiWatchedSwitch.getState() == BootstrapSwitch.State.ON;
     }
 
-    private void waitUntilWatchedStateAreSaved()
+    private void waitUntilWatchedStateAreSaved() throws InterruptedException
     {
         waitForNotificationSuccessMessage("Saved!");
         getDriver().waitUntilCondition(driver ->
-                pageOnlyWatchedSwitch.isEnabled()
+            pageOnlyWatchedSwitch.isEnabled()
                 && pageAndChildrenWatchedSwitch.isEnabled()
                 && wikiWatchedSwitch.isEnabled()
         );
@@ -446,9 +469,9 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * Watch or unwatch the current page.
+     *
      * @param watched the desired state
      * @throws Exception if the expected state cannot be set
-     *
      * @since 10.8RC1
      * @since 9.11.8
      */
@@ -461,9 +484,9 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * Watch or unwatch the current "space".
+     *
      * @param watched the desired state
      * @throws Exception if the expected state cannot be set
-     *
      * @since 10.8RC1
      * @since 9.11.8
      */
@@ -476,9 +499,9 @@ public class NotificationsTrayPage extends ViewPage
 
     /**
      * Watch or unwatch the current wiki.
+     *
      * @param watched the desired state
      * @throws Exception if the expected state cannot be set
-     *
      * @since 10.8RC1
      * @since 9.11.8
      */
@@ -504,7 +527,6 @@ public class NotificationsTrayPage extends ViewPage
     }
 
     /**
-     *
      * @return The tray notification button.
      * @since 12.8RC1
      */

@@ -18,6 +18,9 @@
       },
       "TEXT": {
         "FilterName": "HTML (StarWriter)"
+      },
+      "WEB": {
+        "FilterName": "HTML (StarWriter)"
       }
     }
   },

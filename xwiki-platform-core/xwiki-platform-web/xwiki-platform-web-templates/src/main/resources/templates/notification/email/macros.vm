@@ -17,6 +17,7 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#template('notification/macros.vm')
 #**
  * Display a styled link
  * @param $url URL of the link
@@ -106,7 +107,7 @@
 #end
 
 #macro(displayNotificationDescription $event)
-  #displayCompositeEventDescription($event)
+  #displayCompositeEventDescription($event true)
 #end
 
 

@@ -24,7 +24,8 @@
 #template("startpage.vm")
 #template("register_macros.vm")
 #set ($fields = [])
-#loadConfig('XWiki.RegistrationConfig')
+#set ($passwordOptions = $NULL)
+#_loadPasswordOptions($passwordOptions)
 #definePasswordFields($fields, 'xwikipassword', 'xwikipassword2', $passwordOptions)
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">

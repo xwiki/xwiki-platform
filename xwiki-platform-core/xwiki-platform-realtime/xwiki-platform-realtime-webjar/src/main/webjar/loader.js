@@ -36,7 +36,12 @@ define('xwiki-realtime-loader', [
     return;
   }
 
-  let module = {messages: Messages},
+  let module = {
+    messages: Messages,
+    isForced: window.location.href.indexOf('force=1') >= 0,
+    // Real-time enabled by default.
+    isRt: window.location.href.indexOf('realtime=false') < 0
+  },
 
   // FIXME: The real-time JavaScript code is not loaded anymore on the "lock" page so this code is not really used. We
   // need to decide if we want to re-add the real-time JavaScript code on the lock page and how.
@@ -45,10 +50,6 @@ define('xwiki-realtime-loader', [
     const force = document.querySelectorAll('a[href*="force=1"][href*="/edit/"]');
     return (lockedBy.length && force.length) ? force[0] : null;
   },
-
-  isForced = module.isForced = window.location.href.indexOf('force=1') >= 0,
-  // Real-time enabled by default.
-  isRt = module.isRt = window.location.href.indexOf('realtime=false') < 0,
 
   getRTEditorURL = module.getEditorURL = function(href, info) {
     href = href.replace(/\?(.*)$/, function (all, args) {
@@ -218,16 +219,16 @@ define('xwiki-realtime-loader', [
     const content = createModalContent(Messages['requestDialog.prompt'],
       Messages.get('requestDialog.create', info.name));
 
-    // Initialize auto-accept
-    const autoAccept = $('<p></p>').appendTo(content);
+    // Initialize auto-create
+    const autoCreate = $('<p></p>').appendTo(content);
     let i = 30;
     const interval = setInterval(function() {
       i--;
-      autoAccept.html(Messages['requestDialog.autoAccept'] + i + 's');
+      autoCreate.text(Messages.get('requestDialog.autoCreate', i));
       if (i <= 0) {
         buttonCreate.click();
         clearInterval(interval);
-        autoAccept.remove();
+        autoCreate.remove();
       }
     }, 1000);
 
@@ -401,10 +402,16 @@ define('xwiki-realtime-loader', [
     const editor = isEditorCompatible();
     if (!module.isRt && editor) {
       $('<br/>').appendTo($warning);
-      $('<span></span>').html(Messages.conflictsWarningInfo).appendTo($warning);
-      $('<a></a>', {
+      // The parameter is the edit link but we can't inject it directly because we need to escape the HTML.
+      let suggestion = Messages.get('conflictsWarningSuggestion', '__0__');
+      // The translation message shouldn't contain HTML.
+      suggestion = $('<div></div>').text(suggestion).html();
+      // The link label shouldn't contain HTML.
+      const link = $('<a></a>', {
         href: getRTEditorURL(window.location.href, availableRt[editor].info)
-      }).text(Messages.conflictsWarningInfoLink).appendTo($warning);
+      }).text(Messages.conflictsWarningInfoLink).prop('outerHTML');
+      // Inject the link and append the suggestion.
+      $warning.append(suggestion.replace('__0__', link));
     } else if (module.isRt) {
       $('<br/>').appendTo($warning);
       $('<span></span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);
@@ -836,14 +843,15 @@ define('xwiki-realtime-loader', [
         if (lock) {
           // Found a lock link. Check active sessions.
           this.checkSessions(info);
-          reject();
+          reject(new Error('Lock detected'));
         } else if (window.XWiki.editor === info.type) {
           // No lock and we are using the right editor. Start realtime.
           this.updateKeys(info.type).then(keys => {
             if (!keys[info.type] || !keys.events || !keys.userdata) {
               ErrorBox.show('unavailable');
-              console.error('You are not allowed to create a new realtime session for that document.');
-              reject();
+              const error = new Error('You are not allowed to create a new realtime session for that document.');
+              console.error(error);
+              reject(error);
             } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
               resolve(keys);
             } else {

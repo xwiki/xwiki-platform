@@ -890,7 +890,13 @@ define('editInPlace', [
       reloadEditor: function() {
         var actionButtons = $('.inplace-editing-buttons');
         if (actionButtons.is(':visible')) {
-          actionButtons.trigger('xwiki:actions:reload');
+          // This function is called after the document save confirmation is received, if the save was done by merge. We
+          // register our reload listener from a document saved listener, but we're using promises which are
+          // asynchronous so the reload listener is actually registered with a delay. For this reason we trigger the
+          // reload event with a delay to ensure our reload listener is called.
+          setTimeout(function() {
+            actionButtons.trigger('xwiki:actions:reload');
+          }, 0);
         } else {
           return originalAjaxSaveAndContinue.reloadEditor.apply(this, arguments);
         }

@@ -21,6 +21,7 @@ package org.xwiki.test.extension;
 
 import java.io.StringWriter;
 
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -35,13 +36,12 @@ import org.xwiki.job.JobException;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
 
-import static org.restlet.data.MediaType.APPLICATION_XML;
-
 /**
  * Execute a Job to call the XWiki REST endpoint to install extensions.
  *
  * @version $Id$
- * @since 10.9
+ * @since 15.9-rc-1
+ * @since 15.5.4
  */
 public class JobExecutor
 {
@@ -88,13 +88,13 @@ public class JobExecutor
         throws Exception
     {
         PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", APPLICATION_XML.toString());
+        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
         RequestEntity entity =
-            new StringRequestEntity(writer.toString(), APPLICATION_XML.toString(), "UTF-8");
+            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
         putMethod.setRequestEntity(entity);
 
         httpClient.executeMethod(putMethod);

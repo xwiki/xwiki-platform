@@ -19,8 +19,6 @@
  */
 package org.xwiki.security.authentication;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception thrown when using {@link RetrieveUsernameManager}.
  *
@@ -29,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4.6
  * @since 13.10.10
  */
-@Unstable
 public class RetrieveUsernameException extends Exception
 {
     /**

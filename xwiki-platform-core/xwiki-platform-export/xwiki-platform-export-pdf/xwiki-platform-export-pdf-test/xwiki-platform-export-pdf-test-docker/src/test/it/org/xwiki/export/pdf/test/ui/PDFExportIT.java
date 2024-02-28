@@ -71,7 +71,11 @@ import org.xwiki.test.ui.po.ViewPage;
         "org.xwiki.platform:xwiki-platform-resource-temporary",
         // Code macro highlighting works only if Jython is a core extension. It's not enough to use language=none in our
         // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
-        "org.python:jython-slim"
+        // TODO: Remove when https://jira.xwiki.org/browse/XWIKI-17972 is fixed
+        "org.python:jython-slim",
+        // The image plugin that performs the server-side image resize is not registered until the server is restarted
+        // so we need to make it a core extension.
+        "org.xwiki.platform:xwiki-platform-image-processing-plugin"
     },
     resolveExtraJARs = true,
     // We need the Office server because we want to be able to test how the Office macro is exported to PDF.
@@ -80,7 +84,8 @@ import org.xwiki.test.ui.po.ViewPage;
         // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference).
         // Enabling debug logs also requires PR.
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
-            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)"
+            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)",
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.image.ImagePlugin",
     }
 )
 @ExtendWith(PDFExportExecutionCondition.class)
@@ -224,11 +229,20 @@ class PDFExportIT
             assertTrue(contentPageText.contains("Child\nSection 1\nContent of first section.\n"),
                 "Child document content missing: " + contentPageText);
 
-            // The content of the child document shows an image.
+            // The content of the child document shows the same image multiple times.
             List<PDFImage> contentPageImages = pdf.getImagesFromPage(3);
-            assertEquals(1, contentPageImages.size());
+            assertEquals(3, contentPageImages.size());
+
+            // Verify the images included in the PDF are not resized server-side (we know the image width is specified
+            // in the source wiki syntax and we enabled the server-side image resize by default).
             assertEquals(512, contentPageImages.get(0).getRawWidth());
             assertEquals(512, contentPageImages.get(0).getRawHeight());
+            assertEquals(512, contentPageImages.get(2).getRawWidth());
+            assertEquals(512, contentPageImages.get(2).getRawHeight());
+
+            // For the second image we force the server-side resize.
+            assertEquals(100, contentPageImages.get(1).getRawWidth());
+            assertEquals(100, contentPageImages.get(1).getRawHeight());
         }
     }
 
@@ -1143,6 +1157,24 @@ class PDFExportIT
             // The image from the word document.
             assertEquals(81, images.get(1).getRawWidth());
             assertEquals(81, images.get(1).getRawHeight());
+        }
+    }
+
+    @Test
+    @Order(25)
+    void ampersandInPageTitle(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.createPage(new LocalDocumentReference("A&B=C", testReference), "Page with & in title.", "A&B=C");
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and one content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            // Verify the text from the content page.
+            assertEquals("A&B=C\n2 / 2\nPage with & in title.\n", pdf.getTextFromPage(1));
         }
     }
 

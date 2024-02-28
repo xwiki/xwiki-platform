@@ -65,7 +65,7 @@
       #end
     </div>
     <div class="notification-description">
-      #displayCompositeEventDescription($compositeEvent)
+      #displayCompositeEventDescription($compositeEvent false)
       <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
     </div>
   #end
@@ -241,7 +241,7 @@ $xwiki.getPlainUserName($user)##
   #displayNotificationEventSkeleton($icon, 'comment', $content, '')
 #end
 
-#macro(displayCompositeEventDescription $compositeEvent)
+#macro(displayCompositeEventDescription $compositeEvent $forEmail)
   #set ($baseTranslationPrefix = "${compositeEvent.type}")
   #set ($fallbackTranslationPrefix = "notifications.events.${compositeEvent.type}")
   #set ($fallbackTranslationSuffix = "description")
@@ -254,7 +254,11 @@ $xwiki.getPlainUserName($user)##
       "${baseTranslationPrefix}.${fallbackTranslationSuffix}",
       "${fallbackTranslationPrefix}.${fallbackTranslationSuffix}"
     ])
-    #set ($translationParameters = ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
+    #if ($forEmail)
+      #set ($translationParameters = ["#displayEmailNotificationEventUsers($compositeEvent.users, true, false)"])
+    #else
+      #set ($translationParameters = ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
+    #end
     $services.localization.render($translationKeys,$translationParameters)
   #else
   <div>
@@ -269,7 +273,11 @@ $xwiki.getPlainUserName($user)##
     $services.localization.render($translationKeys,$translationParameters)
   </div>
   <div>
-    #displayNotificationEventUsers($compositeEvent.users, true, true)
+    #if ($forEmail)
+      #displayEmailNotificationEventUsers($compositeEvent.users, true, true)
+    #else
+      #displayNotificationEventUsers($compositeEvent.users, true, true)
+    #end
   </div>
   #end
 #end

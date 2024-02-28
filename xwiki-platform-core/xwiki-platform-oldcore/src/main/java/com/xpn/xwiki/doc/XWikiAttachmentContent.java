@@ -32,7 +32,6 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.UnexpectedException;
 
 import com.xpn.xwiki.web.Utils;
@@ -375,7 +374,6 @@ public class XWikiAttachmentContent implements Cloneable
      *
      * @since 14.3RC1
      */
-    @Unstable
     public void dispose()
     {
         if (this.file != null && this.isContentDirty()) {

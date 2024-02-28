@@ -401,7 +401,7 @@ $xwiki.getUserName("xwiki:${username}")
   #if(!$picturelist.containsKey("${username}--${size}"))
     #getUserAvatarURL($username $avatarURL $size)
     #if ($avatarURL.specified)
-      #set ($picture = "<img src='")
+      #set ($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
       #set ($picture = $picture.concat($escapetool.xml($avatarURL.url)))
       #set ($picture = $picture.concat("' alt='"))
       #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
@@ -767,7 +767,7 @@ $fn
     #end
     #foreach ($childDocName in $page.children)
       #set ($childDoc = $xwiki.getDocument($childDocName))
-      #if ($childDoc && !$blacklistedSpaces.contains($childDoc.getSpace()))
+      #if ($childDoc && ($services.user.properties.displayHiddenDocuments() || !$childDoc.isHidden()))
         #if ($withPageBreaks)
           #pagebreak()
         #end
@@ -832,14 +832,14 @@ $fn
 <div role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large #{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
 aria-label="$escapetool.xml($title)">
-<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
+<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>
 <div class="xwikipanelcontents">
 #else
 (% role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large#{end}panel
 expanded $!specialClassAttribute $!deprecatedClassAttribute"
 aria-label="$escapetool.xml($title)"
 %)(((
-{{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
+{{html}}<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
@@ -1113,14 +1113,14 @@ $html
  *
  * @param docNames list of document names.
  * @param displaySpaces true to group documents by space.
- * @param blacklistedSpaces spaces to exclude from the list.
+ * @param ignoredSpaces spaces to exclude from the list.
  *#
-#macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
+#macro(displayDocumentList $docNames $displaySpaces $ignoredSpaces)
   #set($documentList = [])
   #foreach($docName in $docNames)
     #if($xwiki.hasAccessLevel("view", $xcontext.user, $docName))
       #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
-      #if(!$blacklistedSpaces.contains($document.getSpace()))
+      #if(!$ignoredSpaces.contains($document.getSpace()) && ($services.user.properties.displayHiddenDocuments() || !$document.isHidden()))
         #set($discard = $documentList.add($document))
       #end
     #end

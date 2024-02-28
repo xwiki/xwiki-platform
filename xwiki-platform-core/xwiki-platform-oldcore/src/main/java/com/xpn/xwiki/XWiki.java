@@ -1025,7 +1025,6 @@ public class XWiki implements EventListener
      * @return {@code true} if the wiki has been initialized and the initialization is finished.
      * @since 14.4RC1
      */
-    @Unstable
     public boolean isWikiInitialized(String wikiId)
     {
         Job wikiInitializerJob = getWikiInitializerJob(wikiId);
@@ -3939,7 +3938,7 @@ public class XWiki implements EventListener
                 }
             }
 
-            if ((!password.equals(password2))) {
+            if (!password.equals(password2)) {
                 // TODO: throw wrong password exception
                 return -2;
             }
@@ -5692,8 +5691,7 @@ public class XWiki implements EventListener
                 context.getDoc().getDocumentReference().getName());
         } else {
             ResourceReference resourceReference = getResourceReferenceManager().getResourceReference();
-            if (resourceReference instanceof EntityResourceReference) {
-                EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+            if (resourceReference instanceof EntityResourceReference entityResource) {
                 String action = entityResource.getAction().getActionName();
                 if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
                     reference = getCurrentMixedDocumentReferenceResolver().resolve(request.getParameter("topic"));
@@ -7379,36 +7377,6 @@ public class XWiki implements EventListener
         return doc.validate(context);
     }
 
-    public String addTooltip(String html, String message, String params, XWikiContext context)
-    {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("<span class=\"tooltip_span\" onmouseover=\"");
-        buffer.append(params);
-        buffer.append("; return escape('");
-        buffer.append(message.replaceAll("'", "\\'"));
-        buffer.append("');\">");
-        buffer.append(html);
-        buffer.append("</span>");
-
-        return buffer.toString();
-    }
-
-    public String addTooltipJS(XWikiContext context)
-    {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("<script src=\"");
-        buffer.append(getSkinFile("ajax/wzToolTip.js", context));
-        buffer.append("\"></script>");
-        // buffer.append("<div id=\"dhtmltooltip\"></div>");
-
-        return buffer.toString();
-    }
-
-    public String addTooltip(String html, String message, XWikiContext context)
-    {
-        return addTooltip(html, message, "this.WIDTH='300'", context);
-    }
-
     public String addMandatory(XWikiContext context)
     {
         String star =
@@ -7876,8 +7844,8 @@ public class XWiki implements EventListener
 
             XWikiDocument doc = (XWikiDocument) source;
 
-            if (event instanceof XObjectPropertyEvent) {
-                EntityReference reference = ((XObjectPropertyEvent) event).getReference();
+            if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
+                EntityReference reference = xObjectPropertyEvent.getReference();
                 String modifiedProperty = reference.getName();
                 if ("backlinks".equals(modifiedProperty)) {
                     this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",

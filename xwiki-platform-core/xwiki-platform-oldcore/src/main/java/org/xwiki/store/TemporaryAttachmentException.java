@@ -19,15 +19,12 @@
  */
 package org.xwiki.store;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Dedicated exception for the operations related to {@link TemporaryAttachmentSessionsManager}.
  *
  * @version $Id$
  * @since 14.3RC1
  */
-@Unstable
 public class TemporaryAttachmentException extends Exception
 {
     /**

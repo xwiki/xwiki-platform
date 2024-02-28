@@ -22,6 +22,7 @@
   <img
     v-if="isImage"
     :src="url"
+    alt=""
   />
   <span
     v-else-if="isFont"
@@ -124,6 +125,9 @@ export default {
         }
         // Set the icon to the resolved value of the promise.
         this.remoteIconDescriptor = await iconCache[iconName];
+        // Send a ready even once initialize so that parent containers can know when this component is in a stable 
+        // state. 
+        this.$emit('ready');
       },
       immediate: true
     },

@@ -20,18 +20,18 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
+import javax.inject.Inject;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.email.EmailTemplateRenderer;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.notifications.notifiers.internal.AbstractWikiNotificationRenderer;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
-import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -43,9 +43,10 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 9.11.1
  */
-public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRenderer
-        implements NotificationEmailRenderer
+@Component(roles = WikiEmailNotificationRenderer.class)
+public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRenderer implements NotificationEmailRenderer
 {
+    @Inject
     private EmailTemplateRenderer emailTemplateRenderer;
 
     private Template htmlTemplate;
@@ -57,23 +58,14 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
     /**
      * Constructs a new {@link WikiEmailNotificationRenderer}.
      *
-     * @param authorReference the author reference of the document
-     * @param templateManager the {@link TemplateManager} to use
-     * @param scriptContextManager the {@link ScriptContextManager} to use
-     * @param componentManager the {@link ComponentManager} to use
      * @param baseObject the XObject which has the required properties to instantiate the component
      * @throws NotificationException if the properties of the given BaseObject could not be loaded
      */
-    public WikiEmailNotificationRenderer(DocumentReference authorReference, TemplateManager templateManager,
-            ScriptContextManager scriptContextManager, ComponentManager componentManager, BaseObject baseObject)
-            throws NotificationException
+    @Override
+    public void initialize(BaseObject baseObject) throws NotificationException
     {
-        super(authorReference, templateManager, scriptContextManager, componentManager, baseObject);
-        try {
-            emailTemplateRenderer = componentManager.getInstance(EmailTemplateRenderer.class);
-        } catch (ComponentLookupException e) {
-            throw new NotificationException("Failed to create a new instance of WikiEmailNotificationRenderer.", e);
-        }
+        super.initialize(baseObject);
+
         this.htmlTemplate = extractTemplate(baseObject,
                 WikiEmailNotificationRendererDocumentInitializer.HTML_TEMPLATE);
         this.plainTextTemplate = extractTemplate(baseObject,
@@ -87,7 +79,8 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
     {
         if (this.htmlTemplate != null) {
             return emailTemplateRenderer.renderHTML(
-                    emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.htmlTemplate, Syntax.XHTML_1_0)
+                    emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.htmlTemplate,
+                        Syntax.XHTML_1_0, Map.of())
             );
         }
         // Fallback to the default renderer
@@ -100,7 +93,7 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
         if (this.plainTextTemplate != null) {
             return emailTemplateRenderer.renderPlainText(
                     emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.plainTextTemplate,
-                            Syntax.PLAIN_1_0)
+                        Syntax.PLAIN_1_0, Map.of())
             );
         }
         // Fallback to the default renderer
@@ -114,7 +107,7 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
         if (this.emailSubjectTemplate != null) {
             return emailTemplateRenderer.renderPlainText(
                     emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.emailSubjectTemplate,
-                            Syntax.PLAIN_1_0)
+                        Syntax.PLAIN_1_0, Map.of())
             );
         }
         // Fallback to the default renderer

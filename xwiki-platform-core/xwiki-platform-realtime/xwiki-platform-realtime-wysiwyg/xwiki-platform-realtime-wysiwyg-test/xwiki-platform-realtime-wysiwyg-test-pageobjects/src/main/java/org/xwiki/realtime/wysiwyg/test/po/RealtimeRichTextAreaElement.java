@@ -20,12 +20,12 @@
 package org.xwiki.realtime.wysiwyg.test.po;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -59,11 +59,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
             // Wait for the specified coeditor position to be available in the DOM.
             if (wait) {
                 getFromIFrame(() -> {
-                    // Make sure we don't scroll the page when locating the coeditor position. Note that we can't use
-                    // ExpectedConditions.presenceOfElementLocated() because it calls driver.findElement() which is
-                    // overwritten in XWikiWebDriver to scroll the page.
-                    getDriver()
-                        .waitUntilCondition(driver -> getDriver().findElementWithoutWaitingWithoutScrolling(By.id(id)));
+                    getDriver().waitUntilCondition(driver -> getContainer());
                     return null;
                 });
             }
@@ -107,23 +103,24 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         /**
          * @return {@code true} if this caret indicator is visible in the rich text area
          */
+        @SuppressWarnings("unchecked")
         public boolean isVisible()
         {
             return getFromIFrame(() -> {
                 WebElement root = getDriver().findElementWithoutWaitingWithoutScrolling(By.tagName("html"));
-                Rectangle viewport = root.getRect();
-                int scrollLeft = Integer.parseInt(root.getDomProperty("scrollLeft"));
-                int scrollTop = Integer.parseInt(root.getDomProperty("scrollTop"));
-                Rectangle position = getContainer().getRect();
-                int x = position.getX() - scrollLeft;
-                int y = position.getY() - scrollTop;
-                return viewport.getX() <= x && x < (viewport.getX() + viewport.getWidth()) && viewport.getY() <= y
-                    && y < (viewport.getY() + viewport.getHeight());
+                int viewportHeight = Integer.parseInt(root.getDomProperty("clientHeight"));
+                int viewportWidth = Integer.parseInt(root.getDomProperty("clientWidth"));
+                Map<String, Long> position = (Map<String, Long>) getDriver()
+                    .executeScript("return arguments[0].getBoundingClientRect()", getContainer());
+                return position.get("y") >= 0 && position.get("x") >= 0
+                    && (position.get("y") + position.get("height")) <= viewportHeight
+                    && (position.get("x") + position.get("width")) <= viewportWidth;
             });
         }
 
         private WebElement getContainer()
         {
+            // Make sure we don't scroll the page when locating the coeditor position.
             return getDriver().findElementWithoutWaitingWithoutScrolling(By.id(this.id));
         }
     }

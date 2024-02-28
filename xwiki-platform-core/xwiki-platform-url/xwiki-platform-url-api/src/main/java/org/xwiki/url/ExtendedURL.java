@@ -25,16 +25,19 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.velocity.tools.EscapeTool;
 
@@ -183,33 +186,16 @@ public class ExtendedURL implements Cloneable
     protected Map<String, List<String>> extractParameters(URI uri)
     {
         Map<String, List<String>> uriParameters;
-        if (uri.getQuery() != null) {
-            uriParameters = new LinkedHashMap<>();
-            for (String nameValue : Arrays.asList(uri.getQuery().split("&"))) {
-                String[] pair = nameValue.split("=", 2);
-                // Check if the parameter has a value or not.
-                if (pair.length == 2) {
-                    addParameter(pair[0], pair[1], uriParameters);
-                } else {
-                    addParameter(pair[0], null, uriParameters);
-                }
-            }
+        if (uri.getRawQuery() != null) {
+            // Group the parameters by name and create a list for each key, filtering null values.
+            uriParameters = URLEncodedUtils.parse(uri.getRawQuery(), StandardCharsets.UTF_8).stream()
+                .filter(pair -> StringUtils.isNotBlank(pair.getName()))
+                .collect(Collectors.groupingBy(NameValuePair::getName, Collectors.mapping(NameValuePair::getValue,
+                    Collectors.filtering(Objects::nonNull, Collectors.toList()))));
         } else {
-            uriParameters = Collections.emptyMap();
+            uriParameters = Map.of();
         }
         return uriParameters;
-    }
-
-    private void addParameter(String name, String value, Map<String, List<String>> parameters)
-    {
-        List<String> list = parameters.get(name);
-        if (list == null) {
-            list = new ArrayList<>();
-        }
-        if (value != null) {
-            list.add(value);
-        }
-        parameters.put(name, list);
     }
 
     /**

@@ -256,17 +256,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             }
 
             authenticationFailureManager.recordAuthenticationFailure(username, request);
-
-            String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");
-            int rCode = HttpServletResponse.SC_UNAUTHORIZED;
-            if ((returnCode != null) && (!returnCode.equals(""))) {
-                try {
-                    rCode = Integer.parseInt(returnCode);
-                } catch (Exception e) {
-                    rCode = HttpServletResponse.SC_UNAUTHORIZED;
-                }
-            }
-            response.setStatus(rCode); // TODO: Does this work? (200 in case of error)
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
         return true;

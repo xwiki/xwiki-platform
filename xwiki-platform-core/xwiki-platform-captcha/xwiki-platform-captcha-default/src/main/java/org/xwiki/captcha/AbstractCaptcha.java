@@ -180,7 +180,7 @@ public abstract class AbstractCaptcha implements Captcha
             for (Object prop : configurationObj.getProperties()) {
                 BaseProperty<?> property = (BaseProperty<?>) prop;
                 Object value = property.getValue();
-                if (value != null && !(value instanceof String && StringUtils.isEmpty((String) value))) {
+                if (value != null && !(value instanceof String stringValue && StringUtils.isEmpty(stringValue))) {
                     // Count only non-null values and non-empty strings.
                     parameters.put(property.getName(), value);
                 }

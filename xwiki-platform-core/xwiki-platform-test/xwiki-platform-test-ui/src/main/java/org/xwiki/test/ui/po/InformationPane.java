@@ -21,7 +21,6 @@ package org.xwiki.test.ui.po;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -84,7 +83,7 @@ public class InformationPane extends BaseElement
     public List<String> getAvailableTranslations()
     {
         return getDriver().findElementsWithoutWaiting(this.pane, By.cssSelector("dd[data-key='translations'] > a"))
-            .stream().map(link -> link.getText()).collect(Collectors.toList());
+            .stream().map(link -> link.getText()).toList();
     }
 
     /**
@@ -96,7 +95,7 @@ public class InformationPane extends BaseElement
     {
         return getDriver()
             .findElementsWithoutWaiting(this.pane, By.cssSelector("dd[data-key='translations'] .wikicreatelink a"))
-            .stream().map(link -> link.getText()).collect(Collectors.toList());
+            .stream().map(link -> link.getText()).toList();
     }
 
     /**

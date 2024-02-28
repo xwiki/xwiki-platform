@@ -109,8 +109,6 @@ class NotificationRssDefaultPageTest extends PageTest
             .thenReturn(recordableEventDescriptor);
         when(recordableEventDescriptor.getApplicationName()).thenReturn("eventType.translationKey");
         when(this.localizationScriptService.render("eventType.translationKey")).thenReturn("RSS Event Test&Type");
-
-        when(this.localizationScriptService.render("eventType.translationKey")).thenReturn("RSS Event Test&Type");
         when(this.localizationScriptService.render("notifications.events.by", Syntax.HTML_5_0, List.of("First & Name")))
             .thenReturn("Event by: [First &amp; Name]");
 

@@ -43,6 +43,7 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.security.authentication.AuthenticationAction;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
+import org.xwiki.security.authentication.RegistrationConfiguration;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
 import org.xwiki.security.authentication.ResetPasswordRequestResponse;
@@ -119,6 +120,9 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
+
+    @Inject
+    private RegistrationConfiguration registrationConfiguration;
 
     @Inject
     private Logger logger;
@@ -311,6 +315,10 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
         throws ResetPasswordException
     {
         if (this.checkUserReference(userReference)) {
+            if (!this.isPasswordCompliantWithRegistrationRules(newPassword)) {
+                throw new ResetPasswordException("The provided password is not compliant with the password security "
+                    + "rules.");
+            }
             XWikiContext context = this.contextProvider.get();
 
             DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
@@ -331,5 +339,24 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                 throw new ResetPasswordException("Cannot open user document to perform reset password.", e);
             }
         }
+    }
+
+    @Override
+    public boolean isPasswordCompliantWithRegistrationRules(String newPassword)
+    {
+        int passwordMinimumLength = this.registrationConfiguration.getPasswordMinimumLength();
+        boolean result = newPassword.length() >= passwordMinimumLength;
+
+        if (result) {
+            for (RegistrationConfiguration.PasswordRules passwordRule
+                : this.registrationConfiguration.getPasswordRules()) {
+                if (!passwordRule.getPattern().matcher(newPassword).matches()) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 }

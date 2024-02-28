@@ -171,7 +171,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public InputStream getSearchCoreDefaultContent()
     {
-        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core.zip");
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core-search.zip");
     }
 
     @Override

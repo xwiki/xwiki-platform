@@ -89,7 +89,7 @@
     (((
       = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
       #if ($hasCreateData)
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
+        * [[{{displayIcon name="add"/}} $services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
           #if ("$!templateProvider.getValue('terminal')" == '1')
             #set ($entryReference = $services.model.createDocumentReference('__entryName__', $dataSpaceRef))
           #else
@@ -122,10 +122,10 @@
           'appName': $doc.space,
           'resolve': true
         }))
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
+        * [[{{displayIcon name="edit"/}} $services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
       #end
       #if ($hasEditTranslations)
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:${xwiki.getURL($translationsRef, 'edit', 'editor=wiki')}||class="action translate"]]
+        * [[{{displayIcon name="translate"/}} $services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:${xwiki.getURL($translationsRef, 'edit', 'editor=wiki')}||class="action translate"]]
       #end
       #if ($hasDeleteData)
         #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
@@ -134,7 +134,7 @@
           'scope': 'entries',
           'xredirect': $doc.getURL()
         })))
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:${deleteDataURL}||class="action deleteData"]]
+        * [[{{displayIcon name="cross"/}} $services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:${deleteDataURL}||class="action deleteData"]]
       #end
       #if ($hasDeleteApplication)
         #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
@@ -142,7 +142,7 @@
           'resolve': true,
           'xredirect': $doc.getURL()
         })))
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:${deleteAppURL}||class="action delete"]]
+        * [[{{displayIcon name="trash"/}} $services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:${deleteAppURL}||class="action delete"]]
       #end
     )))
   #end
@@ -253,15 +253,6 @@
   {{/html}}
 #end
 {{/velocity}}</content>
-  <attachment>
-    <filename>locate.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAoxJREFUeNqMUztrFFEU/u48NyZr3I0iKMFHY2BBhaRVbLRUUoiNRLRctBQDYZNCBX+DohbBQtAQBcFCwbS6iykiIihEG0Uxu5OZyezM3Ifn3tlkt/TCuY8z537nO9+5w+r1OpRSSNMUjUYDcRwjz/NlKeUF7QdjfdPnntEJzLJeMA2gB+ccSZJgYWEBURSpYxMTUJYFuC4U+kNfpAyAlPi8tgZLn3Umi4J93zcsHMeBJN+vToCNxUVwyi7I9Lqx+MT4iaEBtmizzHmuiLYSQmhfkZCC3fIIyjMzJq3yPLOWZy4bv2KGC5ycar1y9Rp8zzeOLMtMdqJETFxDWbmeKcXg0nfHL4HlWQEQlXx0qJKH9x+QKDYE6XB79iYRIAasRycrgvWqz9rPtkXhWoL5eSUGNP7w7avqcq4CKqmztKQC8m1bZ2VFBfStm6aq2WwqJyaQXWmOfGwf0bZhhyGE7YPZNlxCxfR0ATvYCRLQJqFNCZIm8acLZY8SbduIVX32Gq2z54p2aboWTZ5uqX4XQisPi8rZDMN3bPPNpCrXjgNBU0cSGqVNqWYtEgVCkVWnsPVlFez8OvzZOXTu3cUYMEW5Ow42KaBECrMDBT/TSNlXRDuGqxDfd8PyKpCCQ0v6G2j9aLepBIEwevu+7EDAYzn1IzcAQkikXIJrjNI6WEC6lIch4y0tPHTpBysVOHsufjxNe1snv3TjTnP8zHX8bIdIMoHn9UPYflnZ/sPAiA8rCsxl9ECc7OXJVddPcPRxA5/+xjgxlCApdeGYPEW/tdk+wYyOwKJ3Igc7ol7VMP7oFvYOxfRAcqUkN/SjJMfTuVMIMwVeqeJIrbbzU/VA2c7PNTAm8f+jpad/AgwABu5JtlhhRBEAAAAASUVORK5CYII=</content>
-    <filesize>746</filesize>
-  </attachment>
   <object>
     <name>AppWithinMinutes.LiveTableViewSheet</name>
     <number>0</number>
@@ -410,7 +401,8 @@ return XWiki;
  * Rename Application
  */
 require(['jquery', 'bootstrap', 'xwiki-form-validation-async'], function($) {
-  #set ($currentDocReference = $xwiki.getDocument($request.currentApp).getDocumentReference())
+  ## Note: if not currentApp request param is not passed, we default to the wiki home page reference to avoid a NPE
+  #set ($currentDocReference = $xwiki.getDocument("$!request.currentApp").getDocumentReference())
   // if we cannot find any extension related to this page app, it's not part of an extension.
   var isNotAnExtension = $services.extension.xar.getInstalledExtensions($currentDocReference).isEmpty();
 
@@ -712,28 +704,8 @@ require(['jquery', 'bootstrap', 'xwiki-form-validation-async'], function($) {
   background: none no-repeat scroll 0 center transparent;
   display: block;
   font-size: .8em;
-  padding: .3em .3em .3em 20px;
+  padding: .3em .3em .3em .3em;
   text-transform: uppercase;
-}
-
-#actionBox .action.edit {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_edit.png')");
-}
-
-#actionBox .action.translate {
-  background-image: url("$doc.getAttachmentURL('locate.png')");
-}
-
-#actionBox .action.delete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_delete.png')");
-}
-
-#actionBox .action.deleteData {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_form_delete.png')");
-}
-
-#actionBox .action.add {
-  background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
 }
 
 #entryNamePopup {

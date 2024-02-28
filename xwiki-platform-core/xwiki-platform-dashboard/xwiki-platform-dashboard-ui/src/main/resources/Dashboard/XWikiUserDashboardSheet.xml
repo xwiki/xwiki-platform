@@ -285,13 +285,13 @@
           #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
             &lt;div class="editProfileCategory"&gt;
               &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.dashboard.edit'))"
-                  href="$doc.getURL('edit', 'category=dashboard')" class="btn btn-xs"&gt;
-                &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
+                  href="$doc.getURL('edit', 'category=dashboard')" class="btn btn-xs btn-default"&gt;
+                $services.icon.renderHTML('pencil')
                 &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.dashboard.edit'))&lt;/span&gt;
               &lt;/a&gt;
             &lt;/div&gt;
           #end
-          &lt;h1&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h1&gt;
+          &lt;h2&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h2&gt;
           &lt;dl&gt;
             &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.dashboard.user.displayOnMainPage')&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;$doc.display('displayOnMainPage', $dashboardPrefs)&lt;/dd&gt;

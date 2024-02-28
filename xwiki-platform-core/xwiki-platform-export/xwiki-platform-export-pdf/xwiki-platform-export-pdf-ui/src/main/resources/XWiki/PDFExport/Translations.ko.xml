@@ -1,0 +1,113 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Translations" locale="ko">
+  <web>XWiki.PDFExport</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>export.pdf.options.template=주형
+export.pdf.options.template.hint=PDF 템플릿 은 표지, 목차, 각 페이지의 머리글과 바닥글에 표시되는 정보를 제어합니다.
+export.pdf.options.loadFailure=PDF 내보내기 옵션을 로드하지 못했습니다 .
+export.pdf.hint=웹 브라우저를 사용하여 PDF (Portable Document Format)로 내보내기
+export.pdf.modal.close=닫다
+export.pdf.inProgress=PDF 로 내보내는 중 ...
+export.pdf.failed=PDF 로 내보내지 못했습니다
+export.pdf.lastError=PDF 내보내기 로그 에 오류가 있습니다: {0}
+export.pdf.canceling=PDF 내보내기 취소 중 ...
+export.pdf.canceled=PDF 내보내기가 취소되었습니다
+export.pdf.cancelFailed=PDF 내보내기를 취소하지 못했습니다
+export.pdf.loading=로드 중...
+export.pdf.pageReadyTimeout=웹페이지 인쇄 준비를 기다리는 동안 시간이 초과되었습니다.
+export.pdf.templates.default=기본 템플릿
+export.pdf.templates.default.versionInfo={2}에 {1}이(가) 작성한 버전 {0}
+export.pdf.template.name=PDF 템플릿
+export.pdf.template.hint=PDF 내보내기 에 사용되는 템플릿
+export.pdf.template.provider=PDF 템플릿 제공업체
+export.pdf.template.skinExtensionInfo=이 페이지에서 제공하는 CSS 및 JavaScript 스킨 확장도 PDF 템플릿의 일부이므로 PDF 템플릿 을 사용할 때 자동으로 로드됩니다 .
+admin.export.pdf=PDF 내보내기
+admin.export.pdf.description=Wiki 페이지를 PDF 로 내보내는 방법을 구성합니다 .
+export.pdf.admin.status=상태
+export.pdf.admin.configuration=구성
+export.pdf.admin.saveComment=관리에서 PDF 내보내기 구성을 업데이트했습니다
+export.pdf.admin.reset=초기화
+export.pdf.admin.reset.hint=기본 구성 복원
+export.pdf.admin.reset.confirmation=기본 구성을 복원하시겠습니까? 모든 변경사항이 손실됩니다.
+export.pdf.config.default=(기본)
+export.pdf.config.empty=(비어 있는)
+export.pdf.generator.label=발전기
+export.pdf.generator.hint=PDF를 생성하는 데 사용되는 도구입니다 .
+export.pdf.generator.checking=PDF 생성기를 사용할 수 있는지 확인하는 중 ...
+export.pdf.generator.checkFailed=PDF 생성기를 사용할 수 있는지 확인하지 못했습니다 .
+export.pdf.generator.available=사용 가능
+export.pdf.generator.unavailable=현재 PDF 생성기를 사용할 수 없습니다 .
+export.pdf.generator.userBrowser.label=사용자 브라우저
+export.pdf.generator.userBrowser.hint=PDF 는 사용자 자체 웹 브라우저에서 제공하는 인쇄 기능을 사용하여 클라이언트 측에서 생성됩니다.
+export.pdf.generator.chromeDockerContainer.label=Chrome 도커 컨테이너
+export.pdf.generator.chromeDockerContainer.hint=PDF 는 XWiki 와 동일한 서버의 Docker 컨테이너 내부에서 실행되는 헤드리스 Chrome 웹 브라우저를 사용하여 서버측에서 생성됩니다 .
+export.pdf.generator.remoteChrome.label=원격 크롬
+export.pdf.generator.remoteChrome.hint=PDF 는 XWiki 와 다른 서버에서 실행될 수 있는 원격 Chrome 웹 브라우저를 사용하여 서버측에서 생성됩니다 .
+XWiki.PDFExport.TemplateClass_cover=씌우다
+XWiki.PDFExport.TemplateClass_cover.hint=첫 페이지에 표시되는 정보입니다. 예를 들어 제목과 저자
+XWiki.PDFExport.TemplateClass_toc=목차
+XWiki.PDFExport.TemplateClass_toc.hint=일반적으로 페이지 번호와 함께 콘텐츠 제목을 나열합니다.
+XWiki.PDFExport.TemplateClass_header=머리글
+XWiki.PDFExport.TemplateClass_header.hint=표지를 제외한 각 페이지 상단에 표시되는 정보입니다. 예를 들어 제목
+XWiki.PDFExport.TemplateClass_footer=보행인
+XWiki.PDFExport.TemplateClass_footer.hint=표지를 제외한 각 페이지 하단에 표시되는 정보입니다. 예를 들어 페이지 번호
+XWiki.PDFExport.TemplateClass_metadata=메타데이터
+XWiki.PDFExport.TemplateClass_metadata.hint=PDF 머리글 또는 바닥글 에 표시할 메타데이터를 생성하기 위해 PDF 내보내기 에 포함된 각 Wiki 페이지에 대해 평가되는 스크립트입니다 . 메타데이터는 값이 Map&lt;String, String&gt;인 메타데이터라는 특수 바인딩을 사용하여 지정됩니다. 메타데이터는 HTML 에서 각 위키 페이지의 제목을 표시하는 데 사용되는 제목의 속성으로 끝납니다 .
+XWiki.PDFExport.ConfigurationClass_templates=템플릿
+XWiki.PDFExport.ConfigurationClass_templates.hint=Wiki 페이지를 PDF 로 내보낼 때 사용자가 선택할 수 있는 PDF 템플릿 목록입니다 .
+XWiki.PDFExport.ConfigurationClass_serverSide=서버 측
+XWiki.PDFExport.ConfigurationClass_serverSide.hint=PDF 내보내기를 서버측에서 수행해야 하는지(예: Docker 컨테이너 내에서 실행되는 헤드리스 Chrome 웹 브라우저를 사용하여) 또는 클라이언트측에서 사용자 웹 브라우저를 대신 사용하여 수행해야 하는지 여부입니다 .
+XWiki.PDFExport.ConfigurationClass_chromeHost=크롬 호스트
+XWiki.PDFExport.ConfigurationClass_chromeHost.hint=이름이나 IP 주소로 지정된 헤드리스 Chrome 웹 브라우저를 실행하는 호스트입니다.
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort=Chrome 원격 디버깅 포트
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort.hint=헤드리스 Chrome 웹 브라우저와 통신하는 데 사용되는 포트 번호입니다.
+XWiki.PDFExport.ConfigurationClass_xwikiURI=XWEEK 당신은
+XWiki.PDFExport.ConfigurationClass_xwikiURI.hint=헤드리스 Chrome 브라우저가 XWiki 인스턴스(예: 인쇄 미리보기 페이지)에 액세스하는 데 사용해야 하는 기본 URI입니다 . 예: localhost, localhost:9293, http://localhost, https://localhost:8080
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage=Chrome 도커 이미지
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint=헤드리스 Chrome 웹 브라우저를 실행하는 Docker 컨테이너를 만드는 데 사용되는 Docker 이미지입니다.
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName=Chrome Docker 컨테이너 이름
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=헤드리스 Chrome 웹 브라우저를 실행하는 Docker 컨테이너의 이름입니다. 이는 기존 컨테이너를 재사용할 때 특히 유용합니다.
+XWiki.PDFExport.ConfigurationClass_dockerNetwork=도커 네트워크
+XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=Chrome Docker 컨테이너를 추가할 Docker 네트워크의 이름 또는 ID입니다. 이는 XWiki 자체가 Docker 컨테이너 내에서 실행되고 Chrome 컨테이너가 통신하기 위해 동일한 네트워크에 있어야 할 때 유용합니다.
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=페이지 준비 시간 초과
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=시간이 초과되기 전에 웹 페이지가 인쇄 준비가 될 때까지 기다리는 시간(초)입니다.
+XWiki.PDFExport.ConfigurationClass_maxContentSize=최대 콘텐츠 크기
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=단일 PDF 내보내기 에 포함될 수 있는 최대 콘텐츠 크기(KB)입니다 . 제한을 비활성화하려면 0을 사용합니다.
+XWiki.PDFExport.ConfigurationClass_replaceFOP=FOP 교체
+XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Apache Formatting Objects Processor(FOP)를 기반으로 이전 PDF 내보내기를 대체합니다.
+</content>
+</xwikidoc>

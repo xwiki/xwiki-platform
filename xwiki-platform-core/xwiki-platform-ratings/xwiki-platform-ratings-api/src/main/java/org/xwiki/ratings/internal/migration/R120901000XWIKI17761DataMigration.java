@@ -33,7 +33,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -48,6 +47,7 @@ import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.ratings.internal.DefaultRating;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
@@ -287,31 +287,31 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
         if (this.getXWikiContext().isMainWiki()) {
             // Move of old Likes and migrate them
             // (note that we copy them in the actual ratings core in order to migrate them)
-            SolrClient likeClient = this.solr.getClient(LIKE_SOLR_CORE);
+            XWikiSolrCore likeCore = this.solr.getCore(LIKE_SOLR_CORE);
             // likeClient could be null here if for some reason the core was never initialized or if it has been
             // removed.
             // In case of a Remote Solr server then the client won't be null, so we check that we can perform a
             // request to it.
-            if (likeClient != null) {
+            if (likeCore != null) {
                 try {
                     SolrQuery solrQuery = new SolrQuery("*")
                         .setStart(0)
                         .setRows(1);
-                    likeClient.query(solrQuery);
+                    likeCore.getClient().query(solrQuery);
                 // we catch Throwable here since Solr create Runtime exceptions in case of client issues.
                 } catch (Throwable e) {
                     // in case of exception we consider that the client is null.
-                    likeClient = null;
+                    likeCore = null;
                     // and we log a debug message in case it's another issue
                     this.logger.debug("Solr test connection for Like migration did not went well.", e);
                 }
             }
             // TODO: Check in case it's a remote Solr core and it has not been created, it could be not null but
             //  still not exist.
-            if (likeClient != null) {
+            if (likeCore != null) {
                 this.logger.info("Starting migration of Likes information to the Ratings Solr Core.");
                 this.solrDocumentMigration120900000
-                    .migrateAllDocumentsFrom1207000000(likeClient, 1, LIKE_SOLR_CORE);
+                    .migrateAllDocumentsFrom1207000000(likeCore, 1, LIKE_SOLR_CORE);
             }
 
             logger.info("The migration is now finished.");

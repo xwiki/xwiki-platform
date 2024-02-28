@@ -20,6 +20,7 @@
 package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,16 +31,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.platform.security.requiredrights.MacroRequiredRightsAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMacro;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Default analyzer for macro blocks. Recurses into the macro content if it is wiki syntax.
@@ -50,6 +50,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 @Component
 @Singleton
 public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
+    implements RequiredRightAnalyzer<MacroBlock>
 {
     @Inject
     @Named("context")
@@ -59,8 +60,25 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
     @Named(ScriptMacroAnalyzer.ID)
     private RequiredRightAnalyzer<MacroBlock> scriptMacroAnalyzer;
 
+    @Inject
+    private Provider<DefaultMacroRequiredRightReporter> macroRequiredRightReporterProvider;
+
     @Override
-    public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock) throws RequiredRightsException
+    public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock)
+    {
+        List<RequiredRightAnalysisResult> result;
+
+        try {
+            result = analyzeWithExceptions(macroBlock);
+        } catch (Exception e) {
+            result = List.of(reportAnalysisError(macroBlock, e));
+        }
+
+        return result;
+    }
+
+    private List<RequiredRightAnalysisResult> analyzeWithExceptions(MacroBlock macroBlock)
+        throws RequiredRightsException
     {
         List<RequiredRightAnalysisResult> result;
 
@@ -73,27 +91,37 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
                 );
             result = specificAnalyzer.analyze(macroBlock);
         } catch (ComponentLookupException e) {
-            // No specific analyzer found, get more information about the macro.
-            MacroTransformationContext transformationContext = getTransformationContext(macroBlock);
-            Macro<?> macro = getMacro(macroBlock, transformationContext);
+            // Check if there is a macro analyzer for this macro, if yes, use it.
+            Optional<MacroRequiredRightsAnalyzer> macroAnalyzer = getMacroAnalyzer(macroBlock.getId());
 
-            if (macro instanceof ScriptMacro) {
-                result = this.scriptMacroAnalyzer.analyze(macroBlock);
-            } else if (macro != null && this.shouldMacroContentBeParsed(macro)) {
-                try {
-                    result = analyzeMacroContent(macroBlock, transformationContext);
-                } catch (MacroExecutionException e1) {
-                    // TODO: should we really throw an exception here? Or just log a warning or add an analysis
-                    //  result if the author doesn't have programming right?
-                    throw new RequiredRightsException("Error while parsing macro content for finding nested macros",
-                        e1);
-                }
+            if (macroAnalyzer.isPresent()) {
+                DefaultMacroRequiredRightReporter reporter = this.macroRequiredRightReporterProvider.get();
+                macroAnalyzer.get().analyze(macroBlock, reporter);
+                result = reporter.getResults();
             } else {
-                result = List.of();
+                // No specific analyzer found, get more information about the macro.
+                Macro<?> macro = getMacro(macroBlock);
+
+                if (macro instanceof ScriptMacro) {
+                    result = this.scriptMacroAnalyzer.analyze(macroBlock);
+                } else if (macro != null && this.shouldMacroContentBeParsed(macro)) {
+                    result = analyzeMacroContent(macroBlock, macroBlock.getContent());
+                } else {
+                    result = List.of();
+                }
             }
         }
 
         return result;
+    }
+
+    private Optional<MacroRequiredRightsAnalyzer> getMacroAnalyzer(String id)
+    {
+        try {
+            return Optional.of(this.componentManagerProvider.get().getInstance(MacroRequiredRightsAnalyzer.class, id));
+        } catch (ComponentLookupException e) {
+            return Optional.empty();
+        }
     }
 
     private boolean shouldMacroContentBeParsed(Macro<?> macro)

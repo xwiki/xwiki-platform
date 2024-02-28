@@ -42,9 +42,9 @@
   #set ($spaceReference = $services.model.resolveSpace($localSpaceReference))
   #set ($spaceDocument = $xwiki.getDocument($spaceReference))
   #if ($spaceDocument)
-    $spaceDocument.plainTitle
+    $escapetool.xml($spaceDocument.plainTitle)
   #else
-    $spaceReference.name
+    $escapetool.xml($spaceReference.name)
   #end
 #end
 #macro (getSpaceFacetHierarchyPathData $spaceReference $return $options)

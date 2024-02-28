@@ -21,19 +21,19 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -41,8 +41,10 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -67,12 +69,6 @@ public class DefaultNotificationFilterPreferenceManagerTest
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
-
-    @BeforeComponent
-    void beforeComponent() throws Exception
-    {
-        this.componentManager.registerComponent(ComponentManager.class, this.componentManager);
-    }
 
     @BeforeEach
     public void setUp() throws Exception
@@ -151,7 +147,43 @@ public class DefaultNotificationFilterPreferenceManagerTest
     {
         filterPreferenceManager.deleteFilterPreference(testUser, "myFilter");
 
-        verify(testProvider, times(1)).deleteFilterPreference(eq(testUser), eq("myFilter"));
+        verify(testProvider).deleteFilterPreferences(testUser, Set.of("myFilter"));
+    }
+
+    @Test
+    void deleteFilterPreferenceProviderException() throws Exception
+    {
+        String providerName1 = "providerName1";
+        String providerName2 = "providerName2";
+
+        NotificationFilterPreferenceProvider provider1 =
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
+        NotificationFilterPreferenceProvider provider2 =
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
+
+        String filterId = "filterId";
+        doThrow(new NotificationException("error provider1")).when(provider1).deleteFilterPreferences(testUser,
+            Set.of(filterId));
+        filterPreferenceManager.deleteFilterPreference(testUser, filterId);
+        verify(testProvider).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider1).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider2).deleteFilterPreferences(testUser, Set.of(filterId));
+
+        doThrow(new NotificationException("error provider2")).when(provider2).deleteFilterPreferences(testUser,
+            Set.of(filterId));
+        filterPreferenceManager.deleteFilterPreference(testUser, filterId);
+        verify(testProvider, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider1, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
+        verify(provider2, times(2)).deleteFilterPreferences(testUser, Set.of(filterId));
+
+        doThrow(new NotificationException("error testprovider")).when(testProvider).deleteFilterPreferences(testUser,
+            Set.of(filterId));
+        NotificationException notificationException = assertThrows(NotificationException.class,
+                () -> filterPreferenceManager.deleteFilterPreference(testUser, filterId));
+        assertEquals("Error when trying to remove filter preferences [filterId] for user [wiki:test.user] - "
+            + "All providers called failed, see exceptions: [NotificationException: error testprovider,"
+            + "NotificationException: error provider1,NotificationException: error provider2].",
+            notificationException.getMessage());
     }
 
     @Test
@@ -185,5 +217,30 @@ public class DefaultNotificationFilterPreferenceManagerTest
         // Checks
         verify(provider1).setStartDateForUser(eq(user), eq(date));
         verify(provider2).setStartDateForUser(eq(user), eq(date));
+    }
+
+    @Test
+    void saveFilterPreferences() throws Exception
+    {
+        DocumentReference user = new DocumentReference("subwiki", "XWiki", "Foo");
+        NotificationFilterPreference pref1 = mock(NotificationFilterPreference.class, "pref1");
+        NotificationFilterPreference pref2 = mock(NotificationFilterPreference.class, "pref2");
+        NotificationFilterPreference pref3 = mock(NotificationFilterPreference.class, "pref3");
+
+        String providerName1 = "providerName1";
+        String providerName2 = "providerName2";
+
+        NotificationFilterPreferenceProvider provider1 =
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName1);
+        NotificationFilterPreferenceProvider provider2 =
+            componentManager.registerMockComponent(NotificationFilterPreferenceProvider.class, providerName2);
+
+        when(pref1.getProviderHint()).thenReturn(providerName1);
+        when(pref2.getProviderHint()).thenReturn(providerName2);
+        when(pref3.getProviderHint()).thenReturn(providerName1);
+
+        this.filterPreferenceManager.saveFilterPreferences(user, Set.of(pref1, pref2, pref3));
+        verify(provider1).saveFilterPreferences(user, Set.of(pref1, pref3));
+        verify(provider2).saveFilterPreferences(user, Set.of(pref2));
     }
 }

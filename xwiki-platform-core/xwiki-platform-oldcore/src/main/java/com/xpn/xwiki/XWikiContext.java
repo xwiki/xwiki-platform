@@ -43,7 +43,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
@@ -108,7 +107,6 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @since 14.3RC1
      * @since 13.10.5
      */
-    @Unstable
     public static final String INACTIVE_USER_REFERENCE = "inactiveUserReference";
 
     /** Logging helper object. */

@@ -33,7 +33,11 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class RequiredRightsPreEditCheckElement extends BaseElement
 {
+    private static final String PANEL_BODY_CLASS = "panel-body";
+
     private List<WebElement> results;
+
+    private List<WebElement> titles;
 
     /**
      * @return the number of results displayed on the current pre-check page
@@ -59,7 +63,9 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
      */
     public void toggleDetailedMessage(int index)
     {
-        getResults().get(index).findElement(By.className("panel-title")).click();
+        WebElement result = getResults().get(index);
+        result.findElement(By.className("panel-title")).click();
+        getDriver().waitUntilElementIsVisible(result, By.className("panel-collapse"));
     }
 
     /**
@@ -69,7 +75,46 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
      */
     public String getDetailedMessage(int index)
     {
-        return getResults().get(index).findElement(By.className("panel-body")).getText();
+        return getResults().get(index).findElement(By.className(PANEL_BODY_CLASS)).getText();
+    }
+
+    /**
+     * Expand/Fold the details.
+     *
+     * @return the current object
+     * @since 15.10RC1
+     */
+    public RequiredRightsPreEditCheckElement toggleDetails()
+    {
+        getDriver().findElement(By.className("required-rights-advanced-toggle")).click();
+        return this;
+    }
+
+    /**
+     * Waits for the content of the given detailed message to be equal to the provided expected value. This is required
+     * as calling get text can return partial value when the toggle transition from {@link #toggleDetails()} is not
+     * finished when calling {@link WebElement#getText()} on the panel body.
+     *
+     * @param index the index of the result to retrieve the detailed message of (the first result is index 0)
+     * @param expectedMessage the expected detailed message of the expected message
+     * @since 15.10RC1
+     */
+    public void waitForDetailedMessage(int index, String expectedMessage)
+    {
+        getDriver()
+            .waitUntilElementHasTextContent(() -> getResults().get(index).findElement(By.className(PANEL_BODY_CLASS)),
+                expectedMessage);
+    }
+
+    /**
+     * @param index the index of the title (the first result is index 0)
+     * @return the href element of the title link
+     * @since 16.0.0RC1
+     * @since 15.10.5
+     */
+    public String getTitleHref(int index)
+    {
+        return getTitles().get(index).findElement(By.cssSelector("a")).getAttribute("href");
     }
 
     /**
@@ -85,11 +130,19 @@ public class RequiredRightsPreEditCheckElement extends BaseElement
         return this.results;
     }
 
+    private List<WebElement> getTitles()
+    {
+        if (this.titles == null) {
+            this.titles = getRoot().findElements(By.cssSelector("h3.group-title"));
+        }
+        return this.titles;
+    }
+
     /**
      * @return the root element of the required rights pre-check results
      */
     private WebElement getRoot()
     {
-        return getDriver().findElementWithoutWaiting(By.id("requiredRightsResults"));
+        return getDriver().findElementWithoutWaiting(By.className("required-rights-results"));
     }
 }

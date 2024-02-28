@@ -60,6 +60,7 @@ import org.xwiki.velocity.internal.DefaultVelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.DeprecatedContext;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
 
 /**
  * Override {@link DefaultVelocityManager} to add XWiki platform specific things and especially deliver and cache a
@@ -87,7 +88,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
      * Accessing it trough {@link Provider} since {@link TemplateManager} depends on {@link VelocityManager}.
      */
     @Inject
-    private Provider<TemplateManager> templates;
+    private Provider<InternalTemplateManager> templates;
 
     @Inject
     private SkinManager skinManager;
@@ -150,7 +151,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
         return velocityContext;
     }
 
-    private Template getVelocityEngineMacrosTemplate()
+    private Template getSkinMacrosTemplate()
     {
         Template template = null;
         Map<String, Template> templateCache = null;
@@ -170,7 +171,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
         }
 
         if (template == null) {
-            template = this.templates.get().getTemplate("macros.vm");
+            template = this.templates.get().getSkinTemplate("macros.vm");
 
             if (templateCache != null) {
                 templateCache.put(currentSkin.getId(), template);
@@ -202,7 +203,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
 
         final Template skinMacrosTemplate;
         if (xcontext != null && xcontext.getWiki() != null) {
-            skinMacrosTemplate = getVelocityEngineMacrosTemplate();
+            skinMacrosTemplate = getSkinMacrosTemplate();
         } else {
             skinMacrosTemplate = null;
         }

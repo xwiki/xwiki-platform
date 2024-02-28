@@ -24,7 +24,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiException;
@@ -77,7 +76,6 @@ public interface DocumentRevisionProvider
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     default void checkAccess(Right right, UserReference userReference, DocumentReference documentReference,
         String revision) throws AuthorizationException, XWikiException
     {

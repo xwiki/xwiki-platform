@@ -135,7 +135,7 @@
       imageSelector.updateSelectedImageReferences([], $(this));
     });
     // We extend the attachment picker to allow quick form submission
-    let results = picker.find('.attachmentPickerResults');
+    const results = picker.find('.attachmentPickerResults');
     let selectButton = element.parents('.modal-content').find('.modal-footer .btn-primary');
     function validateForm(event) {
       event.preventDefault();

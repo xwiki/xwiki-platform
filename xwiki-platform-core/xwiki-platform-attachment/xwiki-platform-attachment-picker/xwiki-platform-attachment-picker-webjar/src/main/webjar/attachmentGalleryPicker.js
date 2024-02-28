@@ -179,6 +179,9 @@ define('xwiki-attachment-picker',
       initSelectedAttachment() {
         this.resultsBlock.on('click', 'a', (event) => {
           event.preventDefault();
+          // We only select the attachment on the first click of a chain.
+          // The `detail` event property for a click indicates the position of this click in the chain
+          // When double-clicking, detail === 1 means that this click is the first click of a double click.
           if (event.detail === 1) {
             const parent = $(event.currentTarget).parents('.attachmentGroup');
 

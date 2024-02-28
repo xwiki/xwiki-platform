@@ -214,7 +214,6 @@ XWiki.docisnew = null;
 #end
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
-XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($foreach.count > 1),#end"$space"#end ];
 XWiki.hasEdit = $hasEdit;
 XWiki.hasProgramming = $hasProgramming;
 XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;

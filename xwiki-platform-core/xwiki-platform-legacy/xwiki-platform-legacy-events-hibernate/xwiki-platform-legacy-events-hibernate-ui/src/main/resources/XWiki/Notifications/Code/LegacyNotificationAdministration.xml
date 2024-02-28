@@ -67,6 +67,7 @@ $services.localization.use('document', 'XWiki.Notifications.Code.LegacyNotificat
   &lt;div&gt;
     &lt;input type="radio" id="mode_since" name="mode" value="since"#if($request.mode == 'since')checked#end/&gt;
     &lt;label for="mode_since"&gt;$escapetool.html($services.localization.render('legacy.event.migration.since'))&lt;/label&gt;
+    &lt;label for="since" class="sr-only"&gt;$escapetool.html($services.localization.render('legacy.event.migration.since.picker.label'))&lt;/label&gt;
     &lt;input type="date" id="since" name="since"#if($request.since) value="$escapetool.xml($request.since)"#end max="$datetool.format('yyyy-MM-dd', $datetool.date)"/&gt;
   &lt;/div&gt;
   &lt;div class="buttons"&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('legacy.event.migration.start'))" name="migrate" class="button"/&gt;&lt;/span&gt;&lt;/div&gt;

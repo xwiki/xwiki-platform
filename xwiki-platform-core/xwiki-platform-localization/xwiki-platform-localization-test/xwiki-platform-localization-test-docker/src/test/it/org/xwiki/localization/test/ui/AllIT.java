@@ -39,8 +39,8 @@ class AllIT
     }
     
     @Nested
-    @DisplayName("Language change tests")
-    class NestedLanguageIT extends LanguageIT
+    @DisplayName("Localization change tests")
+    class NestedLocalizationIT extends LocalizationIT
     {
     }
 }

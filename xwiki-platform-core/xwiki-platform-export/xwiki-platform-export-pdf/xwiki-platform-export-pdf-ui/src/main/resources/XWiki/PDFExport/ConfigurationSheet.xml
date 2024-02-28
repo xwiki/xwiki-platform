@@ -106,7 +106,7 @@
     &lt;select id="pdfGenerator"&gt;
       #foreach ($pdfGenerator in ['userBrowser', 'chromeDockerContainer', 'remoteChrome'])
         &lt;option value="$escapetool.xml($pdfGenerator)"
-            #if ($pdfGenerator == $selectedPDFGenerator)selected="selected"#end
+            #if ($pdfGenerator == $selectedPDFGenerator)selected="selected" #end
             title="$escapetool.xml($services.localization.render("export.pdf.generator.${pdfGenerator}.hint"))"&gt;
           $escapetool.xml($services.localization.render("export.pdf.generator.${pdfGenerator}.label"))
         &lt;/option&gt;

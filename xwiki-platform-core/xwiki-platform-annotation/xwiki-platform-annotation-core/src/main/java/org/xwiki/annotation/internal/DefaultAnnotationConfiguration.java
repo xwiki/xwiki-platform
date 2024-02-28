@@ -109,7 +109,7 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     {
         List<String> exceptionSpaces = configuration.get().getProperty("exceptionSpaces", List.class);
 
-        List<SpaceReference> result = new ArrayList<SpaceReference>();
+        List<SpaceReference> result = new ArrayList<>();
         for (String exceptionSpace : exceptionSpaces) {
             result.add(new SpaceReference(exceptionSpace, getCurrentWikiReference()));
         }
@@ -142,9 +142,9 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
      */
     protected WikiReference getCurrentWikiReference()
     {
-        EntityReference wikiReference = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI);
+        EntityReference wikiEntityReference = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI);
 
-        return wikiReference instanceof WikiReference ? (WikiReference) wikiReference
-            : new WikiReference(wikiReference);
+        return wikiEntityReference instanceof WikiReference wikiReference ? wikiReference
+            : new WikiReference(wikiEntityReference);
     }
 }

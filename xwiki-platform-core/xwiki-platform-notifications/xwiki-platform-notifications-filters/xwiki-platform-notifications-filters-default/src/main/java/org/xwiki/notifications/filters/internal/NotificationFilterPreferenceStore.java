@@ -66,9 +66,6 @@ public class NotificationFilterPreferenceStore
     private static final String FILTER_PREFIX = "NFP_";
 
     @Inject
-    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
-
-    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
@@ -171,7 +168,7 @@ public class NotificationFilterPreferenceStore
         return configureContextWrapper(null, () -> {
             try {
                 List<DefaultNotificationFilterPreference> list = this.queryManager
-                    .createQuery("select nfp from DefaultNotificationFilterPreference nfp " + "order by nfp.internalId",
+                    .createQuery("select nfp from DefaultNotificationFilterPreference nfp order by nfp.internalId",
                         Query.HQL)
                     .setLimit(limit).setOffset(offset).execute();
                 // We return DefaultNotificationFilterPreference instead of NotificationFilterPreference because we
@@ -220,8 +217,28 @@ public class NotificationFilterPreferenceStore
      */
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
-        this.deleteFilterPreference(user.getWikiReference(), getInternalIdFromId(filterPreferenceId));
-        this.observation.notify(new NotificationFilterPreferenceDeletedEvent(), user, filterPreferenceId);
+        deleteFilterPreferences(user, Set.of(filterPreferenceId));
+    }
+
+    /**
+     * Delete filter preferences.
+     *
+     * @param user reference of the user concerned by the filter preference
+     * @param filterPreferenceIds name of the filter preferences
+     * @throws NotificationException if an error happens
+     * @since 16.0.0RC1
+     * @since 15.10.2
+     */
+    public void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        Set<Long> filterPreferenceInternalIds = new HashSet<>();
+        for (String filterPreferenceId : filterPreferenceIds) {
+            filterPreferenceInternalIds.add(getInternalIdFromId(filterPreferenceId));
+        }
+
+        this.deleteFilterPreferences(user.getWikiReference(), filterPreferenceInternalIds);
+        this.observation.notify(new NotificationFilterPreferenceDeletedEvent(), user, filterPreferenceIds);
     }
 
     /**
@@ -271,7 +288,7 @@ public class NotificationFilterPreferenceStore
     public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
-        this.deleteFilterPreference(wikiReference, getInternalIdFromId(filterPreferenceId));
+        this.deleteFilterPreferences(wikiReference, Set.of(getInternalIdFromId(filterPreferenceId)));
         this.observation.notify(new NotificationFilterPreferenceDeletedEvent(), wikiReference, filterPreferenceId);
     }
 
@@ -326,7 +343,7 @@ public class NotificationFilterPreferenceStore
     /**
      * Delete a filter preference.
      */
-    private void deleteFilterPreference(WikiReference wikiReference, long internalFilterPreferenceId)
+    private void deleteFilterPreferences(WikiReference wikiReference, Set<Long> internalFilterPreferenceIds)
         throws NotificationException
     {
         configureContextWrapper(wikiReference, () -> {
@@ -336,12 +353,13 @@ public class NotificationFilterPreferenceStore
 
             try {
                 hibernateStore.executeWrite(context, session ->
-                    session.createQuery("delete from DefaultNotificationFilterPreference where internalId = :id")
-                    .setParameter("id", internalFilterPreferenceId)
+                    session.createQuery("delete from DefaultNotificationFilterPreference where internalId in (:id)")
+                    .setParameter("id", internalFilterPreferenceIds)
                     .executeUpdate());
             } catch (XWikiException e) {
                 throw new NotificationException(
-                    String.format("Failed to delete the notification preference [%s]", internalFilterPreferenceId), e);
+                    String.format("Failed to delete the notification preferences [%s]", internalFilterPreferenceIds),
+                    e);
             }
             return null;
         });
@@ -441,11 +459,7 @@ public class NotificationFilterPreferenceStore
     {
         XWikiContext context = this.contextProvider.get();
         WikiReference currentWiki = context.getWikiReference();
-        if (this.filterPreferenceConfiguration.useMainStore()) {
-            context.setWikiId(context.getMainXWiki());
-        } else if (wikiReference != null) {
-            context.setWikiReference(wikiReference);
-        }
+        context.setWikiReference(wikiReference);
         try {
             return supplier.get();
         } finally {

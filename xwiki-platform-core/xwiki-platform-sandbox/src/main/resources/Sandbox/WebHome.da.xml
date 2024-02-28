@@ -49,7 +49,7 @@ Her er en række test-sider du kan lege med:
 
 Nedenfor er en demonstration af [[XWiki kodesyntaks&gt;&gt;XWiki.XWikiSyntax]] som kan bruges i wikisiderne (overskrifter, billeder, tabeller).
 
-= Overskrifter =
+== Overskrifter ==
 
 XWiki har 6 niveauer af overskrifter. Du angiver dem på følgende måde: 
 
@@ -63,7 +63,7 @@ XWiki har 6 niveauer af overskrifter. Du angiver dem på følgende måde:
 
 ====== Overskrift niveau 6 ======
 
-= Skriftstil =
+== Skriftstil ==
 
 Grundlæggende skriftstile i XWiki:
 
@@ -74,11 +74,11 @@ Grundlæggende skriftstile i XWiki:
 * Tekst i ,,subscript,,
 * Tekst i ^^superscript^^
 
-= Lister =
+== Lister ==
 
 Du kan angive forskellige typer lister i dine wiki-sider:
 
-== Punktliste ==
+=== Punktliste ===
 
 * Niveau 1
 ** Niveau 2
@@ -86,14 +86,14 @@ Du kan angive forskellige typer lister i dine wiki-sider:
 ** Niveau 2
 * Niveau 1
 
-== Nummereret liste ==
+=== Nummereret liste ===
 
 1. Element
 11. Underelement
 111. Element
 1. Underelement
 
-== Blandet liste ==
+=== Blandet liste ===
 
 1. Element 1
 11. Element 2
@@ -101,23 +101,23 @@ Du kan angive forskellige typer lister i dine wiki-sider:
 11*. Element 4
 1. Element 5
 
-= Tabeller =
+== Tabeller ==
 
 Du kan oprette tabeller i wiki-siderne:
 
-== Tabeller med overskrifter i første række ==
+=== Tabeller med overskrifter i første række ===
 
 |= tabeloverskrift |= tabeloverskrift |= tabeloverskrift
 | celle | celle | celle
 | celle | celle | celle
 
-== Tabel med overskrifter i 1. række og venstre kolonne ==
+=== Tabel med overskrifter i 1. række og venstre kolonne ===
 
 |= tabeloverskrift |= tabeloverskrift |= tabeloverskrift
 |= tabeloverskrift | celle | celle
 |= tabeloverskrift | celle | celle
 
-= Henvisninger =
+== Henvisninger ==
 
 XWiki tillader henvisninger til andre wiki-sider eller til internettes andre websider:
 
@@ -127,23 +127,23 @@ XWiki tillader henvisninger til andre wiki-sider eller til internettes andre web
 * [[http://www.xwiki.org]] -&gt; Du kan henvise til sider på andre websites også.
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; Henvisningsnavne kan også bruges på eksterne henvisninger.
 
-= Billeder =
+== Billeder ==
 
 Du kan indsætte billeder i wiki-siderne:
 
 [[image:XWikiLogo.png]]
 
-= Makroer =
+== Makroer ==
 
 Makroer gør det muligt at få indholdet til at se bedre ud og tilføje flere funktioner til wikien. Her er 2 eksempler på hvordan makroer kan anvendes:
 
-== Varselsmakro ==
+=== Varselsmakro ===
 
 Denne makro markerer tekst på en måde, så læserens opmærksomhed fanges:
 
 {{warning}}Hej du der!{{/warning}}
 
-== Indholdsfortegnelse ==
+=== Indholdsfortegnelse ===
 
 Denne makro laver automatisk en indholdsfortegnelse baseret på overskrifter i wiki-siden:
 

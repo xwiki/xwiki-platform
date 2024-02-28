@@ -32,7 +32,7 @@ import org.xwiki.test.ui.XWikiWebDriver;
  */
 public class SystemNotificationFilterPreference extends AbstractNotificationFilterPreference
 {
-    private String description;
+    private final String description;
 
     /**
      * Default constructor.
@@ -44,7 +44,13 @@ public class SystemNotificationFilterPreference extends AbstractNotificationFilt
         XWikiWebDriver webDriver)
     {
         super(parentPage, row, webDriver);
-        this.description = row.findElement(By.className("filterType")).getText();
+        this.description = row.findElement(By.cssSelector("td[data-title='Description'] .view")).getText();
+    }
+
+    @Override
+    protected WebElement getNameElement(WebElement row)
+    {
+        return row.findElement(By.cssSelector("td[data-title='Name'] .view"));
     }
 
     /**
@@ -52,6 +58,6 @@ public class SystemNotificationFilterPreference extends AbstractNotificationFilt
      */
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 }

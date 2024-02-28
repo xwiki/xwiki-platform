@@ -53,6 +53,7 @@ import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
@@ -1620,37 +1621,6 @@ public class Document extends Api
     }
 
     /**
-     * Displays the tooltip of the given field. This function uses the active object or will find the first object that
-     * has the given field.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname)
-    {
-        if (this.currentObj == null) {
-            return this.doc.displayTooltip(fieldname, getXWikiContext());
-        } else {
-            return this.doc.displayTooltip(fieldname, this.currentObj.getBaseObject(), getXWikiContext());
-        }
-    }
-
-    /**
-     * Displays the tooltip of the given field of the given object.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @param obj Object to find the class to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname, Object obj)
-    {
-        if (obj == null) {
-            return "";
-        }
-        return this.doc.displayTooltip(fieldname, obj.getBaseObject(), getXWikiContext());
-    }
-
-    /**
      * Displays the given field. The display mode will be decided depending on page context (edit or inline context will
      * display in edit, view context in view) This function uses the active object or will find the first object that
      * has the given field. This function can return html inside and html macro
@@ -2158,6 +2128,7 @@ public class Document extends Api
      * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
      * @since 10.6RC1
      */
+    @Override
     public boolean hasAccess(Right right, DocumentReference userReference)
     {
         return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());
@@ -3341,5 +3312,30 @@ public class Document extends Api
             // in this case we don't care if the doc is cloned or not since it's readonly
             return new SafeDocumentAuthors(this.doc.getAuthors());
         }
+    }
+
+    /**
+     * You need to have programming right to use this API.
+     * <p>
+     * Update the author of the document. It's the recommended way to update it if you don't fully understand the
+     * various types of authors exposed by {@link #getAuthor()}.
+     * <p>
+     * What will happen in practice is the following:
+     * <ul>
+     * <li>the effective and original metadata authors are set to the passed reference</li>
+     * <li>when saving the document, if the content is modified (the content dirty flag is true) then the content author
+     * will also be updated to the passed reference</li>
+     * </ul>
+     * 
+     * @param userReference the reference of the new author of the document
+     * @throws AccessDeniedException when the current author is not allowed to use this API
+     * @since 16.1.0RC1
+     */
+    @Unstable
+    public void setAuthor(UserReference userReference) throws AccessDeniedException
+    {
+        getContextualAuthorizationManager().checkAccess(Right.PROGRAM);
+
+        getDoc().setAuthor(userReference);
     }
 }

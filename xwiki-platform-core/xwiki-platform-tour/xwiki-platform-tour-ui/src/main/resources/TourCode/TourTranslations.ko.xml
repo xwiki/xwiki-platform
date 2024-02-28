@@ -1,0 +1,101 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="ko">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># App name
+tour.app.name=관광
+
+# Class fields
+TourCode.TourClass_description=설명
+TourCode.TourClass_isActive=활동적인
+TourCode.TourClass_targetPage=대상 페이지
+
+# Live table generic keys
+tour.livetable.doc.title=투어명
+tour.livetable._actions=행위
+tour.livetable._actions.edit=편집하다
+tour.livetable._actions.delete=삭제
+tour.livetable._actions.launch=시작하다
+tour.livetable.emptyvalue=-
+
+# Live table specific keys
+tour.livetable.description=설명
+tour.livetable.isActive=활동적인
+tour.livetable.targetPage=대상 페이지
+tour.livetable.targetClass=대상 클래스
+
+# Tour popover
+tour.popover.previous=« 이전
+tour.popover.next=다음 "
+tour.popover.end=투어 종료
+tour.popover.quit=둘러보기 종료
+tour.popover.show=쇼 투어
+tour.popover.show.hint=언제든지 이 버튼을 클릭하여 둘러보기를 다시 시작할 수 있습니다
+
+# Steps
+TourCode.StepClass_order=주문하다
+TourCode.StepClass_element=요소( 요소를 식별하는 CSS 선택기)
+TourCode.StepClass_title=제목
+TourCode.StepClass_content=콘텐츠
+TourCode.StepClass_backdrop=배경
+TourCode.StepClass_placement=놓기
+TourCode.StepClass_targetPage=대상 페이지
+TourCode.StepClass_action=타겟 액션
+TourCode.StepClass_queryString=쿼리 문자열
+tour.steps=단계
+tour.steps.new_step=새로운 단계
+tour.steps.add_step=단계 추가
+tour.steps.edit_step=단계 편집
+tour.steps.save_step=저장
+tour.steps.delete_confirm=단계를 삭제하시겠습니까?
+tour.steps.delete_done=삭제 단계가 완료되었습니다!
+tour.steps.deleting=단계 삭제 중...
+tour.steps.yes=예
+tour.steps.no=아니요
+tour.steps.edit=편집하다
+tour.steps.delete=삭제
+
+# Upgrade
+tour.upgrade.title=업그레이드
+tour.upgrade.successList=다음 페이지를 성공적으로 변환했습니다:
+tour.upgrade.successNothing=업그레이드할 것이 없습니다!
+
+# Template
+tour.template.name=관광
+tour.template.description=단계별 투어
+</content>
+</xwikidoc>

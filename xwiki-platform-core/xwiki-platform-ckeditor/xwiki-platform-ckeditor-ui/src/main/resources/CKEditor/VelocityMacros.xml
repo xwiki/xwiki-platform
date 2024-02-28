@@ -218,7 +218,7 @@
 
 #macro (displayCKEditorConfigProperty $configDoc $propName $action)
   &lt;dt&gt;
-    &lt;label&gt;$configDoc.displayPrettyName($propName)&lt;/label&gt;
+    &lt;label for="CKEditor.ConfigClass_$escapetool.xml($configDoc.getObject("CKEditor.ConfigClass").getNumber())_${propName}"&gt;$configDoc.displayPrettyName($propName)&lt;/label&gt;
     &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("CKEditor.ConfigClass_${propName}.hint"))&lt;/span&gt;
   &lt;/dt&gt;
   &lt;dd&gt;#displayCKEditorConfigPropertyValue($configDoc $propName $action)&lt;/dd&gt;

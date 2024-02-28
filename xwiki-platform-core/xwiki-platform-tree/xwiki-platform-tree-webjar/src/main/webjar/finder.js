@@ -34,6 +34,9 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     }
   };
 
+  // We want to still activate the links with a click even after they are selected from the finder.
+  $.jstree.defaults.core.allow_reselect = true;
+
   var createSuggestInput = function(options) {
     var input = document.createElement('input');
     input.type = 'text';

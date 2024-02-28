@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxVerbatim</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWiki구문그대로</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 고급 =
+
+== 그대로 ==
+
+=== 1.0 그대로 ===
+
+형식화되지 않은 콘텐츠를 입력할 수 있습니다(즉, XWiki 구문이 고려되지 않습니다).
+
+{{info}} XWiki 구문 1.0에서는 [[사전 매크로&gt;&gt;https://extensions. xwiki .org/ xwiki /bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]]는 XWiki 구문 및 Radeox 매크로만 보존합니다. 그러나 HTML 스니펫과 Groovy/Velocity 스크립트는 계속 실행됩니다.{{/info}}
+
+|=기능|= XWiki 구문 1.0|=결과
+|축어적 인라인|{{{일부 축어형 {pre}*[렌더링되지 않음]*{/pre} 콘텐츠}}}|일부 축어형 {{{*[렌더링되지 않음]*}}} 콘텐츠
+|축어적 블록|((({{{
+{pre}
+여러 줄
+*언어적으로*
+콘텐츠
+{/pre}
+}}}
+{{info}}[[코드 매크로&gt;&gt;https://확장 기능을 사용하는 것도 가능합니다. xwiki .org/ xwiki /bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]] 하지만 기본적으로 콘텐츠를 상자에 표시합니다.{{/info}}
+)))|((({{{
+여러 줄
+*언어적으로*
+콘텐츠
+}}})))
+
+=== 2.0 그대로 ===
+
+형식화되지 않은 콘텐츠를 입력할 수 있습니다(즉, XWiki 구문이 고려되지 않습니다).
+
+|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|축어적 인라인|{{{일부 축어형 {{{**[[렌더링되지 않음]]**}}} 콘텐츠}}}|일부 축어형 {{{**[[렌더링되지 않음]]**}}} 콘텐츠
+|축어적 블록|((({{{
+{{{
+여러 줄
+**언어적으로**
+콘텐츠
+}}}
+}}})))|((({{{
+여러 줄
+**언어적으로**
+콘텐츠
+}}})))</content>
+</xwikidoc>

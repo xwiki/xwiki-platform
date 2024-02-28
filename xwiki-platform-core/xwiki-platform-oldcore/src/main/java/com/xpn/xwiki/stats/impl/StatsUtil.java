@@ -663,12 +663,16 @@ public final class StatsUtil
             cookie.setDomain(cookieDomain);
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName() + " with domain "
-                + cookie.getDomain() + " and path " + cookie.getPath() + " and maxage " + cookie.getMaxAge());
+        // TODO: Fix the code below. It's called after the response has been flushed in XWikiAction and thus the
+        //  cookie is not added. To prevent any stack trace in the logs, we have added the IF on the response.
+        //  However, this whole logic needs to be reviewed since right now it means this cookie is never set.
+        if (!context.getResponse().isCommitted()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName() + " with domain "
+                    + cookie.getDomain() + " and path " + cookie.getPath() + " and maxage " + cookie.getMaxAge());
+            }
+            context.getResponse().addCookie(cookie);
         }
-
-        context.getResponse().addCookie(cookie);
 
         return cookie;
     }

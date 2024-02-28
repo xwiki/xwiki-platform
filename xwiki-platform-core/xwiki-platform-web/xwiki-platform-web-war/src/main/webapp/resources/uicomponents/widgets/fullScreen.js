@@ -69,7 +69,7 @@ widgets.FullScreen = Class.create({
         }.bind(this));
       }.bind(this));
     }.bind(this));
-    // When comming back from preview, check if the user was in full screen before hitting preview, and if so restore
+    // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
     // that full screen
     this.maximizedReference = $(document.body).down("input[name='x-maximized']");
     if (this.maximizedReference && this.maximizedReference.value != "") {
@@ -206,7 +206,7 @@ widgets.FullScreen = Class.create({
   makeFullScreen : function (targetElement) {
     document.fire("xwiki:fullscreen:enter", { "target" : targetElement });
     // Store the selector of the target element in the form, in the hidden input called 'x-maximized'.
-    // This is needed so that the full screen can be reactivated when comming back from preview, if it was activate before
+    // This is needed so that the full screen can be reactivated when coming back from preview, if it was activate before
     // the user hit the preview button.
     if (this.maximizedReference) {
       if (targetElement.id) {

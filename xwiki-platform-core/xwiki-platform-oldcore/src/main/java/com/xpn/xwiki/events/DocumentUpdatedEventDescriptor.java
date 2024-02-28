@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.DocumentEventType;
 
 /**
  * Descriptor for the {@link org.xwiki.bridge.event.DocumentUpdatedEvent}.
@@ -38,7 +39,7 @@ public class DocumentUpdatedEventDescriptor extends AbstractXWikiRecordableEvent
     /**
      * Name of the supported type (as it is stored in Activity Stream).
      */
-    public static final String EVENT_TYPE = "update";
+    public static final String EVENT_TYPE = DocumentEventType.UPDATE;
 
     /**
      * Construct an DocumentUpdatedEventDescriptor.

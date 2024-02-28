@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationFilterPreferenceLivetableResults</name>
   <language/>
@@ -55,8 +55,11 @@
 ##
 ## Build the list of NotificationFilterPreference related to the given user.
 ##
+#set ($isAccessGranted = false)
 #if ("$!request.user" != "")
-  #set ($document = $xwiki.getDocument($services.model.resolveDocument($request.user)))
+  #set ($requestedUserDocRef = $services.model.resolveDocument($request.user))
+  #set ($isAccessGranted = ($services.security.authorization.hasAccess('admin', $requestedUserDocRef) || $xcontext.userReference.equals($requestedUserDocRef)))
+  #set ($document = $xwiki.getDocument($requestedUserDocRef))
   #set ($target = $request.user)
   #set ($userTarget = true)
 ## when request user is not given we are sending the list of NotificationFilterPreference of the current wiki.
@@ -64,6 +67,7 @@
   #set ($target = $services.wiki.getCurrentWikiReference())
   #set ($document = $xwiki.getDocument('XWiki.Notifications.Code.NotificationAdministration'))
   #set ($userTarget = false)
+  #set ($isAccessGranted = true)
 #end
 #set ($elements = [])
 #set ($index = 0)
@@ -82,7 +86,7 @@
   #set ($displayCustom = false)
 #end
 
-#if ($displaySystem)
+#if ($displaySystem &amp;&amp; $isAccessGranted)
   ## First: get the list of available toggeable filters for the user
   ## We display them first because we don't want them to be hidden by thousands of page filters the autowatch option
   ## might have created. It would be not good to have to go to the last page of the livetable to find out these commonly
@@ -104,11 +108,11 @@
         #set ($objectNumber = $!obj.reference.objectNumber)
       #end
       #if ($checked)
-        #set ($checked = 'checked = "checked"')
+        #set ($checkedAttr = 'checked = "checked"')
       #else
-        #set ($checked = '')
+        #set ($checkedAttr = '')
       #end
-      #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checked /&gt;")
+      #set ($checkbox = "&lt;input type='checkbox' class='toggleableFilterPreferenceCheckbox' data-objectNumber='${objectNumber}' data-filtername='${filter.name}' $checkedAttr /&gt;")
       #set ($name = $services.localization.render("notifications.filters.name.$filter.name"))
       #set ($element = {
         'filterPreferenceId'  : $name,
@@ -118,7 +122,12 @@
         'notificationFormats' : "#displayNotificationFormatsList($filter.formats)",
         'isEnabled'           : $checkbox,
         'doc_viewable'        : true,
-        'doc_hasdelete'       : false
+        'doc_hasdelete'       : false,
+        'isEnabled_checked': $checked,
+        'isEnabled_data': {
+          'objectNumber': $objectNumber,
+          'filtername':  $filter.name
+        }
       })
       #set ($discard = $elements.add($element))
     #end
@@ -126,7 +135,7 @@
   #set ($elements = $collectiontool.sort($elements, ['name']))
 #end
 
-#if ($displayCustom)
+#if ($displayCustom  &amp;&amp; $isAccessGranted)
   ## Also get the list of available filters for the user
   #set ($filters = $collectiontool.arrayList)
   #if ($userTarget)
@@ -173,6 +182,7 @@
           #end
           #set ($isEnabled = "&lt;input type='checkbox' class='notificationFilterPreferenceCheckbox' data-preferenceId='${preference.id}' $isEnabled $isDisabled /&gt;")
           
+          ## In case of backport of 15.10.x, isEnabled_disabled must be introduced to disabled legacy filters.
           #set ($element = {
             'filterPreferenceId'  : $preference.id,
             'name'                : $display,
@@ -180,7 +190,11 @@
             'eventTypes'          : "#displayNotificationsEventTypeList($preference.eventTypes)",
             'notificationFormats' : "#displayNotificationFormatsList($preference.notificationFormats)",
             'isEnabled'           : $isEnabled,
-            'doc_viewable'        : true
+            'doc_viewable'        : true,
+            'isEnabled_checked': $preference.isEnabled(),
+            'isEnabled_data': {
+              'preferenceId': $preference.id
+            }
           })
           #set ($discard = $elements.add($element))
         #end
@@ -188,22 +202,26 @@
     #end
   #end
 #end
-##
-## JSON.
-##
-#set ($discard = $response.setContentType('application/json'))
-#set ($offset = $numbertool.toNumber($request.offset))
-#if (!$offset)
-  #set ($offset = 1)
+#if ($isAccessGranted)
+  ##
+  ## JSON.
+  ##
+  #set ($discard = $response.setContentType('application/json'))
+  #set ($offset = $numbertool.toNumber($request.offset))
+  #if (!$offset)
+    #set ($offset = 1)
+  #end
+  $jsontool.serialize({
+    'totalrows'   : $index,
+    'reqNo'       : $request.reqNo,
+    'returnedrows': $elements.size(),
+    'offset'      : $offset,
+    'rows'        : $elements
+  })
+#else
+  #set ($discard = $response.sendError(401))
 #end
-$jsontool.serialize({
-  'totalrows'   : $index,
-  'reqNo'       : $request.reqNo,
-  'returnedrows': $elements.size(),
-  'offset'      : $offset,
-  'rows'        : $elements
-})
-#end
+#end ## (context action)
 ##
 ## MACROS
 ##

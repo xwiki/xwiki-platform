@@ -97,4 +97,39 @@ public privileged aspect DocumentCompatibilityAspect
     {
         return this.doc.getTranslationList(getXWikiContext());
     }
+
+    /**
+     * Displays the tooltip of the given field. This function uses the active object or will find the first object that
+     * has the given field.
+     *
+     * @param fieldname fieldname to display the tooltip of
+     * @return the tooltip display of the field.
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String Document.displayTooltip(String fieldname)
+    {
+        if (this.currentObj == null) {
+            return this.doc.displayTooltip(fieldname, getXWikiContext());
+        } else {
+            return this.doc.displayTooltip(fieldname, this.currentObj.getBaseObject(), getXWikiContext());
+        }
+    }
+
+    /**
+     * Displays the tooltip of the given field of the given object.
+     *
+     * @param fieldname fieldname to display the tooltip of
+     * @param obj Object to find the class to display the tooltip of
+     * @return the tooltip display of the field.
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String Document.displayTooltip(String fieldname, Object obj)
+    {
+        if (obj == null) {
+            return "";
+        }
+        return this.doc.displayTooltip(fieldname, obj.getBaseObject(), getXWikiContext());
+    }
 }

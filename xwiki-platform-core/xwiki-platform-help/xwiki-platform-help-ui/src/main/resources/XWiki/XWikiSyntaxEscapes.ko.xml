@@ -1,0 +1,64 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxEscapes</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxEscapes</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 고급 =
+
+== 탈출 ==
+
+=== 1.0 이스케이프 ===
+
+XWiki 구문을 이스케이프할 수 있습니다 .
+
+|=기능|= XWiki 구문 1.0|=결과
+|문자 탈출|{{{이것은 [링크]가 아닙니다}}}|{{{이것은 [링크]가 아닙니다}}}
+
+=== 2.0 이스케이프 ===
+
+XWiki 구문을 이스케이프할 수 있습니다 .
+
+|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|문자 이스케이프|(((
+{{{이것은 ~[~[링크~]~]}}}가 아닙니다.
+{{info}}~~ 문자를 입력하려면 이중 이스케이프를 사용하세요. ~~~~{{/info}}
+)))|{{{이것은 [[링크]]가 아닙니다}}}
+|긴 텍스트를 탈출하세요
+("축어적" 참조)|~{~{~{{{{ 일부 **더 긴** 텍스트 //형식 없음//}}}~}~}~}|{{{ 일부 **더 긴** 텍스트 //형식 없음//}}}</content>
+</xwikidoc>

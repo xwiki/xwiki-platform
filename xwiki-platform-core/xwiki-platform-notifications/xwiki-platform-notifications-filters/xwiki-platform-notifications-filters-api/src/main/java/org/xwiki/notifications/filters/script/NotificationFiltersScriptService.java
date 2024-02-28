@@ -41,7 +41,7 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.user.CurrentUserReference;
@@ -67,7 +67,7 @@ public class NotificationFiltersScriptService implements ScriptService
 
     @Inject
     @Named("cached")
-    private ModelBridge cachedModelBridge;
+    private FilterPreferencesModelBridge cachedFilterPreferencesModelBridge;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -408,7 +408,11 @@ public class NotificationFiltersScriptService implements ScriptService
     public void createScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
         List<String> eventTypes, EntityReference reference, UserReference userReference) throws NotificationException
     {
-        cachedModelBridge.createScopeFilterPreference(convertReference(userReference), type, formats, eventTypes,
+        cachedFilterPreferencesModelBridge.createScopeFilterPreference(
+            convertReference(userReference),
+            type,
+            formats,
+            eventTypes,
             reference);
     }
 
@@ -429,7 +433,7 @@ public class NotificationFiltersScriptService implements ScriptService
     public void createWikiScopeFilterPreference(NotificationFilterType type, Set<NotificationFormat> formats,
         List<String> eventTypes, EntityReference reference, WikiReference wikiReference) throws NotificationException
     {
-        cachedModelBridge.createScopeFilterPreference(wikiReference, type, formats, eventTypes,
+        cachedFilterPreferencesModelBridge.createScopeFilterPreference(wikiReference, type, formats, eventTypes,
             reference);
     }
 }

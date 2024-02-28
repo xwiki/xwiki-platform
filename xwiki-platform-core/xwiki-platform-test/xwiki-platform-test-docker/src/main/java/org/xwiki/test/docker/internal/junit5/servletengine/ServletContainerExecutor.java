@@ -39,6 +39,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -177,8 +178,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         List<String> javaOpts = new ArrayList<>();
 
-        // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
-        // have been fixed.
+        // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
+        // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
+        // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
+        // run on Java 17+.
+        // PS: We could check the tag and verify if it contains "jdkNN" or "jreNN" where NN >= 17 but the problem is
+        // that there are plenty of tags that don't mention the jdk or jre (like "10" for example which runs on Java 21
+        // ATM).
         if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
             addJava17AddOpens(javaOpts);
         }
@@ -328,7 +334,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
         // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
         return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
-            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9" : LATEST);
+            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
     }
 
     private GenericContainer<?> createServletContainer() throws Exception
@@ -339,9 +345,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
-            // So we provide a name to the image we will built and we check that the image does not exist yet.
+            // So we compute a name for the image we will build, and we check that the image does not exist yet.
             String imageName = String.format("xwiki-%s-office:%s",
-                this.testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
+                this.testConfiguration.getServletEngine().name().toLowerCase(),
+                getDockerImageTag(this.testConfiguration));
 
             // We rebuild every time the LibreOffice version changes
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
@@ -398,7 +405,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 container = new XWikiLocalGenericContainer<>(imageName);
             }
         } else {
-            container = new GenericContainer<>(baseImageName);
+            container = new XWikiGenericContainer<>(baseImageName);
         }
 
         return container;
@@ -424,9 +431,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private void addJava17AddOpens(List<String> list)
     {
-        list.add("--add-opens java.base/java.lang=ALL-UNNAMED");
-        list.add("--add-opens java.base/java.io=ALL-UNNAMED");
-        list.add("--add-opens java.base/java.util=ALL-UNNAMED");
-        list.add("--add-opens java.base/java.util.concurrent=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.lang=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.io=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.util=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.util.concurrent=ALL-UNNAMED");
     }
 }

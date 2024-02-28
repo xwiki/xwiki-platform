@@ -62,6 +62,7 @@ define('xwiki-realtime-saver', [
   class Saver {
     constructor(config) {
       this._initializing = true;
+      this._revertList = [];
 
       this._config = {
         formId: 'edit',
@@ -70,6 +71,9 @@ define('xwiki-realtime-saver', [
 
       // Contains the realtime data.
       this._rtData = {};
+      this._revertList.push(() => {
+        this._rtData = {};
+      });
 
       this._lastSaved = {
         content: '',
@@ -87,6 +91,10 @@ define('xwiki-realtime-saver', [
       this._configure(config);
 
       this._realtimeInput = ChainPadNetflux.start(this._getRealtimeConfig());
+      this._revertList.push(() => {
+        this._realtimeInput?.stop();
+        delete this._realtimeInput;
+      });
     }
 
     _configure(config) {
@@ -131,10 +139,15 @@ define('xwiki-realtime-saver', [
     /**
      * Realtime editors should call this on local edits.
      *
-     * @param {boolean} wasEditedLocally {@code true} if the content was edited locally, {@code false} otherwise
+     * @param {boolean} wasEditedLocally {@code true} if the content was edited locally since the last save,
+     *   {@code false} otherwise
      */
     setLocalEditFlag(wasEditedLocally) {
       this._lastSaved.wasEditedLocally = wasEditedLocally;
+    }
+
+    getLocalEditFlag() {
+      return this._lastSaved.wasEditedLocally;
     }
 
     _bumpVersion(callback, versionData) {
@@ -289,11 +302,7 @@ define('xwiki-realtime-saver', [
      * Stop the autosaver / merge when the user disallows realtime or when the WebSocket is disconnected.
      */
     stop() {
-      this._realtimeInput?.stop();
-      delete this._realtimeInput;
-
-      clearTimeout(this._autosaveTimeout);
-      this._rtData = {};
+      this._revertList.forEach(revert => revert());
     }
 
     setLastSavedContent(content) {
@@ -348,22 +357,37 @@ define('xwiki-realtime-saver', [
 
     _onOpen() {
       // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
-      $('[name="action_preview"]').remove();
+      $('[name="action_preview"]').hide();
+      this._revertList.push(() => {
+        $('[name="action_preview"]').show();
+      });
 
       // Wait to get saved event.
-      $(document).on('xwiki:document:saved.realtime-saver', this._onSavedHandler.bind(this));
+      const saveHandler = this._onSavedHandler.bind(this);
+      $(document).on('xwiki:document:saved.realtime-saver', saveHandler);
+      this._revertList.push(() => {
+        $(document).off('xwiki:document:saved.realtime-saver', saveHandler);
+      });
 
       // Prevent the save buttons from reloading the page. Instead, reset the editor's content.
-      $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {
-        reloadEditor: () => {
-          // TODO: Handle the page title.
-          this._config.getTextAtCurrentRevision().then((data) => {
-            this._config.setTextValue(data);
-          });
+      const originalReloadEditor = XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor;
+      const reloadEditor = XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor = () => {
+        // TODO: Handle the page title.
+        this._config.getTextAtCurrentRevision().then((data) => {
+          this._config.setTextValue(data);
+        });
+      };
+      this._revertList.push(() => {
+        // Revert only if the reloadEditor method has not been overridden by another script.
+        if (XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor === reloadEditor) {
+          XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor = originalReloadEditor;
         }
       });
 
       this._check();
+      this._revertList.push(() => {
+        clearTimeout(this._autosaveTimeout);
+      });
     }
 
     _onSavedHandler() {

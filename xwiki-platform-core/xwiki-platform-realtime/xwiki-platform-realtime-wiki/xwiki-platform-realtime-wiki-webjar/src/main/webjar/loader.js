@@ -33,12 +33,10 @@ define('xwiki-realtime-wikiEditor-loader', [
     compatible: ['wiki', 'wysiwyg']
   };
 
-  Loader.bootstrap(info).then(keys => {
+  Loader.bootstrap(info).then(realtimeContext => {
     require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
-      keys._update = Loader.updateKeys.bind(Loader, info.field, editorId);
-      const config = Loader.getConfig();
-      config.rtURL = Loader.getEditorURL(window.location.href, info);
-      RealtimeWikiEditor.main(config, keys);
+      realtimeContext.rtURL = Loader.getEditorURL(window.location.href, info);
+      RealtimeWikiEditor.main(realtimeContext);
     });
   });
 

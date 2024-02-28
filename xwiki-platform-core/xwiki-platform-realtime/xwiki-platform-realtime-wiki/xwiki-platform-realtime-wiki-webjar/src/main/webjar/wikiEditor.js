@@ -44,16 +44,16 @@ define('xwiki-realtime-wikiEditor', [
 
   var module = {}, editorId = 'wiki';
 
-  module.main = function(editorConfig, docKeys) {
-    var channel = docKeys[editorId],
-    eventsChannel = docKeys.events,
-    userdataChannel = docKeys.userdata;
+  module.main = function(editorConfig) {
+    var channel = editorConfig.channels[editorId],
+    eventsChannel = editorConfig.channels.events,
+    userdataChannel = editorConfig.channels.userdata;
 
     /**
      * Update the channel keys for reconnecting WebSocket.
      */
     var updateKeys = function() {
-      return docKeys._update().then(keys => {
+      return editorConfig.updateChannels().then(keys => {
         if (keys[editorId] && keys[editorId] !== channel) {
           channel = keys[editorId];
         }
@@ -221,7 +221,7 @@ define('xwiki-realtime-wikiEditor', [
           editorType: editorId,
           editorName: 'Wiki',
           userList: info.userList,
-          userName: editorConfig.userName,
+          userName: editorConfig.user.name,
           network: info.network,
           channel: eventsChannel,
           setTextValue: function(newText, toConvert, callback) {
@@ -256,8 +256,8 @@ define('xwiki-realtime-wikiEditor', [
       var realtimeOptions = {
         // Provide initial state...
         initialState: editor.getValue() || '',
-        websocketURL: editorConfig.WebsocketURL,
-        userName: editorConfig.userName,
+        websocketURL: editorConfig.webSocketURL,
+        userName: editorConfig.user.name,
         // The channel we will communicate over.
         channel,
         // The object responsible for encrypting the messages.
@@ -284,8 +284,8 @@ define('xwiki-realtime-wikiEditor', [
           // Update the user list to link the wiki name to the user id.
           userData = UserData.start(info.network, userdataChannel, {
             myId: info.myId,
-            userName: editorConfig.userName,
-            userAvatar: editorConfig.userAvatarURL,
+            userName: editorConfig.user.name,
+            userAvatar: editorConfig.user.avatarURL,
             onChange: info.userList.onChange,
             crypto: Crypto,
             editor: editorId
@@ -363,7 +363,7 @@ define('xwiki-realtime-wikiEditor', [
       module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
 
       // Notify the others that we're editing in realtime.
-      editorConfig.setRealtimeEditing(true);
+      editorConfig.setRealtimeEnabled(true);
 
       function onChangeHandler() {
         // We can't destroy the dialog here because sometimes it's impossible to take an action during a merge conflict.

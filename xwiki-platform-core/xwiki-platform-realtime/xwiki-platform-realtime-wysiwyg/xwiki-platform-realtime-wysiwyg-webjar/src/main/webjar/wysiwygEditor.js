@@ -47,35 +47,33 @@ define('xwiki-realtime-wysiwyg', [
   };
 
   class RealtimeEditor {
-    constructor(editor, editorConfig, docKeys, useRt) {
+    constructor(editor, realtimeContext) {
       this._editor = editor;
-      this._editorConfig = editorConfig;
+      this._realtimeContext = realtimeContext;
 
       // The editor wrapper used to smoothly update (patch) the edited content without losing the caret position.
       this._patchedEditor = new Patches(editor);
 
-      this._docKeys = docKeys;
-
       // The channel used to synchronize the edited content (notify others when you make a change and be notified when
       // others make changes).
-      this._channel = docKeys[EDITOR_TYPE];
+      this._channel = realtimeContext.channels[EDITOR_TYPE];
 
       // The channel used to synchronize the content (auto)save (notify others when you save and be notified when others
       // save, in order to avoid merge conflicts and creating unnecessary document revisions).
-      this._eventsChannel = docKeys.events;
+      this._eventsChannel = realtimeContext.channels.events;
 
       // The channel used to synchronize the user caret position (notify others when your caret position changes and be
       // notified when others' caret position changes).
-      this._userDataChannel = docKeys.userdata;
+      this._userDataChannel = realtimeContext.channels.userdata;
   
-      Interface.realtimeAllowed(useRt);
-      this._createAllowRealtimeCheckbox(useRt);
+      Interface.realtimeAllowed(realtimeContext.realtimeEnabled);
+      this._createAllowRealtimeCheckbox();
 
       this._connection = {
         status: ConnectionStatus.DISCONNECTED
       };
 
-      if (useRt) {
+      if (realtimeContext.realtimeEnabled) {
         this._startRealtimeSync();
       }
     }
@@ -110,7 +108,7 @@ define('xwiki-realtime-wysiwyg', [
       this._connection.realtimeInput = ChainPadNetflux.start(this._getRealtimeOptions());
 
       // Notify the others that we're editing in realtime.
-      this._editorConfig.setRealtimeEditing(true);
+      this._realtimeContext.setRealtimeEnabled(true);
   
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
@@ -123,7 +121,11 @@ define('xwiki-realtime-wysiwyg', [
 
       // Leave the realtime session and stop the autosave when the editor is destroyed. We have to do this because the
       // editor can be destroyed without the page being reloaded (e.g. when editing in-place).
-      this._editor.onBeforeDestroy(this._onAbort.bind(this));
+      this._editor.onBeforeDestroy(() => {
+        // Notify the others that we're not editing anymore.
+        this._realtimeContext.destroy();
+        this._onAbort();
+      });
 
       // Export the typing tests to the window.
       // Call like `test = easyTest()`
@@ -134,26 +136,27 @@ define('xwiki-realtime-wysiwyg', [
     /**
      * Update the channels keys for reconnecting WebSocket.
      */
-    async _updateKeys() {
-      const keys = await this._docKeys._update();
-      this._channel = keys[EDITOR_TYPE] || this._channel;
-      this._eventsChannel = keys.events || this._eventsChannel;
-      this._userDataChannel = keys.userdata || this._userDataChannel;
-      return keys;
+    async _updateChannels() {
+      const channels = await this._realtimeContext.updateChannels();
+      this._channel = channels[EDITOR_TYPE] || this._channel;
+      this._eventsChannel = channels.events || this._eventsChannel;
+      this._userDataChannel = channels.userdata || this._userDataChannel;
+      return channels;
     }
 
-    _createAllowRealtimeCheckbox(useRt) {
+    _createAllowRealtimeCheckbox() {
+      const realtimeEnabled = this._realtimeContext.realtimeEnabled;
       // Don't display the checkbox in the following cases:
-      // * useRt 0 (instead of true/false) => we can't connect to the websocket service
+      // * realtimeEnabled 0 (instead of true/false) => we can't connect to the websocket service
       // * realtime is disabled and we're not an advanced user
-      if (useRt !== 0 && (useRt || this._editorConfig.isAdvancedUser)) {
+      if (realtimeEnabled !== 0 && (realtimeEnabled || this._realtimeContext.user.advanced)) {
         const allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
         const realtimeToggleHandler = () => {
           if (allowRealtimeCheckbox.prop('checked')) {
             Interface.realtimeAllowed(true);
             this._startRealtimeSync();
           } else {
-            this._editorConfig.displayDisableModal((state) => {
+            this._realtimeContext.displayDisableModal((state) => {
               if (!state) {
                 allowRealtimeCheckbox.prop('checked', true);
               } else {
@@ -279,11 +282,11 @@ define('xwiki-realtime-wysiwyg', [
     _getRealtimeOptions() {
       return {
         initialState: this._patchedEditor.getHyperJSON() || '{}',
-        websocketURL: this._editorConfig.WebsocketURL,
-        userName: this._editorConfig.userName,
+        websocketURL: this._realtimeContext.webSocketURL,
+        userName: this._realtimeContext.user.name,
         channel: this._channel,
         crypto: Crypto,
-        network: this._editorConfig.network,
+        network: this._realtimeContext.network,
 
         // Operational Transformation
         // The synchronization is done on JSON so we need to make sure the output of the synchronization is always
@@ -365,8 +368,8 @@ define('xwiki-realtime-wysiwyg', [
         // Update the user list to link the wiki name to the user id.
         const userDataConfig = {
           myId: info.myId,
-          userName: this._editorConfig.userName,
-          userAvatar: this._editorConfig.userAvatarURL,
+          userName: this._realtimeContext.user.name,
+          userAvatar: this._realtimeContext.user.avatarURL,
           onChange: this._connection.userList.onChange,
           crypto: Crypto,
           editor: EDITOR_TYPE,
@@ -396,7 +399,7 @@ define('xwiki-realtime-wysiwyg', [
       this.setEditable(true);
 
       this._onLocal();
-      this._createSaver(info, this._editorConfig.userName);
+      this._createSaver(info, this._realtimeContext.user.name);
     }
 
     _onLocal() {
@@ -456,14 +459,25 @@ define('xwiki-realtime-wysiwyg', [
 
     _beforeReconnecting(callback) {
       const oldChannel = this._channel;
-      this._updateKeys().then(() => {
-        if (this._channel !== oldChannel) {
-          this._editorConfig.onKeysChanged();
-          this.setEditable(false);
-          Interface.getAllowRealtimeCheckbox().prop('checked', false);
-          this._onAbort();
-        } else {
+      this._updateChannels().then(() => {
+        if (this._channel === oldChannel) {
+          // The Netflux channel used before the WebSocket connection closed is still available so we can still use it.
           callback(this._channel, this._patchedEditor.getHyperJSON());
+        } else {
+          // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
+          // abort the current realtime session.
+          this.setEditable(false);
+          this._onAbort();
+          if (!this._saver.getLocalEditFlag()) {
+            // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
+            // Netflux channel.
+            this._startRealtimeSync();
+          } else {
+            // We can't rejoin the realtime session using the new Netflux channel because we would lose the unsaved
+            // local changes. Let the user decide what to do.
+            Interface.getAllowRealtimeCheckbox().prop('checked', false);
+            this._realtimeContext.displayReloadModal();
+          }
         }
       });
     }
@@ -482,7 +496,7 @@ define('xwiki-realtime-wysiwyg', [
       this._connection.realtimeInput.stop();
 
       // Notify the others that we're editing offline (outside of the realtime session).
-      this._editorConfig.setRealtimeEditing(false);
+      this._realtimeContext.setRealtimeEnabled(false);
 
       // Stop the autosave (and leave the events Netflux channel associated with the edited document).
       this._saver.stop();

@@ -86,14 +86,12 @@
       compatible: ['wysiwyg', 'wiki']
     };
 
-    return Loader.bootstrap(info).then(keys => {
+    return Loader.bootstrap(info).then(realtimeContext => {
       return new Promise((resolve, reject) => {
         require(['xwiki-realtime-wysiwyg'], RealtimeWysiwygEditor => {
-          keys._update = Loader.updateKeys.bind(Loader, info.field, info.type);
-          editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), Loader.getConfig(), keys,
-            Loader.isRt);
+          editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
   
-          if (Loader.isRt) {
+          if (realtimeContext.realtimeEnabled) {
             editor.ui.space('top').$.querySelector('.cke_button__source')?.remove();
           } else {
             // When someone is offline, they may have left their tab open for a long time and the lock may have

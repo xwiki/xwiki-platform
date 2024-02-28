@@ -39,7 +39,7 @@
 
 <!--
      For more details about configurations options that may appear in
-     this file, see http://wiki.apache.org/solr/SolrConfigXml.
+     this file, see https://solr.apache.org/guide/solr/latest/configuration-guide/configuring-solrconfig-xml.html.
 -->
 <config>
   <!-- In all configuration below, a prefix of "solr." for class names
@@ -56,7 +56,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>9.4.0</luceneMatchVersion>
+  <luceneMatchVersion>9.8.0</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -90,10 +90,10 @@
        If a 'dir' option (with or without a regex) is used and nothing
        is found that matches, a warning will be logged.
 
-       The example below can be used to load a solr-contrib along
+       The example below can be used to load a Solr Module along
        with their external dependencies.
     -->
-    <!-- <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-ltr-\d.*\.jar" /> -->
+    <!-- <lib dir="${solr.install.dir:../../../..}/modules/ltr/lib" regex=".*\.jar" /> -->
 
   <!-- an exact 'path' can be used instead of a 'dir' to specify a
        specific jar file.  This will cause a serious error to be logged
@@ -121,8 +121,8 @@
        wraps solr.StandardDirectoryFactory and caches small files in memory
        for better NRT performance.
 
-       One can force a particular implementation via solr.MMapDirectoryFactory,
-       solr.NIOFSDirectoryFactory, or solr.SimpleFSDirectoryFactory.
+       One can force a particular implementation via solr.MMapDirectoryFactory
+       or solr.NIOFSDirectoryFactory.
 
        solr.RAMDirectoryFactory is memory based and not persistent.
     -->
@@ -223,7 +223,7 @@
                    'simple' is the default
 
          More details on the nuances of each LockFactory...
-         http://wiki.apache.org/lucene-java/AvailableLockFactories
+         https://cwiki.apache.org/confluence/display/lucene/AvailableLockFactories
     -->
     <lockType>${solr.lock.type:native}</lockType>
 
@@ -295,7 +295,7 @@
          Instead of enabling autoCommit, consider using "commitWithin"
          when adding documents.
 
-         http://wiki.apache.org/solr/UpdateXmlMessages
+         https://solr.apache.org/guide/solr/latest/indexing-guide/indexing-with-update-handlers.html
 
          maxDocs - Maximum number of documents to add since the last
                    commit before automatically triggering a new commit.
@@ -324,7 +324,7 @@
       -->
 
     <autoSoftCommit>
-      <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
+      <maxTime>${solr.autoSoftCommit.maxTime:3000}</maxTime>
     </autoSoftCommit>
 
     <!-- Update Related Event Listeners
@@ -372,30 +372,18 @@
   <query>
 
     <!-- Maximum number of clauses allowed when parsing a boolean query string.
-         
+
          This limit only impacts boolean queries specified by a user as part of a query string,
          and provides per-collection controls on how complex user specified boolean queries can
-         be.  Query strings that specify more clauses then this will result in an error.
-         
-         If this per-collection limit is greater then the global `maxBooleanClauses` limit
+         be.  Query strings that specify more clauses than this will result in an error.
+
+         If this per-collection limit is greater than the global `maxBooleanClauses` limit
          specified in `solr.xml`, it will have no effect, as that setting also limits the size
          of user specified boolean queries.
       -->
     <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
 
     <!-- Solr Internal Query Caches
-
-         There are four implementations of cache available for Solr:
-         LRUCache, based on a synchronized LinkedHashMap, 
-         LFUCache and FastLRUCache, based on a ConcurrentHashMap, and CaffeineCache -
-         a modern and robust cache implementation. Note that in Solr 9.0
-         only CaffeineCache will be available, other implementations are now
-         deprecated.
-
-         FastLRUCache has faster gets and slower puts in single
-         threaded operation and thus is generally faster than LRUCache
-         when the hit ratio of the cache is high (> 75%), and may be
-         faster under other scenarios on multi-cpu systems.
          Starting with Solr 9.0 the default cache implementation used is CaffeineCache.
     -->
 
@@ -405,13 +393,12 @@
          unordered sets of *all* documents that match a query.  When a
          new searcher is opened, its caches may be prepopulated or
          "autowarmed" using data from caches in the old searcher.
-         autowarmCount is the number of items to prepopulate.  For
-         LRUCache, the autowarmed items will be the most recently
+         autowarmCount is the number of items to prepopulate. For
+         CaffeineCache, the autowarmed items will be the most recently
          accessed items.
 
          Parameters:
-           class - the SolrCache implementation LRUCache or
-               (LRUCache or FastLRUCache)
+           class - the SolrCache implementation (CaffeineCache by default)
            size - the maximum number of entries in the cache
            initialSize - the initial capacity (number of entries) of
                the cache.  (see java.util.HashMap)
@@ -429,7 +416,7 @@
 
          Caches results of searches - ordered lists of document ids
          (DocList) based on a query, a sort, and the range of documents requested.
-         Additional supported parameter by LRUCache:
+         Additional supported parameter by CaffeineCache:
             maxRamMB - the maximum amount of RAM (in MB) that this cache is allowed
                        to occupy
       -->
@@ -449,6 +436,7 @@
 
     <!-- custom cache currently used by block join -->
     <cache name="perSegFilter"
+           class="solr.CaffeineCache"
            size="10"
            initialSize="0"
            autowarmCount="10"
@@ -463,7 +451,7 @@
     <!--
        <fieldValueCache size="512"
                         autowarmCount="128"
-                        showItems="32" />
+                        />
       -->
 
     <!-- Custom Cache
@@ -477,6 +465,7 @@
       -->
     <!--
        <cache name="myUserCache"
+              class="solr.CaffeineCache"
               size="4096"
               initialSize="1024"
               autowarmCount="1024"
@@ -593,65 +582,6 @@
 
   </query>
 
-  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     Circuit Breaker Section - This section consists of configurations for
-     circuit breakers
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-    <!-- Circuit Breakers
-
-     Circuit breakers are designed to allow stability and predictable query
-     execution. They prevent operations that can take down the node and cause
-     noisy neighbour issues.
-
-     This flag is the uber control switch which controls the activation/deactivation of all circuit
-     breakers. If a circuit breaker wishes to be independently configurable,
-     they are free to add their specific configuration but need to ensure that this flag is always
-     respected - this should have veto over all independent configuration flags.
-    -->
-    <circuitBreakers enabled="true">
-
-    <!-- Memory Circuit Breaker Configuration
-
-     Specific configuration for max JVM heap usage circuit breaker. This configuration defines whether
-     the circuit breaker is enabled and the threshold percentage of maximum heap allocated beyond which queries will be rejected until the
-     current JVM usage goes below the threshold. The valid value range for this value is 50-95.
-
-     Consider a scenario where the max heap allocated is 4 GB and memoryCircuitBreakerThreshold is
-     defined as 75. Threshold JVM usage will be 4 * 0.75 = 3 GB. Its generally a good idea to keep this value between 75 - 80% of maximum heap
-     allocated.
-
-     If, at any point, the current JVM heap usage goes above 3 GB, queries will be rejected until the heap usage goes below 3 GB again.
-     If you see queries getting rejected with 503 error code, check for "Circuit Breakers tripped"
-     in logs and the corresponding error message should tell you what transpired (if the failure
-     was caused by tripped circuit breakers).
-
-     If, at any point, the current JVM heap usage goes above 3 GB, queries will be rejected until the heap usage goes below 3 GB again.
-     If you see queries getting rejected with 503 error code, check for "Circuit Breakers tripped"
-     in logs and the corresponding error message should tell you what transpired (if the failure
-     was caused by tripped circuit breakers).
-    -->
-    <!--
-   <memBreaker enabled="true" threshold="75"/>
-    -->
-
-      <!-- CPU Circuit Breaker Configuration
-
-     Specific configuration for CPU utilization based circuit breaker. This configuration defines whether the circuit breaker is enabled
-     and the average load over the last minute at which the circuit breaker should start rejecting queries.
-
-     Consider a scenario where the max heap allocated is 4 GB and memoryCircuitBreakerThreshold is
-     defined as 75. Threshold JVM usage will be 4 * 0.75 = 3 GB. Its generally a good idea to keep this value between 75 - 80% of maximum heap
-     allocated.
-    -->
-
-      <!--
-       <cpuBreaker enabled="true" threshold="75"/>
-      -->
-
-  </circuitBreakers>
-
-
   <!-- Request Dispatcher
 
        This section contains instructions for how the SolrDispatchFilter
@@ -664,9 +594,6 @@
          These settings indicate how Solr Requests may be parsed, and
          what restrictions may be placed on the ContentStreams from
          those requests
-
-         enableRemoteStreaming - enables use of the stream.file
-         and stream.url parameters for specifying remote streams.
 
          multipartUploadLimitInKB - specifies the max size (in KiB) of
          Multipart File Uploads that Solr will allow in a Request.
@@ -683,12 +610,7 @@
          Solr components, but may be useful when developing custom
          plugins.
 
-         *** WARNING ***
-         Before enabling remote streaming, you should make sure your
-         system has authentication enabled.
-
-    <requestParsers enableRemoteStreaming="false"
-                    multipartUploadLimitInKB="-1"
+    <requestParsers multipartUploadLimitInKB="-1"
                     formdataUploadLimitInKB="-1"
                     addHttpRequestToContext="false"/>
       -->
@@ -750,172 +672,115 @@
 
   <!-- Request Handlers
 
-       http://wiki.apache.org/solr/SolrRequestHandler
+       https://solr.apache.org/guide/solr/latest/configuration-guide/requesthandlers-searchcomponents.html
 
-       Incoming queries will be dispatched to a specific handler by name
-       based on the path specified in the request.
+       Incoming queries will be dispatched to a specific handler by name based on the path specified in the request.
 
-       If a Request Handler is declared with startup="lazy", then it will
-       not be initialized until the first request that uses it.
+       All handlers (Search Handlers, Update Request Handlers, and other specialized types) can have default parameters (defaults, appends and invariants).
 
+       Search Handlers can also (append, prepend or even replace) default or defined Search Components.
+
+       Update Request Handlers can leverage Update Request Processors to pre-process documents after they are loaded
+       and before they are indexed/stored.
+
+       Not all Request Handlers are defined in the solrconfig.xml, many are implicit.
     -->
-  <!-- SearchHandler
 
-       http://wiki.apache.org/solr/SearchHandler
-
-       For processing Search Queries, the primary Request Handler
-       provided with Solr is "SearchHandler" It delegates to a sequent
-       of SearchComponents (see below) and supports distributed
-       queries across multiple shards
-    -->
+  <!-- Primary search handler, expected by most clients, examples and UI frameworks -->
   <requestHandler name="/select" class="solr.SearchHandler">
-    <!-- default values for query parameters can be specified, these
-         will be overridden by parameters in the request
-      -->
     <lst name="defaults">
-       <str name="echoParams">explicit</str>
-       <int name="rows">10</int>
+      <str name="echoParams">explicit</str>
+      <int name="rows">10</int>
 
-       <!-- We use a custom Query Parser Plugin that adds dynamic aliases for multilingual fields -->
-       <str name="defType">xdismax</str>
+      <!-- XWIKI -->
+      <!-- We use a custom Query Parser Plugin that adds dynamic aliases for multilingual fields -->
+      <str name="defType">xdismax</str>
 
-       <str name="fl">*,score,popularity</str>
+      <str name="fl">*,score,popularity</str>
 
-       <!-- VelocityResponseWriter settings -->
-       <str name="wt">velocity</str>
+      <!-- VelocityResponseWriter settings -->
+      <str name="wt">velocity</str>
 
-       <str name="v.template">browse</str>
-       <str name="v.layout">layout</str>
-       <str name="title">Solritas</str>
+      <str name="v.template">browse</str>
+      <str name="v.layout">layout</str>
+      <str name="title">Solritas</str>
 
-       <!-- Default query fields with default attached boost values. -->
-       <str name="qf">
+      <!-- Default query fields with default attached boost values. -->
+      <str name="qf">
           title^5.0 name^5.0 filename^5.0
           doccontent doccontentraw objcontent attcontent propertyvalue
           author_display^0.2 creator_display^0.2 attauthor_display^0.2
           comment^0.04 spaces^0.04
-       </str>
+      </str>
 
-       <!-- Field aliasing. -->
+      <!-- Field aliasing. -->
 
-       <!-- The list of multilingual fields that will be expanded in the search query. This way, a user can write a
+      <!-- The list of multilingual fields that will be expanded in the search query. This way, a user can write a
             query on the "title" field and all the "title_<language>" variations of the field will be used in the query.
             The list of languages for which a field is expanded is taken from the 'xwiki.supportedLocales' query
             parameter. If this parameter is not defined, the ROOT locale is used instead. -->
-       <str name="xwiki.multilingualFields">title, doccontent, doccontentraw, comment, objcontent, propertyvalue,
-         attcontent, property.*, object.*</str>
+      <str name="xwiki.multilingualFields">title, doccontent, doccontentraw, comment, objcontent, propertyvalue,
+          attcontent, property.*, object.*</str>
 
-       <!-- The list of typed (non-string) dynamic fields that will be expanded in the search query. The names of these
-            fields are suffixed with the name of their data type (e.g. *_int is a dynamic integer field). This allows
-            users to write a query like this:
+      <!-- The list of typed (non-string) dynamic fields that will be expanded in the search query. The names of these
+           fields are suffixed with the name of their data type (e.g. *_int is a dynamic integer field). This allows
+           users to write a query like this:
 
-            property.Blog.BlogPostClass.publishDate:[NOW-1MONTH TO NOW]
+           property.Blog.BlogPostClass.publishDate:[NOW-1MONTH TO NOW]
 
-            which will be expanded into:
+           which will be expanded into:
 
-            property.Blog.BlogPostClass.publishDate_boolean:[NOW-1MONTH TO NOW] OR
-            property.Blog.BlogPostClass.publishDate_int:[NOW-1MONTH TO NOW] OR
-            ...
-            property.Blog.BlogPostClass.publishDate_date:[NOW-1MONTH TO NOW] -->
-       <str name="xwiki.typedDynamicFields">property.*</str>
-       <!-- See the dynamic field definitions in schema.xml -->
-       <str name="xwiki.dynamicFieldTypes">boolean, int, long, float, double, string, date</str>
+           property.Blog.BlogPostClass.publishDate_boolean:[NOW-1MONTH TO NOW] OR
+           property.Blog.BlogPostClass.publishDate_int:[NOW-1MONTH TO NOW] OR
+           ...
+           property.Blog.BlogPostClass.publishDate_date:[NOW-1MONTH TO NOW] -->
+      <str name="xwiki.typedDynamicFields">property.*</str>
+      <!-- See the dynamic field definitions in schema.xml -->
+      <str name="xwiki.dynamicFieldTypes">boolean, int, long, float, double, string, date</str>
 
-       <!-- Trying to preserve compatibility with XWiki lucene plugin's queries. -->
-       <str name="f.object.qf">class</str>
-       <str name="f.ft.qf">doccontent</str>
-       <str name="f.web.qf">space</str>
+      <!-- Trying to preserve compatibility with XWiki lucene plugin's queries. -->
+      <str name="f.object.qf">class</str>
+      <str name="f.ft.qf">doccontent</str>
+      <str name="f.web.qf">space</str>
 
-       <!-- Faceting defaults. -->
-       <str name="facet">false</str>
-       <!-- NOTE: The search UI displays the facets in this order so keep the most important facets first. -->
-       <str name="facet.field">type</str>
-       <str name="facet.field">wiki</str>
-       <str name="facet.field">space_facet</str>
-       <str name="facet.field">locale</str>
-       <str name="facet.field">author</str>
-       <str name="facet.field">creator</str>
-       <str name="facet.field">date</str>
-       <str name="facet.field">creationdate</str>
-       <str name="facet.field">class</str>
-       <str name="facet.field">mimetype</str>
-       <str name="facet.field">attauthor</str>
-       <str name="facet.field">attdate</str>
-       <str name="facet.field">attsize</str>
-       <!-- Raising facet.mincount from 0 to 1 for Points-based fields. -->
-       <str name="f.date.facet.mincount">1</str>
-       <str name="f.creationdate.facet.mincount">1</str>
-       <str name="f.attdate.facet.mincount">1</str>
-       <str name="f.attsize.facet.mincount">1</str>
+      <!-- Faceting defaults. -->
+      <str name="facet">false</str>
+      <!-- NOTE: The search UI displays the facets in this order so keep the most important facets first. -->
+      <str name="facet.field">type</str>
+      <str name="facet.field">wiki</str>
+      <str name="facet.field">space_facet</str>
+      <str name="facet.field">locale</str>
+      <str name="facet.field">author</str>
+      <str name="facet.field">creator</str>
+      <str name="facet.field">date</str>
+      <str name="facet.field">creationdate</str>
+      <str name="facet.field">class</str>
+      <str name="facet.field">mimetype</str>
+      <str name="facet.field">attauthor</str>
+      <str name="facet.field">attdate</str>
+      <str name="facet.field">attsize</str>
+      <!-- Raising facet.mincount from 0 to 1 for Points-based fields. -->
+      <str name="f.date.facet.mincount">1</str>
+      <str name="f.creationdate.facet.mincount">1</str>
+      <str name="f.attdate.facet.mincount">1</str>
+      <str name="f.attsize.facet.mincount">1</str>
 
-       <!-- Highlighting defaults -->
-       <str name="hl">false</str>
-       <!-- Highlight all possible fields, on which we get a hit. -->
-       <str name="hl.fl">*</str>
-       <str name="hl.requireFieldMatch">true</str>
-       <!-- Surround the highlight result with a HTML span. -->
-       <str name="hl.simple.pre"><![CDATA[<span class="search-text-highlight">]]></str>
-       <str name="hl.simple.post"><![CDATA[<span class="search-text-highlight-stop"></span></span>]]></str>
-       <!-- Enable highlighting for range/wildcard/fuzzy/prefix queries. -->
-       <str name="hl.hl.usePhraseHighlighter">true</str>
-       <str name="hl.highlightMultiTerm">true</str>
-       <!-- Return up to 3 highlighted snippets. -->
-       <int name="hl.snippets">3</int>
-       <!-- If the snippets are contiguous, merge them into a single snippet instead of handling them separately. -->
-       <str name="hl.mergeContiguous">true</str>
-     </lst>
-    <!-- In addition to defaults, "appends" params can be specified
-         to identify values which should be appended to the list of
-         multi-val params from the query (or the existing "defaults").
-      -->
-    <!-- In this example, the param "fq=instock:true" would be appended to
-         any query time fq params the user may specify, as a mechanism for
-         partitioning the index, independent of any user selected filtering
-         that may also be desired (perhaps as a result of faceted searching).
-
-         NOTE: there is *absolutely* nothing a client can do to prevent these
-         "appends" values from being used, so don't use this mechanism
-         unless you are sure you always want it.
-      -->
-    <!--
-       <lst name="appends">
-         <str name="fq">inStock:true</str>
-       </lst>
-      -->
-    <!-- "invariants" are a way of letting the Solr maintainer lock down
-         the options available to Solr clients.  Any params values
-         specified here are used regardless of what values may be specified
-         in either the query, the "defaults", or the "appends" params.
-
-         In this example, the facet.field and facet.query params would
-         be fixed, limiting the facets clients can use.  Faceting is
-         not turned on by default - but if the client does specify
-         facet=true in the request, these are the only facets they
-         will be able to see counts for; regardless of what other
-         facet.field or facet.query params they may specify.
-
-         NOTE: there is *absolutely* nothing a client can do to prevent these
-         "invariants" values from being used, so don't use this mechanism
-         unless you are sure you always want it.
-      -->
-    <!--
-       <lst name="invariants">
-         <str name="facet.field">cat</str>
-         <str name="facet.field">manu_exact</str>
-         <str name="facet.query">price:[* TO 500]</str>
-         <str name="facet.query">price:[500 TO *]</str>
-       </lst>
-      -->
-    <!-- If the default list of SearchComponents is not desired, that
-         list can either be overridden completely, or components can be
-         prepended or appended to the default list.  (see below)
-      -->
-    <!--
-       <arr name="components">
-         <str>nameOfCustomComponent1</str>
-         <str>nameOfCustomComponent2</str>
-       </arr>
-      -->
+      <!-- Highlighting defaults -->
+      <str name="hl">false</str>
+      <!-- Highlight all possible fields, on which we get a hit. -->
+      <str name="hl.fl">*</str>
+      <str name="hl.requireFieldMatch">true</str>
+      <!-- Surround the highlight result with a HTML span. -->
+      <str name="hl.simple.pre"><![CDATA[<span class="search-text-highlight">]]></str>
+      <str name="hl.simple.post"><![CDATA[<span class="search-text-highlight-stop"></span></span>]]></str>
+      <!-- Enable highlighting for range/wildcard/fuzzy/prefix queries. -->
+      <str name="hl.hl.usePhraseHighlighter">true</str>
+      <str name="hl.highlightMultiTerm">true</str>
+      <!-- Return up to 3 highlighted snippets. -->
+      <int name="hl.snippets">3</int>
+      <!-- If the snippets are contiguous, merge them into a single snippet instead of handling them separately. -->
+      <str name="hl.mergeContiguous">true</str>
+    </lst>
   </requestHandler>
 
   <!-- A request handler that returns indented JSON by default -->
@@ -924,65 +789,22 @@
       <str name="echoParams">explicit</str>
       <str name="wt">json</str>
       <str name="indent">true</str>
-      <str name="df">text</str>
     </lst>
   </requestHandler>
 
+  <!-- Shared parameters for multiple Request Handlers -->
   <initParams path="/update/**,/query,/select,/spell">
     <lst name="defaults">
-      <str name="df">text</str>
+      <str name="df">_text_</str>
     </lst>
   </initParams>
-
-  <!-- Search Components
-
-       Search components are registered to SolrCore and used by
-       instances of SearchHandler (which can access them by name)
-
-       By default, the following components are available:
-
-       <searchComponent name="query"     class="solr.QueryComponent" />
-       <searchComponent name="facet"     class="solr.FacetComponent" />
-       <searchComponent name="mlt"       class="solr.MoreLikeThisComponent" />
-       <searchComponent name="highlight" class="solr.HighlightComponent" />
-       <searchComponent name="stats"     class="solr.StatsComponent" />
-       <searchComponent name="debug"     class="solr.DebugComponent" />
-
-       Default configuration in a requestHandler would look like:
-
-       <arr name="components">
-         <str>query</str>
-         <str>facet</str>
-         <str>mlt</str>
-         <str>highlight</str>
-         <str>stats</str>
-         <str>debug</str>
-       </arr>
-
-       If you register a searchComponent to one of the standard names,
-       that will be used instead of the default.
-
-       To insert components before or after the 'standard' components, use:
-
-       <arr name="first-components">
-         <str>myFirstComponentName</str>
-       </arr>
-
-       <arr name="last-components">
-         <str>myLastComponentName</str>
-       </arr>
-
-       NOTE: The component registered with the name "debug" will
-       always be executed after the "last-components"
-
-     -->
 
   <!-- Spell Check
 
        The spell check component can return a list of alternative spelling
        suggestions.
 
-       http://wiki.apache.org/solr/SpellCheckComponent
+       https://solr.apache.org/guide/solr/latest/query-guide/spell-checking.html
     -->
   <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
 
@@ -995,7 +817,7 @@
     <!-- a spellchecker built from a field of the main index -->
     <lst name="spellchecker">
       <str name="name">default</str>
-      <str name="field">text</str>
+      <str name="field">_text_</str>
       <str name="classname">solr.DirectSolrSpellChecker</str>
       <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
       <str name="distanceMeasure">internal</str>
@@ -1039,7 +861,7 @@
        IN OTHER WORDS, THERE IS REALLY GOOD CHANCE THE SETUP BELOW IS
        NOT WHAT YOU WANT FOR YOUR PRODUCTION SYSTEM!
 
-       See http://wiki.apache.org/solr/SpellCheckComponent for details
+       See https://solr.apache.org/guide/solr/latest/query-guide/spell-checking.html for details
        on the request parameters.
     -->
   <requestHandler name="/spell" class="solr.SearchHandler" startup="lazy">
@@ -1064,31 +886,13 @@
     </arr>
   </requestHandler>
 
-  <!-- Terms Component
-
-       http://wiki.apache.org/solr/TermsComponent
-
-       A component to return terms and document frequency of those
-       terms
-    -->
-  <searchComponent name="terms" class="solr.TermsComponent"/>
-
-  <!-- A request handler for demonstrating the terms component -->
-  <requestHandler name="/terms" class="solr.SearchHandler" startup="lazy">
-    <lst name="defaults">
-      <bool name="terms">true</bool>
-      <bool name="distrib">false</bool>
-    </lst>
-    <arr name="components">
-      <str>terms</str>
-    </arr>
-  </requestHandler>
-
   <!-- Highlighting Component
 
-       http://wiki.apache.org/solr/HighlightingParameters
+       https://solr.apache.org/guide/solr/latest/query-guide/highlighting.html
     -->
   <searchComponent class="solr.HighlightComponent" name="highlight">
+    <!-- note: the hl.method=unified highlighter is not configured here; it's completely configured
+    via parameters.  The below configuration supports hl.method=original and fastVector. -->
     <highlighting>
       <!-- Configure the standard fragmenter -->
       <!-- This could most likely be commented out in the "default" case -->
@@ -1190,19 +994,17 @@
     </highlighting>
   </searchComponent>
 
-  <!-- Update Processors
+  <!-- Update Request Processors
+       https://solr.apache.org/guide/solr/latest/configuration-guide/update-request-processors.html
 
-       Chains of Update Processor Factories for dealing with Update
-       Requests can be declared, and then used by name in Update
-       Request Processors
-
-       http://wiki.apache.org/solr/UpdateRequestProcessor
-
+       Chains or individual Update Request Processor Factories can be declared and referenced
+       to preprocess documents sent to Update Request Handlers.
     -->
+  <!-- XWiki: use the base update behavior instead of the one provided as example by the default solrconfig.xml -->
 
   <!-- Deduplication
 
-       An example dedup update processor that creates the "id" field
+       An example dedup update request processor chain that creates the "id" field
        on the fly based on the hash code of some other fields.  This
        example has overwriteDupes set to false since we are using the
        id field as the signatureField and Solr will maintain
@@ -1224,7 +1026,7 @@
 
   <!-- Response Writers
 
-       http://wiki.apache.org/solr/QueryResponseWriter
+       https://solr.apache.org/guide/solr/latest/query-guide/response-writers.html
 
        Request responses will be written using the writer specified by
        the 'wt' request parameter matching the name of a registered
@@ -1249,17 +1051,19 @@
      <queryResponseWriter name="schema.xml" class="solr.SchemaXmlResponseWriter"/>
     -->
 
-  <queryResponseWriter name="json" class="solr.JSONResponseWriter">
-    <!-- For the purposes of the tutorial, JSON responses are written as
-     plain text so that they are easy to read in *any* browser.
-     If you expect a MIME type of "application/json" just remove this override.
-    -->
-    <str name="content-type">text/plain; charset=UTF-8</str>
-  </queryResponseWriter>
+  <!-- Overriding the content-type of the response writer.
+       For example, Default content-type of JSON is application/json. This can be overridden to
+       text/plain so that response is easy to read in *any* browser.
+   -->
+  <!--
+     <queryResponseWriter name="json" class="solr.JSONResponseWriter">
+        <str name="content-type">text/plain; charset=UTF-8</str>
+      </queryResponseWriter>
+   -->
 
   <!-- Query Parsers
 
-       https://lucene.apache.org/solr/guide/query-syntax-and-parsing.html
+       https://solr.apache.org/guide/solr/latest/query-guide/query-syntax-and-parsers.html
 
        Multiple QParserPlugins can be registered by name, and then
        used in either the "defType" param for the QueryComponent (used
@@ -1275,7 +1079,7 @@
 
   <!-- Function Parsers
 
-       http://wiki.apache.org/solr/FunctionQuery
+       https://solr.apache.org/guide/solr/latest/query-guide/function-queries.html
 
        Multiple ValueSourceParsers can be registered by name, and then
        used as function names when using the "func" QParser.
@@ -1288,7 +1092,7 @@
 
 
   <!-- Document Transformers
-       http://wiki.apache.org/solr/DocTransformers
+       https://solr.apache.org/guide/solr/latest/query-guide/document-transformers.html
     -->
   <!--
      Could be something like:

@@ -487,7 +487,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal'], function ($, xm) {
       docname: deleteGroupModal.find('.groupName').text(),
       form_token: xm.form_token
     }).then(() =&gt; {
-      editGroupModal.data('liveDataElement').data('liveData').updateEntries();
+      $(editGroupModal.data('livedata')).data('liveData').updateEntries();
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.groups.delete.done')),
         'done'

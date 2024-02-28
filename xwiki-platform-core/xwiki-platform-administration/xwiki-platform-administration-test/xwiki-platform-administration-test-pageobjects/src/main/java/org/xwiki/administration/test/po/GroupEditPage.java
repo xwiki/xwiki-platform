@@ -20,6 +20,10 @@
 
 package org.xwiki.administration.test.po;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.livedata.test.po.LiveDataElement;
@@ -86,11 +90,33 @@ public class GroupEditPage extends InlinePage
 
     public GroupEditPage removeMembers(String... members)
     {
-        for (String ignored : members) {
-            this.membersLiveData.getTableLayout().clickAction(1, "delete");
-            waitForNotificationSuccessMessage("Done");
+
+        for (String member : members) {
+            System.out.printf("Member: %s%n", member);
+            int index = 1;
+            for (WebElement row : getMembersTable().getRows()) {
+                System.out.printf("Username [%s] at index [%d]%n", getRowUserName(row), index);
+                if (Objects.equals(getRowUserName(row), member)) {
+                    getMembersTable().clickAction(index, "delete");
+                    break;
+                }
+                index++;
+            }
         }
         return this;
+    }
+
+    private static String getRowUserName(WebElement row)
+    {
+        List<WebElement> elements =
+            row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .user-name"));
+        String rowUserName;
+        if (elements.isEmpty()) {
+            rowUserName = null;
+        } else {
+            rowUserName = elements.get(0).getText();
+        }
+        return rowUserName;
     }
 
     public void filterMembers(String member)
@@ -109,7 +135,7 @@ public class GroupEditPage extends InlinePage
 
     public TableLayoutElement getMembersTable()
     {
-        if (this.tableLayout != null) {
+        if (this.tableLayout == null) {
             this.tableLayout = this.membersLiveData.getTableLayout();
         }
         return this.tableLayout;

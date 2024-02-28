@@ -399,10 +399,10 @@ class UsersGroupsRightsManagementIT
         assertEquals(1, groupEditPage.getMembersTable().countRows());
         groupEditPage.getMembersTable().assertRow("Member", userName);
 
-        groupEditPage.getMembersTable().filterColumn("Members", "zzz");
+        groupEditPage.getMembersTable().filterColumn("Member", "zzz");
         assertEquals(0, groupEditPage.getMembersTable().countRows());
 
-        groupEditPage.getMembersTable().filterColumn("Members", groupName.substring(2));
+        groupEditPage.getMembersTable().filterColumn("Member", groupName.substring(2));
         assertEquals(1, groupEditPage.getMembersTable().countRows());
         groupEditPage.getMembersTable().assertRow("Member", userName);
     }

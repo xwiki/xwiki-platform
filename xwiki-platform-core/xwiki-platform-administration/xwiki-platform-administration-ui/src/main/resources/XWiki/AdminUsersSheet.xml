@@ -115,8 +115,7 @@
             'icon': 'lock',
             'allowProperty': 'doc.hasenable',
             'urlProperty': 'doc.enable_url'
-          },
-          { 'id': 'delete', 'allowProperty': '-' }
+          }
         ]
       }
     })
@@ -624,9 +623,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
 
   deleteUserModal.on('show.bs.modal', function() {
     var rowData = deleteUserModal.data('rowData');
-    var userReference = rowData.doc_fullName;
-    if (XWiki.currentWiki !== rowData.doc_wiki) {
-      userReference = XWiki.Model.resolve(userReference, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
+    var userReference = rowData['doc.fullName'];
+    if (XWiki.currentWiki !== rowData['doc.wiki']) {
+      userReference = XWiki.Model.resolve(userReference, XWiki.EntityType.DOCUMENT, [rowData['doc.wiki']]);
       userReference = XWiki.Model.serialize(userReference);
     }
     deleteUserModal.data('userReference', userReference);
@@ -680,7 +679,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
       newAuthor: deleteUserModal.find('#newAuthor').val(),
       form_token: xm.form_token
     }).then(() =&gt; {
-      deleteUserModal.data('liveData').deleteRow(deleteUserModal.data('rowIndex'));
+      deleteUserModal.data('liveDataElement').data('liveData').updateEntries();
       deleteUserModal.data('liveDataElement').trigger('xwiki:user:deleted', {reference: userReference});
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('xe.admin.users.delete.done')),

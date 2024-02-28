@@ -111,8 +111,7 @@
             'httpMethod': 'POST',
             'loadingMessage': 'loading',
             'successMessage': 'success',
-            'failureMessage': 'failure',
-            'confirmationMessage': 'Are you sure you want to remove this user from the group?'
+            'failureMessage': 'failure'
           }
         }
       ]

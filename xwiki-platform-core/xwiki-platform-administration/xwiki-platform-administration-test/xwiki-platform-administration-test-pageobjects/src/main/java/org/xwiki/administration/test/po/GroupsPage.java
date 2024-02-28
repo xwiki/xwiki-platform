@@ -75,7 +75,7 @@ public class GroupsPage extends BasePage
 
     public TableLayoutElement getGroupsTable()
     {
-        if (this.tableLayout != null) {
+        if (this.tableLayout == null) {
             this.tableLayout = this.groupsLiveData.getTableLayout();
         }
         return this.tableLayout;

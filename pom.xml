@@ -950,6 +950,10 @@
             <artifactId>metrics-jvm</artifactId>
           </exclusion>
           <exclusion>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-jetty-http</artifactId>
+          </exclusion>
+          <exclusion>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>*</artifactId>
           </exclusion>

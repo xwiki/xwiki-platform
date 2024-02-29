@@ -116,10 +116,14 @@ export default {
           const resource = this.sanitizeUrl(this.entry[action.urlProperty]);
 
           const options = {
-            "method": async.method
+            "method": async.httpMethod
           };
           if (async.body) {
             options.body = async.body;
+          }
+          
+          if(async.headers) {
+            options.headers = async.headers;
           }
 
           const response = await fetch(resource, options)

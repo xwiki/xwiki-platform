@@ -301,7 +301,8 @@ class LiveDataIT
                       "httpMethod": "POST",
                       "loadingMessage": "Loading",
                       "successMessage": "Delete Success",
-                      "failureMessage": "Failed"
+                      "failureMessage": "Failed",
+                      "
                     }
                   }]
               }

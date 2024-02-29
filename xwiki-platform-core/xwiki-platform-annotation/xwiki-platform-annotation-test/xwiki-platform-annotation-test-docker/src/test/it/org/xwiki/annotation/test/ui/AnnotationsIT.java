@@ -80,9 +80,9 @@ class AnnotationsIT
         setup.login(USER_NAME, USER_PASS);
     }
 
-    // TODO: This test must currently not be first. We can get back to a more natural order once XWIKI-9759 is fixed
+    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
-    @Order(3)
+    @Order(4)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
@@ -178,7 +178,7 @@ class AnnotationsIT
     }
 
     @Test
-    @Order(4)
+    @Order(3)
     void showAnnotationsByClickingOnAQuote(TestUtils setup, TestReference testReference)
     {
         // Adds 200 'a' after the content to make sure the content is not on-screen when the comment pane is visible.

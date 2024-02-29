@@ -276,7 +276,7 @@ public class CommentsTab extends BaseElement
     public void clickOnAnnotationQuote(int id)
     {
         getDriver()
-            .findElement(By.id("xwikicomment_%d".formatted(id)))
+            .findElement(By.id(String.format("xwikicomment_%d", id)))
             .findElement(By.cssSelector("blockquote.annotatedText"))
             .click();
     }

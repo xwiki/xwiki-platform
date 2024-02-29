@@ -321,6 +321,6 @@ public class AnnotatableViewPage extends BaseElement
      */
     public WebElement getAnnotationTextById(int id)
     {
-        return getDriver().findElement(By.cssSelector("span.annotation.ID%d".formatted(id)));
+        return getDriver().findElement(By.cssSelector(String.format("span.annotation.ID%d", id)));
     }
 }

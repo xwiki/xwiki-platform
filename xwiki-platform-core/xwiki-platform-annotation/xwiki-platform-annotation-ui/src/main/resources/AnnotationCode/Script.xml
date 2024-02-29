@@ -563,6 +563,7 @@ return XWiki;
       <code>// Retrieve the annotation settings from the configuration object
 const config = JSON.parse(document.getElementById('annotation-config').text);
 
+// TODO: Many messages below rely on string concatenation instead of parameters (XWIKI-21961).
 define('xwiki-annotation-messages', {
   prefix: '',
   keys: [
@@ -1317,7 +1318,9 @@ require(['xwiki-l10n!xwiki-annotation-messages'], function(l10n) {
                 onFailure: function(response) {
                   var failureReason = response.statusText || 'Server not responding';
                   // show the error message at the bottom
-                  this._x_notification = new XWiki.widgets.Notification(l10n.get('annotations.action.edit.form.loaderror') + failureReason, 'error', {timeout : 5});
+                  this._x_notification = new 
+                  XWiki.widgets.Notification(l10n.get('annotations.action.edit.form.loaderror', failureReason), 
+                    'error', {timeout: 5});
                   // load the original content of the container
                   this.fillViewPanel(container, container.originalContentHTML, id, inBubble);
                 }.bind(this),

@@ -424,6 +424,9 @@ public class AsynchronousEventStoreTest
 
 
         this.store.deleteMailEntityEvent(status11).get();
+        // Delete Mail Entity event needs a bit more checks because it's Optional so it might take a bit more time than
+        // other events: we give those few more milliseconds to avoid flickers
+        Thread.sleep(5);
 
         assertNull(this.store.events.get(event1.getId()).mailstatuses.get(status11.getEntityId()));
         assertSame(status13, this.store.events.get(event1.getId()).mailstatuses.get(status13.getEntityId()));

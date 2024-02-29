@@ -41,7 +41,7 @@
     <!-- Runtime dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-realtime-wysiwyg-ui</artifactId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>xar</type>

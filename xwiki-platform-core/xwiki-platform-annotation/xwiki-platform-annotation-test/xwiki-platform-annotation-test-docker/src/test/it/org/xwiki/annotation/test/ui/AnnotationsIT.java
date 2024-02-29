@@ -22,6 +22,7 @@ package org.xwiki.annotation.test.ui;
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -77,6 +78,7 @@ class AnnotationsIT
     }
 
     @Test
+    @Order(1)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
@@ -115,6 +117,7 @@ class AnnotationsIT
     }
 
     @Test
+    @Order(2)
     void addAndDeleteAnnotations(TestUtils setup, TestReference testReference)
     {
         AnnotatableViewPage annotatableViewPage =
@@ -157,6 +160,7 @@ class AnnotationsIT
      * are shown This test is against XAANNOTATIONS-17
      */
     @Test
+    @Order(3)
     void annotationsShouldNotBeShownInXWiki10Syntax(TestUtils setup, TestReference testReference)
     {
         AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(

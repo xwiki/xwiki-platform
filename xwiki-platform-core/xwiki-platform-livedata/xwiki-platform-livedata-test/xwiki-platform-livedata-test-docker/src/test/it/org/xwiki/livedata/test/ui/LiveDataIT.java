@@ -40,9 +40,9 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import org.xwiki.text.StringUtils;
@@ -302,7 +302,10 @@ class LiveDataIT
                       "loadingMessage": "Loading",
                       "successMessage": "Delete Success",
                       "failureMessage": "Failed",
-                      "
+                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=true",
+                      "headers": {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                      }
                     }
                   }]
               }
@@ -310,8 +313,12 @@ class LiveDataIT
             """);
         createXClass(testUtils, testReference);
         createXObjects(testUtils, testReference);
-        testUtils.gotoPage(testReference);
-        throw new RuntimeException("SNAPS");
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        assertEquals(3, tableLayout.countRows());
+        tableLayout.clickAction(1, "delete");
+        viewPage.waitForNotificationSuccessMessage("Delete Success");
+        assertEquals(2, tableLayout.countRows());
     }
 
     private void initLocalization(TestUtils testUtils, TestReference testReference) throws Exception

@@ -64,8 +64,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
     private String urlProperty;
 
     /**
-     * Async is a boolean object so that the field is not serialized when not explicitly defined. A {@code null} value
-     * is equivalent to a {@code false} value.
+     * Holds the properties required to execute the action asynchronously.
      */
     private LiveDataAsyncActionDescriptor async;
 
@@ -199,7 +198,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
     }
 
     /**
-     * @return the descriptor for handling this action asynchronously
+     * @return the properties to execute this action asynchronously
      * @since 16.2.0RC1
      */
     @Unstable
@@ -209,7 +208,7 @@ public class LiveDataActionDescriptor extends BaseDescriptor
     }
 
     /**
-     * @param async the descriptor for handling this action asynchronously
+     * @param async the properties to execute this action asynchronously
      * @since 16.2.0RC1
      */
     @Unstable

@@ -77,8 +77,9 @@ class AnnotationsIT
         setup.login(USER_NAME, USER_PASS);
     }
 
+    // TODO: This test must currently not be first. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
-    @Order(1)
+    @Order(3)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
@@ -160,7 +161,7 @@ class AnnotationsIT
      * are shown This test is against XAANNOTATIONS-17
      */
     @Test
-    @Order(3)
+    @Order(1)
     void annotationsShouldNotBeShownInXWiki10Syntax(TestUtils setup, TestReference testReference)
     {
         AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(

@@ -178,6 +178,7 @@ class AnnotationsIT
     }
 
     @Test
+    @Order(4)
     void showAnnotationsByClickingOnAQuote(TestUtils setup, TestReference testReference)
     {
         // Adds 200 'a' after the content to make sure the content is not on-screen when the comment pane is visible.

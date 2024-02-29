@@ -54,10 +54,12 @@
   #set ($displayFormType = $property.getProperty('displayFormType'))
   #set ($isCheckbox = $editing &amp;&amp; $property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
   ; {{html wiki="true"}}
-    &lt;label#if ($editing) for="${prefix}$property.name"#end&gt;
-      #if ($isCheckbox)
-        $doc.display($property.name, 'edit')
-      #end
+    #if ($isCheckbox)
+      $doc.display($property.name, 'edit', $object)
+    #end
+    ## $object is not hard typed to be an object, it's also sometimes a map, henceforth the weird looking condition on
+    ## this next line. Detailed explanations => https://github.com/xwiki/xwiki-platform/pull/2816#discussion_r1489621617
+    &lt;label#if ($editing &amp;&amp; $object!={}) for="${prefix}$property.name"#end&gt;
       $property.translatedPrettyName
     &lt;/label&gt;
     {{/html}}##
@@ -72,6 +74,8 @@
       #else
         $services.rendering.escape($!object.getProperty($property.name).value, 'xwiki/2.1')
       #end
+  #else
+    :
   #end
 #end
 )))

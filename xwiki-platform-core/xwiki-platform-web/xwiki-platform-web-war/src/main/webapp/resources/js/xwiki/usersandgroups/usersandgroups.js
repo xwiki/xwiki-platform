@@ -18,7 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /* this represent a triple state checkbox */
-
+/*!
+#set ($iconNames = ['check', 'cross'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(icons) {
+  "use strict";
 define('users-and-groups-translation-keys', {
   prefix: 'platform.core.rightsManagement.',
   keys: [
@@ -57,44 +66,44 @@ window.MSCheckbox = Class.create({
     this.state = defaultState;
     this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
     this.nrstates = this.states.length;
-    this.images = [
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')",
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')",
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"
+    this.stateClasses = [
+      "none",
+      "yes",
+      "no"
     ];
-
-    
     
     this.button = document.createElement("button");
-    this.button.className = "rights-edit";
+    this.button.className = "btn btn-default btn-xs rights-edit";
     this.button.addEventListener('click', this.createClickHandler(this));
     
-    var img = document.createElement("img");
-    
-    this.button.appendChild(img);
-    
     $(domNode).appendChild(this.button);
-    this.draw(this.state);
+    this.draw();
   },
-
-  /**
-    * @todo Draw with the current this.state, don't pass as an argument.
-    */
-  draw: function(state)
+  
+  draw: function()
   {
-    //Change display image
-    var img = this.button.firstChild;
-    img.src = this.images[state];
+    //Change the display icon
+    if(this.state === 0) {
+      this.button.innerHTML = '';
+    }
+    if(this.state === 1) {
+      this.button.innerHTML = icons.check;
+    }
+    if(this.state === 2) {
+      this.button.innerHTML = icons.cross;
+    }
+
+    this.button.classList.add(this.stateClasses[this.state]);
     
     //Update the description of the button for accessibility.
     var button = this.button;
+    var state = this.state;
     require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
       var alts = [
         l10n['undefined'],
         l10n['allowed'],
         l10n['denied']
       ];
-      img.alt = alts[state];
       button.title = alts[state];
     });
   },
@@ -105,13 +114,16 @@ window.MSCheckbox = Class.create({
 
   next: function()
   {
+    // Reinitialize class list
+    this.button.classList.remove(this.stateClasses[this.state]);
+    
     this.state = this.nextState();
     if (this.table != undefined) {
       // TODO: Just update the cache, don't invalidate the row, once the rights are as stored as an
       // array, and not as a string.
       delete this.table.fetchedRows[this.idx];
     }
-    this.draw(this.state);
+    this.draw();
   },
 
   /* Confirmation cases:
@@ -230,6 +242,7 @@ window.MSCheckbox = Class.create({
     }
   }
 });
+}).apply(']]#', $jsontool.serialize([$icons]));
 
 /**
   * user list element creator. Used in adminusers.vm.
@@ -542,22 +555,20 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     var saveURL = "$xwiki.getURL('XWiki.XWikiPreferences', 'save')";
     var config = "XWiki.XWikiPreferences";
     var objNum = "0";
-    if (saveDocumentURL != undefined && saveDocumentURL.length > 0) {
+    if (saveDocumentURL !== undefined && saveDocumentURL.length > 0) {
       saveURL = saveDocumentURL;
     }
-    if (configurationClassName != undefined && configurationClassName.length > 0) {
+    if (configurationClassName !== undefined && configurationClassName.length > 0) {
       config = configurationClassName;
     }
-    if (objectNumber != undefined) {
+    if (objectNumber !== undefined) {
       objNum = objectNumber;
     }
     var pivot = self;
-    var newAlt = "yes";
-    var newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
+    var newChecked = "checked";
     var setValue = "1";
-    if (self.getAttribute('alt') == "yes") {
-      newAlt = "no";
-      newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
+    if (self.getAttribute('checked') === "checked") {
+      newChecked = "";
       setValue = "0";
     }
     var paramMap = {};
@@ -566,8 +577,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     paramMap["parameters"]["ajax"] = "1";
     paramMap["parameters"]["comment"] = "$services.localization.render('authenticate_viewedit_savecomment')";
     paramMap["onSuccess"] = function() {
-      pivot.alt = newAlt;
-      pivot.src = newSrc;
+      pivot.setAttribute('checked',newChecked);
     }
     new Ajax.Request(saveURL, paramMap);
   };
@@ -589,7 +599,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "0"},
           onSuccess: function() {
             pivot.alt = "no";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
         }});
       } else {
         new Ajax.Request(url, {
@@ -597,7 +606,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "0"},
           onSuccess: function() {
             pivot.alt = "no";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
         }});
       }
     } else {
@@ -607,7 +615,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
           onSuccess: function() {
             pivot.alt = "yes";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
         }});
       } else {
         new Ajax.Request(url, {
@@ -615,7 +622,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
           onSuccess: function() {
             pivot.alt = "yes";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
         }});
       }
     }

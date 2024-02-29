@@ -257,30 +257,26 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
         #set ($auth_view = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
         #if ("$!auth_view" == '1')
-          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-          #set ($view_alt = 'yes')
+          #set ($view_checked = 'checked')
         #else
-          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-          #set ($view_alt = 'no')
+          #set ($view_checked = '')
         #end
         <dt>
           <label for="authenticate_view">
-            <input type="image" id="authenticate_view" alt="$view_alt" src="$view_icon" class="icon" />
+            <input type="checkbox" id="authenticate_view" $view_checked/>
             $services.localization.render('authenticate_view')
           </label>
           <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
         </dt>
         #set ($auth_edit = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
         #if ("$!auth_edit" == '1')
-          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-          #set ($edit_alt = 'yes')
+          #set ($edit_checked = 'checked')
         #else
-          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-          #set ($edit_alt = 'no')
+          #set ($edit_checked = '')
         #end
         <dt>
           <label for="authenticate_edit">
-            <input type="image" id="authenticate_edit" alt="$edit_alt" src="$edit_icon" class="icon" />
+            <input type="checkbox" id="authenticate_edit" $edit_checked/>
             $services.localization.render('authenticate_edit')
           </label>
           <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
@@ -294,16 +290,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           #set ($guest_comment_requires_captcha = $xwiki.getSpacePreferenceAsInt('guest_comment_requires_captcha', 0))
         #end
         #if($guest_comment_requires_captcha == 1)
-          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-          #set ($guest_comment_requires_captcha_alt = 'yes')
+          #set ($captcha_checked = 'checked')
         #else
-          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-          #set ($guest_comment_requires_captcha_alt = 'no')
+          #set ($captcha_checked = '')
         #end
         <dt>
           <label for="guest_comment_requires_captcha">
-            <input type="image" id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt"
-                src="$guest_comment_requires_captcha_icon" class="icon" />
+            <input type="checkbox" id="guest_comment_requires_captcha" $captcha_checked/>
             $services.localization.render('rightsmanager.guestcommentrequirescaptcha')
           </label>
         </dt>

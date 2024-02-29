@@ -265,4 +265,19 @@ public class CommentsTab extends BaseElement
         getDriver().findElement(
             By.xpath(String.format("//div[@id='xwikicomment_%d']//a[contains(@class, 'commentreply')]", id))).click();
     }
+
+    /**
+     * Click on the annotation of a given id.
+     *
+     * @param id the id of the comment
+     * @since 16.2.0RC1
+     * @since 15.10.7
+     */
+    public void clickOnAnnotationQuote(int id)
+    {
+        getDriver()
+            .findElement(By.id(String.format("xwikicomment_%d", id)))
+            .findElement(By.cssSelector("blockquote.annotatedText"))
+            .click();
+    }
 }

@@ -40,6 +40,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
@@ -107,6 +108,8 @@ class LiveDataIT
         "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
 
+    public static final String ACTIONS_COLUMN = "_actions";
+
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
      * and two XObjects, then edit the XObjects properties from the live data.
@@ -127,28 +130,15 @@ class LiveDataIT
 
         initLocalization(testUtils, testReference);
 
-        String className = testUtils.serializeReference(testReference);
-
         // Initializes the page content.
-        createClassNameLiveDataPage(testUtils, testReference);
+        List<String> properties = List.of(NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, DOC_TITLE_COLUMN);
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
 
         // Creates the XClass.
         createXClass(testUtils, testReference);
 
         // Creates corresponding XObjects.
-        DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
-        testUtils.createPage(o1, "", "O1");
-        addXObject(testUtils, o1, className,
-            NAME_LYNDA, CHOICE_A, "U1");
-        DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
-        // Make 02 not viewable by guests to test the footnotes.
-        testUtils.setRights(o2, null, "XWiki.XWikiGuest", "view", false);
-        addXObject(testUtils, o2, className,
-            NAME_ESTHER, CHOICE_B, "U2");
-        DocumentReference o3 = new DocumentReference("O3", (SpaceReference) testReference.getParent());
-        // Set a localized title on O3 to test the footnotes.
-        testUtils.createPage(o3, "", "$services.localization.render('computedTitle')");
-        addXObject(testUtils, o3, className, NAME_NIKOLAY, "", null);
+        createXObjects(testUtils, testReference);
 
         testUtils.gotoPage(testReference);
 
@@ -246,6 +236,24 @@ class LiveDataIT
         assertEquals(CHOICE_T_TRANSLATION, suggestionElements.get(0).getLabel());
     }
 
+    private void createXObjects(TestUtils testUtils, TestReference testReference)
+    {
+        String className = testUtils.serializeReference(testReference);
+        DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
+        testUtils.createPage(o1, "", "O1");
+        addXObject(testUtils, o1, className,
+            NAME_LYNDA, CHOICE_A, "U1");
+        DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
+        // Make 02 not viewable by guests to test the footnotes.
+        testUtils.setRights(o2, null, "XWiki.XWikiGuest", "view", false);
+        addXObject(testUtils, o2, className,
+            NAME_ESTHER, CHOICE_B, "U2");
+        DocumentReference o3 = new DocumentReference("O3", (SpaceReference) testReference.getParent());
+        // Set a localized title on O3 to test the footnotes.
+        testUtils.createPage(o3, "", "$services.localization.render('computedTitle')");
+        addXObject(testUtils, o3, className, NAME_NIKOLAY, "", null);
+    }
+
     /**
      * @since 12.10.9
      */
@@ -274,6 +282,35 @@ class LiveDataIT
         tableLayout.assertRow("label", "first result");
 
         assertEquals(Set.of("100", "25", "15", "50"), tableLayout.getPaginationSizes());
+    }
+
+    @Test
+    @Order(3)
+    void asyncAction(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference.getLastSpaceReference(), true);
+
+        List<String> properties = List.of(NAME_COLUMN, ACTIONS_COLUMN);
+        createClassNameLiveDataPage(testUtils, testReference, properties, """
+            {
+              "meta": {
+                "actions": [{
+                    "id": "delete",
+                    "async": {
+                      "httpMethod": "POST",
+                      "loadingMessage": "Loading",
+                      "successMessage": "Delete Success",
+                      "failureMessage": "Failed"
+                    }
+                  }]
+              }
+            }
+            """);
+        createXClass(testUtils, testReference);
+        createXObjects(testUtils, testReference);
+        testUtils.gotoPage(testReference);
+        throw new RuntimeException("SNAPS");
     }
 
     private void initLocalization(TestUtils testUtils, TestReference testReference) throws Exception
@@ -333,21 +370,19 @@ class LiveDataIT
         testUtils.addClassProperty(testReference, USER_COLUMN, "Users");
     }
 
-    private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference)
-        throws Exception
+    private static void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference,
+        List<String> properties, String body) throws Exception
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
         Page page = rest.page(testReference);
-        String properties =
-            StringUtils.joinWith(",", NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, DOC_TITLE_COLUMN);
         page.setContent("{{velocity}}\n"
             + "{{liveData\n"
             + "  id=\"test\"\n"
-            + "  properties=\"" + properties + "\"\n"
+            + "  properties=\"" + String.join(",", properties) + "\"\n"
             + "  source=\"liveTable\"\n"
             + "  sourceParameters=\"translationPrefix=&className=" + testUtils.serializeReference(
             testReference.getLocalDocumentReference()) + "\"\n"
-            + "}}{{/liveData}}\n"
+            + "}}" + body + "{{/liveData}}\n"
             + "{{/velocity}}");
         rest.save(page);
     }

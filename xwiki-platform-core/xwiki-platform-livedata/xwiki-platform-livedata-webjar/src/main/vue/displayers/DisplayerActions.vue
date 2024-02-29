@@ -120,7 +120,6 @@ export default {
           };
           if (async.body) {
             options.body = async.body;
-
           }
 
           const response = await fetch(resource, options)

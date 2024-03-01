@@ -24,21 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-filter</artifactId>
+    <artifactId>xwiki-platform-filter-test</artifactId>
     <version>16.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-filter-test</artifactId>
-  <name>XWiki Platform - Filter - Tests - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Tests for the Filter Application</description>
-  <properties>
-    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
-  <modules>
-    <module>xwiki-platform-filter-test-pageobjects</module>
-    <module>xwiki-platform-filter-test-tests</module>
-  </modules>
+  <artifactId>xwiki-platform-filter-test-pageobjects</artifactId>
+  <name>XWiki Platform - Filter - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Filter - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

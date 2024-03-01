@@ -113,6 +113,36 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
 
         xclass.addBooleanField("extensionConflictSetup", "Enable extension conflict setup", "yesno");
         xclass.addBooleanField("email_checked", "Email address verified");
+
+        // Shortcut preferences (22) added in 16.2.0-rc1
+        // Edit modes (7)
+        xclass.addTextField("shortcut_view_edit", "Shortcut for default edit mode", 30);
+        xclass.addTextField("shortcut_view_wiki", "Shortcut for wiki edit mode", 30);
+        xclass.addTextField("shortcut_view_wysiwyg", "Shortcut for wysiwyg edit mode", 30);
+        xclass.addTextField("shortcut_view_inline", "Shortcut for inline edit mode", 30);
+        xclass.addTextField("shortcut_view_rights", "Shortcut for rights edit mode", 30);
+        xclass.addTextField("shortcut_view_objects", "Shortcut for object edit mode", 30);
+        xclass.addTextField("shortcut_view_class", "Shortcut for class edit mode", 30);
+        // Extra info views (5)
+        xclass.addTextField("shortcut_view_comments", "Shortcut to view page comments", 30);
+        xclass.addTextField("shortcut_view_annotations", "Shortcut to view page annotations", 30);
+        xclass.addTextField("shortcut_view_attachments", "Shortcut to view page attachments", 30);
+        xclass.addTextField("shortcut_view_history", "Shortcut to view page history", 30);
+        xclass.addTextField("shortcut_view_information", "Shortcut to view page information", 30);
+        // Alternative views (1)
+        xclass.addTextField("shortcut_view_code", "Shortcut to view page code", 30);
+        // Page actions (2)
+        xclass.addTextField("shortcut_view_delete", "Shortcut to delete the page", 30);
+        xclass.addTextField("shortcut_view_rename", "Shortcut to rename the page", 30);
+        // Editor actions (5)
+        xclass.addTextField("shortcut_edit_preview", "Shortcut to see preview from the editor", 30);
+        xclass.addTextField("shortcut_edit_backtoedit", "Shortcut to go back to the editor from preview", 30);
+        xclass.addTextField("shortcut_edit_cancel", "Shortcut to cancel edition", 30);
+        xclass.addTextField("shortcut_edit_saveandcontinue", "Shortcut to save and continue in the editor", 30);
+        xclass.addTextField("shortcut_edit_saveandview", "Shortcut to save and view from the editor", 30);
+        // Developer shortcuts (2)
+        xclass.addTextField("shortcut_developer_usertype", "Shortcut to switch the current user type", 30);
+        xclass.addTextField("shortcut_developer_display_hidden_docs", "Shortcut to switch display of hidden documents", 30);
     }
 
     @Override

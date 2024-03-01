@@ -60,7 +60,76 @@ user.profile.network.saving=Saving...
 user.profile.network.error=Error saving the notification setting
 user.profile.status.done=Done
 user.profile.status.saving=Saving...
-user.profile.status.error=Error saving the user status</content>
+user.profile.status.error=Error saving the user status
+
+platform.core.profile.section.shortcutPreferences=Keyboard shortcut Preferences
+platform.core.profile.section.shortcutPreferences.hint=Configure what keys to press to quickly operate common actions.The preferences defined in this section override the default shortcuts used on the wiki.When leaving the value of this preference empty, the default shortcut will be used.
+platform.core.profile.section.shortcutPreferences.editModes=Edit modes
+platform.core.profile.section.shortcutPreferences.editModes.hint=Shortcuts to edit the current page with a specific editor.
+platform.core.profile.section.shortcutPreferences.viewInfos=View page informations
+platform.core.profile.section.shortcutPreferences.viewInfos.hint=Shortcuts to access additional page information or alternative view modes.
+platform.core.profile.section.shortcutPreferences.pageActions=Page actions
+platform.core.profile.section.shortcutPreferences.pageActions.hint=Shortcuts to start an action on the current page.
+platform.core.profile.section.shortcutPreferences.editorActions=Editor actions
+platform.core.profile.section.shortcutPreferences.editorActions.hint=Shortcuts accessible when editing the page.
+platform.core.profile.section.shortcutPreferences.developerShortcuts=Developer shortcuts
+platform.core.profile.section.shortcutPreferences.developerShortcuts.hint=Shortcuts for advanced actions included for developer convenience.
+
+platform.core.profile.shortcut.view.edit=Default edit mode
+platform.core.profile.shortcut.view.wiki=Wiki edit mode
+platform.core.profile.shortcut.view.wysiwyg=Wysiwyg edit mode
+platform.core.profile.shortcut.view.inline=Inline edit mode
+platform.core.profile.shortcut.view.rights=Rights edit mode
+platform.core.profile.shortcut.view.objects=Objects edit mode
+platform.core.profile.shortcut.view.class=Class edit mode
+
+platform.core.profile.shortcut.view.comments=View page comments
+platform.core.profile.shortcut.view.annotations=View page annotations
+platform.core.profile.shortcut.view.attachments=View page attachments
+platform.core.profile.shortcut.view.history=View page history
+platform.core.profile.shortcut.view.information=View page information
+platform.core.profile.shortcut.view.code=View page code
+
+platform.core.profile.shortcut.view.delete=Delete the page
+platform.core.profile.shortcut.view.rename=Rename the page
+
+platform.core.profile.shortcut.edit.preview=See preview from the editor
+platform.core.profile.shortcut.edit.backtoedit=Go back to the editor from preview
+platform.core.profile.shortcut.edit.cancel=Cancel edition
+platform.core.profile.shortcut.edit.save=Save
+platform.core.profile.shortcut.edit.saveandview=Save and view
+
+platform.core.profile.shortcut.dev.usertype=Switch the current user type
+platform.core.profile.shortcut.dev.hiddendocs=Toggle hidden documents
+
+
+XWiki.XWikiUsers_shortcut_view_edit.hint=Key to switch to the default edit mode.
+XWiki.XWikiUsers_shortcut_view_wiki.hint=Key to switch to the wiki edit mode.
+XWiki.XWikiUsers_shortcut_view_wysiwyg.hint=Key to switch to the WYSIWYG edit mode.
+XWiki.XWikiUsers_shortcut_view_inline.hint=Key to switch to the inline edit mode.
+XWiki.XWikiUsers_shortcut_view_rights.hint=Key to switch to the rights edit mode.
+XWiki.XWikiUsers_shortcut_view_objects.hint=Key to switch to the objects edit mode.
+XWiki.XWikiUsers_shortcut_view_class.hint=Key to switch to the class edit mode.
+
+XWiki.XWikiUsers_shortcut_view_comments.hint=Key to open and focus the comments tab.
+XWiki.XWikiUsers_shortcut_view_annotations.hint=Key to open and focus the annotations tab.
+XWiki.XWikiUsers_shortcut_view_attachments.hint=Key to open and focus the attachments tab.
+XWiki.XWikiUsers_shortcut_view_history.hint=Key to open and focus the history tab.
+XWiki.XWikiUsers_shortcut_view_information.hint=Key to open and focus the information tab.
+XWiki.XWikiUsers_shortcut_view_code.hint=Key to switch to the code view mode.
+
+XWiki.XWikiUsers_shortcut_view_delete.hint=Key to delete the page.
+XWiki.XWikiUsers_shortcut_view_rename.hint=Key to rename the page.
+
+XWiki.XWikiUsers_shortcut_edit_preview.hint=Key to preview the updated content.
+XWiki.XWikiUsers_shortcut_edit_backtoedit.hint=Key to go back to edit.
+XWiki.XWikiUsers_shortcut_edit_cancel.hint=Key to cancel edition.
+XWiki.XWikiUsers_shortcut_edit_saveandcontinue.hint=Key to save edits.
+XWiki.XWikiUsers_shortcut_edit_saveandview.hint=Key to save edits and go back to view mode.
+
+XWiki.XWikiUsers_shortcut_developer_usertype.hint=Key to switch the user type.
+XWiki.XWikiUsers_shortcut_developer_display_hidden_docs.hint=Key to toggle display of hidden pages.
+</content>
   <object>
     <name>XWiki.UserProfileTranslations</name>
     <number>0</number>

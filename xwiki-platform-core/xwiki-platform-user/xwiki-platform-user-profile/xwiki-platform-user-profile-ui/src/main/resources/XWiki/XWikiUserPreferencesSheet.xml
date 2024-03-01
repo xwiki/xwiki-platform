@@ -247,6 +247,29 @@
   #end
 #end
 ###############################
+##   DISPLAY TEXT FIELD
+###############################
+#macro (displayTextField $fieldName $defaultValue)
+  #set ($value = $doc.getValue($fieldName, $obj))
+  #set ($prop = $xclass.get($fieldName))
+  #set ($defaultValueHint = "($escapetool.xml($services.localization.render('userprofile.default')))")
+  #if ($isEdit)
+    #set ($escapedId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
+    &lt;input type="text" name="$escapedId" id="$escapedId"
+      #if ($services.localization.get("XWiki.XWikiUsers_${fieldName}.hint"))
+        #set ($escapedHintId = $escapedSelectId + "_hint")
+        aria-describedby="$escapedHintId"
+      #end
+      #if ($value)
+        value="$value"
+      #elseif ($defaultValue)
+        value="$defaultValue"
+      #end&gt;
+  #else
+    &lt;span&gt;$!value&lt;/span&gt;
+  #end
+#end
+###############################
 ##      DISPLAY FIELD
 ###############################
 #macro (displayField $fieldName $label $defaultValue)
@@ -262,6 +285,8 @@
   &lt;dd data-user-property="$!escapetool.xml($fieldName)"&gt;
     #if ($fieldName == 'timezone' &amp;&amp; !$xwiki.jodatime)
       #unwrapXPropertyDisplay($doc.display('timezone'))
+    #elseif ($fieldName.indexOf('_') &gt; -1 &amp;&amp; $fieldName.substring(0,$fieldName.indexOf('_')) == 'shortcut')
+        #displayTextField($fieldName, $defaultValue)
     #else
       #displaySelectField($fieldName, $defaultValue)
     #end
@@ -318,7 +343,9 @@
         #displayField('extensionConflictSetup', 'platform.core.profile.extensionConflictSetup', $defaultValue)
       &lt;/dl&gt;
       &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences'))&lt;/h2&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.hint'))&lt;/span&gt;
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editModes'))&lt;/h3&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editModes.hint'))&lt;/span&gt;
       &lt;dl&gt;
         #displayField('shortcut_view_edit', 'platform.core.profile.shortcut.view.edit', $!xwiki.getXWikiPreference('shortcut_view_edit'))
         #displayField('shortcut_view_wiki', 'platform.core.profile.shortcut.view.wiki', $!xwiki.getXWikiPreference('shortcut_view_wiki'))
@@ -329,6 +356,7 @@
         #displayField('shortcut_view_class', 'platform.core.profile.shortcut.view.class', $!xwiki.getXWikiPreference('shortcut_view_class'))
       &lt;/dl&gt;
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.viewInfos'))&lt;/h3&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.viewInfos.hint'))&lt;/span&gt;
       &lt;dl&gt;
         #displayField('shortcut_view_comments', 'platform.core.profile.shortcut.view.comments', $!xwiki.getXWikiPreference('shortcut_view_comments'))
         #displayField('shortcut_view_annotations', 'platform.core.profile.shortcut.view.annotations', $!xwiki.getXWikiPreference('shortcut_view_annotations'))
@@ -338,19 +366,22 @@
         #displayField('shortcut_view_code', 'platform.core.profile.shortcut.view.code', $!xwiki.getXWikiPreference('shortcut_view_code'))
       &lt;/dl&gt;
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.pageActions'))&lt;/h3&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.pageActions.hint'))&lt;/span&gt;
       &lt;dl&gt;
         #displayField('shortcut_view_delete', 'platform.core.profile.shortcut.view.delete', $!xwiki.getXWikiPreference('shortcut_view_delete'))
         #displayField('shortcut_view_rename', 'platform.core.profile.shortcut.view.rename', $!xwiki.getXWikiPreference('shortcut_view_rename'))
       &lt;/dl&gt;
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editorActions'))&lt;/h3&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.editorActions.shortcutPreferences.hint'))&lt;/span&gt;
       &lt;dl&gt;
         #displayField('shortcut_edit_preview', 'platform.core.profile.shortcut.edit.preview', $!xwiki.getXWikiPreference('shortcut_edit_preview'))
         #displayField('shortcut_edit_backtoedit', 'platform.core.profile.shortcut.edit.backtoedit', $!xwiki.getXWikiPreference('shortcut_edit_backtoedit'))
         #displayField('shortcut_edit_cancel', 'platform.core.profile.shortcut.edit.cancel', $!xwiki.getXWikiPreference('shortcut_edit_cancel'))
-        #displayField('shortcut_edit_save', 'platform.core.profile.shortcut.edit.save', $!xwiki.getXWikiPreference('shortcut_edit_save'))
+        #displayField('shortcut_edit_saveandcontinue', 'platform.core.profile.shortcut.edit.save', $!xwiki.getXWikiPreference('shortcut_edit_saveandcontinue'))
         #displayField('shortcut_edit_saveandview', 'platform.core.profile.shortcut.edit.saveandview', $!xwiki.getXWikiPreference('shortcut_edit_saveandview'))
       &lt;/dl&gt;
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.developerShortcuts'))&lt;/h3&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.developerShortcuts.hint'))&lt;/span&gt;
       &lt;dl&gt;
         #displayField('shortcut_developer_usertype', 'platform.core.profile.shortcut.dev.usertype', $!xwiki.getXWikiPreference('shortcut_developer_usertype'))
         #displayField('shortcut_developer_display_hidden_docs', 'platform.core.profile.shortcut.dev.hiddendocs', $!xwiki.getXWikiPreference('shortcut_developer_display_hidden_docs'))

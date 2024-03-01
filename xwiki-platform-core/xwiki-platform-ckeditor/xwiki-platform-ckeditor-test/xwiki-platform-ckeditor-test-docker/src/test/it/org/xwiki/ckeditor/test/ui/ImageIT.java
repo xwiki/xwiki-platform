@@ -27,7 +27,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.openqa.selenium.By;
@@ -784,13 +783,6 @@ class ImageIT extends AbstractCKEditorIT
 
         // Verify that the content matches what we did using CKEditor.
         assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
-    }
-
-    @RepeatedTest(10)
-    void blank(TestUtils testUtils, TestReference testReference)
-    {
-        testUtils.gotoPage(testReference);
-        testUtils.getDriver().get("about:blank");
     }
 
     private ViewPage uploadAttachment(TestUtils setup, EntityReference entityReference, String attachmentName)

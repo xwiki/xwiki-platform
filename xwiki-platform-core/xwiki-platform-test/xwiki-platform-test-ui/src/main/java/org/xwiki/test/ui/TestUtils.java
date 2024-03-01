@@ -2908,15 +2908,34 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams) throws Exception
+        {
+            return get(reference, queryParams, true);
+        }
+
+        /**
          * Return object model of the passed reference or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(EntityReference reference, boolean failIfNotFound) throws Exception
         {
+            return get(reference, Map.of(), failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams, boolean failIfNotFound)
+            throws Exception
+        {
             Class<?> resource = getResourceAPI(reference);
 
-            return get(resource, reference, failIfNotFound);
+            return get(resource, queryParams, reference, failIfNotFound);
         }
 
         /**
@@ -2944,13 +2963,32 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference) throws Exception
+        {
+            return get(resourceURI, queryParams, reference, true);
+        }
+
+        /**
          * Return object model of the passed reference with the passed resource URI or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(Object resourceURI, EntityReference reference, boolean failIfNotFound) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, reference), false,
+            return get(resourceURI, Map.of(), reference, failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference,
+            boolean failIfNotFound) throws Exception
+        {
+            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
                 failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
 
             if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
@@ -3030,6 +3068,16 @@ public class TestUtils
         public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, toElements(reference));
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public GetMethod executeGet(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
+            throws Exception
+        {
+            return executeGet(resourceURI, queryParams, toElements(reference));
         }
 
         public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception

@@ -36,6 +36,12 @@ public class PreferencesEditPage extends EditPage
     @FindBy(id = "XWiki.XWikiUsers_0_timezone")
     private WebElement timezone;
 
+    @FindBy(id = "XWiki.XWikiUsers_0_shortcut_view_edit")
+    private WebElement shortcutViewEdit;
+
+    @FindBy(id = "XWiki.XWikiUsers_0_shortcut_view_information")
+    private WebElement shortcutInformation;
+
     public void setSimpleUserType()
     {
         Select select = new Select(this.userType);
@@ -80,5 +86,17 @@ public class PreferencesEditPage extends EditPage
         getDriver().scrollTo(this.timezone);
         this.timezone.clear();
         this.timezone.sendKeys(value);
+    }
+
+    public void setShortcutViewEdit(String shortcutValue)
+    {
+        this.shortcutViewEdit.clear();
+        this.shortcutViewEdit.sendKeys(shortcutValue);
+    }
+
+    public void setShortcutInformation(String shortcutValue)
+    {
+        this.shortcutInformation.clear();
+        this.shortcutInformation.sendKeys(shortcutValue);
     }
 }

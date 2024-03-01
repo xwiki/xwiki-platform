@@ -163,7 +163,6 @@
           #end
         #end
         document.observe("dom:loaded", extraInit, false);
-        //# sourceURL=docextra
       </script>
     </div> ## xwikidatacontents
   #end

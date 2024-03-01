@@ -42,6 +42,9 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[3]/dd[1]")
     private WebElement defaultEditorToUse;
 
+    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[5]/dd[1]")
+    private WebElement viewEditShortcut;
+
     @FindBy(xpath = "//a[@id='changePassword']")
     private WebElement changePassword;
 
@@ -64,6 +67,11 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
     public String getTimezone()
     {
         return this.timezone.getText();
+    }
+
+    public String getViewEditShortcut()
+    {
+        return this.viewEditShortcut.getText();
     }
 
     public PreferencesEditPage editPreferences()

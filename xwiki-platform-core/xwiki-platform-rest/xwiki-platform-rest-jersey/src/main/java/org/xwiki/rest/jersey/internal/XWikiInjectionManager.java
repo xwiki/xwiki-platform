@@ -129,21 +129,24 @@ public class XWikiInjectionManager implements InjectionManager, Initializable
     private void injectJAXRS(Object component)
     {
         // Inject the various JAX-RS context fields
-        // TODO: find a way to reuse Jersey binders instead of reinventing the wheel
+        // TODO: find a way to fully reuse Jersey binders instead of reinventing the wheel
         for (Field field : FieldUtils.getFieldsListWithAnnotation(component.getClass(), Context.class)) {
             try {
+                Object value;
                 if (CONTEXT_REQUEST.contains(field.getType())) {
-                    FieldUtils.writeField(field, component, getRequestProcessingContext().request(), true);
+                    value = getRequestProcessingContext().request();
                 } else if (CONTEXT_ROUTING.contains(field.getType())) {
-                    FieldUtils.writeField(field, component, getRequestProcessingContext().routingContext(), true);
+                    value = getRequestProcessingContext().routingContext();
                 } else if (CONTEXT_ASYNC.contains(field.getType())) {
-                    FieldUtils.writeField(field, component, getRequestProcessingContext().asyncContext(), true);
+                    value = getRequestProcessingContext().asyncContext();
                 } else if (CONTEXT_SECURITY.contains(field.getType())) {
-                    FieldUtils.writeField(field, component, getContainerRequestContext().getSecurityContext(), true);
+                    value = getContainerRequestContext().getSecurityContext();
                 } else {
-                    this.logger.warn("Unsupported JAX-RS Context injection for type [{}] on class [{}]",
-                        field.getType(), component.getClass());
+                    // Fallback on regular CDI components
+                    value = this.injectionManager.getInstance(field.getType());
                 }
+
+                FieldUtils.writeField(field, component, value, true);
             } catch (IllegalAccessException e) {
                 this.logger.error("Failed to inject JAX-RS fields in component [{}]", component.getClass(), e);
             }

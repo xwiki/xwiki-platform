@@ -71,6 +71,7 @@
     <module>xwiki-platform-distribution-flavor-test-upgrade-1410</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1310</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1210</module>
+    <module>xwiki-platform-distribution-flavor-test-upgrade-1210-custom</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1110</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1011</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-911</module>

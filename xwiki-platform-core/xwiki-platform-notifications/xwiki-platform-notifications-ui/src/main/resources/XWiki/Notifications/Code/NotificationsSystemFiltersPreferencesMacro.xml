@@ -590,7 +590,7 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
-&lt;div class="systemFilterPreferences xform" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
+&lt;div class="systemFilterPreferences xform" data-target="$escapetool.xml($wikimacro.parameters.target)" $!divData&gt;
   &lt;div class="row"&gt;
     &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.system.hint'))

@@ -408,8 +408,10 @@ public class XWikiDockerExtension extends AbstractExtension
             testConfiguration.getServletEngine().getInternalPort()));
 
         // Setup the wcag validation context.
-        testContext.getUtil().getWCAGUtils().setupWCAGValidation(testConfiguration.isWCAG(),
-            extensionContext.getTestClass().get().getName());
+        testContext.getUtil().getWCAGUtils().setupWCAGValidation(
+            testConfiguration.isWCAG(),
+            extensionContext.getTestClass().get().getName(),
+            testConfiguration.shouldWCAGStopOnError());
 
 
         // - the one used by RestTestUtils, i.e. outside of any container

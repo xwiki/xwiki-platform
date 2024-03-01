@@ -65,6 +65,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -87,6 +88,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
@@ -2486,82 +2488,61 @@ public class TestUtils
             RestTestUtils.urlPrefix = newURLPrefix;
         }
 
-        private String toSpaceElement(Iterable<?> spaces)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            for (Object space : spaces) {
-                if (builder.length() > 0) {
-                    builder.append("/spaces/");
-                }
-
-                if (space instanceof EntityReference) {
-                    builder.append(((EntityReference) space).getName());
-                } else {
-                    builder.append(space.toString());
-                }
-            }
-
-            return builder.toString();
-        }
-
-        private String toSpaceElement(String spaceReference)
-        {
-            return toSpaceElement(
-                relativeReferenceResolver.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
-        }
-
         protected Object[] toElements(Page page)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
-            if (page.getWiki() != null) {
-                elements.add(page.getWiki());
-            } else {
-                elements.add(this.testUtils.getCurrentWiki());
-            }
-
-            // Add spaces
-            elements.add(toSpaceElement(page.getSpace()));
-
-            // Add name
-            elements.add(page.getName());
-
-            // Add translation
+            // Get locale
+            Locale locale;
             if (StringUtils.isNotEmpty(page.getLanguage())) {
-                elements.add(page.getLanguage());
+                locale = LocaleUtils.toLocale(page.getLanguage());
+            } else {
+                locale = null;
             }
 
-            return elements.toArray();
+            // Wiki
+            WikiReference wikiReference;
+            if (page.getWiki() != null) {
+                wikiReference = new WikiReference(page.getWiki());
+            } else {
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
+            }
+
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(page.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
+
+            // Document
+            DocumentReference documentReference = new DocumentReference(page.getName(), spaceReference, locale);
+
+            return toElements(documentReference);
         }
 
         public Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
+            // Wiki
+            WikiReference wikiReference;
             if (obj.getWiki() != null) {
-                elements.add(obj.getWiki());
+                wikiReference = new WikiReference(obj.getWiki());
             } else {
-                elements.add(this.testUtils.getCurrentWiki());
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
             }
 
-            // Add spaces
-            elements.add(toSpaceElement(obj.getSpace()));
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(obj.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
 
-            // Add name
-            elements.add(obj.getPageName());
+            // Document
+            DocumentReference documentReference = new DocumentReference(obj.getPageName(), spaceReference);
 
-            if (!onlyDocument) {
-                // Add class
-                elements.add(obj.getClassName());
-
-                // Add number
-                elements.add(obj.getNumber());
+            // Object
+            EntityReference finalReference;
+            if (onlyDocument) {
+                finalReference = documentReference;
+            } else {
+                String objectName = obj.getClassName() + '[' + obj.getNumber() + ']';
+                finalReference = new ObjectReference(objectName, documentReference);
             }
 
-            return elements.toArray();
+            return toElements(finalReference);
         }
 
         public Object[] toElements(EntityReference reference)

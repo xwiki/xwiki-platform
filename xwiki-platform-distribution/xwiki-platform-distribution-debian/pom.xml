@@ -63,7 +63,8 @@
     <debian.homepage>http://www.xwiki.org</debian.homepage>
     <debian.controlDir>${project.build.directory}/maven-deb-control-directory</debian.controlDir>
 
-    <xwikiDataDir>/var/lib/xwiki/data</xwikiDataDir>
+    <debian.xwiki.var>/var/lib/xwiki</debian.xwiki.var>
+    <xwikiDataDir>${debian.xwiki.var}/data</xwikiDataDir>
   </properties>
   <dependencies>
     <dependency>

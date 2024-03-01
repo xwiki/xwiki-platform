@@ -36,7 +36,9 @@
     <div class="rating-header $cssclass">$ratinglabel</div>
     <div class="rating-stars">
         <ul class="star-rating ${cssclass}-star #if($locked) locked #end">
-            <li class="current-rating" style="width:${width}%;"></li>
+            <li class="current-rating">
+                <meter class="average-rating" min="0" max="5" value="$rating"/>
+            </li>
             #set($cls = ["one-star", "two-stars", "three-stars", "four-stars", "five-stars"])
             #foreach($r in [1..5])
                 #set($i = $r - 1)

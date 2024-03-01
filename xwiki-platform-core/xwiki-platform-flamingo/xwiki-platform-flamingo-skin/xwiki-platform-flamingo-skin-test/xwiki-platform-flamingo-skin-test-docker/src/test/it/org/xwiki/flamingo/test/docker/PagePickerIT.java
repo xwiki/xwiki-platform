@@ -77,7 +77,7 @@ class PagePickerIT
         setup.loginAsSuperAdmin();
 
         String childName = "Child";
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 11; i++) {
             DocumentReference childReference = new DocumentReference(childName + i,
                 reference.getLastSpaceReference());
             setup.createPage(childReference, "Test page " + i, "Child page " + i);

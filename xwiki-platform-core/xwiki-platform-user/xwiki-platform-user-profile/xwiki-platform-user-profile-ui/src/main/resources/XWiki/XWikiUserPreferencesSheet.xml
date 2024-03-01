@@ -255,7 +255,7 @@
   #set ($defaultValueHint = "($escapetool.xml($services.localization.render('userprofile.default')))")
   #if ($isEdit)
     #set ($escapedId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
-    &lt;input type="text" name="$escapedId" id="$escapedId"
+    &lt;input type="text" name="$escapedId" id="$escapedId" size="30"
       #if ($services.localization.get("XWiki.XWikiUsers_${fieldName}.hint"))
         #set ($escapedHintId = $escapedSelectId + "_hint")
         aria-describedby="$escapedHintId"

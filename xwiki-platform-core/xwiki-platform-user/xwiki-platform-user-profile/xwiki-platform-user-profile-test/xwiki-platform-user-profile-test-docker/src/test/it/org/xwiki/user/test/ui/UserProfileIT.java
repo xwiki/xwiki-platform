@@ -99,7 +99,7 @@ class UserProfileIT
 
     private static final String TEXT_EDITOR = "Text";
 
-    private static final String NEW_SHORTCUT_VALUE = "p";
+    private static final String NEW_SHORTCUT_VALUE = "B";
 
     private static final String DEFAULT_EDITOR = "Text (Default)";
 
@@ -262,9 +262,8 @@ class UserProfileIT
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
-
-        // Overriding the default shortcut value (E)
         PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
+        // Overriding the default shortcut value (E)
         preferencesEditPage.setShortcutViewEdit(NEW_SHORTCUT_VALUE);
         preferencesEditPage.clickSaveAndView();
 
@@ -397,13 +396,13 @@ class UserProfileIT
         preferencesEditPage.setShortcutInformation(NEW_SHORTCUT_VALUE);
         preferencesEditPage.clickSaveAndView();
 
-        ViewPage viewPage = setup.gotoPage(testReference);
+        ViewPage viewPage = setup.createPage(testReference, "one **two** three", "");
         InformationPane infoPane = viewPage.openInformationDocExtraPane();
         CommentsTab commentsPane = viewPage.openCommentsDocExtraPane();
         assertTrue(commentsPane.isOpened());
         assertFalse(infoPane.isOpened());
         // We try using the default shortcut. We expect it to not work, that is, to still have the commentsTab opened.
-        viewPage.useShortcutKeyForInformationPane();
+        setup.getDriver().createActions().sendKeys("i").perform();
         assertTrue(commentsPane.isOpened());
         assertFalse(infoPane.isOpened());
         // We now use the user preference defined shortcut to open it instead.

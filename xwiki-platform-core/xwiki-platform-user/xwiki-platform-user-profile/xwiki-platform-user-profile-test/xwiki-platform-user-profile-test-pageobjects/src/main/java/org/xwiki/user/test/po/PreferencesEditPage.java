@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -88,15 +89,23 @@ public class PreferencesEditPage extends EditPage
         this.timezone.sendKeys(value);
     }
 
+    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     public void setShortcutViewEdit(String shortcutValue)
     {
+        getDriver().scrollTo(this.shortcutViewEdit);
         this.shortcutViewEdit.clear();
         this.shortcutViewEdit.sendKeys(shortcutValue);
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_edit"),
+                "value");
     }
 
+    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     public void setShortcutInformation(String shortcutValue)
     {
+        getDriver().scrollTo(this.shortcutInformation);
         this.shortcutInformation.clear();
         this.shortcutInformation.sendKeys(shortcutValue);
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_information"),
+            "value");
     }
 }

@@ -69,7 +69,8 @@ public class CKEditorToolBar extends BaseElement
 
     protected WebElement findContainer(CKEditor editor)
     {
-        return getDriver().findElementWithoutWaiting(editor.getContainer(), By.className("cke_top"));
+        return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].ui.space('top').$;",
+            editor.getName());
     }
 
     /**

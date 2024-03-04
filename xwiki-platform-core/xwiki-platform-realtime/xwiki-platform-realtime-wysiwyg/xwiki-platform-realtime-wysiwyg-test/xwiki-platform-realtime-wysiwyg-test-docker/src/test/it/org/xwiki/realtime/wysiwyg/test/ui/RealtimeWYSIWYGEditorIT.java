@@ -35,6 +35,7 @@ import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
 import org.xwiki.model.reference.DocumentReference;
@@ -131,15 +132,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Edit again and verify the Save and View button.
         viewPage.edit();
-        editPage = new RealtimeWYSIWYGEditPage();
-        editPage.getContenEditor().getRichTextArea().sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "three");
-        viewPage = editPage.clickSaveAndView();
+        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        new RealtimeCKEditor().getRichTextArea().sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "three");
+        viewPage = inplaceEditablePage.saveAndView();
         assertEquals("one\ntwo\nthree", viewPage.getContent());
 
         // Edit again to verify the autosave.
         viewPage.edit();
-        editPage = new RealtimeWYSIWYGEditPage();
-        textArea = editPage.getContenEditor().getRichTextArea();
+        inplaceEditablePage = new InplaceEditablePage();
+        editor = new RealtimeCKEditor();
+        textArea = editor.getRichTextArea();
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
         textArea.sendKeys("zero");
 
@@ -147,7 +149,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String saveStatus = editor.getToolBar().waitForAutoSave();
         assertTrue(saveStatus.startsWith("Saved:"), "Unexpected save status: " + saveStatus);
 
-        viewPage = editPage.clickCancel();
+        viewPage = inplaceEditablePage.cancel();
         assertEquals("zero\ntwo\nthree", viewPage.getContent());
     }
 
@@ -560,12 +562,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // (the caret container is modified directly leading to a change in the number of child nodes which requires an
         // update of the DOM range that specifies the caret position). When the selection is restored the caret is
         // placed back in the underline style, at the end (because the selection is saved and restored relative to the
-        // text found before the caret). In order to avoid this flacky behavior we first type the text, then select it
+        // text found before the caret). In order to avoid this flacky behavior we first type some text, then select it
         // and finally remove the underline style.
-        secondTextArea.sendKeys(" end");
-        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
+        secondTextArea.sendKeys(" ");
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_LEFT));
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "u"));
+        secondTextArea.sendKeys(Keys.ARROW_RIGHT, "end");
 
         //
         // First Tab
@@ -715,6 +717,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(firstTabHandle);
+        // Wait for the content to be synchronized before applying the macro parameter changes, otherwise we might
+        // overwrite the text typed in the second tab.
+        firstTextArea.waitUntilTextContains("two");
         firstMacroEditModal.clickSubmit();
 
         // The content is reloaded when a macro is updated.

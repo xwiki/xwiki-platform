@@ -695,6 +695,8 @@ define('editInPlace', [
     viewContent.trigger('xwiki:actions:view', {document: xwikiDocument});
     $('#document-title h1').html(xwikiDocument.renderedTitle);
     viewContent.html(xwikiDocument.renderedContent);
+    // Reset the editor to let others know that we're no editing anymore.
+    XWiki.editor = '';
     if (!reload) {
       // If the user has canceled the edit then the restored page content may include the section edit links. Show them
       // in case they were hidden.
@@ -717,6 +719,8 @@ define('editInPlace', [
     // for editing the document content in place and one for editing the document syntax in-place) and we don't want
     // them to interfere (e.g. canceling one form shouldn't cancel the other forms).
     $('#xwikicontent').closest('.xcontent').addClass('form');
+    // Let others know which editor is used for the page content.
+    XWiki.editor = config.editMode;
     return initActionButtons(xwikiDocument).then(initTitleEditor).then(initContentEditor)
       .then(startRealTimeEditingSession);
   };
@@ -957,6 +961,8 @@ define('editInPlace', [
       viewContent.focus();
     }
     var data = $.extend({}, config, {
+      // Use the same name as for the standalone editor, in order to be consistent.
+      editorName: 'content',
       document: xwikiDocument,
       // The content editor is loaded on demand, asynchronously.
       deferred: $.Deferred()

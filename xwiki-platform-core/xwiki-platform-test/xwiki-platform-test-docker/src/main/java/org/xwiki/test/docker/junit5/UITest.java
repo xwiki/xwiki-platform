@@ -125,6 +125,12 @@ public @interface UITest
     boolean wcag() default false;
 
     /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    boolean wcagStopOnError() default true;
+
+    /**
      * @return the list of configuration properties to use when generating the XWiki configuration files such as
      *         {@code xwiki.properties} with Velocity (check {@code xwiki.properties.vm} to find the list of supported
      *         properties)

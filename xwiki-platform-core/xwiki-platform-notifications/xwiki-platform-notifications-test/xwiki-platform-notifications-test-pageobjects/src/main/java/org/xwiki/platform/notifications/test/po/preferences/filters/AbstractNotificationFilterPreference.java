@@ -40,6 +40,8 @@ import static org.xwiki.test.ui.po.BootstrapSwitch.State.ON;
  */
 public abstract class AbstractNotificationFilterPreference
 {
+    private final XWikiWebDriver webDriver;
+
     private AbstractNotificationsSettingsPage parentPage;
 
     private WebElement row;
@@ -68,6 +70,7 @@ public abstract class AbstractNotificationFilterPreference
         for (WebElement format : formatElements) {
             this.formats.add(format.getText());
         }
+        this.webDriver = webDriver;
         this.enabledSwitch = new BootstrapSwitch(getBootstrapSwitchElement(row), webDriver);
     }
 
@@ -93,6 +96,7 @@ public abstract class AbstractNotificationFilterPreference
      */
     private WebElement getBootstrapSwitchElement(WebElement row)
     {
+        this.webDriver.waitUntilElementIsVisible(row, By.cssSelector(".displayer-toggle .bootstrap-switch"));
         return row.findElement(By.className("displayer-toggle")).findElement(By.className("bootstrap-switch"));
     }
 

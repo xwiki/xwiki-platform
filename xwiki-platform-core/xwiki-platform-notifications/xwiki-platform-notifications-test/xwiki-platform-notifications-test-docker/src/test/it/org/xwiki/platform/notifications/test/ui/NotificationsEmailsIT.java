@@ -83,19 +83,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class NotificationsEmailsIT
 {
     private static final String FIRST_USER_NAME = NotificationsEmailsIT.class.getSimpleName() + "user1";
+
     private static final String SECOND_USER_NAME = NotificationsEmailsIT.class.getSimpleName() + "user2";
 
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
+
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
 
     private static final String SYSTEM = "org.xwiki.platform";
 
     private static final String NOTIFICATIONS_EMAIL_TEST = "NotificationsEmailTest";
+
     private static final String EMAIL_FORMAT = "email";
+
     private static final String ALERT_FORMAT = "alert";
+
     private static final String CREATE = "create";
 
     public static final String USER_EMAIL = "test@xwiki.org";
+
     public static final String ADMIN_EMAIL = "admin@xwiki.org";
 
     private GreenMail mail;
@@ -131,8 +137,8 @@ public class NotificationsEmailsIT
         testUtils.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "server", "externaldomain",
             "port", "4242", "secure", "1");
 
-        mail = new GreenMail(ServerSetupTest.SMTP);
-        mail.start();
+        this.mail = new GreenMail(ServerSetupTest.SMTP);
+        this.mail.start();
     }
 
     @AfterAll
@@ -140,11 +146,11 @@ public class NotificationsEmailsIT
     {
         testUtils.deletePage("XWiki", FIRST_USER_NAME);
         testUtils.deletePage("XWiki", SECOND_USER_NAME);
-        mail.stop();
+        this.mail.stop();
     }
 
     @Test
-    public void notificationsEmails(TestUtils testUtils) throws Exception
+    void notificationsEmails(TestUtils testUtils) throws Exception
     {
         testUtils.login(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         NotificationsUserProfilePage p;
@@ -178,10 +184,10 @@ public class NotificationsEmailsIT
         schedulerHomePage.clickJobActionTrigger("Notifications daily email");
 
         // Wait 30s instead of the default 5s to make sure the mail has enough time to arrive, even if the CI is slow.
-        assertTrue(mail.waitForIncomingEmail(30000L, 1), "Timeout reached for getting notification email.");
+        assertTrue(this.mail.waitForIncomingEmail(30000L, 1), "Timeout reached for getting notification email.");
 
-        assertEquals(1, mail.getReceivedMessages().length);
-        MimeMessage message = mail.getReceivedMessages()[0];
+        assertEquals(1, this.mail.getReceivedMessages().length);
+        MimeMessage message = this.mail.getReceivedMessages()[0];
 
         // Convert to org.simplejavamail.email because it is more simple to read
         Email email = EmailConverter.mimeMessageToEmail(message);
@@ -221,7 +227,7 @@ public class NotificationsEmailsIT
 
         Pattern pattern = Pattern.compile(expectedContent, Pattern.COMMENTS);
         assertTrue(pattern.matcher(htmlTextContent).find(), String.format("Email is supposed to contain: [\n%s\n], "
-                + "but all we have is [\n%s\n].", expectedContent, htmlTextContent));
+            + "but all we have is [\n%s\n].", expectedContent, htmlTextContent));
 
         expectedContent = IOUtils.toString(getClass().getResourceAsStream("/expectedHtmlMail2.txt"),
             StandardCharsets.UTF_8);
@@ -238,7 +244,8 @@ public class NotificationsEmailsIT
         testUtils.rest().delete(page2);
     }
 
-    private String prepareMail(String email) {
+    private String prepareMail(String email)
+    {
         StringBuilder stringBuilder = new StringBuilder();
         // Some part of the email is unique (dates), so we remove them before comparing emails
         Scanner scanner = new Scanner(email);

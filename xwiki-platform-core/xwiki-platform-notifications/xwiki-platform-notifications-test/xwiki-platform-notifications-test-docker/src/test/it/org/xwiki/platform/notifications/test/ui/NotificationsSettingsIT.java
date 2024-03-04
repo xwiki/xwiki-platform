@@ -243,8 +243,7 @@ class NotificationsSettingsIT
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
 
         try {
-            NotificationsUserProfilePage notificationsUserProfilePage =
-                NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
 
             // Create a page
             testUtils.createPage(testReference.getLastSpaceReference().getName(), testReference.getName(), "", "");
@@ -257,17 +256,18 @@ class NotificationsSettingsIT
             assertFalse(trayPage.isWikiWatched());
 
             // Go back to the preferences to ensure the filter has been created
-            notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            NotificationsUserProfilePage notificationsUserProfilePage =
+                NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             List<CustomNotificationFilterPreference> preferences =
-                    notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+                notificationsUserProfilePage.getCustomNotificationFilterPreferences();
             assertEquals(1, preferences.size());
 
             // Filter 0
             assertTrue(preferences.get(0).getFilterName().contains("Page only"));
             assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome",
-                    preferences.get(0).getLocation());
+                preferences.get(0).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT,
-                    preferences.get(0).getFilterAction());
+                preferences.get(0).getFilterAction());
             assertTrue(preferences.get(0).getEventTypes().isEmpty());
             assertTrue(preferences.get(0).getFormats().containsAll(List.of("Email", "Alert")));
             assertTrue(preferences.get(0).isEnabled());
@@ -724,7 +724,7 @@ class NotificationsSettingsIT
 
     @Test
     @Order(6)
-    void watchAndRename(TestUtils testUtils, TestReference testReference) throws Exception
+    void watchAndRename(TestUtils testUtils, TestReference testReference)
     {
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         ViewPage viewPage = testUtils.createPage(testReference, "Content", "Title");
@@ -735,12 +735,12 @@ class NotificationsSettingsIT
         RenamePage renamePage = viewPage.rename();
         renamePage.getDocumentPicker().setTitle(testReference.getName() + "Renamed");
         CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton().waitUntilFinished();
-        viewPage = statusPage.gotoNewPage();
+        statusPage.gotoNewPage();
         notificationsTrayPage = new NotificationsTrayPage();
         notificationsTrayPage.showNotificationTray();
         assertTrue(notificationsTrayPage.isPageOnlyWatched());
 
-        viewPage = testUtils.gotoPage(testReference);;
+        testUtils.gotoPage(testReference);
         notificationsTrayPage = new NotificationsTrayPage();
         notificationsTrayPage.showNotificationTray();
         assertFalse(notificationsTrayPage.isPageOnlyWatched());

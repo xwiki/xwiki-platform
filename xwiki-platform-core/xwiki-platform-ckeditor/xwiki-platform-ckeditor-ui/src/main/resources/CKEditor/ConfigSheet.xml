@@ -218,15 +218,19 @@ require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPr
   var commaSeparator = /\s*,\s*/;
   var enhanceConfig = function(editor) {
     var availablePlugins = editor.config.plugins.split(commaSeparator);
-    enhanceList($('#CKEditor\\.ConfigClass_0_removePlugins'), availablePlugins);
+    enhanceList($('#CKEditor\\.ConfigClass_0_removePlugins'), availablePlugins, 'available-plugins-select');
 
     var availableButtons = Object.keys(editor.ui.items);
-    enhanceList($('#CKEditor\\.ConfigClass_0_removeButtons'), availableButtons);
+    enhanceList($('#CKEditor\\.ConfigClass_0_removeButtons'), availableButtons, 'available-buttons-select');
+    
+    enhanceTextArea($('#CKEditor\\.ConfigClass_0_advanced'), 'advanced-text-area');
   };
 
-  var enhanceList = function(input, allowedValues) {
+  var enhanceList = function(input, allowedValues, selectId) {
     var values = input.hide().val().split(commaSeparator);
     var select = $('&lt;select class="form-control" multiple&gt;&lt;/select&gt;').insertAfter(input);
+    input.parent().prev().find('label').attr('for', selectId);
+    select.attr('id', selectId);
     allowedValues.sort().forEach(function(value) {
       select.append($('&lt;option&gt;&lt;/option&gt;').text(value));
     });
@@ -241,6 +245,11 @@ require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPr
       var values = select.selectpicker('val') || [];
       input.val(values.join(','));
     });
+  };
+  
+  var enhanceTextArea = function(textarea, textareaId) {
+    textarea.parent().prev().find('label').attr('for', textareaId);
+    textarea.attr('id', textareaId);
   };
 
   ckeditorPromise.done(function(ckeditor) {

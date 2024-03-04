@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -637,7 +637,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- To be remove if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <!-- To be removed if we stop declaring hibernate validator as oldcore runtime dependency -->
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>

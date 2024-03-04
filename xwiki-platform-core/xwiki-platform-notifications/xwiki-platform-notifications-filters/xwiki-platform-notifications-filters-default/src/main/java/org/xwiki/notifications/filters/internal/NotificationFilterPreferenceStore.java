@@ -66,9 +66,6 @@ public class NotificationFilterPreferenceStore
     private static final String FILTER_PREFIX = "NFP_";
 
     @Inject
-    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
-
-    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
@@ -462,11 +459,7 @@ public class NotificationFilterPreferenceStore
     {
         XWikiContext context = this.contextProvider.get();
         WikiReference currentWiki = context.getWikiReference();
-        if (this.filterPreferenceConfiguration.useMainStore()) {
-            context.setWikiId(context.getMainXWiki());
-        } else if (wikiReference != null) {
-            context.setWikiReference(wikiReference);
-        }
+        context.setWikiReference(wikiReference);
         try {
             return supplier.get();
         } finally {

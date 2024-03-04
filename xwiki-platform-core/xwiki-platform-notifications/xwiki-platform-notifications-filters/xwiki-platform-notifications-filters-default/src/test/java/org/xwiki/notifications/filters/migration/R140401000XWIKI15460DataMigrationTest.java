@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -38,7 +39,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -101,9 +101,6 @@ class R140401000XWIKI15460DataMigrationTest
     private UserManager userManager;
 
     @MockComponent
-    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
-
-    @MockComponent
     private Execution execution;
 
     @MockComponent
@@ -116,6 +113,9 @@ class R140401000XWIKI15460DataMigrationTest
 
     @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
+    private ConfigurationSource configurationSource;
 
     private XWikiContext context;
 
@@ -163,6 +163,7 @@ class R140401000XWIKI15460DataMigrationTest
     @CsvSource({ "mainwikiid,1", "anotherwiki,0" })
     void hibernateMigrate(String currentWikiId, int expectedTimes) throws Exception
     {
+        when(this.configurationSource.getProperty("eventstream.usemainstore", true)).thenReturn(false);
         // nfp0 is from main wiki
         // nfp1 is from a removed wiki
         // nfp2 is from a not-removed wikiA
@@ -287,7 +288,7 @@ class R140401000XWIKI15460DataMigrationTest
     void hibernateMigrateSkipped() throws Exception
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("anotherwiki");
-        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(true);
+        when(this.configurationSource.getProperty("eventstream.usemainstore", true)).thenReturn(true);
         this.dataMigration.hibernateMigrate();
 
         // The store is used on all execution path after the check of the first condition.
@@ -298,6 +299,8 @@ class R140401000XWIKI15460DataMigrationTest
     @Test
     void hibernateMigrateNotificationException() throws Exception
     {
+
+        when(this.configurationSource.getProperty("eventstream.usemainstore", true)).thenReturn(false);
         when(this.store.getPaginatedFilterPreferences(1000, 0)).thenThrow(NotificationException.class);
         DataMigrationException dataMigrationException =
             assertThrows(DataMigrationException.class, () -> this.dataMigration.hibernateMigrate());
@@ -308,6 +311,7 @@ class R140401000XWIKI15460DataMigrationTest
     @Test
     void hibernateMigrateWikiManagerException() throws Exception
     {
+        when(this.configurationSource.getProperty("eventstream.usemainstore", true)).thenReturn(false);
         when(this.wikiDescriptorManager.getAllIds()).thenThrow(WikiManagerException.class);
         DataMigrationException dataMigrationException =
             assertThrows(DataMigrationException.class, () -> this.dataMigration.hibernateMigrate());

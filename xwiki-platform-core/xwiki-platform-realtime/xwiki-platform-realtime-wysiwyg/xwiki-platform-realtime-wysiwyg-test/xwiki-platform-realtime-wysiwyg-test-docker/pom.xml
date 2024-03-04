@@ -46,6 +46,14 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- Used to test the integration with the in-place editing. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- We need this for the WYSIWYG editor administration section where we set the default WYSIWYG editor. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -87,6 +95,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-realtime-wysiwyg-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used for testing the integration with in-place editing. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

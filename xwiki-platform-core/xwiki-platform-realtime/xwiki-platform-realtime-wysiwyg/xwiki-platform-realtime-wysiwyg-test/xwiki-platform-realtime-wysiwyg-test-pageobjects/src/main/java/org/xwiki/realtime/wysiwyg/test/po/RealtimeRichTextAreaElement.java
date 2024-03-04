@@ -58,7 +58,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
             // Wait for the specified coeditor position to be available in the DOM.
             if (wait) {
-                getFromIFrame(() -> {
+                getFromEditedContent(() -> {
                     getDriver().waitUntilCondition(driver -> getContainer());
                     return null;
                 });
@@ -72,22 +72,22 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public String getAvatarURL()
         {
-            return getFromIFrame(() -> getContainer().getAttribute("src"));
+            return getFromEditedContent(() -> getContainer().getAttribute("src"));
         }
 
         public String getAvatarHint()
         {
-            return getFromIFrame(() -> getContainer().getAttribute("title"));
+            return getFromEditedContent(() -> getContainer().getAttribute("title"));
         }
 
         public Point getLocation()
         {
-            return getFromIFrame(() -> getContainer().getLocation());
+            return getFromEditedContent(() -> getContainer().getLocation());
         }
 
         public CoeditorPosition waitForLocation(Point point)
         {
-            return getFromIFrame(() -> {
+            return getFromEditedContent(() -> {
                 getDriver().waitUntilCondition(driver -> {
                     try {
                         return getContainer().getLocation().equals(point);
@@ -106,7 +106,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         @SuppressWarnings("unchecked")
         public boolean isVisible()
         {
-            return getFromIFrame(() -> {
+            return getFromEditedContent(() -> {
                 WebElement root = getDriver().findElementWithoutWaitingWithoutScrolling(By.tagName("html"));
                 int viewportHeight = Integer.parseInt(root.getDomProperty("clientHeight"));
                 int viewportWidth = Integer.parseInt(root.getDomProperty("clientWidth"));
@@ -140,7 +140,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public List<CoeditorPosition> getCoeditorPositions()
     {
-        return getFromIFrame(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
+        return getFromEditedContent(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
             .map(element -> element.getAttribute("id")).map(CoeditorPosition::new).collect(Collectors.toList()));
     }
 

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>15.10.7</version>
+    <version>15.10.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data</name>

@@ -24,8 +24,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 /**
@@ -48,9 +48,9 @@ public class RestletJacksonContextResolver implements ContextResolver<ObjectMapp
     {
         JsonMapper.Builder builder = JsonMapper.builder();
 
-        // Disable all annotation handling to make sure Jackson is not going to try to take into account JAX-RS
-        // annotations
-        builder.disable(MapperFeature.USE_ANNOTATIONS);
+        // Configure to use just the Jackson annotation introspector, not the JAX-RS one as this is XWiki's legacy
+        // behavior.
+        builder.annotationIntrospector(new JacksonAnnotationIntrospector());
 
         this.objectMapper = builder.build();
     }

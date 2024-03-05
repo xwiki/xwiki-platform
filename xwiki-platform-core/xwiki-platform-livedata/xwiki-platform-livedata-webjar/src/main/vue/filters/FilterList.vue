@@ -93,7 +93,11 @@ export default {
             this.removeFilter();
           } else if (value !== this.value) {
             // If the selected value has an empty value, then use the empty filter, otherwise use the contains filter.
-            this.applyFilter(value, value === '' ? 'empty' : 'contains');
+            if (value === '') {
+              this.applyFilter(value, 'empty');
+            } else {
+              this.applyFilter(value);
+            }
           }
         },
       };

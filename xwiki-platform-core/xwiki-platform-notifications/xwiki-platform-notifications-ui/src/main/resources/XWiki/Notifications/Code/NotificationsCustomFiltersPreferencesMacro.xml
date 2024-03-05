@@ -469,6 +469,7 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
   'xwiki-events-bridge'
 ], function ($, xm, Vue, notifications, l10n) {
   Vue.component('DisplayerToggle', notifications.DisplayerToggle);
+  Vue.component('DisplayerScope', notifications.DisplayerScope);
 
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
@@ -800,38 +801,18 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
   &lt;/div&gt;
   #set ($sourceParameters = {
     'translationPrefix': 'notifications.settings.filters.preferences.custom.table.',
-    'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
-    'eventType': '',
-    'format': '',
     'type': 'custom'
   })
   #if ($wikimacro.parameters.target == 'user')
     #set ($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
   #end
-  #set ($liveDataConfig = {
-    'meta': {
-      'propertyDescriptors': [
-        { 'id': 'notificationFormats', 'displayer': 'html', 'filterable': false, 'sortable': false },
-        { 'id': 'isEnabled', 'displayer': 'toggle', 'filterable': false, 'sortable': false },
-        { 'id': 'name', 'displayer': 'html', 'filterable': false, 'sortable': false},
-        { 'id': 'filterType', 'filterable': false, 'sortable': false},
-        { 'id': 'eventTypes', 'displayer': 'html', 'filterable': false, 'sortable': false}
-      ],
-      'actions': [
-        {'id': 'delete', 'allowProperty': 'doc.viewable'}
-      ],
-      'entryDescriptor': {
-          'idProperty': 'filterPreferenceId'
-      }
-    }
-  })
   $services.liveData.render({
     'id': 'notificationCustomFilterPreferencesLiveData',
-    'properties': 'name,filterType,eventTypes,notificationFormats,isEnabled,_actions',
-    'source': 'liveTable',
+    'properties': 'scope,location,filterType,eventTypes,notificationFormats,isEnabled',
+    'source': 'notificationFilters',
     'sourceParameters': $escapetool.url($sourceParameters),
     'limit': 10
-  }, $liveDataConfig)
+  })
 &lt;/div&gt;
 ######################################################
 ### ADD FILTER MODAL

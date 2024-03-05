@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -76,6 +77,36 @@ public class NotificationFilterPreferenceStore
 
     @Inject
     private ObservationManager observation;
+
+    public Optional<NotificationFilterPreference> getFilterPreference(String filterPreferenceId,
+        WikiReference wikiReference) throws NotificationException
+    {
+        Optional<NotificationFilterPreference> result = Optional.empty();
+        DefaultNotificationFilterPreference filterPreference = configureContextWrapper(wikiReference, () -> {
+            Query query;
+            try {
+                query = this.queryManager.createQuery(
+                    "select nfp from DefaultNotificationFilterPreference nfp where nfp.id = :id",
+                    Query.HQL);
+                query.setLimit(1);
+                query.bindValue("id", filterPreferenceId);
+
+                List<DefaultNotificationFilterPreference> results = query.execute();
+                if (!results.isEmpty()) {
+                    return results.get(0);
+                }
+            } catch (QueryException e) {
+                throw new NotificationException(
+                    String.format("Error while retrieving notification with id [%s]", filterPreferenceId), e);
+            }
+            return null;
+        });
+        if (filterPreference != null) {
+            result = Optional.of(filterPreference);
+        }
+
+        return result;
+    }
 
     /**
      * Get the notification preference that corresponds to the given id and user.

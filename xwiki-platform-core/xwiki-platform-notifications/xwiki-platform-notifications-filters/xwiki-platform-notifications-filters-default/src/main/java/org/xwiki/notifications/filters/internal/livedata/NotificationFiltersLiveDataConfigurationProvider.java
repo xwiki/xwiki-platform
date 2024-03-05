@@ -67,12 +67,23 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     static final String DOC_VIEWABLE_FIELD = "doc_viewable";
     static final String DOC_HAS_DELETE_FIELD = "doc_hasdelete";
 
-    enum Scope
+    public enum Scope
     {
-        WIKI,
-        SPACE,
-        PAGE,
-        USER
+        WIKI("wiki"),
+        SPACE("page"),
+        PAGE("pageOnly"),
+        USER("user");
+
+        private final String fieldName;
+        Scope(String fieldName)
+        {
+            this.fieldName = fieldName;
+        }
+
+        String getFieldName()
+        {
+            return this.fieldName;
+        }
     };
 
     private static final String REMOVE = "remove";
@@ -81,6 +92,9 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
 
     @Inject
     private ContextualLocalizationManager l10n;
+
+    @Inject
+    private NotificationFilterLiveDataTranslationHelper translationHelper;
 
     @Inject
     private IconManager iconManager;
@@ -135,7 +149,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     private LiveDataPropertyDescriptor getDisplayDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // FIXME: this translation should be changed
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "name"));
         descriptor.setId(DISPLAY_FIELD);
         descriptor.setType(STRING_TYPE);
@@ -151,7 +164,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     private LiveDataPropertyDescriptor getScopeDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // FIXME: this translation should be changed
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "scope"));
         descriptor.setId(SCOPE_FIELD);
         descriptor.setType(STRING_TYPE);
@@ -159,20 +171,13 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         LiveDataPropertyDescriptor.FilterDescriptor filterList =
             new LiveDataPropertyDescriptor.FilterDescriptor("list");
         filterList.addOperator("empty", null);
-        // TODO: Provide a generic component for those translations?
-        String translationPrefix = "notifications.filters.preferences.scopeNotificationFilter.";
         filterList.setParameter("options", Stream.of(Scope.values())
-            .map(item ->  {
-                String label = l10n.getTranslationPlain(translationPrefix + item.name().toLowerCase());
-                if (label == null) {
-                    label = item.name().toLowerCase();
-                }
-                return Map.of(
-                    "value", item.name(),
-                    "label", label
-                );
-            }).collect(Collectors.toList()));
+            .map(item -> Map.of(
+                "value", item.name(),
+                "label", this.translationHelper.getScopeTranslation(item)
+            )).collect(Collectors.toList()));
         filterList.addOperator("equals", null);
+        filterList.setDefaultOperator("equals");
         descriptor.setFilter(filterList);
         descriptor.setVisible(true);
         descriptor.setEditable(false);
@@ -185,7 +190,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     private LiveDataPropertyDescriptor getLocationDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        // FIXME: this translation should be changed
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "location"));
         descriptor.setId(LOCATION_FIELD);
         descriptor.setType(STRING_TYPE);
@@ -208,19 +212,13 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         LiveDataPropertyDescriptor.FilterDescriptor filterList =
             new LiveDataPropertyDescriptor.FilterDescriptor("list");
         filterList.addOperator("empty", null);
-        String translationPrefix = "notifications.filters.type.custom.";
         filterList.setParameter("options", Stream.of(NotificationFilterType.values())
-            .map(item ->  {
-                String label = l10n.getTranslationPlain(translationPrefix + item.name().toLowerCase());
-                if (label == null) {
-                    label = item.name().toLowerCase();
-                }
-                return Map.of(
-                    "value", item.name(),
-                    "label", label
-                );
-            }).collect(Collectors.toList()));
+            .map(item -> Map.of(
+                "value", item.name(),
+                "label", this.translationHelper.getFilterTypeTranslation(item)
+            )).collect(Collectors.toList()));
         filterList.addOperator("equals", null);
+        filterList.setDefaultOperator("equals");
         descriptor.setFilter(filterList);
         descriptor.setVisible(true);
         descriptor.setEditable(false);
@@ -235,9 +233,8 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "notificationFormats"));
         descriptor.setId(NOTIFICATION_FORMATS_FIELD);
-        descriptor.setType(LIST_TYPE);
-        // FIXME: We should provide a new custom displayer for this.
-        //descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("notificationFormats"));
+        descriptor.setType(STRING_TYPE);
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -251,9 +248,8 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "eventTypes"));
         descriptor.setId(EVENT_TYPES_FIELD);
-        descriptor.setType(LIST_TYPE);
-        // FIXME: We should provide a new custom displayer for this.
-        //descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("eventTypes"));
+        descriptor.setType(STRING_TYPE);
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);

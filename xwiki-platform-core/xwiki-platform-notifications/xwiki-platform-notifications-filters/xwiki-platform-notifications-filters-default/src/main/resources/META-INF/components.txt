@@ -1,4 +1,5 @@
 org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceEventConverter
+org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveDataTranslationHelper
 org.xwiki.notifications.filters.internal.livedata.NotificationFiltersLiveDataConfigurationProvider
 org.xwiki.notifications.filters.internal.livedata.NotificationFiltersLiveDataConfigurationResolver
 org.xwiki.notifications.filters.internal.livedata.NotificationFiltersLiveDataEntryStore

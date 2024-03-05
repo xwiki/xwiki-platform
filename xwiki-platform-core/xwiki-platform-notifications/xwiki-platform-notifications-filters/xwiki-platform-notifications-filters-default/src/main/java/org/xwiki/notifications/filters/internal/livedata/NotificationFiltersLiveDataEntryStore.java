@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +34,10 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataException;
@@ -44,14 +49,16 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.internal.DefaultQueryParameter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -92,8 +99,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    @Named(ScopeNotificationFilter.FILTER_NAME)
-    private NotificationFilter scopeNotificationFilter;
+    @Named("context")
+    private ComponentManager componentManager;
 
     @Inject
     @Named("html/5.0")
@@ -103,7 +110,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     private QueryManager queryManager;
 
     @Inject
-    private ContextualLocalizationManager localizationManager;
+    private NotificationFilterLiveDataTranslationHelper translationHelper;
 
     @Override
     public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
@@ -142,24 +149,57 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         }
         return Map.of(
             NotificationFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId(),
-            NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD, filterPreference.getEventTypes(),
+            NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
+            this.displayEventTypes(filterPreference),
             NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
-            filterPreference.getNotificationFormats(),
+            displayNotificationFormats(filterPreference),
             NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD, filterPreference.isEnabled(),
             NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope),
             NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
             this.entityReferenceSerializer.serialize(location),
             NotificationFiltersLiveDataConfigurationProvider.DISPLAY_FIELD, this.renderDisplay(filterPreference),
             NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
-            localizationManager.getTranslationPlain("notifications.filters.type.custom." +
-                filterPreference.getFilterType().name().toLowerCase())
+            this.translationHelper.getFilterTypeTranslation(filterPreference.getFilterType())
         );
+    }
+
+    private String displayEventTypes(NotificationFilterPreference filterPreference) throws LiveDataException
+    {
+        StringBuilder result = new StringBuilder("<ul class=\"list-unstyled\">");
+        Set<String> eventTypes = filterPreference.getEventTypes();
+        if (eventTypes.isEmpty()) {
+            result.append("<li>");
+            result.append(this.translationHelper.getAllEventTypesTranslation());
+            result.append("<li>");
+        } else {
+            for (String eventType : eventTypes) {
+                result.append("<li>");
+                result.append(this.translationHelper.getEventTypeTranslation(eventType));
+                result.append("</li>");
+            }
+        }
+        result.append("</ul>");
+        return result.toString();
+    }
+
+    private String displayNotificationFormats(NotificationFilterPreference filterPreference)
+    {
+        StringBuilder result = new StringBuilder("<ul class=\"list-unstyled\">");
+        String translationPrefix = "notifications.format.";
+
+        for (NotificationFormat notificationFormat : filterPreference.getNotificationFormats()) {
+            result.append("<li>");
+            result.append(this.translationHelper.getTranslationWithPrefix(translationPrefix,
+                notificationFormat.name().toLowerCase()));
+            result.append("</li>");
+        }
+        result.append("</ul>");
+
+        return result.toString();
     }
 
     private Map<String, String> getScopeInfo(NotificationFiltersLiveDataConfigurationProvider.Scope scope)
     {
-        String translationPrefix = "notifications.filters.preferences.scopeNotificationFilter.";
-        String name = translationPrefix + scope.name().toLowerCase();
         String icon = "";
         switch (scope) {
             case WIKI -> icon = "wiki";
@@ -167,23 +207,29 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             case PAGE -> icon = "page";
             case USER -> icon = "user";
         }
-        return Map.of("icon", icon, "name", this.localizationManager.getTranslationPlain(name));
+        return Map.of("icon", icon, "name", this.translationHelper.getScopeTranslation(scope));
     }
 
-    private String renderDisplay(NotificationFilterPreference filterPreference)
-        throws NotificationException, LiveDataException
+    private String renderDisplay(NotificationFilterPreference filterPreference) throws LiveDataException
     {
-        String result;
+        String result = "";
         WikiPrinter printer = new DefaultWikiPrinter();
-        // FIXME: here I hardcode the fact that the pref is for a ScopeNotificationFilter, need to check if that's
-        // always true
-        Block block = this.notificationFilterManager.displayFilter(scopeNotificationFilter, filterPreference);
-        try {
-            blockRenderer.render(block, printer);
-            result = printer.toString();
-        } catch (Exception e) {
-            throw new LiveDataException("Error while rendering a block for notification filter", e);
+        String missingComponentExceptionMessage = String.format("Cannot find NotificationFilter component for "
+            + "preference named [%s]", filterPreference.getFilterName());
+        if (this.componentManager.hasComponent(NotificationFilter.class, filterPreference.getFilterName())) {
+            try {
+                NotificationFilter filter =
+                    this.componentManager.getInstance(NotificationFilter.class, filterPreference.getFilterName());
+                Block block = this.notificationFilterManager.displayFilter(filter, filterPreference);
+                blockRenderer.render(block, printer);
+                result = printer.toString();
+            } catch (Exception e) {
+                throw new LiveDataException("Error while rendering a block for notification filter", e);
+            }
+        } else {
+            throw new LiveDataException(missingComponentExceptionMessage);
         }
+
         return result;
     }
 
@@ -224,10 +270,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                 }
 
                 case NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
-                    String formatFilter = handleFormatFilter(queryFilter);
-                    if (formatFilter != null) {
-                        queryWhereClauses.add(formatFilter);
-                    }
+                    handleFormatFilter(queryFilter, queryWhereClauses);
                 }
 
                 case NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
@@ -237,14 +280,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                         NotificationFiltersLiveDataConfigurationProvider.Scope scope =
                             NotificationFiltersLiveDataConfigurationProvider.Scope.valueOf(
                                 String.valueOf(constraint.getValue()));
-                        String fieldName = "";
-                        switch (scope) {
-                            case WIKI -> fieldName = "wiki";
-                            case SPACE -> fieldName = "page";
-                            case PAGE -> fieldName = "pageOnly";
-                            case USER -> fieldName = "user";
-                        }
-                        queryWhereClauses.add(String.format("len(nfp.%s) > 0", fieldName));
+                        queryWhereClauses.add(String.format("length(nfp.%s) > 0 ", scope.getFieldName()));
                     }
                 }
 
@@ -253,10 +289,19 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
                     if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
                         queryWhereClauses.add("nfp.filterType = :filterType");
-                        result.bindings.put("filterType", constraint.getValue());
+                        result.bindings.put("filterType",
+                            NotificationFilterType.valueOf(String.valueOf(constraint.getValue())));
                     }
                 }
-                // TODO: handle other filters
+
+                case NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD -> {
+                    Optional<FiltersHQLQuery> locationQueryOpt = this.handleLocationFilter(queryFilter);
+                    if (locationQueryOpt.isPresent()) {
+                        FiltersHQLQuery locationHQLQuery = locationQueryOpt.get();
+                        queryWhereClauses.add(locationHQLQuery.whereClause);
+                        result.bindings.putAll(locationHQLQuery.bindings);
+                    }
+                }
             }
         }
         if (!queryWhereClauses.isEmpty()) {
@@ -275,7 +320,63 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         }
     }
 
-    private String handleFormatFilter(LiveDataQuery.Filter formatFilter)
+    private Optional<FiltersHQLQuery> handleLocationFilter(LiveDataQuery.Filter locationFilter)
+    {
+        FiltersHQLQuery filtersHQLQuery = new FiltersHQLQuery();
+        List<String> clauses = new ArrayList<>();
+        int clauseCounter = 0;
+        String clauseValue = "(nfp.pageOnly like :constraint_%1$s or nfp.page like :constraint_%1$s or "
+            + "nfp.wiki like :constraint_%1$s or nfp.user like :constraint_%1$s)";
+        String constraintName = "constraint_%s";
+        for (LiveDataQuery.Constraint constraint : locationFilter.getConstraints()) {
+            if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
+                clauses.add(String.format("(nfp.pageOnly = :constraint_%1$s or nfp.page = :constraint_%1$s or "
+                    + "nfp.wiki = :constraint_%1$s or nfp.user = :constraint_%1$s)", clauseCounter));
+                DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
+                queryParameter.literal(String.valueOf(constraint.getValue()));
+                filtersHQLQuery.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
+            } else if (STARTS_WITH_OPERATOR.equals(constraint.getOperator())) {
+                clauses.add(String.format(clauseValue, clauseCounter));
+                DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
+                queryParameter.literal(String.valueOf(constraint.getValue())).anyChars();
+                filtersHQLQuery.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
+            } else if (CONTAINS_OPERATOR.equals(constraint.getOperator())) {
+                clauses.add(String.format(clauseValue, clauseCounter));
+                DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
+                queryParameter.anyChars().literal(String.valueOf(constraint.getValue())).anyChars();
+                filtersHQLQuery.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
+            }
+            clauseCounter++;
+        }
+        if (!clauses.isEmpty()) {
+            filtersHQLQuery.whereClause = buildQueryClause(locationFilter, clauses);
+            return Optional.of(filtersHQLQuery);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private String buildQueryClause(LiveDataQuery.Filter filter, List<String> clauses)
+    {
+        StringBuilder result = new StringBuilder("(");
+        String operatorAppender;
+        if (filter.isMatchAll()) {
+            operatorAppender = " and ";
+        } else {
+            operatorAppender = " or ";
+        }
+        Iterator<String> iterator = clauses.iterator();
+        while (iterator.hasNext()) {
+            result.append(iterator.next());
+            if (iterator.hasNext()) {
+                result.append(operatorAppender);
+            }
+        }
+        result.append(")");
+        return result.toString();
+    }
+
+    private void handleFormatFilter(LiveDataQuery.Filter formatFilter, List<String> queryWhereClauses)
     {
         List<String> clauses = new ArrayList<>();
         for (LiveDataQuery.Constraint constraint : formatFilter.getConstraints()) {
@@ -306,23 +407,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             }
         }
         if (!clauses.isEmpty()) {
-            StringBuilder result = new StringBuilder();
-            String operatorAppender;
-            if (formatFilter.isMatchAll()) {
-                operatorAppender = " and ";
-            } else {
-                operatorAppender = " or ";
-            }
-            Iterator<String> iterator = clauses.iterator();
-            while (iterator.hasNext()) {
-                result.append(iterator.next());
-                if (iterator.hasNext()) {
-                    result.append(operatorAppender);
-                }
-            }
-            return result.toString();
-        } else {
-            return null;
+            queryWhereClauses.add(buildQueryClause(formatFilter, clauses));
         }
     }
 
@@ -346,7 +431,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
+                case NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
+                    NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
                     if (sortEntry.isDescending()) {
                         clauses.add("nfp.user desc, nfp.wiki desc, nfp.page desc, nfp.pageOnly desc");
                     } else {
@@ -354,14 +440,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD -> {
-                    if (sortEntry.isDescending()) {
-                        clauses.add("nfp.filterType desc");
-                    } else {
-                        clauses.add("nfp.filterType asc");
-                    }
-                }
-                // TODO: handle other columns
+                case NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
+                    clauses.add(String.format("nfp.filterType %s", sortOperator));
             }
         }
         if (!clauses.isEmpty()) {

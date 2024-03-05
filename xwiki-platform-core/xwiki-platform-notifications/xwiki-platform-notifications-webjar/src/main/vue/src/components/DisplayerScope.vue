@@ -57,3 +57,10 @@ export default {
   mixins: [displayerMixin]
 }
 </script>
+<style>
+
+.scope-name {
+  margin-left: 1em;
+}
+
+</style>

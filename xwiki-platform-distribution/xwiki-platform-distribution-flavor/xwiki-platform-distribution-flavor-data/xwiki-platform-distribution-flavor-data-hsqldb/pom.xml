@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
-    <version>15.10.7-SNAPSHOT</version>
+    <version>15.10.7</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data-hsqldb</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data - HSQLDB</name>

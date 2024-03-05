@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>15.10.7-SNAPSHOT</version>
+    <version>15.10.7</version>
   </parent>
   <artifactId>xwiki-platform-test-page</artifactId>
   <name>XWiki Platform - Test - Page Tests Framework</name>

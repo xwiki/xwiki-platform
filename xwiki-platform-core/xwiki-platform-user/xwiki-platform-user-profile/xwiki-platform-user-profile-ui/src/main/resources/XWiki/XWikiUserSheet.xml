@@ -514,6 +514,7 @@ return XWiki;
 }
 
 .column h1, .column h2 {
+  font-weight: bold;
   font-size: 115%;
   margin: 10px 0;
 }

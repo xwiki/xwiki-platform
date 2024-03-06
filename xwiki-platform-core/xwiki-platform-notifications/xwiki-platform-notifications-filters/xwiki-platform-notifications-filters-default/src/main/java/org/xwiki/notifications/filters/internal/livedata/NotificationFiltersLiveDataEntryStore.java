@@ -82,6 +82,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     private static final String EMAIL_FORMAT = "email";
     private static final String ALERT_FORMAT = "alert";
     private static final String LOCATION_TEMPLATE = "notification/filters/livedatalocation.vm";
+    private static final String TARGET_SOURCE_PARAMETER = "target";
+    private static final String WIKI_SOURCE_PARAMETER = "wiki";
 
     @Inject
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
@@ -152,14 +154,27 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             this.displayEventTypes(filterPreference),
             NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
             displayNotificationFormats(filterPreference),
-            NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD, filterPreference.isEnabled(),
             NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope),
             NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
             this.displayLocation(filterPreference, scope),
             NotificationFiltersLiveDataConfigurationProvider.DISPLAY_FIELD, this.renderDisplay(filterPreference),
             NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
-            this.translationHelper.getFilterTypeTranslation(filterPreference.getFilterType())
+            this.translationHelper.getFilterTypeTranslation(filterPreference.getFilterType()),
+            NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD, displayIsEnabled(filterPreference),
+            "isEnabled_checked", filterPreference.isEnabled(),
+            "isEnabled_data", Map.of(
+                "preferenceId", filterPreference.getId()
+            )
         );
+    }
+
+    private String displayIsEnabled(NotificationFilterPreference filterPreference)
+    {
+        String checked = (filterPreference.isEnabled()) ? "checked=\"checked\"" : "";
+        String disabled = (filterPreference.getId().startsWith("watchlist_")) ? "disabled=\"disabled\"" : "";
+        String html = "<input type=\"checkbox\" class=\"notificationFilterPreferenceCheckbox\" "
+            + "data-preferenceId=\"%s\" %s %s />";
+        return String.format(html, filterPreference.getId(), checked, disabled);
     }
 
     private String displayLocation(NotificationFilterPreference filterPreference,
@@ -293,7 +308,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                 case NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
                     // We authorize only a single constraint here
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
-                    if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
+                    if (EQUALS_OPERATOR.equals(constraint.getOperator())
+                        && !StringUtils.isBlank(String.valueOf(constraint.getValue()))) {
                         NotificationFiltersLiveDataConfigurationProvider.Scope scope =
                             NotificationFiltersLiveDataConfigurationProvider.Scope.valueOf(
                                 String.valueOf(constraint.getValue()));
@@ -326,7 +342,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
                     if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
                         if (NotificationFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
-                            constraint.getValue())) {
+                            constraint.getValue()))
+                        {
                             queryWhereClauses.add("length(nfp.allEventTypes) = 0 ");
                         } else {
                             queryWhereClauses.add("nfp.allEventTypes like :eventTypes");
@@ -339,7 +356,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             }
         }
         if (!queryWhereClauses.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder(" where ");
+            StringBuilder stringBuilder = new StringBuilder(" and ");
             Iterator<String> iterator = queryWhereClauses.iterator();
             while (iterator.hasNext()) {
                 stringBuilder.append(iterator.next());
@@ -502,16 +519,33 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         if (query.getOffset() > Integer.MAX_VALUE) {
             throw new LiveDataException("Currently only integer offsets are supported.");
         }
+        Map<String, Object> sourceParameters = query.getSource().getParameters();
+        if (!sourceParameters.containsKey(TARGET_SOURCE_PARAMETER)) {
+            throw new LiveDataException("The target source parameter is mandatory.");
+        }
+        String target = String.valueOf(sourceParameters.get(TARGET_SOURCE_PARAMETER));
+        EntityReference ownerReference;
+        if (WIKI_SOURCE_PARAMETER.equals(target)) {
+            ownerReference =
+                this.entityReferenceResolver.resolve(String.valueOf(sourceParameters.get(WIKI_SOURCE_PARAMETER)),
+                EntityType.WIKI);
+        } else {
+            ownerReference = this.entityReferenceResolver.resolve(String.valueOf(sourceParameters.get(target)),
+                EntityType.DOCUMENT);
+        }
+        String serializedOwner = this.entityReferenceSerializer.serialize(ownerReference);
+
         LiveData liveData = new LiveData();
-        String baseQuery = "select nfp from DefaultNotificationFilterPreference nfp ";
+        String baseQuery = "select nfp from DefaultNotificationFilterPreference nfp where owner = :owner";
         Optional<FiltersHQLQuery> optionalFiltersHQLQuery = handleFilter(query.getFilters());
         if (optionalFiltersHQLQuery.isPresent()) {
             baseQuery += optionalFiltersHQLQuery.get().whereClause;
         }
         baseQuery += handleSortEntries(query.getSort());
         try {
-            // FIXME: handle wiki
-            Query hqlQuery = this.queryManager.createQuery(baseQuery, Query.HQL);
+            Query hqlQuery = this.queryManager.createQuery(baseQuery, Query.HQL)
+                .bindValue("owner", serializedOwner)
+                .setWiki(ownerReference.extractReference(EntityType.WIKI).getName());
             if (optionalFiltersHQLQuery.isPresent()) {
                 for (Map.Entry<String, Object> binding : optionalFiltersHQLQuery.get().bindings.entrySet()) {
                     hqlQuery = hqlQuery.bindValue(binding.getKey(), binding.getValue());

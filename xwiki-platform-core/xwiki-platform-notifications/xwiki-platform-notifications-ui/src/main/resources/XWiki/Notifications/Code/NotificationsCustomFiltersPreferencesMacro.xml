@@ -801,15 +801,17 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
     &lt;/div&gt;
   &lt;/div&gt;
   #set ($sourceParameters = {
-    'translationPrefix': 'notifications.settings.filters.preferences.custom.table.',
-    'type': 'custom'
+    'type': 'custom',
+    'target': $wikimacro.parameters.target
   })
   #if ($wikimacro.parameters.target == 'user')
     #set ($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+  #else
+    #set ($discard = $sourceParameters.put('wiki', $services.model.serialize($services.wiki.getCurrentWikiReference(), 'default')))
   #end
   $services.liveData.render({
     'id': 'notificationCustomFilterPreferencesLiveData',
-    'properties': 'scope,location,filterType,eventTypes,notificationFormats,isEnabled',
+    'properties': 'display,scope,location,filterType,eventTypes,notificationFormats,isEnabled',
     'source': 'notificationFilters',
     'sourceParameters': $escapetool.url($sourceParameters),
     'limit': 10

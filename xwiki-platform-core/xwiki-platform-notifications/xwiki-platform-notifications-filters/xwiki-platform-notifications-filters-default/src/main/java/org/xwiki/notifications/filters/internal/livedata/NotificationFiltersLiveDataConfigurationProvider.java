@@ -66,7 +66,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     static final String EVENT_TYPES_FIELD = "eventTypes";
     static final String NOTIFICATION_FORMATS_FIELD = "notificationFormats";
     static final String IS_ENABLED_FIELD = "isEnabled";
-    static final String IS_ENABLED_CHECKED_FIELD = "isEnabled_checked";
     static final String DOC_VIEWABLE_FIELD = "doc_viewable";
     static final String DOC_HAS_DELETE_FIELD = "doc_hasdelete";
     private static final String TRANSLATION_PREFIX = "notifications.settings.filters.preferences.custom.table.";
@@ -75,7 +74,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     private static final String HTML_DISPLAYER = "html";
     private static final String VALUE_KEY = "value";
     private static final String LABEL_KEY = "label";
-
 
     public enum Scope
     {
@@ -158,7 +156,7 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "name"));
         descriptor.setId(DISPLAY_FIELD);
         descriptor.setType(STRING_TYPE);
-        // FIXME: we should maybe display it by default, as it's what makes custom filter displayer works...
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
         descriptor.setVisible(false);
         descriptor.setEditable(false);
         descriptor.setSortable(false);
@@ -285,6 +283,9 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "isEnabled"));
         descriptor.setId(IS_ENABLED_FIELD);
         descriptor.setType("Boolean");
+        LiveDataPropertyDescriptor.FilterDescriptor filterBoolean =
+            new LiveDataPropertyDescriptor.FilterDescriptor("boolean");
+        descriptor.setFilter(filterBoolean);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("toggle"));
         descriptor.setVisible(true);
         descriptor.setEditable(false);

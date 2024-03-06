@@ -20,16 +20,12 @@
 package com.xpn.xwiki.store;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +38,15 @@ import org.xwiki.user.UserReferenceSerializer;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.criteria.impl.RevisionCriteria;
+import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.store.hibernate.query.VersioningStoreQueryFactory;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -62,8 +61,6 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 {
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
-
-    private static final String FIELD_DOCID = "docId";
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -112,17 +109,23 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     @Override
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        return getXWikiDocVersions(doc, new RevisionCriteriaFactory().createRevisionCriteria(true), context)
+            .toArray(new Version[0]);
+    }
+
+    @Override
+    public Collection<Version> getXWikiDocVersions(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
+        throws XWikiException
+    {
         try {
-            XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+            XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, criteria, context);
             if (archive == null) {
-                return new Version[0];
+                return List.of();
             }
             Collection<XWikiRCSNodeInfo> nodes = archive.getNodes();
-            Version[] versions = new Version[nodes.size()];
-            Iterator<XWikiRCSNodeInfo> it = nodes.iterator();
-            for (int i = 0; i < versions.length; i++) {
-                XWikiRCSNodeInfo node = it.next();
-                versions[versions.length - 1 - i] = node.getId().getVersion();
+            Deque<Version> versions = new LinkedList<>();
+            for (XWikiRCSNodeInfo node : nodes) {
+                versions.addFirst(node.getId().getVersion());
             }
             return versions;
         } catch (Exception e) {
@@ -137,6 +140,12 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext inputxcontext)
         throws XWikiException
     {
+        return getXWikiDocumentArchive(doc, new RevisionCriteriaFactory().createRevisionCriteria(true), inputxcontext);
+    }
+
+    private XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, RevisionCriteria criteria,
+        XWikiContext inputxcontext) throws XWikiException
+    {
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
         if (archiveDoc != null) {
             return archiveDoc;
@@ -150,7 +159,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                 context.setWikiId(doc.getDatabase());
             }
             archiveDoc = new XWikiDocumentArchive(doc.getDocumentReference().getWikiReference(), doc.getId());
-            loadXWikiDocArchive(archiveDoc, true, context);
+            loadXWikiDocArchive(archiveDoc, criteria, context);
             doc.setDocumentArchive(archiveDoc);
         } finally {
             context.setWikiId(db);
@@ -165,8 +174,14 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
+        loadXWikiDocArchive(archivedoc, new RevisionCriteriaFactory().createRevisionCriteria(true), context);
+    }
+
+    private void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, RevisionCriteria criteria, XWikiContext context)
+        throws XWikiException
+    {
         try {
-            List<XWikiRCSNodeInfo> nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), bTransaction);
+            List<XWikiRCSNodeInfo> nodes = loadRCSNodeInfo(context, archivedoc.getId(), criteria);
             archivedoc.setNodes(nodes);
         } catch (Exception e) {
             Object[] args = { Long.valueOf(archivedoc.getId()) };
@@ -288,39 +303,44 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     /**
+     * Loads all the RCS nodes present in the archive of a given document.
+     *
      * @param context the XWiki context
      * @param id {@link XWikiRCSNodeContent#getId()}
      * @param bTransaction should store to use old transaction(false) or create new (true)
-     * @return loaded rcs node content
+     * @return loaded RCS nodes content
      * @throws XWikiException if any error
      */
     protected List<XWikiRCSNodeInfo> loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
         throws XWikiException
     {
+        return loadRCSNodeInfo(context, id, new RevisionCriteriaFactory().createRevisionCriteria(true));
+    }
+
+    /**
+     * Loads a part of the RCS nodes present in the archive of a given document, based on criteria.
+     *
+     * @param context the XWiki context
+     * @param id {@link XWikiRCSNodeContent#getId()}
+     * @param criteria the criteria matching the nodes to load
+     * @return loaded RCS nodes content
+     * @throws XWikiException if any error
+     */
+    private List<XWikiRCSNodeInfo> loadRCSNodeInfo(XWikiContext context, final long id, RevisionCriteria criteria)
+        throws XWikiException
+    {
         return executeRead(context, session -> {
             try {
-                CriteriaBuilder builder = session.getCriteriaBuilder();
-                CriteriaQuery<XWikiRCSNodeInfo> query = builder.createQuery(XWikiRCSNodeInfo.class);
-                Root<XWikiRCSNodeInfo> root = query.from(XWikiRCSNodeInfo.class);
-
-                query.select(root);
-
-                Predicate[] predicates = new Predicate[2];
-                predicates[0] = builder.equal(root.get("id").get(FIELD_DOCID), id);
-                predicates[1] = builder.isNotNull(root.get("diff"));
-                query.where(predicates);
-
-                List<XWikiRCSNodeInfo> nodes = session.createQuery(query).getResultList();
+                List<XWikiRCSNodeInfo> nodes =
+                    VersioningStoreQueryFactory.getRCSNodeInfoQuery(session, id, criteria).getResultList();
 
                 // Remember the wiki where the nodes are from
                 nodes.forEach(n -> n.getId().setWikiReference(context.getWikiReference()));
 
                 return nodes;
             } catch (IllegalArgumentException e) {
-                // This happens when the database has wrong values...
-                LOGGER.error("Invalid history for document [{}]", id, e);
-
-                return Collections.<XWikiRCSNodeInfo>emptyList();
+                throw new XWikiException(
+                    String.format("Encountered invalid history when fetching archive for document [%s]", id), e);
             }
         });
     }
@@ -351,11 +371,37 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException
     {
         executeWrite(context, session -> {
-            session
-                .createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id." + FIELD_DOCID + '=' + ':'
-                    + FIELD_DOCID)
-                .setParameter(FIELD_DOCID, doc.getId()).executeUpdate();
+            VersioningStoreQueryFactory.getDeleteArchiveQuery(session, doc.getId()).executeUpdate();
             return null;
+        });
+    }
+
+    @Override
+    public long getXWikiDocVersionsCount(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
+        throws XWikiException
+    {
+        return getRCSNodeInfoCount(context, doc.getId(), criteria);
+    }
+
+    /**
+     * Counts the number of RCS nodes present in the archive of a given document, based on criteria.
+     *
+     * @param context the XWiki context
+     * @param id {@link XWikiRCSNodeContent#getId()}
+     * @param criteria the criteria matching the nodes to count
+     * @return the number of matching RCS nodes
+     * @throws XWikiException if any error
+     */
+    private long getRCSNodeInfoCount(XWikiContext context, final long id, RevisionCriteria criteria)
+        throws XWikiException
+    {
+        return executeRead(context, session -> {
+            try {
+                return VersioningStoreQueryFactory.getRCSNodeInfoCountQuery(session, id, criteria).getSingleResult();
+            } catch (IllegalArgumentException e) {
+                throw new XWikiException(
+                    String.format("Encountered invalid history when computing archive size for document [%s]", id), e);
+            }
         });
     }
 }

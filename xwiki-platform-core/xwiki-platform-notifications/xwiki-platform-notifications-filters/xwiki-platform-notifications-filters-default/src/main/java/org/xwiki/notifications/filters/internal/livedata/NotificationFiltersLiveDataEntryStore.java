@@ -31,18 +31,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.RecordableEventDescriptor;
-import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -63,6 +60,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -82,6 +81,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     private static final String EQUALS_OPERATOR = "equals";
     private static final String EMAIL_FORMAT = "email";
     private static final String ALERT_FORMAT = "alert";
+    private static final String LOCATION_TEMPLATE = "notification/filters/livedatalocation.vm";
 
     @Inject
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
@@ -112,6 +112,12 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     @Inject
     private NotificationFilterLiveDataTranslationHelper translationHelper;
 
+    @Inject
+    private TemplateManager templateManager;
+
+    @Inject
+    private ScriptContextManager scriptContextManager;
+
     @Override
     public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
     {
@@ -138,15 +144,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         throws NotificationException, LiveDataException
     {
         NotificationFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
-        EntityReference location = null;
-        switch (scope) {
-            case WIKI -> location = this.entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
-            case SPACE -> location = this.entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
-            case PAGE -> location = this.entityReferenceResolver.resolve(filterPreference.getPageOnly(),
-                EntityType.DOCUMENT);
-            case USER -> location = this.entityReferenceResolver.resolve(filterPreference.getUser(),
-                EntityType.DOCUMENT);
-        }
+
+        // FIXME: Check authorization?
         return Map.of(
             NotificationFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId(),
             NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
@@ -156,11 +155,29 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD, filterPreference.isEnabled(),
             NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope),
             NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
-            this.entityReferenceSerializer.serialize(location),
+            this.displayLocation(filterPreference, scope),
             NotificationFiltersLiveDataConfigurationProvider.DISPLAY_FIELD, this.renderDisplay(filterPreference),
             NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
             this.translationHelper.getFilterTypeTranslation(filterPreference.getFilterType())
         );
+    }
+
+    private String displayLocation(NotificationFilterPreference filterPreference,
+        NotificationFiltersLiveDataConfigurationProvider.Scope scope)
+    {
+        EntityReference location = null;
+        switch (scope) {
+            case WIKI -> location = this.entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
+            case SPACE -> location = this.entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
+            case PAGE -> location = this.entityReferenceResolver.resolve(filterPreference.getPageOnly(),
+                EntityType.DOCUMENT);
+            case USER -> location = this.entityReferenceResolver.resolve(filterPreference.getUser(),
+                EntityType.DOCUMENT);
+        }
+        // FIXME: Do we need a new execution context?
+        ScriptContext currentScriptContext = this.scriptContextManager.getCurrentScriptContext();
+        currentScriptContext.setAttribute("location", location, ScriptContext.ENGINE_SCOPE);
+        return this.templateManager.renderNoException(LOCATION_TEMPLATE);
     }
 
     private String displayEventTypes(NotificationFilterPreference filterPreference) throws LiveDataException
@@ -300,6 +317,23 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                         FiltersHQLQuery locationHQLQuery = locationQueryOpt.get();
                         queryWhereClauses.add(locationHQLQuery.whereClause);
                         result.bindings.putAll(locationHQLQuery.bindings);
+                    }
+                }
+
+                case NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD -> {
+                    // We authorize only a single constraint here
+                    // FIXME: Actually maybe we should allow specifying multiple equals constraints?
+                    LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+                    if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
+                        if (NotificationFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
+                            constraint.getValue())) {
+                            queryWhereClauses.add("length(nfp.allEventTypes) = 0 ");
+                        } else {
+                            queryWhereClauses.add("nfp.allEventTypes like :eventTypes");
+                            DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
+                            queryParameter.anyChars().literal(String.valueOf(constraint.getValue())).anyChars();
+                            result.bindings.put("eventTypes", queryParameter);
+                        }
                     }
                 }
             }
@@ -442,6 +476,9 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
 
                 case NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
                     clauses.add(String.format("nfp.filterType %s", sortOperator));
+
+                case NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD ->
+                    clauses.add(String.format("nfp.allEventTypes %s", sortOperator));
             }
         }
         if (!clauses.isEmpty()) {

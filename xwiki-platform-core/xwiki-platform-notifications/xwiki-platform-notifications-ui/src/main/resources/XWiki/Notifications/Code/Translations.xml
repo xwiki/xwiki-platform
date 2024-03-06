@@ -54,6 +54,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Scope Notificatio
 notifications.filters.preferences.scopeNotificationFilter.page=Page only
 notifications.filters.preferences.scopeNotificationFilter.space=Page and children
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.user=User
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations

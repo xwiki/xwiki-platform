@@ -34,8 +34,8 @@
       :intercept-touch="false"
   >
     <template #viewer>
-      <XWikiIcon :iconDescriptor="{name: entry.scope.icon}" />
-      <span class="scope-name">{{ entry.scope.name }}</span>
+      <XWikiIcon :iconDescriptor="{name: entry[propertyId].icon}" />
+      <span class="scope-name">{{ entry[propertyId].name }}</span>
     </template>
 
     <!--
@@ -57,10 +57,9 @@ export default {
   mixins: [displayerMixin]
 }
 </script>
-<style>
 
-.scope-name {
+<style scoped>
+span.scope-name {
   margin-left: 1em;
 }
-
 </style>

@@ -19,7 +19,9 @@
  */
 package org.xwiki.notifications.filters.internal.livedata;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconManager;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryDescriptor;
+import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
@@ -53,7 +56,7 @@ import com.xpn.xwiki.objects.classes.LevelsClass;
 @Named(NotificationFiltersLiveDataSource.NAME)
 public class NotificationFiltersLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
-    private static final String TRANSLATION_PREFIX = "notifications.settings.filters.preferences.custom.table.";
+    public static final String ALL_EVENTS_OPTION_VALUE = "__ALL_EVENTS__";
     static final String ID_FIELD = "filterPreferenceId";
     static final String SCOPE_FIELD = "scope";
     static final String LOCATION_FIELD = "location";
@@ -66,6 +69,13 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     static final String IS_ENABLED_CHECKED_FIELD = "isEnabled_checked";
     static final String DOC_VIEWABLE_FIELD = "doc_viewable";
     static final String DOC_HAS_DELETE_FIELD = "doc_hasdelete";
+    private static final String TRANSLATION_PREFIX = "notifications.settings.filters.preferences.custom.table.";
+    private static final String REMOVE = "remove";
+    private static final String STRING_TYPE = "String";
+    private static final String HTML_DISPLAYER = "html";
+    private static final String VALUE_KEY = "value";
+    private static final String LABEL_KEY = "label";
+
 
     public enum Scope
     {
@@ -85,10 +95,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
             return this.fieldName;
         }
     };
-
-    private static final String REMOVE = "remove";
-    private static final String STRING_TYPE = "String";
-    private static final String LIST_TYPE = "java.util.List";
 
     @Inject
     private ContextualLocalizationManager l10n;
@@ -193,8 +199,7 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "location"));
         descriptor.setId(LOCATION_FIELD);
         descriptor.setType(STRING_TYPE);
-        // FIXME: We should provide a new custom location displayer for LD.
-        //descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("location"));
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -249,7 +254,23 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "eventTypes"));
         descriptor.setId(EVENT_TYPES_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
+        LiveDataPropertyDescriptor.FilterDescriptor filterList =
+            new LiveDataPropertyDescriptor.FilterDescriptor("list");
+        filterList.addOperator("empty", null);
+        List<Map<String, String>> options = new ArrayList<>();
+        options.add(Map.of(
+            VALUE_KEY, ALL_EVENTS_OPTION_VALUE,
+            LABEL_KEY, this.translationHelper.getAllEventTypesTranslation()));
+        try {
+            options.addAll(this.translationHelper.getAllEventTypesOptions(true));
+        } catch (LiveDataException e) {
+            this.logger.error("Cannot provide event filter options", e);
+        }
+        filterList.setParameter("options", options);
+        filterList.addOperator("equals", null);
+        filterList.setDefaultOperator("equals");
+        descriptor.setFilter(filterList);
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);

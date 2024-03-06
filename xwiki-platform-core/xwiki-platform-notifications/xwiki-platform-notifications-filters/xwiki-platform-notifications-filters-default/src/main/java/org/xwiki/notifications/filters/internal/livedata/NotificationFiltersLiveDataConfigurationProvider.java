@@ -20,8 +20,6 @@
 package org.xwiki.notifications.filters.internal.livedata;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,7 +32,9 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconManager;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
@@ -43,8 +43,6 @@ import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
-
-import com.xpn.xwiki.objects.classes.LevelsClass;
 
 /**
  * Configuration of the {@link NotificationFiltersLiveDataSource}.
@@ -66,10 +64,10 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     static final String EVENT_TYPES_FIELD = "eventTypes";
     static final String NOTIFICATION_FORMATS_FIELD = "notificationFormats";
     static final String IS_ENABLED_FIELD = "isEnabled";
-    static final String DOC_VIEWABLE_FIELD = "doc_viewable";
+    static final String ACTIONS_FIELD = "actions";
     static final String DOC_HAS_DELETE_FIELD = "doc_hasdelete";
     private static final String TRANSLATION_PREFIX = "notifications.settings.filters.preferences.custom.table.";
-    private static final String REMOVE = "remove";
+    private static final String DELETE = "delete";
     private static final String STRING_TYPE = "String";
     private static final String HTML_DISPLAYER = "html";
     private static final String VALUE_KEY = "value";
@@ -122,20 +120,16 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         entryDescriptor.setIdProperty(ID_FIELD);
         meta.setEntryDescriptor(entryDescriptor);
 
-        // FIXME: Handle delete action
-        /*
-        LiveDataActionDescriptor removeAction = new LiveDataActionDescriptor();
-        removeAction.setName(this.l10n.getTranslationPlain("wordsNotification.settings.remove"));
-        removeAction.setId(REMOVE);
-        removeAction.setAllowProperty(DOC_HAS_DELETE_FIELD);
-        removeAction.setUrlProperty(REMOVE_OBJECT_URL_FIELD);
+        LiveDataActionDescriptor deleteAction = new LiveDataActionDescriptor();
+        deleteAction.setName(this.l10n.getTranslationPlain("liveData.action.delete"));
+        deleteAction.setId(DELETE);
+        deleteAction.setAllowProperty(DOC_HAS_DELETE_FIELD);
         try {
-            removeAction.setIcon(this.iconManager.getMetaData(REMOVE));
+            deleteAction.setIcon(this.iconManager.getMetaData(DELETE));
         } catch (IconException e) {
             this.logger.error("Error while getting icon for the remove action", e);
         }
-        meta.setActions(List.of(removeAction));
-        */
+        meta.setActions(List.of(deleteAction));
 
         meta.setPropertyDescriptors(List.of(
             getDisplayDescriptor(),
@@ -144,7 +138,8 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
             getFilterTypeDescriptor(),
             getNotificationFormatsDescriptor(),
             getEventTypesDescriptor(),
-            getIsEnabledDescriptor()
+            getIsEnabledDescriptor(),
+            getActionDescriptor()
         ));
 
         return input;
@@ -295,20 +290,19 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         return descriptor;
     }
 
-    /*
     private LiveDataPropertyDescriptor getActionDescriptor()
     {
         LiveDataPropertyDescriptor actionDescriptor = new LiveDataPropertyDescriptor();
-        actionDescriptor.setName(this.l10n.getTranslationPlain("wordsNotification.livedata.action"));
+        actionDescriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "_actions"));
         actionDescriptor.setId(ACTIONS_FIELD);
         LiveDataPropertyDescriptor.DisplayerDescriptor displayer =
             new LiveDataPropertyDescriptor.DisplayerDescriptor(ACTIONS_FIELD);
-        displayer.setParameter(ACTIONS_FIELD, List.of(REMOVE));
+        displayer.setParameter(ACTIONS_FIELD, List.of(DELETE));
         actionDescriptor.setDisplayer(displayer);
         actionDescriptor.setVisible(true);
         actionDescriptor.setEditable(false);
         actionDescriptor.setSortable(false);
         actionDescriptor.setFilterable(false);
         return actionDescriptor;
-    }*/
+    }
 }

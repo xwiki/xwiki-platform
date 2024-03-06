@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.livedata;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -130,6 +131,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             filterPreferenceOpt = notificationFilterPreferenceStore
                 .getFilterPreference(String.valueOf(entryId), wikiReference);
             if (filterPreferenceOpt.isPresent()) {
+                // FIXME: check authorization
                 NotificationFilterPreference filterPreference = filterPreferenceOpt.get();
                 result = Optional.of(getPreferenceInformation(filterPreference));
             }
@@ -147,8 +149,10 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     {
         NotificationFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
 
+        HashMap<String, Object> result = new LinkedHashMap<>();
         // FIXME: Check authorization?
-        return Map.of(
+        // FIXME: refactor to use plenty of puts: Map.of only accept 10 args
+        result.putAll(Map.of(
             NotificationFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId(),
             NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
             this.displayEventTypes(filterPreference),
@@ -165,7 +169,10 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             "isEnabled_data", Map.of(
                 "preferenceId", filterPreference.getId()
             )
-        );
+        ));
+        // We don't care: if we access the LD we do have delete.
+        result.put(NotificationFiltersLiveDataConfigurationProvider.DOC_HAS_DELETE_FIELD, true);
+        return result;
     }
 
     private String displayIsEnabled(NotificationFilterPreference filterPreference)
@@ -533,6 +540,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             ownerReference = this.entityReferenceResolver.resolve(String.valueOf(sourceParameters.get(target)),
                 EntityType.DOCUMENT);
         }
+        // FIXME: check authorization to access this owner info
         String serializedOwner = this.entityReferenceSerializer.serialize(ownerReference);
 
         LiveData liveData = new LiveData();

@@ -52,6 +52,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -2643,6 +2644,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return getVersioningStore(context).getXWikiDocVersions(this, context);
     }
 
+    /**
+     * Counts the number of document versions matching criteria like author, minimum creation date, etc.
+     *
+     * @param criteria criteria used to match versions
+     * @param context the XWiki context
+     * @return the number of matching versions
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public long getRevisionsCount(RevisionCriteria criteria, XWikiContext context) throws XWikiException
+    {
+        return getVersioningStore(context).getXWikiDocVersionsCount(this, criteria, context);
+    }
+
     public String[] getRecentRevisions(int nb, XWikiContext context) throws XWikiException
     {
         try {
@@ -2668,52 +2684,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Get document versions matching criterias like author, minimum creation date, etc.
+     * Gets document versions matching criteria like author, minimum creation date, etc.
      *
      * @param criteria criteria used to match versions
      * @return a list of matching versions
      */
     public List<String> getRevisions(RevisionCriteria criteria, XWikiContext context) throws XWikiException
     {
-        List<String> results = new ArrayList<String>();
-
-        Version[] revisions = getRevisions(context);
-
-        XWikiRCSNodeInfo nextNodeinfo = null;
-        XWikiRCSNodeInfo nodeinfo;
-        for (Version revision : revisions) {
-            nodeinfo = nextNodeinfo;
-            nextNodeinfo = getRevisionInfo(revision.toString(), context);
-
-            if (nodeinfo == null) {
-                continue;
-            }
-
-            // Minor/Major version matching
-            if (criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit()) {
-                // Author matching
-                if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
-                    // Date range matching
-                    Date versionDate = nodeinfo.getDate();
-                    if (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate())) {
-                        results.add(nodeinfo.getVersion().toString());
-                    }
-                }
-            }
-        }
-
-        nodeinfo = nextNodeinfo;
-        if (nodeinfo != null) {
-            if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
-                // Date range matching
-                Date versionDate = nodeinfo.getDate();
-                if (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate())) {
-                    results.add(nodeinfo.getVersion().toString());
-                }
-            }
-        }
-
-        return criteria.getRange().subList(results);
+        // We collect explicitly into an ArrayList to ensure mutability of the resulting list.
+        return getVersioningStore(context).getXWikiDocVersions(this, criteria, context).stream()
+            .map(Version::toString)
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public XWikiRCSNodeInfo getRevisionInfo(String version, XWikiContext context) throws XWikiException

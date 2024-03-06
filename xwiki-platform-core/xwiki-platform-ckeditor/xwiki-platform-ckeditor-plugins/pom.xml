@@ -60,6 +60,15 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- This is needed for realtime editing. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <!-- Marked as optional because the realtime plugin is disabled by default. -->
+      <optional>true</optional>
+    </dependency>
     <!-- This is used by the resource suggest picker on the link modal. -->
     <dependency>
       <groupId>org.webjars.npm</groupId>

@@ -178,7 +178,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
@@ -283,7 +283,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = newPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
         for (String id : List.of("Iimage.gif", "customID")) {
-            editor.executeOnIframe(() -> setup.getDriver().findElement(By.id(id)).click());
+            editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.id(id)).click());
             imageDialogEditModal = editor.getToolBar().editImage();
             imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
             imageDialogEditModal.clickInsert();
@@ -327,7 +327,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -343,7 +343,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -415,7 +415,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogSelectModal.clickSelect().clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceValue("doc:", false).submit();
 
@@ -447,7 +447,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.switchToAdvancedTab().selectCenterAlignment();
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
 
@@ -459,7 +459,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         // Verify that the caption and alignment are still set.
@@ -470,14 +470,14 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.close();
 
         // Verify that the link is still set.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
         LinkDialog linkSelectorModal = editor.getToolBar().insertOrEditLink();
         assertEquals("doc", linkSelectorModal.getSelectedResourceType());
         assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
         linkSelectorModal.cancel();
 
         // Change the caption to ensure that saving again works.
-        editor.executeOnIframe(
+        editor.executeOnEditedContent(
             () -> setup.getDriver().findElement(By.cssSelector("figcaption"))
                 // Go to the start of the caption and insert "New ".
                 .sendKeys(Keys.HOME, "New "));
@@ -540,7 +540,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -582,7 +582,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -775,14 +775,14 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
 
         imageDialogEditModal.switchToStandardTab().setImageStyle("---");
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().setImageStyle("Bordered");

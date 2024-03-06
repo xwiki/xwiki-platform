@@ -118,6 +118,16 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- This is needed for realtime editing. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+      <!-- Marked as optional because realtime editing is currently disabled by default. -->
+      <optional>true</optional>
+    </dependency>
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

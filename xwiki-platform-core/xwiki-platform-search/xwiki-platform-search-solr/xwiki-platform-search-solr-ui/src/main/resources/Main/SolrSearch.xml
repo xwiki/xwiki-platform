@@ -719,6 +719,7 @@ a.search-result-highlightAll:after {
   margin: 0 .2em;
   display: flex;
   justify-content: space-between;
+  position: relative;
 }
 
 .search-facet-header:after {
@@ -728,10 +729,9 @@ a.search-result-highlightAll:after {
   content: "";
   display: block;
   height: 0;
-  margin: 2.45em 0 0;
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
   width: 100%;
 }
 

@@ -115,7 +115,7 @@ public class RevisionCriteriaFactory
      *
      * @param includeMinorVersions include minor versions in the set
      * @return a new revision criteria
-     * @since 15.10.7
+     * @since 15.10.8
      * @since 16.2.0RC1
      */
     @Unstable

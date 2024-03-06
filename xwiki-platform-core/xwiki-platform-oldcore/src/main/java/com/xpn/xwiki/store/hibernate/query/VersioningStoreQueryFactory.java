@@ -42,7 +42,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  *
  * @param <T> the type of element returned by the query
  * @version $Id$
- * @since 15.10.7
+ * @since 15.10.8
  * @since 16.2.0RC1
  */
 @Unstable

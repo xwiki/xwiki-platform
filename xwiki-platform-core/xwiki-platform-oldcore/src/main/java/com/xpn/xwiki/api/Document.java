@@ -1426,7 +1426,7 @@ public class Document extends Api
      *
      * @param criteria criteria used to match versions
      * @return the number of matching versions
-     * @since 15.10.7
+     * @since 15.10.8
      * @since 16.2.0RC1
      */
     @Unstable

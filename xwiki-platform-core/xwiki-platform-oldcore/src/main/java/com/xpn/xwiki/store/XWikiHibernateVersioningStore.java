@@ -147,7 +147,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiContext inputxcontext) throws XWikiException
     {
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
-        if (archiveDoc != null) {
+        // We only retrieve a cached archive if we want a complete one.
+        if (archiveDoc != null && criteria.isAllInclusive()) {
             return archiveDoc;
         }
 
@@ -160,7 +161,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
             archiveDoc = new XWikiDocumentArchive(doc.getDocumentReference().getWikiReference(), doc.getId());
             loadXWikiDocArchive(archiveDoc, criteria, context);
-            doc.setDocumentArchive(archiveDoc);
+            // We only store the archive if it is a complete one.
+            if (criteria.isAllInclusive()) {
+                doc.setDocumentArchive(archiveDoc);
+            }
         } finally {
             context.setWikiId(db);
 

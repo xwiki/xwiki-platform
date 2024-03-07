@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,6 +47,8 @@ import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -75,6 +78,10 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     @Inject
     @Named("cached")
     private FilterPreferencesModelBridge filterPreferencesModelBridge;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
 
     @Override
     public Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException
@@ -205,6 +212,29 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters)
     {
         return filters.stream().filter(filter -> filter instanceof ToggleableNotificationFilter);
+    }
+
+    @Override
+    public List<ToggleableNotificationFilter> getToggleableFilters(UserReference userReference)
+        throws NotificationException
+    {
+        DocumentReference userDoc = this.documentReferenceUserReferenceSerializer.serialize(userReference);
+        List<ToggleableNotificationFilter> result = new ArrayList<>();
+        getAllFilters(userDoc, false)
+            .stream().filter(filter -> filter instanceof ToggleableNotificationFilter)
+            .forEach(item -> result.add((ToggleableNotificationFilter) item));
+        return result;
+    }
+
+    @Override
+    public List<ToggleableNotificationFilter> getToggleableFilters(WikiReference wikiReference)
+        throws NotificationException
+    {
+        List<ToggleableNotificationFilter> result = new ArrayList<>();
+        getAllFilters(wikiReference)
+            .stream().filter(filter -> filter instanceof ToggleableNotificationFilter)
+            .forEach(item -> result.add((ToggleableNotificationFilter) item));
+        return result;
     }
 
     @Override

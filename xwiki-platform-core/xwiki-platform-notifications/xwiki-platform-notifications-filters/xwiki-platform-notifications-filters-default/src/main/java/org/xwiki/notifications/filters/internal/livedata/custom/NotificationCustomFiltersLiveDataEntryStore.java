@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.livedata;
+package org.xwiki.notifications.filters.internal.livedata.custom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +54,7 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
+import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveDataTranslationHelper;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -70,21 +71,19 @@ import org.xwiki.template.TemplateManager;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Dedicated {@link LiveDataEntryStore} for the {@link NotificationFiltersLiveDataSource}.
+ * Dedicated {@link LiveDataEntryStore} for the {@link NotificationCustomFiltersLiveDataSource}.
  * This component is in charge of performing the actual HQL queries to display the live data.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-@Named(NotificationFiltersLiveDataSource.NAME)
-public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
+@Named(NotificationCustomFiltersLiveDataSource.NAME)
+public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntryStore
 {
     private static final String STARTS_WITH_OPERATOR = "startsWith";
     private static final String CONTAINS_OPERATOR = "contains";
     private static final String EQUALS_OPERATOR = "equals";
-    private static final String EMAIL_FORMAT = "email";
-    private static final String ALERT_FORMAT = "alert";
     private static final String LOCATION_TEMPLATE = "notification/filters/livedatalocation.vm";
     private static final String TARGET_SOURCE_PARAMETER = "target";
     private static final String WIKI_SOURCE_PARAMETER = "wiki";
@@ -161,30 +160,30 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     private Map<String, Object> getPreferenceInformation(NotificationFilterPreference filterPreference)
         throws NotificationException, LiveDataException
     {
-        NotificationFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
+        NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
 
         HashMap<String, Object> result = new LinkedHashMap<>();
         // Map.of only accept 10 args
-        result.put(NotificationFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId());
-        result.put(NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId());
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
             this.displayEventTypes(filterPreference));
-        result.put(NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
             displayNotificationFormats(filterPreference));
-        result.put(NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope));
-        result.put(NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope));
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
             this.displayLocation(filterPreference, scope));
-        result.put(NotificationFiltersLiveDataConfigurationProvider.DISPLAY_FIELD,
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.DISPLAY_FIELD,
             this.renderDisplay(filterPreference));
-        result.put(NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
             this.translationHelper.getFilterTypeTranslation(filterPreference.getFilterType()));
-        result.put(NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD,
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD,
             displayIsEnabled(filterPreference));
         result.put("isEnabled_checked", filterPreference.isEnabled());
         result.put("isEnabled_data", Map.of(
             "preferenceId", filterPreference.getId()
         ));
         // We don't care: if we access the LD we do have delete.
-        result.put(NotificationFiltersLiveDataConfigurationProvider.DOC_HAS_DELETE_FIELD, true);
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.DOC_HAS_DELETE_FIELD, true);
         return result;
     }
 
@@ -198,7 +197,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     }
 
     private String displayLocation(NotificationFilterPreference filterPreference,
-        NotificationFiltersLiveDataConfigurationProvider.Scope scope)
+        NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
     {
         EntityReference location = null;
         switch (scope) {
@@ -248,7 +247,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         return result.toString();
     }
 
-    private Map<String, String> getScopeInfo(NotificationFiltersLiveDataConfigurationProvider.Scope scope)
+    private Map<String, String> getScopeInfo(NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
     {
         String icon = "";
         switch (scope) {
@@ -283,17 +282,17 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         return result;
     }
 
-    private NotificationFiltersLiveDataConfigurationProvider.Scope getScope(NotificationFilterPreference
+    private NotificationCustomFiltersLiveDataConfigurationProvider.Scope getScope(NotificationFilterPreference
         filterPreference)
     {
         if (!StringUtils.isBlank(filterPreference.getUser())) {
-            return NotificationFiltersLiveDataConfigurationProvider.Scope.USER;
+            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.USER;
         } else if (!StringUtils.isBlank(filterPreference.getPageOnly())) {
-            return NotificationFiltersLiveDataConfigurationProvider.Scope.PAGE;
+            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.PAGE;
         } else if (!StringUtils.isBlank(filterPreference.getPage())) {
-            return NotificationFiltersLiveDataConfigurationProvider.Scope.SPACE;
+            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.SPACE;
         } else {
-            return NotificationFiltersLiveDataConfigurationProvider.Scope.WIKI;
+            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.WIKI;
         }
     }
 
@@ -309,7 +308,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         List<String> queryWhereClauses = new ArrayList<>();
         for (LiveDataQuery.Filter queryFilter : queryFilters) {
             switch (queryFilter.getProperty()) {
-                case NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD -> {
                     // We only check first constraint: if there's more they are either redundant or contradictory.
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
                     if (Boolean.parseBoolean(String.valueOf(constraint.getValue()))) {
@@ -319,7 +318,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
                     // We authorize only a single constraint here
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
                     String constraintValue = String.valueOf(constraint.getValue());
@@ -334,19 +333,19 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
                     // We authorize only a single constraint here
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
                     if (EQUALS_OPERATOR.equals(constraint.getOperator())
                         && !StringUtils.isBlank(String.valueOf(constraint.getValue()))) {
-                        NotificationFiltersLiveDataConfigurationProvider.Scope scope =
-                            NotificationFiltersLiveDataConfigurationProvider.Scope.valueOf(
+                        NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope =
+                            NotificationCustomFiltersLiveDataConfigurationProvider.Scope.valueOf(
                                 String.valueOf(constraint.getValue()));
                         queryWhereClauses.add(String.format("length(nfp.%s) > 0 ", scope.getFieldName()));
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD -> {
                     // We authorize only a single constraint here
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
                     if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
@@ -356,7 +355,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD -> {
                     Optional<FiltersHQLQuery> locationQueryOpt = this.handleLocationFilter(queryFilter);
                     if (locationQueryOpt.isPresent()) {
                         FiltersHQLQuery locationHQLQuery = locationQueryOpt.get();
@@ -365,12 +364,12 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD -> {
                     // We authorize only a single constraint here
                     // FIXME: Actually maybe we should allow specifying multiple equals constraints?
                     LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
                     if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
-                        if (NotificationFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
+                        if (NotificationCustomFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
                             constraint.getValue()))
                         {
                             queryWhereClauses.add("length(nfp.allEventTypes) = 0 ");
@@ -465,10 +464,10 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                 sortOperator = "desc";
             }
             switch (sortEntry.getProperty()) {
-                case NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD ->
+                case NotificationCustomFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD ->
                     clauses.add(String.format("nfp.enabled %s", sortOperator));
 
-                case NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
                     if (sortEntry.isDescending()) {
                         clauses.add("nfp.alertEnabled desc, nfp.emailEnabled asc");
                     } else {
@@ -476,8 +475,8 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
-                    NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
+                case NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
+                    NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
                     if (sortEntry.isDescending()) {
                         clauses.add("nfp.user desc, nfp.wiki desc, nfp.page desc, nfp.pageOnly desc");
                     } else {
@@ -485,10 +484,10 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                     }
                 }
 
-                case NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
+                case NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
                     clauses.add(String.format("nfp.filterType %s", sortOperator));
 
-                case NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD ->
+                case NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD ->
                     clauses.add(String.format("nfp.allEventTypes %s", sortOperator));
             }
         }

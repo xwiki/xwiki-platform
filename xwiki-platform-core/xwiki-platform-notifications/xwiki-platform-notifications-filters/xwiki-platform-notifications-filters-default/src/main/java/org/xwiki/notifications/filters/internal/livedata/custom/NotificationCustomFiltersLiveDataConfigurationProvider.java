@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.livedata;
+package org.xwiki.notifications.filters.internal.livedata.custom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,16 +44,17 @@ import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveDataTranslationHelper;
 
 /**
- * Configuration of the {@link NotificationFiltersLiveDataSource}.
+ * Configuration of the {@link NotificationCustomFiltersLiveDataSource}.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-@Named(NotificationFiltersLiveDataSource.NAME)
-public class NotificationFiltersLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
+@Named(NotificationCustomFiltersLiveDataSource.NAME)
+public class NotificationCustomFiltersLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
     public static final String ALL_EVENTS_OPTION_VALUE = "__ALL_EVENTS__";
     static final String ID_FIELD = "filterPreferenceId";
@@ -179,8 +180,8 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("scope"));
         descriptor.setFilter(createFilterList(Stream.of(Scope.values())
             .map(item -> Map.of(
-                "value", item.name(),
-                "label", this.translationHelper.getScopeTranslation(item)
+                VALUE_KEY, item.name(),
+                LABEL_KEY, this.translationHelper.getScopeTranslation(item)
             )).collect(Collectors.toList())));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
@@ -213,8 +214,8 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setType(STRING_TYPE);
         descriptor.setFilter(createFilterList(Stream.of(NotificationFilterType.values())
             .map(item -> Map.of(
-                "value", item.name(),
-                "label", this.translationHelper.getFilterTypeTranslation(item)
+                VALUE_KEY, item.name(),
+                LABEL_KEY, this.translationHelper.getFilterTypeTranslation(item)
             )).collect(Collectors.toList())));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
@@ -233,8 +234,8 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
         descriptor.setFilter(createFilterList(Stream.of(NotificationFormat.values()).map(item ->
             Map.of(
-                "value", item.name(),
-                "label", this.translationHelper.getFormatTranslation(item)
+                VALUE_KEY, item.name(),
+                LABEL_KEY, this.translationHelper.getFormatTranslation(item)
             )).collect(Collectors.toList())));
         descriptor.setVisible(true);
         descriptor.setEditable(false);

@@ -801,7 +801,6 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
     &lt;/div&gt;
   &lt;/div&gt;
   #set ($sourceParameters = {
-    'type': 'custom',
     'target': $wikimacro.parameters.target
   })
   #if ($wikimacro.parameters.target == 'user')
@@ -812,7 +811,7 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
   $services.liveData.render({
     'id': 'notificationCustomFilterPreferencesLiveData',
     'properties': 'display,scope,location,filterType,eventTypes,notificationFormats,isEnabled,actions',
-    'source': 'notificationFilters',
+    'source': 'notificationCustomFilters',
     'sourceParameters': $escapetool.url($sourceParameters),
     'limit': 10
   })

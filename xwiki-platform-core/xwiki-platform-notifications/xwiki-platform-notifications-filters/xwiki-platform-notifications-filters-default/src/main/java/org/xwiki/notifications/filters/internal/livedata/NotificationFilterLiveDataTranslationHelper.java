@@ -17,12 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.notifications.filters.internal.livedata;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -36,6 +34,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.livedata.custom.NotificationCustomFiltersLiveDataConfigurationProvider;
 
 @Component(roles = NotificationFilterLiveDataTranslationHelper.class)
 @Singleton
@@ -66,7 +65,7 @@ public class NotificationFilterLiveDataTranslationHelper
         return getTranslationWithPrefix("notifications.filters.type.custom.", filterType.name().toLowerCase());
     }
 
-    public String getScopeTranslation(NotificationFiltersLiveDataConfigurationProvider.Scope scope)
+    public String getScopeTranslation(NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
     {
         return getTranslationWithPrefix("notifications.filters.preferences.scopeNotificationFilter.",
             scope.name().toLowerCase());

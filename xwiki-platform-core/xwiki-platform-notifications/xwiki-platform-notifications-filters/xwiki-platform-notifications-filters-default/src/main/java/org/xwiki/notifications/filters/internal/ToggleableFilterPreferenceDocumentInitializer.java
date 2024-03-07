@@ -47,19 +47,26 @@ public class ToggleableFilterPreferenceDocumentInitializer extends AbstractManda
      * The path to the class parent document.
      */
     private static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+    public static final LocalDocumentReference XCLASS =
+        new LocalDocumentReference(PARENT_PATH, "ToggleableFilterPreferenceClass");
+
+    public static final String FIELD_FILTER_NAME = "filterName";
+
+    public static final String FIELD_IS_ENABLED = "isEnabled";
+
 
     /**
      * Default constructor.
      */
     public ToggleableFilterPreferenceDocumentInitializer()
     {
-        super(new LocalDocumentReference(PARENT_PATH, "ToggleableFilterPreferenceClass"));
+        super(XCLASS);
     }
 
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("filterName", "Filter name", 64);
-        xclass.addBooleanField("isEnabled", "Is enabled ?", "checkbox", "", true);
+        xclass.addTextField(FIELD_FILTER_NAME, "Filter name", 64);
+        xclass.addBooleanField(FIELD_IS_ENABLED, "Is enabled ?", "checkbox", "", true);
     }
 }

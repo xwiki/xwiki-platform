@@ -17,38 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.livedata;
-
-import java.util.Collection;
+package org.xwiki.notifications.filters.internal.livedata.system;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataException;
-import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
+import org.xwiki.livedata.LiveDataSource;
 
-/**
- * Descriptor for the {@link NotificationFiltersLiveDataSource}.
- *
- * @version $Id$
- */
 @Component
 @Singleton
-@Named(NotificationFiltersLiveDataSource.NAME)
-public class NotificationFiltersLiveDataPropertyDescriptorStore implements LiveDataPropertyDescriptorStore
+@Named(NotificationSystemFiltersLiveDataSource.NAME)
+public class NotificationSystemFiltersLiveDataSource implements LiveDataSource
 {
+    static final String NAME = "notificationSystemFilters";
+
     @Inject
-    @Named(NotificationFiltersLiveDataSource.NAME)
-    private Provider<LiveDataConfiguration> liveDataConfigurationProvider;
+    @Named(NAME)
+    private LiveDataEntryStore notificationFiltersLiveDataEntryStore;
+
+    @Inject
+    @Named(NAME)
+    private LiveDataPropertyDescriptorStore notificationFiltersLiveDataPropertyDescriptorStore;
 
     @Override
-    public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
+    public LiveDataEntryStore getEntries()
     {
-        return liveDataConfigurationProvider.get().getMeta().getPropertyDescriptors();
+        return this.notificationFiltersLiveDataEntryStore;
+    }
+
+    @Override
+    public LiveDataPropertyDescriptorStore getProperties()
+    {
+        return this.notificationFiltersLiveDataPropertyDescriptorStore;
     }
 }

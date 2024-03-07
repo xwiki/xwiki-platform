@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -31,6 +32,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.user.UserReference;
 
 /**
  * Provide an interface for interacting with user notification filters.
@@ -108,6 +110,18 @@ public interface NotificationFilterManager
      * @since 10.4RC1
      */
     Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters);
+
+    default List<ToggleableNotificationFilter> getToggleableFilters(UserReference userReference)
+        throws NotificationException
+    {
+        return List.of();
+    }
+
+    default List<ToggleableNotificationFilter> getToggleableFilters(WikiReference wikiReference)
+        throws NotificationException
+    {
+        return List.of();
+    }
 
     /**
      * For all toggleable notification filters, get if the filter is enabled regarding the user profile.

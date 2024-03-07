@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.livedata;
+package org.xwiki.notifications.filters.internal.livedata.system;
+
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,28 +28,27 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
-import org.xwiki.livedata.internal.JSONMerge;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
+import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 
 /**
- * Needed component for the live data configuration.
+ * Descriptor for the {@link NotificationSystemFiltersLiveDataSource}.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-@Named(NotificationFiltersLiveDataSource.NAME)
-public class NotificationFiltersLiveDataConfigurationResolver implements
-    LiveDataConfigurationResolver<LiveDataConfiguration>
+@Named(NotificationSystemFiltersLiveDataSource.NAME)
+public class NotificationSystemFiltersLiveDataPropertyDescriptorStore implements LiveDataPropertyDescriptorStore
 {
     @Inject
-    @Named(NotificationFiltersLiveDataSource.NAME)
-    private Provider<LiveDataConfiguration> notificationFiltersLiveDataConfigurationProvider;
+    @Named(NotificationSystemFiltersLiveDataSource.NAME)
+    private Provider<LiveDataConfiguration> liveDataConfigurationProvider;
 
     @Override
-    public LiveDataConfiguration resolve(LiveDataConfiguration input) throws LiveDataException
+    public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
     {
-        return new JSONMerge().merge(input, this.notificationFiltersLiveDataConfigurationProvider.get());
+        return liveDataConfigurationProvider.get().getMeta().getPropertyDescriptors();
     }
 }

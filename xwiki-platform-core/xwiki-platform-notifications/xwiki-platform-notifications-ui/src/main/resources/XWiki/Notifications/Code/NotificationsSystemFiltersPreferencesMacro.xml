@@ -599,37 +599,20 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
 &lt;/div&gt;
 {{/html}}
 #set ($sourceParameters = {
-  'translationPrefix': 'notifications.settings.filters.preferences.system.table.',
-  'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
-  'eventType': '',
-  'format': '',
-  'type': 'system'
+  'target': $wikimacro.parameters.target
 })
 #if ($wikimacro.parameters.target == 'user')
-#set($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+  #set($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+#else
+  #set ($discard = $sourceParameters.put('wiki', $services.model.serialize($services.wiki.getCurrentWikiReference(), 'default')))
 #end
-
-#set ($liveDataConfig = {
-  'meta': {
-    'propertyDescriptors': [
-      { 'id': 'notificationFormats', 'displayer': 'html', 'filterable': false, 'sortable': false },
-      { 'id': 'isEnabled', 'displayer': 'toggle', 'filterable': false, 'sortable': false },
-      { 'id': 'name', 'filterable': false, 'sortable': false},
-      { 'id': 'filterType', 'filterable': false, 'sortable': false}
-    ],
-    'entryDescriptor': {
-        'idProperty': 'filterPreferenceId'
-    }
-  }
+$services.liveData.render({
+  'id': 'notificationSystemFilterPreferencesLiveData',
+  'properties': 'name,description,notificationFormats,isEnabled',
+  'source': 'notificationSystemFilters',
+  'sourceParameters': $escapetool.url($sourceParameters),
+  'limit': 10
 })
-#set ($sourceParameters = $services.rendering.escape($escapetool.url($sourceParameters), 'xwiki/2.1'))
-{{liveData
-  id='notificationSystemFilterPreferencesLiveData'
-  properties="name,filterType,notificationFormats,isEnabled"
-  source='liveTable'
-  sourceParameters="$sourceParameters"
-  limit='10'
-}}$jsontool.serialize($liveDataConfig){{/liveData}}
 #end
 {{/velocity}}</code>
     </property>

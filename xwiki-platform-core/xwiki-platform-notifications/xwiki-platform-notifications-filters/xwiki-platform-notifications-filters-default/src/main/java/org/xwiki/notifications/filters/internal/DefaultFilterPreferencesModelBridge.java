@@ -63,13 +63,6 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultFilterPreferencesModelBridge implements FilterPreferencesModelBridge
 {
-    private static final LocalDocumentReference TOGGLEABLE_FILTER_PREFERENCE_CLASS =
-        new LocalDocumentReference(Arrays.asList("XWiki", "Notifications", "Code"), "ToggleableFilterPreferenceClass");
-
-    private static final String FIELD_FILTER_NAME = "filterName";
-
-    private static final String FIELD_IS_ENABLED = "isEnabled";
-
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -120,10 +113,12 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
                 if (filter instanceof ToggleableNotificationFilter) {
                     ToggleableNotificationFilter toggleableFilter = (ToggleableNotificationFilter) filter;
                     boolean status = toggleableFilter.isEnabledByDefault();
-                    BaseObject obj = doc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
+                    BaseObject obj = doc.getXObject(ToggleableFilterPreferenceDocumentInitializer.XCLASS,
+                        ToggleableFilterPreferenceDocumentInitializer.FIELD_FILTER_NAME,
                             filter.getName(), false);
                     if (obj != null) {
-                        status = obj.getIntValue(FIELD_IS_ENABLED, status ? 1 : 0) != 0;
+                        status = obj.getIntValue(ToggleableFilterPreferenceDocumentInitializer.FIELD_IS_ENABLED,
+                            status ? 1 : 0) != 0;
                     }
                     filterStatus.put(filter.getName(), status);
                 }

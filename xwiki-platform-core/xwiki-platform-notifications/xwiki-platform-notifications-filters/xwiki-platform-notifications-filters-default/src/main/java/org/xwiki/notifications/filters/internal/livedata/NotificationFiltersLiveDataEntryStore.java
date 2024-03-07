@@ -52,6 +52,7 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -62,6 +63,8 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -85,6 +88,7 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     private static final String LOCATION_TEMPLATE = "notification/filters/livedatalocation.vm";
     private static final String TARGET_SOURCE_PARAMETER = "target";
     private static final String WIKI_SOURCE_PARAMETER = "wiki";
+    private static final String UNAUTHORIZED_EXCEPTION_MSG = "You don't have rights to access those information.";
 
     @Inject
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
@@ -121,19 +125,29 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     @Inject
     private ScriptContextManager scriptContextManager;
 
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
     @Override
     public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
     {
         Optional<Map<String, Object>> result = Optional.empty();
-        WikiReference wikiReference = contextProvider.get().getWikiReference();
+        XWikiContext context = contextProvider.get();
+        WikiReference wikiReference = context.getWikiReference();
         Optional<NotificationFilterPreference> filterPreferenceOpt;
         try {
             filterPreferenceOpt = notificationFilterPreferenceStore
                 .getFilterPreference(String.valueOf(entryId), wikiReference);
             if (filterPreferenceOpt.isPresent()) {
-                // FIXME: check authorization
-                NotificationFilterPreference filterPreference = filterPreferenceOpt.get();
-                result = Optional.of(getPreferenceInformation(filterPreference));
+                DefaultNotificationFilterPreference filterPreference =
+                    (DefaultNotificationFilterPreference) filterPreferenceOpt.get();
+                if (this.contextualAuthorizationManager.hasAccess(Right.ADMIN)
+                    || filterPreference.getOwner().equals(
+                        this.entityReferenceSerializer.serialize(context.getUserReference()))) {
+                    result = Optional.of(getPreferenceInformation(filterPreference));
+                } else {
+                    throw new LiveDataException(UNAUTHORIZED_EXCEPTION_MSG);
+                }
             }
         } catch (NotificationException e) {
             throw new LiveDataException(
@@ -150,25 +164,24 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         NotificationFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
 
         HashMap<String, Object> result = new LinkedHashMap<>();
-        // FIXME: Check authorization?
-        // FIXME: refactor to use plenty of puts: Map.of only accept 10 args
-        result.putAll(Map.of(
-            NotificationFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId(),
-            NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
-            this.displayEventTypes(filterPreference),
-            NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
-            displayNotificationFormats(filterPreference),
-            NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope),
-            NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
-            this.displayLocation(filterPreference, scope),
-            NotificationFiltersLiveDataConfigurationProvider.DISPLAY_FIELD, this.renderDisplay(filterPreference),
-            NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
-            this.translationHelper.getFilterTypeTranslation(filterPreference.getFilterType()),
-            NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD, displayIsEnabled(filterPreference),
-            "isEnabled_checked", filterPreference.isEnabled(),
-            "isEnabled_data", Map.of(
-                "preferenceId", filterPreference.getId()
-            )
+        // Map.of only accept 10 args
+        result.put(NotificationFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId());
+        result.put(NotificationFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
+            this.displayEventTypes(filterPreference));
+        result.put(NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
+            displayNotificationFormats(filterPreference));
+        result.put(NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope));
+        result.put(NotificationFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
+            this.displayLocation(filterPreference, scope));
+        result.put(NotificationFiltersLiveDataConfigurationProvider.DISPLAY_FIELD,
+            this.renderDisplay(filterPreference));
+        result.put(NotificationFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
+            this.translationHelper.getFilterTypeTranslation(filterPreference.getFilterType()));
+        result.put(NotificationFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD,
+            displayIsEnabled(filterPreference));
+        result.put("isEnabled_checked", filterPreference.isEnabled());
+        result.put("isEnabled_data", Map.of(
+            "preferenceId", filterPreference.getId()
         ));
         // We don't care: if we access the LD we do have delete.
         result.put(NotificationFiltersLiveDataConfigurationProvider.DOC_HAS_DELETE_FIELD, true);
@@ -224,12 +237,10 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
     private String displayNotificationFormats(NotificationFilterPreference filterPreference)
     {
         StringBuilder result = new StringBuilder("<ul class=\"list-unstyled\">");
-        String translationPrefix = "notifications.format.";
 
         for (NotificationFormat notificationFormat : filterPreference.getNotificationFormats()) {
             result.append("<li>");
-            result.append(this.translationHelper.getTranslationWithPrefix(translationPrefix,
-                notificationFormat.name().toLowerCase()));
+            result.append(this.translationHelper.getFormatTranslation(notificationFormat));
             result.append("</li>");
         }
         result.append("</ul>");
@@ -309,7 +320,18 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
                 }
 
                 case NotificationFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
-                    handleFormatFilter(queryFilter, queryWhereClauses);
+                    // We authorize only a single constraint here
+                    LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+                    String constraintValue = String.valueOf(constraint.getValue());
+                    if (EQUALS_OPERATOR.equals(constraint.getOperator())
+                        && !StringUtils.isEmpty(constraintValue)) {
+                        if (NotificationFormat.ALERT.name().equals(constraintValue)) {
+                            queryWhereClauses.add("nfp.alertEnabled = 1");
+                        }
+                        if (NotificationFormat.EMAIL.name().equals(constraintValue)) {
+                            queryWhereClauses.add("nfp.emailEnabled = 1");
+                        }
+                    }
                 }
 
                 case NotificationFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
@@ -434,41 +456,6 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
         return result.toString();
     }
 
-    private void handleFormatFilter(LiveDataQuery.Filter formatFilter, List<String> queryWhereClauses)
-    {
-        List<String> clauses = new ArrayList<>();
-        for (LiveDataQuery.Constraint constraint : formatFilter.getConstraints()) {
-            boolean isEmailEnabled = false;
-            boolean isAlertEnabled = false;
-            String constraintValue = String.valueOf(constraint.getValue());
-            if (StringUtils.isNotBlank(constraintValue)) {
-                if (STARTS_WITH_OPERATOR.equals(constraint.getOperator())) {
-                    isEmailEnabled = EMAIL_FORMAT.startsWith(constraintValue);
-                    isAlertEnabled = ALERT_FORMAT.startsWith(constraintValue);
-                } else if (CONTAINS_OPERATOR.equals(constraint.getOperator())) {
-                    isEmailEnabled = EMAIL_FORMAT.contains(constraintValue);
-                    isAlertEnabled = ALERT_FORMAT.contains(constraintValue);
-                } else if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
-                    isEmailEnabled = EMAIL_FORMAT.equals(constraintValue);
-                    isAlertEnabled = ALERT_FORMAT.equals(constraintValue);
-                }
-                if (isEmailEnabled) {
-                    clauses.add("nfp.emailEnabled = 1");
-                } else {
-                    clauses.add("nfp.emailEnabled = 0");
-                }
-                if (isAlertEnabled) {
-                    clauses.add("nfp.alertEnabled = 1");
-                } else {
-                    clauses.add("nfp.alertEnabled = 0");
-                }
-            }
-        }
-        if (!clauses.isEmpty()) {
-            queryWhereClauses.add(buildQueryClause(formatFilter, clauses));
-        }
-    }
-
     private String handleSortEntries(List<LiveDataQuery.SortEntry> sortEntries)
     {
         List<String> clauses = new ArrayList<>();
@@ -540,7 +527,11 @@ public class NotificationFiltersLiveDataEntryStore implements LiveDataEntryStore
             ownerReference = this.entityReferenceResolver.resolve(String.valueOf(sourceParameters.get(target)),
                 EntityType.DOCUMENT);
         }
-        // FIXME: check authorization to access this owner info
+        XWikiContext context = this.contextProvider.get();
+        if (!this.contextualAuthorizationManager.hasAccess(Right.ADMIN)
+            && !ownerReference.equals(context.getUserReference())) {
+            throw new LiveDataException(UNAUTHORIZED_EXCEPTION_MSG);
+        }
         String serializedOwner = this.entityReferenceSerializer.serialize(ownerReference);
 
         LiveData liveData = new LiveData();

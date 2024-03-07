@@ -38,21 +38,21 @@ public class NotificationFiltersLiveDataSource implements LiveDataSource
 
     @Inject
     @Named(NAME)
-    private LiveDataEntryStore wordsQueryLiveDataEntryStore;
+    private LiveDataEntryStore notificationFiltersLiveDataEntryStore;
 
     @Inject
     @Named(NAME)
-    private LiveDataPropertyDescriptorStore wordsQueryLiveDataPropertyDescriptorStore;
+    private LiveDataPropertyDescriptorStore notificationFiltersLiveDataPropertyDescriptorStore;
 
     @Override
     public LiveDataEntryStore getEntries()
     {
-        return this.wordsQueryLiveDataEntryStore;
+        return this.notificationFiltersLiveDataEntryStore;
     }
 
     @Override
     public LiveDataPropertyDescriptorStore getProperties()
     {
-        return this.wordsQueryLiveDataPropertyDescriptorStore;
+        return this.notificationFiltersLiveDataPropertyDescriptorStore;
     }
 }

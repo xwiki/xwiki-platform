@@ -42,6 +42,7 @@ import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
 
 /**
@@ -58,7 +59,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
     static final String ID_FIELD = "filterPreferenceId";
     static final String SCOPE_FIELD = "scope";
     static final String LOCATION_FIELD = "location";
-    // FIXME: Should we keep that?
     static final String DISPLAY_FIELD = "display";
     static final String FILTER_TYPE_FIELD = "filterType";
     static final String EVENT_TYPES_FIELD = "eventTypes";
@@ -112,7 +112,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         input.setMeta(meta);
 
         LiveDataPaginationConfiguration pagination = new LiveDataPaginationConfiguration();
-        // FIXME: probably not for system filters?
         pagination.setShowPageSizeDropdown(true);
         meta.setPagination(pagination);
 
@@ -160,6 +159,17 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         return descriptor;
     }
 
+    private LiveDataPropertyDescriptor.FilterDescriptor createFilterList(List<Map<String, String>> options)
+    {
+        LiveDataPropertyDescriptor.FilterDescriptor filterList =
+            new LiveDataPropertyDescriptor.FilterDescriptor("list");
+        filterList.addOperator("empty", null);
+        filterList.setParameter("options", options);
+        filterList.addOperator("equals", null);
+        filterList.setDefaultOperator("equals");
+        return filterList;
+    }
+
     private LiveDataPropertyDescriptor getScopeDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
@@ -167,17 +177,11 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setId(SCOPE_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("scope"));
-        LiveDataPropertyDescriptor.FilterDescriptor filterList =
-            new LiveDataPropertyDescriptor.FilterDescriptor("list");
-        filterList.addOperator("empty", null);
-        filterList.setParameter("options", Stream.of(Scope.values())
+        descriptor.setFilter(createFilterList(Stream.of(Scope.values())
             .map(item -> Map.of(
                 "value", item.name(),
                 "label", this.translationHelper.getScopeTranslation(item)
-            )).collect(Collectors.toList()));
-        filterList.addOperator("equals", null);
-        filterList.setDefaultOperator("equals");
-        descriptor.setFilter(filterList);
+            )).collect(Collectors.toList())));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -207,17 +211,11 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "filterType"));
         descriptor.setId(FILTER_TYPE_FIELD);
         descriptor.setType(STRING_TYPE);
-        LiveDataPropertyDescriptor.FilterDescriptor filterList =
-            new LiveDataPropertyDescriptor.FilterDescriptor("list");
-        filterList.addOperator("empty", null);
-        filterList.setParameter("options", Stream.of(NotificationFilterType.values())
+        descriptor.setFilter(createFilterList(Stream.of(NotificationFilterType.values())
             .map(item -> Map.of(
                 "value", item.name(),
                 "label", this.translationHelper.getFilterTypeTranslation(item)
-            )).collect(Collectors.toList()));
-        filterList.addOperator("equals", null);
-        filterList.setDefaultOperator("equals");
-        descriptor.setFilter(filterList);
+            )).collect(Collectors.toList())));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -233,6 +231,11 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setId(NOTIFICATION_FORMATS_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
+        descriptor.setFilter(createFilterList(Stream.of(NotificationFormat.values()).map(item ->
+            Map.of(
+                "value", item.name(),
+                "label", this.translationHelper.getFormatTranslation(item)
+            )).collect(Collectors.toList())));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -248,9 +251,6 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         descriptor.setId(EVENT_TYPES_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
-        LiveDataPropertyDescriptor.FilterDescriptor filterList =
-            new LiveDataPropertyDescriptor.FilterDescriptor("list");
-        filterList.addOperator("empty", null);
         List<Map<String, String>> options = new ArrayList<>();
         options.add(Map.of(
             VALUE_KEY, ALL_EVENTS_OPTION_VALUE,
@@ -260,10 +260,7 @@ public class NotificationFiltersLiveDataConfigurationProvider implements Provide
         } catch (LiveDataException e) {
             this.logger.error("Cannot provide event filter options", e);
         }
-        filterList.setParameter("options", options);
-        filterList.addOperator("equals", null);
-        filterList.setDefaultOperator("equals");
-        descriptor.setFilter(filterList);
+        descriptor.setFilter(createFilterList(options));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);

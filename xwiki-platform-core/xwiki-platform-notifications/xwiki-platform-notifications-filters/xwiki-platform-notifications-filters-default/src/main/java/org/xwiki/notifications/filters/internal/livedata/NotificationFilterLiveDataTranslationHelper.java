@@ -34,6 +34,7 @@ import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
 
 @Component(roles = NotificationFilterLiveDataTranslationHelper.class)
@@ -86,6 +87,11 @@ public class NotificationFilterLiveDataTranslationHelper
             throw new LiveDataException(
                 String.format("Error while getting description for event type [%s]", eventType), e);
         }
+    }
+
+    public String getFormatTranslation(NotificationFormat format)
+    {
+        return getTranslationWithPrefix("notifications.format.", format.name().toLowerCase());
     }
 
     public List<Map<String, String>> getAllEventTypesOptions(boolean allFarm) throws LiveDataException

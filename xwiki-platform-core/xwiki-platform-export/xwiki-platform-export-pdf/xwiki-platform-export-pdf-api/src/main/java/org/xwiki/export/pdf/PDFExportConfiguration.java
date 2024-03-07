@@ -113,7 +113,11 @@ public interface PDFExportConfiguration
     /**
      * @return {@code true} if the XWiki URI is specified in the configuration, {@code false} if the default XWiki URI
      *         is used
+     * @since 14.10.22
+     * @since 15.10.8
+     * @since 16.2.0RC1
      */
+    @Unstable
     default boolean isXWikiURISpecified()
     {
         try {

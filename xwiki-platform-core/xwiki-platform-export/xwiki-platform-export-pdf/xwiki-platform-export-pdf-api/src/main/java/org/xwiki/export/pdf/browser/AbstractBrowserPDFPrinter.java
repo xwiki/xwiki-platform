@@ -105,7 +105,9 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         }
         this.cookieFilters.forEach(cookieFilter -> {
             try {
-                cookieFilter.filter(cookies, cookieFilterContext);
+                if (cookieFilter.isFilterRequired()) {
+                    cookieFilter.filter(cookies, cookieFilterContext);
+                }
             } catch (Exception e) {
                 this.logger.warn("Failed to apply cookie filter [{}]. Root cause is: [{}].", cookieFilter,
                     ExceptionUtils.getRootCauseMessage(e));
@@ -136,8 +138,10 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      */
     private CookieFilterContext findCookieFilterContext(URL printPreviewURL, BrowserTab browserTab) throws IOException
     {
+        boolean isFilterRequired = this.cookieFilters.stream().anyMatch(CookieFilter::isFilterRequired);
         return getBrowserPrintPreviewURLs(printPreviewURL).stream()
-            .map(url -> this.getCookieFilterContext(url, browserTab)).flatMap(Optional::stream).findFirst()
+            .map(url -> this.getCookieFilterContext(url, isFilterRequired, browserTab)).flatMap(Optional::stream)
+            .findFirst()
             .orElseThrow(() -> new IOException("Couldn't find an alternative print preview URL that the web browser "
                 + "used for PDF printing can access."));
     }
@@ -174,14 +178,17 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         return uriBuilder.build().toURL();
     }
 
-    private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, BrowserTab browserTab)
+    private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, boolean isFilterRequired,
+        BrowserTab browserTab)
     {
-        return getBrowserIPAddress(targetURL, browserTab).map(browserIPAddress -> new CookieFilterContext()
+        Optional<String> browserIPAddress = isFilterRequired ? getBrowserIPAddress(targetURL, browserTab)
+            : Optional.of(StringUtils.defaultString(getRequest().getHeader("X-Forwarded-For")));
+        return browserIPAddress.map(ip -> new CookieFilterContext()
         {
             @Override
             public String getBrowserIPAddress()
             {
-                return browserIPAddress;
+                return ip;
             }
 
             @Override

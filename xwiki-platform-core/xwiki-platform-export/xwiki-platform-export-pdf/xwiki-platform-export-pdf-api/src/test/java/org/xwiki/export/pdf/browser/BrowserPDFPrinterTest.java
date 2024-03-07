@@ -36,7 +36,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -94,7 +94,9 @@ class BrowserPDFPrinterTest
     {
         ReflectionUtils.setFieldValue(this.printer, "logger", this.logger);
         ReflectionUtils.setFieldValue(this.printer, "configuration", this.configuration);
-        ReflectionUtils.setFieldValue(this.printer, "cookieFilters", Collections.singletonList(this.cookieFilter));
+        ReflectionUtils.setFieldValue(this.printer, "cookieFilters", List.of(this.cookieFilter));
+
+        when(this.cookieFilter.isFilterRequired()).thenReturn(true);
 
         when(this.printer.getBrowserManager()).thenReturn(this.browserManager);
         when(this.printer.getRequest()).thenReturn(this.request);
@@ -171,6 +173,24 @@ class BrowserPDFPrinterTest
 
         verify(this.browserTab).navigate(new URL("http://external:9293/xwiki/rest/client?media=json"));
         verify(this.browserTab).navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"));
+    }
+
+    @Test
+    void printWithoutCookieFiltering() throws Exception
+    {
+        when(this.cookieFilter.isFilterRequired()).thenReturn(false);
+        Cookie[] cookies = new Cookie[] {mock(Cookie.class)};
+        when(this.request.getCookies()).thenReturn(cookies);
+
+        when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
+        when(this.browserTab.navigate(new URL("http://xwiki-host:9293/xwiki/bin/export/Some/Page?x=y#z"), cookies, true,
+            30)).thenReturn(true);
+
+        this.printer.print(new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z"));
+
+        verify(this.browserTab, never()).navigate(new URL("http://external:9293/xwiki/rest/client?media=json"));
+        verify(this.browserTab, never()).navigate(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json"));
+        verify(this.cookieFilter, never()).filter(any(), any());
     }
 
     @Test

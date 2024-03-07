@@ -20,6 +20,8 @@
 package org.xwiki.export.pdf.internal.browser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -89,6 +91,18 @@ class AuthenticationCookieFilterTest
         when(this.xcontext.getResponse()).thenReturn(this.httpResponse);
 
         when(this.loginManagerProvider.get()).thenReturn(this.loginManager);
+    }
+
+    @Test
+    void isFilterRequired() throws Exception
+    {
+        assertFalse(this.authCookieFilter.isFilterRequired());
+
+        when(this.loginManager.getRememberedUsername(this.httpRequest, this.httpResponse)).thenReturn("alice");
+        assertFalse(this.authCookieFilter.isFilterRequired());
+
+        when(this.loginManager.getRememberedPassword(this.httpRequest, this.httpResponse)).thenReturn("wonderland");
+        assertTrue(this.authCookieFilter.isFilterRequired());
     }
 
     @Test

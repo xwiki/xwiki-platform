@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal.livedata.system;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +42,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveDataTranslationHelper;
@@ -62,9 +65,6 @@ import com.xpn.xwiki.XWikiContext;
 @Named(NotificationSystemFiltersLiveDataSource.NAME)
 public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntryStore
 {
-    private static final String STARTS_WITH_OPERATOR = "startsWith";
-    private static final String CONTAINS_OPERATOR = "contains";
-    private static final String EQUALS_OPERATOR = "equals";
     private static final String TARGET_SOURCE_PARAMETER = "target";
     private static final String WIKI_SOURCE_PARAMETER = "wiki";
     private static final String UNAUTHORIZED_EXCEPTION_MSG = "You don't have rights to access those information.";
@@ -189,6 +189,7 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
         if (!isAuthorized) {
             throw new LiveDataException(UNAUTHORIZED_EXCEPTION_MSG);
         }
+        filters.sort(Comparator.comparing(NotificationFilter::getName));
 
         LiveData liveData = new LiveData();
         int offset = query.getOffset().intValue();

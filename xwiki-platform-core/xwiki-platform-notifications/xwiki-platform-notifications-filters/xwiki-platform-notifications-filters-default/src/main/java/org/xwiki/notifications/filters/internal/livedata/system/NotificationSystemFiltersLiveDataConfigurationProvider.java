@@ -20,9 +20,6 @@
 package org.xwiki.notifications.filters.internal.livedata.system;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,8 +33,6 @@ import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveDataTranslationHelper;
 
 /**
  * Configuration of the {@link NotificationSystemFiltersLiveDataSource}.
@@ -50,7 +45,7 @@ import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveD
 public class NotificationSystemFiltersLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
     static final String NAME_FIELD = "name";
-    static final String DESCRIPTION_FIELD = "description";
+    static final String DESCRIPTION_FIELD = "filterDescription";
     static final String NOTIFICATION_FORMATS_FIELD = "notificationFormats";
     static final String IS_ENABLED_FIELD = "isEnabled";
     private static final String TRANSLATION_PREFIX = "notifications.settings.filters.preferences.system.table.";
@@ -59,9 +54,6 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
 
     @Inject
     private ContextualLocalizationManager l10n;
-
-    @Inject
-    private NotificationFilterLiveDataTranslationHelper translationHelper;
 
     @Override
     public LiveDataConfiguration get()
@@ -118,17 +110,6 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
         return descriptor;
     }
 
-    private LiveDataPropertyDescriptor.FilterDescriptor createFilterList(List<Map<String, String>> options)
-    {
-        LiveDataPropertyDescriptor.FilterDescriptor filterList =
-            new LiveDataPropertyDescriptor.FilterDescriptor("list");
-        filterList.addOperator("empty", null);
-        filterList.setParameter("options", options);
-        filterList.addOperator("equals", null);
-        filterList.setDefaultOperator("equals");
-        return filterList;
-    }
-
     private LiveDataPropertyDescriptor getNotificationFormatsDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
@@ -136,15 +117,10 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
         descriptor.setId(NOTIFICATION_FORMATS_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
-        descriptor.setFilter(createFilterList(Stream.of(NotificationFormat.values()).map(item ->
-            Map.of(
-                "value", item.name(),
-                "label", this.translationHelper.getFormatTranslation(item)
-            )).collect(Collectors.toList())));
-        descriptor.setVisible(false);
+        descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(false);
-        descriptor.setFilterable(true);
+        descriptor.setFilterable(false);
 
         return descriptor;
     }

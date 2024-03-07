@@ -95,6 +95,7 @@ notifications.settings.filters.preferences.system.title=System Filters
 notifications.settings.filters.preferences.system.hint=System filters that you can switches to have a more fine-grained control of the notifications you want to receive.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Name
+notifications.settings.filters.preferences.system.table.filterDescription=Description
 notifications.settings.filters.preferences.system.table.filterType=Description
 notifications.settings.filters.preferences.system.table.notificationFormats=Formats
 notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?

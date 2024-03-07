@@ -58,8 +58,10 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -325,5 +327,19 @@ public class VersioningStoreQueryFactoryTest
         assertEquals(ascending, orders.get(1).isAscending());
         verify(this.queryNodeInfo).setFirstResult(start);
         verify(this.queryNodeInfo).setMaxResults(size);
+    }
+
+    @Test
+    void testRCSNodeInfoQueryWithAllRange()
+    {
+        // When the size of the range is 0 (ALL), there should be no filtering done.
+        RevisionCriteria criteria = new RevisionCriteriaFactory().createRevisionCriteria(true);
+        for (int start : new int[] {-10, 0, 10}) {
+            criteria.setRange(RangeFactory.createRange(start, 0));
+            VersioningStoreQueryFactory.getRCSNodeInfoQuery(this.session, 42L, criteria);
+        }
+        verify(this.criteriaQueryNodeInfo, never()).orderBy(Mockito.<Order[]>any());
+        verify(this.queryNodeInfo, never()).setFirstResult(anyInt());
+        verify(this.queryNodeInfo, never()).setMaxResults(anyInt());
     }
 }

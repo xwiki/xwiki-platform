@@ -788,7 +788,7 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
 ######################################################
 {{html clean="false"}}
 &lt;div class="customFilterPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
-  &lt;div class="row"&gt;
+  &lt;div class="row xform"&gt;
     &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.custom.hint'))
     &lt;/p&gt;
@@ -830,7 +830,6 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
     'properties': 'name,filterType,eventTypes,notificationFormats,isEnabled,_actions',
     'source': 'liveTable',
     'sourceParameters': $escapetool.url($sourceParameters),
-    'description': $services.localization.render('notifications.settings.filters.preferences.custom.table.description'),
     'limit': 10
   }, $liveDataConfig)
 &lt;/div&gt;

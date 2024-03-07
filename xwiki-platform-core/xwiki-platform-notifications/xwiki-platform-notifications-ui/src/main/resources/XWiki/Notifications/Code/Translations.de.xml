@@ -95,6 +95,7 @@ notifications.settings.filters.preferences.system.table.name=Name
 notifications.settings.filters.preferences.system.table.filterType=Beschreibung
 notifications.settings.filters.preferences.system.table.notificationFormats=Formate
 notifications.settings.filters.preferences.system.table.isEnabled=Aktiviert?
+notifications.settings.filters.preferences.system.table.description=Hier werden alle Systemfilter dieses Wikis angezeigt.
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=Benutzerdefinierte Filter
@@ -106,6 +107,7 @@ notifications.settings.filters.preferences.custom.table.eventTypes=Events
 notifications.settings.filters.preferences.custom.table.notificationFormats=Formate
 notifications.settings.filters.preferences.custom.table.isEnabled=Aktiviert?
 notifications.settings.filters.preferences.custom.table._actions=Aktionen
+notifications.settings.filters.preferences.custom.table.description=Hier werden alle selbst erstellten Filter dieses Nutzenden oder Wikis angezeigt.
 notifications.filters.type.custom.inclusive=Für dieses Event benachrichtigen
 notifications.filters.type.custom.exclusive=Das Event ignorieren
 notifications.settings.addFilter=Filter hinzufügen

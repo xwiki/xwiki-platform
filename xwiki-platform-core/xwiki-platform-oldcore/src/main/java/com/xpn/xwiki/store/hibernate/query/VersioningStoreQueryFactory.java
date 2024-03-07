@@ -121,10 +121,10 @@ public final class VersioningStoreQueryFactory<T>
         int start = range.getStart();
         int size = range.getSize();
 
-        if (start > 0 || start == 0 && size >= 0) {
+        if (start > 0 && size != 0 || start == 0 && size > 0) {
             this.criteriaQuery.orderBy(this.builder.asc(this.root.get(FIELD_ID).get(FIELD_VERSION1)),
                 this.builder.asc(this.root.get(FIELD_ID).get(FIELD_VERSION2)));
-        } else {
+        } else if (size != 0) {
             this.criteriaQuery.orderBy(this.builder.desc(this.root.get(FIELD_ID).get(FIELD_VERSION1)),
                 this.builder.desc(this.root.get(FIELD_ID).get(FIELD_VERSION2)));
             start = -start;
@@ -133,10 +133,10 @@ public final class VersioningStoreQueryFactory<T>
 
         this.query = this.session.createQuery(this.criteriaQuery);
 
-        if (size >= 0) {
+        if (size > 0) {
             this.query.setFirstResult(start);
             this.query.setMaxResults(size);
-        } else {
+        } else if (size < 0) {
             int newStart = Math.max(0, start + size);
             this.query.setFirstResult(newStart);
             this.query.setMaxResults(start - newStart);

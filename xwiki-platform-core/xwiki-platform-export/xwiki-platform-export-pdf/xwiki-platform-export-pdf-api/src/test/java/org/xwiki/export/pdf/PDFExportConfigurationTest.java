@@ -17,35 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.script.internal.safe;
+package org.xwiki.export.pdf;
 
-import org.junit.Test;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.script.safe.ScriptSafeProvider;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.junit.jupiter.api.Test;
+
 /**
- * Unit tests for {@link SafeExtension}.
+ * Unit tests for the default methods of {@link PDFExportConfiguration}.
  * 
  * @version $Id$
  */
-public class SafeExtensionTest
+class PDFExportConfigurationTest
 {
-    private InstalledExtension extension = mock(InstalledExtension.class);
-
-    @SuppressWarnings("unchecked")
-    private ScriptSafeProvider<Object> safeProvider = mock(ScriptSafeProvider.class);
-
-    private SafeExtension<InstalledExtension> safeExtension = new SafeExtension<>(extension, safeProvider);
+    private PDFExportConfiguration config = mock(PDFExportConfiguration.class);
 
     @Test
-    public void getPropertyWithDefaultValue()
+    void isXWikiURISpecified() throws Exception
     {
-        when(this.extension.getProperty("foo", 23)).thenReturn(16);
-        when(this.safeProvider.get(16)).thenReturn(61);
-        assertEquals((Object) 61, safeExtension.getProperty("foo", 23));
+        when(this.config.isXWikiURISpecified()).thenCallRealMethod();
+
+        when(this.config.getXWikiURI()).thenReturn(new URI("http://www.xwiki.org"));
+        assertTrue(this.config.isXWikiURISpecified());
+
+        when(this.config.getXWikiURI()).thenReturn(new URI(PDFExportConfiguration.DEFAULT_XWIKI_URI));
+        assertFalse(this.config.isXWikiURISpecified());
+
+        when(this.config.getXWikiURI()).thenThrow(new URISyntaxException("some URI", "some reason"));
+        assertTrue(this.config.isXWikiURISpecified());
     }
 }

@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
-import org.xwiki.script.internal.safe.AbstractSafeObject;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.AbstractSafeObject;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Wrap a {@link Captcha} implementation for script API access.

@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Script safe provider for {@link Captcha} instances.

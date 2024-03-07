@@ -77,6 +77,11 @@ public class AuthenticationCookieFilter implements CookieFilter
             PersistentLoginManagerInterface loginManager = this.persistentLoginManagerProvider.get();
             String userName = loginManager.getRememberedUsername(xcontext.getRequest(), xcontext.getResponse());
             String password = loginManager.getRememberedPassword(xcontext.getRequest(), xcontext.getResponse());
+            if (userName == null || password == null) {
+                // No need to update the cookies if the user is not logged in or if the authentication cookies are not
+                // valid.
+                return;
+            }
             HttpServletRequest fakeRequest = new HttpServletRequestWrapper(xcontext.getRequest())
             {
                 @Override

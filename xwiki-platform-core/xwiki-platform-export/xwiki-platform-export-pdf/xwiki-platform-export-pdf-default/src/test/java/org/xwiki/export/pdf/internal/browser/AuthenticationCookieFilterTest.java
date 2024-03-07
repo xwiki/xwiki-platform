@@ -19,7 +19,15 @@
  */
 package org.xwiki.export.pdf.internal.browser;
 
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
 
 import javax.inject.Provider;
 import javax.servlet.http.Cookie;
@@ -40,12 +48,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link AuthenticationCookieFilter}.
@@ -111,8 +113,33 @@ class AuthenticationCookieFilterTest
         }).when(this.loginManager).rememberLogin(any(HttpServletRequest.class), any(HttpServletResponse.class),
             eq("alice"), eq("wonderland"));
 
-        this.authCookieFilter.filter(Collections.singletonList(cookie), this.cookieFilterContext);
+        this.authCookieFilter.filter(List.of(cookie), this.cookieFilterContext);
 
         assertEquals("value_bound_to_172.17.0.3", cookie.getValue());
+    }
+
+    @Test
+    void filterWithoutAuthenticationCookies() throws Exception
+    {
+        Cookie cookie = new Cookie("test", "before");
+
+        this.authCookieFilter.filter(List.of(cookie), this.cookieFilterContext);
+
+        assertEquals("before", cookie.getValue());
+        verify(this.loginManager, never()).rememberLogin(any(), any(), any(), any());
+
+        when(this.loginManager.getRememberedUsername(this.httpRequest, this.httpResponse)).thenReturn("alice");
+
+        this.authCookieFilter.filter(List.of(cookie), this.cookieFilterContext);
+
+        assertEquals("before", cookie.getValue());
+        verify(this.loginManager, never()).rememberLogin(any(), any(), any(), any());
+
+        when(this.loginManager.getRememberedPassword(this.httpRequest, this.httpResponse)).thenReturn("wonderland");
+
+        this.authCookieFilter.filter(List.of(cookie), this.cookieFilterContext);
+
+        verify(this.loginManager).rememberLogin(any(HttpServletRequest.class), any(HttpServletResponse.class),
+            eq("alice"), eq("wonderland"));
     }
 }

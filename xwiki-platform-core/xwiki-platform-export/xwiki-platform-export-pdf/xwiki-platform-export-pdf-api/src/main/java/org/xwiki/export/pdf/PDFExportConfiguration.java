@@ -40,6 +40,16 @@ import org.xwiki.stability.Unstable;
 public interface PDFExportConfiguration
 {
     /**
+     * The default host used by the headless Chrome to access XWiki.
+     */
+    String DEFAULT_XWIKI_HOST = "host.xwiki.internal";
+
+    /**
+     * The default URI used by the headless Chrome to access XWiki.
+     */
+    String DEFAULT_XWIKI_URI = "//" + DEFAULT_XWIKI_HOST;
+
+    /**
      * @return the Docker image used to create the Docker container running the headless Chrome web browser; defaults to
      *         "{@code zenika/alpine-chrome:latest}"
      */
@@ -99,6 +109,21 @@ public interface PDFExportConfiguration
      * @since 15.7RC1
      */
     URI getXWikiURI() throws URISyntaxException;
+
+    /**
+     * @return {@code true} if the XWiki URI is specified in the configuration, {@code false} if the default XWiki URI
+     *         is used
+     */
+    default boolean isXWikiURISpecified()
+    {
+        try {
+            return !getXWikiURI().toString().equals(DEFAULT_XWIKI_URI);
+        } catch (URISyntaxException e) {
+            // If the XWiki URI cannot be parsed then most likely it is specified (basically we expect the default XWiki
+            // URI to be valid).
+            return true;
+        }
+    }
 
     /**
      * @return {@code true} if the PDF export should be performed server-side, e.g. using a headless Chrome web browser

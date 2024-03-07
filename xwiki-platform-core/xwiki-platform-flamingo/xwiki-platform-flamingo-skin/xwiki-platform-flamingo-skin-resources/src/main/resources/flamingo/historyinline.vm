@@ -34,9 +34,7 @@
 #set ($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
 #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-#set ($versions = $tdoc.getRevisions($criteria))
-#set ($discard = $collectiontool.reverseModifiable($versions))
-#set ($totalVersions = $versions.size())
+#set ($totalVersions = $tdoc.getRevisionsCount($criteria))
 #if ($totalVersions == 0)
   #warning ($services.localization.render('core.viewers.history.empty'))
 #else

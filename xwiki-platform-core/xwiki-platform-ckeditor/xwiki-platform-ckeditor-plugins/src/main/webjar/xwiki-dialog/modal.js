@@ -29,9 +29,10 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
   let iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=cross`;
   // Default value taken until the fetch is fulfilled
   var closeIconTemplate = `<span aria-hidden="true">&times;</span>`;
-  $.get(iconURL,function(response) {
+  const iconRequest = $.get(iconURL, function(response) {
     // We override the template if the request is successful
     let iconMetadata = response.getElementsByTagName('icon')[0];
+    console.log(iconMetadata);
     if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'IMAGE') {
       closeIconTemplate = '<img src="' + iconMetadata.getElementsByTagName('url')[0].textContent +
           '" alt="" />';
@@ -40,9 +41,8 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
           iconMetadata.getElementsByTagName('cssClass')[0].textContent +
           '" aria-hidden="true"></span>';
     }
-  });
-  let modalTemplate =
-    '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
+  }).then(function() {
+  return '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
       '<div class="modal-dialog" role="document">' +
         '<div class="modal-content">' +
           '<div class="modal-header">' +
@@ -58,7 +58,9 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
           '</div>' +
         '</div>' +
       '</div>' +
-    '</div>',
+    '</div>';
+  });
+  
 
   createModal = function(definition) {
     definition = $.extend({
@@ -67,6 +69,7 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
       acceptLabel: translations.get('ok'),
       dismissLabel: translations.get('cancel')
     }, definition);
+    const modalTemplate = iconRequest.value();
     var modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
     modal.find('.close').attr({
       title: translations.get('close'),

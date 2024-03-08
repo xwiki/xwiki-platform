@@ -47,6 +47,7 @@
           :class="'action action_' + action.id"
           :title="action.description"
           :href="sanitizeUrl(entry[action.urlProperty]) || '#'"
+          @click="handleClick($event, action)"
         >
           <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
         </a>
@@ -93,7 +94,49 @@ export default {
         .map(action => this.logic.getActionDescriptor(action));
     },
   },
+  methods: {
+    async handleClick(event, action) {
+      const {async} = action;
+      if (async) {
+        event.preventDefault();
+        const confirmed = await new Promise((resolve) => {
+          if (async.confirmationMessage) {
+            new XWiki.widgets.ConfirmationBox({
+              onYes: () => resolve(true),
+              onNo: () => resolve(false)
+            }, {
+              confirmationText: async.confirmationMessage
+            })
+          } else {
+            resolve(true)
+          }
+        })
+        if (confirmed) {
+          const notif = new XWiki.widgets.Notification(async.loadingMessage, 'inprogress');
+          const resource = this.sanitizeUrl(this.entry[action.urlProperty]);
 
+          const options = {
+            "method": async.httpMethod
+          };
+          if (async.body) {
+            options.body = async.body;
+          }
+          
+          if(async.headers) {
+            options.headers = async.headers;
+          }
+
+          const response = await fetch(resource, options)
+          if (response.ok) {
+            notif.replace(new XWiki.widgets.Notification(async.successMessage, 'done'));
+            this.logic.updateEntries();
+          } else {
+            notif.replace(new XWiki.widgets.Notification(async.failureMessage, 'error'));
+          }
+        }
+      }
+    }
+  }
 };
 </script>
 

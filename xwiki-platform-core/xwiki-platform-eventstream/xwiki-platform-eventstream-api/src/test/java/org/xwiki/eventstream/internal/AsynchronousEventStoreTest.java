@@ -37,9 +37,14 @@ import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.events.EventStreamAddedEvent;
+import org.xwiki.eventstream.events.MailEntityAddedEvent;
+import org.xwiki.eventstream.events.MailEntityDeleteEvent;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,6 +52,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
 /**
  * Validate {@link AbstractAsynchronousEventStore}.
@@ -265,6 +273,9 @@ public class AsynchronousEventStoreTest
     @InjectMockComponents
     private TestAbstractAsynchronousEventStore store;
 
+    @MockComponent
+    private ObservationManager observation;
+
     private DefaultEvent event(String id)
     {
         DefaultEvent event = new DefaultEvent();
@@ -404,12 +415,25 @@ public class AsynchronousEventStoreTest
         assertSame(status21, this.store.events.get(event2.getId()).mailstatuses.get(status21.getEntityId()));
         assertSame(status24, this.store.events.get(event2.getId()).mailstatuses.get(status24.getEntityId()));
 
+        verify(this.observation).notify(any(EventStreamAddedEvent.class), eq(event1));
+        verify(this.observation).notify(any(EventStreamAddedEvent.class), eq(event2));
+        verify(this.observation).notify(any(MailEntityAddedEvent.class), eq(status11));
+        verify(this.observation).notify(any(MailEntityAddedEvent.class), eq(status13));
+        verify(this.observation).notify(any(MailEntityAddedEvent.class), eq(status21));
+        verify(this.observation).notify(any(MailEntityAddedEvent.class), eq(status24));
+
+
         this.store.deleteMailEntityEvent(status11).get();
+        // Delete Mail Entity event needs a bit more checks because it's Optional so it might take a bit more time than
+        // other events: we give those few more milliseconds to avoid flickers
+        Thread.sleep(5);
 
         assertNull(this.store.events.get(event1.getId()).mailstatuses.get(status11.getEntityId()));
         assertSame(status13, this.store.events.get(event1.getId()).mailstatuses.get(status13.getEntityId()));
         assertSame(status21, this.store.events.get(event2.getId()).mailstatuses.get(status21.getEntityId()));
         assertSame(status24, this.store.events.get(event2.getId()).mailstatuses.get(status24.getEntityId()));
+
+        verify(this.observation).notify(any(MailEntityDeleteEvent.class), eq(status11));
     }
 
     @Test

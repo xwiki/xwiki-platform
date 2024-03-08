@@ -21,8 +21,9 @@ define('xwiki-realtime-userData', [
   'chainpad',
   'chainpad-netflux',
   'json.sortify'
-], function(ChainPad, chainpadNetflux, jsonSortify) {
+], function(ChainPad, ChainPadNetflux, jsonSortify) {
   'use strict';
+
   let userData, onChange;
   function updateUserData(textData) {
     try {
@@ -52,7 +53,6 @@ define('xwiki-realtime-userData', [
       patchTransformer: ChainPad.SmartJSONTransformer,
 
       onReady: function(info) {
-        module.leave = info.leave;
         module.chainpad = info.realtime;
         updateUserData(module.chainpad.getUserDoc());
         initializing = false;
@@ -129,14 +129,10 @@ define('xwiki-realtime-userData', [
       }, 3000);
     }
 
-    userData.leave = function() {
+    userData.stop = function() {
       clearInterval(intervalId);
-      try {
-        // Don't throw error if the channel is already removed.
-        module.leave();
-      } catch (e) {
-        console.error(e);
-      }
+      module.realtimeInput?.stop();
+      delete module.realtimeInput;
     };
 
     return userData;
@@ -156,7 +152,8 @@ define('xwiki-realtime-userData', [
     const config = createConfig(network, key, configData);
     userData = createUserData(configData, config);
 
-    chainpadNetflux.start(config);
+    // We can't store the realtimeInput in the userData object because it's not serializable to JSON.
+    module.realtimeInput = ChainPadNetflux.start(config);
 
     return userData;
   };

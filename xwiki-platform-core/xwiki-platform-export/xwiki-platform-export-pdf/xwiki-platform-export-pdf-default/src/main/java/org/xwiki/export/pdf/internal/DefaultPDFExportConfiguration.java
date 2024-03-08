@@ -49,6 +49,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
 {
     private static final String SCHEME_SEPARATOR = "//";
 
+    private static final String PROPERTY_XWIKI_URI = "xwikiURI";
+
+    private static final String PROPERTY_XWIKI_HOST = "xwikiHost";
+
+    private static final String XWIKI_PROPERTIES_PREFIX = "export.pdf.";
+
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource xwikiProperties;
@@ -105,7 +111,7 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     {
         // The old way to configure the XWiki URI was through the "xwikiHost" property. We keep supporting it for
         // backward compatibility with old XWiki instances that have this configuration set.
-        String xwikiURI = getProperty("xwikiURI", getProperty("xwikiHost", "host.xwiki.internal"));
+        String xwikiURI = getProperty(PROPERTY_XWIKI_URI, getProperty(PROPERTY_XWIKI_HOST, DEFAULT_XWIKI_HOST));
         // We allow the scheme to be omitted when configuring the XWiki URI (falls back to the scheme used when the PDF
         // export was triggered) but we need to add the scheme separator for the URI to be valid and to make sure the
         // host is not parsed as the path.
@@ -113,6 +119,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
             xwikiURI = SCHEME_SEPARATOR + xwikiURI;
         }
         return new URI(xwikiURI);
+    }
+
+    @Override
+    public boolean isXWikiURISpecified()
+    {
+        return hasProperty(PROPERTY_XWIKI_URI) || hasProperty(PROPERTY_XWIKI_HOST);
     }
 
     @Override
@@ -162,7 +174,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
         if (this.configDocument.containsKey(key)) {
             return this.configDocument.getProperty(key, defaultValue);
         } else {
-            return this.xwikiProperties.getProperty("export.pdf." + key, defaultValue);
+            return this.xwikiProperties.getProperty(XWIKI_PROPERTIES_PREFIX + key, defaultValue);
         }
+    }
+
+    private boolean hasProperty(String key)
+    {
+        return this.configDocument.containsKey(key) || this.xwikiProperties.containsKey(XWIKI_PROPERTIES_PREFIX + key);
     }
 }

@@ -56,6 +56,7 @@ import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -126,6 +127,10 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -411,7 +416,11 @@ public class BaseAttachmentsResource extends XWikiResource
                 String.format("Failed to instantiate a [%s] component.", AttachmentValidator.class.getName()), e);
         }
 
-        // Set the document author.
+        // Set the document creator / author.
+        if (document.isNew()) {
+            document.getAuthors()
+                .setCreator(this.documentReferenceUserReferenceResolver.resolve(xcontext.getUserReference()));
+        }
         document.setAuthorReference(xcontext.getUserReference());
 
         // Calculate and store the attachment media type.

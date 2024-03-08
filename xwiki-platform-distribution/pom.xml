@@ -468,6 +468,8 @@
                        TODO: find out what it's about...
                    -->
                   <ignoredResourcePattern>builddef.lst</ignoredResourcePattern>
+                  <!-- Silly mistakes... -->
+                  <ignoredResourcePattern>.gitignore</ignoredResourcePattern>
                 </ignoredResourcePatterns>
                 <ignoredClassPatterns>
                   <!-- Java 9 modules descriptor (should probably be fixed in the plugin) -->

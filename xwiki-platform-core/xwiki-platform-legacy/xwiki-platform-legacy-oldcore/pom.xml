@@ -35,7 +35,7 @@
     <!-- The features provided by this module so that it's found when resolving extension that pretty much never depend on this one -->
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-oldcore,
-      com.xpn.xwiki.platform:xwiki-core
+      ${xwiki.platform.oldcore.extension.features}
     </xwiki.extension.features>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->

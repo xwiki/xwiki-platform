@@ -65,7 +65,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 14.7RC1
  */
-@UITest
+@UITest(
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    },
+    resolveExtraJARs = true
+)
 class ImageIT extends AbstractCKEditorIT
 {
     
@@ -162,7 +169,8 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]",
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+                + "data-xwiki-image-style-border=\"true\"]]",
             savedPage.editWiki().getContent());
 
         // Re-edit the page.
@@ -170,7 +178,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
@@ -275,7 +283,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = newPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
         for (String id : List.of("Iimage.gif", "customID")) {
-            editor.executeOnIframe(() -> setup.getDriver().findElement(By.id(id)).click());
+            editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.id(id)).click());
             imageDialogEditModal = editor.getToolBar().editImage();
             imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
             imageDialogEditModal.clickInsert();
@@ -319,7 +327,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -335,7 +343,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -407,7 +415,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogSelectModal.clickSelect().clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceValue("doc:", false).submit();
 
@@ -439,7 +447,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.switchToAdvancedTab().selectCenterAlignment();
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
 
@@ -451,7 +459,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         // Verify that the caption and alignment are still set.
@@ -462,14 +470,14 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.close();
 
         // Verify that the link is still set.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
         LinkDialog linkSelectorModal = editor.getToolBar().insertOrEditLink();
         assertEquals("doc", linkSelectorModal.getSelectedResourceType());
         assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
         linkSelectorModal.cancel();
 
         // Change the caption to ensure that saving again works.
-        editor.executeOnIframe(
+        editor.executeOnEditedContent(
             () -> setup.getDriver().findElement(By.cssSelector("figcaption"))
                 // Go to the start of the caption and insert "New ".
                 .sendKeys(Keys.HOME, "New "));
@@ -532,7 +540,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -574,7 +582,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -732,7 +740,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -761,19 +769,20 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+            + "data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
 
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
 
         imageDialogEditModal.switchToStandardTab().setImageStyle("---");
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().setImageStyle("Bordered");
@@ -782,7 +791,8 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+            + "data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
     }
 
     private ViewPage uploadAttachment(TestUtils setup, EntityReference entityReference, String attachmentName)
@@ -794,16 +804,19 @@ class ImageIT extends AbstractCKEditorIT
         return newPage;
     }
 
-    private static void createBorderedStyle(TestUtils setup) throws Exception
+    private static void createBorderedStyle(TestUtils setup)
     {
         DocumentReference borderedStyleDocumentReference =
-            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "borderedPage");
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"),
+                "borderedPage");
         // For a reason I can't explain, using the rest API lead to random 401 http response, making the tests using the
         // methods flickering. Using the UI based methods until I can understand the root cause.
         setup.deletePage(borderedStyleDocumentReference);
         setup.addObject(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass", Map.of(
             "prettyName", "Bordered",
-            "type", "bordered"
+            "type", "bordered",
+            "defaultBorder", "1",
+            "adjustableAlignment", "1"
         ));
     }
 

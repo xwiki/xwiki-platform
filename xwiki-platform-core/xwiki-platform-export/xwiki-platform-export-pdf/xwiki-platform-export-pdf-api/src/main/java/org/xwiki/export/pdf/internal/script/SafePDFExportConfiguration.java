@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.script.internal.safe.AbstractSafeObject;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.AbstractSafeObject;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 

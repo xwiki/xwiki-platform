@@ -38,6 +38,7 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <modules>
+    <module>xwiki-platform-filter-test-pageobjects</module>
     <module>xwiki-platform-filter-test-tests</module>
   </modules>
 </project>

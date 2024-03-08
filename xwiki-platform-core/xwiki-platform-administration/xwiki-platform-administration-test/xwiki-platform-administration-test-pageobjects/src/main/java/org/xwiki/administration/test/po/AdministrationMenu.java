@@ -52,7 +52,7 @@ public class AdministrationMenu extends BaseElement
 
     private By categoryByName(String categoryName)
     {
-        return By.xpath(".//a[contains(@class, 'panel-heading') and . = '" + categoryName + "']");
+        return By.xpath(".//a[contains(@class, 'panel-heading') and normalize-space(.) = '" + categoryName + "']");
     }
 
     private By categoryById(String categoryId)
@@ -112,7 +112,7 @@ public class AdministrationMenu extends BaseElement
 
     private By sectionByName(String categoryName, String sectionName)
     {
-        return By.xpath(".//a[contains(@class, 'panel-heading') and . = '" + categoryName
+        return By.xpath(".//a[contains(@class, 'panel-heading') and normalize-space(.) = '" + categoryName
             + "']/following-sibling::*//a[contains(@class, 'list-group-item') and . = '" + sectionName + "']");
     }
 

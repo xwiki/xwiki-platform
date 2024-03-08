@@ -991,7 +991,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
 {{html clean="false"}}
 &lt;div class="xform"&gt;
 &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.hint'))&lt;/p&gt;
-&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
+&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $!divData&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th scope="col"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;

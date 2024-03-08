@@ -33,7 +33,7 @@
   <description>SOLR server configured for XWiki needs</description>
   <modules>
     <module>xwiki-platform-search-solr-server-plugin</module>
-    <module>xwiki-platform-search-solr-server-core</module>
+    <module>xwiki-platform-search-solr-server-core-search</module>
     <module>xwiki-platform-search-solr-server-core-minimal</module>
   </modules>
 </project>

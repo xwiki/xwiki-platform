@@ -51,10 +51,11 @@
   width: 15% !important;
 }
 
-/* This button has no border or background, but wraps an image to allow keyboard navigation. */
-#usersandgroupstable button.rights-edit {
-  border-color: transparent;
-  background: transparent;
+#usersandgroupstable button.rights-edit.yes {
+  color: $theme.notificationSuccessColor;
+}
+#usersandgroupstable button.rights-edit.no {
+  color: $theme.notificationErrorColor;
 }
 
 .spaceName {

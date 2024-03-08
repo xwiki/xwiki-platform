@@ -17,33 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.captcha.script;
+package org.xwiki.captcha.script.internal;
 
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
-import org.xwiki.script.safe.AbstractSafeObject;
-import org.xwiki.script.safe.ScriptSafeProvider;
+import org.xwiki.script.wrap.AbstractWrappingObject;
 
 /**
  * Wrap a {@link Captcha} implementation for script API access.
  *
  * @version $Id$
- * @since 10.8RC1
+ * @since 16.2.0RC1
  */
-public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha> implements Captcha
+public class WrappedScriptCaptcha extends AbstractWrappingObject<Captcha> implements Captcha
 {
     private Logger logger;
 
     /**
      * @param captcha the {@link Captcha} to wrap for Script API access
-     * @param safeProvider the provider making the conversion to the safe version
      * @param logger the logging component
      */
-    public WrappedScriptCaptcha(Captcha captcha, ScriptSafeProvider<Captcha> safeProvider, Logger logger)
+    public WrappedScriptCaptcha(Captcha captcha, Logger logger)
     {
-        super(captcha, safeProvider);
+        super(captcha);
         this.logger = logger;
     }
 

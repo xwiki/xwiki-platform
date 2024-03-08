@@ -232,6 +232,22 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Was never meant to be public</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.captcha.script.CaptchaScriptSafeProvider</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.captcha.script.WrappedScriptCaptcha</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

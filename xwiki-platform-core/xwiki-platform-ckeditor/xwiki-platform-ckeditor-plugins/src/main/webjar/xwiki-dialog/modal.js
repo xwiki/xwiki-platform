@@ -43,39 +43,21 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
     }
     // Once we retrieve the icon value, we
     // 1. Replace all the uses of the icon in the DOM already generated
-    console.log(closeIconTemplate);
     const closeButtons = document.querySelectorAll(
       '.modal > .modal-dialog > .modal-content > .modal-header > button.close');
     closeButtons.forEach((button)=> {
       button.innerHTML = closeIconTemplate;
     });
     // 2. replace the modal template used to create new modals
-    const newModalTemplate = '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
-      '<div class="modal-dialog" role="document">' +
-        '<div class="modal-content">' +
-          '<div class="modal-header">' +
-            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-            closeIconTemplate +
-            '</button>' +
-            '<h4 class="modal-title"></h4>' +
-          '</div>' +
-          '<div class="modal-body"></div>' +
-          '<div class="modal-footer">' +
-            '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
-            '<button type="button" class="btn btn-primary" disabled="disabled">OK</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-    modalTemplate = newModalTemplate;
+    closeButtonTemplate = closeIconTemplate;
   });
-  
+  let closeButtonTemplate = '<span aria-hidden="true">&times;</span>';
   let modalTemplate = '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
     '<div class="modal-dialog" role="document">' +
       '<div class="modal-content">' +
         '<div class="modal-header">' +
           '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-            '<span aria-hidden="true">&times;</span>' +
+            closeButtonTemplate +
           '</button>' +
           '<h4 class="modal-title"></h4>' +
         '</div>' +

@@ -26,7 +26,7 @@ define('modalTranslationKeys', [], [
 define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations) {
   'use strict';
   // Fetch the cross icon from the icon theme to fill up the modal template.
-  let iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=cross`;
+  let iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/iconThemes/icons?name=cross`;
   // Default value taken until the fetch is fulfilled
   var closeIconTemplate = `<span aria-hidden="true">&times;</span>`;
   $.get(iconURL, function(response) {

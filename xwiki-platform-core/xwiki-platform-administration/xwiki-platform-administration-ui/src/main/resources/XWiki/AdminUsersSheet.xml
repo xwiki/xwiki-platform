@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.AdminUsersSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.AdminUsersSheet" locale="">
   <web>XWiki</web>
   <name>AdminUsersSheet</name>
   <language/>
@@ -361,6 +361,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -380,6 +382,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -408,6 +411,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -726,6 +731,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -745,6 +752,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -754,6 +762,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -789,6 +799,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -806,16 +818,14 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
-/**
+      <code>/**
  * Users Live Table
  */
 #userstable .action_disable .action-icon {
-  color: $theme.notificationWarningColor;
+  color: @brand-warning;
 }
 #userstable .action_enable .action-icon {
-  color: $theme.notificationSuccessColor;
+  color: @brand-success;
 }
 
 /**
@@ -836,13 +846,13 @@ body &gt; .selectize-dropdown {
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

@@ -83,7 +83,7 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getNameDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "name"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + NAME_FIELD));
         descriptor.setId(NAME_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
@@ -98,7 +98,7 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getDescriptionDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "description"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + DESCRIPTION_FIELD));
         descriptor.setId(DESCRIPTION_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
@@ -113,10 +113,10 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getNotificationFormatsDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "notificationFormats"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + NOTIFICATION_FORMATS_FIELD));
         descriptor.setId(NOTIFICATION_FORMATS_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(false);
@@ -128,7 +128,7 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getIsEnabledDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "isEnabled"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + IS_ENABLED_FIELD));
         descriptor.setId(IS_ENABLED_FIELD);
         descriptor.setType("Boolean");
         LiveDataPropertyDescriptor.FilterDescriptor filterBoolean =

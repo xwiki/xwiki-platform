@@ -28,6 +28,12 @@ import org.xwiki.livedata.LiveDataEntryStore;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataSource;
 
+/**
+ * Live data source for notification system filter preferences.
+ *
+ * @version $Id$
+ * @since 16.2.0RC1
+ */
 @Component
 @Singleton
 @Named(NotificationSystemFiltersLiveDataSource.NAME)

@@ -90,9 +90,8 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
     @Override
     public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
     {
-        Optional<Map<String, Object>> result = Optional.empty();
-
-        return result;
+        // We don't need to retrieve a single element for now.
+        return Optional.empty();
     }
 
     private Map<String, Object> getPreferencesInformation(ToggleableNotificationFilter notificationFilter,
@@ -118,8 +117,8 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
 
     private String getObjectNumber(ToggleableNotificationFilterActivation filterActivation)
     {
-        return (filterActivation != null && filterActivation.getObjectNumber() != -1) ?
-            String.valueOf(filterActivation.getObjectNumber()) : "";
+        return (filterActivation != null && filterActivation.getObjectNumber() != -1)
+            ? String.valueOf(filterActivation.getObjectNumber()) : "";
     }
 
     private Map<String, String> displayIsEnabledData(NotificationFilter notificationFilter,

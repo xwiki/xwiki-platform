@@ -20,7 +20,6 @@
 package org.xwiki.notifications.filters.internal.livedata.custom;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,13 +80,15 @@ import com.xpn.xwiki.XWikiContext;
 @Named(NotificationCustomFiltersLiveDataSource.NAME)
 public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntryStore
 {
+    private static final String WIKI = "wiki";
     private static final String STARTS_WITH_OPERATOR = "startsWith";
     private static final String CONTAINS_OPERATOR = "contains";
     private static final String EQUALS_OPERATOR = "equals";
     private static final String LOCATION_TEMPLATE = "notification/filters/livedatalocation.vm";
     private static final String TARGET_SOURCE_PARAMETER = "target";
-    private static final String WIKI_SOURCE_PARAMETER = "wiki";
+    private static final String WIKI_SOURCE_PARAMETER = WIKI;
     private static final String UNAUTHORIZED_EXCEPTION_MSG = "You don't have rights to access those information.";
+    private static final String AND = " and ";
 
     @Inject
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
@@ -162,7 +163,7 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
     {
         NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
 
-        HashMap<String, Object> result = new LinkedHashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         // Map.of only accept 10 args
         result.put(NotificationCustomFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId());
         result.put(NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD,
@@ -199,14 +200,24 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
     private String displayLocation(NotificationFilterPreference filterPreference,
         NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
     {
-        EntityReference location = null;
+        EntityReference location;
         switch (scope) {
-            case WIKI -> location = this.entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
-            case SPACE -> location = this.entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
-            case PAGE -> location = this.entityReferenceResolver.resolve(filterPreference.getPageOnly(),
-                EntityType.DOCUMENT);
-            case USER -> location = this.entityReferenceResolver.resolve(filterPreference.getUser(),
-                EntityType.DOCUMENT);
+            case USER:
+                location = this.entityReferenceResolver.resolve(filterPreference.getUser(), EntityType.DOCUMENT);
+                break;
+
+            case WIKI:
+                location = this.entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
+                break;
+
+            case SPACE:
+                location = this.entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
+                break;
+
+            default:
+            case PAGE:
+                location = this.entityReferenceResolver.resolve(filterPreference.getPageOnly(), EntityType.DOCUMENT);
+                break;
         }
         // FIXME: Do we need a new execution context?
         ScriptContext currentScriptContext = this.scriptContextManager.getCurrentScriptContext();
@@ -214,47 +225,64 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
         return this.templateManager.renderNoException(LOCATION_TEMPLATE);
     }
 
-    private String displayEventTypes(NotificationFilterPreference filterPreference) throws LiveDataException
+    private String getUnstyledList(List<String> items)
     {
         StringBuilder result = new StringBuilder("<ul class=\"list-unstyled\">");
-        Set<String> eventTypes = filterPreference.getEventTypes();
-        if (eventTypes.isEmpty()) {
+        for (String item : items) {
             result.append("<li>");
-            result.append(this.translationHelper.getAllEventTypesTranslation());
-            result.append("<li>");
-        } else {
-            for (String eventType : eventTypes) {
-                result.append("<li>");
-                result.append(this.translationHelper.getEventTypeTranslation(eventType));
-                result.append("</li>");
-            }
+            result.append(item);
+            result.append("</li>");
         }
         result.append("</ul>");
         return result.toString();
+    }
+
+    private String displayEventTypes(NotificationFilterPreference filterPreference) throws LiveDataException
+    {
+        String result;
+        Set<String> eventTypes = filterPreference.getEventTypes();
+        if (eventTypes.isEmpty()) {
+            result = getUnstyledList(List.of(this.translationHelper.getAllEventTypesTranslation()));
+        } else {
+            List<String> items = new ArrayList<>();
+            for (String eventType : eventTypes) {
+                items.add(this.translationHelper.getEventTypeTranslation(eventType));
+            }
+            result = getUnstyledList(items);
+        }
+        return result;
     }
 
     private String displayNotificationFormats(NotificationFilterPreference filterPreference)
     {
-        StringBuilder result = new StringBuilder("<ul class=\"list-unstyled\">");
-
+        List<String> items = new ArrayList<>();
         for (NotificationFormat notificationFormat : filterPreference.getNotificationFormats()) {
-            result.append("<li>");
-            result.append(this.translationHelper.getFormatTranslation(notificationFormat));
-            result.append("</li>");
+            items.add(this.translationHelper.getFormatTranslation(notificationFormat));
         }
-        result.append("</ul>");
 
-        return result.toString();
+        return getUnstyledList(items);
     }
 
     private Map<String, String> getScopeInfo(NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
     {
-        String icon = "";
+        String icon;
         switch (scope) {
-            case WIKI -> icon = "wiki";
-            case SPACE -> icon = "chart-organisation";
-            case PAGE -> icon = "page";
-            case USER -> icon = "user";
+            case USER:
+                icon = "user";
+                break;
+
+            case WIKI:
+                icon = WIKI;
+                break;
+
+            case SPACE:
+                icon = "chart-organisation";
+                break;
+
+            default:
+            case PAGE:
+                icon = "page";
+                break;
         }
         return Map.of("icon", icon, "name", this.translationHelper.getScopeTranslation(scope));
     }
@@ -296,10 +324,10 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
         }
     }
 
-    private static class FiltersHQLQuery
+    private static final class FiltersHQLQuery
     {
-        String whereClause;
-        Map<String, Object> bindings = new LinkedHashMap<>();
+        private String whereClause;
+        private final Map<String, Object> bindings = new LinkedHashMap<>();
     }
 
     private Optional<FiltersHQLQuery> handleFilter(List<LiveDataQuery.Filter> queryFilters)
@@ -308,88 +336,35 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
         List<String> queryWhereClauses = new ArrayList<>();
         for (LiveDataQuery.Filter queryFilter : queryFilters) {
             switch (queryFilter.getProperty()) {
-                case NotificationCustomFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD -> {
-                    // We only check first constraint: if there's more they are either redundant or contradictory.
-                    LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
-                    if (Boolean.parseBoolean(String.valueOf(constraint.getValue()))) {
-                        queryWhereClauses.add("nfp.enabled = 1");
-                    } else {
-                        queryWhereClauses.add("nfp.enabled = 0");
-                    }
-                }
+                case NotificationCustomFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD ->
+                    this.handleIsEnabledFilter(queryFilter, queryWhereClauses);
 
-                case NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
-                    // We authorize only a single constraint here
-                    LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
-                    String constraintValue = String.valueOf(constraint.getValue());
-                    if (EQUALS_OPERATOR.equals(constraint.getOperator())
-                        && !StringUtils.isEmpty(constraintValue)) {
-                        if (NotificationFormat.ALERT.name().equals(constraintValue)) {
-                            queryWhereClauses.add("nfp.alertEnabled = 1");
-                        }
-                        if (NotificationFormat.EMAIL.name().equals(constraintValue)) {
-                            queryWhereClauses.add("nfp.emailEnabled = 1");
-                        }
-                    }
-                }
+                case NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD ->
+                    this.handleNotificationFormatsFilter(queryFilter, queryWhereClauses);
 
-                case NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD -> {
-                    // We authorize only a single constraint here
-                    LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
-                    if (EQUALS_OPERATOR.equals(constraint.getOperator())
-                        && !StringUtils.isBlank(String.valueOf(constraint.getValue()))) {
-                        NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope =
-                            NotificationCustomFiltersLiveDataConfigurationProvider.Scope.valueOf(
-                                String.valueOf(constraint.getValue()));
-                        queryWhereClauses.add(String.format("length(nfp.%s) > 0 ", scope.getFieldName()));
-                    }
-                }
+                case NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD ->
+                    this.handleScopeFilter(queryFilter, queryWhereClauses);
 
-                case NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD -> {
-                    // We authorize only a single constraint here
-                    LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
-                    if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
-                        queryWhereClauses.add("nfp.filterType = :filterType");
-                        result.bindings.put("filterType",
-                            NotificationFilterType.valueOf(String.valueOf(constraint.getValue())));
-                    }
-                }
+                case NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
+                    this.handleFilterTypeFilter(queryFilter, queryWhereClauses, result);
 
-                case NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD -> {
-                    Optional<FiltersHQLQuery> locationQueryOpt = this.handleLocationFilter(queryFilter);
-                    if (locationQueryOpt.isPresent()) {
-                        FiltersHQLQuery locationHQLQuery = locationQueryOpt.get();
-                        queryWhereClauses.add(locationHQLQuery.whereClause);
-                        result.bindings.putAll(locationHQLQuery.bindings);
-                    }
-                }
+                case NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD ->
+                    this.handleLocationFilter(queryFilter, queryWhereClauses, result);
 
-                case NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD -> {
-                    // We authorize only a single constraint here
-                    // FIXME: Actually maybe we should allow specifying multiple equals constraints?
-                    LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
-                    if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
-                        if (NotificationCustomFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
-                            constraint.getValue()))
-                        {
-                            queryWhereClauses.add("length(nfp.allEventTypes) = 0 ");
-                        } else {
-                            queryWhereClauses.add("nfp.allEventTypes like :eventTypes");
-                            DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
-                            queryParameter.anyChars().literal(String.valueOf(constraint.getValue())).anyChars();
-                            result.bindings.put("eventTypes", queryParameter);
-                        }
-                    }
+                case NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD ->
+                    this.handleEventTypeFilter(queryFilter, queryWhereClauses, result);
+
+                default -> {
                 }
             }
         }
         if (!queryWhereClauses.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder(" and ");
+            StringBuilder stringBuilder = new StringBuilder(AND);
             Iterator<String> iterator = queryWhereClauses.iterator();
             while (iterator.hasNext()) {
                 stringBuilder.append(iterator.next());
                 if (iterator.hasNext()) {
-                    stringBuilder.append(" and ");
+                    stringBuilder.append(AND);
                 }
             }
             result.whereClause = stringBuilder.toString();
@@ -399,9 +374,81 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
         }
     }
 
-    private Optional<FiltersHQLQuery> handleLocationFilter(LiveDataQuery.Filter locationFilter)
+    private void handleFilterTypeFilter(LiveDataQuery.Filter queryFilter, List<String> queryWhereClauses,
+        FiltersHQLQuery result)
     {
-        FiltersHQLQuery filtersHQLQuery = new FiltersHQLQuery();
+        // We authorize only a single constraint here
+        LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+        if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
+            queryWhereClauses.add("nfp.filterType = :filterType");
+            result.bindings.put("filterType",
+                NotificationFilterType.valueOf(String.valueOf(constraint.getValue())));
+        }
+    }
+
+    private void handleScopeFilter(LiveDataQuery.Filter queryFilter, List<String> queryWhereClauses)
+    {
+        // We authorize only a single constraint here
+        LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+        if (EQUALS_OPERATOR.equals(constraint.getOperator())
+            && !StringUtils.isBlank(String.valueOf(constraint.getValue()))) {
+            NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope =
+                NotificationCustomFiltersLiveDataConfigurationProvider.Scope.valueOf(
+                    String.valueOf(constraint.getValue()));
+            queryWhereClauses.add(String.format("length(nfp.%s) > 0 ", scope.getFieldName()));
+        }
+    }
+
+    private void handleNotificationFormatsFilter(LiveDataQuery.Filter queryFilter, List<String> queryWhereClauses)
+    {
+        // We authorize only a single constraint here
+        LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+        String constraintValue = String.valueOf(constraint.getValue());
+        if (EQUALS_OPERATOR.equals(constraint.getOperator())
+            && !StringUtils.isEmpty(constraintValue)) {
+            if (NotificationFormat.ALERT.name().equals(constraintValue)) {
+                queryWhereClauses.add("nfp.alertEnabled = 1");
+            }
+            if (NotificationFormat.EMAIL.name().equals(constraintValue)) {
+                queryWhereClauses.add("nfp.emailEnabled = 1");
+            }
+        }
+    }
+
+    private void handleIsEnabledFilter(LiveDataQuery.Filter queryFilter, List<String> queryWhereClauses)
+    {
+        // We only check first constraint: if there's more they are either redundant or contradictory.
+        LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+        if (Boolean.parseBoolean(String.valueOf(constraint.getValue()))) {
+            queryWhereClauses.add("nfp.enabled = 1");
+        } else {
+            queryWhereClauses.add("nfp.enabled = 0");
+        }
+    }
+
+    private void handleEventTypeFilter(LiveDataQuery.Filter queryFilter, List<String> queryWhereClauses,
+        FiltersHQLQuery result)
+    {
+        // We authorize only a single constraint here
+        // FIXME: Actually maybe we should allow specifying multiple equals constraints?
+        LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+        if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
+            if (NotificationCustomFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
+                constraint.getValue()))
+            {
+                queryWhereClauses.add("length(nfp.allEventTypes) = 0 ");
+            } else {
+                queryWhereClauses.add("nfp.allEventTypes like :eventTypes");
+                DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
+                queryParameter.anyChars().literal(String.valueOf(constraint.getValue())).anyChars();
+                result.bindings.put("eventTypes", queryParameter);
+            }
+        }
+    }
+
+    private void handleLocationFilter(LiveDataQuery.Filter locationFilter, List<String> queryWhereClauses,
+        FiltersHQLQuery result)
+    {
         List<String> clauses = new ArrayList<>();
         int clauseCounter = 0;
         String clauseValue = "(nfp.pageOnly like :constraint_%1$s or nfp.page like :constraint_%1$s or "
@@ -413,25 +460,22 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
                     + "nfp.wiki = :constraint_%1$s or nfp.user = :constraint_%1$s)", clauseCounter));
                 DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
                 queryParameter.literal(String.valueOf(constraint.getValue()));
-                filtersHQLQuery.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
+                result.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
             } else if (STARTS_WITH_OPERATOR.equals(constraint.getOperator())) {
                 clauses.add(String.format(clauseValue, clauseCounter));
                 DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
                 queryParameter.literal(String.valueOf(constraint.getValue())).anyChars();
-                filtersHQLQuery.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
+                result.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
             } else if (CONTAINS_OPERATOR.equals(constraint.getOperator())) {
                 clauses.add(String.format(clauseValue, clauseCounter));
                 DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
                 queryParameter.anyChars().literal(String.valueOf(constraint.getValue())).anyChars();
-                filtersHQLQuery.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
+                result.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
             }
             clauseCounter++;
         }
         if (!clauses.isEmpty()) {
-            filtersHQLQuery.whereClause = buildQueryClause(locationFilter, clauses);
-            return Optional.of(filtersHQLQuery);
-        } else {
-            return Optional.empty();
+            queryWhereClauses.add(buildQueryClause(locationFilter, clauses));
         }
     }
 
@@ -440,7 +484,7 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
         StringBuilder result = new StringBuilder("(");
         String operatorAppender;
         if (filter.isMatchAll()) {
-            operatorAppender = " and ";
+            operatorAppender = AND;
         } else {
             operatorAppender = " or ";
         }
@@ -489,6 +533,9 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
 
                 case NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD ->
                     clauses.add(String.format("nfp.allEventTypes %s", sortOperator));
+
+                default -> {
+                }
             }
         }
         if (!clauses.isEmpty()) {

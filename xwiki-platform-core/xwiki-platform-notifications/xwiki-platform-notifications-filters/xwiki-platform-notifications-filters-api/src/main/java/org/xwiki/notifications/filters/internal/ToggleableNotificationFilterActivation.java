@@ -24,8 +24,15 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.DocumentReference;
 
+/**
+ * Provide information about the activation of {@link ToggleableNotificationFilter}.
+ *
+ * @version $Id$
+ * @since 16.2.0RC1
+ */
 public class ToggleableNotificationFilterActivation implements Serializable
 {
     private final String name;
@@ -33,6 +40,15 @@ public class ToggleableNotificationFilterActivation implements Serializable
     private final DocumentReference objectLocation;
     private final int objectNumber;
 
+    /**
+     * Default constructor.
+     *
+     * @param name the name of the filter
+     * @param isEnabled {@code true} if the filter is enabled
+     * @param objectLocation the location of the object holding activation information
+     * @param objectNumber the number of the actual object holding activation information or {@code -1} if there's no
+     *                     object
+     */
     public ToggleableNotificationFilterActivation(String name, boolean isEnabled, DocumentReference objectLocation,
         int objectNumber)
     {
@@ -42,21 +58,33 @@ public class ToggleableNotificationFilterActivation implements Serializable
         this.objectNumber = objectNumber;
     }
 
+    /**
+     * @return the name of the filter
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * @return {@code true} if the filter is enabled
+     */
     public boolean isEnabled()
     {
         return isEnabled;
     }
 
+    /**
+     * @return the location of the object holding activation information
+     */
     public DocumentReference getObjectLocation()
     {
         return objectLocation;
     }
 
+    /**
+     * @return the number of the actual object holding activation information or {@code -1} if there's no object
+     */
     public int getObjectNumber()
     {
         return objectNumber;
@@ -92,5 +120,16 @@ public class ToggleableNotificationFilterActivation implements Serializable
             .append(objectLocation)
             .append(objectNumber)
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("name", name)
+            .append("isEnabled", isEnabled)
+            .append("objectLocation", objectLocation)
+            .append("objectNumber", objectNumber)
+            .toString();
     }
 }

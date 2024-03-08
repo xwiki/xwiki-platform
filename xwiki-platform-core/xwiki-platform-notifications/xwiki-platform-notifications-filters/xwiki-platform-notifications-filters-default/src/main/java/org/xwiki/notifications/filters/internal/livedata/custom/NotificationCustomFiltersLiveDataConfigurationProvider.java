@@ -56,7 +56,7 @@ import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveD
 @Named(NotificationCustomFiltersLiveDataSource.NAME)
 public class NotificationCustomFiltersLiveDataConfigurationProvider implements Provider<LiveDataConfiguration>
 {
-    public static final String ALL_EVENTS_OPTION_VALUE = "__ALL_EVENTS__";
+    static final String ALL_EVENTS_OPTION_VALUE = "__ALL_EVENTS__";
     static final String ID_FIELD = "filterPreferenceId";
     static final String SCOPE_FIELD = "scope";
     static final String LOCATION_FIELD = "location";
@@ -74,11 +74,31 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private static final String VALUE_KEY = "value";
     private static final String LABEL_KEY = "label";
 
+    /**
+     * Defines the different scopes a filter might have.
+     *
+     * @version $Id$
+     */
     public enum Scope
     {
+        /**
+         * Filter preference targeting a wiki.
+         */
         WIKI("wiki"),
+
+        /**
+         * Filter preference targeting a space.
+         */
         SPACE("page"),
+
+        /**
+         * Filter preference targeting a page.
+         */
         PAGE("pageOnly"),
+
+        /**
+         * Filter preference targeting a user.
+         */
         USER("user");
 
         private final String fieldName;
@@ -87,6 +107,9 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
             this.fieldName = fieldName;
         }
 
+        /**
+         * @return the database field name used to hold value of the concerned scope.
+         */
         String getFieldName()
         {
             return this.fieldName;
@@ -166,18 +189,19 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
             new LiveDataPropertyDescriptor.FilterDescriptor("list");
         filterList.addOperator("empty", null);
         filterList.setParameter("options", options);
-        filterList.addOperator("equals", null);
-        filterList.setDefaultOperator("equals");
+        String equalsOperator = "equals";
+        filterList.addOperator(equalsOperator, null);
+        filterList.setDefaultOperator(equalsOperator);
         return filterList;
     }
 
     private LiveDataPropertyDescriptor getScopeDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "scope"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + SCOPE_FIELD));
         descriptor.setId(SCOPE_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("scope"));
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(SCOPE_FIELD));
         descriptor.setFilter(createFilterList(Stream.of(Scope.values())
             .map(item -> Map.of(
                 VALUE_KEY, item.name(),
@@ -194,7 +218,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getLocationDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "location"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + LOCATION_FIELD));
         descriptor.setId(LOCATION_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
@@ -209,7 +233,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getFilterTypeDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "filterType"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + FILTER_TYPE_FIELD));
         descriptor.setId(FILTER_TYPE_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setFilter(createFilterList(Stream.of(NotificationFilterType.values())
@@ -228,10 +252,10 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getNotificationFormatsDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "notificationFormats"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + NOTIFICATION_FORMATS_FIELD));
         descriptor.setId(NOTIFICATION_FORMATS_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("html"));
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
         descriptor.setFilter(createFilterList(Stream.of(NotificationFormat.values()).map(item ->
             Map.of(
                 VALUE_KEY, item.name(),
@@ -248,7 +272,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getEventTypesDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "eventTypes"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + EVENT_TYPES_FIELD));
         descriptor.setId(EVENT_TYPES_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
@@ -257,6 +281,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
             VALUE_KEY, ALL_EVENTS_OPTION_VALUE,
             LABEL_KEY, this.translationHelper.getAllEventTypesTranslation()));
         try {
+            // FIXME: all farm shouldn't always be true
             options.addAll(this.translationHelper.getAllEventTypesOptions(true));
         } catch (LiveDataException e) {
             this.logger.error("Cannot provide event filter options", e);
@@ -273,7 +298,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private LiveDataPropertyDescriptor getIsEnabledDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
-        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + "isEnabled"));
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + IS_ENABLED_FIELD));
         descriptor.setId(IS_ENABLED_FIELD);
         descriptor.setType("Boolean");
         LiveDataPropertyDescriptor.FilterDescriptor filterBoolean =

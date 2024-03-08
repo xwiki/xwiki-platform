@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -32,7 +31,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.user.UserReference;
 
 /**
  * Provide an interface for interacting with user notification filters.

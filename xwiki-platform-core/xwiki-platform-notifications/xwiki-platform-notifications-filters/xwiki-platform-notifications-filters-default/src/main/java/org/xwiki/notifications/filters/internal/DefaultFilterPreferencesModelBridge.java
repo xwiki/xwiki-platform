@@ -95,7 +95,8 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
     }
 
     @Override
-    public Map<String, ToggleableNotificationFilterActivation> getToggleableFilterActivations(DocumentReference user) throws NotificationException
+    public Map<String, ToggleableNotificationFilterActivation> getToggleableFilterActivations(DocumentReference user)
+        throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         WikiReference currentWiki = context.getWikiReference();

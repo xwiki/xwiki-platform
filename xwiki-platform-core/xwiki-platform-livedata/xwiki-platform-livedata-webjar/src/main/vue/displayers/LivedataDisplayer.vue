@@ -53,7 +53,6 @@
   <component
     class="livedata-displayer"
     :data-livedata-property-id="propertyId"
-    :class="['livedata-displayer', propertyId]"
     :is="`Displayer${this.capitalize(this.displayerId)}`"
     :property-id="propertyId"
     :entry="entry"

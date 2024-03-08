@@ -811,10 +811,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
 /**
  * Users Live Table
  */
-#userstable .action_disable {
+#userstable .action_disable .action-icon {
   color: $theme.notificationWarningColor;
 }
-#userstable .action_enable {
+#userstable .action_enable .action-icon {
   color: $theme.notificationSuccessColor;
 }
 

@@ -4,8 +4,11 @@
 
 // Used by: Inline boxes
 span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
-  padding: 0 floor(@font-size-base * 0.2);
   border: none;
+}
+
+span.box, span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
+  padding: 0 floor(@font-size-base * 0.2);
   box-shadow: none;
   & > img {
     // Style the silk icons

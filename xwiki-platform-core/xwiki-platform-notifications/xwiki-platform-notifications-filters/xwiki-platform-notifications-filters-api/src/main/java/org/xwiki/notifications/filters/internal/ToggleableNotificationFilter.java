@@ -49,12 +49,4 @@ public interface ToggleableNotificationFilter extends NotificationFilter
     {
         return Arrays.asList(NotificationFormat.values());
     }
-
-    /**
-     * @return the events handled by this filter
-     */
-    default List<String> getEventTypes()
-    {
-        return Collections.emptyList();
-    }
 }

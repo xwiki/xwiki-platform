@@ -185,7 +185,7 @@ require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro', 
   $(document).on('xwiki:livedata:toggle', '#notificationSystemFilterPreferencesLiveData', (event) =&gt; {
     const detail = event.detail;
     const data = detail.data
-    save(detail.checked, data.filtername, data.objectNumber, docURL).then(({checked, objectNumber}) =&gt; {
+    save(detail.checked, data.filterName, data.objectNumber, docURL).then(({checked, objectNumber}) =&gt; {
       detail.callback({
         ...detail,
         data: {

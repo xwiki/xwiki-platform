@@ -111,18 +111,6 @@ public interface NotificationFilterManager
      */
     Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters);
 
-    default List<ToggleableNotificationFilter> getToggleableFilters(UserReference userReference)
-        throws NotificationException
-    {
-        return List.of();
-    }
-
-    default List<ToggleableNotificationFilter> getToggleableFilters(WikiReference wikiReference)
-        throws NotificationException
-    {
-        return List.of();
-    }
-
     /**
      * For all toggleable notification filters, get if the filter is enabled regarding the user profile.
      *

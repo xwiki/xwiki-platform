@@ -19,11 +19,11 @@
  */
 package org.xwiki.notifications.filters.internal.livedata.system;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,20 +37,18 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
+import org.xwiki.notifications.filters.internal.ToggleableNotificationFilterActivation;
 import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveDataTranslationHelper;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -78,22 +76,16 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
     private NotificationFilterManager notificationFilterManager;
 
     @Inject
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
+
+    @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private UserReferenceResolver<String> userReferenceResolver;
-
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
     private NotificationFilterLiveDataTranslationHelper translationHelper;
 
     @Inject
     private ContextualAuthorizationManager contextualAuthorizationManager;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public Optional<Map<String, Object>> get(Object entryId) throws LiveDataException
@@ -104,7 +96,7 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
     }
 
     private Map<String, Object> getPreferencesInformation(ToggleableNotificationFilter notificationFilter,
-        Map<String, Boolean> filterActions)
+        ToggleableNotificationFilterActivation filterActivation)
     {
         return Map.of(
             NotificationSystemFiltersLiveDataConfigurationProvider.NAME_FIELD,
@@ -116,18 +108,42 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
             NotificationSystemFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
             this.displayNotificationFormats(notificationFilter),
             NotificationSystemFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD,
-            this.displayIsEnabled(notificationFilter, filterActions)
+            this.displayIsEnabled(notificationFilter, filterActivation),
+            "isEnabled_data",
+            this.displayIsEnabledData(notificationFilter, filterActivation),
+            "isEnabled_checked",
+            this.isEnabled(notificationFilter, filterActivation)
         );
     }
 
-    private String displayIsEnabled(ToggleableNotificationFilter notificationFilter,
-        Map<String, Boolean> filterActions)
+    private String getObjectNumber(ToggleableNotificationFilterActivation filterActivation)
     {
-        boolean isEnabled = notificationFilter.isEnabledByDefault() || filterActions.get(notificationFilter.getName());
-        String checked = (isEnabled) ? "checked=\"checked\"" : "";
+        return (filterActivation != null && filterActivation.getObjectNumber() != -1) ?
+            String.valueOf(filterActivation.getObjectNumber()) : "";
+    }
+
+    private Map<String, String> displayIsEnabledData(NotificationFilter notificationFilter,
+        ToggleableNotificationFilterActivation filterActivation)
+    {
+        return Map.of(
+            "objectNumber", getObjectNumber(filterActivation),
+            "filterName", notificationFilter.getName()
+        );
+    }
+
+    private boolean isEnabled(ToggleableNotificationFilter notificationFilter,
+        ToggleableNotificationFilterActivation filterActivation)
+    {
+        return notificationFilter.isEnabledByDefault() || (filterActivation != null && filterActivation.isEnabled());
+    }
+
+    private String displayIsEnabled(ToggleableNotificationFilter notificationFilter,
+        ToggleableNotificationFilterActivation filterActivation)
+    {
+        String checked = (this.isEnabled(notificationFilter, filterActivation)) ? "checked=\"checked\"" : "";
         String html = "<input type=\"checkbox\" class=\"toggleableFilterPreferenceCheckbox\" "
-            + "data-filtername=\"%s\" %s />";
-        return String.format(html, notificationFilter.getName(), checked);
+            + "data-filterName=\"%s\" data-objectNumber='%s' %s />";
+        return String.format(html, notificationFilter.getName(), getObjectNumber(filterActivation), checked);
     }
 
     private String displayNotificationFormats(ToggleableNotificationFilter filter)
@@ -156,7 +172,7 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
         }
         String target = String.valueOf(sourceParameters.get(TARGET_SOURCE_PARAMETER));
         List<ToggleableNotificationFilter> filters = null;
-        Map<String, Boolean> filtersActivations = null;
+        Map<String, ToggleableNotificationFilterActivation> filtersActivations = null;
         boolean isAuthorized = false;
         try {
             if (WIKI_SOURCE_PARAMETER.equals(target)) {
@@ -164,9 +180,13 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
                     new WikiReference(String.valueOf(sourceParameters.get(WIKI_SOURCE_PARAMETER)));
                 if (this.contextualAuthorizationManager.hasAccess(Right.ADMIN, wikiReference)) {
                     isAuthorized = true;
-                    filters = this.notificationFilterManager.getToggleableFilters(wikiReference);
+                    filters = this.notificationFilterManager.getAllFilters(wikiReference)
+                        .stream()
+                        .filter(filter -> filter instanceof ToggleableNotificationFilter)
+                        .map(item -> (ToggleableNotificationFilter) item)
+                        .collect(Collectors.toList());
                     filtersActivations =
-                        this.notificationFilterManager.getToggeableFilterActivations(
+                        this.filterPreferencesModelBridge.getToggleableFilterActivations(
                             new DocumentReference(wikiReference, NOTIFICATION_ADMINISTRATION_REF));
                 }
             } else {
@@ -174,12 +194,15 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
                 String targetValue = String.valueOf(sourceParameters.get(target));
                 DocumentReference userDoc =
                     this.documentReferenceResolver.resolve(targetValue);
-                UserReference userReference = this.userReferenceResolver.resolve(targetValue);
                 if (this.contextualAuthorizationManager.hasAccess(Right.ADMIN)
                     || context.getUserReference().equals(userDoc)) {
                     isAuthorized = true;
-                    filters = this.notificationFilterManager.getToggleableFilters(userReference);
-                    filtersActivations = this.notificationFilterManager.getToggeableFilterActivations(userDoc);
+                    filters = this.notificationFilterManager.getAllFilters(userDoc, false)
+                        .stream()
+                        .filter(filter -> filter instanceof ToggleableNotificationFilter)
+                        .map(item -> (ToggleableNotificationFilter) item)
+                        .collect(Collectors.toList());
+                    filtersActivations = this.filterPreferencesModelBridge.getToggleableFilterActivations(userDoc);
                 }
             }
         } catch (NotificationException e) {
@@ -196,7 +219,9 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
         if (offset < filters.size()) {
             List<Map<String, Object>> entries = liveData.getEntries();
             for (int i = offset; i < Math.min(filters.size(), offset + query.getLimit()); i++) {
-                entries.add(getPreferencesInformation(filters.get(i), filtersActivations));
+                ToggleableNotificationFilter notificationFilter = filters.get(i);
+                entries.add(getPreferencesInformation(notificationFilter,
+                    filtersActivations.get(notificationFilter.getName())));
             }
             liveData.setCount(entries.size());
         }

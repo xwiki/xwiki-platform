@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -39,7 +38,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -97,30 +95,33 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
     }
 
     @Override
-    public Map<String, Boolean> getToggleableFilterActivations(DocumentReference user) throws NotificationException
+    public Map<String, ToggleableNotificationFilterActivation> getToggleableFilterActivations(DocumentReference user) throws NotificationException
     {
         XWikiContext context = contextProvider.get();
         WikiReference currentWiki = context.getWikiReference();
         context.setWikiReference(user.getWikiReference());
         XWiki xwiki = context.getWiki();
 
-        Map<String, Boolean> filterStatus = new HashMap<>();
+        Map<String, ToggleableNotificationFilterActivation> filterStatus = new HashMap<>();
 
         try {
             XWikiDocument doc = xwiki.getDocument(user, context);
             for (NotificationFilter filter : componentManager.<NotificationFilter>getInstanceList(
-                    NotificationFilter.class)) {
-                if (filter instanceof ToggleableNotificationFilter) {
-                    ToggleableNotificationFilter toggleableFilter = (ToggleableNotificationFilter) filter;
+                NotificationFilter.class)) {
+                if (filter instanceof ToggleableNotificationFilter toggleableFilter) {
                     boolean status = toggleableFilter.isEnabledByDefault();
                     BaseObject obj = doc.getXObject(ToggleableFilterPreferenceDocumentInitializer.XCLASS,
                         ToggleableFilterPreferenceDocumentInitializer.FIELD_FILTER_NAME,
                             filter.getName(), false);
+                    int objNumber = -1;
                     if (obj != null) {
                         status = obj.getIntValue(ToggleableFilterPreferenceDocumentInitializer.FIELD_IS_ENABLED,
                             status ? 1 : 0) != 0;
+                        objNumber = obj.getNumber();
                     }
-                    filterStatus.put(filter.getName(), status);
+                    ToggleableNotificationFilterActivation filterActivation =
+                        new ToggleableNotificationFilterActivation(filter.getName(), status, user, objNumber);
+                    filterStatus.put(filter.getName(), filterActivation);
                 }
             }
         } catch (Exception e) {

@@ -246,6 +246,12 @@
                   <code>java.class.removed</code>
                   <old>class org.xwiki.captcha.script.WrappedScriptCaptcha</old>
                 </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.typeChanged</code>
+                  <old>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider</old>
+                  <new>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider</new>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

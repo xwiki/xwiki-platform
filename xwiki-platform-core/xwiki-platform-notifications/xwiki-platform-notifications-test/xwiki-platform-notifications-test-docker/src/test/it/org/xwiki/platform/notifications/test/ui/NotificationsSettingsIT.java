@@ -198,42 +198,48 @@ class NotificationsSettingsIT
         assertEquals(6, preferences.size());
 
         // Filter 0
-        assertEquals("Minor Event (Alert)", preferences.get(0).getFilterName());
-        assertEquals("Hide notifications concerning minor changes on pages", preferences.get(0).getDescription());
-        assertEquals(List.of("Alert"), preferences.get(0).getFormats());
-        assertTrue(preferences.get(0).isEnabled());
+        SystemNotificationFilterPreference filter0 = preferences.get(0);
+        assertEquals("Read Event Filter (Alert)", filter0.getName());
+        assertEquals("Hide notifications that you have marked as read", filter0.getDescription());
+        assertEquals(List.of("Alert"), filter0.getFormats());
+        assertFalse(filter0.isEnabled());
 
         // Filter 1
-        assertEquals("Minor Event (Email)", preferences.get(1).getFilterName());
-        assertEquals("Hide notifications concerning minor changes on pages", preferences.get(1).getDescription());
-        assertEquals(List.of("Email"), preferences.get(1).getFormats());
-        assertTrue(preferences.get(1).isEnabled());
+        SystemNotificationFilterPreference filter1 = preferences.get(1);
+        assertEquals("Read Event Filter (Email)", filter1.getName());
+        assertEquals("Hide notifications that you have marked as read", filter1.getDescription());
+        assertEquals(List.of("Email"), filter1.getFormats());
+        assertFalse(filter1.isEnabled());
 
         // Filter 2
-        assertEquals("Own Events Filter", preferences.get(2).getFilterName());
-        assertEquals("Hide notifications about your own activity unless the event specifically targets you",
-            preferences.get(2).getDescription());
-        assertEquals(List.of("Alert", "Email"), preferences.get(2).getFormats());
-        assertTrue(preferences.get(2).isEnabled());
+        SystemNotificationFilterPreference filter2 = preferences.get(2);
+        assertEquals("Minor Event (Alert)", filter2.getName());
+        assertEquals("Hide notifications concerning minor changes on pages", filter2.getDescription());
+        assertEquals(List.of("Alert"), filter2.getFormats());
+        assertTrue(filter2.isEnabled());
 
         // Filter 3
-        assertEquals("Read Event Filter (Alert)", preferences.get(3).getFilterName());
-        assertEquals("Hide notifications that you have marked as read", preferences.get(3).getDescription());
-        assertEquals(List.of("Alert"), preferences.get(3).getFormats());
-        assertFalse(preferences.get(3).isEnabled());
+        SystemNotificationFilterPreference filter3 = preferences.get(3);
+        assertEquals("Minor Event (Email)", filter3.getName());
+        assertEquals("Hide notifications concerning minor changes on pages", filter3.getDescription());
+        assertEquals(List.of("Email"), filter3.getFormats());
+        assertTrue(filter3.isEnabled());
 
         // Filter 4
-        assertEquals("Read Event Filter (Email)", preferences.get(4).getFilterName());
-        assertEquals("Hide notifications that you have marked as read", preferences.get(4).getDescription());
-        assertEquals(List.of("Email"), preferences.get(4).getFormats());
-        assertFalse(preferences.get(4).isEnabled());
+        SystemNotificationFilterPreference filter4 = preferences.get(4);
+        assertEquals("Own Events Filter", filter4.getName());
+        assertEquals("Hide notifications about your own activity unless the event specifically targets you",
+            filter4.getDescription());
+        assertEquals(List.of("Alert", "Email"), filter4.getFormats());
+        assertTrue(filter4.isEnabled());
 
         // Filter 5
-        assertEquals("System Filter", preferences.get(5).getFilterName());
+        SystemNotificationFilterPreference filter5 = preferences.get(5);
+        assertEquals("System Filter", filter5.getName());
         assertEquals("Hide notifications from the System user unless the event specifically targets you",
-            preferences.get(5).getDescription());
-        assertEquals(List.of("Alert", "Email"), preferences.get(5).getFormats());
-        assertTrue(preferences.get(5).isEnabled());
+            filter5.getDescription());
+        assertEquals(List.of("Alert", "Email"), filter5.getFormats());
+        assertTrue(filter5.isEnabled());
     }
 
     @Test
@@ -263,7 +269,7 @@ class NotificationsSettingsIT
             assertEquals(1, preferences.size());
 
             // Filter 0
-            assertTrue(preferences.get(0).getFilterName().contains("Page only"));
+            assertEquals("Page only", preferences.get(0).getScope());
             assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome",
                 preferences.get(0).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT,
@@ -303,7 +309,7 @@ class NotificationsSettingsIT
             assertEquals(1, preferences.size());
 
             // Filter 1
-            assertTrue(preferences.get(0).getFilterName().contains("Page and children"));
+            assertEquals("Page and children", preferences.get(0).getScope());
             assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome",
                 preferences.get(0).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT,
@@ -330,7 +336,7 @@ class NotificationsSettingsIT
             assertEquals(2, preferences.size());
 
             // Filter 2
-            assertTrue(preferences.get(1).getFilterName().contains("Page only"));
+            assertEquals("Page only", preferences.get(1).getScope());
             assertEquals(testReference.getLastSpaceReference().getName() + "." + testReference.getName(),
                 preferences.get(1).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.IGNORE_EVENT,
@@ -604,7 +610,7 @@ class NotificationsSettingsIT
         CustomNotificationFilterPreference filterPreference =
             customNotificationFilterPreferences.get(0);
 
-        assertTrue(filterPreference.getFilterName().contains("Page and children"));
+        assertEquals("Page and children", filterPreference.getScope());
         assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".WebHome", filterPreference.getLocation());
         assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
         assertEquals(List.of("Email"), filterPreference.getFormats());
@@ -625,7 +631,7 @@ class NotificationsSettingsIT
         assertEquals(1, customNotificationFilterPreferences.size());
         filterPreference = customNotificationFilterPreferences.get(0);
 
-        assertTrue(filterPreference.getFilterName().contains("Page and children"));
+        assertEquals("Page and children", filterPreference.getScope());
         assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".WebHome", filterPreference.getLocation());
         assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
         assertEquals(List.of("Email"), filterPreference.getFormats());
@@ -648,8 +654,7 @@ class NotificationsSettingsIT
 
         filterPreference = customNotificationFilterPreferences.get(1);
 
-        assertTrue(filterPreference.getFilterName().contains("Page"));
-        assertFalse(filterPreference.getFilterName().contains("Page and children"));
+        assertEquals("Page only", filterPreference.getScope());
         assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".SubSpace.SubPage",
             filterPreference.getLocation());
         assertEquals(CustomNotificationFilterPreference.FilterAction.IGNORE_EVENT, filterPreference.getFilterAction());
@@ -669,7 +674,7 @@ class NotificationsSettingsIT
         filterPreference =
             customNotificationFilterPreferences.get(0);
 
-        assertTrue(filterPreference.getFilterName().contains("Page and children"));
+        assertEquals("Page and children", filterPreference.getScope());
         assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".WebHome", filterPreference.getLocation());
         assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
         assertEquals(List.of("Email"), filterPreference.getFormats());
@@ -677,8 +682,7 @@ class NotificationsSettingsIT
 
         filterPreference = customNotificationFilterPreferences.get(1);
 
-        assertTrue(filterPreference.getFilterName().contains("Page"));
-        assertFalse(filterPreference.getFilterName().contains("Page and children"));
+        assertEquals("Page only", filterPreference.getScope());
         assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".SubSpace.SubPage",
             filterPreference.getLocation());
         assertEquals(CustomNotificationFilterPreference.FilterAction.IGNORE_EVENT, filterPreference.getFilterAction());
@@ -705,21 +709,21 @@ class NotificationsSettingsIT
 
         filterPreference = customNotificationFilterPreferences.get(2);
 
-        assertTrue(filterPreference.getFilterName().contains("Page"));
-        assertFalse(filterPreference.getFilterName().contains("Page and children"));
+        assertEquals("Page only", filterPreference.getScope());
         assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".Page1", filterPreference.getLocation());
         assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
         assertEquals(List.of("Alert"), filterPreference.getFormats());
-        assertEquals(List.of("A page is modified", "A page is deleted"), filterPreference.getEventTypes());
+        // core.events.delete before core.events.update
+        assertEquals(List.of("A page is deleted", "A page is modified"), filterPreference.getEventTypes());
 
         filterPreference = customNotificationFilterPreferences.get(3);
 
-        assertTrue(filterPreference.getFilterName().contains("Page"));
-        assertFalse(filterPreference.getFilterName().contains("Page and children"));
+        assertEquals("Page only", filterPreference.getScope());
         assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".Page2", filterPreference.getLocation());
         assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
         assertEquals(List.of("Alert"), filterPreference.getFormats());
-        assertEquals(List.of("A page is modified", "A page is deleted"), filterPreference.getEventTypes());
+        // core.events.delete before core.events.update
+        assertEquals(List.of("A page is deleted","A page is modified"), filterPreference.getEventTypes());
     }
 
     @Test

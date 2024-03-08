@@ -133,7 +133,8 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
     private boolean isEnabled(ToggleableNotificationFilter notificationFilter,
         ToggleableNotificationFilterActivation filterActivation)
     {
-        return notificationFilter.isEnabledByDefault() || (filterActivation != null && filterActivation.isEnabled());
+        return (filterActivation != null && filterActivation.isEnabled()) ||
+            (filterActivation == null && notificationFilter.isEnabledByDefault());
     }
 
     private String displayIsEnabled(ToggleableNotificationFilter notificationFilter,
@@ -186,7 +187,7 @@ public class NotificationSystemFiltersLiveDataEntryStore implements LiveDataEntr
                         .collect(Collectors.toList());
                     filtersActivations =
                         this.filterPreferencesModelBridge.getToggleableFilterActivations(
-                            new DocumentReference(wikiReference, NOTIFICATION_ADMINISTRATION_REF));
+                            new DocumentReference(NOTIFICATION_ADMINISTRATION_REF, wikiReference));
                 }
             } else {
                 XWikiContext context = this.contextProvider.get();

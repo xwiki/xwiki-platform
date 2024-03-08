@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.livedata.custom;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -240,7 +241,9 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
     private String displayEventTypes(NotificationFilterPreference filterPreference) throws LiveDataException
     {
         String result;
-        Set<String> eventTypes = filterPreference.getEventTypes();
+        List<String> eventTypes = new ArrayList<>(filterPreference.getEventTypes());
+        // Ensure to always have same order
+        eventTypes.sort(Comparator.naturalOrder());
         if (eventTypes.isEmpty()) {
             result = getUnstyledList(List.of(this.translationHelper.getAllEventTypesTranslation()));
         } else {
@@ -256,7 +259,10 @@ public class NotificationCustomFiltersLiveDataEntryStore implements LiveDataEntr
     private String displayNotificationFormats(NotificationFilterPreference filterPreference)
     {
         List<String> items = new ArrayList<>();
-        for (NotificationFormat notificationFormat : filterPreference.getNotificationFormats()) {
+        List<NotificationFormat> notificationFormats = new ArrayList<>(filterPreference.getNotificationFormats());
+        // Ensure to always have same order
+        notificationFormats.sort(Comparator.comparing(NotificationFormat::name));
+        for (NotificationFormat notificationFormat : notificationFormats) {
             items.add(this.translationHelper.getFormatTranslation(notificationFormat));
         }
 

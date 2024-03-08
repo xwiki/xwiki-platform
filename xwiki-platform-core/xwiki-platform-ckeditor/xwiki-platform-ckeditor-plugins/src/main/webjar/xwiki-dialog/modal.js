@@ -29,8 +29,8 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
   let iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=cross`;
   // Default value taken until the fetch is fulfilled
   var closeIconTemplate = `<span aria-hidden="true">&times;</span>`;
-  const iconRequest = $.get(iconURL, function(response) {
-    // We override the template if the request is successful
+  $.get(iconURL, function(response) {
+    // We override the close button content template if the request is successful
     let iconMetadata = response.getElementsByTagName('icon')[0];
     console.log(iconMetadata);
     if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'IMAGE') {
@@ -41,8 +41,16 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
           iconMetadata.getElementsByTagName('cssClass')[0].textContent +
           '" aria-hidden="true"></span>';
     }
-  }).then(function() {
-  return '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
+    // Once we retrieve the icon value, we
+    // 1. Replace all the uses of the icon in the DOM already generated
+    console.log(closeIconTemplate);
+    const closeButtons = document.querySelectorAll(
+      '.modal > .modal-dialog > .modal-content > .modal-header > button.close');
+    closeButtons.forEach((button)=> {
+      button.innerHTML = closeIconTemplate;
+    });
+    // 2. replace the modal template used to create new modals
+    const newModalTemplate = '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
       '<div class="modal-dialog" role="document">' +
         '<div class="modal-content">' +
           '<div class="modal-header">' +
@@ -59,18 +67,36 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
         '</div>' +
       '</div>' +
     '</div>';
+    modalTemplate = newModalTemplate;
   });
   
+  let modalTemplate = '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
+    '<div class="modal-dialog" role="document">' +
+      '<div class="modal-content">' +
+        '<div class="modal-header">' +
+          '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+          '</button>' +
+          '<h4 class="modal-title"></h4>' +
+        '</div>' +
+        '<div class="modal-body"></div>' +
+        '<div class="modal-footer">' +
+          '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
+          '<button type="button" class="btn btn-primary" disabled="disabled">OK</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>',
+  
 
-  createModal = function(definition) {
+  createModal = function (definition) {
     definition = $.extend({
       title: '',
       content: '',
       acceptLabel: translations.get('ok'),
       dismissLabel: translations.get('cancel')
     }, definition);
-    const modalTemplate = iconRequest.value();
-    var modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
+    let modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
     modal.find('.close').attr({
       title: translations.get('close'),
       'aria-label': translations.get('close')

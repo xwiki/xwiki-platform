@@ -70,6 +70,22 @@ public class AuthenticationCookieFilter implements CookieFilter
     private Provider<XWikiContext> xcontextProvider;
 
     @Override
+    public boolean isFilterRequired()
+    {
+        try {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            PersistentLoginManagerInterface loginManager = this.persistentLoginManagerProvider.get();
+            String userName = loginManager.getRememberedUsername(xcontext.getRequest(), xcontext.getResponse());
+            String password = loginManager.getRememberedPassword(xcontext.getRequest(), xcontext.getResponse());
+            return userName != null && password != null;
+        } catch (Exception e) {
+            this.logger.warn("Skipping XWiki authentication cookie filtering because [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
+        }
+    }
+
+    @Override
     public void filter(List<Cookie> cookies, CookieFilterContext cookieFilterContext)
     {
         try {
@@ -77,6 +93,11 @@ public class AuthenticationCookieFilter implements CookieFilter
             PersistentLoginManagerInterface loginManager = this.persistentLoginManagerProvider.get();
             String userName = loginManager.getRememberedUsername(xcontext.getRequest(), xcontext.getResponse());
             String password = loginManager.getRememberedPassword(xcontext.getRequest(), xcontext.getResponse());
+            if (userName == null || password == null) {
+                // No need to update the cookies if the user is not logged in or if the authentication cookies are not
+                // valid.
+                return;
+            }
             HttpServletRequest fakeRequest = new HttpServletRequestWrapper(xcontext.getRequest())
             {
                 @Override

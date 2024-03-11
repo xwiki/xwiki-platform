@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.captcha.script;
+package org.xwiki.captcha.script.internal;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Script safe provider for {@link Captcha} instances.
@@ -43,6 +43,6 @@ public class CaptchaScriptSafeProvider implements ScriptSafeProvider<Captcha>
     @Override
     public <S> S get(Captcha unsafe)
     {
-        return (S) new WrappedScriptCaptcha(unsafe, this, logger);
+        return (S) new WrappedScriptCaptcha(unsafe, logger);
     }
 }

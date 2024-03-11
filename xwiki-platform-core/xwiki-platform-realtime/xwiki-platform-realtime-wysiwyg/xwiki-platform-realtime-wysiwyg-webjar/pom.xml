@@ -59,7 +59,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>hyper-json</artifactId>
-      <version>1.4.0</version>
+      <version>1.5.0</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

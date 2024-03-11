@@ -22,6 +22,8 @@ package org.xwiki.livedata;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.stability.Unstable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -60,6 +62,11 @@ public class LiveDataActionDescriptor extends BaseDescriptor
      * Specifies the live data property that holds the URL that can be used to perform this action on a given entry.
      */
     private String urlProperty;
+
+    /**
+     * Holds the properties required to execute the action asynchronously.
+     */
+    private LiveDataAsyncActionDescriptor async;
 
     /**
      * Default constructor.
@@ -188,5 +195,25 @@ public class LiveDataActionDescriptor extends BaseDescriptor
         if (this.icon == null) {
             this.icon = new HashMap<>();
         }
+    }
+
+    /**
+     * @return the properties to execute this action asynchronously
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public LiveDataAsyncActionDescriptor getAsync()
+    {
+        return this.async;
+    }
+
+    /**
+     * @param async the properties to execute this action asynchronously
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public void setAsync(LiveDataAsyncActionDescriptor async)
+    {
+        this.async = async;
     }
 }

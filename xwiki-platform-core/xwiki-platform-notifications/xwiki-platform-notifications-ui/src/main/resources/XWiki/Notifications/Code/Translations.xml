@@ -97,7 +97,6 @@ notifications.settings.filters.preferences.system.table.name=Name
 notifications.settings.filters.preferences.system.table.filterType=Description
 notifications.settings.filters.preferences.system.table.notificationFormats=Formats
 notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
-notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=Custom Filters
@@ -109,7 +108,6 @@ notifications.settings.filters.preferences.custom.table.eventTypes=Events
 notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
 notifications.settings.filters.preferences.custom.table.isEnabled=Is enabled?
 notifications.settings.filters.preferences.custom.table._actions=Actions
-notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
 notifications.filters.type.custom.inclusive=Notify of the event
 notifications.filters.type.custom.exclusive=Ignore the event
 
@@ -266,6 +264,10 @@ notifications.filters.preferences.addPreference.location.hint=Which page should 
 ## Filter Types
 notifications.filters.type.inclusive=Inclusive
 notifications.filters.type.exclusive=Exclusive
+  
+## until 16.2.0RC1
+notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
+notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

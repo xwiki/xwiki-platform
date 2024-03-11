@@ -170,7 +170,10 @@
         "visible":false
       }
     ],
-    "actions":["edit"]
+    "actions":[
+      "edit",
+      {"id": "delete", "icon": "cross", "extraClasses": "text-danger"}
+    ]
   }
 }
 ---
@@ -193,7 +196,8 @@
       }
     ],
     "actions":[
-      {"id":"edit"}
+      {"id":"edit"},
+      {"id":"delete","icon":{"iconSetName":"Font Awesome","iconSetType":"font","cssClass":"fa fa-times text-danger"}}
     ]
   }
 }

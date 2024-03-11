@@ -33,6 +33,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,15 +74,26 @@ class StringLiveDataConfigurationResolverTest
         tableIconMetaData.put(IconManager.META_DATA_ICON_SET_NAME, "Silk");
         tableIconMetaData.put(IconManager.META_DATA_URL, "/path/to/table.png");
 
+        Map<String, Object> crossIconMetadata = Map.of(
+            IconManager.META_DATA_ICON_SET_TYPE, "font",
+            IconManager.META_DATA_ICON_SET_NAME, "Font Awesome",
+            IconManager.META_DATA_CSS_CLASS, "fa fa-times"
+        );
+
         when(this.iconManager.getMetaData("file")).thenReturn(fileIconMetaData);
         when(this.iconManager.getMetaData("table")).thenReturn(tableIconMetaData);
+        when(this.iconManager.getMetaData("cross")).thenReturn(crossIconMetadata);
     }
 
     @ParameterizedTest
     @MethodSource("getTestData")
     void resolve(String message, String input, String output) throws Exception
     {
-        assertEquals(output, this.objectMapper.writeValueAsString(this.resolver.resolve(input)), message);
+        JsonNode expect = this.objectMapper.readValue(output, JsonNode.class);
+        JsonNode actual =
+            this.objectMapper.readValue(this.objectMapper.writeValueAsString(this.resolver.resolve(input)),
+                JsonNode.class);
+        assertEquals(expect, actual, message);
     }
 
     private static Stream<String[]> getTestData() throws Exception

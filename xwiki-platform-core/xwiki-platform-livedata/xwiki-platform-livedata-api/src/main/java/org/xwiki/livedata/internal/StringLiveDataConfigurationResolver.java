@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * Resolves the live data configuration from a JSON string input.
@@ -88,6 +89,10 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
     private static final String LAYOUTS = "layouts";
 
     private static final String ACTIONS = "actions";
+
+    private static final String CSS_CLASS = "cssClass";
+
+    private static final String EXTRA_CLASSES = "extraClasses";
 
     @Inject
     private Logger logger;
@@ -252,6 +257,21 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
             }
         } else if (!icon.isObject()) {
             descriptor.remove(ICON);
+        }
+        normalizeIconClasses(descriptor);
+    }
+
+    private static void normalizeIconClasses(ObjectNode descriptor)
+    {
+        JsonNode icon = descriptor.path(ICON);
+        if (icon.isObject()) {
+            JsonNode extraClasses = descriptor.path(EXTRA_CLASSES);
+            if (extraClasses.isTextual() && icon.has(CSS_CLASS) && icon.path(CSS_CLASS).isTextual()) {
+                String cssClasses = icon.path(CSS_CLASS).textValue() + " " + extraClasses.textValue();
+                ((ObjectNode) icon).set(CSS_CLASS, new TextNode(cssClasses.trim()));
+            }
+            // Does not need to be preserved once the icon is fully resolved.
+            descriptor.remove(EXTRA_CLASSES);
         }
     }
 

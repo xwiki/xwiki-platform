@@ -66,7 +66,7 @@
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
     <jersey.version>2.41</jersey.version>
-    <hk2.version>2.6.1</hk2.version>
+    <hk2.version>3.1.0</hk2.version>
     <zookeeper.version>3.9.1</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->

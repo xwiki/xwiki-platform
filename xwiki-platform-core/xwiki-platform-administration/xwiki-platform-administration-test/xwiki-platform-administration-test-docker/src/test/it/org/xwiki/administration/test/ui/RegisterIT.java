@@ -346,7 +346,7 @@ class RegisterIT
             assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
 
-            assertEquals(String.format("Information\n%s %s (%s): Registration successful.", firstName, lastName,
+            assertEquals(String.format("%s %s (%s): Registration successful.", firstName, lastName,
                     AbstractRegistrationPage.JOHN_SMITH_USERNAME),
                 ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
         }

@@ -91,7 +91,7 @@
       <artifactId>bootstrap-select</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed to display Live Data and use the liveTable source -->
+    <!-- Needed to display Live Data and use the liveTable source. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-api</artifactId>

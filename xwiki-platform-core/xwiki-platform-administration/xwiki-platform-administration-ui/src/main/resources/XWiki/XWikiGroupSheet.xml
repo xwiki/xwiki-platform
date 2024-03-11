@@ -109,9 +109,9 @@
           'id': 'delete',
           'async': {
             'httpMethod': 'POST',
-            'loadingMessage': 'loading',
-            'successMessage': 'success',
-            'failureMessage': 'failure'
+            'loadingMessage': $services.localization.render('administration.section.groups.deleteUserFromGroup.loading'),
+            'successMessage': $services.localization.render('administration.section.groups.deleteUserFromGroup.success'),
+            'failureMessage': $services.localization.render('administration.section.groups.deleteUserFromGroup.failure')
           }
         }
       ]

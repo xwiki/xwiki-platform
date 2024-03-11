@@ -549,8 +549,8 @@ require(['jquery', 'xwiki-l10n!xwiki-administration-localization', 'xwiki-locale
     <property>
       <code>/* Do not display the supported language field (we assume it's the following one)
   when the multilingual option is set to No. */
-form#localization dd:has(&gt; div.dropdown &gt; select[name="XWiki.XWikiPreferences_0_multilingual"] &gt; option[value="0"]:checked) + dt,
-form#localization dd:has(&gt; div.dropdown &gt; select[name="XWiki.XWikiPreferences_0_multilingual"] &gt; option[value="0"]:checked) + dt + dd {
+form#localization dd:has(> div.dropdown > select[name="XWiki.XWikiPreferences_0_multilingual"] > option[value="0"]:checked) + dt,
+form#localization dd:has(> div.dropdown > select[name="XWiki.XWikiPreferences_0_multilingual"] > option[value="0"]:checked) + dt + dd {
   display: none;
 }</code>
     </property>

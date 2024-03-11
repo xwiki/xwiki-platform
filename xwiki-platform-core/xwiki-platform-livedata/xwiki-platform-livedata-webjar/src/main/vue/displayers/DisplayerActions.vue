@@ -87,7 +87,7 @@ export default {
   mixins: [displayerMixin],
 
   computed: {
-    actions() {
+    actions () {
       // The list of actions can be overwritten from the displayer configuration.
       return (this.config.actions || this.data.meta.actions)
           // Show only the actions that are allowed for the current live data entry.
@@ -123,7 +123,7 @@ export default {
             options.body = async.body;
           }
 
-          if (async.headers) {
+          if(async.headers) {
             options.headers = async.headers;
           }
 
@@ -142,24 +142,20 @@ export default {
 </script>
 
 
-<style lang="less">
-.displayer-actions {
-  .action {
-    color: @text-muted;
-    white-space: nowrap;
-    text-transform: capitalize;
-  }
+<style>
 
-  .action + .action {
-    margin-left: .5em;
-  }
-
-  .action-name {
-    margin-left: .25em;
-  }
-
-  .actions-container .action_delete .action-icon {
-    color: @brand-danger;
-  }
+.displayer-actions .action {
+  color: @text-muted;
+  white-space: nowrap;
+  text-transform: capitalize;
 }
+
+.displayer-actions .action + .action {
+  margin-left: .5em;
+}
+
+.displayer-actions .action-name {
+  margin-left: .25em;
+}
+
 </style>

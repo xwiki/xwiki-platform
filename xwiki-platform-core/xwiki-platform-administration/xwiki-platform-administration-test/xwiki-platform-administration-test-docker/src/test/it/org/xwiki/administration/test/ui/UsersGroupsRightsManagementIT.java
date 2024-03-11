@@ -114,8 +114,8 @@ class UsersGroupsRightsManagementIT
     }
 
     /**
-     * Verify the following group editing features, from 2 locations: from the Admin UI Group page and from the Group
-     * page itself (in inline edit mode):
+     * Verify the following group editing features, from 2 locations: from the Admin UI Group page and from the
+     * Group page itself (in inline edit mode):
      * <ul>
      * <li>Validate adding users as group members.</li>
      * <li>Validate adding sub-groups</li>

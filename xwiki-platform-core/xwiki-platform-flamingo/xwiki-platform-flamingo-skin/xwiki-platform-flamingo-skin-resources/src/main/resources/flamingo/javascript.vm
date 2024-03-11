@@ -271,11 +271,10 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
         #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
       #end
     #end
-    $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
-      'forceSkinAction' : true,
-      'h' : $searchSuggestConfigHash.hashCode()
-    })##
-    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)##
+    <script src="${services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.js', {'evaluate': true, 'h': $searchSuggestConfigHash.hashCode()})}" defer="defer"></script>
+    $xwiki.linkx.use(
+      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
+      {'type': 'text/css', 'rel': 'stylesheet'})##
   #end
 #end
 #set($editActions = ['edit', 'inline', 'admin'])

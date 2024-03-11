@@ -276,23 +276,25 @@ class UsersGroupsRightsManagementIT
 
         usersPage = UsersAdministrationSectionPage.gotoPage();
 
+        int rowNumber = usersPage.getRowNumberByUsername(userName);
+
         // Verify the user is enabled and can only be edited or disabled
-        assertFalse(usersPage.isUserDisabled(1));
-        assertFalse(usersPage.canDeleteUser(1));
-        assertFalse(usersPage.canEnableUser(1));
-        assertTrue(usersPage.canDisableUser(1));
-        assertTrue(usersPage.canEditUser(1));
+        assertFalse(usersPage.isUserDisabled(rowNumber));
+        assertFalse(usersPage.canDeleteUser(rowNumber));
+        assertFalse(usersPage.canEnableUser(rowNumber));
+        assertTrue(usersPage.canDisableUser(rowNumber));
+        assertTrue(usersPage.canEditUser(rowNumber));
 
         // Verify that when the user is disabled it can be enabled back, deleted or edited
-        usersPage = usersPage.disableUser(1);
-        assertTrue(usersPage.isUserDisabled(1));
-        assertTrue(usersPage.canDeleteUser(1));
-        assertTrue(usersPage.canEnableUser(1));
-        assertFalse(usersPage.canDisableUser(1));
-        assertTrue(usersPage.canEditUser(1));
+        usersPage = usersPage.disableUser(rowNumber);
+        assertTrue(usersPage.isUserDisabled(rowNumber));
+        assertTrue(usersPage.canDeleteUser(rowNumber));
+        assertTrue(usersPage.canEnableUser(rowNumber));
+        assertFalse(usersPage.canDisableUser(rowNumber));
+        assertTrue(usersPage.canEditUser(rowNumber));
 
         // Delete the newly created user and see if groups are cleaned
-        ConfirmationModal confirmation = usersPage.clickDeleteUser(1);
+        ConfirmationModal confirmation = usersPage.clickDeleteUser(rowNumber);
         assertTrue(confirmation.getMessage().contains("Are you sure you want to proceed?"));
         confirmation.clickOk();
         usersPage.getUsersLiveData().getTableLayout().assertRow("User",

@@ -78,6 +78,12 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
         return new DeleteUserConfirmationModal();
     }
 
+    public int getRowNumberByUsername(String userName)
+    {
+        int rowNumber = getUsersLiveData().getTableLayout().getRowIndexForElement(By.xpath("//a[text()='" + userName + "']"));
+        return rowNumber;
+    }
+
     public boolean canDeleteUser(int rowNumber)
     {
         return getUsersLiveData().getTableLayout().hasAction(rowNumber, "delete");

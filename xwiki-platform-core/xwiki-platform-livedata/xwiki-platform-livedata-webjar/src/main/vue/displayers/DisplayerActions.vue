@@ -30,24 +30,24 @@
     all the displayer default behavior
   -->
   <BaseDisplayer
-      class="displayer-actions"
-      view-only
-      :property-id="propertyId"
-      :entry="entry"
-      :is-empty="false"
-      :intercept-touch="false"
+    class="displayer-actions"
+    view-only
+    :property-id="propertyId"
+    :entry="entry"
+    :is-empty="false"
+    :intercept-touch="false"
   >
 
     <!-- Provide the Action Viewer widget to the `viewer` slot -->
     <template #viewer>
       <div class="actions-container">
         <a
-            v-for="action in actions"
-            :key="action.id"
-            :class="'action action_' + action.id"
-            :title="action.description"
-            :href="sanitizeUrl(entry[action.urlProperty]) || '#'"
-            @click="handleClick($event, action)"
+          v-for="action in actions"
+          :key="action.id"
+          :class="'action action_' + action.id"
+          :title="action.description"
+          :href="sanitizeUrl(entry[action.urlProperty]) || '#'"
+          @click="handleClick($event, action)"
         >
           <XWikiIcon :iconDescriptor="action.icon" class="action-icon"/>
           <span class="action-name">{{ action.name }}</span>
@@ -90,9 +90,9 @@ export default {
     actions () {
       // The list of actions can be overwritten from the displayer configuration.
       return (this.config.actions || this.data.meta.actions)
-          // Show only the actions that are allowed for the current live data entry.
-          .filter(action => this.logic.isActionAllowed(action, this.entry))
-          .map(action => this.logic.getActionDescriptor(action));
+        // Show only the actions that are allowed for the current live data entry.
+        .filter(action => this.logic.isActionAllowed(action, this.entry))
+        .map(action => this.logic.getActionDescriptor(action));
     },
   },
   methods: {
@@ -122,7 +122,7 @@ export default {
           if (async.body) {
             options.body = async.body;
           }
-
+          
           if(async.headers) {
             options.headers = async.headers;
           }

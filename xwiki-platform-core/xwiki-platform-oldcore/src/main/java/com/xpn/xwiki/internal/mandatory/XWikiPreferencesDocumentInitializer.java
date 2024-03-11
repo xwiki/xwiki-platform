@@ -137,6 +137,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("version", "Version", 30);
         xclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8, ContentType.PURE_TEXT);
         xclass.addTextField("dateformat", "Date Format", 30);
+
         // mail
         xclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
         xclass.addTextField("admin_email", "Admin eMail", 30);

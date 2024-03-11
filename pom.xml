@@ -50,7 +50,7 @@
     <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
-    <bootstrap.version>3.4.1</bootstrap.version>
+    <bootstrap.version>5.3.3</bootstrap.version>
     <batik.version>1.17</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.1</tika.version>

@@ -86,7 +86,7 @@
 
 #macro (editGroupModal)
   &lt;div class="modal" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModal-label"
-      data-backdrop="static" data-keyboard="false" data-liveData="#groupstable" data-liveDataAction="edit"&gt;
+      data-backdrop="static" data-keyboard="false" data-live-data="#groupstable" data-live-data-action="edit"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -105,7 +105,7 @@
 
 #macro (deleteGroupModal)
   &lt;div class="modal" id="deleteGroupModal" tabindex="-1" role="dialog" aria-labelledby="deleteGroupModal-label"
-       data-liveData="#groupstable" data-liveDataAction="delete"&gt;
+       data-live-data="#groupstable" data-live-data-action="delete"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -441,9 +441,9 @@ define('xwiki-livedata-modal', ['jquery', 'bootstrap'], function($) {
       });
     });
   };
-  $('.modal[data-liveData]').each(function () {
+  $('.modal[data-live-data]').each(function () {
     var modal = $(this);
-    $(modal.attr('data-liveData')).bindActionToModal(modal.attr('data-liveDataAction'), modal);
+    $(modal.attr('data-live-data')).bindActionToModal(modal.attr('data-live-data-action'), modal);
   });
 });
 

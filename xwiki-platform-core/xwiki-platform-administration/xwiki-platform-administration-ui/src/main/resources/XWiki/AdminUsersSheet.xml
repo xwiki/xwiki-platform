@@ -158,7 +158,7 @@
 
 #macro (editUserModal)
   &lt;div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModal-label"
-      data-backdrop="static" data-keyboard="false" data-liveData="#userstable" data-liveDataAction="edit"&gt;
+      data-backdrop="static" data-keyboard="false" data-live-data="#userstable" data-live-data-action="edit"&gt;
     &lt;div class="modal-dialog modal-lg" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -188,7 +188,7 @@
   ## have script or programming rights.
   #userPicker_import
   &lt;div class="modal" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModal-label"
-      data-liveData="#userstable" data-liveDataAction="delete"&gt;
+      data-live-data="#userstable" data-live-data-action="delete"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;

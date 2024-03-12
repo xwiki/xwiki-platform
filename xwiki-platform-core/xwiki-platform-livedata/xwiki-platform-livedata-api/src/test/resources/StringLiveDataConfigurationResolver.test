@@ -172,7 +172,8 @@
     ],
     "actions":[
       "edit",
-      {"id": "delete", "icon": "cross", "extraClasses": "text-danger"}
+      {"id": "delete", "icon": "cross", "extraClasses": "text-danger"},
+      {"id": "test", "icon": "test", "extraClasses": "text-test"}
     ]
   }
 }
@@ -197,7 +198,8 @@
     ],
     "actions":[
       {"id":"edit"},
-      {"id":"delete","icon":{"iconSetName":"Font Awesome","iconSetType":"font","cssClass":"fa fa-times text-danger"}}
+      {"id":"delete","icon":{"iconSetName":"Font Awesome","iconSetType":"font","cssClass":"fa fa-times text-danger"}},
+      {"id":"test","icon":{"iconSetName":"Test","iconSetType":"test","cssClass":"text-test"}}
     ]
   }
 }

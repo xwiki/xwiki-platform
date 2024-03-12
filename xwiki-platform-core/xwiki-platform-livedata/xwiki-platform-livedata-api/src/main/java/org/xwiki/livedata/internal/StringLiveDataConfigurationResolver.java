@@ -171,7 +171,7 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
         JsonNode sortConfig = queryConfig.path(SORT);
         if (sortConfig.isTextual()) {
             SortEntry sortEntry = new SortEntry(sortConfig.asText());
-            queryConfig.set(SORT, objectMapper.valueToTree(new SortEntry[] {sortEntry}));
+            queryConfig.set(SORT, objectMapper.valueToTree(new SortEntry[] { sortEntry }));
         } else if (sortConfig.isObject() && sortConfig.has(PROPERTY)) {
             queryConfig.putArray(SORT).add(sortConfig);
         } else if (sortConfig.isArray()) {
@@ -261,14 +261,26 @@ public class StringLiveDataConfigurationResolver implements LiveDataConfiguratio
         normalizeIconClasses(descriptor);
     }
 
+    /**
+     * Adds the {@link #EXTRA_CLASSES} to the icon's CSS classes. It is done by looking for an {@link #EXTRA_CLASSES}
+     * field on the descriptor. If the {@link #EXTRA_CLASSES} field is not found, nothing happen. If it is found, it is
+     * concatenated at the end of the {@link #CSS_CLASS} field of the {@link #ICON} object. If the {@link #CSS_CLASS} is
+     * not present, it is initialized with the value of {@link #EXTRA_CLASSES}. The {@link #EXTRA_CLASSES} field is
+     * removed for the descriptor in all cases.
+     *
+     * @param descriptor the descriptor to normalize
+     */
     private static void normalizeIconClasses(ObjectNode descriptor)
     {
         JsonNode icon = descriptor.path(ICON);
         if (icon.isObject()) {
             JsonNode extraClasses = descriptor.path(EXTRA_CLASSES);
-            if (extraClasses.isTextual() && icon.has(CSS_CLASS) && icon.path(CSS_CLASS).isTextual()) {
-                String cssClasses = icon.path(CSS_CLASS).textValue() + " " + extraClasses.textValue();
-                ((ObjectNode) icon).set(CSS_CLASS, new TextNode(cssClasses.trim()));
+            if (extraClasses.isTextual()) {
+                String cssClasses = extraClasses.textValue().trim();
+                if (icon.path(CSS_CLASS).isTextual()) {
+                    cssClasses = icon.path(CSS_CLASS).textValue().trim() + " " + cssClasses;
+                }
+                ((ObjectNode) icon).set(CSS_CLASS, new TextNode(cssClasses));
             }
             // Does not need to be preserved once the icon is fully resolved.
             descriptor.remove(EXTRA_CLASSES);

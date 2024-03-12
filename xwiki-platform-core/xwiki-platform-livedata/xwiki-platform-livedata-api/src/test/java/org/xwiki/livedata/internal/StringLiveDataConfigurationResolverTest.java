@@ -79,10 +79,16 @@ class StringLiveDataConfigurationResolverTest
             IconManager.META_DATA_ICON_SET_NAME, "Font Awesome",
             IconManager.META_DATA_CSS_CLASS, "fa fa-times"
         );
+        
+        Map<String, Object> testIconMetadata = Map.of(
+            IconManager.META_DATA_ICON_SET_TYPE, "test",
+            IconManager.META_DATA_ICON_SET_NAME, "Test"
+        );
 
         when(this.iconManager.getMetaData("file")).thenReturn(fileIconMetaData);
         when(this.iconManager.getMetaData("table")).thenReturn(tableIconMetaData);
         when(this.iconManager.getMetaData("cross")).thenReturn(crossIconMetadata);
+        when(this.iconManager.getMetaData("test")).thenReturn(testIconMetadata);
     }
 
     @ParameterizedTest

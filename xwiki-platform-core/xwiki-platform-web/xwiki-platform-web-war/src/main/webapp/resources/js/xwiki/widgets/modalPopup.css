@@ -8,7 +8,7 @@
   width: 100%;
   height: 100%;
   text-align: center;
-  z-index: 1100; /* Higher index than the other modal otherwise the dialog is displayed behind. */
+  z-index: 1005;
 }
 /* Semi-transparent overlay screen that covers the entire page. */
 .xdialog-screen {

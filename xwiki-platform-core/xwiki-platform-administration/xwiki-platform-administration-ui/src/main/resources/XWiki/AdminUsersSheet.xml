@@ -112,7 +112,7 @@
           },
           {
             'id': 'enable',
-            'icon': 'lock',
+            'icon': 'unlock',
             'allowProperty': 'doc.hasenable',
             'urlProperty': 'doc.enable_url'
           }

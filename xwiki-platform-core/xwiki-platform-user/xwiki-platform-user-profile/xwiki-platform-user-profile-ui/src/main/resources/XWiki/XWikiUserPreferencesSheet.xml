@@ -289,17 +289,28 @@
         #displayField('displayHiddenDocuments', 'platform.core.profile.displayHiddenDocuments', '0')
       &lt;/dl&gt;
       &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h2&gt;
+      #set ($defaultLegacyValue = $xwiki.getXWikiPreference('accessibility'))
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('font_size'))
+        #if ("$!defaultValue" == '' &amp;&amp; "$!defaultLegacyValue" == '1')
+          #set ($defaultValue = 'Large')
+        #end
         #if ("$!defaultValue" == '')
           #set ($defaultValue = 'Regular')
         #end
         #displayField('font_size', 'platform.core.profile.accessibility.fontSize', $defaultValue)
         #set ($defaultValue = $xwiki.getXWikiPreference('underline'))
+        #if ("$!defaultValue" == '' &amp;&amp; "$!defaultLegacyValue" == '1')
+          #set ($defaultValue = 'Yes')
+        #end
         #if ("$!defaultValue" == '')
           #set ($defaultValue = 'OnlyInlineLinks')
         #end
         #displayField('underline', 'platform.core.profile.accessibility.underline', $defaultValue)
+      &lt;/dl&gt;
+      &lt;dl hidden&gt;
+        ## Unset the legacy 'accessibility' parameter
+        #displayField('accessibility', 'platform.core.profile.enableAccessibility', '')
       &lt;/dl&gt;
       &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.localizationPreferences'))&lt;/h2&gt;
       &lt;dl&gt;

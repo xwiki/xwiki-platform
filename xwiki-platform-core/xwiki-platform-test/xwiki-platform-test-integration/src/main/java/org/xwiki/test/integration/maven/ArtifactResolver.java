@@ -64,7 +64,7 @@ public class ArtifactResolver
 
     private boolean isOffline;
 
-    private boolean isDebug;
+    private boolean isVerbose;
 
     private RepositoryResolver repositoryResolver;
 
@@ -72,13 +72,13 @@ public class ArtifactResolver
 
     /**
      * @param isOffline if true then don't go out to resolve artifacts
-     * @param isDebug if true then display debugging messages in the standard output
+     * @param isVerbose if true then display debugging messages in the standard output
      * @param repositoryResolver the resolver to create Maven repositories and sessions
      */
-    public ArtifactResolver(boolean isOffline, boolean isDebug, RepositoryResolver repositoryResolver)
+    public ArtifactResolver(boolean isOffline, boolean isVerbose, RepositoryResolver repositoryResolver)
     {
         this.isOffline = isOffline;
-        this.isDebug = isDebug;
+        this.isVerbose = isVerbose;
         this.repositoryResolver = repositoryResolver;
     }
 
@@ -158,7 +158,7 @@ public class ArtifactResolver
 
             DependencyNode node = collectResult.getRoot();
 
-            if (this.isDebug) {
+            if (this.isVerbose) {
                 LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
                 node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
             }
@@ -167,7 +167,7 @@ public class ArtifactResolver
             t1 = System.currentTimeMillis();
             DependencyResult dependencyResult = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
-            if (this.isDebug) {
+            if (this.isVerbose) {
                 LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
             }
 

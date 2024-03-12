@@ -231,10 +231,6 @@ class LiveTableLiveDataPropertyStoreTest
         descriptor4.setDisplayer(displayer4);
         LiveDataPropertyDescriptor.FilterDescriptor filter4 = new LiveDataPropertyDescriptor.FilterDescriptor();
         filter4.setId("list");
-        LiveDataPropertyDescriptor.OperatorDescriptor operatorEmpty =
-            new LiveDataPropertyDescriptor.OperatorDescriptor();
-        operatorEmpty.setId("empty");
-        filter4.setOperators(List.of(operatorEmpty));
         filter4.setParameter("options", List.of(
             Map.of("value", "edit", "label", "Edit right"),
             Map.of("value", "delete", "label", "delete")

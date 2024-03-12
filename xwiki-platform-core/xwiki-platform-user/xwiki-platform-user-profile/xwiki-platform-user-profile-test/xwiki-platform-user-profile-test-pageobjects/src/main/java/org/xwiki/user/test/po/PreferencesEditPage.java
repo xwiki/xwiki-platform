@@ -89,17 +89,17 @@ public class PreferencesEditPage extends EditPage
         this.timezone.sendKeys(value);
     }
 
-    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     public void setShortcutViewEdit(String shortcutValue)
     {
         getDriver().scrollTo(this.shortcutViewEdit);
         this.shortcutViewEdit.clear();
         this.shortcutViewEdit.sendKeys(shortcutValue);
-        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_edit"),
+        if (!shortcutValue.equals("")) {
+            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_edit"),
                 "value");
+        }
     }
 
-    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     public void setShortcutInformation(String shortcutValue)
     {
         getDriver().scrollTo(this.shortcutInformation);

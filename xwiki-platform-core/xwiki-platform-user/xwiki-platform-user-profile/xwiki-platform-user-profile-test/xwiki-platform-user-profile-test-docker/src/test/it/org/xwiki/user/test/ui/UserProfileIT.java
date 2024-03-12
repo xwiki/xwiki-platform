@@ -42,6 +42,8 @@ import org.xwiki.user.test.po.PreferencesUserProfilePage;
 import org.xwiki.user.test.po.ProfileEditPage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
 
+import javax.validation.constraints.AssertTrue;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -120,6 +122,7 @@ class UserProfileIT
         this.userName = testReference.getLastSpaceReference().getName();
         setup.loginAsSuperAdmin();
         setup.rest().deletePage("XWiki", this.userName);
+        // We make sure the user is in advanced mode so that they can use view mode shortcuts
         setup.createUserAndLogin(this.userName, DEFAULT_PASSWORD);
 
         // At first edition the Dashboard is saving the doc to insert a new object, so we need to be sure
@@ -262,12 +265,21 @@ class UserProfileIT
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
+
+
+        // Setting to Advanced user, so that the view shortcuts are enabled
         PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setAdvancedUserType();
+        preferencesEditPage.clickSaveAndView();
+
         // Overriding the default shortcut value (E)
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setShortcutViewEdit(NEW_SHORTCUT_VALUE);
         preferencesEditPage.clickSaveAndView();
 
-        userProfilePage = new ProfileUserProfilePage(this.userName);
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(NEW_SHORTCUT_VALUE, preferencesPage.getViewEditShortcut());
 
@@ -275,7 +287,14 @@ class UserProfileIT
         setup.getDriver().addPageNotYetReloadedMarker();
         setup.getDriver().createActions().sendKeys(NEW_SHORTCUT_VALUE).perform();
         setup.getDriver().waitUntilPageIsReloaded();
-        preferencesEditPage = new PreferencesEditPage();
+        // The edit shortcut sends us to the profile section, whatever the section we were in was.
+        ProfileEditPage profileEditPage = new ProfileEditPage();
+        // We make sure we can find a field on this page (aka we didn't cast this erroneously)
+        assertEquals("", profileEditPage.getUserFirstName());
+
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
         // Reset the preference
         preferencesEditPage.setShortcutViewEdit("");
         preferencesEditPage.clickSaveAndView();
@@ -391,8 +410,15 @@ class UserProfileIT
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
 
-        // Overriding the default shortcut value (I)
+        // Setting to Advanced user, so that the view shortcuts are enabled
         PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
+        preferencesEditPage.setAdvancedUserType();
+        preferencesEditPage.clickSaveAndView();
+
+        // Overriding the default shortcut value (I)
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        preferencesPage = userProfilePage.switchToPreferences();
+        preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setShortcutInformation(NEW_SHORTCUT_VALUE);
         preferencesEditPage.clickSaveAndView();
 
@@ -416,7 +442,7 @@ class UserProfileIT
         assertFalse(infoPane.isOpened());
 
         // Reset the preference
-        userProfilePage = new ProfileUserProfilePage(this.userName);
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
         preferencesEditPage = new PreferencesEditPage();
         preferencesEditPage.setShortcutInformation("");

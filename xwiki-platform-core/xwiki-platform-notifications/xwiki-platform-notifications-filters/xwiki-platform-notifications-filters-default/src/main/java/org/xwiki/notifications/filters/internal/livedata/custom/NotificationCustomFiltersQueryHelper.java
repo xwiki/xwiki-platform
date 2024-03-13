@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationFormat;
@@ -226,7 +227,7 @@ public class NotificationCustomFiltersQueryHelper
     }
 
     private Query getHQLQuery(LiveDataQuery query, boolean isCount, String owner, WikiReference wikiReference)
-        throws QueryException
+        throws QueryException, LiveDataException
     {
         String baseQuery = (isCount) ? "select count(nfp.id) "
             + "from DefaultNotificationFilterPreference nfp where owner = :owner" : BASE_QUERY;
@@ -256,55 +257,66 @@ public class NotificationCustomFiltersQueryHelper
      * @param wikiReference the wiki where to count all filter preferences
      * @return the total number of filter preferences
      * @throws QueryException in case of problem to perform the query
+     * @throws LiveDataException in case of problem with the livedata query
      */
-    public long countTotalFilters(LiveDataQuery query, String owner, WikiReference wikiReference) throws QueryException
+    public long countTotalFilters(LiveDataQuery query, String owner, WikiReference wikiReference)
+        throws QueryException, LiveDataException
     {
         return getHQLQuery(query, true, owner, wikiReference)
             .<Long>execute()
             .get(0);
     }
 
-    private String handleSortEntries(List<LiveDataQuery.SortEntry> sortEntries)
+    private String handleSortEntries(List<LiveDataQuery.SortEntry> sortEntries) throws LiveDataException
     {
         List<String> clauses = new ArrayList<>();
         for (LiveDataQuery.SortEntry sortEntry : sortEntries) {
-            String sortOperator = "asc";
-            if (sortEntry.isDescending()) {
-                sortOperator = "desc";
-            }
-            switch (sortEntry.getProperty()) {
+            String sortOperator = (sortEntry.isDescending()) ? "desc" : "asc";
+            String clause = switch (sortEntry.getProperty()) {
                 case NotificationCustomFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD ->
-                    clauses.add(String.format("nfp.enabled %s", sortOperator));
+                    String.format("nfp.enabled %s", sortOperator);
 
-                case NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD -> {
-                    // We use on purpose asc/desc in combination to ensure having both formats in the middle of the data
-                    // since it's the most common: by doing that we'll have [only alerts, both formats, only emails]
-                    if (sortEntry.isDescending()) {
-                        clauses.add("nfp.emailEnabled asc, nfp.alertEnabled desc");
-                    } else {
-                        clauses.add("nfp.alertEnabled asc, nfp.emailEnabled desc");
-                    }
-                }
+                case NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD ->
+                    handleNotificationFormatSort(sortEntry);
 
                 case NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
                     NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD ->
-                    clauses.add(String.format("nfp.user %1$s, nfp.wiki %1$s, nfp.page %1$s, nfp.pageOnly %1$s",
-                        sortOperator));
+                    handleLocationSort(sortEntry);
 
                 case NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
-                    clauses.add(String.format("nfp.filterType %s", sortOperator));
+                    String.format("nfp.filterType %s", sortOperator);
 
                 case NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD ->
-                    clauses.add(String.format("nfp.allEventTypes %s", sortOperator));
+                    String.format("nfp.allEventTypes %s", sortOperator);
 
-                default -> {
-                }
-            }
+                default -> throw new LiveDataException("Unexpected sort value: " + sortEntry.getProperty());
+            };
+            clauses.add(clause);
         }
         if (!clauses.isEmpty()) {
             return clauses.stream().collect(Collectors.joining(", ", " order by ", ""));
         } else {
             return "";
+        }
+    }
+
+    private String handleLocationSort(LiveDataQuery.SortEntry sortEntry)
+    {
+        if (sortEntry.isDescending()) {
+            return "nfp.user desc, nfp.wiki desc, nfp.page desc, nfp.pageOnly desc";
+        } else {
+            return "nfp.pageOnly asc, nfp.page asc, nfp.wiki asc, nfp.user asc";
+        }
+    }
+
+    private String handleNotificationFormatSort(LiveDataQuery.SortEntry sortEntry)
+    {
+        // We use on purpose asc/desc in combination to ensure having both formats in the middle of the data
+        // since it's the most common: by doing that we'll have [only alerts, both formats, only emails]
+        if (sortEntry.isDescending()) {
+            return "nfp.emailEnabled asc, nfp.alertEnabled desc";
+        } else {
+            return "nfp.alertEnabled asc, nfp.emailEnabled desc";
         }
     }
 
@@ -316,9 +328,10 @@ public class NotificationCustomFiltersQueryHelper
      * @param wikiReference the wiki where to retrieve the filter preferences
      * @return the list of filter preferences
      * @throws QueryException in case of problem to perform the query
+     * @throws LiveDataException in case of problem with the livedata query
      */
     public List<NotificationFilterPreference> getFilterPreferences(LiveDataQuery query, String owner,
-        WikiReference wikiReference) throws QueryException
+        WikiReference wikiReference) throws QueryException, LiveDataException
     {
         return getHQLQuery(query, false, owner, wikiReference)
             .setLimit(query.getLimit())

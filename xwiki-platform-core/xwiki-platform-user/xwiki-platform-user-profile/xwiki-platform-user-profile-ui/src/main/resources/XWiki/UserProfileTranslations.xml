@@ -124,7 +124,7 @@ XWiki.XWikiUsers_shortcut_view_rename.hint=Key to rename the page.
 XWiki.XWikiUsers_shortcut_edit_preview.hint=Key to preview the updated content.
 XWiki.XWikiUsers_shortcut_edit_backtoedit.hint=Key to go back to edit.
 XWiki.XWikiUsers_shortcut_edit_cancel.hint=Key to cancel edition.
-XWiki.XWikiUsers_shortcut_edit_saveandcontinue.hint=Key to save edits.
+XWiki.XWikiUsers_shortcut_edit_save.hint=Key to save edits.
 XWiki.XWikiUsers_shortcut_edit_saveandview.hint=Key to save edits and go back to view mode.
 
 XWiki.XWikiUsers_shortcut_developer_usertype.hint=Key to switch the user type.

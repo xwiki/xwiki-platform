@@ -74,7 +74,12 @@
  * @param class The class to use.
  *#
 #macro(editActionButton $action $resourceIdentifier $class)
-#submitButton("action_${action}", $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"), $services.localization.render($resourceIdentifier), $class)
+#if($!xwiki.getUserPreference("shortcut_edit_${resourceIdentifier}") != '')
+  #set ($shortcut = $xwiki.getUserPreference("shortcut_edit_${resourceIdentifier}"))
+#else
+  #set ($shortcut = $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"))
+#end
+#submitButton("action_${action}", $shortcut, $services.localization.render($resourceIdentifier), $class)
 <input type="hidden" name="xaction" value="$escapetool.xml($action)" />
 #end
 

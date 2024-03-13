@@ -379,7 +379,7 @@
         #displayField('shortcut_edit_preview', 'platform.core.profile.shortcut.edit.preview', $!xwiki.getXWikiPreference('shortcut_edit_preview'))
         #displayField('shortcut_edit_backtoedit', 'platform.core.profile.shortcut.edit.backtoedit', $!xwiki.getXWikiPreference('shortcut_edit_backtoedit'))
         #displayField('shortcut_edit_cancel', 'platform.core.profile.shortcut.edit.cancel', $!xwiki.getXWikiPreference('shortcut_edit_cancel'))
-        #displayField('shortcut_edit_saveandcontinue', 'platform.core.profile.shortcut.edit.save', $!xwiki.getXWikiPreference('shortcut_edit_saveandcontinue'))
+        #displayField('shortcut_edit_save', 'platform.core.profile.shortcut.edit.save', $!xwiki.getXWikiPreference('shortcut_edit_save'))
         #displayField('shortcut_edit_saveandview', 'platform.core.profile.shortcut.edit.saveandview', $!xwiki.getXWikiPreference('shortcut_edit_saveandview'))
       &lt;/dl&gt;
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.developerShortcuts'))&lt;/h3&gt;

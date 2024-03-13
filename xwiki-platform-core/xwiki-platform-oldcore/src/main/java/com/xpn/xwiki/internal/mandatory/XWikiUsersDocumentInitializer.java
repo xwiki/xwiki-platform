@@ -138,7 +138,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("shortcut_edit_preview", "Shortcut to see preview from the editor", 30);
         xclass.addTextField("shortcut_edit_backtoedit", "Shortcut to go back to the editor from preview", 30);
         xclass.addTextField("shortcut_edit_cancel", "Shortcut to cancel edition", 30);
-        xclass.addTextField("shortcut_edit_saveandcontinue", "Shortcut to save and continue in the editor", 30);
+        xclass.addTextField("shortcut_edit_save", "Shortcut to save and continue in the editor", 30);
         xclass.addTextField("shortcut_edit_saveandview", "Shortcut to save and view from the editor", 30);
         // Developer shortcuts (2)
         xclass.addTextField("shortcut_developer_usertype", "Shortcut to switch the current user type", 30);

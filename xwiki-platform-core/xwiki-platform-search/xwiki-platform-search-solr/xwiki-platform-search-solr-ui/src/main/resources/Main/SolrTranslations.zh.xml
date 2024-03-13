@@ -1,1 +1,179 @@
+<?xml version="1.1" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="zh">
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>solr.admin.title=Solr搜索管理
+solr.admin.submit=应用
+solr.admin.error.action={0} 失败:
+solr.admin.error.notallowed=您无权执行此操作。
+solr.admin.error.norights=访问此部分需要管理员权限。
+solr.admin.success.action={0} 触发成功。
+solr.admin.status.title=状态
+solr.admin.status.queueSize.label=队列大小
+solr.admin.status.queueSize.hint=剩余待索引、重新索引或从索引中删除的实体数量（基于执行的操作）。
+solr.admin.indexing.title=索引中
+solr.admin.indexing.action.label=动作
+solr.admin.indexing.action.hint=要对索引执行的操作。
+solr.admin.indexing.action.select_index=添加到索引
+solr.admin.indexing.action.select_delete=从索引删除
+solr.admin.indexing.action.select_reindex=重新索引
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=这个Wiki中的所有文档将受到选定操作的影响。
+solr.admin.indexing.wiki.select_farm=整个站点
+solr.admin.indexing.query.label=自定义查询
+solr.admin.indexing.query.hint=可选查询，用于限制索引中将受到选定操作影响的文档。
+solr.admin.info.affectedDocuments=索引中受影响的文档：
+solr.sortBy=排序：
+solr.sortBy.score=相关性
+solr.sortBy.title_sort=标题
+solr.sortBy.date=上次修改时间
+solr.sortBy.author_display_sort=最后的作者
+solr.sortBy.filename_sort=文件名
+solr.sortBy.attsize_sort=文件大小
+solr.sortBy.attdate_sort=上传时间
+solr.sortBy.attauthor_display_sort=上传人
+solr.sortOrder.asc=正序
+solr.sortOrder.desc=倒序
+solr.options=显示：
+solr.options.highlight=高亮
+solr.options.highlight.title=显示每个结果中匹配到的内容
+solr.options.facet=侧边栏
+solr.options.facet.title=允许对结果应用额外的过滤器
+solr.result.language=语言
+solr.result.locatedIn=位于
+solr.result.author=由 {0} 修改于 {1}
+solr.result.mediaType={0} 的文件类型
+solr.result.uploadedBy=由 {0} 上传于 {1} ({2})
+solr.result.highlightAll=高亮所有匹配项
+solr.facets.title=优化您的搜索条件
+solr.facets.hint=选择一个类别并在当前结果上启用过滤器
+solr.facets.resetAll=全部重置
+solr.facets.expandAll=全部展开
+solr.facets.collapseAll=全部收起
+solr.facets.emptyValue=空值
+solr.facets.moreValues={0} 更多
+solr.filterBy.type.document=文档
+solr.filterBy.type.attachment=附件
+solr.filterBy.type.object=对象
+solr.filterBy.type.object_property=对象属性
+solr.filterBy.fileType.image=图片
+solr.filterBy.fileType.audio=音频
+solr.filterBy.fileType.video=视频
+solr.filterBy.fileType.text=文本
+solr.filterBy.fileType.office=Office文件
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=幻灯片
+solr.filterBy.fileType.spreadsheet=电子表格
+solr.filterBy.fileType.archive=压缩包
+solr.filterBy.fileType.font=字体
+solr.filterBy.fileType.other=其他
+solr.facet.fileType.text.plain=文本
+solr.facet.fileType.text.javascript=JavaScript脚本
+solr.facet.fileType.text.java-source=Java源代码
+solr.facet.fileType.text.sh=Shell脚本
+solr.facet.fileType.image.icon=图标
+solr.facet.fileType.archive.java-archive=JAR包
+solr.facet.fileType.archive.xara=XAR包
+solr.facet.fileType.other.octet-stream=二进制数据
+solr.facet.date.today=今天
+solr.facet.date.last7Days=最近7天
+solr.facet.date.last30Days=最近30天
+solr.facet.date.olderThan30Days=30天之前
+solr.facet.date.customInterval=自定义日期和时间间隔
+solr.facet.date.start=开始日期和时间
+solr.facet.date.end=结束日期和时间
+solr.facet.date.applyCustomInterval=应用
+solr.facet.date.between=从 {0} 到 {1}
+solr.facet.date.after={0} 之后
+solr.facet.date.before={0} 之前
+solr.facet.date.any=任何时间
+solr.facet.size.tiny=微型
+solr.facet.size.small=小型
+solr.facet.size.medium=中型
+solr.facet.size.large=大型
+solr.facet.size.between=在 {0} 和 {1} 之间
+solr.facet.size.lessThan=小于{0}
+solr.facet.size.moreThan=大于 {0}
+solr.facet.size.any=任意大小
+solr.field.type=结果类型
+solr.field.locale=语言
+solr.field.locale.emptyValue=无特定语言
+solr.field.locale.emptyValue.hint=一些文档没有设置语言，因为它们包含脚本（这些脚本不是用自然语言编写的）或者它们构成了用户界面，这些界面按当前语言显示（就像本页面一样）。
+solr.field.wiki=Wiki库
+solr.field.spaces=位置
+solr.field.space_exact=位置
+solr.field.space_facet=位置
+solr.field.name=页面
+solr.field.name_exact=页面
+solr.field.title=标题
+solr.field.author=上个作者
+solr.field.author_display=上个作者
+solr.field.creator=创建人
+solr.field.creator_display=创建人
+solr.field.date=上次修改时间
+solr.field.creationdate=创建时间
+solr.field.doccontent=已渲染的文档内容
+solr.field.doccontentraw=原始文档内容
+solr.field.class=对象类型
+solr.field.class.definedBy=由 {0} » {1} 定义
+solr.field.propertyname=属性名称
+solr.field.propertyvalue=属性值
+solr.field.filename=附件名称
+solr.field.attcontent=附件内容
+solr.field.comment=评论
+solr.field.objcontent=对象
+solr.field.mimetype=文件类型
+solr.field.attauthor=上传人
+solr.field.attauthor_display=上传人
+solr.field.attdate=上传时间
+solr.field.attsize=文件大小
+solr.uix.docdoesnotexist.title=您是在寻找以下页面之一吗？
+solr.uix.attachmentdoesnotexist.title=您是在寻找以下附件之一吗？
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location=位于 {0} » {1} » {2}
+
+## until 7.2RC1
+solr.field.space=位置
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

@@ -135,12 +135,12 @@
     shortcut.add("#if($!{xwiki.getUserPreference('shortcut_developer_usertype')}!='')$!{xwiki.getUserPreference('shortcut_developer_usertype')}#{else}$services.localization.render('core.shortcuts.developer.user.type')#end", function() {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/usertype/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.type.error'))");
-    }, {'type': #if($!{xwiki.getUserPreference('shortcut_developer_usertype')}!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
+    }, {'type': #if($!xwiki.getUserPreference('shortcut_developer_usertype')!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
 
     shortcut.add("#if($!{xwiki.getUserPreference('shortcut_developer_display_hidden_docs')}!='')$!{xwiki.getUserPreference('shortcut_developer_display_hidden_docs')}#{else}$services.localization.render('core.shortcuts.developer.user.displayHiddenDocs')#end", function () {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/displayHiddenDocuments/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.displayHiddenDocs.error'))");
-    }, {'type': #if($!{xwiki.getUserPreference('shortcut_developer_usertype')}!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
+    }, {'type': #if($!xwiki.getUserPreference('shortcut_developer_usertype')!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
     //]]>
   #end
 </script>

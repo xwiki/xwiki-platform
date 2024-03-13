@@ -42,8 +42,6 @@ import org.xwiki.user.test.po.PreferencesUserProfilePage;
 import org.xwiki.user.test.po.ProfileEditPage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
 
-import javax.validation.constraints.AssertTrue;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

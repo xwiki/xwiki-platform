@@ -114,15 +114,18 @@ public class NotificationFilterLiveDataTranslationHelper
      */
     public String getEventTypeTranslation(String eventType)
     {
+        String result = eventType;
         try {
             RecordableEventDescriptor descriptor =
                 this.recordableEventDescriptorManager.getDescriptorForEventType(eventType, true);
-            return getTranslationWithFallback(descriptor.getDescription());
+            if (descriptor != null) {
+                result = getTranslationWithFallback(descriptor.getDescription());
+            }
         } catch (EventStreamException e) {
             this.logger.error("Error while getting description for event type [{}] falling back on event name",
                 eventType, e);
-            return eventType;
         }
+        return result;
     }
 
     /**

@@ -237,7 +237,7 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
 
         LiveData liveData = new LiveData();
         try {
-            long filterCount = this.queryHelper.countTotalFilters(serializedOwner, wikiReference);
+            long filterCount = this.queryHelper.countTotalFilters(query, serializedOwner, wikiReference);
             List<NotificationFilterPreference> filterPreferences =
                 this.queryHelper.getFilterPreferences(query, serializedOwner, wikiReference);
             liveData.setCount(filterCount);

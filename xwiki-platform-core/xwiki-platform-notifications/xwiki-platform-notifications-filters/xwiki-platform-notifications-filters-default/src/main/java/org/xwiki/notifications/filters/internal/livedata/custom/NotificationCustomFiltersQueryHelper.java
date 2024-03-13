@@ -225,19 +225,41 @@ public class NotificationCustomFiltersQueryHelper
         return clauses.stream().collect(Collectors.joining(operatorAppender, "(", ")"));
     }
 
+    private Query getHQLQuery(LiveDataQuery query, boolean isCount, String owner, WikiReference wikiReference)
+        throws QueryException
+    {
+        String baseQuery = (isCount) ? "select count(nfp.id) "
+            + "from DefaultNotificationFilterPreference nfp where owner = :owner" : BASE_QUERY;
+        Optional<FiltersHQLQuery> optionalFiltersHQLQuery = handleFilter(query.getFilters());
+        if (optionalFiltersHQLQuery.isPresent()) {
+            baseQuery += optionalFiltersHQLQuery.get().whereClause;
+        }
+        if (!isCount) {
+            baseQuery += handleSortEntries(query.getSort());
+        }
+        Query hqlQuery = this.queryManager.createQuery(baseQuery, Query.HQL)
+            .bindValue(OWNER_BINDING, owner)
+            .setWiki(wikiReference.getName());
+        if (optionalFiltersHQLQuery.isPresent()) {
+            for (Map.Entry<String, Object> binding : optionalFiltersHQLQuery.get().bindings.entrySet()) {
+                hqlQuery = hqlQuery.bindValue(binding.getKey(), binding.getValue());
+            }
+        }
+        return hqlQuery;
+    }
+
     /**
      * Count the total number of filter preferences for given owner on given wiki.
+     *
+     * @param query the query to use for applying the filters
      * @param owner the owner for which to count all filter preferences
      * @param wikiReference the wiki where to count all filter preferences
      * @return the total number of filter preferences
      * @throws QueryException in case of problem to perform the query
      */
-    public long countTotalFilters(String owner, WikiReference wikiReference) throws QueryException
+    public long countTotalFilters(LiveDataQuery query, String owner, WikiReference wikiReference) throws QueryException
     {
-        return this.queryManager.createQuery("select count(nfp.id) "
-                + "from DefaultNotificationFilterPreference nfp where owner = :owner", Query.HQL)
-            .bindValue(OWNER_BINDING, owner)
-            .setWiki(wikiReference.getName())
+        return getHQLQuery(query, true, owner, wikiReference)
             .<Long>execute()
             .get(0);
     }
@@ -298,21 +320,7 @@ public class NotificationCustomFiltersQueryHelper
     public List<NotificationFilterPreference> getFilterPreferences(LiveDataQuery query, String owner,
         WikiReference wikiReference) throws QueryException
     {
-        String baseQuery = BASE_QUERY;
-        Optional<FiltersHQLQuery> optionalFiltersHQLQuery = handleFilter(query.getFilters());
-        if (optionalFiltersHQLQuery.isPresent()) {
-            baseQuery += optionalFiltersHQLQuery.get().whereClause;
-        }
-        baseQuery += handleSortEntries(query.getSort());
-        Query hqlQuery = this.queryManager.createQuery(baseQuery, Query.HQL)
-            .bindValue(OWNER_BINDING, owner)
-            .setWiki(wikiReference.getName());
-        if (optionalFiltersHQLQuery.isPresent()) {
-            for (Map.Entry<String, Object> binding : optionalFiltersHQLQuery.get().bindings.entrySet()) {
-                hqlQuery = hqlQuery.bindValue(binding.getKey(), binding.getValue());
-            }
-        }
-        return hqlQuery
+        return getHQLQuery(query, false, owner, wikiReference)
             .setLimit(query.getLimit())
             .setOffset(query.getOffset().intValue())
             .execute();

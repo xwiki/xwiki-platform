@@ -28,7 +28,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +39,6 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQueryParameter;
 
@@ -65,10 +63,6 @@ public class NotificationCustomFiltersQueryHelper
 
     @Inject
     private QueryManager queryManager;
-
-    @Inject
-    @Named("count")
-    private QueryFilter countQueryFilter;
 
     private static final class FiltersHQLQuery
     {
@@ -240,10 +234,10 @@ public class NotificationCustomFiltersQueryHelper
      */
     public long countTotalFilters(String owner, WikiReference wikiReference) throws QueryException
     {
-        return this.queryManager.createQuery(BASE_QUERY, Query.HQL)
+        return this.queryManager.createQuery("select count(nfp.id) "
+                + "from DefaultNotificationFilterPreference nfp where owner = :owner", Query.HQL)
             .bindValue(OWNER_BINDING, owner)
             .setWiki(wikiReference.getName())
-            .addFilter(this.countQueryFilter)
             .<Long>execute()
             .get(0);
     }

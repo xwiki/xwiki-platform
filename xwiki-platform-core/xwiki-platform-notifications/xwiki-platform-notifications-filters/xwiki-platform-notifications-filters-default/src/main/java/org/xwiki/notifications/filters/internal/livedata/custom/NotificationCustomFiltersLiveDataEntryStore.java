@@ -233,7 +233,7 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
         TargetInformation targetInformation = getTargetInformation(query);
         String serializedOwner = this.entityReferenceSerializer.serialize(targetInformation.ownerReference);
         WikiReference wikiReference =
-            (WikiReference) targetInformation.ownerReference.extractReference(EntityType.WIKI);
+            new WikiReference(targetInformation.ownerReference.extractReference(EntityType.WIKI));
 
         LiveData liveData = new LiveData();
         try {

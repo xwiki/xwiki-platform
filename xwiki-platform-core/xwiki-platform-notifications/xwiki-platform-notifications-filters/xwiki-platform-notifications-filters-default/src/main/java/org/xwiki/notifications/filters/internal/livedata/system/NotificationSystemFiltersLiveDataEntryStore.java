@@ -121,7 +121,7 @@ public class NotificationSystemFiltersLiveDataEntryStore extends AbstractNotific
         List<ToggleableNotificationFilter> allFilters = null;
         try {
             if (targetInformation.isWikiTarget) {
-                WikiReference wikiReference = (WikiReference) targetInformation.ownerReference;
+                WikiReference wikiReference = new WikiReference(targetInformation.ownerReference);
                 allFilters =
                     this.notificationFilterManager.getAllFilters(wikiReference)
                         .stream()
@@ -132,7 +132,7 @@ public class NotificationSystemFiltersLiveDataEntryStore extends AbstractNotific
                     this.filterPreferencesModelBridge.getToggleableFilterActivations(
                         new DocumentReference(NOTIFICATION_ADMINISTRATION_REF, wikiReference));
             } else {
-                DocumentReference userDoc = (DocumentReference) targetInformation.ownerReference;
+                DocumentReference userDoc = new DocumentReference(targetInformation.ownerReference);
                 allFilters = this.notificationFilterManager.getAllFilters(userDoc, false)
                         .stream()
                         .filter(filter -> filter instanceof ToggleableNotificationFilter)

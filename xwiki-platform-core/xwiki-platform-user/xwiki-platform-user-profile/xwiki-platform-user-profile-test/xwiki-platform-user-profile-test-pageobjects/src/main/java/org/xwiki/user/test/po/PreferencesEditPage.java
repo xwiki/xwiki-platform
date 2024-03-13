@@ -105,7 +105,9 @@ public class PreferencesEditPage extends EditPage
         getDriver().scrollTo(this.shortcutInformation);
         this.shortcutInformation.clear();
         this.shortcutInformation.sendKeys(shortcutValue);
-        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_information"),
-            "value");
+        if (!shortcutValue.equals("")) {
+            getDriver().waitUntilElementHasNonEmptyAttributeValue(By.id("XWiki.XWikiUsers_0_shortcut_view_information"),
+                "value");
+        }
     }
 }

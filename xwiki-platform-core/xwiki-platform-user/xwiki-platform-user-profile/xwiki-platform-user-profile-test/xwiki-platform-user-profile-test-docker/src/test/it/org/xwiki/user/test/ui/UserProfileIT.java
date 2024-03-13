@@ -444,7 +444,7 @@ class UserProfileIT
         // Reset the preference
         userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
-        preferencesEditPage = new PreferencesEditPage();
+        preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setShortcutInformation("");
         preferencesEditPage.clickSaveAndView();
     }

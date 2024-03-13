@@ -104,8 +104,6 @@ notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
 notifications.settings.filters.preferences.custom.title=Custom Filters
 notifications.settings.filters.preferences.custom.hint=Create filters to control the notifications you want to receive.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.custom.table.name=Location
-notifications.settings.filters.preferences.custom.table.location=Location
 notifications.settings.filters.preferences.custom.table.scope=Scope
 notifications.settings.filters.preferences.custom.table.location=Location
 notifications.settings.filters.preferences.custom.table.filterType=Filter Action
@@ -273,6 +271,7 @@ notifications.filters.type.exclusive=Exclusive
 ## until 16.2.0RC1
 notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
 notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
+notifications.settings.filters.preferences.custom.table.name=Location
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

@@ -22,7 +22,6 @@ package org.xwiki.notifications.filters.internal.livedata.custom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -69,8 +68,11 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     static final String DOC_HAS_DELETE_FIELD = "doc_hasdelete";
     private static final String TRANSLATION_PREFIX = "notifications.settings.filters.preferences.custom.table.";
     private static final String DELETE = "delete";
+    // FIXME: We should define those constants in LiveData module
     private static final String STRING_TYPE = "String";
     private static final String HTML_DISPLAYER = "html";
+    private static final String BOOLEAN = "boolean";
+    private static final String STATIC_LIST_DISPLAYER = "staticList";
     private static final String VALUE_KEY = "value";
     private static final String LABEL_KEY = "label";
 
@@ -148,7 +150,8 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         deleteAction.setId(DELETE);
         deleteAction.setAllowProperty(DOC_HAS_DELETE_FIELD);
         try {
-            deleteAction.setIcon(this.iconManager.getMetaData(DELETE));
+            // FIXME: we should map delete action icon to the cross..
+            deleteAction.setIcon(this.iconManager.getMetaData("cross"));
         } catch (IconException e) {
             this.logger.error("Error while getting icon for the remove action", e);
         }
@@ -175,6 +178,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         descriptor.setId(DISPLAY_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
+        // This is not visible because we don't want to keep that property and it's aiming at being removed.
         descriptor.setVisible(false);
         descriptor.setEditable(false);
         descriptor.setSortable(false);
@@ -187,9 +191,9 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     {
         LiveDataPropertyDescriptor.FilterDescriptor filterList =
             new LiveDataPropertyDescriptor.FilterDescriptor("list");
-        filterList.addOperator("empty", null);
         filterList.setParameter("options", options);
         String equalsOperator = "equals";
+        // We do not want any other operator than equals
         filterList.addOperator(equalsOperator, null);
         filterList.setDefaultOperator(equalsOperator);
         return filterList;
@@ -206,7 +210,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
             .map(item -> Map.of(
                 VALUE_KEY, item.name(),
                 LABEL_KEY, this.translationHelper.getScopeTranslation(item)
-            )).collect(Collectors.toList())));
+            )).toList()));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -240,7 +244,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
             .map(item -> Map.of(
                 VALUE_KEY, item.name(),
                 LABEL_KEY, this.translationHelper.getFilterTypeTranslation(item)
-            )).collect(Collectors.toList())));
+            )).toList()));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -255,12 +259,12 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + NOTIFICATION_FORMATS_FIELD));
         descriptor.setId(NOTIFICATION_FORMATS_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
         descriptor.setFilter(createFilterList(Stream.of(NotificationFormat.values()).map(item ->
             Map.of(
                 VALUE_KEY, item.name(),
                 LABEL_KEY, this.translationHelper.getFormatTranslation(item)
-            )).collect(Collectors.toList())));
+            )).toList()));
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(STATIC_LIST_DISPLAYER));
         descriptor.setVisible(true);
         descriptor.setEditable(false);
         descriptor.setSortable(true);
@@ -275,14 +279,13 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + EVENT_TYPES_FIELD));
         descriptor.setId(EVENT_TYPES_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(STATIC_LIST_DISPLAYER));
         List<Map<String, String>> options = new ArrayList<>();
         options.add(Map.of(
             VALUE_KEY, ALL_EVENTS_OPTION_VALUE,
             LABEL_KEY, this.translationHelper.getAllEventTypesTranslation()));
         try {
-            // FIXME: all farm shouldn't always be true
-            options.addAll(this.translationHelper.getAllEventTypesOptions(true));
+            options.addAll(this.translationHelper.getAllEventTypesOptions());
         } catch (LiveDataException e) {
             this.logger.error("Cannot provide event filter options", e);
         }
@@ -300,10 +303,8 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + IS_ENABLED_FIELD));
         descriptor.setId(IS_ENABLED_FIELD);
-        descriptor.setType("Boolean");
-        LiveDataPropertyDescriptor.FilterDescriptor filterBoolean =
-            new LiveDataPropertyDescriptor.FilterDescriptor("boolean");
-        descriptor.setFilter(filterBoolean);
+        descriptor.setType(BOOLEAN);
+        descriptor.setFilter(new LiveDataPropertyDescriptor.FilterDescriptor(BOOLEAN));
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("toggle"));
         descriptor.setVisible(true);
         descriptor.setEditable(false);

@@ -50,7 +50,6 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
     static final String IS_ENABLED_FIELD = "isEnabled";
     private static final String TRANSLATION_PREFIX = "notifications.settings.filters.preferences.system.table.";
     private static final String STRING_TYPE = "String";
-    private static final String HTML_DISPLAYER = "html";
 
     @Inject
     private ContextualLocalizationManager l10n;
@@ -80,18 +79,21 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
         return input;
     }
 
+    private void setDescriptorValues(LiveDataPropertyDescriptor descriptor)
+    {
+        descriptor.setVisible(true);
+        descriptor.setEditable(false);
+        descriptor.setSortable(false);
+        descriptor.setFilterable(false);
+    }
+
     private LiveDataPropertyDescriptor getNameDescriptor()
     {
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + NAME_FIELD));
         descriptor.setId(NAME_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
-        descriptor.setVisible(true);
-        descriptor.setEditable(false);
-        descriptor.setSortable(false);
-        descriptor.setFilterable(false);
-
+        this.setDescriptorValues(descriptor);
         return descriptor;
     }
 
@@ -101,12 +103,7 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + DESCRIPTION_FIELD));
         descriptor.setId(DESCRIPTION_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
-        descriptor.setVisible(true);
-        descriptor.setEditable(false);
-        descriptor.setSortable(false);
-        descriptor.setFilterable(false);
-
+        this.setDescriptorValues(descriptor);
         return descriptor;
     }
 
@@ -116,12 +113,8 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + NOTIFICATION_FORMATS_FIELD));
         descriptor.setId(NOTIFICATION_FORMATS_FIELD);
         descriptor.setType(STRING_TYPE);
-        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(HTML_DISPLAYER));
-        descriptor.setVisible(true);
-        descriptor.setEditable(false);
-        descriptor.setSortable(false);
-        descriptor.setFilterable(false);
-
+        descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("staticList"));
+        this.setDescriptorValues(descriptor);
         return descriptor;
     }
 
@@ -130,16 +123,9 @@ public class NotificationSystemFiltersLiveDataConfigurationProvider implements P
         LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
         descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + IS_ENABLED_FIELD));
         descriptor.setId(IS_ENABLED_FIELD);
-        descriptor.setType("Boolean");
-        LiveDataPropertyDescriptor.FilterDescriptor filterBoolean =
-            new LiveDataPropertyDescriptor.FilterDescriptor("boolean");
-        descriptor.setFilter(filterBoolean);
+        descriptor.setType("boolean");
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor("toggle"));
-        descriptor.setVisible(true);
-        descriptor.setEditable(false);
-        descriptor.setSortable(false);
-        descriptor.setFilterable(false);
-
+        this.setDescriptorValues(descriptor);
         return descriptor;
     }
 }

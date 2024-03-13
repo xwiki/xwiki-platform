@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
@@ -35,12 +36,13 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.livedata.custom.NotificationCustomFiltersLiveDataConfigurationProvider;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Helper for getting various translations for live data custom sources.
  *
  * @version $Id$
- * @since 16.2.ORC1
+ * @since 16.2.0RC1
  */
 @Component(roles = NotificationFilterLiveDataTranslationHelper.class)
 @Singleton
@@ -51,6 +53,12 @@ public class NotificationFilterLiveDataTranslationHelper
 
     @Inject
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private Logger logger;
 
     private String getTranslationWithFallback(String translationKey)
     {
@@ -104,15 +112,16 @@ public class NotificationFilterLiveDataTranslationHelper
      * @return the plain text event type description translation
      * @throws LiveDataException if the event type descriptor cannot be found
      */
-    public String getEventTypeTranslation(String eventType) throws LiveDataException
+    public String getEventTypeTranslation(String eventType)
     {
         try {
             RecordableEventDescriptor descriptor =
                 this.recordableEventDescriptorManager.getDescriptorForEventType(eventType, true);
             return getTranslationWithFallback(descriptor.getDescription());
         } catch (EventStreamException e) {
-            throw new LiveDataException(
-                String.format("Error while getting description for event type [%s]", eventType), e);
+            this.logger.error("Error while getting description for event type [{}] falling back on event name",
+                eventType, e);
+            return eventType;
         }
     }
 
@@ -127,16 +136,16 @@ public class NotificationFilterLiveDataTranslationHelper
 
     /**
      * Get event type information from all descriptor to populate a select.
-     * @param allFarm {@code true} if the event type should be retrieved for the whole farm.
      * @return a list of maps containing two information: {@code value} holding the event type, and {@code label}
      * holding a translation of the description
      * @throws LiveDataException in case of problem to load the descriptors
      */
-    public List<Map<String, String>> getAllEventTypesOptions(boolean allFarm) throws LiveDataException
+    public List<Map<String, String>> getAllEventTypesOptions() throws LiveDataException
     {
         try {
+            boolean isMainWiki = this.wikiDescriptorManager.isMainWiki(this.wikiDescriptorManager.getCurrentWikiId());
             List<RecordableEventDescriptor> recordableEventDescriptors =
-                this.recordableEventDescriptorManager.getRecordableEventDescriptors(allFarm);
+                this.recordableEventDescriptorManager.getRecordableEventDescriptors(isMainWiki);
             return recordableEventDescriptors.stream().map(descriptor -> Map.of(
                 "value", descriptor.getEventType(),
                 "label", getTranslationWithFallback(descriptor.getDescription())

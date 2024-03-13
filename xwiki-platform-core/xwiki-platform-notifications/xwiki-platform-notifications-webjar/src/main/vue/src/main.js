@@ -19,6 +19,7 @@
  */
 import DisplayerToggle from "./components/DisplayerToggle.vue";
 import DisplayerScope from "./components/DisplayerScope.vue";
+import DisplayerStaticList from "./components/DisplayerStaticList.vue";
 
 // Export the elements that are expected to be imported from other modules.
-export {DisplayerToggle,DisplayerScope}
+export {DisplayerToggle,DisplayerScope,DisplayerStaticList}

@@ -470,6 +470,7 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
 ], function ($, xm, Vue, notifications, l10n) {
   Vue.component('DisplayerToggle', notifications.DisplayerToggle);
   Vue.component('DisplayerScope', notifications.DisplayerScope);
+  Vue.component('DisplayerStaticList', notifications.DisplayerStaticList);
 
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',

@@ -32,7 +32,7 @@
   <name>XWiki Platform - Distribution - Debian - Solr - Core - Search</name>
   <description>Install a XWiki core in the right location (based on Solr default setup)</description>
   <properties>
-    <debian.solr.core>search</debian.solr.core>
+    <debian.xwiki.core>search</debian.xwiki.core>
     <debian.solr.package>xwiki-platform-search-solr-server-core-search</debian.solr.package>
   </properties>
 </project>

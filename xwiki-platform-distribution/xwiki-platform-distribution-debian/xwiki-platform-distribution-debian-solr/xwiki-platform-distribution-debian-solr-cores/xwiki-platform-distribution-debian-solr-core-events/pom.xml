@@ -31,6 +31,6 @@
   <packaging>deb</packaging>
   <name>XWiki Platform - Distribution - Debian - Solr - Core - Events</name>
   <properties>
-    <debian.solr.core>events</debian.solr.core>
+    <debian.xwiki.core>events</debian.xwiki.core>
   </properties>
 </project>

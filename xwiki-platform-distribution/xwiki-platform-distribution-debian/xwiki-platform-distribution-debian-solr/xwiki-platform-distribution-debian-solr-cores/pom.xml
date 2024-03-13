@@ -41,11 +41,13 @@
  This package contains a pre configured Solr core for XWiki ${debian.solr.core} to be used in a standalone Solr setup.
     </debian.description>
 
-    <debian.package>xwiki-solr9-${debian.solr.core}</debian.package>
+    <debian.package>xwiki-solr${solr.major.version}-${debian.xwiki.core}</debian.package>
 
-    <debian.xwiki.var.solr>${debian.xwiki.var}/solr9</debian.xwiki.var.solr>
+    <debian.xwiki.var.solr.base>${debian.xwiki.var}/solr</debian.xwiki.var.solr.base>
+    <debian.xwiki.var.solr>${debian.xwiki.var.solr.base}/${solr.major.version}</debian.xwiki.var.solr>
     <debian.solr.package>xwiki-platform-search-solr-server-core-minimal</debian.solr.package>
-    <debian.solr.var.solr>/var/solr/data/xwiki_</debian.solr.var.solr>
+    <debian.solr.var.solr>/var/solr/data</debian.solr.var.solr>
+    <debian.solr.core>xwiki_${debian.xwiki.core}_${solr.major.version}</debian.solr.core>
 
     <debian.postinst>
 #!/bin/sh
@@ -56,6 +58,9 @@ set -e
 if [ ! -d ${debian.xwiki.var} ]; then
   mkdir ${debian.xwiki.var}/
 fi
+if [ ! -d ${debian.xwiki.var.solr.base} ]; then
+  mkdir ${debian.xwiki.var.solr.base}/
+fi
 if [ ! -d ${debian.xwiki.var.solr} ]; then
   mkdir ${debian.xwiki.var.solr}/
 fi
@@ -64,9 +69,9 @@ fi
 
 # Make the default solr user ("solr") owner of the data folder
 if id "solr" >/dev/null 2>&amp;1; then
-  chown -R solr:solr ${debian.xwiki.var.solr}/${debian.solr.core}/
+  chown -R solr:solr ${debian.xwiki.var.solr}/${debian.xwiki.core}/
 else
-  echo "No user with name 'solr' could be found. Please make the user which runs Solr the owner of the folder ${debian.xwiki.var.solr}/${debian.solr.core}/"
+  echo "No user with name 'solr' could be found. Please make the user which runs Solr the owner of the folder ${debian.xwiki.var.solr}/${debian.xwiki.core}/"
 fi
     </debian.postinst>
     <debian.postrm>
@@ -76,7 +81,7 @@ set -e
 #set -x
 
 if [ "$1" = "purge"  ]; then
-    rm -rf ${debian.xwiki.var.solr}/${debian.solr.core}
+    rm -rf ${debian.xwiki.var.solr}/${debian.xwiki.core}
 
     if [ -e /usr/share/debconf/confmodule ]; then
         . /usr/share/debconf/confmodule
@@ -147,7 +152,7 @@ fi
                 <type>directory</type>
                 <mapper>
                   <type>perm</type>
-                  <prefix>${debian.xwiki.var.solr}/${debian.solr.core}</prefix>
+                  <prefix>${debian.xwiki.var.solr}/${debian.xwiki.core}</prefix>
                 </mapper>
                 <conffile>true</conffile>
               </data>
@@ -155,8 +160,8 @@ fi
               <data>
                 <type>link</type>
                 <symlink>true</symlink>
-                <linkName>${debian.solr.var.solr}${debian.solr.core}</linkName>
-                <linkTarget>${debian.xwiki.var.solr}/${debian.solr.core}</linkTarget>
+                <linkName>${debian.solr.var.solr}/${debian.solr.core}</linkName>
+                <linkTarget>${debian.xwiki.var.solr}/${debian.xwiki.core}</linkTarget>
               </data>
             </dataSet>
           </configuration>

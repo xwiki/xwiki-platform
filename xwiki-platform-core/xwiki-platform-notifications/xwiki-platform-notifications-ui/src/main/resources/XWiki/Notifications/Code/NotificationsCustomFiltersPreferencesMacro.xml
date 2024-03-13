@@ -128,17 +128,19 @@
       <code>'use strict';
 
 define('notifications-custom-filters-preferences-macro-translation-keys', {
-  prefix: 'notifications.',
+  prefix: '',
   keys: [
-    'settings.saving',
-    'settings.saved',
-    'settings.savingfailed',
-    'filters.preferences.setEnabled.inProgress',
-    'filters.preferences.setEnabled.done',
-    'filters.preferences.setEnabled.error',
-    'filters.preferences.delete.inProgress',
-    'filters.preferences.delete.done',
-    'filters.preferences.delete.error'
+    'notifications.settings.saving',
+    'notifications.settings.saved',
+    'notifications.settings.savingfailed',
+    'notifications.filters.preferences.setEnabled.inProgress',
+    'notifications.filters.preferences.setEnabled.done',
+    'notifications.filters.preferences.setEnabled.error',
+    'notifications.filters.preferences.delete.inProgress',
+    'notifications.filters.preferences.delete.done',
+    'notifications.filters.preferences.delete.error',
+    'livedata.displayer.boolean.true',
+    'livedata.displayer.boolean.false'
   ]
 });
 

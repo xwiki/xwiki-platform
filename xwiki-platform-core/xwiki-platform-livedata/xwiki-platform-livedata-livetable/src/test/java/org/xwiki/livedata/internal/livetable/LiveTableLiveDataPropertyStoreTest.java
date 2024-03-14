@@ -218,6 +218,7 @@ class LiveTableLiveDataPropertyStoreTest
         LiveDataPropertyDescriptor.OperatorDescriptor operator2 = new LiveDataPropertyDescriptor.OperatorDescriptor();
         operator2.setId("equals");
         filter3.setOperators(List.of(operator1, operator2));
+        filter3.setDefaultOperator("equals");
         filter3.setParameter("searchURL",
             "/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}");
         descriptor3.setFilter(filter3);

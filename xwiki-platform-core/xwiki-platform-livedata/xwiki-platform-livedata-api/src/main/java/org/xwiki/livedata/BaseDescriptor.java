@@ -21,6 +21,7 @@ package org.xwiki.livedata;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Base class for various live data configuration descriptors.
@@ -69,5 +70,13 @@ public class BaseDescriptor extends WithParameters
         }
 
         return false;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("id", id)
+            .toString();
     }
 }

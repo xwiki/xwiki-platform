@@ -21,6 +21,8 @@ package org.xwiki.livedata.internal.livetable;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -172,92 +174,75 @@ class LiveTableLiveDataPropertyStoreTest
 
         when(xclass.getEnabledProperties()).thenReturn(Arrays.asList(dateField, computedField, listField, levelsField));
 
-//        LiveDataPropertyDescriptor descriptor0 = new LiveDataPropertyDescriptor();
-//        descriptor0.setId("doc.title");
-//
-//        LiveDataPropertyDescriptor descriptor1 = new LiveDataPropertyDescriptor();
-//        descriptor1.setId("birthdate");
-//        descriptor1.setName("Birthdate");
-//        descriptor1.setDescription("The date when you were born.");
-//        descriptor1.setType("date");
-//        LiveDataPropertyDescriptor.DisplayerDescriptor displayer1 =
-//            new LiveDataPropertyDescriptor.DisplayerDescriptor();
-//        displayer1.setId("xObjectProperty");
-//        descriptor1.setDisplayer(displayer1);
-//        LiveDataPropertyDescriptor.FilterDescriptor filter1 = new LiveDataPropertyDescriptor.FilterDescriptor();
-//        filter1.setId("date");
-//        filter1.setParameter("dateFormat", "h:mm a");
-//        descriptor1.setFilter(filter1);
-//
-//        LiveDataPropertyDescriptor descriptor2 = new LiveDataPropertyDescriptor();
-//        descriptor2.setId("total");
-//        descriptor2.setName("Total");
-//        descriptor2.setDescription("The computed total amount.");
-//        descriptor2.setType("Computed");
-//        LiveDataPropertyDescriptor.DisplayerDescriptor displayer2 =
-//            new LiveDataPropertyDescriptor.DisplayerDescriptor();
-//        displayer2.setId("xObjectProperty");
-//        descriptor2.setDisplayer(displayer2);
-//
-//        LiveDataPropertyDescriptor descriptor3 = new LiveDataPropertyDescriptor();
-//        descriptor3.setId("status");
-//        descriptor3.setName("Status");
-//        descriptor3.setDescription("The status.");
-//        descriptor3.setType("List");
-//        descriptor3.setSortable(false);
-//        LiveDataPropertyDescriptor.DisplayerDescriptor displayer3 =
-//            new LiveDataPropertyDescriptor.DisplayerDescriptor();
-//        displayer3.setId("xObjectProperty");
-//        descriptor3.setDisplayer(displayer3);
-//        LiveDataPropertyDescriptor.FilterDescriptor filter3 = new LiveDataPropertyDescriptor.FilterDescriptor();
-//        filter3.setId("list");
-//        LiveDataPropertyDescriptor.OperatorDescriptor operator1 = new LiveDataPropertyDescriptor.OperatorDescriptor();
-//        operator1.setId("empty");
-//        LiveDataPropertyDescriptor.OperatorDescriptor operator2 = new LiveDataPropertyDescriptor.OperatorDescriptor();
-//        operator1.setId("equals");
-//        filter3.setOperators(List.of(operator1, operator2));
-//        filter3.setParameter("searchURL",
-//            "/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}");
-//        descriptor3.setFilter(filter3);
-//
-//        LiveDataPropertyDescriptor descriptor4 = new LiveDataPropertyDescriptor();
-//        descriptor4.setId("levels");
-//        descriptor4.setType("Levels");
-//        LiveDataPropertyDescriptor.DisplayerDescriptor displayer4 =
-//            new LiveDataPropertyDescriptor.DisplayerDescriptor();
-//        displayer4.setId("xObjectProperty");
-//        descriptor4.setDisplayer(displayer4);
-//        LiveDataPropertyDescriptor.FilterDescriptor filter4 = new LiveDataPropertyDescriptor.FilterDescriptor();
-//        filter4.setId("list");
-//        LiveDataPropertyDescriptor.OperatorDescriptor operatorEmpty =
-//            new LiveDataPropertyDescriptor.OperatorDescriptor();
-//        operatorEmpty.setId("empty");
-//        filter4.setOperators(List.of(operatorEmpty));
-//        filter4.setParameter("options", List.of(
-//            Map.of("value", "edit", "label", "Edit right"),
-//            Map.of("value", "delete", "label", "delete")
-//        ));
-//        descriptor4.setFilter(filter4);
+        LiveDataPropertyDescriptor descriptor0 = new LiveDataPropertyDescriptor();
+        descriptor0.setId("doc.title");
 
-        StringBuilder expectedClassProps = new StringBuilder();
-        expectedClassProps.append("{'id':'birthdate','name':'Birthdate','description':'The date when you were born.'"
-            + ",'type':'Date','displayer':{'id':'xObjectProperty'},'filter':{'id':'date','dateFormat':'h:mm a'}},");
-        expectedClassProps.append("{'id':'total','name':'Total','description':'The computed total amount.',"
-            + "'type':'Computed','displayer':{'id':'xObjectProperty'}},");
-        expectedClassProps.append("{'id':'status','name':'Status','description':'The status.',"
-            + "'type':'List','sortable':false,'displayer':{'id':'xObjectProperty'},"
-            + "'filter':{'id':'list','operators':[{'id':'empty'},{'id':'equals'}],"
-            + "'searchURL':'/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}'}},");
-        expectedClassProps.append("{'id':'levels','type':'Levels','displayer':{'id':'xObjectProperty'},"
-            + "'filter':{'id':'list','operators':[{'id':'empty'}],"
-            + "'options':[{'label':'Edit right','value': 'edit'},{'label':'delete','value':'delete'}]}}");
+        LiveDataPropertyDescriptor descriptor1 = new LiveDataPropertyDescriptor();
+        descriptor1.setId("birthdate");
+        descriptor1.setName("Birthdate");
+        descriptor1.setDescription("The date when you were born.");
+        descriptor1.setType("Date");
+        LiveDataPropertyDescriptor.DisplayerDescriptor displayer1 =
+            new LiveDataPropertyDescriptor.DisplayerDescriptor();
+        displayer1.setId("xObjectProperty");
+        descriptor1.setDisplayer(displayer1);
+        LiveDataPropertyDescriptor.FilterDescriptor filter1 = new LiveDataPropertyDescriptor.FilterDescriptor();
+        filter1.setId("date");
+        filter1.setParameter("dateFormat", "h:mm a");
+        descriptor1.setFilter(filter1);
 
+        LiveDataPropertyDescriptor descriptor2 = new LiveDataPropertyDescriptor();
+        descriptor2.setId("total");
+        descriptor2.setName("Total");
+        descriptor2.setDescription("The computed total amount.");
+        descriptor2.setType("Computed");
+        LiveDataPropertyDescriptor.DisplayerDescriptor displayer2 =
+            new LiveDataPropertyDescriptor.DisplayerDescriptor();
+        displayer2.setId("xObjectProperty");
+        descriptor2.setDisplayer(displayer2);
+
+        LiveDataPropertyDescriptor descriptor3 = new LiveDataPropertyDescriptor();
+        descriptor3.setId("status");
+        descriptor3.setName("Status");
+        descriptor3.setDescription("The status.");
+        descriptor3.setType("List");
+        descriptor3.setSortable(false);
+        LiveDataPropertyDescriptor.DisplayerDescriptor displayer3 =
+            new LiveDataPropertyDescriptor.DisplayerDescriptor();
+        displayer3.setId("xObjectProperty");
+        descriptor3.setDisplayer(displayer3);
+        LiveDataPropertyDescriptor.FilterDescriptor filter3 = new LiveDataPropertyDescriptor.FilterDescriptor();
+        filter3.setId("list");
+        LiveDataPropertyDescriptor.OperatorDescriptor operator1 = new LiveDataPropertyDescriptor.OperatorDescriptor();
+        operator1.setId("empty");
+        LiveDataPropertyDescriptor.OperatorDescriptor operator2 = new LiveDataPropertyDescriptor.OperatorDescriptor();
+        operator2.setId("equals");
+        filter3.setOperators(List.of(operator1, operator2));
+        filter3.setParameter("searchURL",
+            "/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}");
+        descriptor3.setFilter(filter3);
+
+        LiveDataPropertyDescriptor descriptor4 = new LiveDataPropertyDescriptor();
+        descriptor4.setId("levels");
+        descriptor4.setType("Levels");
+        LiveDataPropertyDescriptor.DisplayerDescriptor displayer4 =
+            new LiveDataPropertyDescriptor.DisplayerDescriptor();
+        displayer4.setId("xObjectProperty");
+        descriptor4.setDisplayer(displayer4);
+        LiveDataPropertyDescriptor.FilterDescriptor filter4 = new LiveDataPropertyDescriptor.FilterDescriptor();
+        filter4.setId("list");
+        LiveDataPropertyDescriptor.OperatorDescriptor operatorEmpty =
+            new LiveDataPropertyDescriptor.OperatorDescriptor();
+        operatorEmpty.setId("empty");
+        filter4.setOperators(List.of(operatorEmpty));
+        filter4.setParameter("options", List.of(
+            Map.of("value", "edit", "label", "Edit right"),
+            Map.of("value", "delete", "label", "delete")
+        ));
+        descriptor4.setFilter(filter4);
         Collection<LiveDataPropertyDescriptor> properties = this.propertyStore.get();
 
-//        assertEquals(List.of(descriptor0, descriptor1, descriptor2, descriptor3, descriptor4), properties);
-        String expectedJSON =
-            "[" + getExpectedDocPropsJSON() + "," + expectedClassProps.toString().replace('\'', '"') + "]";
-        assertEquals(expectedJSON, this.objectMapper.writeValueAsString(properties));
+        assertEquals(List.of(descriptor0, descriptor1, descriptor2, descriptor3, descriptor4), properties);
     }
 
     @Test

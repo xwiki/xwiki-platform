@@ -65,7 +65,9 @@ export default {
   },
 
   // Create the selectize widget.
-  mounted() {
+  async mounted() {
+    // Wait for the translations to be loaded, otherwise the true / false option label might be displayed untranslated.
+    await this.logic.translationsLoaded();
     $(this.$refs.input).xwikiSelectize({
       onChange: value => {
         this.filterValue = value;

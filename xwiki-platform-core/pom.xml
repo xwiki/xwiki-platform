@@ -257,8 +257,8 @@
                   <regex>true</regex>
                   <ignore>true</ignore>
                   <code>java.field.typeChanged</code>
-                  <old>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider.*</old>
-                  <new>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider.*</new>
+                  <old>field org.xwiki.filter.script.AbstractFilterScriptService.scriptProvider.*</old>
+                  <new>field org.xwiki.filter.script.AbstractFilterScriptService.scriptProvider.*</new>
                 </item>
               </differences>
             </revapi.differences>

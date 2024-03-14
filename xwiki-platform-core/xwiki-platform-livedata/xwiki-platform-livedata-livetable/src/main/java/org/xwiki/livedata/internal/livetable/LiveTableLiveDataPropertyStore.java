@@ -71,6 +71,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class LiveTableLiveDataPropertyStore extends WithParameters implements LiveDataPropertyDescriptorStore
 {
+    private static final String EQUALS_OPERATOR = "equals";
+
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -159,11 +161,10 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         // The returned property value is the displayer output.
         descriptor.setDisplayer(new DisplayerDescriptor("xObjectProperty"));
         if (xproperty instanceof ListClass) {
-            descriptor.setFilter(new FilterDescriptor("list"));
-            descriptor.getFilter().addOperator("empty", null);
+            FilterDescriptor filterList = new FilterDescriptor("list");
             if (xproperty instanceof LevelsClass) {
                 // We need to provide a list of maps of value / labels so that selectize can interpret them.
-                descriptor.getFilter().setParameter("options", ((LevelsClass) xproperty).getList(xcontext)
+                filterList.setParameter("options", ((LevelsClass) xproperty).getList(xcontext)
                     .stream()
                     .map(item -> Map.of(
                         "value", item,
@@ -171,14 +172,17 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
                     ))
                     .collect(Collectors.toList()));
             } else {
-                descriptor.getFilter().setParameter("searchURL", getSearchURL(xproperty));
+                filterList.setParameter("searchURL", getSearchURL(xproperty));
             }
             if (xproperty.newProperty() instanceof StringListProperty) {
                 // The default live table results page currently supports only exact matching for list properties with
                 // multiple selection and no relational storage (selected values are stored concatenated on a single
                 // database column).
-                descriptor.getFilter().addOperator("equals", null);
+                filterList.addOperator("empty", null);
+                filterList.addOperator(EQUALS_OPERATOR, null);
+                filterList.setDefaultOperator(EQUALS_OPERATOR);
             }
+            descriptor.setFilter(filterList);
         } else if (xproperty instanceof DateClass) {
             String dateFormat = ((DateClass) xproperty).getDateFormat();
             if (!StringUtils.isEmpty(dateFormat)) {

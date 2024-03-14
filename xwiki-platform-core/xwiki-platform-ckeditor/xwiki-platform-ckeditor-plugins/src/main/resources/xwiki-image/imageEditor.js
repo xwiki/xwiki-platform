@@ -198,6 +198,14 @@ define('imageEditor', ['jquery', 'modal', 'imageStyleClient', 'l10n!imageEditor'
       
       var data = modal.data('input');
       // Resolve the image url and assign it to a transient image object to be able to access its width and height.
+      if(!data.imageData.resourceReference) {
+        // In case of pasted image, the resource reference is undefined. We initialize it the first time the image
+        // is edited after being pasted.
+        data.imageData.resourceReference = {
+          'type': 'url',
+          'reference': data.imageData.src
+        };
+      }
       img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
       return promise;
     }

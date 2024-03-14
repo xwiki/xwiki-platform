@@ -1204,7 +1204,7 @@ zoom = zoom
 zoom_in = zoom_in
 zoom_out = zoom_out
 
-## Deprecated in 16.1.0 to fit the new name convention
+## Deprecated in 16.2.0 to fit the new name convention
 bullet_black = bullet_black
 credit-card = creditcards
 emoticon_smile = emoticon_smile

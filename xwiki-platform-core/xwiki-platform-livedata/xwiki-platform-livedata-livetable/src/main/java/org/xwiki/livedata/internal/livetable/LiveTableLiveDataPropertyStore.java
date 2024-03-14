@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -43,6 +44,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.WithParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -87,6 +89,9 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
     {
@@ -129,6 +134,16 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         }
     }
 
+    // TODO: we should have a helper in the localization component for this kind of fallback
+    private String getRightTranslationWithFallback(String right)
+    {
+        String result = this.localizationManager.getTranslationPlain("rightsmanager." + right);
+        if (StringUtils.isEmpty(result)) {
+            result = right;
+        }
+        return result;
+    }
+
     private LiveDataPropertyDescriptor getLiveDataPropertyDescriptor(PropertyClass xproperty)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -147,7 +162,14 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
             descriptor.setFilter(new FilterDescriptor("list"));
             descriptor.getFilter().addOperator("empty", null);
             if (xproperty instanceof LevelsClass) {
-                descriptor.getFilter().setParameter("options", ((LevelsClass) xproperty).getList(xcontext));
+                // We need to provide a list of maps of value / labels so that selectize can interpret them.
+                descriptor.getFilter().setParameter("options", ((LevelsClass) xproperty).getList(xcontext)
+                    .stream()
+                    .map(item -> Map.of(
+                        "value", item,
+                        "label", getRightTranslationWithFallback(item)
+                    ))
+                    .collect(Collectors.toList()));
             } else {
                 descriptor.getFilter().setParameter("searchURL", getSearchURL(xproperty));
             }

@@ -14,7 +14,8 @@
     "filters": [
       {
         "id": "text",
-        "operators": ["contains", "startsWith", "equals"]
+        "operators": ["contains", "startsWith", "equals"],
+        "defaultOperator": "contains"
       },
       {
         "id": "number",
@@ -22,20 +23,24 @@
           {"id": "equals", "name": "="},
           {"id": "less", "name": "<"},
           {"id": "greater", "name": ">"}
-        ]
+        ],
+        "defaultOperator": "equals"
       },
       {
         "id": "boolean",
-        "operators": ["equals"]
+        "operators": ["equals"],
+        "defaultOperator": "equals"
       },
       {
         "id": "date",
         "operators": ["between", "before", "after", "contains"],
-        "dateFormat": "yyyy/MM/dd HH:mm"
+        "dateFormat": "yyyy/MM/dd HH:mm",
+        "defaultOperator": "between"
       },
       {
         "id": "list",
-        "operators": ["equals", "startsWith", "contains", "empty"]
+        "operators": ["equals", "startsWith", "contains", "empty"],
+        "defaultOperator": "contains"
       }
     ],
 

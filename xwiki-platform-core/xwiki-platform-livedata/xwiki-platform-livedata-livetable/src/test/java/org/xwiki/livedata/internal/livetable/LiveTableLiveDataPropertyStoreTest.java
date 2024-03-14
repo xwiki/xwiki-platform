@@ -218,6 +218,7 @@ class LiveTableLiveDataPropertyStoreTest
         LiveDataPropertyDescriptor.OperatorDescriptor operator2 = new LiveDataPropertyDescriptor.OperatorDescriptor();
         operator2.setId("equals");
         filter3.setOperators(List.of(operator1, operator2));
+        filter3.setDefaultOperator("equals");
         filter3.setParameter("searchURL",
             "/xwiki/rest/wikis/wiki/classes/Some.Class/properties/status/values?fp={encodedQuery}");
         descriptor3.setFilter(filter3);
@@ -231,10 +232,6 @@ class LiveTableLiveDataPropertyStoreTest
         descriptor4.setDisplayer(displayer4);
         LiveDataPropertyDescriptor.FilterDescriptor filter4 = new LiveDataPropertyDescriptor.FilterDescriptor();
         filter4.setId("list");
-        LiveDataPropertyDescriptor.OperatorDescriptor operatorEmpty =
-            new LiveDataPropertyDescriptor.OperatorDescriptor();
-        operatorEmpty.setId("empty");
-        filter4.setOperators(List.of(operatorEmpty));
         filter4.setParameter("options", List.of(
             Map.of("value", "edit", "label", "Edit right"),
             Map.of("value", "delete", "label", "delete")

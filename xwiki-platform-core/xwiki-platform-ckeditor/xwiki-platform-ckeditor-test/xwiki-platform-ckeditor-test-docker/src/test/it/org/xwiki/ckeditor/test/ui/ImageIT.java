@@ -808,7 +808,7 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(subPageReference).editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnEditedContent(() -> {
+        editor.executeOnIframe(() -> {
             setup.getDriver().findElement(By.cssSelector("html")).sendKeys(Keys.chord(Keys.CONTROL, "v"));
             setup.getDriver().findElement(By.cssSelector("img")).click();
         });

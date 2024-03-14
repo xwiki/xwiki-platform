@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal.livedata.system;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -117,48 +118,43 @@ public class NotificationSystemFiltersLiveDataEntryStore extends AbstractNotific
     public LiveData get(LiveDataQuery query) throws LiveDataException
     {
         TargetInformation targetInformation = getTargetInformation(query);
-        Map<String, ToggleableNotificationFilterActivation> filtersActivations = null;
-        List<ToggleableNotificationFilter> allFilters = null;
+        Map<String, ToggleableNotificationFilterActivation> filtersActivations;
+
+        Collection<NotificationFilter> notificationFilters;
         try {
             if (targetInformation.isWikiTarget) {
                 WikiReference wikiReference = new WikiReference(targetInformation.ownerReference);
-                allFilters =
-                    this.notificationFilterManager.getAllFilters(wikiReference)
-                        .stream()
-                        .filter(filter -> filter instanceof ToggleableNotificationFilter)
-                        .map(item -> (ToggleableNotificationFilter) item)
-                        .toList();
+                notificationFilters = this.notificationFilterManager.getAllFilters(wikiReference);
                 filtersActivations =
                     this.filterPreferencesModelBridge.getToggleableFilterActivations(
                         new DocumentReference(NOTIFICATION_ADMINISTRATION_REF, wikiReference));
             } else {
                 DocumentReference userDoc = new DocumentReference(targetInformation.ownerReference);
-                allFilters = this.notificationFilterManager.getAllFilters(userDoc, false)
-                        .stream()
-                        .filter(filter -> filter instanceof ToggleableNotificationFilter)
-                        .map(item -> (ToggleableNotificationFilter) item)
-                        .toList();
+                notificationFilters = this.notificationFilterManager.getAllFilters(userDoc, false);
                 filtersActivations = this.filterPreferencesModelBridge.getToggleableFilterActivations(userDoc);
             }
         } catch (NotificationException e) {
             throw new LiveDataException("Error when getting list of filters", e);
         }
 
+        List<ToggleableNotificationFilter> allFilters = notificationFilters.stream()
+            .filter(filter -> filter instanceof ToggleableNotificationFilter)
+            .map(item -> (ToggleableNotificationFilter) item)
+            .toList();
+
         int totalFilters = allFilters.size();
-        List<ToggleableNotificationFilter> filters = allFilters
+        LiveData liveData = new LiveData();
+        liveData.setCount(totalFilters);
+        List<Map<String, Object>> entries = liveData.getEntries();
+
+        allFilters
             .stream()
             .sorted(Comparator.comparing(NotificationFilter::getName))
             .skip(query.getOffset())
             .limit(query.getLimit())
-            .toList();
+            .forEach(filter ->
+                entries.add(getPreferencesInformation(filter, filtersActivations.get(filter.getName()))));
 
-        LiveData liveData = new LiveData();
-        List<Map<String, Object>> entries = liveData.getEntries();
-        for (ToggleableNotificationFilter notificationFilter : filters) {
-            entries.add(getPreferencesInformation(notificationFilter,
-                filtersActivations.get(notificationFilter.getName())));
-        }
-        liveData.setCount(totalFilters);
         return liveData;
     }
 }

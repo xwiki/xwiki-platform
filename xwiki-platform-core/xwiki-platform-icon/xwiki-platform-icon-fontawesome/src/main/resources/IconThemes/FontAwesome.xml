@@ -405,7 +405,7 @@ zoom = search
 zoom_in = search-plus
 zoom_out = search-minus
 
-## Deprecated in 16.2.0 to fit the new name convention
+## Deprecated since 16.2.0 to conform to the new naming convention.
 bullet_black = circle
 credit-card = credit-card
 emoticon_smile=smile-o

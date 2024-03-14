@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.text.XWikiToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,6 +42,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class LiveDataPropertyDescriptor
 {
     private static final String NAME = "name";
+
     /**
      * Holds the filter configuration.
      */
@@ -161,7 +162,8 @@ public class LiveDataPropertyDescriptor
         @Override
         public String toString()
         {
-            return new ToStringBuilder(this)
+            return new XWikiToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("defaultOperator", defaultOperator)
                 .append("operators", operators)
                 .toString();
@@ -239,7 +241,8 @@ public class LiveDataPropertyDescriptor
         @Override
         public String toString()
         {
-            return new ToStringBuilder(this)
+            return new XWikiToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append(NAME, name)
                 .toString();
         }
@@ -608,7 +611,8 @@ public class LiveDataPropertyDescriptor
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this)
+        return new XWikiToStringBuilder(this)
+            .appendSuper(super.toString())
             .append("id", id)
             .append(NAME, name)
             .append("description", description)

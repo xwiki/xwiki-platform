@@ -169,7 +169,7 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
                         "value", item,
                         "label", getRightTranslationWithFallback(item)
                     ))
-                    .toList());
+                    .collect(Collectors.toList()));
             } else {
                 descriptor.getFilter().setParameter("searchURL", getSearchURL(xproperty));
             }

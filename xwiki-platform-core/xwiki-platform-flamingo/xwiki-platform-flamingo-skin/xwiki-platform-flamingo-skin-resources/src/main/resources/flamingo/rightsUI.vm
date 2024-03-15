@@ -228,7 +228,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                 #else
                   <input type="hidden" name="wiki" value="local"/>
                 #end
-                <input type="hidden" name="clsname" value="$clsname" />
+                <input type="hidden" name="clsname" value="$escapetool.xml($clsname)" />
               </td>
             </tr>
             <tr id="unregistered">

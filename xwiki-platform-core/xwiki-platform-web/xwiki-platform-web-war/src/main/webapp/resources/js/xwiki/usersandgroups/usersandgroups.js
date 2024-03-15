@@ -55,34 +55,37 @@ window.MSCheckbox = Class.create({
     */
   initialize: function(domNode, right, saveUrl, defaultState, table, idx)
   {
-    this.table = table;
-    this.idx = idx;
-    if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
-      this.currentUorG = this.table.fetchedRows[this.idx].fullname;
-      this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
-    } else {
-      // guest users
-      this.currentUorG = window.unregUser;
-      this.isUserInGroup = false;
-    }
-    this.right = right;
-    this.saveUrl = saveUrl;
-    this.defaultState = defaultState;
-    this.state = defaultState;
-    this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
-    this.nrstates = this.states.length;
-    this.stateClasses = [
-      "none",
-      "yes",
-      "no"
-    ];
-    
-    this.button = document.createElement("button");
-    this.button.className = "btn btn-default btn-xs rights-edit";
-    this.button.addEventListener('click', this.createClickHandler(this));
-    
-    $(domNode).appendChild(this.button);
-    this.draw();
+    require(['xwiki-l10n!users-and-groups-translation-keys'], (l10n) => {
+      this._l10n = l10n; 
+      this.table = table;
+      this.idx = idx;
+      if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
+        this.currentUorG = this.table.fetchedRows[this.idx].fullname;
+        this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
+      } else {
+        // guest users
+        this.currentUorG = window.unregUser;
+        this.isUserInGroup = false;
+      }
+      this.right = right;
+      this.saveUrl = saveUrl;
+      this.defaultState = defaultState;
+      this.state = defaultState;
+      this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
+      this.nrstates = this.states.length;
+      this.stateClasses = [
+        "none",
+        "yes",
+        "no"
+      ];
+
+      this.button = document.createElement("button");
+      this.button.className = "btn btn-default btn-xs rights-edit";
+      this.button.addEventListener('click', this.createClickHandler(this));
+
+      $(domNode).appendChild(this.button);
+      this.draw();
+    });
   },
   
   draw: function()
@@ -103,14 +106,14 @@ window.MSCheckbox = Class.create({
     //Update the description of the button for accessibility.
     var button = this.button;
     var state = this.state;
-    require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
-      var alts = [
-        l10n['platform.core.rightsManagement.undefined'],
-        l10n['platform.core.rightsManagement.allowed'],
-        l10n['platform.core.rightsManagement.denied']
-      ];
-      button.title = alts[state];
-    });
+
+    var alts = [
+      this._l10n['platform.core.rightsManagement.undefined'],
+      this._l10n['platform.core.rightsManagement.allowed'],
+      this._l10n['platform.core.rightsManagement.denied']
+    ];
+    button.title = alts[state];
+
   },
 
   nextState: function(){
@@ -139,6 +142,7 @@ window.MSCheckbox = Class.create({
    */
   createClickHandler: function(self)
   {
+    const l10n = this._l10n;
     return function(event) {
       event.preventDefault();
       if (self.req) {
@@ -147,102 +151,102 @@ window.MSCheckbox = Class.create({
 
       var action = "";
       var nxtst = (self.state + 1) % self.nrstates;
-      require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
-        // 1. The current user is clearing / denying himself any right.
-        if (self.currentUorG == window.currentUser) {
-          if (nxtst == 2) {
-            var denymessage = l10n['rightsmanager.denyrightforcurrentuser'].replace('__right__', self.right);
-            if (!confirm(denymessage)) {
-              var clearmessage = l10n['rightsmanager.clearrightforcurrentuserinstead'].replace('__right__', self.right);
-              if (confirm(clearmessage)) {
-                action = "clear";
-                self.state = 2;
-                nxtst = 0;
-              } else {
-                return;
-              }
-            }
-          } else if (nxtst == 0) {
-            var clearmessage = l10n['rightsmanager.clearrightforcurrentuser'].replace('__right__', self.right);
-            if (!confirm(clearmessage)) {
-              return;
-            }
-          }
-        }
-        // 2. The current user is clearing / denying any rights for a group he belongs to.
-        else if (self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
-          if (nxtst == 2) {
-            var denymessage = l10n['rightsmanager.denyrightforgroup'].replace(/__right__/g, self.right);
-            denymessage = denymessage.replace('__name__', self.currentUorG);
-            if (!confirm(denymessage)) {
-              var clearmessage = l10n['rightsmanager.clearrightforgroupinstead'].replace(/__right__/g, self.right);
-              clearmessage = clearmessage.replace('__name__', self.currentUorG);
-              if (confirm(clearmessage)) {
-                action = "clear";
-                self.state = 2;
-                nxtst = 0;
-              } else {
-                return;
-              }
-            }
-          } else if (nxtst == 0) {
-            var clearmessage = l10n['rightsmanager.clearrightforgroup'].replace(/__right__/g, self.right);
-            clearmessage = clearmessage.replace('__name__', self.currentUorG);
-            if (!confirm(clearmessage)) {
-              return;
-            }
-          }
-        }
-        // 3. The current user is is clearing / denying admin right for any user / group.
-        else if (self.right == "admin") {
-          if (nxtst == 2) {
-            var denymessage = l10n['rightsmanager.denyrightforuorg'].replace('__right__', self.right);
-            denymessage = denymessage.replace('__name__', self.currentUorG);
-            if (!confirm(denymessage)) {
-              return;
-            }
-          } else if (nxtst == 0) {
-            var clearmessage = l10n['rightsmanager.clearrightforuorg'].replace('__right__', self.right);
-            clearmessage = clearmessage.replace('__name__', self.currentUorG);
-            if (!confirm(clearmessage)) {
-              return;
-            }
-          }
-        }
-        if (action == "") {
-          if (nxtst == 0) {
-            action = "clear";
-          } else if (nxtst == 1) {
-            action = "allow";
-          } else {
-            action = "deny";
-          }
-        }
 
-        // Compose the complete URI
-        var url = self.saveUrl + "&action=" + action + "&right=" + self.right;
-
-        self.req = new Ajax.Request(url, {
-          method: 'get',
-          onSuccess: function(transport) {
-            if (transport.responseText.strip() == "SUCCESS") {
-              self.next();
+      // 1. The current user is clearing / denying himself any right.
+      if (self.currentUorG == window.currentUser) {
+        if (nxtst == 2) {
+          var denymessage = l10n['rightsmanager.denyrightforcurrentuser'].replace('__right__', self.right);
+          if (!confirm(denymessage)) {
+            var clearmessage = l10n['rightsmanager.clearrightforcurrentuserinstead'].replace('__right__', self.right);
+            if (confirm(clearmessage)) {
+              action = "clear";
+              self.state = 2;
+              nxtst = 0;
             } else {
-              //if an error occurred while trying to save a right rule, display an alert
-              // and refresh the page, since probably the user does not have the right to perform
-              // that action
-              alert(l10n['platform.core.rightsManagement.saveFailure']);
-              var rURL = unescape(window.location.pathname);
-              window.location.href = rURL;
+              return;
             }
-          },
-          onFailure: function() {
-            alert(l10n['platform.core.rightsManagement.ajaxFailure']);
-          },
-          onComplete: function() {
-            delete self.req;
           }
-        });
+        } else if (nxtst == 0) {
+          var clearmessage = l10n['rightsmanager.clearrightforcurrentuser'].replace('__right__', self.right);
+          if (!confirm(clearmessage)) {
+            return;
+          }
+        }
+      }
+      // 2. The current user is clearing / denying any rights for a group he belongs to.
+      else if (self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
+        if (nxtst == 2) {
+          var denymessage = l10n['rightsmanager.denyrightforgroup'].replace(/__right__/g, self.right);
+          denymessage = denymessage.replace('__name__', self.currentUorG);
+          if (!confirm(denymessage)) {
+            var clearmessage = l10n['rightsmanager.clearrightforgroupinstead'].replace(/__right__/g, self.right);
+            clearmessage = clearmessage.replace('__name__', self.currentUorG);
+            if (confirm(clearmessage)) {
+              action = "clear";
+              self.state = 2;
+              nxtst = 0;
+            } else {
+              return;
+            }
+          }
+        } else if (nxtst == 0) {
+          var clearmessage = l10n['rightsmanager.clearrightforgroup'].replace(/__right__/g, self.right);
+          clearmessage = clearmessage.replace('__name__', self.currentUorG);
+          if (!confirm(clearmessage)) {
+            return;
+          }
+        }
+      }
+      // 3. The current user is is clearing / denying admin right for any user / group.
+      else if (self.right == "admin") {
+        if (nxtst == 2) {
+          var denymessage = l10n['rightsmanager.denyrightforuorg'].replace('__right__', self.right);
+          denymessage = denymessage.replace('__name__', self.currentUorG);
+          if (!confirm(denymessage)) {
+            return;
+          }
+        } else if (nxtst == 0) {
+          var clearmessage = l10n['rightsmanager.clearrightforuorg'].replace('__right__', self.right);
+          clearmessage = clearmessage.replace('__name__', self.currentUorG);
+          if (!confirm(clearmessage)) {
+            return;
+          }
+        }
+      }
+
+      if (action == "") {
+        if (nxtst == 0) {
+          action = "clear";
+        } else if (nxtst == 1) {
+          action = "allow";
+        } else {
+          action = "deny";
+        }
+      }
+
+      // Compose the complete URI
+      var url = self.saveUrl + "&action=" + action + "&right=" + self.right;
+
+      self.req = new Ajax.Request(url, {
+        method: 'get',
+        onSuccess: function(transport) {
+          if (transport.responseText.strip() == "SUCCESS") {
+            self.next();
+          } else {
+            //if an error occurred while trying to save a right rule, display an alert
+            // and refresh the page, since probably the user does not have the right to perform
+            // that action
+            alert(l10n['platform.core.rightsManagement.saveFailure']);
+            var rURL = unescape(window.location.pathname);
+            window.location.href = rURL;
+          }
+        },
+        onFailure: function() {
+          alert(l10n['platform.core.rightsManagement.ajaxFailure']);
+        },
+        onComplete: function() {
+          delete self.req;
+        }
       });
     }
   }

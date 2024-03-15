@@ -707,20 +707,10 @@ define(
     title: translations.get('title'),
     content: '<div class="macro-editor xform"></div>',
     acceptLabel: translations.get('submit'),
+    form: true,
     onLoad: function() {
       var modal = this;
-      // This modal acts and looks like a form. We replace its content node by a form, so we can benefit from
-      // native form utilities, such as implicit form validation (pressing Enter on a text field)
-      const modalContent= modal[0].querySelector('.modal-content');
-      const modalContentInnerHTML = modalContent.innerHTML;
-      const formModalContent = document.createElement('form');
-      formModalContent.classList.add('modal-content');
-      formModalContent.innerHTML = modalContentInnerHTML;
-      modalContent.replaceWith(formModalContent);
-
       var submitButton = modal.find('.modal-footer .btn-primary');
-      // We want the submit button to actually submit the form
-      submitButton[0].removeAttribute('type');
       modal.on('show.bs.modal', function(event) {
         submitButton.prop('disabled', true);
       }).on('shown.bs.modal', function(event) {
@@ -734,7 +724,7 @@ define(
           load.call(this, input, macroEditor);
         }
       });
-      formModalContent.addEventListener('submit', function(event) {
+      modal.find('.modal-content')[0].addEventListener('submit', function(event) {
         // Ideally we would handle this propagation by making the modal a dialog and using method="dialog" on the form
         event.preventDefault();
         event.stopPropagation();

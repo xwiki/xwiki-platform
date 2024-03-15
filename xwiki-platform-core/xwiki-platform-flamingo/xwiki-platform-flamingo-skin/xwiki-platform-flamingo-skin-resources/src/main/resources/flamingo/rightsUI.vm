@@ -207,6 +207,8 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             </tr>
             <tr id="usersandgroupstable-filters">
               ## Users/groups filter
+              ## We split the column amount in between the two objects as evenly as possible.
+              ## This way we can make sure both element have enough space to display correctly.
               #set ($colsp = ($maxlevel+2)/2)
               <td colspan="$colsp">
                 <label for="name">$services.localization.render('rightsmanager.searchfilter')</label>

@@ -93,11 +93,17 @@ public final class VersioningStoreQueryFactory<T>
             }
 
             Date minDate = criteria.getMinDate();
+            Date maxDate = criteria.getMaxDate();
             // Hibernate requires positive timestamps.
             if (minDate.getTime() < 0) {
                 minDate = new Date(0);
             }
-            predicates.add(this.builder.between(this.root.get(FIELD_DATE), minDate, criteria.getMaxDate()));
+            // Most databases (e.g., MariaDB) store timestamps as seconds, using integers. As such we cannot go
+            // higher than Integer.MAX_VALUE seconds.
+            if (maxDate.getTime() > Integer.MAX_VALUE * 1000L) {
+                maxDate = new Date(Integer.MAX_VALUE * 1000L);
+            }
+            predicates.add(this.builder.between(this.root.get(FIELD_DATE), minDate, maxDate));
 
             if (!criteria.getIncludeMinorVersions()) {
                 // In this case, we keep only the highest minor version for each major version.

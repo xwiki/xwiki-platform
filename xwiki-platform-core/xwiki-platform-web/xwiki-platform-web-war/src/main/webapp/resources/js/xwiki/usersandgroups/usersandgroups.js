@@ -148,7 +148,6 @@ window.MSCheckbox = Class.create({
       var action = "";
       var nxtst = (self.state + 1) % self.nrstates;
       require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
-      var cancelRequest = false;
       // 1. The current user is clearing / denying himself any right.
       if (self.currentUorG == window.currentUser) {
         if (nxtst == 2) {
@@ -160,13 +159,13 @@ window.MSCheckbox = Class.create({
               self.state = 2;
               nxtst = 0;
             } else {
-              cancelRequest = true;
+              return;
             }
           }
         } else if (nxtst == 0) {
           var clearmessage = l10n['rightsmanager.clearrightforcurrentuser'].replace('__right__', self.right);
           if (!confirm(clearmessage)) {
-            cancelRequest = true;
+            return;
           }
         }
       }
@@ -183,14 +182,14 @@ window.MSCheckbox = Class.create({
               self.state = 2;
               nxtst = 0;
             } else {
-              cancelRequest = true;
+              return;
             }
           }
         } else if (nxtst == 0) {
           var clearmessage = l10n['rightsmanager.clearrightforgroup'].replace(/__right__/g, self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
-            cancelRequest = true;
+            return;
           }
         }
       }
@@ -200,52 +199,50 @@ window.MSCheckbox = Class.create({
           var denymessage = l10n['rightsmanager.denyrightforuorg'].replace('__right__', self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
-            cancelRequest = true;
+            return;
           }
         } else if (nxtst == 0) {
           var clearmessage = l10n['rightsmanager.clearrightforuorg'].replace('__right__', self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
-            cancelRequest = true;
+            return;
           }
         }
       }
-      if(!cancelRequest) {
-        if (action == "") {
-          if (nxtst == 0) {
-            action = "clear";
-          } else if (nxtst == 1) {
-            action = "allow";
+      if (action == "") {
+        if (nxtst == 0) {
+          action = "clear";
+        } else if (nxtst == 1) {
+          action = "allow";
+        } else {
+          action = "deny";
+        }
+      }
+
+      // Compose the complete URI
+      var url = self.saveUrl + "&action=" + action + "&right=" + self.right;
+
+      self.req = new Ajax.Request(url, {
+        method: 'get',
+        onSuccess: function (transport) {
+          if (transport.responseText.strip() == "SUCCESS") {
+            self.next();
           } else {
-            action = "deny";
+            //if an error occurred while trying to save a right rule, display an alert
+            // and refresh the page, since probably the user does not have the right to perform
+            // that action
+            alert(l10n['platform.core.rightsManagement.saveFailure']);
+            var rURL = unescape(window.location.pathname);
+            window.location.href = rURL;
           }
+        },
+        onFailure: function () {
+          alert(l10n['platform.core.rightsManagement.ajaxFailure']);
+        },
+        onComplete: function () {
+          delete self.req;
         }
-
-        // Compose the complete URI
-        var url = self.saveUrl + "&action=" + action + "&right=" + self.right;
-
-        self.req = new Ajax.Request(url, {
-          method: 'get',
-          onSuccess: function (transport) {
-            if (transport.responseText.strip() == "SUCCESS") {
-              self.next();
-            } else {
-              //if an error occurred while trying to save a right rule, display an alert
-              // and refresh the page, since probably the user does not have the right to perform
-              // that action
-              alert(l10n['platform.core.rightsManagement.saveFailure']);
-              var rURL = unescape(window.location.pathname);
-              window.location.href = rURL;
-            }
-          },
-          onFailure: function () {
-            alert(l10n['platform.core.rightsManagement.ajaxFailure']);
-          },
-          onComplete: function () {
-            delete self.req;
-          }
-        });
-      }
+      });
     });
     }
   }

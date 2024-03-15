@@ -224,7 +224,7 @@ window.MSCheckbox = Class.create({
 
       self.req = new Ajax.Request(url, {
         method: 'get',
-        onSuccess: function (transport) {
+        onSuccess: function(transport) {
           if (transport.responseText.strip() == "SUCCESS") {
             self.next();
           } else {
@@ -236,10 +236,10 @@ window.MSCheckbox = Class.create({
             window.location.href = rURL;
           }
         },
-        onFailure: function () {
+        onFailure: function() {
           alert(l10n['platform.core.rightsManagement.ajaxFailure']);
         },
-        onComplete: function () {
+        onComplete: function() {
           delete self.req;
         }
       });

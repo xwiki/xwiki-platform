@@ -65,7 +65,7 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ComponentTest
-public class AsynchronousEventStoreTest
+class AsynchronousEventStoreTest
 {
     public static class TestAbstractAsynchronousEventStore extends AbstractAsynchronousEventStore
     {
@@ -118,7 +118,6 @@ public class AsynchronousEventStoreTest
 
         @Override
         public List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds)
-            throws Exception
         {
             return List.of();
         }
@@ -130,7 +129,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException
+        protected EventStatus syncSaveEventStatus(EventStatus status)
         {
             this.lock.lock();
 
@@ -144,7 +143,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
+        protected EntityEvent syncSaveMailEntityEvent(EntityEvent event)
         {
             this.lock.lock();
 
@@ -158,7 +157,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Event syncSaveEvent(Event event) throws EventStreamException
+        protected Event syncSaveEvent(Event event)
         {
             this.lock.lock();
 
@@ -172,7 +171,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Event syncPrefilterEvent(Event event) throws EventStreamException
+        protected Event syncPrefilterEvent(Event event)
         {
             this.lock.lock();
 
@@ -188,7 +187,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
+        protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status)
         {
             this.lock.lock();
 
@@ -206,7 +205,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
+        protected Void syncDeleteEventStatuses(String entityId, Date date)
         {
             this.lock.lock();
 
@@ -224,7 +223,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException
+        protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event)
         {
             this.lock.lock();
 
@@ -358,7 +357,7 @@ public class AsynchronousEventStoreTest
     }
 
     @Test
-    void eventstatus() throws InterruptedException, ExecutionException, EventStreamException
+    void eventstatus() throws InterruptedException, ExecutionException
     {
         DefaultEvent event1 = event("id1");
         DefaultEvent event2 = event("id2");

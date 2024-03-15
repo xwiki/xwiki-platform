@@ -98,7 +98,8 @@ public final class VersioningStoreQueryFactory<T>
             if (minDate.getTime() < 0) {
                 minDate = new Date(0);
             }
-            // Most databases store timestamps as seconds, using integers.
+            // Most databases (e.g., MariaDB) store timestamps as seconds, using integers. As such we cannot go
+            // higher than Integer.MAX_VALUE seconds.
             if (maxDate.getTime() > Integer.MAX_VALUE * 1000L) {
                 maxDate = new Date(Integer.MAX_VALUE * 1000L);
             }

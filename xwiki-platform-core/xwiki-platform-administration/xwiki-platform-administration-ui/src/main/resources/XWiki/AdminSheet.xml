@@ -943,6 +943,10 @@ require(['jquery'], function($) {
 
 #admin-page-content .usersorgroupsnames {
   white-space: nowrap;
+  /* Triple of the value for the .right column. This is useful to make sure the columns are somwhat balanced when
+    there is only one right (e.g. extension rights with a default flavor).
+    Keeping them balanced is useful to make sure the filters are displayed properly, which is especially important
+    on a subwiki where we have to find a place to display the scope selector. */
   width: 27%;
 }
 

@@ -3,7 +3,7 @@ Version: [[version]]
 Section: java
 Priority: optional
 Architecture: all
-Depends: xwiki-solr9-core (= [[version]]), xwiki-solr9-events (= [[version]]), xwiki-solr9-ratings (= [[version]]), xwiki-solr9-extension_index (= [[version]])
+Depends: xwiki-solr[[solr.major.version]]-search (= [[version]]), xwiki-solr[[solr.major.version]]-events (= [[version]]), xwiki-solr[[solr.major.version]]-ratings (= [[version]]), xwiki-solr[[solr.major.version]]-extension_index (= [[version]])
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

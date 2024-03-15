@@ -592,7 +592,7 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
 {{html clean="false"}}
 &lt;div class="systemFilterPreferences xform" data-target="$escapetool.xml($wikimacro.parameters.target)" $!divData&gt;
   &lt;div class="row"&gt;
-    &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
+    &lt;p class="xHint col-xs-12 col-sm-12 col-md-12 col-lg-12"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.system.hint'))
     &lt;/p&gt;
   &lt;/div&gt;
@@ -622,9 +622,6 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
     }
   }
 })
-#set ($description = 
-    $services.localization.render('notifications.settings.filters.preferences.system.table.description'))
-#set ($description = $services.rendering.escape($description, 'xwiki/2.1'))
 #set ($sourceParameters = $services.rendering.escape($escapetool.url($sourceParameters), 'xwiki/2.1'))
 {{liveData
   id='notificationSystemFilterPreferencesLiveData'
@@ -632,7 +629,6 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webj
   source='liveTable'
   sourceParameters="$sourceParameters"
   limit='10'
-  description="$description"
 }}$jsontool.serialize($liveDataConfig){{/liveData}}
 #end
 {{/velocity}}</code>

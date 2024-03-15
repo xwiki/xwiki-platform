@@ -138,7 +138,7 @@ public interface XWikiVersioningStoreInterface
         throws XWikiException
     {
         return getXWikiDocStringVersions(doc, criteria, context).size();
-    };
+    }
 
     XWikiDocument loadXWikiDoc(XWikiDocument doc, String version, XWikiContext context) throws XWikiException;
 

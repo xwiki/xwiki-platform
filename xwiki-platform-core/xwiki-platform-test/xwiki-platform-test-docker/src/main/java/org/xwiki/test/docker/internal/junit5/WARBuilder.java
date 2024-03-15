@@ -245,11 +245,11 @@ public class WARBuilder
         LOGGER.info("Copying JAR dependencies ...");
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Copying JAR: {}", artifact.getFile());
             }
             copyFile(artifact.getFile(), libDirectory);
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Generating XED file for: {}", artifact.getFile());
             }
             generateXEDForJAR(artifact, libDirectory, this.mavenResolver);

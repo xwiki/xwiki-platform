@@ -33,6 +33,19 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+    <!-- Define here extension features that will be used within some modules and their legacy versions -->
+    <!-- Extension features of xwiki-platform-oldcore -->
+    <xwiki.platform.oldcore.extension.features>
+      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+      com.xpn.xwiki.platform:xwiki-core,
+
+      <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
+      org.xwiki.platform:xwiki-platform-filter-instance-oldcore,
+
+      <!-- A contrib extension to use with versions of oldcore which does not support authservice API -->
+      org.xwiki.contrib:authservice-backport-api,
+      org.xwiki.contrib:authservice-backport-default
+    </xwiki.platform.oldcore.extension.features>
   </properties>
   <build>
     <pluginManagement>
@@ -216,6 +229,36 @@
                   <ignore>true</ignore>
                   <code>java.method.removed</code>
                   <old>method java.lang.String org.xwiki.rest.XWikiResource::getUriTemplate()</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Was actually internal classes exposed through public APIs</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.captcha.script.CaptchaScriptSafeProvider</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.captcha.script.WrappedScriptCaptcha</old>
+                </item>
+                <item>
+                  <regex>true</regex>
+                  <ignore>true</ignore>
+                  <code>java.field.typeChanged</code>
+                  <old>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider.*</old>
+                  <new>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider.*</new>
+                </item>
+                <item>
+                  <regex>true</regex>
+                  <ignore>true</ignore>
+                  <code>java.field.typeChanged</code>
+                  <old>field org.xwiki.filter.script.AbstractFilterScriptService.scriptProvider.*</old>
+                  <new>field org.xwiki.filter.script.AbstractFilterScriptService.scriptProvider.*</new>
                 </item>
               </differences>
             </revapi.differences>

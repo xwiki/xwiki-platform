@@ -24,9 +24,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.EditRightsPane;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Represents the actions possible on the Global Rights Administration Page.
  *

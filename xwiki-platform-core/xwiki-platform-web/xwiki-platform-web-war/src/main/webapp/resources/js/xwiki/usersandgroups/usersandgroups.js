@@ -139,7 +139,7 @@ window.MSCheckbox = Class.create({
    */
   createClickHandler: function(self)
   {
-    return function (event) {
+    return function(event) {
       event.preventDefault();
       if (self.req) {
         return;

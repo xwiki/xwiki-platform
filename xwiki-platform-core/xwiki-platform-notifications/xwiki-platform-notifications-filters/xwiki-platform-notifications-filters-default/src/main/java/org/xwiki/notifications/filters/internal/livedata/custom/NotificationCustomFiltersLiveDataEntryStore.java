@@ -116,7 +116,7 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
     }
 
     private Map<String, Object> getPreferenceInformation(NotificationFilterPreference filterPreference)
-        throws NotificationException, LiveDataException
+        throws LiveDataException
     {
         NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
 
@@ -245,7 +245,7 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
             for (NotificationFilterPreference notificationFilterPreference : filterPreferences) {
                 entries.add(getPreferenceInformation(notificationFilterPreference));
             }
-        } catch (QueryException | NotificationException e) {
+        } catch (QueryException e) {
             throw new LiveDataException("Error when querying notification filter preferences", e);
         }
         return liveData;

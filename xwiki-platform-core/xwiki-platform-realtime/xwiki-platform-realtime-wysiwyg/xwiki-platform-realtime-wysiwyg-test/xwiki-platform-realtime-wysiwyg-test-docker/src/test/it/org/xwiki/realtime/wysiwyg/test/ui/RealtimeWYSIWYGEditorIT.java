@@ -312,7 +312,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         secondTextArea = secondEditor.getRichTextArea();
-        secondTextArea.waitUntilContentEditable();
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         secondTextArea.sendKeys("my info tex");
@@ -684,7 +683,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         firstTextArea.sendKeys("one");
@@ -724,7 +722,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is updated.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
 
         // Move to the information box title field and type something.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
@@ -735,12 +732,15 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
+
+        // The content was reloaded because the macro parameters have changed (from the first tab).
+        secondTextArea = secondEditor.getRichTextArea();
+
         secondTextArea.waitUntilTextContains("Some title");
         secondMacroEditModal.clickSubmit();
 
-        // The content is reloaded when a macro is updated.
+        // The content is again reloaded because we modified the macro parameters.
         secondTextArea = secondEditor.getRichTextArea();
-        secondTextArea.waitUntilContentEditable();
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
@@ -916,7 +916,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
 
         // Select the default information message and delete it.
         firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP, Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
@@ -930,7 +929,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
 
         // Replace the default error message.
         firstTextArea.sendKeys(Keys.PAGE_DOWN, Keys.ARROW_UP, Keys.ARROW_UP, Keys.chord(Keys.SHIFT, Keys.HOME),

@@ -30,14 +30,16 @@ import javax.servlet.ServletResponse;
 
 /**
  * <p>
- * Example filter that sets the character encoding to be used in parsing the incoming request,
- * either unconditionally or only if the client did not specify a character encoding. Configuration
- * of this filter is based on the following initialization parameters:
+ * Filter that sets the character encoding to be used in parsing the incoming request,
+ * either unconditionally or only if the client did not specify a character encoding. Further, the default encoding of
+ * the response is set to the same character encoding. Configuration of this filter is based on the following
+ * initialization parameters:
  * </p>
  * <ul>
  * <li><strong>encoding</strong> - The character encoding to be configured for this request,
  * either conditionally or unconditionally based on the <code>ignore</code> initialization
- * parameter. This parameter is required, so there is no default.</li>
+ * parameter. This same encoding is also used as default for the response. This parameter is required, so there is no
+ * default.</li>
  * <li><strong>ignore</strong> - If set to "true", any character encoding specified by the client
  * is ignored, and the value returned by the <code>selectEncoding()</code> method is set. If set
  * to "false, <code>selectEncoding()</code> is called <strong>only</strong> if the client has not
@@ -107,6 +109,8 @@ public class SetCharacterEncodingFilter implements Filter
                 request.setCharacterEncoding(encoding);
             }
         }
+        // Set the default encoding for the response.
+        response.setCharacterEncoding(this.encoding);
         // Pass control on to the next filter
         chain.doFilter(request, response);
     }

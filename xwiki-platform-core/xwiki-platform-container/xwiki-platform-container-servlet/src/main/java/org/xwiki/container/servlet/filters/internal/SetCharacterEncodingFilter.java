@@ -104,12 +104,14 @@ public class SetCharacterEncodingFilter implements Filter
     {
         // Conditionally select and set the character encoding to be used
         if (ignore || (request.getCharacterEncoding() == null)) {
-            String encoding = selectEncoding(request);
-            if (encoding != null) {
-                request.setCharacterEncoding(encoding);
+            String selectedEncoding = selectEncoding(request);
+            if (selectedEncoding != null) {
+                request.setCharacterEncoding(selectedEncoding);
             }
         }
-        // Set the default encoding for the response.
+        // Set the default encoding for the response. Use the same encoding as the request as this is supposed to be
+        // the encoding that XWiki uses in general. It is not clear that XWiki in general supports any encoding besides
+        // UTF-8, though.
         response.setCharacterEncoding(this.encoding);
         // Pass control on to the next filter
         chain.doFilter(request, response);

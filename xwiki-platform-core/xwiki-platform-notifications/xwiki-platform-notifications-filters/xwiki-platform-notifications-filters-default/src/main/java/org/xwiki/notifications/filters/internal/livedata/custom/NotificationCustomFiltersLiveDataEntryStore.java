@@ -59,6 +59,7 @@ import org.xwiki.template.TemplateManager;
  * Dedicated {@link LiveDataEntryStore} for the {@link NotificationCustomFiltersLiveDataSource}.
  * This component is in charge of performing the actual HQL queries to display the live data.
  *
+ * @since 16.3.0RC1
  * @version $Id$
  */
 @Component

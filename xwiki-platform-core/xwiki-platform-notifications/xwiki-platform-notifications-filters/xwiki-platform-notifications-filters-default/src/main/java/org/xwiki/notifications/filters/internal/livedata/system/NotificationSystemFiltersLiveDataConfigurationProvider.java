@@ -38,6 +38,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Configuration of the {@link NotificationSystemFiltersLiveDataSource}.
  *
  * @version $Id$
+ * @since 16.3.0RC1
  */
 @Component
 @Singleton

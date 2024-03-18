@@ -36,6 +36,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
  * Descriptor for the {@link NotificationSystemFiltersLiveDataSource}.
  *
  * @version $Id$
+ * @since 16.3.0RC1
  */
 @Component
 @Singleton

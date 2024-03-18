@@ -32,7 +32,7 @@ import org.xwiki.livedata.LiveDataSource;
  * Live data source for custom notification filters.
  *
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 16.3.0RC1
  */
 @Component
 @Singleton

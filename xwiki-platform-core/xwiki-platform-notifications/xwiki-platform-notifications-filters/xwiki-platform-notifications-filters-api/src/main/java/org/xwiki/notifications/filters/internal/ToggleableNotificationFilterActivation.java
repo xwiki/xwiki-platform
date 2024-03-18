@@ -31,7 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
  * Provide information about the activation of {@link ToggleableNotificationFilter}.
  *
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 16.3.0RC1
  */
 public class ToggleableNotificationFilterActivation implements Serializable
 {

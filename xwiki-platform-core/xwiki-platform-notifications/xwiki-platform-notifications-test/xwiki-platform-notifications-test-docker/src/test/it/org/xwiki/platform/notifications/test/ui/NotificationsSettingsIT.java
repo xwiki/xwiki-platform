@@ -34,6 +34,7 @@ import org.xwiki.platform.notifications.test.po.NotificationsAdministrationPage;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
+import org.xwiki.platform.notifications.test.po.preferences.CustomNotificationFilterPreferencesLiveDataElement;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterModal;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
@@ -45,6 +46,7 @@ import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeNodeElement;
 import org.xwiki.user.test.po.AbstractUserProfilePage;
+import org.xwiki.user.test.po.ProfileUserProfilePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -264,8 +266,10 @@ class NotificationsSettingsIT
             // Go back to the preferences to ensure the filter has been created
             NotificationsUserProfilePage notificationsUserProfilePage =
                 NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            CustomNotificationFilterPreferencesLiveDataElement customPrefLiveData =
+                notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
             List<CustomNotificationFilterPreference> preferences =
-                notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+                customPrefLiveData.getCustomNotificationFilterPreferences();
             assertEquals(1, preferences.size());
 
             // Filter 0
@@ -290,7 +294,9 @@ class NotificationsSettingsIT
 
             // Go back to the preferences to ensure the filter has been deleted
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+            customPrefLiveData =
+                notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+            preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             assertTrue(preferences.isEmpty());
 
             // back to the page
@@ -305,7 +311,9 @@ class NotificationsSettingsIT
 
             // Go back to the preferences to ensure the filter has been created
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+            customPrefLiveData =
+                notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+            preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             assertEquals(1, preferences.size());
 
             // Filter 1
@@ -332,7 +340,9 @@ class NotificationsSettingsIT
 
             // Go back to the preferences
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+            customPrefLiveData =
+                notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+            preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             assertEquals(2, preferences.size());
 
             // Filter 2
@@ -349,7 +359,9 @@ class NotificationsSettingsIT
             preferences.get(1).setEnabled(false);
             // Refresh the page
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+            customPrefLiveData =
+                notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+            preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             // Verify the change have been saved
             assertFalse(preferences.get(1).isEnabled());
 
@@ -364,9 +376,12 @@ class NotificationsSettingsIT
 
             // Delete the filters
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
+            customPrefLiveData =
+                notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+            preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             // The livetable page is refreshed so we need to load back the filter preferences
-            notificationsUserProfilePage.getCustomNotificationFilterPreferences().get(1).delete();
-            notificationsUserProfilePage.getCustomNotificationFilterPreferences().get(0).delete();
+            preferences.get(1).delete();
+            preferences.get(0).delete();
 
             // Verify it's all like the beginning
             testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
@@ -378,18 +393,22 @@ class NotificationsSettingsIT
 
             // Go back to the preferences
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            preferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+            customPrefLiveData =
+                notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+            preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             assertTrue(preferences.isEmpty());
         } finally {
             // Clean up
             testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
 
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            List<CustomNotificationFilterPreference> preferences = p.getCustomNotificationFilterPreferences();
+            CustomNotificationFilterPreferencesLiveDataElement customPrefLiveData =
+                p.getCustomNotificationFilterPreferencesLiveData();
+            List<CustomNotificationFilterPreference> preferences =
+                customPrefLiveData.getCustomNotificationFilterPreferences();
             while (!preferences.isEmpty()) {
                 preferences.get(preferences.size() - 1).delete();
-                // Reload the livetable
-                preferences = p.getCustomNotificationFilterPreferences();
+                preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             }
         }
     }
@@ -562,10 +581,11 @@ class NotificationsSettingsIT
      *   - create a new user and check that the filter exist for it
      *   - add a new filter to the user with admin user
      *   - login with the new user and add another new filter
+     *   - Add several new preferences and check the modal sort/filter operations
      */
     @Test
     @Order(5)
-    void addCustomFilters(TestUtils testUtils)
+    void customFiltersAndLiveData(TestUtils testUtils, TestReference testReference) throws Exception
     {
         // Create pages for the filter locations
         SpaceReference lastSpaceReference = new SpaceReference("xwiki", NotificationsSettingsIT.class.getSimpleName());
@@ -579,8 +599,10 @@ class NotificationsSettingsIT
 
         testUtils.loginAsSuperAdmin();
         NotificationsAdministrationPage administrationPage = NotificationsAdministrationPage.gotoPage();
+        CustomNotificationFilterPreferencesLiveDataElement customPrefLiveData =
+            administrationPage.getCustomNotificationFilterPreferencesLiveData();
         List<CustomNotificationFilterPreference> customNotificationFilterPreferences =
-            administrationPage.getCustomNotificationFilterPreferences();
+            customPrefLiveData.getCustomNotificationFilterPreferences();
         assertTrue(customNotificationFilterPreferences.isEmpty());
 
         CustomNotificationFilterModal customNotificationFilterModal = administrationPage.clickAddCustomFilter();
@@ -605,7 +627,7 @@ class NotificationsSettingsIT
 
         // check newly created filter
         customNotificationFilterPreferences =
-            administrationPage.getCustomNotificationFilterPreferences();
+            customPrefLiveData.getCustomNotificationFilterPreferences();
         assertEquals(1, customNotificationFilterPreferences.size());
         CustomNotificationFilterPreference filterPreference =
             customNotificationFilterPreferences.get(0);
@@ -626,7 +648,8 @@ class NotificationsSettingsIT
         // go to notification settings of new user and check that the custom filter exists there too
         NotificationsUserProfilePage notificationsUserProfilePage =
             NotificationsUserProfilePage.gotoPage(secondUserUsername);
-        customNotificationFilterPreferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+        customPrefLiveData = notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+        customNotificationFilterPreferences = customPrefLiveData.getCustomNotificationFilterPreferences();
 
         assertEquals(1, customNotificationFilterPreferences.size());
         filterPreference = customNotificationFilterPreferences.get(0);
@@ -649,7 +672,7 @@ class NotificationsSettingsIT
         customNotificationFilterModal.clickSubmit();
 
         // Check the newly created filter
-        customNotificationFilterPreferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+        customNotificationFilterPreferences = customPrefLiveData.getCustomNotificationFilterPreferences();
         assertEquals(2, customNotificationFilterPreferences.size());
 
         filterPreference = customNotificationFilterPreferences.get(1);
@@ -667,8 +690,9 @@ class NotificationsSettingsIT
         // check the filters
         notificationsUserProfilePage =
             NotificationsUserProfilePage.gotoPage(secondUserUsername);
+        customPrefLiveData = notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
         customNotificationFilterPreferences =
-            notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+            customPrefLiveData.getCustomNotificationFilterPreferences();
         assertEquals(2, customNotificationFilterPreferences.size());
 
         filterPreference =
@@ -704,7 +728,7 @@ class NotificationsSettingsIT
         customNotificationFilterModal.clickSubmit(2);
 
         // check created filters
-        customNotificationFilterPreferences = notificationsUserProfilePage.getCustomNotificationFilterPreferences();
+        customNotificationFilterPreferences = customPrefLiveData.getCustomNotificationFilterPreferences();
         assertEquals(4, customNotificationFilterPreferences.size());
 
         filterPreference = customNotificationFilterPreferences.get(2);
@@ -724,6 +748,84 @@ class NotificationsSettingsIT
         assertEquals(List.of("Alert"), filterPreference.getFormats());
         // core.events.delete before core.events.update
         assertEquals(List.of("A page is deleted","A page is modified"), filterPreference.getEventTypes());
+
+        // follow a user
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(FIRST_USER_NAME);
+        assertFalse(userProfilePage.isFollowed());
+        userProfilePage.toggleFollowButton();
+
+        notificationsUserProfilePage =
+            NotificationsUserProfilePage.gotoPage(secondUserUsername);
+        notificationsUserProfilePage.setAutoWatchMode(AbstractNotificationsSettingsPage.AutowatchMode.NEW);
+
+        // Create multiple pages
+        for (int i = 0; i < 15; i++) {
+            DocumentReference pageRef = new DocumentReference("Page_" + i, testReference.getLastSpaceReference());
+            testUtils.rest().savePage(pageRef, "Content of page " + i, "Title of page " + i );
+        }
+        String pageSpaceName =
+            NotificationsSettingsIT.class.getSimpleName() + "." + testReference.getLastSpaceReference().getName();
+
+        notificationsUserProfilePage =
+            NotificationsUserProfilePage.gotoPage(secondUserUsername);
+        customPrefLiveData = notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
+
+        // 4 filters created before following a user
+        // +1 when following the user
+        // +15 when creating the pages after setting autowatch
+        assertEquals(20, customPrefLiveData.getTableLayout().getTotalEntries());
+
+        customPrefLiveData.filterScope("USER");
+        assertEquals(1, customPrefLiveData.getTableLayout().getTotalEntries());
+        filterPreference = customPrefLiveData.getCustomNotificationFilterPreferences().get(0);
+        assertEquals("User", filterPreference.getScope());
+        assertEquals(List.of("Alert", "Email"), filterPreference.getFormats());
+        assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
+        assertTrue(filterPreference.getEventTypes().isEmpty());
+        assertEquals("XWiki." + FIRST_USER_NAME, filterPreference.getLocation());
+
+        customPrefLiveData.clearAllFilters();
+        customPrefLiveData.filterLocation(testReference.getLastSpaceReference().getName());
+        // Click twice to order descending
+        customPrefLiveData.sortLocation();
+        customPrefLiveData.sortLocation();
+        assertEquals(15, customPrefLiveData.getTableLayout().getTotalEntries());
+        filterPreference = customPrefLiveData.getCustomNotificationFilterPreferences().get(0);
+        assertEquals("Page only", filterPreference.getScope());
+        assertEquals(List.of("Alert", "Email"), filterPreference.getFormats());
+        assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
+        assertTrue(filterPreference.getEventTypes().isEmpty());
+        // Order is alphabetical so Page_9 is > Page_15
+        assertEquals(pageSpaceName + ".Page_9", filterPreference.getLocation());
+
+        customPrefLiveData.clearAllFilters();
+        customPrefLiveData.clearAllSort();
+        assertEquals(20, customPrefLiveData.getTableLayout().getTotalEntries());
+        customPrefLiveData.filterFilterAction("INCLUSIVE");
+        assertEquals(19, customPrefLiveData.getTableLayout().getTotalEntries());
+        customPrefLiveData.filterLocation("2");
+        // 3 possibles matches: Page2,Page_2,Page_12
+        assertEquals(3, customPrefLiveData.getTableLayout().getTotalEntries());
+        customPrefLiveData.sortFormats();
+        customPrefLiveData.sortFormats();
+        filterPreference = customPrefLiveData.getCustomNotificationFilterPreferences().get(0);
+        assertEquals("Page only", filterPreference.getScope());
+        assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".Page2", filterPreference.getLocation());
+        assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
+        assertEquals(List.of("Alert"), filterPreference.getFormats());
+        // core.events.delete before core.events.update
+        assertEquals(List.of("A page is deleted","A page is modified"), filterPreference.getEventTypes());
+
+        customPrefLiveData.filterFormat("EMAIL");
+        assertEquals(2, customPrefLiveData.getTableLayout().getTotalEntries());
+        customPrefLiveData.sortLocation();
+
+        filterPreference = customPrefLiveData.getCustomNotificationFilterPreferences().get(0);
+        assertEquals("Page only", filterPreference.getScope());
+        assertEquals(List.of("Alert", "Email"), filterPreference.getFormats());
+        assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
+        assertTrue(filterPreference.getEventTypes().isEmpty());
+        assertEquals(pageSpaceName + ".Page_12", filterPreference.getLocation());
     }
 
     @Test

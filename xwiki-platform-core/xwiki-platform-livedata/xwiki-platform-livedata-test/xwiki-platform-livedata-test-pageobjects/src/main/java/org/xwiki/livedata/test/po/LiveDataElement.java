@@ -104,6 +104,13 @@ public class LiveDataElement extends BaseElement
         return isVueLoaded() && areComponentsLoaded();
     }
 
+    private WebElement openDropDownMenu()
+    {
+        WebElement dropdownMenu = getRootElement().findElement(By.cssSelector(".livedata-dropdown-menu "));
+        dropdownMenu.click();
+        return dropdownMenu;
+    }
+
     /**
      * Click on the refresh button from the actions menu.
      *
@@ -111,9 +118,7 @@ public class LiveDataElement extends BaseElement
      */
     public void refresh()
     {
-        WebElement dropdownMenu = getRootElement().findElement(By.cssSelector(".livedata-dropdown-menu "));
-        dropdownMenu.click();
-        dropdownMenu.findElement(By.cssSelector(".livedata-action-refresh")).click();
+        openDropDownMenu().findElement(By.cssSelector(".livedata-action-refresh")).click();
     }
 
     /**
@@ -139,7 +144,7 @@ public class LiveDataElement extends BaseElement
         return this;
     }
 
-    private void waitUntilReady()
+    public void waitUntilReady()
     {
         getDriver().waitUntilCondition(input -> isVueLoaded());
 
@@ -179,5 +184,49 @@ public class LiveDataElement extends BaseElement
     private WebElement getRootElement()
     {
         return getDriver().findElement(By.id(this.id));
+    }
+
+    /**
+     * Open the panel for advanced filter and returns it.
+     * @return an instance of {@link FiltersPanelElement} once it's opened.
+     * @since 16.3.0RC1
+     */
+    public FiltersPanelElement openFiltersPanel()
+    {
+        openDropDownMenu().findElement(By.linkText("Filter...")).click();
+        return new FiltersPanelElement(this,
+            getRootElement().findElement(By.className("livedata-advanced-panel-filter")));
+    }
+
+    /**
+     * Open the panel for advanced sorting and returns it.
+     * @return an instance of {@link SortPanelElement} once it's opened.
+     * @since 16.3.0RC1
+     */
+    public SortPanelElement openSortPanel()
+    {
+        openDropDownMenu().findElement(By.linkText("Sort...")).click();
+        return new SortPanelElement(this,
+            getRootElement().findElement(By.className("livedata-advanced-panel-sort")));
+    }
+
+    /**
+     * Clear all custom sorting that might have been put.
+     */
+    public void clearAllSort()
+    {
+        SortPanelElement sortPanelElement = openSortPanel();
+        sortPanelElement.clearAllSort();
+        sortPanelElement.closePanel();
+    }
+
+    /**
+     * Clear all custom filters that might have been put.
+     */
+    public void clearAllFilters()
+    {
+        FiltersPanelElement filtersPanelElement = openFiltersPanel();
+        filtersPanelElement.clearAllFilters();
+        filtersPanelElement.closePanel();
     }
 }

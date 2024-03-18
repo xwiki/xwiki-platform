@@ -50,6 +50,7 @@ import org.xwiki.notifications.filters.internal.livedata.AbstractNotificationFil
  * This component is in charge of performing the actual HQL queries to display the live data.
  *
  * @version $Id$
+ * @since 16.3.0RC1
  */
 @Component
 @Singleton

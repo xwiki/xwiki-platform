@@ -48,6 +48,7 @@ import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveD
 /**
  * Configuration of the {@link NotificationCustomFiltersLiveDataSource}.
  *
+ * @since 16.3.0RC1
  * @version $Id$
  */
 @Component

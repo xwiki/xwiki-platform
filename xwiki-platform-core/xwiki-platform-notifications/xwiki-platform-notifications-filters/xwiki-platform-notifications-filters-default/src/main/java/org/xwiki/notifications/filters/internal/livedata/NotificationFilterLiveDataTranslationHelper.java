@@ -42,7 +42,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * Helper for getting various translations for live data custom sources.
  *
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 16.3.0RC1
  */
 @Component(roles = NotificationFilterLiveDataTranslationHelper.class)
 @Singleton

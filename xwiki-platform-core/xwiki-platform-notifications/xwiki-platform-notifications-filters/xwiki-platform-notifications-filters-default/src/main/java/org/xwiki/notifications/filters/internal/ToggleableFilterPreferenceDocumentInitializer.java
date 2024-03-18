@@ -44,17 +44,20 @@ public class ToggleableFilterPreferenceDocumentInitializer extends AbstractManda
 {
     /**
      * Reference of the xclass.
+     * @since 16.3.0RC1
      */
     public static final LocalDocumentReference XCLASS =
         new LocalDocumentReference(List.of("XWiki", "Notifications", "Code"), "ToggleableFilterPreferenceClass");
 
     /**
      * Name of field holding the filter name.
+     * @since 16.3.0RC1
      */
     public static final String FIELD_FILTER_NAME = "filterName";
 
     /**
      * Name of the field holding the activation value.
+     * @since 16.3.0RC1
      */
     public static final String FIELD_IS_ENABLED = "isEnabled";
 

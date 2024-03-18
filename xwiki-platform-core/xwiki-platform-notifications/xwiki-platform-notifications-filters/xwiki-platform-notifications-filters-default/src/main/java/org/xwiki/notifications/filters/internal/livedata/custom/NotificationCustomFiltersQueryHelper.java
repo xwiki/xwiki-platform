@@ -48,7 +48,7 @@ import org.xwiki.query.internal.DefaultQueryParameter;
  * TODO: maybe this could be improved with some APIs to put in NotificationFilterPreferenceStore.
  *
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 16.3.0RC1
  */
 @Component(roles = NotificationCustomFiltersQueryHelper.class)
 @Singleton

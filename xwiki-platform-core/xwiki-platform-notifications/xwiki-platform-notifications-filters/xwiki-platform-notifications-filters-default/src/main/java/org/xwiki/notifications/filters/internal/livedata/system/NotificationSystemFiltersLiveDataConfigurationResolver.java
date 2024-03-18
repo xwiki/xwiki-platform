@@ -34,6 +34,7 @@ import org.xwiki.livedata.internal.JSONMerge;
  * Needed component for the live data configuration.
  *
  * @version $Id$
+ * @since 16.3.0RC1
  */
 @Component
 @Singleton

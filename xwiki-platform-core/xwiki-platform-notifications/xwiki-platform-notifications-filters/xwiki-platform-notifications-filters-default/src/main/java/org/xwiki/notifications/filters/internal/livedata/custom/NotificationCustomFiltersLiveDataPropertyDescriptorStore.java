@@ -35,6 +35,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 /**
  * Descriptor for the {@link NotificationCustomFiltersLiveDataSource}.
  *
+ * @since 16.3.0RC1
  * @version $Id$
  */
 @Component

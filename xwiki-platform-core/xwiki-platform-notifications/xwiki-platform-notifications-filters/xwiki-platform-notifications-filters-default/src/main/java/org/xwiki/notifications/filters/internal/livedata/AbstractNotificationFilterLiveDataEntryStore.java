@@ -51,7 +51,7 @@ import com.xpn.xwiki.XWikiContext;
  * {@link org.xwiki.notifications.filters.internal.livedata.system.NotificationSystemFiltersLiveDataEntryStore}.
  *
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 16.3.0RC1
  */
 public abstract class AbstractNotificationFilterLiveDataEntryStore implements LiveDataEntryStore
 {

@@ -86,7 +86,7 @@ public class NotificationFilterPreferenceStore
      * @param filterPreferenceId a filter preference id
      * @return the corresponding preference or {@link Optional#empty()} if none can be found
      * @throws NotificationException if an error occurs
-     * @since 16.2.0RC1
+     * @since 16.3.0RC1
      */
     public Optional<NotificationFilterPreference> getFilterPreference(String filterPreferenceId,
         WikiReference wikiReference) throws NotificationException

@@ -128,7 +128,7 @@ public class NotificationCustomFiltersQueryHelper
             NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope =
                 NotificationCustomFiltersLiveDataConfigurationProvider.Scope.valueOf(
                     String.valueOf(constraint.getValue()));
-            queryWhereClauses.add(String.format("length(nfp.%s) > 0 ", scope.getFieldName()));
+            queryWhereClauses.add(String.format("length(nfp.%s) > 0", scope.getFieldName()));
         }
     }
 
@@ -168,7 +168,7 @@ public class NotificationCustomFiltersQueryHelper
             if (NotificationCustomFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
                 constraint.getValue()))
             {
-                queryWhereClauses.add("length(nfp.allEventTypes) = 0 ");
+                queryWhereClauses.add("length(nfp.allEventTypes) = 0");
             } else {
                 queryWhereClauses.add("nfp.allEventTypes like :eventTypes");
                 DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);

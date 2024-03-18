@@ -31,6 +31,6 @@
   <packaging>deb</packaging>
   <name>XWiki Platform - Distribution - Debian - Solr - Core - Ratings</name>
   <properties>
-    <debian.solr.core>ratings</debian.solr.core>
+    <debian.xwiki.core>ratings</debian.xwiki.core>
   </properties>
 </project>

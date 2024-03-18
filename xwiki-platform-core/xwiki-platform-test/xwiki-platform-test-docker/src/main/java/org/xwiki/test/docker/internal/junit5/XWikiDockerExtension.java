@@ -137,11 +137,11 @@ public class XWikiDockerExtension extends AbstractExtension
             // See https://github.com/testcontainers/testcontainers-java/issues/2253
             setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
         }
-        if (testConfiguration.isDebug()) {
-            // Debug: get logs when starting the sshd container
+        if (testConfiguration.isVerbose()) {
+            // Get logs when starting the sshd container
             setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
                 TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
-            // Debug: get logs when starting the vnc container
+            // Get logs when starting the vnc container
             setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
                 TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
         }
@@ -153,7 +153,7 @@ public class XWikiDockerExtension extends AbstractExtension
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
         ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration.isOffline(),
-            testConfiguration.isDebug(), repositoryResolver);
+            testConfiguration.isVerbose(), repositoryResolver);
         MavenResolver mavenResolver =
             new MavenResolver(testConfiguration.getProfiles(), artifactResolver, repositoryResolver);
 

@@ -44,10 +44,10 @@
   <version>16.2.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
+    <!-- Versions of XWiki dependencies used in Platform modules -->
+    <rendering.version>${commons.version}</rendering.version>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
     <platform.version>${commons.version}</platform.version>
-    <!-- Versions of XWiki dependencies used in Platform modules -->
-    <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
     <bootstrap.version>3.4.1</bootstrap.version>
@@ -63,11 +63,12 @@
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.6</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
+    <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
     <jersey.version>2.41</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.1</zookeeper.version>
+    <zookeeper.version>3.9.2</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
     <testcontainers.version>1.19.7</testcontainers.version>

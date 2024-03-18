@@ -188,7 +188,7 @@ public class ArtifactResolver
      * @return the collection of resolved artifact results for the minimal XWiki distribution/flavor to be used for
      *         functional tests
      * @throws Exception if an error occurred during resolving
-     * @since 16.2.0C1
+     * @since 16.2.0RC1
      */
     public Collection<ArtifactResult> getDistributionDependencies(String commonsVersion, String platformVersion,
         List<Artifact> extraArtifacts) throws Exception

@@ -91,7 +91,7 @@ public class MavenResolver
     /**
      * @return the version of the XWiki platform artifacts to download/resolve
      * @throws Exception if an error occurred during reading and parsing of the POM
-     * @since 16.2RC1
+     * @since 16.2.0RC1
      */
     public String getCommonsVersion() throws Exception
     {

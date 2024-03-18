@@ -182,27 +182,29 @@ public class ArtifactResolver
     }
 
     /**
-     * @param xwikiVersion the version of the artifacts to resolve
+     * @param commonsVersion the version to use for xwiki-commons artifacts
+     * @param platformVersion the version to use for xwiki-platform artifacts
      * @param extraArtifacts the list of extra artifacts that should be added to {@code WEB-INF/lib}. Can be empty
      * @return the collection of resolved artifact results for the minimal XWiki distribution/flavor to be used for
-     * functional tests
+     *         functional tests
      * @throws Exception if an error occurred during resolving
+     * @since 16.2RC1
      */
-    public Collection<ArtifactResult> getDistributionDependencies(String xwikiVersion, List<Artifact> extraArtifacts)
-        throws Exception
+    public Collection<ArtifactResult> getDistributionDependencies(String commonsVersion, String platformVersion,
+        List<Artifact> extraArtifacts) throws Exception
     {
         Artifact rootDistributionArtifact = new DefaultArtifact(PLATFORM_GROUPID,
-            "xwiki-platform-minimaldependencies", "pom", xwikiVersion);
+            "xwiki-platform-minimaldependencies", "pom", platformVersion);
 
         List<Artifact> dependentArtifacts = new ArrayList<>();
 
         // We provision XAR and JAR extensions (as dependencies of XAR extensions). Thus, we need the associated
         // handlers.
         Artifact xarHandlerArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-extension-handler-xar",
-            JAR, xwikiVersion);
+            JAR, platformVersion);
         dependentArtifacts.add(xarHandlerArtifact);
         Artifact jarHandlerArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-extension-handler-jar",
-            JAR, xwikiVersion);
+            JAR, platformVersion);
         dependentArtifacts.add(jarHandlerArtifact);
 
         // Since we want to be able to provision SNAPSHOT extensions, we need to configure the SNAPSHOT
@@ -210,29 +212,29 @@ public class ArtifactResolver
         // default list of extension repositories.
         if (!this.isOffline) {
             Artifact artifact = new DefaultArtifact(COMMONS_GROUPID,
-                "xwiki-commons-extension-repository-maven-snapshots", JAR, xwikiVersion);
+                "xwiki-commons-extension-repository-maven-snapshots", JAR, commonsVersion);
             dependentArtifacts.add(artifact);
         } else {
             Artifact artifact = new DefaultArtifact(COMMONS_GROUPID,
-                "xwiki-commons-extension-repository-maven", JAR, xwikiVersion);
+                "xwiki-commons-extension-repository-maven", JAR, commonsVersion);
             dependentArtifacts.add(artifact);
         }
 
         // Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
         // more explanations), we need to add it manually.
         Artifact skinArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-flamingo-skin-resources",
-            JAR, xwikiVersion);
+            JAR, platformVersion);
         dependentArtifacts.add(skinArtifact);
 
         // We use the ComponentScriptService in TestUtils#setPropertyInXWikiCfg so we need the dependency for our tests.
         Artifact componentScript = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-component-script",
-            JAR, xwikiVersion);
+            JAR, platformVersion);
         dependentArtifacts.add(componentScript);
 
         // Add the PR Checker JAR so that we can verify that we don't have wiki pages requiring PR rights (except when
         // explicitly allowed).
         Artifact prCheckerArtifact = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-test-checker", JAR,
-            xwikiVersion);
+            platformVersion);
         dependentArtifacts.add(prCheckerArtifact);
 
         // Add specified extra artifacts

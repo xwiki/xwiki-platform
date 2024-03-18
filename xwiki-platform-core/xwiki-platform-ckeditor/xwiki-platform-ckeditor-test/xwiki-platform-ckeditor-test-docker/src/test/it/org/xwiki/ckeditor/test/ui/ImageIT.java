@@ -19,6 +19,11 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +40,7 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
@@ -54,11 +60,6 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test of the CKEditor Image Plugin.
@@ -815,9 +816,10 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(subPageReference).editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnEditedContent(() -> {
-            setup.getDriver().findElement(By.cssSelector("html")).sendKeys(Keys.chord(Keys.CONTROL, "v"));
-            setup.getDriver().findElement(By.cssSelector("img")).click();
+        RichTextAreaElement richTextArea = editor.getRichTextArea();
+        richTextArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        richTextArea.verifyContent(content -> {
+            content.getImages().get(0).click();
         });
 
         // Verify that it's possible to edit a freshly pasted image.

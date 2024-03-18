@@ -116,8 +116,17 @@ public class CKEditor extends BaseElement
      */
     public RichTextAreaElement getRichTextArea()
     {
-        // The in-line frame element is renewed while editing so we can't cache it.
-        return new RichTextAreaElement(getContentContainer());
+        return getRichTextArea(true);
+    }
+
+    /**
+     * @param wait whether to wait or not for the content to be editable
+     * @return the rich text area
+     */
+    public RichTextAreaElement getRichTextArea(boolean wait)
+    {
+        // The in-line frame element is renewed while editing (e.g. when a macro is inserted) so we can't cache it.
+        return new RichTextAreaElement(getContentContainer(), wait);
     }
 
     /**

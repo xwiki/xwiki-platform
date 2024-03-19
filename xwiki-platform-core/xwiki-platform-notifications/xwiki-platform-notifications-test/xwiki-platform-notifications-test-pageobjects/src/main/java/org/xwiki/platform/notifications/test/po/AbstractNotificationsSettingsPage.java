@@ -298,6 +298,15 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
         for (WebElement row : liveDataElement.getTableLayout().getRows()) {
             preferences.add(new CustomNotificationFilterPreference(this, row, this.getDriver()));
         }
+        preferences.sort((o1, o2) -> {
+            String name = "data-livedata-entry-id";
+            int substringIndex = "NFP_".length();
+            // Sort by numbering value of the custom filter indexes. If sorting alphanumerically, 10 is lower than 2
+            // which can lead to unexpected sorting.
+            Long attribute = Long.parseLong(o1.getRow().getAttribute(name).substring(substringIndex));
+            Long attribute1 = Long.parseLong(o2.getRow().getAttribute(name).substring(substringIndex));
+            return attribute.compareTo(attribute1);
+        });
         return preferences;
     }
 

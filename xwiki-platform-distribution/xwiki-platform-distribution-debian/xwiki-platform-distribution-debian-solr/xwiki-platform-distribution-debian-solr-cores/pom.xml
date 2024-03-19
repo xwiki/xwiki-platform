@@ -68,7 +68,7 @@ fi
 # TODO: add some automatic Solr data cleanup depending on the previous version
 
 # Make the default solr user ("solr") owner of the data folder
-if id "solr" >/dev/null 2>&amp;1; then
+if id "solr" &gt;/dev/null 2&gt;&amp;1; then
   chown -R solr:solr ${debian.xwiki.var.solr}/${debian.xwiki.core}/
 else
   echo "No user with name 'solr' could be found. Please make the user which runs Solr the owner of the folder ${debian.xwiki.var.solr}/${debian.xwiki.core}/"

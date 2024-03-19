@@ -41,7 +41,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Represents a page for notification settings.
  * This kind of page can be seen in user profile or in global administration.
- * 
+ *
  * @version $Id$
  * @since 13.2RC1
  */
@@ -323,7 +323,22 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
         for (WebElement row : this.notificationCustomFilterPreferencesLivetable.findElements(By.tagName(ROW_TAG))) {
             preferences.add(new CustomNotificationFilterPreference(this, row, this.getDriver()));
         }
+        preferences.sort((o1, o2) -> {
+            // Sort by numbering value of the custom filter indexes. If sorting alphanumerically, 10 is lower than 2
+            // which can lead to unexpected sorting.
+            Long attribute = getNotificationId(o1);
+            Long attribute1 = getNotificationId(o2);
+            return attribute.compareTo(attribute1);
+        });
         return preferences;
+    }
+
+    private static Long getNotificationId(CustomNotificationFilterPreference o1)
+    {
+        String nfp = o1.getLivetableRow()
+            .findElement(By.cssSelector("input.notificationFilterPreferenceCheckbox"))
+            .getAttribute("data-preferenceid");
+        return Long.parseLong(nfp.substring("NFP_".length()));
     }
 
     /**

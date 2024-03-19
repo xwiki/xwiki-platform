@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions-test</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mentions-test-docker</artifactId>
   <name>XWiki Platform - Mentions - Test - Functional Docker Tests</name>

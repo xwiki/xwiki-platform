@@ -60,4 +60,10 @@ class AllIT
     class NestedRealtimeWYSIWYGEditorIT extends RealtimeWYSIWYGEditorIT
     {
     }
+    
+    @Nested
+    @DisplayName("Realtime Multi-User WYSIWYG Editor Tests")
+    class NestedRealtimeWYSIWYGMultiUserIT extends RealtimeWYSIWYGMultiUserIT
+    {
+    }
 }

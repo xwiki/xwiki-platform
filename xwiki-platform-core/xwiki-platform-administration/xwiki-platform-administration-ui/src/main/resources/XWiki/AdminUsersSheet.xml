@@ -819,16 +819,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
     </property>
     <property>
       <code>/**
- * Users Live Table
- */
-#userstable .action_disable .action-icon {
-  color: @brand-warning;
-}
-#userstable .action_enable .action-icon {
-  color: @brand-success;
-}
-
-/**
  * Delete User Modal
  */
 #deleteUserModal .userName {

@@ -159,6 +159,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         meta.setActions(List.of(deleteAction));
 
         meta.setPropertyDescriptors(List.of(
+            getIDDescriptor(),
             getDisplayDescriptor(),
             getScopeDescriptor(),
             getLocationDescriptor(),
@@ -170,6 +171,21 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         ));
 
         return input;
+    }
+
+    private LiveDataPropertyDescriptor getIDDescriptor()
+    {
+        LiveDataPropertyDescriptor descriptor = new LiveDataPropertyDescriptor();
+        descriptor.setName(this.l10n.getTranslationPlain(TRANSLATION_PREFIX + ID_FIELD));
+        descriptor.setId(ID_FIELD);
+        descriptor.setType(STRING_TYPE);
+        // This is not visible we want to use that field only for sorting
+        descriptor.setVisible(false);
+        descriptor.setEditable(false);
+        descriptor.setSortable(true);
+        descriptor.setFilterable(false);
+
+        return descriptor;
     }
 
     private LiveDataPropertyDescriptor getDisplayDescriptor()

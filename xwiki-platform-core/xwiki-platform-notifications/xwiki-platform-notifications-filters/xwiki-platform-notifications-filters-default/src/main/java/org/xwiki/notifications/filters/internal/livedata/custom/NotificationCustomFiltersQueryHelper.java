@@ -289,6 +289,9 @@ public class NotificationCustomFiltersQueryHelper
                 case NotificationCustomFiltersLiveDataConfigurationProvider.EVENT_TYPES_FIELD ->
                     String.format("nfp.allEventTypes %s", sortOperator);
 
+                case NotificationCustomFiltersLiveDataConfigurationProvider.ID_FIELD ->
+                    String.format("nfp.internalId %s", sortOperator);
+
                 default -> throw new LiveDataException("Unexpected sort value: " + sortEntry.getProperty());
             };
             clauses.add(clause);

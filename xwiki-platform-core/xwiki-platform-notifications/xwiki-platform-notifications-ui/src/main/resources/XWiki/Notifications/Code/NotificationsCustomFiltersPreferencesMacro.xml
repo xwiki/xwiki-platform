@@ -811,10 +811,11 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
   #end
   $services.liveData.render({
     'id': 'notificationCustomFilterPreferencesLiveData',
-    'properties': 'display,scope,location,filterType,eventTypes,notificationFormats,isEnabled,actions',
+    'properties': 'filterPreferenceId,display,scope,location,filterType,eventTypes,notificationFormats,isEnabled,actions',
     'source': 'notificationCustomFilters',
     'sourceParameters': $escapetool.url($sourceParameters),
-    'limit': 10
+    'limit': 10,
+    'sort': 'filterPreferenceId:desc'
   })
 &lt;/div&gt;
 ######################################################

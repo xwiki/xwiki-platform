@@ -19,10 +19,12 @@
  */
 package org.xwiki.search.solr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -380,6 +382,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     {
         migrateFields(sourceCore, targetCore, true);
         migrateFields(sourceCore, targetCore, false);
+        migrateCopyFields(sourceCore, targetCore);
 
         commit(targetCore);
     }
@@ -387,7 +390,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     private void migrateFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore, boolean dynamic) throws SolrException
     {
         Map<String, Map<String, Object>> sourceFields =
-            dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
+            dynamic ? this.solrSchemaUtils.getDynamicFields(sourceCore, false)
                 : this.solrSchemaUtils.getFields(sourceCore, false);
         Map<String, Map<String, Object>> targetFields =
             dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
@@ -396,6 +399,18 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             if (!targetFields.containsKey(entry.getKey())) {
                 // Add the missing type
                 this.solrSchemaUtils.setField(targetCore, entry.getValue(), dynamic, true);
+            }
+        }
+    }
+
+    private void migrateCopyFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        Map<String, Set<String>> sourceFields = this.solrSchemaUtils.getCopyFields(sourceCore, false);
+        Map<String, Set<String>> targetFields = this.solrSchemaUtils.getCopyFields(targetCore, false);
+        for (Map.Entry<String, Set<String>> entry : sourceFields.entrySet()) {
+            if (!targetFields.containsKey(entry.getKey())) {
+                // Add the missing type
+                this.solrSchemaUtils.addCopyField(targetCore, entry.getKey(), new ArrayList<>(entry.getValue()));
             }
         }
     }
@@ -1001,7 +1016,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void setField(Map<String, Object> fieldAttributes, boolean dynamic) throws SolrException
     {
-
         this.solrSchemaUtils.setField(this.core, fieldAttributes, dynamic);
     }
 

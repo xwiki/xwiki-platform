@@ -41,7 +41,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LiveDataPropertyDescriptor
 {
-    private static final String NAME = "name";
+    private static final String NAME_CONSTANT = "name";
 
     /**
      * Holds the filter configuration.
@@ -243,7 +243,7 @@ public class LiveDataPropertyDescriptor
         {
             return new XWikiToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append(NAME, name)
+                .append(NAME_CONSTANT, name)
                 .toString();
         }
     }
@@ -614,7 +614,7 @@ public class LiveDataPropertyDescriptor
         return new XWikiToStringBuilder(this)
             .appendSuper(super.toString())
             .append("id", id)
-            .append(NAME, name)
+            .append(NAME_CONSTANT, name)
             .append("description", description)
             .append("icon", icon)
             .append("type", type)

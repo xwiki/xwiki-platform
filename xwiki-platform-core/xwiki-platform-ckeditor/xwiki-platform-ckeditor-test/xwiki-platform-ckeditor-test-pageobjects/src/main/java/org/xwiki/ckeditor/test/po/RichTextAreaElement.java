@@ -31,7 +31,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
@@ -64,9 +63,11 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
-     * The in-line frame element.
+     * The element that defines the rich text area.
      */
     private final WebElement container;
+
+    private final boolean isFrame;
 
     private final RichTextAreaContent content = new RichTextAreaContent();
 
@@ -74,10 +75,16 @@ public class RichTextAreaElement extends BaseElement
      * Creates a new rich text area element.
      * 
      * @param container the element that defines the rich text area
+     * @param wait whether to wait or not for the content to be editable
      */
-    public RichTextAreaElement(WebElement container)
+    public RichTextAreaElement(WebElement container, boolean wait)
     {
         this.container = container;
+        this.isFrame = "iframe".equals(container.getTagName());
+
+        if (wait) {
+            this.waitUntilContentEditable();
+        }
     }
 
     /**
@@ -118,21 +125,16 @@ public class RichTextAreaElement extends BaseElement
 
     protected void maybeSwitchToEditedContent()
     {
-        if (isFrame()) {
+        if (this.isFrame) {
             getDriver().switchTo().frame(this.container);
         }
     }
 
     protected void maybeSwitchToDefaultContent()
     {
-        if (isFrame()) {
+        if (this.isFrame) {
             getDriver().switchTo().defaultContent();
         }
-    }
-
-    protected boolean isFrame()
-    {
-        return "iframe".equals(this.container.getTagName());
     }
 
     /**
@@ -248,7 +250,7 @@ public class RichTextAreaElement extends BaseElement
      */
     private WebElement getRootEditableElement(boolean switchToFrame)
     {
-        if (isFrame()) {
+        if (this.isFrame) {
             if (switchToFrame) {
                 getDriver().switchTo().frame(this.container);
             }
@@ -266,11 +268,8 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentEditable()
     {
-        getFromEditedContent(() -> {
-            getDriver().waitUntilCondition(
-                ExpectedConditions.attributeToBe(getRootEditableElement(false), "contenteditable", "true"));
-            return null;
-        });
+        getDriver().waitUntilCondition(driver -> getFromEditedContent(
+            () -> getRootEditableElement(false).getAttribute("contenteditable").equals("true")));
     }
 
     /**

@@ -129,8 +129,10 @@ public class WARBuilder
 
         // Step: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
         LOGGER.info("Finding version ...");
-        String xwikiVersion = this.mavenResolver.getPlatformVersion();
-        LOGGER.info("Found version = [{}]", xwikiVersion);
+        String commonsVersion = this.mavenResolver.getCommonsVersion();
+        LOGGER.info("Found commons version = [{}]", commonsVersion);
+        String platformVersion = this.mavenResolver.getPlatformVersion();
+        LOGGER.info("Found platform version = [{}]", platformVersion);
 
         File webInfDirectory = new File(this.targetWARDirectory, "WEB-INF");
 
@@ -141,8 +143,8 @@ public class WARBuilder
             List<Artifact> extraArtifacts =this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
-            Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion,
-                extraArtifacts);
+            Collection<ArtifactResult> artifactResults =
+                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
@@ -194,7 +196,7 @@ public class WARBuilder
 
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
-        this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
+        this.configurationFilesGenerator.generate(webInfDirectory, platformVersion, this.artifactResolver);
     }
 
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception

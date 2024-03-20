@@ -243,8 +243,8 @@ class NotificationsIT
 
         List<SystemNotificationFilterPreference> minorEvent = p.getSystemNotificationFilterPreferences()
             .stream()
-            .filter(fp -> fp.getFilterName().equals("Minor Event (Alert)"))
-            .collect(Collectors.toList());
+            .filter(fp -> fp.getName().equals("Minor Event (Alert)"))
+            .toList();
 
         assertEquals(1, minorEvent.size());
         minorEvent.get(0).setEnabled(false);
@@ -391,16 +391,18 @@ class NotificationsIT
 
         DocumentReference page2 = new DocumentReference("page2", testReference.getLastSpaceReference());
         try {
+            int filterPreferenceNumber = 4;
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             List<SystemNotificationFilterPreference> preferences = p.getSystemNotificationFilterPreferences();
 
             // Now let's do some changes (own even filter)
+            SystemNotificationFilterPreference filterPreference = preferences.get(filterPreferenceNumber);
             p.setApplicationState(SYSTEM, "alert", BootstrapSwitch.State.ON);
-            assertEquals("Own Events Filter", preferences.get(2).getFilterName());
-            preferences.get(2).setEnabled(false);
+            assertEquals("Own Events Filter", filterPreference.getName());
+            filterPreference.setEnabled(false);
             setup.gotoPage(page2);
             p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
-            assertFalse(p.getSystemNotificationFilterPreferences().get(2).isEnabled());
+            assertFalse(p.getSystemNotificationFilterPreferences().get(filterPreferenceNumber).isEnabled());
 
             // Watch the entire wiki so that we receive notifications
             NotificationsTrayPage tray = new NotificationsTrayPage();
@@ -419,9 +421,10 @@ class NotificationsIT
             // Go back to enable the own even filter
             p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             preferences = p.getSystemNotificationFilterPreferences();
-            assertEquals("Own Events Filter", preferences.get(2).getFilterName());
-            assertFalse(preferences.get(2).isEnabled());
-            preferences.get(2).setEnabled(true);
+            filterPreference = preferences.get(filterPreferenceNumber);
+            assertEquals("Own Events Filter", filterPreference.getName());
+            assertFalse(filterPreference.isEnabled());
+            filterPreference.setEnabled(true);
             setup.createPage(page2, "", "Page 2");
             setup.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
             notificationsTrayPage = new NotificationsTrayPage();

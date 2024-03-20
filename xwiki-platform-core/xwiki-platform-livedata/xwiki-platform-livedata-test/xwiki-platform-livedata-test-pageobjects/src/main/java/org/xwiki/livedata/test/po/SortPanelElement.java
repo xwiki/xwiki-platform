@@ -17,9 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import DisplayerToggle from "./components/DisplayerToggle.vue";
-import DisplayerScope from "./components/DisplayerScope.vue";
-import DisplayerStaticList from "./components/DisplayerStaticList.vue";
 
-// Export the elements that are expected to be imported from other modules.
-export {DisplayerToggle,DisplayerScope,DisplayerStaticList}
+package org.xwiki.livedata.test.po;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
+/**
+ * Represents the advanced panel for sorting columns.
+ *
+ * @version $Id$
+ * @since 16.3.0RC1
+ */
+public class SortPanelElement extends AbstractLiveDataAdvancedPanelElement
+{
+    /**
+     * Default constructor.
+     * @param liveData the livedata of the panel.
+     * @param container the container of the panel.
+     */
+    public SortPanelElement(LiveDataElement liveData, WebElement container)
+    {
+        super(liveData, container);
+    }
+
+    /**
+     * Remove all sorting on all columns.
+     */
+    public void clearAllSort()
+    {
+        this.clickOnMouseOverLinks(By.className("sort-entry"), By.className("delete-sort"));
+        this.liveData.waitUntilReady();
+    }
+}

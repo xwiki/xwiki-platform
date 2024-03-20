@@ -31,9 +31,9 @@ import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.platform.notifications.test.po.preferences.AbstractNotificationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
+import org.xwiki.platform.notifications.test.po.preferences.CustomNotificationFilterPreferencesLiveDataElement;
 import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterModal;
-import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.Select;
@@ -287,27 +287,12 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     }
 
     /**
-     * @return the custom notification filter preferences
-     * @since 13.2RC1
+     * @return the livedata containing the custom filter preferences.
+     * @since 16.3.0RC1
      */
-    public List<CustomNotificationFilterPreference> getCustomNotificationFilterPreferences()
+    public CustomNotificationFilterPreferencesLiveDataElement getCustomNotificationFilterPreferencesLiveData()
     {
-        List<CustomNotificationFilterPreference> preferences = new ArrayList<>();
-        LiveDataElement liveDataElement =
-            new LiveDataElement("notificationCustomFilterPreferencesLiveData");
-        for (WebElement row : liveDataElement.getTableLayout().getRows()) {
-            preferences.add(new CustomNotificationFilterPreference(this, row, this.getDriver()));
-        }
-        preferences.sort((o1, o2) -> {
-            String name = "data-livedata-entry-id";
-            int substringIndex = "NFP_".length();
-            // Sort by numbering value of the custom filter indexes. If sorting alphanumerically, 10 is lower than 2
-            // which can lead to unexpected sorting.
-            Long attribute = Long.parseLong(o1.getRow().getAttribute(name).substring(substringIndex));
-            Long attribute1 = Long.parseLong(o2.getRow().getAttribute(name).substring(substringIndex));
-            return attribute.compareTo(attribute1);
-        });
-        return preferences;
+        return new CustomNotificationFilterPreferencesLiveDataElement(this);
     }
 
     /**

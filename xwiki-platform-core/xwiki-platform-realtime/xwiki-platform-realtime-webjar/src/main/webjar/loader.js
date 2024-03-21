@@ -22,13 +22,12 @@ define('xwiki-realtime-loader', [
   'xwiki-meta',
   'xwiki-realtime-config',
   'xwiki-realtime-document',
-  'xwiki-realtime-interface',
   'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-errorBox',
   'xwiki-events-bridge'
 ], function(
   /* jshint maxparams:false */
-  $, xm, realtimeConfig, doc, Interface, Messages, ErrorBox
+  $, xm, realtimeConfig, doc, Messages, ErrorBox
 ) {
   'use strict';
 
@@ -715,39 +714,29 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  joinAllUsers = function() {
+  joinAllUsers = async function() {
     const getChannels = doc.getChannels.bind(doc, {
       path: doc.language + '/events/all',
       create: true
     });
-    getChannels().then(channels => {
-      const channelKey = channels[0].key;
-      if (channelKey) {
-        require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
-          const onError = function (error) {
-            allRt.error = true;
-            displayWsWarning();
-            console.error(error);
-          };
-          // Connect to the WebSocket server.
-          Netflux.connect(realtimeConfig.webSocketURL).then(onNetfluxConnect.bind(null, getChannels, channelKey,
-            onError), onError);
-        });
-      }
-    });
+    const channels = await getChannels();
+    const channelKey = channels[0].key;
+    if (channelKey) {
+      const Netflux = await new Promise((resolve, reject) => {
+        require(['netflux-client'], resolve, reject);
+      });
+      // Connect to the WebSocket server.
+      const network = await Netflux.connect(realtimeConfig.webSocketURL);
+      await onNetfluxConnect(getChannels, channelKey, network);
+    }
   },
 
-  onNetfluxConnect = function(getChannels, channelKey, onError, network) {
+  onNetfluxConnect = async function(getChannels, channelKey, network) {
     allRt.network = network;
-    const onOpen = function(channel) {
-      allRt.userList = channel.members;
-      allRt.wChan = channel;
-      addMessageHandler();
-    };
     // Join the "all" channel.
-    network.join(channelKey).then(onOpen, onError);
+    onOpen(await network.join(channelKey));
     // Add direct messages handler.
-    network.on('message', function(msg, sender) {
+    network.on('message', msg => {
       const data = tryParse(msg);
       if (data?.cmd === 'displayWarning') {
         // Display the warning message only for the fields that we're still editing.
@@ -755,12 +744,13 @@ define('xwiki-realtime-loader', [
       }
     });
     // On reconnect, join the "all" channel again.
-    network.on('reconnect', function() {
+    network.on('reconnect', () => {
       hideWarning();
       hideWsError();
-      getChannels().then(channels => network.join(channels[0].key)).then(onOpen, onError);
+      module.ready = getChannels().then(channels => network.join(channels[0].key));
+      module.ready.then(onOpen, onError);
     });
-    network.on('disconnect', function() {
+    network.on('disconnect', () => {
       if (RealtimeContext.getRealtimeEditedFields().length) {
         displayWsError();
       } else if (Object.keys(RealtimeContext.instances).length) {
@@ -769,11 +759,24 @@ define('xwiki-realtime-loader', [
     });
   },
 
+  onOpen = channel => {
+    allRt.userList = channel.members;
+    allRt.wChan = channel;
+    addMessageHandler();
+  },
+
+  onError = error => {
+    allRt.error = true;
+    displayWsWarning();
+    console.error(error);
+  },
+
   beforeLaunchRealtime = function(realtimeContext) {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       if (realtimeContext.realtimeEnabled) {
         module.whenReady(function(wsAvailable) {
           realtimeContext.realtimeEnabled = wsAvailable;
+          realtimeContext.network = allRt.network;
           resolve(realtimeContext);
         });
       } else {
@@ -801,21 +804,17 @@ define('xwiki-realtime-loader', [
       }
     },
 
-    whenReady: function(callback) {
+    whenReady: async function(callback) {
       displayConnecting();
-      // We want realtime enabled so we have to wait for the network to be ready.
-      if (allRt.network) {
-        hideConnecting();
+      try {
+        await module.ready;
         callback(true);
-      } else if (allRt.error) {
-        // Can't connect to network: hide the warning about "not being warned when some wants RT" and display error
-        // about not being able to enable WebSocket.
-        hideConnecting();
+      } catch (error) {
         hideWarning();
-        displayWsWarning(true);
+        onError(error);
         callback(false);
-      } else {
-        setTimeout(module.whenReady.bind(module, callback), 100);
+      } finally {
+        hideConnecting();
       }
     },
 
@@ -844,10 +843,10 @@ define('xwiki-realtime-loader', [
         }
         return await beforeLaunchRealtime(realtimeContext);
       }
-    }
-  });
+    },
 
-  joinAllUsers();
+    ready: joinAllUsers()
+  });
 
   return module;
 });

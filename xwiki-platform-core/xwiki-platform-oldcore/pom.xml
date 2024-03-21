@@ -42,6 +42,9 @@
 
     <!-- Workaround a limitation in Eclipse M2E which prevent using classes from OldCore test-jar in other module's main classes -->
     <m2e.disableTestClasspathFlag>true</m2e.disableTestClasspathFlag>
+
+    <!-- TODO: disabled because Spoon cannot parse XWikiVersioningStoreInterface with Java 11 -->
+    <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
   <dependencies>
     <dependency>

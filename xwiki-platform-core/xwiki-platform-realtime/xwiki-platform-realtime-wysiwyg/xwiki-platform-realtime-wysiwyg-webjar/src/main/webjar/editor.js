@@ -65,8 +65,11 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      *   descendants)
      *
      * @param {boolean} propagate true when the new content should be propagated to coeditors
+     * @returns {Promise} a promise that resolves when the editor has finished handling the content update (some
+     *   changes, like for instance if you modify some macro parameters, might require a full refresh of the edited
+     *   content).
      */
-    contentUpdated(updatedNodes, propagate) {
+    async contentUpdated(updatedNodes, propagate) {
       throw new Error('Not implemented!');
     }
 
@@ -107,7 +110,7 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {string} data the data to be converted
      * @returns {string} html representation of the input data that can be inserted in the editor's DOM.
      */
-    convertDataToHtml(data) {
+    convertDataToHTML(data) {
       throw new Error('Not implemented!');
     }
 
@@ -137,6 +140,31 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {Function} callback the function to call before the editor is destroyed
      */
     onBeforeDestroy(callback) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * Adds a callback to be called before the editor is locked.
+     *
+     * @param {Function} callback the function to call before the editor is locked
+     */
+    onLock(callback) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * Adds a callback to be called after the editor is unlocked.
+     *
+     * @param {Function} callback the function to call after the editor is unlocked
+     */
+    onUnlock(callback) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * @param {boolean} readOnly {@code true} if the editor should be set to read-only mode, false otherwise
+     */
+    setReadOnly(readOnly) {
       throw new Error('Not implemented!');
     }
   }

@@ -23,12 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.TemporaryConfigurationExecutor;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
@@ -74,12 +76,19 @@ public class PDFExportJob extends AbstractPDFExportJob
     @Inject
     private PrintPreviewURLBuilder printPreviewURLBuilder;
 
+    @Inject
+    private TemporaryConfigurationExecutor temporaryConfigurationExecutor;
+
     @Override
     protected void runInternal() throws Exception
     {
         if (!this.request.getDocuments().isEmpty()) {
             this.requiredSkinExtensionsRecorder.start();
-            render(this.request.getDocuments());
+            this.temporaryConfigurationExecutor.call("executionContext",
+                Map.of("rendering.imageDimensionsIncludedInImageURL", false), () -> {
+                    render(this.request.getDocuments());
+                    return null;
+                });
             if (!this.status.isCanceled()) {
                 this.status.setRequiredSkinExtensions(this.requiredSkinExtensionsRecorder.stop());
             }

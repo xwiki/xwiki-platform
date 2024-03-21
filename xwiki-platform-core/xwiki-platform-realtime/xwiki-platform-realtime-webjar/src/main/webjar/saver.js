@@ -61,7 +61,7 @@ define('xwiki-realtime-saver', [
    */
   class Saver {
     constructor(config) {
-      this._initializing = true;
+      this._startInitializing();
       this._revertList = [];
 
       this._config = {
@@ -95,6 +95,24 @@ define('xwiki-realtime-saver', [
         this._realtimeInput?.stop();
         delete this._realtimeInput;
       });
+    }
+
+    _startInitializing() {
+      this._initializing = new Promise(resolve => {
+        this._notifyReady = () => {
+          // Mark the Saver as ready right away (rather than using a promise callback which would be called on the next
+          // tick), to be visible to the code executed right after _notifyReady is called.
+          this._initializing = false;
+          resolve();
+        };
+      });
+    }
+
+    async toBeReady() {
+      if (this._initializing) {
+        await this._initializing;
+      }
+      return this;
     }
 
     _configure(config) {
@@ -324,7 +342,7 @@ define('xwiki-realtime-saver', [
 
     _onReady(info) {
       this._chainpad = info.realtime;
-      this._initializing = false;
+      this._notifyReady();
       this._onRemote();
       this._onOpen();
     }

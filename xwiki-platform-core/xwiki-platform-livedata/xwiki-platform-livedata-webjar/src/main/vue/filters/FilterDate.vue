@@ -59,6 +59,7 @@ import "daterangepicker";
 import moment from "moment";
 import "moment-jdateformatparser";
 import $ from "jquery";
+import xm from 'xwiki-meta';
 
 export default {
 
@@ -81,7 +82,7 @@ export default {
           from: ["before", "after", "between"],
           to: "contains",
           getValue: ({ oldValue }) => {
-            const date = moment((oldValue + "").split("/")[0]);
+            const date = this.getMoment((oldValue + "").split("/")[0]);
             return date.isValid() ? date.format(this.format) : oldValue;
           },
         },
@@ -104,7 +105,7 @@ export default {
           from: ["before", "after"],
           to: "between",
           getValue: ({ oldValue }) => {
-            const date = moment(oldValue + "");
+            const date = this.getMoment(oldValue + "");
             return date.isValid() ? (oldValue + "/" + oldValue) : oldValue;
           },
         },
@@ -114,13 +115,12 @@ export default {
 
 
   computed: {
-
     valueFormatted () {
       if (typeof this.filterEntry.value === 'string' && this.filterEntry.value.length) {
         const range = this.filterEntry.value.split("/");
         if (range.length <= 2) {
           return range.map(dateString => {
-            const date = moment(dateString);
+            const date = this.getMoment(dateString);
             return date.isValid() ? date.format(this.format) : dateString;
           }).join(" - ");
         }
@@ -134,23 +134,24 @@ export default {
 
     format () {
       const javaDateFormat = this.config.dateFormat;
-      return javaDateFormat ? moment().toMomentFormatString(javaDateFormat) : "YYYY/MM/DD HH:mm";
+      return javaDateFormat ? this.getMoment().toMomentFormatString(javaDateFormat) : "YYYY/MM/DD HH:mm";
     },
 
     ranges () {
       return {
         "Today":
-          [moment().startOf('day'), moment().endOf('day')],
+          [this.getMoment().startOf('day'), this.getMoment().endOf('day')],
         "Yesterday":
-          [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+          [this.getMoment().subtract(1, 'days').startOf('day'), this.getMoment().subtract(1, 'days').endOf('day')],
         "Last 7 days":
-          [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+          [this.getMoment().subtract(6, 'days').startOf('day'), this.getMoment().endOf('day')],
         "Last 30 days":
-          [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
+          [this.getMoment().subtract(29, 'days').startOf('day'), this.getMoment().endOf('day')],
         "This month":
-          [moment().startOf('month'), moment().endOf('month')],
+          [this.getMoment().startOf('month'), this.getMoment().endOf('month')],
         "Last month":
-          [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+          [this.getMoment().subtract(1, 'month').startOf('month'),
+            this.getMoment().subtract(1, 'month').endOf('month')],
       };
     },
 
@@ -186,13 +187,18 @@ export default {
   },
 
   methods: {
+    getMoment (argument) {
+      return moment(argument).tz(xm.userTimeZone);
+    },
+
     // Get date filter value from input element
     getDateValue () {
       const daterangepicker = $(this.$refs.filterDate).data("daterangepicker");
       if (this.operator === "between") {
         // Serialize the date range as a ISO 8601 time interval, without fractional seconds.
         // See https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
-        return `${daterangepicker.startDate.format()}/${daterangepicker.endDate.add(59, 'seconds').format()}`
+        return `${this.getMoment(daterangepicker.startDate.format())}/
+        ${this.getMoment(daterangepicker.endDate.add(59, 'seconds')).format()}`
       } else if (this.operator === 'before' || this.operator === 'after') {
         // Use the ISO 8601 representation, without fractional seconds.
         return daterangepicker.startDate.format();

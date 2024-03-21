@@ -495,6 +495,12 @@ XWiki.ExtensionBehaviour = Class.create({
       parameters : formData,
       onCreate : function() {
         dependency.removeClassName('extension-item-unknown').addClassName('extension-item-loading');
+        // Remove the unknown icon.
+        dependency.removeChild(dependency.childNodes[1]);
+        // Add the load icon
+        let loadPath = '$xwiki.getSkinFile("icons/xwiki/spinner.gif")';
+        let loadIcon = '<img  src="'+ loadPath + '" alt=""/>';
+        dependency.update(loadIcon + dependency.innerHTML);
       },
       onSuccess : function(response) {
         // Update the dependency if it's still attached to the document.

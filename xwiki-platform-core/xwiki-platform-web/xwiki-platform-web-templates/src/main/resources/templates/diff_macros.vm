@@ -331,34 +331,38 @@
 #end
 
 #macro (createDocumentDiff $oldDoc $newDoc $return)
-  #set ($objectDiffs = [])
-  #set ($tagsDiff = $NULL)
-  #foreach ($objectDiff in $oldDoc.getObjectDiff($oldDoc, $newDoc))
-    #if ($objectDiff.get(0).className == 'XWiki.TagClass')
-      #set ($tagsDiff = $objectDiff)
-    #else
-      #set ($discard = $objectDiffs.add($objectDiff))
-    #end
-  #end
-  #set ($classDiff = $oldDoc.getClassDiff($oldDoc, $newDoc))
-  #if ($classDiff && $classDiff.size() > 0)
-    #set ($classDiff = $classDiff.get(0))
-  #end
-  #set ($documentReference = $oldDoc.documentReference)
-  #if (!$documentReference)
-    #set ($documentReference = $newDoc.documentReference)
+  #set ($docInstance = $oldDoc)
+  #if ("$!docInstance" == "")
+    #set ($docInstance = $newDoc)
   #end
   #set ($return = $NULL)
-  #setVariable("$return" {
-    'documentReference': $documentReference,
-    'oldDoc': $oldDoc,
-    'newDoc': $newDoc,
-    'metaData': $oldDoc.getMetaDataDiff($oldDoc, $newDoc),
-    'tags': $tagsDiff,
-    'attachments': $oldDoc.getAttachmentDiff($oldDoc, $newDoc),
-    'objects': $objectDiffs,
-    'classProperties': $classDiff
-  })
+  #if ("$!docInstance" != "")
+    #set ($objectDiffs = [])
+    #set ($tagsDiff = $NULL)
+    #foreach ($objectDiff in $docInstance.getObjectDiff($oldDoc, $newDoc))
+      #if ($objectDiff.get(0).className == 'XWiki.TagClass')
+        #set ($tagsDiff = $objectDiff)
+      #else
+        #set ($discard = $objectDiffs.add($objectDiff))
+      #end
+    #end
+    #set ($classDiff = $docInstance.getClassDiff($oldDoc, $newDoc))
+    #if ($classDiff && $classDiff.size() > 0)
+      #set ($classDiff = $classDiff.get(0))
+    #end
+    #set ($documentReference = $docInstance.documentReference)
+
+    #setVariable("$return" {
+      'documentReference': $documentReference,
+      'oldDoc': $oldDoc,
+      'newDoc': $newDoc,
+      'metaData': $docInstance.getMetaDataDiff($oldDoc, $newDoc),
+      'tags': $tagsDiff,
+      'attachments': $docInstance.getAttachmentDiff($oldDoc, $newDoc),
+      'objects': $objectDiffs,
+      'classProperties': $classDiff
+    })
+  #end
 #end
 
 #macro (displayDocumentDiff $docDiff $conflicts)

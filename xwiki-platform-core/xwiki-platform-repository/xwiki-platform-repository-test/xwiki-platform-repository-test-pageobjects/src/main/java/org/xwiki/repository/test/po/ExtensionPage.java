@@ -41,7 +41,7 @@ public class ExtensionPage extends ViewPage
     public boolean isValidExtension()
     {
         List<WebElement> elements = getDriver().findElements(
-            By.xpath("//div[@class = 'box successmessage' and . = 'Success\nInstallable with the Extension Manager']"));
+            By.xpath("//div[@class = 'box successmessage' and ./p[contains(., 'Installable with the Extension Manager')]]"));
         return !elements.isEmpty();
     }
 

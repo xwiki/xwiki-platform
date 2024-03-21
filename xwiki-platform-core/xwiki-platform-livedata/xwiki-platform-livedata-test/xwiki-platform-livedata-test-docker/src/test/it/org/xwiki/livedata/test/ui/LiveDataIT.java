@@ -105,7 +105,7 @@ class LiveDataIT
     private static final String DOC_TITLE_COLUMN = "doc.title";
 
     private static final String FOOTNOTE_COMPUTED_TITLE =
-        "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
+        "(\n1\n) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
 
     public static final String ACTIONS_COLUMN = "_actions";

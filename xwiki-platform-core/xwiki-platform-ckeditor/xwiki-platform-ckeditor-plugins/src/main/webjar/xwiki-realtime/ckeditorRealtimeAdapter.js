@@ -52,6 +52,20 @@ define('xwiki-ckeditor-realtime-adapter', [
         // Initial content load.
         this._onContentLoaded();
       }
+
+      // Realtime synchronization must be paused while the editor is locked.
+      this._lockCallbacks = [];
+      this._ckeditor.on('startLoading', () => {
+        if (this._ckeditor.mode === 'wysiwyg') {
+          this._lockCallbacks.forEach(callback => callback());
+        }
+      });
+      this._unlockCallbacks = [];
+      this._ckeditor.on('endLoading', () => {
+        if (this._ckeditor.mode === 'wysiwyg' && this._ckeditor.editable()) {
+          this._unlockCallbacks.forEach(callback => callback());
+        }
+      });
     }
 
     /** @inheritdoc */
@@ -61,7 +75,16 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     getOutputHTML() {
-      return this._ckeditor.getData();
+      const fullPage = this._ckeditor.config.fullPage;
+      try {
+        // We're interested only in the edited content (what's inside the content wrapper). Moreover, the returned HTML
+        // should be independent of the editor type (iframe-based on in-place).
+        this._ckeditor.config.fullPage = false;
+        return this._ckeditor.getData();
+      } finally {
+        // Restore the configuration value.
+        this._ckeditor.config.fullPage = fullPage;
+      }
     }
 
     /** @inheritdoc */
@@ -75,9 +98,9 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    contentUpdated(updatedNodes, propagate) {
+    async contentUpdated(updatedNodes, propagate) {
       try {
-        this._initializeWidgets(updatedNodes);
+        await this._updateWidgets(updatedNodes);
       } catch (e) {
         console.log("Failed to (re)initialize the widgets.", e);
       }
@@ -90,7 +113,7 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     onChange(callback) {
       this._ckeditor.on('change', (event) => {
-        if (!event.data?.remote) {
+        if (!event.data?.remote && !this._ckeditor.readOnly) {
           callback();
         }
       });
@@ -98,7 +121,7 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     getSelection() {
-      return this._ckeditor.getSelection()?.getNative();
+      return this._ckeditor.getSelection(true)?.getNative();
     }
 
     /** @inheritdoc */
@@ -112,7 +135,7 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    convertDataToHtml(data) {
+    convertDataToHTML(data) {
       return this._ckeditor.dataProcessor.toHtml(data);
     }
 
@@ -192,7 +215,7 @@ define('xwiki-ckeditor-realtime-adapter', [
       this._ckeditor.on('beforeDestroy', callback);
     }
 
-    _initializeWidgets(updatedNodes) {
+    async _updateWidgets(updatedNodes) {
       // Reset the focused and selected widgets, as well as the widget holding the focused editable because they may
       // have been invalidated by the DOM changes.
       this._ckeditor.widgets.focused = null;
@@ -201,6 +224,10 @@ define('xwiki-ckeditor-realtime-adapter', [
 
       // Find the widgets that need to be reinitialized because some of their content was updated.
       const updatedWidgets = new Set();
+      // Also check if there where any macro parameters updated, which would require a full content refresh in order to
+      // re-render the macros with the new parameter values (because macro output is not synchronized, for security
+      // reasons).
+      let shouldRefreshContent = false;
       updatedNodes.forEach(updatedNode => {
         if (updatedNode.nodeType === Node.ATTRIBUTE_NODE) {
           // For attribute nodes we consider the owner element was updated.
@@ -220,6 +247,9 @@ define('xwiki-ckeditor-realtime-adapter', [
             }
           });
         }
+        // The macro parametes are kept on the macro wrapper, so if the macro wrapper was updated then it's very likely
+        // that the macro parameters were also updated.
+        shouldRefreshContent = shouldRefreshContent || this._isMacroWrapper(updatedNode);
       });
 
       // Delete the updated widgets so that we can reinitialize them.
@@ -231,9 +261,32 @@ define('xwiki-ckeditor-realtime-adapter', [
       // the DOM.
       this._ckeditor.widgets.checkWidgets();
 
+      if (shouldRefreshContent) {
+        await this._refreshContent();
+      }
+
       // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
       // selection is restored.
       setTimeout(() => this._ckeditor.widgets.checkSelection(), 0);
+    }
+
+    _isMacroWrapper(element) {
+      return element.matches('.macro[data-macro], .cke_widget_wrapper.cke_widget_xwiki-macro');
+    }
+
+    async _refreshContent() {
+      // Refresh the content to re-render the macros. Don't preserve the selection because this is done by the realtime
+      // framework when applying remove changes.
+      this._ckeditor.execCommand('xwiki-refresh', {preserveSelection: false});
+
+      return new Promise(resolve => {
+        const macroPlugin = this._ckeditor.plugins['xwiki-macro'];
+        if (macroPlugin) {
+          macroPlugin.onceAfterRefresh(this._ckeditor, resolve);
+        } else {
+          resolve();
+        }
+      });
     }
 
     _onContentLoaded() {
@@ -248,6 +301,21 @@ define('xwiki-ckeditor-realtime-adapter', [
           element.setAttribute('class', 'rt-non-realtime');
         });
       }
+    }
+
+    /** @inheritdoc */
+    onLock(callback) {
+      this._lockCallbacks.push(callback);
+    }
+
+    /** @inheritdoc */
+    onUnlock(callback) {
+      this._unlockCallbacks.push(callback);
+    }
+
+    /** @inheritdoc */
+    setReadOnly(readOnly) {
+      this._ckeditor.setReadOnly(readOnly);
     }
   }
 

@@ -22,7 +22,23 @@
 
   CKEDITOR.plugins.add('xwiki-loading', {
     init: function(editor) {
-      var loadingCounter = 0;
+      let readOnlyCounter = 0;
+      let originalSetReadOnly = editor.setReadOnly.bind(editor);
+      editor.setReadOnly = function(readOnly) {
+        if (readOnly) {
+          readOnlyCounter++;
+          if (readOnlyCounter === 1) {
+            originalSetReadOnly(true);
+          }
+        } else if (readOnlyCounter > 0) {
+          readOnlyCounter--;
+          if (readOnlyCounter === 0) {
+            originalSetReadOnly(false);
+          }
+        }
+      };
+
+      let loadingCounter = 0;
       editor.setLoading = function(loading) {
         if (loading) {
           loadingCounter++;
@@ -69,6 +85,20 @@
           this.setReadOnly(false);
         }
       });
+
+      editor.toBeReady = function() {
+        return new Promise(resolve => {
+          if (loadingCounter > 0) {
+            this.once('endLoading', resolve);
+          } else if (this.status === 'ready') {
+            resolve();
+          } else if (this.status === 'recreating') {
+            this.once('contentDom', resolve);
+          } else {
+            this.on('instanceReady', resolve);
+          }
+        });
+      };
     }
   });
 })();

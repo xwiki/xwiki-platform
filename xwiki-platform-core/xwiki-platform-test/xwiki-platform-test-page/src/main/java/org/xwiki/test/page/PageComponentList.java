@@ -88,6 +88,7 @@ import org.xwiki.script.internal.service.ServicesScriptContextInitializer;
 import org.xwiki.sheet.internal.DefaultSheetManager;
 import org.xwiki.sheet.internal.SheetDocumentDisplayer;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.user.DefaultUserComponentList;
 import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 import org.xwiki.velocity.internal.InternalVelocityEngine;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
@@ -307,6 +308,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList
+@DefaultUserComponentList
 public @interface PageComponentList
 {
 }

@@ -13,7 +13,7 @@
 
 #body {
   // Both left and right panels are displayed
-  &.content {
+  &.content:not(.hideleft):not(.hideright):not(.hidelefthideright) {
     // Left panels are small
     &.panel-left-width-Small {
       .main {
@@ -117,6 +117,12 @@
 
   // Only right panels
   &.hideleft {
+    #leftPanels {
+      display: none;
+    }
+    .main {
+      .make-md-column-push(0);
+    }
     &.panel-right-width-Small {
       .main {
         .make-md-column(11, @main-padding);
@@ -136,6 +142,9 @@
 
   // Only left panels
   &.hideright {
+    #rightPanels {
+      display: none;
+    }
     &.panel-left-width-Small {
       .main {
         .make-md-column(11, @main-padding);
@@ -167,6 +176,12 @@
 
   // No Panels
   &.hidelefthideright {
+    #leftPanels {
+      display: none;
+    }
+    #rightPanels {
+      display: none;
+    }
     .main {
       .make-md-column(12, @main-padding);
     }
@@ -206,6 +221,12 @@
 
 #leftPanels, #rightPanels {
   .make-xs-column(12);
+}
+#rightPanels {
+  left: 0;
+}
+#leftPanels {
+  right: 0;
 }
 
 .rightmenu {
@@ -251,6 +272,57 @@
 #docextrapanes {
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
+}
+
+#leftPanelsToggler, #rightPanelsToggler {
+  /* Make sure the toggler are displayed above the panels. */
+  z-index: 1;
+  /* Smoothen out state transition when expanding and collapsing the panel. */
+  & > * {
+    transition: transform .2s;
+  }
+}
+
+#body.content #leftPanelsToggler {
+  position: absolute;
+  left: 0;
+  border-radius: 0 @border-radius-small @border-radius-small 0;
+  & > * {
+    transform: rotate(0);
+  }
+
+  &[aria-expanded="false"] {
+    & + #leftPanels {
+      transition: right 0.2s;
+      right: 100%;
+    }
+
+    & > * {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+#body.content #rightPanelsToggler {
+  position: absolute;
+  right: 0;
+  /* Merge the button with the panel. */
+  border-radius: @border-radius-small 0 0 @border-radius-small;
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  & > * {
+    transform: rotate(180deg);
+  }
+
+  &[aria-expanded="false"] {
+    & + #rightPanels {
+      transition: left 0.2s;
+      left: 100%;
+    }
+
+    & > * {
+      transform: rotate(0);
+    }
+  }
 }
 
 #xwikicontent {

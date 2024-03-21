@@ -43,6 +43,7 @@ import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.csrf.CSRFTokenConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Concrete implementation of the {@link CSRFToken} component.
@@ -95,6 +96,9 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
      */
     @Inject
     private Logger logger;
+
+    @Inject
+    private DocumentReferenceResolver<String> resolver;
 
     /**
      * {@inheritDoc}
@@ -180,11 +184,15 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     {
         String query = "resubmit=" + urlEncode(getRequestURI());
 
-        // back URL is the URL of the document that was about to be modified, so in most
+        // backURL is the URL of the document that was about to be modified, so in most
         // cases we can redirect back to the correct document (if the user clicks "no")
-        String backUrl = getDocumentURL(this.docBridge.getCurrentDocumentReference(), null);
+        DocumentReference currentDocRef = this.docBridge.getCurrentDocumentReference();
+        // If the current document is null (on the login page for example), let's redirect to the default page
+        if (currentDocRef == null) {
+            currentDocRef = resolver.resolve(null);
+        }
+        String backUrl = getDocumentURL(currentDocRef, null);
         query += "&xback=" + urlEncode(backUrl);
-
         // redirect to the resubmission template
         query += "&xpage=" + RESUBMIT_TEMPLATE;
         return backUrl + "?" + query;

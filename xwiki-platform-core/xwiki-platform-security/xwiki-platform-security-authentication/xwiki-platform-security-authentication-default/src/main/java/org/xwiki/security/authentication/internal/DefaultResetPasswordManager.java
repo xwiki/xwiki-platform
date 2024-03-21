@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -83,13 +84,8 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     protected static final LocalDocumentReference LDAP_CLASS_REFERENCE =
         new LocalDocumentReference(XWIKI_SPACE, "LDAPProfileClass");
 
-    protected static final LocalDocumentReference RESET_PASSWORD_REQUEST_CLASS_REFERENCE =
-        new LocalDocumentReference(XWIKI_SPACE, "ResetPasswordRequestClass");
-
     protected static final LocalDocumentReference USER_CLASS_REFERENCE =
         new LocalDocumentReference(XWIKI_SPACE, "XWikiUsers");
-
-    protected static final String VERIFICATION_PROPERTY = "verification";
     protected static final String TOKEN_LIFETIME = "security.authentication.resetPasswordTokenLifetime";
 
     @Inject
@@ -164,10 +160,12 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                         throw new ResetPasswordException(exceptionMessage);
                     }
 
-                    BaseObject xObject = userDocument.getXObject(RESET_PASSWORD_REQUEST_CLASS_REFERENCE, true, context);
+                    BaseObject xObject = userDocument.getXObject(ResetPasswordRequestClassDocumentInitializer.REFERENCE,
+                        true, context);
                     String verificationCode = context.getWiki().generateRandomString(30);
-                    xObject.set(VERIFICATION_PROPERTY, verificationCode, context);
-
+                    xObject.set(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD,
+                        verificationCode, context);
+                    xObject.setDateValue(ResetPasswordRequestClassDocumentInitializer.REQUEST_DATE_FIELD, new Date());
                     String saveComment =
                         this.localizationManager.getTranslationPlain("xe.admin.passwordReset.versionComment");
                     context.getWiki().saveDocument(userDocument, saveComment, true, context);
@@ -184,7 +182,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                     userReference);
             }
         }
-        return new DefaultResetPasswordRequestResponse(userReference, null);
+        return new DefaultResetPasswordRequestResponse(userReference);
     }
 
     @Override
@@ -237,21 +235,25 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
     }
 
     /**
-     * Check if the reset password token should be reset.
-     * To determine if the token should be reset, we check: 1. the token lifetime property, 2. the save date of the
-     * document.
+     * Check if the reset password token is expired.
      *
-     * @param userDocument
-     * @return
+     * @param requestXObject the request xobject to determine if it's expired or not
+     * @return {@code true} if the token has expired and cannot be used anymore.
      */
-    private boolean shouldTokenBeReset(XWikiDocument userDocument)
+    private boolean isTokenExpired(BaseObject requestXObject)
     {
-        Integer tokenLifeTime = this.configurationSource.getProperty(TOKEN_LIFETIME, 0);
-        boolean result = true;
-        if (tokenLifeTime != 0) {
-            Instant saveInstant = userDocument.getDate().toInstant();
-            Instant now = Instant.now();
-            return (saveInstant.plus(tokenLifeTime, ChronoUnit.MINUTES).isBefore(now));
+        Integer tokenLifeTime = this.configurationSource.getProperty(TOKEN_LIFETIME, 60);
+        boolean result = false;
+        if (tokenLifeTime > 0) {
+            Date dateValue =
+                requestXObject.getDateValue(ResetPasswordRequestClassDocumentInitializer.REQUEST_DATE_FIELD);
+            if (dateValue == null) {
+                return true;
+            } else {
+                Instant saveInstant = dateValue.toInstant();
+                Instant now = Instant.now();
+                return (saveInstant.plus(tokenLifeTime, ChronoUnit.MINUTES).isBefore(now));
+            }
         }
         return result;
     }
@@ -271,14 +273,17 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
             try {
                 XWikiDocument userDocument = context.getWiki().getDocument(reference, context);
-                BaseObject xObject = userDocument.getXObject(RESET_PASSWORD_REQUEST_CLASS_REFERENCE);
+                BaseObject xObject = userDocument.getXObject(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
                 if (xObject == null) {
                     throw new ResetPasswordException(exceptionMessage);
                 }
 
-                String storedVerificationCode = xObject.getStringValue(VERIFICATION_PROPERTY);
+                String storedVerificationCode =
+                    xObject.getStringValue(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD);
                 BaseClass xClass = xObject.getXClass(context);
-                PropertyInterface verification = xClass.get(VERIFICATION_PROPERTY);
+                PropertyInterface verification =
+                    xClass.get(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD);
+                // FIXME: shouldn't we be able to get rid of this check?
                 if (!(verification instanceof PasswordClass)) {
                     throw new ResetPasswordException("Bad definition of ResetPassword XClass.");
                 }
@@ -286,14 +291,11 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                 String equivalentPassword =
                     passwordClass.getEquivalentPassword(storedVerificationCode, verificationCode);
 
-                String newVerificationCode = verificationCode;
-                if (this.shouldTokenBeReset(userDocument)) {
-                    // We ensure to reset the verification code before checking if it's correct to avoid
-                    // any bruteforce attack.
-                    newVerificationCode = context.getWiki().generateRandomString(30);
-                    xObject.set(VERIFICATION_PROPERTY, newVerificationCode, context);
+                // If the token is expired we remove it right away to avoid any attack.
+                if (this.isTokenExpired(xObject)) {
+                    userDocument.removeXObject(xObject);
                     String saveComment = this.localizationManager
-                        .getTranslationPlain("xe.admin.passwordReset.step2.versionComment.changeValidationKey");
+                        .getTranslationPlain("security.authentication.resetPassword.tokenExpired");
                     context.getWiki().saveDocument(userDocument, saveComment, true, context);
                 }
 
@@ -301,12 +303,12 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                     throw new ResetPasswordException(exceptionMessage);
                 }
 
-                return new DefaultResetPasswordRequestResponse(userReference, newVerificationCode);
+                return new DefaultResetPasswordRequestResponse(userReference);
             } catch (XWikiException e) {
                 throw new ResetPasswordException("Cannot open user document to check verification code.", e);
             }
         } else {
-            return new DefaultResetPasswordRequestResponse(userReference, null);
+            return new DefaultResetPasswordRequestResponse(userReference);
         }
     }
 
@@ -326,7 +328,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
 
             try {
                 XWikiDocument userDocument = context.getWiki().getDocument(reference, context);
-                userDocument.removeXObjects(RESET_PASSWORD_REQUEST_CLASS_REFERENCE);
+                userDocument.removeXObjects(ResetPasswordRequestClassDocumentInitializer.REFERENCE);
                 BaseObject userXObject = userDocument.getXObject(USER_CLASS_REFERENCE);
 
                 // /!\ We cannot use BaseCollection#setStringValue as it's storing value in plain text.

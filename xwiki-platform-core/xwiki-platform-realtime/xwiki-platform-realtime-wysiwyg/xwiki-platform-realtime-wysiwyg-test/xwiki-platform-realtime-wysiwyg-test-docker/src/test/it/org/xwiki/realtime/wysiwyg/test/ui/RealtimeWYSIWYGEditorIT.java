@@ -576,7 +576,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.sendKeys(Keys.ARROW_RIGHT, "er");
 
         firstTextArea.waitUntilTextContains("end");
-        String content = firstTextArea.getContent();
+        // Normalize the spaces because not all browsers behave the same (where some browser inserts a space another may
+        // insert a non-breaking space).
+        String content = firstTextArea.getContent().replace("&nbsp;", " ");
         assertTrue(content.contains("<strong>bolder</strong> <em>italic</em> <ins>underline</ins> end"),
             "Unexpected content: " + content);
     }
@@ -724,8 +726,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea = firstEditor.getRichTextArea();
 
         // Move to the information box title field and type something.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
-        firstTextArea.sendKeys(Keys.END, " title");
+        firstTextArea.sendKeys(Keys.ARROW_UP, Keys.END, " title");
 
         //
         // Second Tab
@@ -743,8 +744,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea = secondEditor.getRichTextArea();
 
         // Move to the information box title field and type something.
-        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
-        secondTextArea.sendKeys(Keys.HOME);
+        secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
         secondTextArea.sendKeys(" cool");
 
@@ -918,7 +918,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea = firstEditor.getRichTextArea();
 
         // Select the default information message and delete it.
-        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP, Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
 
         // Insert a nested error box.
         firstTextArea.sendKeys("inside", Keys.ENTER, "/err");
@@ -931,12 +931,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea = firstEditor.getRichTextArea();
 
         // Replace the default error message.
-        firstTextArea.sendKeys(Keys.PAGE_DOWN, Keys.ARROW_UP, Keys.ARROW_UP, Keys.chord(Keys.SHIFT, Keys.HOME),
-            Keys.BACK_SPACE);
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         firstTextArea.sendKeys("nested");
 
         // Type some text after the information box.
-        firstTextArea.sendKeys(Keys.PAGE_DOWN, "after");
+        firstTextArea.sendKeys(Keys.ARROW_DOWN, "after");
 
         //
         // Second Tab

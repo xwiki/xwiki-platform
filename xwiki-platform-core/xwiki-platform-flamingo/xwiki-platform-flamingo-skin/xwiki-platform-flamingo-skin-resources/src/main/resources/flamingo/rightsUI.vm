@@ -129,7 +129,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #end
   #end
 #end
-#set ($r = [])
+#set ($guestRights = [])
 #foreach ($i in [0..$maxlevel])
   #set ($value = 0)
   #if ($allowWins.contains($i))
@@ -145,7 +145,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       #set ($value = 1)
     #end
   #end
-  #set ($discard = $r.add($value))
+  #set ($discard = $guestRights.add($value))
 #end
 
 <div id="xwikieditcontent">
@@ -323,11 +323,10 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 
   function startup() {
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
-
-    #if ($isWorkspace)
-      window.groupScopeIndex = 0;
-      hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
-    #end
+      #if ($isWorkspace)
+        window.groupScopeIndex = 0;
+        hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
+      #end
 
       window.activeRights = [#foreach($i in [0..$maxlevel])#if ($currentAllowed[$i])"$levelsRights.get($i)",#end#end];
       window.saveUrl = "$saveUrl";
@@ -340,11 +339,11 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       // the callback function is called from LiveTable with 3 arguments
       var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}", targetDocument) };
       var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
-    #foreach($i in [0..$maxlevel])
-      #if ($currentAllowed[$i])
-        var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, $r.get($i));
+      #foreach($i in [0..$maxlevel])
+        #if ($currentAllowed[$i])
+          var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, $guestRights.get($i));
+        #end
       #end
-    #end
       Event.observe(window, 'load', function() {
         if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {
           $('unregistered').addClassName('hidden');
@@ -352,13 +351,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           $('unregistered').removeClassName('hidden');
         }
       });
-    #if("$!editor" == 'globaladmin' && $isStandardRights)
-      Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
-      Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
-    #end
-    #if($guest_comment_captcha_prop && $isStandardRights)
-      Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
-    #end
+      #if("$!editor" == 'globaladmin' && $isStandardRights)
+        Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+        Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+      #end
+      #if($guest_comment_captcha_prop && $isStandardRights)
+        Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+      #end
       return true;
     }
     return false;

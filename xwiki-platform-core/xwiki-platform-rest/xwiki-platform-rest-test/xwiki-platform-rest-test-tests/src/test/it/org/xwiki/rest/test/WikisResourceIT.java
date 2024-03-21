@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -59,6 +60,7 @@ import org.xwiki.test.ui.TestUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class WikisResourceIT extends AbstractHttpIT
 {
@@ -114,6 +116,48 @@ public class WikisResourceIT extends AbstractHttpIT
 
             checkLinks(wiki);
         }
+    }
+
+    @Test
+    public void testSearchWikisName() throws Exception
+    {
+        this.testUtils.rest().delete(reference);
+        this.testUtils.rest().savePage(reference, "Name Content", "Name Title " + this.pageName);
+
+        GetMethod getMethod = executeGet(
+            String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
+        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        // Ensure that the terminal page is found by its name.
+        int resultSize = searchResults.getSearchResults().size();
+        assertEquals(1, resultSize);
+        assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+
+        // Create a non-terminal page with the same "name" but this time as last space.
+        List<String> nonTerminalSpaces = List.of(this.spaces.get(0), this.pageName);
+        DocumentReference nonTerminalReference = new DocumentReference(this.wikiName, nonTerminalSpaces, "WebHome");
+        String nonTerminalFullName = String.join(".", nonTerminalSpaces) + "." + "WebHome";
+        this.testUtils.rest().savePage(nonTerminalReference, "content2" + this.pageName, "title2" + this.pageName);
+
+        getMethod = executeGet(
+            String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
+        searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        // Ensure that searching by name finds both terminal and non-terminal page.
+        resultSize = searchResults.getSearchResults().size();
+        assertEquals(2, resultSize);
+        List<String> foundPages = searchResults.getSearchResults().stream()
+            .map(SearchResult::getPageFullName)
+            .collect(Collectors.toList());
+        assertTrue(foundPages.contains(this.fullName));
+        assertTrue(foundPages.contains(nonTerminalFullName));
+
+        // Ensure that searching by space finds neither the terminal nor the non-terminal page.
+        getMethod =
+            executeGet(String.format("%s?scope=name&q=" + this.spaces.get(0),
+                buildURI(WikiSearchResource.class, getWiki())));
+        searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        assertEquals(0, searchResults.getSearchResults().size());
     }
 
     @Test

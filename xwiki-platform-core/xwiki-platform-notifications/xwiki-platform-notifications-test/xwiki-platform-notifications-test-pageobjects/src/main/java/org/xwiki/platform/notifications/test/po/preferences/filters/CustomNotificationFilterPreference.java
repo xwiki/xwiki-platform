@@ -91,10 +91,12 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
         }
     }
 
-    @Override
-    protected WebElement getNameElement(WebElement row)
+    /**
+     * @return the scope of the filter.
+     */
+    public String getScope()
     {
-        return row.findElement(By.cssSelector("td[data-title='Location']"));
+        return getRow().findElement(By.cssSelector("td[data-title='Scope']")).getText();
     }
 
     /**
@@ -110,7 +112,7 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
      */
     public String getLocation()
     {
-        return this.getRow().findElement(By.cssSelector("td[data-title='Location'] .html-wrapper ol"))
+        return getRow().findElement(By.cssSelector("td[data-title='Location'] .html-wrapper ol"))
             .getAttribute("data-entity");
     }
 

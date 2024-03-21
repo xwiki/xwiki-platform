@@ -277,12 +277,12 @@ define('xwiki-realtime-wikiEditor', [
           });
         },
 
-        onReady: function(info) {
+        onReady: async function(info) {
           module.chainpad = info.realtime;
           module.leaveChannel = info.leave;
 
           // Update the user list to link the wiki name to the user id.
-          userData = UserData.start(info.network, userdataChannel, {
+          userData = await UserData.start(info.network, userdataChannel, {
             myId: info.myId,
             userName: editorConfig.user.name,
             userAvatar: editorConfig.user.avatarURL,

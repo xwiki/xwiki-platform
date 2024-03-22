@@ -96,14 +96,14 @@ var XWiki = (function(XWiki) {
 
     addShortcuts: function() {
       var shortcuts = {
-        'action_cancel' : "$services.localization.render('core.shortcuts.edit.cancel')",
-        'action_preview' : "$services.localization.render('core.shortcuts.edit.preview')",
+        'action_cancel' : "#if($!{xwiki.getUserPreference('shortcut_edit_cancel')} != '')$!{xwiki.getUserPreference('shortcut_edit_cancel')}#{else}$services.localization.render('core.shortcuts.edit.cancel')#end",
+        'action_preview' : "#if($!{xwiki.getUserPreference('shortcut_edit_preview')} != '')$!{xwiki.getUserPreference('shortcut_edit_preview')}#{else}$services.localization.render('core.shortcuts.edit.preview')#end",
         // The following 2 are both "Back to edit" in the preview mode, depending on the used editor
-        'action_edit' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
-        'action_inline' : "$services.localization.render('core.shortcuts.edit.backtoedit')",
-        'action_save' : "$services.localization.render('core.shortcuts.edit.saveandview')",
-        'action_propupdate' : "$services.localization.render('core.shortcuts.edit.saveandview')",
-        'action_saveandcontinue' : "$services.localization.render('core.shortcuts.edit.saveandcontinue')"
+        'action_edit' : "#if($!{xwiki.getUserPreference('shortcut_edit_backtoedit')} != '')$!{xwiki.getUserPreference('shortcut_edit_backtoedit')}#{else}$services.localization.render('core.shortcuts.edit.backtoedit')#end",
+        'action_inline' : "#if($!{xwiki.getUserPreference('shortcut_edit_backtoedit')} != '')$!{xwiki.getUserPreference('shortcut_edit_backtoedit')}#{else}$services.localization.render('core.shortcuts.edit.backtoedit')#end",
+        'action_save' : "#if($!{xwiki.getUserPreference('shortcut_edit_saveandview')} != '')$!{xwiki.getUserPreference('shortcut_edit_saveandview')}#{else}$services.localization.render('core.shortcuts.edit.saveandview')#end",
+        'action_propupdate' : "#if($!{xwiki.getUserPreference('shortcut_edit_saveandview')} != '')$!{xwiki.getUserPreference('shortcut_edit_saveandview')}#{else}$services.localization.render('core.shortcuts.edit.saveandview')#end",
+        'action_saveandcontinue' : "#if($!{xwiki.getUserPreference('shortcut_edit_saveandcontinue')} != '')$!{xwiki.getUserPreference('shortcut_edit_saveandcontinue')}#{else}$services.localization.render('core.shortcuts.edit.saveandcontinue')#end"
       }
       for (var key in shortcuts) {
         var targetButtons = $$("input[name=" + key + "]");

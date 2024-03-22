@@ -271,7 +271,10 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
         #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
       #end
     #end
-    <script src="${services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.js', {'evaluate': true, 'h': $searchSuggestConfigHash.hashCode()})}" defer="defer"></script>
+    <script src="${services.webjars.url(
+      'org.xwiki.platform:xwiki-platform-search-webjar',
+      'searchSuggest' + $jsExtension,
+      {'evaluate': true, 'h': $searchSuggestConfigHash.hashCode()})}" defer="defer"></script>##
     $xwiki.linkx.use(
       $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
       {'type': 'text/css', 'rel': 'stylesheet'})##

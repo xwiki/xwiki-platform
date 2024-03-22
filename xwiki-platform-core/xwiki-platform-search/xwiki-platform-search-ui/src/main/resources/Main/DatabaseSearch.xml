@@ -101,7 +101,10 @@
 {{velocity}}
 #set ($rssMode = $xcontext.action == 'get' || "$!request.xpage" == 'plain')
 #if (!$rssMode)
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'search.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url(
+    'org.xwiki.platform:xwiki-platform-search-webjar',
+    'search.min.css',
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   ## Disable the document extra data: comments, attachments, history...
   #set ($displayDocExtra = false)
   #databaseSearchForm

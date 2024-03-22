@@ -35,6 +35,7 @@
   <name>XWiki Platform - Search - WebJar</name>
   <description>A JavaScript component to manage and display search suggestions.</description>
   <dependencies>
+    <!-- Search suggestions require SearchSuggestSourceObjectEvaluator. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-api</artifactId>

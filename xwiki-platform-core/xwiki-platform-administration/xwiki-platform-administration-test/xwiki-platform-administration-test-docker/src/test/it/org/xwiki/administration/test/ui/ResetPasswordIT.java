@@ -60,19 +60,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
     // by GreenMail running on the host.
     3025
-},
+    },
     properties = {
         // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
-        "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
-        // Pages created in the tests need to have PR since we ask for PR to send mails, so we need to exclude them from
-        // the PR checker.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\."
-            + "(ResetPassword|ResetPasswordComplete)"
+        "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml,notification-filter-preferences.hbm.xml",
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
-        "org.xwiki.platform:xwiki-platform-mail-send-storage"
+        "org.xwiki.platform:xwiki-platform-mail-send-storage",
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
     }
 )
 public class ResetPasswordIT

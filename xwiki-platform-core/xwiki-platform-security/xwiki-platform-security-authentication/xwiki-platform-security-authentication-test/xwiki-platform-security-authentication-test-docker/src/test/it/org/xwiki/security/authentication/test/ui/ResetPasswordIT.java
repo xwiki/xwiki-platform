@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.ui;
+package org.xwiki.security.authentication.test.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,7 +99,7 @@ public class ResetPasswordIT
     @Test
     public void resetForgottenPassword(TestUtils setup) throws Exception
     {
-        setup.loginAsSuperAdmin();
+        setup.forceGuestUser();
 
         String userName = "testUser" + RandomStringUtils.randomAlphanumeric(6);
         String password = "password";
@@ -107,9 +107,6 @@ public class ResetPasswordIT
 
         // Create a user
         setup.createUser(userName, password, null);
-
-        // Make sure we are not logged in and go to the reset password page
-        setup.forceGuestUser();
         ResetPasswordPage resetPasswordPage = ResetPasswordPage.gotoPage();
 
         // Try to reset the password of a non existent user

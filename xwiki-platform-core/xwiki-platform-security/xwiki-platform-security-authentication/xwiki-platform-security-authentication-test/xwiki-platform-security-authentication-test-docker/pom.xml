@@ -24,15 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-administration-test</artifactId>
+    <artifactId>xwiki-platform-security-authentication-test</artifactId>
     <version>16.3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-administration-test-docker</artifactId>
-  <name>XWiki Platform - Administration - Tests - Functional Docker Tests</name>
+  <artifactId>xwiki-platform-security-authentication-test-docker</artifactId>
+  <name>XWiki Platform - Security - Authentication - Tests - Functional Docker Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
-  <description>XWiki Platform - Administration - Tests - Functional Tests in Docker</description>
+  <description>XWiki Platform - Security - Authentication - Tests - Functional Tests in Docker</description>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
@@ -43,15 +43,15 @@
          ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <artifactId>xwiki-platform-security-authentication-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- We have to bundle an implementation for the refactoring API because some tests need to delete pages. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-refactoring-default</artifactId>
+      <artifactId>xwiki-platform-security-authentication-default</artifactId>
       <version>${project.version}</version>
+      <type>jar</type>
     </dependency>
     <!-- We currently need to depend on mail-ui in the test because it contains the Mail.SendMailConfigClass. We can
          not have administration-ui depend on mail-ui, because mail-ui already depends on administration-ui which would
@@ -61,13 +61,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <!-- The UserProfile sheet is used to disable/enable user profiles -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-profile-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
@@ -84,6 +77,16 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.icegreen</groupId>
+      <artifactId>greenmail-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

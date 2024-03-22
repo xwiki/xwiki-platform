@@ -291,14 +291,6 @@
       &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h2&gt;
       #set ($defaultLegacyValue = $xwiki.getXWikiPreference('accessibility'))
       &lt;dl&gt;
-        #set ($defaultValue = $xwiki.getXWikiPreference('font_size'))
-        #if ("$!defaultValue" == '' &amp;&amp; "$!defaultLegacyValue" == '1')
-          #set ($defaultValue = 'Large')
-        #end
-        #if ("$!defaultValue" == '')
-          #set ($defaultValue = 'Regular')
-        #end
-        #displayField('font_size', 'platform.core.profile.accessibility.fontSize', $defaultValue)
         #set ($defaultValue = $xwiki.getXWikiPreference('underline'))
         #if ("$!defaultValue" == '' &amp;&amp; "$!defaultLegacyValue" == '1')
           #set ($defaultValue = 'Yes')

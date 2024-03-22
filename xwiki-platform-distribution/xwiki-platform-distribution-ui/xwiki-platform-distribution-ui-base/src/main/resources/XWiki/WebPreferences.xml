@@ -478,30 +478,6 @@
         <values>Text|Wysiwyg</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </editor>
-      <font_size>
-        <cache>0</cache>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>font_size</name>
-        <number>12</number>
-        <picker>1</picker>
-        <prettyName>Font size</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <sort>none</sort>
-        <tooltip/>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>Regular|Large|Larger|Largest</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </font_size>
       <guest_comment_requires_captcha>
         <customDisplay/>
         <defaultValue/>

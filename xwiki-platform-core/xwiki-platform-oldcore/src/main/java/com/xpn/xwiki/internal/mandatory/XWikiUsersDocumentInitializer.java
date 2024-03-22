@@ -101,7 +101,6 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("imaccount", "imaccount", 30);
         xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
         xclass.addStaticListField("usertype", "User type", "Simple|Advanced", "Simple");
-        xclass.addStaticListField("font_size", "Font size", "Regular|Large|Larger|Largest", "Regular");
         xclass.addStaticListField("underline", "Underline links", "OnlyInlineLinks|Yes|No", "OnlyInlineLinks");
         xclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);

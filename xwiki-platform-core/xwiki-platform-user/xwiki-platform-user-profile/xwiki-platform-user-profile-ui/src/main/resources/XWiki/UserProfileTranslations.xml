@@ -37,7 +37,6 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=The wiki contains documents that are not displayed by default. These hidden documents represent technical content, like application classes, configuration pages, macros, styles, scripts, etc.
-XWiki.XWikiUsers_font_size.hint=Change the font size for the main text.
 XWiki.XWikiUsers_underline.hint=Choose if links should be underlined.
 XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
 XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.

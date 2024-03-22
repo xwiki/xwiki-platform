@@ -49,6 +49,7 @@ import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.user.DefaultUserComponentList;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -70,6 +71,7 @@ import static org.mockito.Mockito.when;
     TemplateScriptService.class
 })
 @HTML50ComponentList
+@DefaultUserComponentList
 class NotificationMailDefaultHtmlTest extends PageTest
 {
     private static final DocumentReference TEST_DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Test", "WebHome");

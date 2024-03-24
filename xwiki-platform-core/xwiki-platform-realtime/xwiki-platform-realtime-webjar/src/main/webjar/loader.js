@@ -32,7 +32,7 @@ define('xwiki-realtime-loader', [
   'use strict';
 
   if (!realtimeConfig.webSocketURL) {
-    console.log('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
+    console.error('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
     return;
   }
 
@@ -212,10 +212,10 @@ define('xwiki-realtime-loader', [
       checkSocket(info.field).then(types => {
         // Determine if it's a realtime session.
         if (types.length) {
-          console.log('Found an active realtime session.');
+          console.debug('Found an active realtime session.');
           displayModal(null, types, null, info);
         } else {
-          console.log("Couldn't find an active realtime session.");
+          console.debug("Couldn't find an active realtime session.");
           module.whenReady(function(rt) {
             if (rt) {
               displayModal(null, null, null, info);
@@ -589,11 +589,11 @@ define('xwiki-realtime-loader', [
     resize();
   },
 
-  tryParse = function(msg) {
+  tryParse = function(message) {
     try {
-      return JSON.parse(msg);
-    } catch (e) {
-      console.error('Cannot parse the message');
+      return JSON.parse(message);
+    } catch (error) {
+      console.error('Cannot parse the message.', {message, error});
     }
   },
 
@@ -836,7 +836,7 @@ define('xwiki-realtime-loader', [
         } else if (Object.keys(keys.active).length && !keys[info.type + '_users']) {
           // Let the user choose between joining the existing real-time session (with a different editor) or create
           // a new real-time session with the current editor.
-          console.log('Join the existing realtime session or create a new one.');
+          console.debug('Join the existing realtime session or create a new one.');
           await new Promise(resolve => {
             displayModal(info.type, Object.keys(keys.active), resolve, info);
           });

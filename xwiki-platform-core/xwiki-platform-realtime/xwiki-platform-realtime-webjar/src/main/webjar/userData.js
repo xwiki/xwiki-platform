@@ -34,9 +34,8 @@ define('xwiki-realtime-userData', [
       if (typeof onChange === 'function') {
         onChange(userData);
       }
-    } catch (e) {
-      console.log('Failed to parse user data: ' + textData);
-      console.error(e);
+    } catch (error) {
+      console.error('Failed to parse user data.', {userData: textData, error});
     }
   }
 
@@ -155,7 +154,7 @@ define('xwiki-realtime-userData', [
     configData = configData || {};
     myId = configData.myId;
     if (!myId || !configData.userName) {
-      console.warn("myId and userName are required!");
+      console.error("myId and userName are required!");
       return;
     }
 

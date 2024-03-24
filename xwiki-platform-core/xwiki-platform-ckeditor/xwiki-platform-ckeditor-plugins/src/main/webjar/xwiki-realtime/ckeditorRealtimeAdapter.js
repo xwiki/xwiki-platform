@@ -43,16 +43,6 @@ define('xwiki-ckeditor-realtime-adapter', [
         this._ckeditor.config['xwiki-upload'].isTemporaryAttachmentSupported = false;
       }
 
-      // Register code to be executed each time the editor content is reloaded.
-      // We use a very low priority because we want our listener to be executed after CKEditor's default listeners
-      // (e.g. after the CKEditor widgets are initialized).
-      const priority = 1000;
-      this._ckeditor.on('contentDom', this._onContentLoaded.bind(this), null, null, priority);
-      if (this._ckeditor.editable()) {
-        // Initial content load.
-        this._onContentLoaded();
-      }
-
       // Realtime synchronization must be paused while the editor is locked.
       this._lockCallbacks = [];
       this._ckeditor.on('startLoading', () => {
@@ -102,7 +92,7 @@ define('xwiki-ckeditor-realtime-adapter', [
       try {
         await this._updateWidgets(updatedNodes);
       } catch (e) {
-        console.log("Failed to (re)initialize the widgets.", e);
+        console.error("Failed to (re)initialize the widgets.", e);
       }
 
       // Notify the content change (e.g. to update the empty line placeholders) without triggering our own change
@@ -135,79 +125,41 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    convertDataToHTML(data) {
-      return this._ckeditor.dataProcessor.toHtml(data);
+    parseInputHTML(html) {
+      const fixedHTML = this._ckeditor.dataProcessor.toHtml(html);
+
+      let doc;
+      try {
+        doc = new DOMParser().parseFromString(fixedHTML, 'text/html');
+      } catch (e) {
+        console.error('Failed to parse the given HTML string: ' + html, e);
+        return;
+      }
+
+      this._initializeWidgets(doc.body);
+
+      return doc.body;
+    }
+
+    _initializeWidgets(contentWrapper) {
+      const nextWidgetId = this._ckeditor.widgets._.nextId;
+      const widgets = this._ckeditor.widgets.instances;
+      try {
+        this._ckeditor.widgets._.nextId = 0;
+        this._ckeditor.widgets.instances = {};
+        contentWrapper.querySelectorAll('.macro[data-macro]').forEach(macroElement => {
+          macroElement.dataset.xwikiDomUpdated = 'true';
+        });
+        return this._ckeditor.widgets.initOnAll(new this._CKEDITOR.dom.element(contentWrapper));
+      } finally {
+        this._ckeditor.widgets._.nextId = nextWidgetId;
+        this._ckeditor.widgets.instances = widgets;
+      }
     }
 
     /** @inheritdoc */
     showNotification(message, type) {
       this._ckeditor.showNotification(message, type);
-    }
-
-    /** @inheritdoc */
-    getCustomFilters() {
-      // Widget attributes that may have different values for each user (so they can't really be synchronized).
-      const ignoredWidgetAttributes = ['data-cke-widget-upcasted', 'data-cke-widget-id', 'data-cke-filter'];
-
-      // Reject the CKEditor drag and resize handlers (for widgets and images).
-      const ignoredWidgetHelpers = [
-        'cke_widget_drag_handler_container', 'cke_widget_drag_handler', 'cke_image_resizer'
-      ];
-
-      return [
-        //
-        // Widget filter.
-        //
-        {
-          shouldSerializeNode: (node) => !(
-            // Reject the hidden (widget) selection and some widget helpers.
-            node.nodeType === Node.ELEMENT_NODE &&
-            (node.hasAttribute('data-cke-hidden-sel') ||
-              ignoredWidgetHelpers.some(className => node.classList.contains(className)))
-          ),
-          filterHyperJSON: (hjson) => {
-            ignoredWidgetAttributes.forEach(attributeName => {
-              delete hjson[1][attributeName];
-            });
-            // Each user may have a different widget selected and/or focused, we don't want to synchronize that.
-            if (hjson[1].class) {
-              hjson[1].class = hjson[1].class.split(/\s+/).filter(className => ![
-                'cke_widget_selected', 'cke_widget_focused', 'cke_widget_editable_focused'
-              ].includes(className)).join(' ');
-            }
-            return hjson;
-          }
-        },
-
-        //
-        // Filling character sequence filter.
-        // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_dom_selection.html#property-FILLING_CHAR_SEQUENCE
-        // See https://bugs.webkit.org/show_bug.cgi?id=15256 (Impossible to place an editable selection inside empty
-        // elements)
-        //
-        {
-          // Both shouldSerializeNode and filterHyperJSON are currently called only for elements so in order to filter
-          // text nodes we need to filter the direct text child nodes of the element passed to filterHyperJSON.
-          filterHyperJSON: (hjson) => {
-            const oldChildNodes = hjson[2];
-            const newChildNodes = [];
-            oldChildNodes.forEach(childNode => {
-              if (typeof childNode === 'string') {
-                // Remove the filling character sequence from text nodes.
-                childNode = childNode.replace(CKEDITOR.dom.selection.FILLING_CHAR_SEQUENCE, '');
-                // Ignore text nodes that are used only to allow the user to place the caret inside empty elements.
-                if (childNode !== '') {
-                  newChildNodes.push(childNode);
-                }
-              } else {
-                newChildNodes.push(childNode);
-              }
-            });
-            hjson[2] = newChildNodes;
-            return hjson;
-          }
-        }
-      ];
     }
 
     /** @inheritdoc */
@@ -287,20 +239,6 @@ define('xwiki-ckeditor-realtime-adapter', [
           resolve();
         }
       });
-    }
-
-    _onContentLoaded() {
-      this._fixMagicLine();
-    }
-
-    _fixMagicLine() {
-      // Make sure the magic line is not synchronized between editors.
-      const magicLine = this._ckeditor._.magiclineBackdoor?.that?.line?.$;
-      if (magicLine) {
-        [magicLine, magicLine.parentElement].forEach(function (element) {
-          element.setAttribute('class', 'rt-non-realtime');
-        });
-      }
     }
 
     /** @inheritdoc */

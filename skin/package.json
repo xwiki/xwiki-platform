@@ -35,7 +35,7 @@
     "vuetify": "3.5.11"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "4.5.1",
+    "@vitejs/plugin-vue": "5.0.4",
     "rimraf": "5.0.5",
     "vite": "5.2.6",
     "vite-plugin-inspect": "0.8.3",

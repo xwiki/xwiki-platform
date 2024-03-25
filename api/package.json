@@ -31,7 +31,7 @@
     "reflect-metadata": "0.1.13",
     "rimraf": "5.0.5",
     "vite": "5.2.6",
-    "vitest": "1.0.1",
+    "vitest": "1.4.0",
     "vue-tsc": "1.8.27"
   }
 }

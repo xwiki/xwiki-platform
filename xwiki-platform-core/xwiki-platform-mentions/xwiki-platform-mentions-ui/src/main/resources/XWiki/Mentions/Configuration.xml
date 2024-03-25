@@ -310,20 +310,20 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <mentionsBackground>
+      <mentionsColor>
         <customDisplay/>
         <disabled>0</disabled>
         <hint/>
-        <name>mentionsBackground</name>
+        <name>mentionsColor</name>
         <number>1</number>
         <picker>0</picker>
-        <prettyName>mentionsBackground</prettyName>
+        <prettyName>mentionsColor</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </mentionsBackground>
+      </mentionsColor>
       <quoteActivated>
         <customDisplay/>
         <defaultValue>1</defaultValue>
@@ -339,20 +339,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </quoteActivated>
-      <selfMentionsBackground>
+      <selfMentionsForeground>
         <customDisplay/>
         <disabled>0</disabled>
         <hint/>
-        <name>selfMentionsBackground</name>
+        <name>selfMentionsForeground</name>
         <number>2</number>
         <picker>0</picker>
-        <prettyName>selfMentionsBackground</prettyName>
+        <prettyName>selfMentionsForeground</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </selfMentionsBackground>
+      </selfMentionsForeground>
       <selfMentionsColor>
         <customDisplay/>
         <disabled>0</disabled>
@@ -369,16 +369,16 @@
       </selfMentionsColor>
     </class>
     <property>
-      <mentionsBackground>@breadcrumb-bg</mentionsBackground>
+      <mentionsColor>@breadcrumb-bg</mentionsColor>
     </property>
     <property>
       <quoteActivated>1</quoteActivated>
     </property>
     <property>
-      <selfMentionsBackground>@btn-danger-bg</selfMentionsBackground>
+      <selfMentionsForeground>@btn-danger-color</selfMentionsForeground>
     </property>
     <property>
-      <selfMentionsColor>@btn-danger-color</selfMentionsColor>
+      <selfMentionsColor>@btn-danger-bg</selfMentionsColor>
     </property>
   </object>
 </xwikidoc>

@@ -47,20 +47,20 @@
     <defaultWeb/>
     <nameField/>
     <validationScript/>
-    <mentionsBackground>
+    <mentionsColor>
       <customDisplay/>
       <disabled>0</disabled>
       <hint/>
-      <name>mentionsBackground</name>
+      <name>mentionsColor</name>
       <number>1</number>
       <picker>0</picker>
-      <prettyName>mentionsBackground</prettyName>
+      <prettyName>mentionsColor</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </mentionsBackground>
+    </mentionsColor>
     <quoteActivated>
       <customDisplay/>
       <defaultValue>1</defaultValue>

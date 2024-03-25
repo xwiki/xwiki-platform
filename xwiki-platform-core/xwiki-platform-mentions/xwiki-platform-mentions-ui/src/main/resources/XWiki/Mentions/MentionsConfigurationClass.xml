@@ -76,20 +76,20 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </quoteActivated>
-    <selfMentionsBackground>
+    <selfMentionsForeground>
       <customDisplay/>
       <disabled>0</disabled>
       <hint/>
-      <name>selfMentionsBackground</name>
+      <name>selfMentionsForeground</name>
       <number>2</number>
       <picker>0</picker>
-      <prettyName>selfMentionsBackground</prettyName>
+      <prettyName>selfMentionsForeground</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </selfMentionsBackground>
+    </selfMentionsForeground>
     <selfMentionsColor>
       <customDisplay/>
       <disabled>0</disabled>

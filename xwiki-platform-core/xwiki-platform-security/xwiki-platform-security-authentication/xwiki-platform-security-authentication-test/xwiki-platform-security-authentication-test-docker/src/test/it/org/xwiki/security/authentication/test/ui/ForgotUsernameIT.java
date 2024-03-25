@@ -92,6 +92,7 @@ class ForgotUsernameIT
 
     private void configureEmail(TestUtils setup, TestConfiguration testConfiguration)
     {
+        setup.loginAsSuperAdmin();
         setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host",
             testConfiguration.getServletEngine().getHostIP(), "port", "3025", "sendWaitTime", "0");
     }

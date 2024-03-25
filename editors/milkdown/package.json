@@ -30,7 +30,7 @@
     "@milkdown/transformer": "7.3.3",
     "@milkdown/vue": "7.3.3",
     "inversify": "6.0.2",
-    "vue": "3.3.10",
+    "vue": "3.4.21",
     "vue-i18n": "9.8.0",
     "vuetify": "3.5.11"
   },

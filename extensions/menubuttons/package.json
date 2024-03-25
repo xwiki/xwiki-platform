@@ -24,7 +24,7 @@
     "@cristal/skin": "workspace:^",
     "inversify": "6.0.2",
     "reflect-metadata": "0.1.13",
-    "vue": "3.3.10",
+    "vue": "3.4.21",
     "vue-i18n": "9.8.0"
   },
   "devDependencies": {

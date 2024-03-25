@@ -304,7 +304,8 @@
           };
           // Show our custom insert/edit dialog.
           require(['macroWizard'], function(macroWizard) {
-            macroWizard(input).done(function(data) {
+            // Give the focus back to the editor after the modal is closed.
+            macroWizard(input).always(editor.focus.bind(editor)).done(function(data) {
               macroPlugin.insertOrUpdateMacroWidget(editor, data, widget);
             });
           });

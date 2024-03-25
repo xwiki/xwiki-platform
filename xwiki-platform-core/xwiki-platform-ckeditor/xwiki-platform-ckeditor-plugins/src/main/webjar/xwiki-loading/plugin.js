@@ -21,7 +21,7 @@
   'use strict';
 
   CKEDITOR.plugins.add('xwiki-loading', {
-    init: function(editor) {
+    beforeInit: function(editor) {
       let readOnlyCounter = 0;
       let originalSetReadOnly = editor.setReadOnly.bind(editor);
       editor.setReadOnly = function(readOnly) {
@@ -37,6 +37,11 @@
           }
         }
       };
+      // Initialize the read-only counter, in case the editor is created read-only or in case the editor is created
+      // hidden. See CKEDITOR-390: The inline editor loads as read-only in Safari
+      if (editor.readOnly) {
+        editor.setReadOnly(true);
+      }
 
       let loadingCounter = 0;
       editor.setLoading = function(loading) {

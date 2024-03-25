@@ -66,7 +66,7 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
       textAfterRebase
     };
     console.error(error);
-    console.log('Debugging info available at `window.REALTIME_DEBUG.' + errorType + '`');
+    console.debug('Debugging info available at `window.REALTIME_DEBUG.' + errorType + '`');
 
     // Return an empty patch in case we can't do anything else.
     return [];
@@ -96,8 +96,7 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
               rebasedLocalOperation = rebaseOperationSafely(rebasedLocalOperation, remoteOperations[j]);
             } catch (e) {
                 console.error("The pluggable transform function threw an error, " +
-                  "failing operational transformation");
-                console.error(e.stack);
+                  "failing operational transformation", e);
                 return [];
             }
             if (!rebasedLocalOperation) {

@@ -59,14 +59,14 @@
     <jetty.server.version>10.0.20</jetty.server.version>
     <jetty.client.version>${jetty.server.version}</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.107.Final</netty.version>
+    <netty.version>4.1.108.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.6</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.41</jersey.version>
+    <jersey.version>2.42</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.2</zookeeper.version>
 

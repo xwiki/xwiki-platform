@@ -50,6 +50,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
+import org.apache.solr.servlet.SolrDispatchFilter;
 import org.apache.solr.core.CoreDescriptor;
 import org.apache.solr.core.SolrCore;
 import org.xwiki.component.annotation.Component;
@@ -113,6 +114,9 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             } else {
                 updateHomeDirectory();
             }
+
+            // Solr expects the Solr home path to be indicated as system property
+            System.setProperty(SolrDispatchFilter.SOLR_INSTALL_DIR_ATTRIBUTE, this.solrHomePath.toString());
 
             // Validate and create the search core
             if (Files.exists(this.solrSearchCorePath)) {

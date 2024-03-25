@@ -42,7 +42,6 @@ define('xwiki-realtime-wysiwyg-patches', [
       this._editor = editor;
       this._diffDOM = this._createDiffDOM();
       this._filters = new Filters();
-      this._filters.filters.push(...editor.getCustomFilters());
     }
 
     _createDiffDOM() {
@@ -164,11 +163,11 @@ define('xwiki-realtime-wysiwyg-patches', [
       try {
         remoteHyperJSON = this._revertHyperJSONFilters(remoteFilteredHyperJSON);
       } catch (e) {
-        console.error('Failed to revert the HyperJSON filters.', {
+        console.warn('Failed to revert the HyperJSON filters.', {
           filteredHyperJSON: remoteFilteredHyperJSON,
           error: e
         });
-        return;
+        remoteHyperJSON = remoteFilteredHyperJSON;
       }
 
       let newContent;
@@ -210,17 +209,8 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @returns {string} the HyperJSON that corresponds to the given HTML
      */
     _convertHTMLToHyperJSON(html) {
-      const fixedHTML = this._editor.convertDataToHTML(html);
-
-      let doc;
-      try {
-        doc = new DOMParser().parseFromString(fixedHTML, 'text/html');
-      } catch (e) {
-        console.error('Failed to parse the given HTML string: ' + html, e);
-        return;
-      }
-
-      return this._stringifyNode(doc.body, false);
+      const contentWrapper = this._editor.parseInputHTML(html);
+      return this._stringifyNode(contentWrapper, false);
     }
 
     /**

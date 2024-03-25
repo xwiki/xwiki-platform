@@ -427,7 +427,7 @@ define('xwiki-realtime-wysiwyg', [
       // Initialize the edited content with the content from the realtime session.
       await this._onRemote(info);
 
-      console.log('Unlocking editor');
+      console.debug('Unlocking editor');
       this.setEditable(true);
     }
 
@@ -439,12 +439,12 @@ define('xwiki-realtime-wysiwyg', [
         // Stringify the JSON and send it into ChainPad.
         localContent = this._patchedEditor.getHyperJSON();
       }
-      console.log('Push local content: ' + localContent);
+      console.debug('Push local content: ' + localContent);
       this._connection.chainpad.contentUpdate(localContent);
 
       const remoteContent = this._connection.chainpad.getUserDoc();
       if (remoteContent !== localContent) {
-        console.error('Unexpected remote content after synchronization: ', {
+        console.warn('Unexpected remote content after synchronization: ', {
           expected: localContent,
           actual: remoteContent,
           diff: ChainPad.Diff.diff(localContent, remoteContent)
@@ -458,7 +458,7 @@ define('xwiki-realtime-wysiwyg', [
       }
 
       let remoteContent = info.realtime.getUserDoc();
-      console.log('Received remote content: ' + remoteContent);
+      console.debug('Received remote content: ' + remoteContent);
 
       // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they had
       // to be reloaded, e.g. rendering macros have to be rendered server-side).
@@ -482,7 +482,7 @@ define('xwiki-realtime-wysiwyg', [
       if (this._connection.status === ConnectionStatus.DISCONNECTED) {
         return;
       }
-      console.log('Connection status: ' + info.state);
+      console.debug('Connection status: ' + info.state);
       this._connection.toolbar.failed();
       if (info.state) {
         this._connection.status = ConnectionStatus.CONNECTING;
@@ -524,7 +524,7 @@ define('xwiki-realtime-wysiwyg', [
         return;
       }
 
-      console.log("Aborting the realtime session!");
+      console.debug("Aborting the realtime session!");
       this._connection.status = ConnectionStatus.DISCONNECTED;
 
       // Stop the realtime content synchronization (leave the WYSIWYG editor Netflux channel associated with the edited
@@ -603,7 +603,7 @@ define('xwiki-realtime-wysiwyg', [
         container = range.startContainer;
         offset = range.startOffset;
       }
-      const test = TypingTest.testInput(this._editor.getContentWrapper(), container, offset, this._onLocal);
+      const test = TypingTest.testInput(this._editor.getContentWrapper(), container, offset, this._onLocal.bind(this));
       this._onLocal();
       return test;
     }

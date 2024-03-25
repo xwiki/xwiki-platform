@@ -83,7 +83,7 @@
       <name>selfMentionsForeground</name>
       <number>2</number>
       <picker>0</picker>
-      <prettyName>selfMentionsForeground</prettyName>
+      <prettyName>Self Mentions foreground</prettyName>
       <size>30</size>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>

@@ -543,11 +543,11 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       marked:
-        specifier: 11.0.0
-        version: 11.0.0
+        specifier: 11.2.0
+        version: 11.2.0
       marked-base-url:
         specifier: 1.1.2
-        version: 1.1.2(marked@11.0.0)
+        version: 1.1.2(marked@11.2.0)
     devDependencies:
       '@types/dompurify':
         specifier: 3.0.2
@@ -5048,16 +5048,16 @@ packages:
     resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
     dev: true
 
-  /marked-base-url@1.1.2(marked@11.0.0):
+  /marked-base-url@1.1.2(marked@11.2.0):
     resolution: {integrity: sha512-Rgnd6tGrVhyPgQzPvKt1vBA3eUAHNtAXBJ/Xf30/e9kHufBqDK283HTqW9cPinV8lNcIVQ+JLSUwZnEPchyx6Q==}
     peerDependencies:
       marked: '>= 4 < 12'
     dependencies:
-      marked: 11.0.0
+      marked: 11.2.0
     dev: false
 
-  /marked@11.0.0:
-    resolution: {integrity: sha512-2GsW34uXaFEGTQ/+3rCnNC6vUYTAgFuDLGl70v/aWinA5mIJtTrrFAmfbLOfVvgPyxXuDVL9He/7reCK+6j3Sw==}
+  /marked@11.2.0:
+    resolution: {integrity: sha512-HR0m3bvu0jAPYiIvLUUQtdg1g6D247//lvcekpHO1WMvbwDlwSkZAX9Lw4F4YHE1T0HaaNve0tuAWuV1UJ6vtw==}
     engines: {node: '>= 18'}
     hasBin: true
     dev: false

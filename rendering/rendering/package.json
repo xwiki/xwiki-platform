@@ -24,7 +24,7 @@
     "@cristal/rendering-wikimodel": "workspace:^",
     "dompurify": "3.0.6",
     "inversify": "6.0.2",
-    "marked": "11.0.0",
+    "marked": "11.2.0",
     "marked-base-url": "1.1.2"
   },
   "devDependencies": {

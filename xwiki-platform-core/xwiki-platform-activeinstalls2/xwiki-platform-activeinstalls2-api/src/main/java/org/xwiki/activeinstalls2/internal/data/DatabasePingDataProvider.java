@@ -124,8 +124,8 @@ public class DatabasePingDataProvider extends AbstractPingDataProvider
     private XWikiStoreInterface getStoreInterface(XWikiContext xcontext)
     {
         XWikiStoreInterface storeInterface = xcontext.getWiki().getStore();
-        if (storeInterface instanceof XWikiCacheStoreInterface) {
-            storeInterface = ((XWikiCacheStoreInterface) storeInterface).getStore();
+        if (storeInterface instanceof XWikiCacheStoreInterface xwikiCacheStoreInterface) {
+            storeInterface = xwikiCacheStoreInterface.getStore();
         }
         return storeInterface;
     }

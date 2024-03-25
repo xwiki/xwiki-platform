@@ -1,0 +1,60 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Authentication.Translations" locale="ko">
+  <web>XWiki.Authentication</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <parent>WebHome</parent>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>authentication.admin.failureStrategy.label=실패 전략
+authentication.admin.failureStrategy.hint=다중 인증 실패 시 사용할 전략입니다. 여러 전략을 선택할 수 있습니다.
+authentication.admin.failureStrategy.disableAccount.name=계정 비활성화
+authentication.admin.failureStrategy.captcha.name=보안 문자
+authentication.admin.maxAttempts.label=승인된 최대 시도 횟수
+authentication.admin.maxAttempts.hint=이는 전략이 활성화되기 전에 인증된 로그인 실패의 최대 횟수를 나타냅니다. 이 숫자는 다음 기간의 맥락에서만 고려됩니다. 값이 0이면 기능이 비활성화되었음을 의미합니다.
+authentication.admin.timeWindow.label=로그인 실패 기간
+authentication.admin.timeWindow.hint=전략을 활성화하기 위해 실패한 로그인 시도를 고려하는 기간(초)입니다.
+authentication.admin.isAuthenticationSecurityEnabled.label=인증 보안 메커니즘 활성화 또는 비활성화
+authentication.admin.isAuthenticationSecurityEnabled.hint=인증 보안 메커니즘을 비활성화하면 인증 실패 기록도 재설정됩니다.
+authentication.admin.isAuthenticationSecurityEnabled.disabled=장애가 있는
+authentication.admin.isAuthenticationSecurityEnabled.enabled=활성화됨
+authentication.admin.heading=인증보안
+security.authservice.admin.title=인증 서비스
+security.authservice.admin.currentAuthService=현재 인증 서비스
+security.authservice.admin.component.label=인증 서비스 설정:
+security.authservice.admin.component.save=저장
+security.authservice.admin.component.noService=대체 인증 서비스를 찾을 수 없습니다.
+security.authservice.admin.other.warning=현재 인증 서비스는 사용자 정의 시스템에 의해 삽입되므로 수정할 수 없습니다.
+security.authservice.admin.class.warning=현재 인증 서비스는 xwiki .cfg 구성 파일에 의해 제어되기 때문에 수정할 수 없습니다.
+</content>
+  </xwikidoc>

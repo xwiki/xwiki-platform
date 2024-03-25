@@ -1,0 +1,179 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ko">
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>solr.admin.title=Solr 검색 관리
+solr.admin.submit=적용하다
+solr.admin.error.action={0} 실패:
+solr.admin.error.notallowed=이 작업을 수행할 권한이 없습니다.
+solr.admin.error.norights=이 섹션에 액세스하려면 관리 권한이 필요합니다.
+solr.admin.success.action={0}이(가) 성공적으로 트리거되었습니다.
+solr.admin.status.title=상태
+solr.admin.status.queueSize.label=대기열 크기
+solr.admin.status.queueSize.hint=인덱싱, 재인덱싱 또는 인덱스에서 삭제되도록 남겨진 엔터티 수입니다(실행된 작업에 따라 다름).
+solr.admin.indexing.title=인덱싱
+solr.admin.indexing.action.label=행동
+solr.admin.indexing.action.hint=인덱스에 대해 수행할 작업입니다.
+solr.admin.indexing.action.select_index=색인에 추가
+solr.admin.indexing.action.select_delete=색인에서 삭제
+solr.admin.indexing.action.select_reindex=재색인
+solr.admin.indexing.wiki.label=일주일
+solr.admin.indexing.wiki.hint=모든 문서가 선택한 작업의 영향을 받는 Wiki입니다.
+solr.admin.indexing.wiki.select_farm=농장 전체
+solr.admin.indexing.query.label=맞춤 쿼리
+solr.admin.indexing.query.hint=인덱스에서 선택한 작업의 영향을 받는 문서를 제한하는 선택적 쿼리입니다.
+solr.admin.info.affectedDocuments=인덱스에서 영향을 받는 문서:
+solr.sortBy=정렬 기준:
+solr.sortBy.score=관련성
+solr.sortBy.title_sort=제목
+solr.sortBy.date=마지막 수정 날짜
+solr.sortBy.author_display_sort=마지막 저자
+solr.sortBy.filename_sort=파일 이름
+solr.sortBy.attsize_sort=파일 크기
+solr.sortBy.attdate_sort=업로드 날짜
+solr.sortBy.attauthor_display_sort=업로드한 사람
+solr.sortOrder.asc=오름차순
+solr.sortOrder.desc=내림차순
+solr.options=보여주다:
+solr.options.highlight=강조
+solr.options.highlight.title=각 결과에서 일치된 내용을 추출하여 표시합니다
+solr.options.facet=패싯
+solr.options.facet.title=결과의 추가 필터링 허용
+solr.result.language=다음 픽스업이 번역에 적용되었습니다: 너비가 0인 공간
+solr.result.locatedIn=에 위치한
+solr.result.author={1}에 {0}이(가) 수정함
+solr.result.mediaType={0} 유형의 파일
+solr.result.uploadedBy={1}({2})에 {0}이(가) 업로드함
+solr.result.highlightAll=모든 일치 항목 강조 표시
+solr.facets.title=검색 세분화
+solr.facets.hint=카테고리를 선택하고 현재 결과에 대한 필터를 활성화하세요
+solr.facets.resetAll=모두 초기화
+solr.facets.expandAll=모두 펼치기
+solr.facets.collapseAll=모든 축소
+solr.facets.emptyValue=빈 값
+solr.facets.moreValues={0}개 이상
+solr.filterBy.type.document=문서
+solr.filterBy.type.attachment=부착
+solr.filterBy.type.object=물체
+solr.filterBy.type.object_property=객체 속성
+solr.filterBy.fileType.image=영상
+solr.filterBy.fileType.audio=오디오
+solr.filterBy.fileType.video=동영상
+solr.filterBy.fileType.text=텍스트
+solr.filterBy.fileType.office=사무실
+solr.filterBy.fileType.word=단어
+solr.filterBy.fileType.presentation=프레젠테이션
+solr.filterBy.fileType.spreadsheet=스프레드시트
+solr.filterBy.fileType.archive=보관소
+solr.filterBy.fileType.font=폰트
+solr.filterBy.fileType.other=다른
+solr.facet.fileType.text.plain=일반 텍스트
+solr.facet.fileType.text.javascript=자바스크립트
+solr.facet.fileType.text.java-source=자바 소스
+solr.facet.fileType.text.sh=쉘 스크립트
+solr.facet.fileType.image.icon=상
+solr.facet.fileType.archive.java-archive=항아리
+solr.facet.fileType.archive.xara=자르
+solr.facet.fileType.other.octet-stream=바이너리 데이터
+solr.facet.date.today=오늘
+solr.facet.date.last7Days=지난 7일
+solr.facet.date.last30Days=지난 30일
+solr.facet.date.olderThan30Days=30일 이상
+solr.facet.date.customInterval=맞춤 날짜 및 시간 간격
+solr.facet.date.start=시작 날짜 및 시간
+solr.facet.date.end=종료 날짜 및 시간
+solr.facet.date.applyCustomInterval=적용하다
+solr.facet.date.between=0}부터 {1}까지
+solr.facet.date.after=0} 이후
+solr.facet.date.before=0} 이전
+solr.facet.date.any=모든 날짜
+solr.facet.size.tiny=매우 작은
+solr.facet.size.small=작은
+solr.facet.size.medium=중간
+solr.facet.size.large=크기가 큰
+solr.facet.size.between=0}에서 {1} 사이
+solr.facet.size.lessThan=0} 미만
+solr.facet.size.moreThan=0} 이상
+solr.facet.size.any=모든 크기
+solr.field.type=결과 유형
+solr.field.locale=언어
+solr.field.locale.emptyValue=언어 없음
+solr.field.locale.emptyValue.hint=일부 문서에는 스크립트(자연어로 작성되지 않음)가 포함되어 있거나 현재 언어로 표시되는 사용자 인터페이스(예: 이 페이지)를 구성하기 때문에 언어 세트가 없습니다.
+solr.field.wiki=일주일
+solr.field.spaces=위치
+solr.field.space_exact=위치
+solr.field.space_facet=위치
+solr.field.name=페이지
+solr.field.name_exact=페이지
+solr.field.title=제목
+solr.field.author=마지막 저자
+solr.field.author_display=마지막 저자
+solr.field.creator=창조자
+solr.field.creator_display=창조자
+solr.field.date=마지막 수정 날짜
+solr.field.creationdate=생산 일
+solr.field.doccontent=렌더링된 문서 콘텐츠
+solr.field.doccontentraw=원시 문서 콘텐츠
+solr.field.class=객체 유형
+solr.field.class.definedBy=0}에 의해 정의됨 » {1}
+solr.field.propertyname=속성 이름
+solr.field.propertyvalue=자산 가치
+solr.field.filename=첨부파일 이름
+solr.field.attcontent=첨부파일 내용
+solr.field.comment=코멘트
+solr.field.objcontent=사물
+solr.field.mimetype=파일 형식
+solr.field.attauthor=업로드한 사람
+solr.field.attauthor_display=업로드한 사람
+solr.field.attdate=업로드 날짜
+solr.field.attsize=파일 크기
+solr.uix.docdoesnotexist.title=대신 다음 페이지 중 하나를 찾고 계셨습니까?
+solr.uix.attachmentdoesnotexist.title=대신 다음 첨부 파일 중 하나를 찾고 계셨습니까?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location=0} » {1} » {2}에 위치
+
+## until 7.2RC1
+solr.field.space=위치
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

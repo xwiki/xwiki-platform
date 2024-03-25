@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Extension.Security.Code.Translations" locale="ko">
+  <web>XWiki.Extension.Security.Code</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Extension.Security.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>extension.security.admin.title=보안 취약점
+extension.security.indexed.started=색인은 {0}에 시작되었습니다.
+extension.security.indexed.on={0}에 색인이 생성되었습니다. 이 날짜 이후에 설치된 확장 프로그램이나 이 날짜 이후에 출시된 보안 취약점은 나타나지 않습니다. 새로운 보안 검색이 정기적으로 수행됩니다.
+extension.security.indexed.nojob=이전 색인화 처리를 찾을 수 없습니다.
+extension.security.admin.generalWarning=이 보안 검색에는 설치된 모든 확장 프로그램이 포함되지는 않습니다. Extension Manager를 통해 업데이트할 수 없는 확장은 현재 포함되지 않습니다.
+extension.security.admin.configuration.title=구성
+extension.security.admin.environment.explanation=이 섹션에 나열된 확장에는 알려진 취약점이 있지만 Extension Manager에서 업그레이드할 수 없습니다. 이는 XWiki 자체 또는 해당 환경(예: 서블릿 엔진 또는 도커 컨테이너)을 업그레이드해야만 문제를 해결할 수 있음을 의미합니다 .
+extension.security.notification.message=알려진 보안 취약점이 있는 확장 프로그램 {0}개를 확인했습니다. 자세한 내용은 {1} 보고서를 참조하세요
+extension.security.experimental.warning=이 확장은 현재 실험적이며 부정확한 분석이 나타날 수 있다는 점에 유의하세요. 그러므로 어떤 조치를 취하기 전에 제시된 결과를 주의 깊게 읽어야 합니다. 
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled=스캔 활성화됨
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=체크를 해제하면 더 이상 보안검사가 실행되지 않습니다
+XWiki.Extension.Security.Code.ConfigClass_scanDelay=스캔 지연
+XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=두 보안 검색 사이에 대기하는 시간(기본값: 24h)
+XWiki.Extension.Security.Code.ConfigClass_scanURL=스캔 URL
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=보안 스캔 을 위한 원격 소스로 사용할 URL ( 기본값: https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=리뷰 URL
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=보안 검색 검토를 위한 원격 소스 로 사용할 URL(기본값: https://extensions.xwiki .org / xwiki / bin/view/Extension/Extension/Security/Code/Reviews)
+</content>
+  </xwikidoc>

@@ -197,7 +197,7 @@ public class WCAGContext
                 // If the ruleid is not defined in FAILS_ON_RULE,
                 // the default behavior will be to add it to the fails.
                 // In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
-                .collect(Collectors.toList());
+                .toList();
             this.failCount = numberOfChecks(failingViolations);
             if (this.failCount != 0) {
                 this.failReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
@@ -207,7 +207,7 @@ public class WCAGContext
             List<Rule> warningViolations = axeResults.getViolations()
                 .stream()
                 .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
-                .collect(Collectors.toList());
+                .toList();
             this.warnCount = numberOfChecks(warningViolations);
             if (this.warnCount != 0) {
                 this.warnReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
@@ -258,6 +258,8 @@ public class WCAGContext
     private String testClassName;
 
     private String testMethodName;
+
+    private boolean stopOnError = true;
 
     /**
      * Sets the current test class name. This name is the string representation of the TestUI class in which the
@@ -449,6 +451,22 @@ public class WCAGContext
     public boolean isWCAGEnabled()
     {
         return this.wcagEnabled;
+    }
+
+    /**
+     * @param stopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public void setWCAGStopOnError(boolean stopOnError)
+    {
+        this.stopOnError = stopOnError;
+    }
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public boolean shouldWCAGStopOnError()
+    {
+        return this.stopOnError;
     }
 
     /**

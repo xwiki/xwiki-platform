@@ -551,7 +551,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       <content>{{velocity}}
       #set($obj = $doc.getObject('XWiki.XWikiUsers'))
       #if(!$obj)
-      = $services.localization.render('xe.admin.users.sheet') =
+      == $services.localization.render('xe.admin.users.sheet') ==
 
       {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
       #else
@@ -565,7 +565,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     #set ($discard = $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet"))
     #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserNetworkSheet"))
     {{html}}
-    &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
+    &lt;h2&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h2&gt;
     #if ($followedUsers.size() &gt; 0)
       &lt;ul class="followed-users"&gt;
         #foreach ($followedUser in $followedUsers)
@@ -603,7 +603,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     &lt;div class="half column"&gt;
       &lt;div class="following profile-section highlighted-profile-section"&gt;
         ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
+        &lt;h2&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h2&gt;
         #if (!$followedUsers || $followedUsers.size() == 0)
           $services.localization.render('platform.core.profile.section.following.none')
         #else
@@ -633,7 +633,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     #if ($followedUsers.size() &gt; 0)
       &lt;div class="half column"&gt;
         &lt;div class="networkActivity profile-section"&gt;
-          &lt;h1&gt;$services.localization.render('platform.core.profile.section.networkActivity')&lt;/h1&gt;
+          &lt;h2&gt;$services.localization.render('platform.core.profile.section.networkActivity')&lt;/h2&gt;
     {{/html}}
 
 {{activity authors="$!{authorsParam}" /}}

@@ -83,7 +83,7 @@ Generates:
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -103,6 +103,7 @@ Generates:
         <name>code</name>
         <number>10</number>
         <prettyName>Macro code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -115,6 +116,7 @@ Generates:
         <name>contentDescription</name>
         <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -183,6 +185,7 @@ Generates:
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -256,65 +259,63 @@ Generates:
     </property>
     <property>
       <code>{{velocity}}
-#if ("$!xcontext.macro.params.columns" != "") 
-  #set ($collist = [])
+#if ("$!xcontext.macro.params.columns" != "")
+  #set ($properties = [])
   #foreach ($colname in $xcontext.macro.params.columns.split(','))
-    #set ($discard = $collist.add($colname.trim()))
+    #set ($discard = $properties.add($colname.trim()))
   #end
 #else
-  #set($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
+  #set ($properties = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
 #end
-#set($colprops = {
-  'doc.title' : { 'size' : 30, 'link' : 'view' },
-  'doc.location' : { 'html': true },
-  'doc.fullName' : { 'size' : 30, 'link' : 'view' },
-  'doc.name' : { 'size' : 30, 'link' : 'view' },
-  'doc.space' : { 'link' : 'space' },
-  'doc.author' : { 'link' : 'author' }
+#set ($sourceParameters = {
+  'translationPrefix' : 'platform.index.'
 })
-#set($options = { 
-  'translationPrefix' : 'platform.index.',
-  'rowCount' : $xcontext.macro.params.count,
-  'description' : 'This table lists documents found on this wiki based on passed criteria. The columns can be sorted and some can be filtered.'
-})
-#if ("$!xcontext.macro.params.space" != "") 
-  #set ($extraParams = "&amp;space=$escapetool.url($xcontext.macro.params.space)")
+#if ("$!xcontext.macro.params.space" != "")
+  #set ($discard = $sourceParameters.put('space', $xcontext.macro.params.space))
 #end
-#if ("$!xcontext.macro.params.location" != "") 
-  #set ($extraParams = "$!{extraParams}&amp;location=$escapetool.url($xcontext.macro.params.location)")
+#if ("$!xcontext.macro.params.location" != "")
+  #set ($discard = $sourceParameters.put('location', $xcontext.macro.params.location))
 #end
-#if ("$!xcontext.macro.params.parent" != "") 
-  #set ($extraParams = "$!{extraParams}&amp;parent=$escapetool.url($xcontext.macro.params.parent)")
+#if ("$!xcontext.macro.params.parent" != "")
+  #set ($discard = $sourceParameters.put('parent', $xcontext.macro.params.parent))
 #end
-#if ("$!extraParams" != "")
-  #set($discard = $options.put('extraParams', $extraParams))
+#set ($propertyDescriptors = [])
+#if ("$!services.like" != "")
+  ## We can't make it sortable or filterable right now since it's not stored in DB.
+  #set ($discard = $propertyDescriptors.add({ 'id': '_likes', 'sortable': false, 'filterable': false }))
+  #set ($discard = $properties.add('_likes'))
 #end
 #if(!$isGuest &amp;&amp; $xcontext.macro.params.actions == "true")
-  #set($discard = $collist.add('_actions'))
-  #set($discard = $colprops.put('_actions', {
-    'actions': ['copy', 'rename', 'rights', 'delete'],
-    'filterable': false,
-    'sortable': false
-  }))
+  #set ($discard = $propertyDescriptors.add({ 'id': '_actions', 'displayer': { 'id': 'actions', 'actions': ['copy', 'rename', 'rights', 'delete'] }}))
+  #set ($discard = $properties.add('_actions'))
 #end
-#if ("$!services.like" != "")
-  #set($discard = $collist.add('_likes'))
-  ## We can't make it sortable or filterable right now since it's not stored in DB.
-  #set($discard = $colprops.put('_likes', {
-    'filterable': false,
-    'sortable': false
-  }))
-#end
-#if ($collist.contains('doc.location'))
-  #set ($discard = $options.put('selectedColumn','doc.location'))
-#end
+#set ($liveDataConfig = {'meta': {'propertyDescriptors': $propertyDescriptors}})
 #if ("$!xcontext.macro.params.id" != "")
-  #set ($livetableId = $xcontext.macro.params.id)
+  #set ($livedataId = $xcontext.macro.params.id)
 #else
   ## TODO: Improve this since we could have several livetables on the same page with same ids
-  #set ($livetableId = "documents-$mathtool.random(1, 1000)")
+  #set ($livedataId = "documents-$mathtool.random(1, 1000)")
 #end
-#livetable($livetableId $collist $colprops $options)
+
+#set ($livedataId = $services.rendering.escape($livedataId, 'xwiki/2.1'))
+#set ($description = '')
+#if ("$!xcontext.macro.params.description" != '')
+  #set ($description = $services.rendering.escape($xcontext.macro.params.description, 'xwiki/2.1'))
+#end
+#set ($limit = '')
+#if ("$!xcontext.macro.params.count" != '')
+  #set ($limit = $services.rendering.escape($xcontext.macro.params.count, 'xwiki/2.1'))
+#end
+#set ($propertiesStr = $services.rendering.escape($stringtool.join($properties, ','), 'xwiki/2.1'))
+{{liveData
+  id="$livedataId"
+  properties="$propertiesStr"
+  source="liveTable"
+  sourceParameters="$escapetool.url($sourceParameters)"
+  #if ($description != '')description="$description"#end
+  #if ($properties.contains('doc.location'))sort="doc.location"#end
+  #if ($limit != '')limit="$limit"#end
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
 {{/velocity}}</code>
     </property>
     <property>
@@ -332,7 +333,7 @@ Generates:
       </defaultCategories>
     </property>
     <property>
-      <description>Displays a list of documents in a Livetable</description>
+      <description>Displays a list of documents in a Live Data</description>
     </property>
     <property>
       <id>documents</id>
@@ -378,6 +379,7 @@ Generates:
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -403,13 +405,24 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
@@ -456,6 +469,7 @@ Generates:
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -481,13 +495,24 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
@@ -534,6 +559,7 @@ Generates:
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -559,13 +585,24 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
@@ -612,6 +649,7 @@ Generates:
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -637,20 +675,31 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
       <defaultValue/>
     </property>
     <property>
-      <description>Livetable id</description>
+      <description>Live Data id</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -690,6 +739,7 @@ Generates:
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -715,13 +765,24 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
@@ -768,6 +829,7 @@ Generates:
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -793,20 +855,31 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
       <defaultValue/>
     </property>
     <property>
-      <description>Specifies the list of columns to display (e.g. "doc.name,doc.space"). If not specified then the default column list of used ("doc.name,doc.space,doc.date,doc.author")</description>
+      <description>Specifies the list of properties (e.g., "doc.name,doc.space"). If not specified then the default properties list is used ("doc.name,doc.space,doc.date,doc.author")</description>
     </property>
     <property>
       <mandatory>0</mandatory>
@@ -846,6 +919,7 @@ Generates:
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -871,13 +945,24 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
@@ -891,6 +976,96 @@ Generates:
     </property>
     <property>
       <name>location</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentsMacro</name>
+    <number>7</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>216587c3-ad5c-45aa-a379-3e016dc72268</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>type</name>
+        <number>5</number>
+        <picker>1</picker>
+        <prettyName>Parameter type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Provide a description of the list of documents</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>description</name>
     </property>
     <property>
       <type/>

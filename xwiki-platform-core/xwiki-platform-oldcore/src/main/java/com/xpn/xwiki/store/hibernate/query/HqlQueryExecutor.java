@@ -54,7 +54,6 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -180,7 +179,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             }
 
             return results;
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             throw new QueryException("Exception while executing query", query, e);
         } finally {
             getContext().setWikiId(oldDatabase);

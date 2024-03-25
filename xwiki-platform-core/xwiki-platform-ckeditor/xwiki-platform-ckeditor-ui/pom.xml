@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor-ui</artifactId>
   <name>XWiki Platform - CKEditor - UI</name>
@@ -34,10 +34,13 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor Integration</xwiki.extension.name>
-    <!-- Don't run Revapi here because there's no Java code. -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- This module has been moved from XWiki Contrib to platform. -->
+    <xwiki.extension.previousIds>org.xwiki.contrib:application-ckeditor-ui</xwiki.extension.previousIds>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-ui</xwiki.extension.features>
+
+    <!-- Don't run Revapi here because there's no Java code. -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
 
   <dependencies>
@@ -114,6 +117,16 @@
       <artifactId>xwiki-platform-extension-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- This is needed for realtime editing. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+      <!-- Marked as optional because realtime editing is currently disabled by default. -->
+      <optional>true</optional>
     </dependency>
     <!-- Test dependencies. -->
     <dependency>

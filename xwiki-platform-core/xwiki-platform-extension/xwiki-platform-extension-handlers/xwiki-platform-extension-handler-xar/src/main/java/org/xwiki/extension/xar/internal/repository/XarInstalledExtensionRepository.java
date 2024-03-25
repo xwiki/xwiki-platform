@@ -231,12 +231,8 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
      */
     public Collection<XarInstalledExtension> getXarInstalledExtensions(DocumentReference reference)
     {
-        if (reference instanceof DocumentVersionReference) {
-            DocumentVersionReference versionReference = (DocumentVersionReference) reference;
-
-            if (versionReference.getVersion() instanceof ExtensionId) {
-                ExtensionId extensionId = (ExtensionId) versionReference.getVersion();
-
+        if (reference instanceof DocumentVersionReference versionReference) {
+            if (versionReference.getVersion() instanceof ExtensionId extensionId) {
                 if (extensionId != null) {
                     return Arrays.asList((XarInstalledExtension) getInstalledExtension(extensionId));
                 }

@@ -21,7 +21,7 @@ package org.xwiki.index.test.po;
 
 import java.util.Collections;
 
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -35,7 +35,7 @@ public class SpaceIndexPage extends ViewPage
     /**
      * The live table that lists the documents from the space.
      */
-    private LiveTableElement liveTable = new LiveTableElement("spaceindex");
+    private final LiveDataElement liveDataElement = new LiveDataElement("spaceindex");
 
     /**
      * Opens the document index for the specified page.
@@ -52,8 +52,8 @@ public class SpaceIndexPage extends ViewPage
     /**
      * @return the document index live table
      */
-    public LiveTableElement getLiveTable()
+    public LiveDataElement getLiveData()
     {
-        return liveTable;
+        return this.liveDataElement;
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-test</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-test-docker</artifactId>
   <name>XWiki Platform - Notifications - Test - Functional Docker Tests</name>
@@ -128,7 +128,7 @@
     <dependency>
       <groupId>org.simplejavamail</groupId>
       <artifactId>simple-java-mail</artifactId>
-      <version>6.7.0</version>
+      <version>6.7.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

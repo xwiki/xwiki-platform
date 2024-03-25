@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf-test</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-test-docker</artifactId>
   <name>XWiki Platform - Export - PDF - Test - Functional Tests in Docker</name>
@@ -66,6 +66,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-localization-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to verify that image server-side resize is disabled while exporting to PDF. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-processing-plugin</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

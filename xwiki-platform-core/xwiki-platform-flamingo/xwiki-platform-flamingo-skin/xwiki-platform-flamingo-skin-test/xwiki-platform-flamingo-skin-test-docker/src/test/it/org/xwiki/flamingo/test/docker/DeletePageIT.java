@@ -35,6 +35,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.flamingo.skin.test.po.RestoreStatusPage;
 import org.xwiki.flamingo.skin.test.po.UndeletePage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -57,6 +58,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -273,6 +275,20 @@ class DeletePageIT
         confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
+        confirmationPage.openAffectChildrenPanel();
+        TableLayoutElement affectChildrenLiveData = new LiveDataElement("deleteSpaceIndex").getTableLayout();
+        assertEquals(nbChildren, affectChildrenLiveData.countRows());
+        for (int i = 1; i <= nbChildren; i++) {
+            SpaceReference childSpaceReference = childrenReferences[i - 1].getLastSpaceReference();
+            affectChildrenLiveData.assertCellWithLink("Title", String.format("Child %d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertCellWithLink("Location", String.format("Child_%d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertRow("Date", hasItem(affectChildrenLiveData.getDatePatternMatcher()));
+            affectChildrenLiveData.assertCellWithLink("Last Author", "superadmin",
+                setup.getURL(new DocumentReference("xwiki", "XWiki", "superadmin")));
+        }
+
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
         assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());

@@ -23,14 +23,14 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
              workspace/xwiki-platform_Quality_Checks
          When the "xwiki-platform_Quality_Checks" module is built you definitely don't want its pom.xml to point to
-         workspace/xwiki-commons since that job may not have been built for some time (and thus it might not be up to
-         date with the latest code from the SCM, thus causing build failures that are hard to track.
+         workspace/xwiki-commons since that job may not have been built for some time (and thus, it might not be
+         up-to-date with the latest code from the SCM, thus causing build failures that are hard to track.
 
          By using an empty value we force Maven to resolve the parent from the Maven repositories,
          see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
@@ -41,13 +41,13 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.0-SNAPSHOT</version>
+  <version>16.3.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
+    <!-- Versions of XWiki dependencies used in Platform modules -->
+    <rendering.version>${commons.version}</rendering.version>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
     <platform.version>${commons.version}</platform.version>
-    <!-- Versions of XWiki dependencies used in Platform modules -->
-    <rendering.version>${platform.version}</rendering.version>
 
     <!-- Dependencies versions -->
     <bootstrap.version>3.4.1</bootstrap.version>
@@ -56,25 +56,28 @@
     <tika.version>2.9.1</tika.version>
     <pdfbox.version>2.0.30</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <!-- We are stuck at version 9.x until we upgrade to a version of SolrJ which use a more recent version (or something else) -->
-    <jetty.client.version>9.4.53.v20231009</jetty.client.version>
-    <jetty.server.version>10.0.18</jetty.server.version>
+    <jetty.server.version>10.0.20</jetty.server.version>
+    <jetty.client.version>${jetty.server.version}</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.101.Final</netty.version>
+    <netty.version>4.1.108.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.4</dockerJava.version>
+    <dockerJava.version>3.3.6</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
-    <solr.version>8.11.2</solr.version>
-    <zookeeper.version>3.9.1</zookeeper.version>
+    <solr.major.version>9</solr.major.version>
+    <solr.version>9.4.1</solr.version>
+    <lucene.version>9.8.0</lucene.version>
+    <jersey.version>2.42</jersey.version>
+    <hk2.version>2.6.1</hk2.version>
+    <zookeeper.version>3.9.2</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.19.3</testcontainers.version>
+    <testcontainers.version>1.19.7</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.5.8</libreoffice.version>
+    <libreoffice.version>7.6.5</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -105,19 +108,23 @@
     <hsqldb.version>2.7.2</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>8.2.0</mysql.version>
+    <mysql.version>8.3.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.3.0</mariadb.version>
+    <mariadb.version>3.3.3</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.0</pgsql.version>
+    <pgsql.version>42.7.2</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.11.0.0</oracle.version>
+    
+    <!-- Versions of Node related tools -->
+    <node.version>v20.11.1</node.version>
+    <npm.version>10.4.0</npm.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -133,14 +140,14 @@
     <module>xwiki-platform-tools</module>
     <module>xwiki-platform-core</module>
   </modules>
-  <!-- Dependency Management that are used in platform and in sub-projects too (like xwiki-enterprise) -->
+  <!-- Dependency Management that are used in platform and in subprojects too (like xwiki-enterprise) -->
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>mchange-commons-java</artifactId>
-        <version>0.2.20</version>
+        <version>0.3.0</version>
       </dependency>
       <dependency>
         <groupId>com.mchange</groupId>
@@ -172,7 +179,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.25.0</version>
+        <version>4.26.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -183,7 +190,8 @@
       </dependency>
 
       <!-- Jython engine -->
-      <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
+      <!-- We use a customized Jython JAR here because the standard one include many library we already get as
+           dependencies -->
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
@@ -430,7 +438,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.12.5</version>
+        <version>2.12.7</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -575,12 +583,12 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.13.0</version>
+        <version>5.14.0</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna-platform</artifactId>
-        <version>5.13.0</version>
+        <version>5.14.0</version>
       </dependency>
 
       <dependency>
@@ -597,7 +605,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.17.1</version>
+        <version>1.17.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -689,7 +697,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.3.12</version>
+        <version>1.3.13</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -699,7 +707,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.15</version>
+        <version>2.2.16</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -709,7 +717,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.18</version>
+        <version>3.1.19</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -744,99 +752,6 @@
         <version>4.2.1</version>
       </dependency>
 
-      <!-- Restlet -->
-      <dependency>
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet.ext.jaxrs</artifactId>
-        <version>${restlet.version}</version>
-        <exclusions>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-          </exclusion>
-          <!-- We use a more accurate and up to date JSON framework version -->
-          <exclusion>
-            <artifactId>org.restlet.lib.org.json</artifactId>
-            <groupId>org.restlet.jse</groupId>
-          </exclusion>
-          <!-- The recent one have a different id so we can't rely on dependencyManagement -->
-          <exclusion>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-          </exclusion>
-          <!-- Restlet does not declare the right version of JAX-RS API... -->
-          <exclusion>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-          </exclusion>
-          <!-- Restlet does not use the right artifact for JAXB implementation -->
-          <exclusion>
-            <artifactId>jaxb-impl</artifactId>
-            <groupId>com.sun.xml.bind</groupId>
-          </exclusion>
-          <!-- Restlet does not use the right artifact for JSON -->
-          <exclusion>
-            <artifactId>json</artifactId>
-            <groupId>org.json</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-      <!-- We need Jackson for a proper JSON representation of our REST resources.
-          See XWIKI-9136: Rest API JSON does not retrieve inherited fields -->
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet.ext.jackson</artifactId>
-        <version>${restlet.version}</version>
-        <scope>runtime</scope>
-        <exclusions>
-          <!-- Wrong version of Woodstox -->
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-      <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
-          above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not very
-          good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a dedicated
-          JAXB converter for XML representation. -->
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet.ext.jaxb</artifactId>
-        <version>${restlet.version}</version>
-        <scope>runtime</scope>
-        <exclusions>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>stax-api</artifactId>
-            <groupId>javax.xml.stream</groupId>
-          </exclusion>
-          <!-- Restlet does not use the right artifact for JAXB implementation -->
-          <exclusion>
-            <artifactId>jaxb-impl</artifactId>
-            <groupId>com.sun.xml.bind</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet.jee</groupId>
-        <artifactId>org.restlet.ext.servlet</artifactId>
-        <version>${restlet.version}</version>
-        <exclusions>
-          <exclusion>
-            <!-- We use "se" version of the client API -->
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
       <!-- Used by solr-core and closure-compiler -->
       <dependency>
         <groupId>com.google.re2j</groupId>
@@ -848,7 +763,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>1.6.14</version>
+        <version>1.6.15</version>
       </dependency>
 
       <!-- Jetty client libraries -->
@@ -1007,35 +922,16 @@
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
         <version>${solr.version}</version>
-        <exclusions>
-          <!-- We want a different version of Woodstox and the id changed -->
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-          </exclusion>
-          <!--
-            The version of the Jetty client libraries used by solrj often conflict with the version of Jetty used by XWiki.
-            The reason is generally that upgrading Jetty is always a pain and tend to lack behind.
-          -->
-          <exclusion>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-core</artifactId>
         <version>${solr.version}</version>
         <exclusions>
-          <!-- We want a different version of Woodstox and the id changed -->
+          <!-- Wrong ids -->
           <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
           <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>
@@ -1055,8 +951,8 @@
             <artifactId>metrics-jvm</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>*</artifactId>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-jetty-http</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.eclipse.jetty</groupId>
@@ -1067,12 +963,8 @@
             <artifactId>*</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.apache.hadoop</groupId>
+            <groupId>org.eclipse.jetty.toolchain</groupId>
             <artifactId>*</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.bitbucket.b_c</groupId>
-            <artifactId>jose4j</artifactId>
           </exclusion>
           <!-- We use slf4j in XWiki -->
           <exclusion>
@@ -1080,6 +972,11 @@
             <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-backward-codecs</artifactId>
+        <version>${lucene.version}</version>
       </dependency>
       <dependency>
         <groupId>org.xerial.snappy</groupId>
@@ -1099,7 +996,7 @@
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.23.0</version>
+        <version>1.24.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>
@@ -1117,6 +1014,124 @@
         <groupId>org.apache.zookeeper</groupId>
         <artifactId>zookeeper-jute</artifactId>
         <version>${zookeeper.version}</version>
+      </dependency>
+      <!-- Jersey -->
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.inject</groupId>
+        <artifactId>jersey-hk2</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-common</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-jaxb</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-json-binding</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-json-jackson</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-multipart</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-sse</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>hk2-api</artifactId>
+        <version>${hk2.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>aopalliance-repackaged</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.hk2</groupId>
+        <artifactId>hk2-locator</artifactId>
+        <version>${hk2.version}</version>
+        <exclusions>
+          <!-- Wrong ids -->
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>aopalliance-repackaged</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>aopalliance</groupId>
+        <artifactId>aopalliance</artifactId>
+        <version>1.0</version>
       </dependency>
 
       <!-- Database connectors -->
@@ -1162,6 +1177,19 @@
           <exclusion>
             <groupId>*</groupId>
             <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>vue</artifactId>
+        <version>2.7.16</version>
+        <exclusions>
+          <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
+          not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
+          <exclusion>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>vue__compiler-sfc</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1446,6 +1474,62 @@
                 <id>com.google.javascript:closure-compiler-unshaded</id>
                 <features>com.google.javascript:closure-compiler</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy</id>
+                <features>org.codehaus.groovy:groovy</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-datetime</id>
+                <features>org.codehaus.groovy:groovy-datetime</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-jmx</id>
+                <features>org.codehaus.groovy:groovy-jmx</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-json</id>
+                <features>org.codehaus.groovy:groovy-json</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-jsr223</id>
+                <features>org.codehaus.groovy:groovy-jsr223</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-macro</id>
+                <features>org.codehaus.groovy:groovy-macro</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-nio</id>
+                <features>org.codehaus.groovy:groovy-nio</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-servlet</id>
+                <features>org.codehaus.groovy:groovy-servlet</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-sql</id>
+                <features>org.codehaus.groovy:groovy-sql</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-templates</id>
+                <features>org.codehaus.groovy:groovy-templates</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-xml</id>
+                <features>org.codehaus.groovy:groovy-xml</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>org.apache.groovy:groovy-dateutil</id>
+                <features>org.codehaus.groovy:groovy-dateutil</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>javax.inject:javax.inject</id>
+                <features>org.glassfish.hk2.external:jakarta.inject</features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>aopalliance:aopalliance</id>
+                <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>
@@ -1459,6 +1543,11 @@
             <!-- See https://github.com/jshint/jshint/blob/master/examples/.jshintrc -->
             <options>esversion:11,maxparams:5,maxdepth:3,maxstatements:20,maxcomplexity:10,camelcase,maxlen:120</options>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>1.15.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1565,7 +1654,8 @@
                 <bannedDependencyType>
                   <dependencyType>xar</dependencyType>
                   <projectPackaging>jar|webjar</projectPackaging>
-                  <!-- Integration test modules are never going to be installed as extension and they need to depend on XAR modules -->
+                  <!-- Integration test modules are never going to be installed as extension, and they need to depend
+                       on XAR modules -->
                   <projectArtifactId>^((?!-test-docker|.*-test-tests).)*$</projectArtifactId>
                 </bannedDependencyType>
               </rules>

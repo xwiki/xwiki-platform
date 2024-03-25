@@ -36,7 +36,7 @@ public class PageWithPanels extends BasePage
      */
     public boolean hasPanel(String panelTitle)
     {
-        String xpath = String.format("//h1[@class = 'xwikipaneltitle' and . = '%s']", panelTitle);
+        String xpath = String.format("//h2[@class = 'xwikipaneltitle' and . = '%s']", panelTitle);
         return getDriver().findElementsWithoutWaiting(By.xpath(xpath)).size() > 0;
     }
 

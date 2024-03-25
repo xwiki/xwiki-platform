@@ -31,7 +31,9 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.SolrClientInstance;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
@@ -67,6 +69,9 @@ public class R141005000XWIKI20575XWIKI20619DataMigration implements HibernateDat
 
     @Inject
     private SolrInstance solrInstance;
+
+    @Inject
+    private Solr solr;
 
     @Inject
     private Execution execution;
@@ -109,14 +114,15 @@ public class R141005000XWIKI20575XWIKI20619DataMigration implements HibernateDat
     public void migrate() throws DataMigrationException
     {
         try {
-            Map<String, Map<String, Object>> dynamicFields =
-                this.solrSchemaUtils.getDynamicFields(SolrClientInstance.CORE_NAME, true);
+            XWikiSolrCore core = this.solr.getCore(SolrClientInstance.CORE_NAME);
+
+            Map<String, Map<String, Object>> dynamicFields = this.solrSchemaUtils.getDynamicFields(core, true);
 
             // Make sure the dynamic field for Local.ROOT is registered
-            maybeAddField(DYNAMIC_FIELD_ROOT_NAME, DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, dynamicFields);
+            maybeAddField(core, DYNAMIC_FIELD_ROOT_NAME, DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, dynamicFields);
 
             // Make sure the dynamic field for Local.ROOT is registered
-            maybeAddField(DYNAMIC_FIELD_PTBR_NAME, "text_pt_BR", dynamicFields);
+            maybeAddField(core, DYNAMIC_FIELD_PTBR_NAME, "text_pt_BR", dynamicFields);
 
             this.solrInstance.deleteByQuery("*:*");
             this.solrInstance.commit();
@@ -125,13 +131,12 @@ public class R141005000XWIKI20575XWIKI20619DataMigration implements HibernateDat
         }
     }
 
-    private void maybeAddField(String name, String type, Map<String, Map<String, Object>> dynamicFields)
-        throws SolrException
+    private void maybeAddField(XWikiSolrCore core, String name, String type,
+        Map<String, Map<String, Object>> dynamicFields) throws SolrException
     {
         if (!dynamicFields.containsKey(name)) {
-            this.solrSchemaUtils.setField(SolrClientInstance.CORE_NAME, name, type, true, "multiValued", true, "stored",
-                true, "indexed", true);
-            this.solrSchemaUtils.commit(SolrClientInstance.CORE_NAME);
+            this.solrSchemaUtils.setField(core, name, type, true, "multiValued", true, "stored", true, "indexed", true);
+            this.solrSchemaUtils.commit(core);
 
             this.logger.info("Missing dynamic field [{}] has been added.", name);
         } else {

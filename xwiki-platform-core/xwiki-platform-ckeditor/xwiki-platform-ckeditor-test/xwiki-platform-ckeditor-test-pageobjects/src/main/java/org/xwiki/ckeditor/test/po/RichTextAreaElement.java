@@ -19,16 +19,16 @@
  */
 package org.xwiki.ckeditor.test.po;
 
-import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -42,18 +42,46 @@ import org.xwiki.test.ui.po.BaseElement;
 public class RichTextAreaElement extends BaseElement
 {
     /**
-     * The in-line frame element.
+     * Provides information about the content of the rich text area.
+     *
+     * @since 16.1.0RC1
+     * @since 15.10.7
      */
-    private final WebElement iframe;
+    public class RichTextAreaContent
+    {
+        /**
+         * @return the list of images included in the rich text area
+         */
+        public List<WebElement> getImages()
+        {
+
+            return getRootEditableElement(false).findElements(By.tagName("img"));
+        }
+    }
+
+    /**
+     * The element that defines the rich text area.
+     */
+    private final WebElement container;
+
+    private final boolean isFrame;
+
+    private final RichTextAreaContent content = new RichTextAreaContent();
 
     /**
      * Creates a new rich text area element.
      * 
-     * @param iframe the in-line frame used by the rich text area
+     * @param container the element that defines the rich text area
+     * @param wait whether to wait or not for the content to be editable
      */
-    public RichTextAreaElement(WebElement iframe)
+    public RichTextAreaElement(WebElement container, boolean wait)
     {
-        this.iframe = iframe;
+        this.container = container;
+        this.isFrame = "iframe".equals(container.getTagName());
+
+        if (wait) {
+            this.waitUntilContentEditable();
+        }
     }
 
     /**
@@ -62,9 +90,9 @@ public class RichTextAreaElement extends BaseElement
     public String getText()
     {
         try {
-            return getActiveElement().getText();
+            return getRootEditableElement().getText();
         } finally {
-            getDriver().switchTo().defaultContent();
+            maybeSwitchToDefaultContent();
         }
     }
 
@@ -74,9 +102,9 @@ public class RichTextAreaElement extends BaseElement
     public void clear()
     {
         try {
-            getActiveElement().clear();
+            getRootEditableElement().clear();
         } finally {
-            getDriver().switchTo().defaultContent();
+            maybeSwitchToDefaultContent();
         }
     }
 
@@ -86,8 +114,22 @@ public class RichTextAreaElement extends BaseElement
     public void click()
     {
         try {
-            getActiveElement().click();
+            getRootEditableElement().click();
         } finally {
+            maybeSwitchToDefaultContent();
+        }
+    }
+
+    protected void maybeSwitchToEditedContent()
+    {
+        if (this.isFrame) {
+            getDriver().switchTo().frame(this.container);
+        }
+    }
+
+    protected void maybeSwitchToDefaultContent()
+    {
+        if (this.isFrame) {
             getDriver().switchTo().defaultContent();
         }
     }
@@ -101,15 +143,9 @@ public class RichTextAreaElement extends BaseElement
     {
         if (keysToSend.length > 0) {
             try {
-                WebElement activeElement = getActiveElement();
-
-                // Calling sendKeys doesn't focus the contentEditable element on Firefox so the typed keys are simply
-                // ignored. We need to focus the element ourselves before sending the keys.
-                getDriver().executeScript("arguments[0].focus()", activeElement);
-
-                activeElement.sendKeys(keysToSend);
+                getActiveElement().sendKeys(keysToSend);
             } finally {
-                getDriver().switchTo().defaultContent();
+                maybeSwitchToDefaultContent();
             }
         }
     }
@@ -124,7 +160,7 @@ public class RichTextAreaElement extends BaseElement
      */
     public Object executeScript(String script, Object... arguments)
     {
-        return getFromIFrame(() -> getDriver().executeScript(script, arguments));
+        return getFromEditedContent(() -> getDriver().executeScript(script, arguments));
     }
 
     /**
@@ -132,7 +168,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public String getContent()
     {
-        return (String) executeScript("return document.body.innerHTML");
+        try {
+            return getRootEditableElement().getDomProperty("innerHTML");
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
     }
 
     /**
@@ -142,7 +182,11 @@ public class RichTextAreaElement extends BaseElement
      */
     public void setContent(String content)
     {
-        executeScript("document.body.innerHTML = arguments[0];", content);
+        try {
+            getDriver().executeScript("arguments[0].innerHTML = arguments[1];", getRootEditableElement(), content);
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
     }
 
     /**
@@ -152,8 +196,35 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentContains(String html)
     {
-        new WebDriverWait(getDriver(), Duration.ofSeconds(getDriver().getTimeout()))
-            .until((ExpectedCondition<Boolean>) d -> StringUtils.contains(getContent(), html));
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return StringUtils.contains(getContent(), html);
+            } catch (StaleElementReferenceException e) {
+                // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
+                // waiting, for instance because a macro was inserted or updated as a result of a remote change.
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Waits until the rich text area contains the specified plain text.
+     * 
+     * @param textFragment the text fragment to wait for
+     * @since 16.0
+     * @since 15.10.6
+     */
+    public void waitUntilTextContains(String textFragment)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return StringUtils.contains(getText(), textFragment);
+            } catch (StaleElementReferenceException e) {
+                // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
+                // waiting, for instance because a macro was inserted or updated as a result of a remote change.
+                return false;
+            }
+        });
     }
 
     /**
@@ -161,8 +232,49 @@ public class RichTextAreaElement extends BaseElement
      */
     private WebElement getActiveElement()
     {
-        getDriver().switchTo().frame(this.iframe);
-        return getDriver().switchTo().activeElement();
+        WebElement rootEditableElement = getRootEditableElement();
+        String browserName = getDriver().getCapabilities().getBrowserName().toLowerCase();
+        if (browserName.contains("firefox")) {
+            // Firefox works best if we send the keys to the root editable element, but we need to focus it first,
+            // otherwise the keys are ignored. If we send the keys to a nested editable then we can't navigate outside
+            // of it using the arrow keys (as if the editing scope is set to that nested editable).
+            getDriver().executeScript("arguments[0].focus()", rootEditableElement);
+            return rootEditableElement;
+        } else {
+            // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
+            // keys to the root editable then they are inserted directly in the root editable (e.g. when editing a macro
+            // inline the characters we type will be inserted outside the macro content nested editable).
+            WebElement activeElement = getDriver().switchTo().activeElement();
+            boolean rootEditableElementIsOrContainsActiveElement = (boolean) getDriver()
+                .executeScript("return arguments[0].contains(arguments[1])", rootEditableElement, activeElement);
+            return rootEditableElementIsOrContainsActiveElement ? activeElement : rootEditableElement;
+        }
+    }
+
+    /**
+     * @return the top most editable element in the rich text area (that includes all the editable content, including
+     *         nested editable areas)
+     */
+    private WebElement getRootEditableElement()
+    {
+        return getRootEditableElement(true);
+    }
+
+    /**
+     * @return the top most editable element in the rich text area (that includes all the editable content, including
+     *         nested editable areas)
+     * @param switchToFrame {@code true} if the driver should switch to the frame containing the rich text area
+     */
+    private WebElement getRootEditableElement(boolean switchToFrame)
+    {
+        if (this.isFrame) {
+            if (switchToFrame) {
+                getDriver().switchTo().frame(this.container);
+            }
+            return getDriver().findElement(By.tagName("body"));
+        } else {
+            return this.container;
+        }
     }
 
     /**
@@ -173,10 +285,8 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitUntilContentEditable()
     {
-        getFromIFrame(() -> {
-            getDriver().waitUntilElementHasAttributeValue(By.className("cke_editable"), "contenteditable", "true");
-            return null;
-        });
+        getDriver().waitUntilCondition(driver -> getFromEditedContent(
+            () -> getRootEditableElement(false).getAttribute("contenteditable").equals("true")));
     }
 
     /**
@@ -186,23 +296,43 @@ public class RichTextAreaElement extends BaseElement
     public RichTextAreaElement waitForPlaceholder(String placeholder)
     {
         try {
-            WebElement activeElement = getActiveElement();
+            WebElement rootEditableElement = getRootEditableElement();
             getDriver().waitUntilCondition(
-                driver -> Objects.equals(placeholder, activeElement.getAttribute("data-cke-editorplaceholder")));
+                driver -> Objects.equals(placeholder, rootEditableElement.getAttribute("data-cke-editorplaceholder")));
         } finally {
-            getDriver().switchTo().defaultContent();
+            maybeSwitchToDefaultContent();
         }
 
         return this;
     }
 
-    protected <T> T getFromIFrame(Supplier<T> supplier)
+    protected <T> T getFromEditedContent(Supplier<T> supplier)
     {
         try {
-            getDriver().switchTo().frame(this.iframe);
-            return supplier.get();
+            maybeSwitchToEditedContent();
+            try {
+                return supplier.get();
+            } catch (StaleElementReferenceException e) {
+                // Try again in case the edited content has been updated.
+                return supplier.get();
+            }
         } finally {
-            getDriver().switchTo().defaultContent();
+            maybeSwitchToDefaultContent();
         }
+    }
+
+    /**
+     * Executes some code in the context of the rich text area content window.
+     * 
+     * @param verifier the code that verifies the content of the rich text area
+     * @since 16.1.0RC1
+     * @since 15.10.7
+     */
+    public void verifyContent(Consumer<RichTextAreaContent> verifier)
+    {
+        getFromEditedContent(() -> {
+            verifier.accept(this.content);
+            return null;
+        });
     }
 }

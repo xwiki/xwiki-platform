@@ -1,0 +1,69 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxParagraphs</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxParagraphs</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 편집 중 =
+
+== 단락 ==
+
+=== 1.0 단락 ===
+
+단락은 2개 이상의 새 줄로 구분된 텍스트 요소입니다.
+
+{{info}} XWiki 구문 1.0 에서는 새 줄이 허용되지 않습니다 . 
+대신 다음과 같이 이중 백슬래시를 삽입해야 합니다. {{{}}}{{/info}}
+
+|=기능|= XWiki 구문 1.0|=결과
+|간단한 단락|이것은 단락입니다|이것은 단락입니다
+|여러 줄의 단락|{{{}}}여러 줄의 단락|여러 줄의 단락
+|두 문단|문단 1\\문단 2|문단 1\\문단 2
+|매개변수화된 단락|&lt;p style="text-align:center;color:blue"&gt;가운데 맞춤 및 파란색 단락&lt;/p&gt;|(% style="text-align:center;color:blue" %)가운데 및 파란색 단락
+
+=== 2.0 단락 ===
+
+단락은 2개 이상의 새 줄로 구분된 텍스트 요소입니다.
+
+|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|간단한 단락|이것은 단락입니다|이것은 단락입니다
+|여러 줄의 단락|여러 줄의 단락|여러 줄의 단락
+|두 문단|문단 1\\문단 2|문단 1\\문단 2
+|매개변수화된 단락|{{{(% style="text-align:center;color:blue" %)}}}가운데 및 파란색 단락|(% style="text-align:center;color:blue" %)가운데 파란색 단락
+|단락 내용 일부에 다른 스타일|{{{(% style="color:red" %)}}}빨간색{{{(%%)}}} 내부 스타일이 다른 단락|(% 스타일이 있는 단락) ="color:red" %)red(%%) 내부 텍스트</content>
+</xwikidoc>

@@ -456,10 +456,9 @@ $xwiki.ssx.use('Main.Spaces')##
   ## List spaces.
   ##
   #foreach($space in $spaceList)
-    ## Display space only if the user has view right on space home and if the space is not blacklisted.
-    ## $blacklistedSpaces is set in xwikivars.vm
+    ## Display space only if the user has view right on space home
     #set ($spaceHomeDocumentReference = $services.model.resolveSpace($space))
-    #if($xwiki.hasAccessLevel('view', $services.model.serialize($spaceHomeDocumentReference)) &amp;&amp; !$blacklistedSpaces.contains($space))
+    #if($xwiki.hasAccessLevel('view', $services.model.serialize($spaceHomeDocumentReference)))
       &lt;li class="xitem xunderline xhighlight space"&gt;
         &lt;div class="xitemcontainer"&gt;
           &lt;div class="spSpaceName"&gt;&lt;a href="$xwiki.getURL($spaceHomeDocumentReference)"&gt;${escapetool.xml($space)}&lt;/a&gt;&lt;/div&gt;

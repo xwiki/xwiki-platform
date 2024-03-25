@@ -124,7 +124,7 @@
 #set ($list = $services.query.xwql('from doc.object(XWiki.XWikiUsers) as user order by doc.creationDate desc').addFilter('hidden').setLimit(5).setOffset(0).execute())
 |=(% scope="col" %)$services.localization.render('xe.panels.members.photo')|=(% scope="col" %)$services.localization.render('xe.panels.members.name')
 #foreach ($user in $list)
-  |{{html}}#smallUserAvatar($user){{/html}}|[[$xwiki.getUserName($user, false)&gt;&gt;$user]]
+  |{{html clean="false"}}#smallUserAvatar($user){{/html}}|{{html clean="false"}}$xwiki.getUserName($user){{/html}}
 #end
 
 [[$services.localization.render('xe.panels.members.viewall')&gt;&gt;Main.UserDirectory]]

@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-rest</artifactId>
   <name>XWiki Platform - Test - Rest</name>
@@ -44,10 +44,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-job-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

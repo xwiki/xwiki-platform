@@ -494,7 +494,7 @@ public class RepositoryManager implements Initializable, Disposable
                     }
 
                     if (!valid) {
-                        this.logger.debug("Attachment [{}] does not exists", attachmentReference);
+                        this.logger.debug("Attachment [{}] does not exist", attachmentReference);
                     }
                 } else if (ResourceType.URL.equals(resourceReference.getType())
                     || ExtensionResourceReference.TYPE.equals(resourceReference.getType())) {

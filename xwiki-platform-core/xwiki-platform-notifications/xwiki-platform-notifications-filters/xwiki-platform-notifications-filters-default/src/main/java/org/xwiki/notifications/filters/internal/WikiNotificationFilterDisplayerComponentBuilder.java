@@ -19,15 +19,14 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
@@ -53,10 +52,10 @@ import com.xpn.xwiki.objects.BaseObject;
 public class WikiNotificationFilterDisplayerComponentBuilder implements WikiBaseObjectComponentBuilder
 {
     @Inject
-    private ComponentManager componentManager;
+    private AuthorizationManager authorizationManager;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private Provider<WikiNotificationFilterDisplayer> wikiNotificationFilterDisplayerProvider;
 
 
     @Override
@@ -68,9 +67,11 @@ public class WikiNotificationFilterDisplayerComponentBuilder implements WikiBase
             this.checkRights(parentDocument.getDocumentReference(), parentDocument.getAuthorReference());
 
             // Instantiate the component
-            return Arrays.asList(
-                    new WikiNotificationFilterDisplayer(parentDocument.getAuthorReference(),
-                            this.componentManager, baseObject));
+            WikiNotificationFilterDisplayer wikiNotificationFilterDisplayer =
+                this.wikiNotificationFilterDisplayerProvider.get();
+            wikiNotificationFilterDisplayer.initialize(parentDocument.getAuthorReference(), baseObject);
+
+            return List.of(wikiNotificationFilterDisplayer);
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
                     "Unable to build the WikiNotificationFilterDisplayer wiki component "

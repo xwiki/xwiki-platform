@@ -99,24 +99,42 @@
     #livetable_filterObfuscated($map)
     $jsontool.serialize($map)
 #else
-    <h1>$escapetool.xml($services.localization.render('like.likers.title', [$doc.plainTitle]))</h1>
-    #set($columns = ["name", "first_name", "last_name"])
-    #set($columnsProperties = {
-        "name" : { "type" : "text", "sortable": false, "filterable": false, "html": true },
-        "first_name" : { "type" : "text", "sortable": false, "filterable": false},
-        "last_name" : { "type" : "text", "sortable": false, "filterable": false}
-    })
-    #set ($queryParams = {
-        "livetable": "true",
-        "xpage": "likers",
-        "outputSyntax": "plain"
-    })
-    ## We rely on the same column name than the Users administration, so we use same translation prefix for now.
-    #set($options = {
-        'url': $doc.getURL('get', $escapetool.url($queryParams)),
-        'outputOnlyHtml': true,
-        'translationPrefix' : "xe.admin.users."
-    })
-
-    #livetable("likers" $columns $columnsProperties $options)
+  #set($titleToDisplay = $services.localization.render('like.likers.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+  #template('contentheader.vm')
+  ## We rely on the same column name than the Users administration, so we use same translation prefix for now.
+  #set ($sourceParameters = {
+    'template': 'likers.vm',
+    'livetable': 'true',
+    'outputSyntax': 'plain',
+    '$doc': $doc.documentReference,
+    'translationPrefix' : 'xe.admin.users.'
+  })
+  ## The id of the live data needs to be complex in order to avoid 'id collision' that would break
+  ## the liveData.
+  $services.liveData.render({
+    'id': 'likersTable',
+    'properties': 'name,first_name,last_name',
+    'source': 'liveTable',
+    'sourceParameters': $escapetool.url($sourceParameters)
+  }, {
+    'meta': {
+      'propertyDescriptors': [
+        {
+          'id': 'name',
+          'displayer': 'html',
+          'sortable': false,
+          'filterable': false
+        },
+        {
+          'id': 'first_name',
+          'sortable': false,
+          'filterable': false
+        },{
+          'id': 'last_name',
+          'sortable': false,
+          'filterable': false
+        }
+      ]
+    }
+  })
 #end

@@ -321,11 +321,12 @@ already take care of padding and shadow. */
 }
 
 #docextrapanes {
-  box-shadow: 0 1px 2px @xwiki-border-color;
-  border-top: 1px solid @xwiki-border-color;
+  border: 1px solid @xwiki-border-color;
   border-top-left-radius: @border-radius-base;
   border-top-right-radius: @border-radius-base;
   margin-top: -1px;
+  /* Makes the bottom border hidden below the footer on pages with a long content (longer than the viewport height). */
+  margin-bottom: -1px;
 }
 
 #xdocFooter {

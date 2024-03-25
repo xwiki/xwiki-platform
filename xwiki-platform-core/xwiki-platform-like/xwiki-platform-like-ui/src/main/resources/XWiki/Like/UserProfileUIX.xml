@@ -165,7 +165,7 @@
     </property>
     <property>
       <content>{{velocity}}
-=$escapetool.xml($services.localization.render('like.userprofile.menu'))=
+==$escapetool.xml($services.localization.render('like.userprofile.menu'))==
 #set ($docTitleDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.title')))
 #set ($docLocationDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.location')))
 #set ($likesDisplayName = $escapetool.xml($services.localization.render('like.livetable.column.likes')))

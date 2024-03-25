@@ -90,17 +90,17 @@ public class ConfigurationFilesGenerator
 
     /**
      * @param configurationFileTargetDirectory the location where to generate the config files
-     * @param version the XWiki version for which to generate config files (used to get the config resources for the
-     * right version)
+     * @param platformVersion the XWiki version for which to generate config files (used to get the config resources for
+     *            the right version)
      * @param resolver the artifact resolver to use (can contain resolved artifacts in cache)
      * @throws Exception if an error occurs during config generation
      */
-    public void generate(File configurationFileTargetDirectory, String version, ArtifactResolver resolver)
+    public void generate(File configurationFileTargetDirectory, String platformVersion, ArtifactResolver resolver)
         throws Exception
     {
         VelocityContext context = createVelocityContext();
         Artifact artifact = new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
-            JAR, version);
+            JAR, platformVersion);
         File configurationJARFile = resolver.resolveArtifact(artifact).getArtifact().getFile();
 
         configurationFileTargetDirectory.mkdirs();
@@ -128,9 +128,9 @@ public class ConfigurationFilesGenerator
         }
 
         // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
-        // tests. Only do this in the CI for now (or if debug is true) since this is currently used for debugging
+        // tests. Only do this in the CI for now (or if verbose is true) since this is currently used for debugging
         // problems.
-        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isDebug()) {
+        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isVerbose()) {
             copyLogbackConfigFile(configurationFileTargetDirectory);
         }
     }

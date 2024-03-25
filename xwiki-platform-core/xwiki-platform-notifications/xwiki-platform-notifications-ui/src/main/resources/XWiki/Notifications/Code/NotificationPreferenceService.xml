@@ -52,7 +52,7 @@
 #elseif ("$!request.target" == 'user')
   #set ($targetDoc = $xwiki.getDocument($targetUser))
   #set ($targetRef = $services.model.resolveDocument($targetUser))
-  #set($isActionAllowed = ($services.security.authorization.hasAccess('admin', $requestedUserDocRef) || $xcontext.userReference.equals($targetRef)))
+  #set($isActionAllowed = ("$!request.action" == 'watchUser' || "$!request.action" == 'unwatchUser' || $services.security.authorization.hasAccess('admin', $requestedUserDocRef) || $xcontext.userReference.equals($targetRef)))
 #end
 #if ("$!request.action" == "" &amp;&amp; $request.method.equalsIgnoreCase('get'))
   This is a technical page for Notifications macro.

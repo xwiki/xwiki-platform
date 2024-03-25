@@ -1,0 +1,139 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxImages" locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxImages</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxImages</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 편집 중 =
+
+== 이미지 ==
+
+=== 1.0 이미지 ===
+
+|=기능|= XWiki 구문 1.0|=결과
+|현재 페이지 첨부파일의 이미지|(((
+{{info}}[[이미지 매크로&gt;&gt;https://extensions를 참조하세요. xwiki .org/ xwiki /bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]] 자세한 내용은{{/info}}
+{{{{이미지:img.png}}}}
+)))|이미지: XWiki .XWikiSyntaxImages@img.png
+|다른 페이지에 첨부된 이미지|{{{{image:img.png|document=Space.Page}}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+|매개변수가 있는 이미지|{{{{image:img.png|width=25|height=25}}}}|[[image: XWiki .XWikiSyntaxImages@img.png||width="25" height="25" ]]
+| URL 에 있는 이미지 |{{{https://some/ url /img.png}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+
+=== 2.0 이미지 ===
+
+|=기능|= XWiki 구문 2.0|=결과
+|현재 페이지의 첨부 파일 이미지|{{{image:img.png}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+|다른 페이지에 첨부된 이미지|{{{image:Space.Page@img.png}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+|매개변수가 있는 이미지|{{{[[image:img.png||width="25" height="25"]]}}}|[[image: XWiki .XWikiSyntaxImages@img.png||width="25 " 높이="25"]]
+|캡션이 포함된 이미지|{{{[[~[~[ XWiki ~&gt;~&gt;https://www. xwiki .org~]~]는 캡션을 지원합니다.&gt;&gt;image:img.png]]}}}|((([[~[~[ XWiki ~&gt;~&gt;https://www. xwiki .org~]~] 캡션을 지원합니다.&gt;&gt;이미지: XWiki .XWikiSyntaxImages@img.png]]))
+| URL 에 있는 이미지 |{{{image:https://some/ url /img.png}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+
+{{velocity}}$subHeading XWiki 구문 2.0 이미지 사양 $subHeading{{/velocity}}
+
+{{정보}}
+##( )## 부분은 필수이고 ##{ }## 부분은 선택사항입니다.
+{{/정보}}
+
+이미지의 전체 형식은 **##image~: (reference)##** 또는 **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]#입니다. #**
+
+* **##caption##**: 선택적 캡션입니다. 임의의 XWiki 2.0 구문을 포함할 수 있지만 중첩된 링크 구문은 ##~~##을 사용하여 이스케이프해야 합니다. 캡션은 이미지 구문이 단락의 유일한 콘텐츠인 경우에만 지원됩니다. 캡션이 있는 이미지는 링크로 묶일 수도 있습니다. 이 경우 링크에는 이미지가 포함되지만 캡션은 포함되지 않습니다.
+* **##image~:##** 리소스를 이미지로 식별하는 필수 문자열입니다.
+* **##reference##**: 다음 형식 중 하나로 표시되는 이미지에 대한 참조입니다.
+** ** URL **: **##http:~/~/path/imageName##** 형식의 이미지 URL 입니다. 예: ##http:~/~/domain.org/path/img.png##
+** **첨부파일** **##~{~{~{wikiName:} space.} 페이지@}(이미지 이름)##** 형식의 참조
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 이미지 참조는 해당 위키 내부 페이지에 첨부된 이미지를 가리킵니다. 예: 마이위키
+*** **##space##**: 선택적인 Wiki Space 이름입니다. 공간을 지정하지 않으면 현재 공간이 사용됩니다. 예: 메인
+*** **##page##**: 참조 이미지가 첨부된 위키 페이지의 이름을 포함하는 선택적 문자열입니다. 예: 웹홈
+*** **##imageName##**: 위키에 저장된 페이지에 첨부된 이미지의 이름을 포함하는 필수 문자열입니다.
+* **##parameters##**: 이미지에 전달되는 공백으로 구분된 매개변수의 선택적 목록입니다. 예: ##width="800" height="600" alt="img.png" title="내 멋진 이미지"##
+** ** HTML 속성**: HTML 표준에 의해 정의된 모든 속성은 렌더링된 HTML ##&lt;img&gt;## 태그 에 추가됩니다 .
+*** **##style##**: 이미지에 적용되어야 하는 CSS 스타일 정보입니다. 예: ##style="float:right;height:50"##(오른쪽 이미지, 높이 50px), ##style="display:block;margin-left:auto;margin-right:auto;width :80%"##(이미지 중앙, 너비는 블록 너비의 80%), ##style="vertical-align:bottom"##(텍스트는 그림 하단에서 시작)
+*** **##height##**: 표시되는 이미지의 높이를 정의하는 매개변수입니다. 값은 픽셀(예: ##height="80"##) 또는 이미지가 포함된 블록의 높이와 관련된 픽셀(예: ##height="40%"##)로 표시되어야 합니다.
+*** **##width##**: 표시된 이미지의 너비를 정의하는 매개변수입니다. 값은 픽셀(예: ##width="80"##) 또는 이미지가 포함된 블록의 너비와 관련된 픽셀(예: ##width="40%"##)로 표시되어야 합니다.
+*** **##title##**: 예를 들어 이미지 위에 마우스를 올리면 표시되는 표시된 이미지의 제목을 정의하는 매개변수입니다. 예: ##title="내 멋진 이미지"##
+*** **##alt##**: 브라우저가 이미지를 표시할 수 없는 경우 표시해야 하는 텍스트를 정의하는 매개변수입니다. 이것은 필수 HTML 속성 이므로 XWiki는 ##alt## 매개변수가 정의되지 않은 경우 파일 이름을 대신 사용합니다. 예: ##alt="img.png"##
+*** **추가**: 더 많은 속성을 포함하는 HTML ##&lt;img&gt;## 태그 에 대한 더 자세한 설명을 검토할 수 있습니다. [[ HTML 표준에서&gt;&gt;https:// html .spec.whatwg.org /다중 페이지/임베디드 콘텐츠. html #the-img-요소]].
+
+=== 2.1 이미지 ===
+
+|=기능|= XWiki 구문 2.1|=결과
+|현재 페이지의 첨부 파일 이미지|{{{image:img.png}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+|다른 페이지에 첨부된 이미지|{{{image:PageA.PageB@img.png}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+|매개변수가 있는 이미지|{{{[[image:img.png||width="25" height="25"]]}}}|[[image: XWiki .XWikiSyntaxImages@img.png||width="25 " 높이="25"]]
+|캡션이 포함된 이미지|{{{[[~[~[ XWiki ~&gt;~&gt;https://www. xwiki .org~]~]는 캡션을 지원합니다.&gt;&gt;image:img.png]]}}}|((([[~[~[ XWiki ~&gt;~&gt;https://www. xwiki .org~]~] 캡션을 지원합니다.&gt;&gt;이미지: XWiki .XWikiSyntaxImages@img.png]]))
+| URL 에 있는 이미지 |{{{image:https://some/ url /img.png}}}|이미지: XWiki .XWikiSyntaxImages@img.png
+|사전 패키지된 아이콘|{{{image:icon:accept}}}|image:icon:accept
+
+{{velocity}}$subHeading XWiki 구문 2.1 이미지 사양 $subHeading{{/velocity}}
+
+{{정보}}
+범례: ##()## 부분은 필수이고 ##{}## 부분은 선택사항입니다.
+{{/정보}}
+
+이미지의 전체 형식은 **##image~: (reference)##** 또는 **##~[~[{caption&gt;&gt;}image~: (reference) {||parameters}]]#입니다. #**
+
+* **##caption##**: 선택적 캡션입니다. 임의의 XWiki 2.1 구문을 포함할 수 있지만 중첩된 링크 구문은 ##~~##을 사용하여 이스케이프해야 합니다. 캡션은 이미지 구문이 단락의 유일한 콘텐츠인 경우에만 지원됩니다. 캡션이 있는 이미지는 링크로 묶일 수도 있습니다. 이 경우 링크에는 이미지가 포함되지만 캡션은 포함되지 않습니다.
+* **##image~:##** 리소스를 이미지로 식별하는 필수 문자열입니다.
+* **##reference##**: 다음 형식 중 하나로 표시되는 이미지에 대한 참조입니다.
+** ** URL **: **##[ url :](프로토콜:~/~/path/imageName)##** 형식의 이미지 URL 입니다 . 예: ##http:~/~/domain.org/path/img.png##
+*** **## url :##** 이미지를 URL 로 식별하는 선택적 문자열입니다 .
+*** **##protocol:~/~/path/imageName##**: 이미지의 URL
+** **첨부 파일**: **##[attach~:]~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##** 형식의 참조입니다.
+*** **##attach~:##** 참조를 XWiki 문서 첨부로 식별하는 선택적 문자열입니다.
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 이미지 참조는 해당 위키 내부 페이지에 첨부된 이미지를 가리킵니다. Wiki를 지정하지 않으면 현재 Wiki가 사용됩니다. 예: ##mywiki##.
+*** **##spaceNameList##**: 선택적으로 점으로 구분된 위키 스페이스 이름 목록입니다. 공간을 지정하지 않으면 현재 공간이 사용됩니다. 예: ##메인##, ##AB##, ##ABC##
+*** **##pageName##**: 참조된 이미지가 첨부된 위키 페이지의 이름을 포함하는 선택적 문자열입니다. 예: ##환영합니다##
+*** **##imageName##**: 위키에 저장된 페이지에 첨부된 이미지의 이름을 포함하는 필수 문자열입니다. 예: ##myImage.png##
+** **페이지 첨부**: **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##** 형식의 참조
+*** **##pageAttach~:##** 참조를 XWiki 페이지 첨부 로 식별하는 필수 문자열입니다 .
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 이미지 참조는 해당 위키 내부 페이지에 첨부된 이미지를 가리킵니다. Wiki를 지정하지 않으면 현재 Wiki가 사용됩니다. 예: ##mywiki##.
+*** **##pageNameList##**: 선택적으로 점으로 구분된 위키 페이지 이름 목록입니다. 페이지가 지정되지 않으면 현재 페이지가 사용됩니다. 예: ##메인##, ##A/B##, ##A/B/C##
+*** **##imageName##**: 위키에 저장된 페이지에 첨부된 이미지의 이름을 포함하는 필수 문자열입니다. 예: ##myImage.png##
+** **아이콘**: **##icon{{{:(}}}iconName)##** 형식의 참조입니다. 예: **##아이콘:수락##**
+*** **##icon:##** 이미지 참조를 [[ XWiki 아이콘 세트&gt;&gt;https://www.famfamfam.com/lab/icons/silk/previews/ 의 아이콘으로 식별하는 필수 문자열입니다. index_abc.png]].
+*** **##iconName##**: 참조된 아이콘을 식별하는 필수 문자열입니다. 예: ##수락##
+** **데이터 URI**: **##(data{{{:)}}}(content)##** 형식의 참조입니다. 예: **##{{{data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##**
+*** **##data:##** [[데이터 URI 체계&gt;&gt;https://en.wikipedia.org/wiki/Data_URI_scheme]]을 사용하여 인라인으로 지정되는 이미지를 식별하는 필수 문자열입니다.
+*** **##content##**: 인코딩된 이미지입니다. 예: ##{{{image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==}}}##
+* **##parameters##**: 이미지에 전달되는 공백으로 구분된 매개변수의 선택적 목록입니다. 예: ##width="800" height="600" alt="img.png" title="내 멋진 이미지"##
+** ** HTML 속성**: HTML 표준에 의해 정의된 모든 속성은 렌더링된 HTML ##&lt;img&gt;## 태그 에 추가됩니다 .
+*** **##style##**: 이미지에 적용되어야 하는 CSS 스타일 정보입니다. 예: ##style="float:right;height:50"##(오른쪽 이미지, 높이 50px), ##style="display:block;margin-left:auto;margin-right:auto;width :80%"##(이미지 중앙, 너비는 블록 너비의 80%), ##style="vertical-align:bottom"##(텍스트는 그림 하단에서 시작)
+*** **##height##**: 표시되는 이미지의 높이를 정의하는 매개변수입니다. 값은 픽셀(예: ##height="80"##) 또는 이미지가 포함된 블록의 높이와 관련된 픽셀(예: ##height="40%"##)로 표시되어야 합니다.
+*** **##width##**: 표시된 이미지의 너비를 정의하는 매개변수입니다. 값은 픽셀(예: ##width="80"##) 또는 이미지가 포함된 블록의 너비와 관련된 픽셀(예: ##width="40%"##)로 표시되어야 합니다.
+*** **##title##**: 예를 들어 이미지 위에 마우스를 올리면 표시되는 표시된 이미지의 제목을 정의하는 매개변수입니다. 예: ##title="내 멋진 이미지"##
+*** **##alt##**: 브라우저가 이미지를 표시할 수 없는 경우 표시해야 하는 텍스트를 정의하는 매개변수입니다. 이것은 필수 HTML 속성 이므로 XWiki는 ##alt## 매개변수가 정의되지 않은 경우 파일 이름을 대신 사용합니다. 예: ##alt="img.png"##
+*** **추가**: 더 많은 속성을 포함하는 HTML ##&lt;img&gt;## 태그 에 대한 더 자세한 설명을 검토할 수 있습니다. [[ HTML 표준에서&gt;&gt;https:// html .spec.whatwg.org /다중 페이지/임베디드 콘텐츠. html #the-img-요소]].
+** **##queryString##**: 참조 이미지에 대한 다운로드 링크를 생성할 때 쿼리가 서버에 전달되도록 허용합니다. 예: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"##(**##keepAspectRatio=true##는 ## 외에 ##width## 및 ##height## 매개변수가 지정된 경우 실패합니다. 쿼리문자열##!**)</content>
+  </xwikidoc>

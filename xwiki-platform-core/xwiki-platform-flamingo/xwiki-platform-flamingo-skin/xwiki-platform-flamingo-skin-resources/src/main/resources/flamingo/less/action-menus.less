@@ -121,8 +121,7 @@
     border-radius: 0;
     border: 0;
     min-width: 0;
-    transform-origin: 100% 50%;
-    transition: transform 300ms ease-in-out;
+    transition: width 300ms ease-in-out, padding 300ms ease-in-out;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }
 
@@ -144,7 +143,8 @@
     }
     // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
     & + #headerglobalsearchinput { // we need to be that specific to be applied
-      transform: scaleX(0);
+      width: 0;
+      padding: 0;
     }
   }
 }
@@ -319,6 +319,11 @@
 
   .btn-group > dl.dropdown-menu {
     & > dt.dropdown-header {
+      &.sr-only {
+        // Overwrite bootstrap default style that would take priority on .sr-only style
+        padding: 0;
+      }
+
       // Use the bootstrap style for our semantic architecture
       &:extend(li.dropdown-header);
       font-weight: initial;

@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="ko">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## Homepage Tour (by steps order)
+tour.homepageTour.welcome.title=XWiki 에 오신 것을 환영합니다
+tour.homepageTour.welcome.content=다음 몇 분 안에 Wiki의 인터페이스와 기본 기능을 발견하게 될 것입니다.
+tour.homepageTour.panels.title=패널
+tour.homepageTour.panels.contentA=현재 패널을 사용하면 위키의 응용프로그램과 페이지에 접근할 수 있습니다.
+tour.homepageTour.panels.contentB=관리자는 이를 사용자 정의하고 표시할 패널을 결정할 수 있습니다.
+tour.homepageTour.breadcrumbs.title=빵 부스러기
+tour.homepageTour.breadcrumbs.contentA=탐색경로를 사용하면 페이지의 위치를 식별하고 계층 구조를 탐색할 수 있습니다.
+tour.homepageTour.breadcrumbs.contentB={0} 버튼을 누르면 항상 Wiki 홈페이지로 이동됩니다.
+tour.homepageTour.pageContent.title={0}페이지에서 당신을 멘션했습니다
+tour.homepageTour.pageContent.contentA=현재 페이지의 내용이 표시되는 곳입니다.
+tour.homepageTour.pageContent.contentB=지식을 정리하기 위해 이 페이지를 편집하여 표, 목록, 매크로 및 구조를 추가하세요.
+tour.homepageTour.pageMenu.title=페이지 메뉴
+tour.homepageTour.pageMenu.contentA=이 메뉴에는 페이지 관련 작업이 포함되어 있습니다. 적절한 권한이 있으면 페이지를 편집, 생성, 관리 또는 삭제할 수 있습니다.
+tour.homepageTour.pageMenu.contentB={0} 버튼을 누르면 내보내기, 인쇄, 공유 등의 추가 작업이 표시됩니다.
+tour.homepageTour.pageTabs.title=페이지 탭
+tour.homepageTour.pageTabs.contentA=댓글은 사용자가 페이지 콘텐츠에 대해 토론할 수 있는 좋은 방법입니다.
+tour.homepageTour.pageTabs.contentB=파일을 첨부하거나, 페이지 버전을 비교하거나, 페이지 정보를 볼 수도 있습니다.
+tour.homepageTour.header.title=머리글
+tour.homepageTour.header.contentA=콘텐츠를 검색하거나 , 페이지 변경 사항을 확인하거나, 사용자 프로필에 액세스할 수 있습니다.
+tour.homepageTour.header.contentB={0} 버튼을 누르면 관리 및 색인과 같은 Wiki 관련 작업이 포함된 서랍이 열립니다.
+tour.homepageTour.tourComplete.title=투어 완료
+tour.homepageTour.tourComplete.contentA=이것으로 XWiki 의 인터페이스와 기본 기능 에 대한 둘러보기를 마칩니다 .
+tour.homepageTour.tourComplete.contentB=각 기능에 대한 자세한 내용을 보려면 {0} 문서 {1}에 액세스하세요.
+</content>
+</xwikidoc>

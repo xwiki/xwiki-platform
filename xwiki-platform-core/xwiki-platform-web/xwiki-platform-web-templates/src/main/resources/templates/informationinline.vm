@@ -150,7 +150,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         $escapetool.xml($services.localization.render('core.viewers.information.noIncludedPages'))
       </span>
     #else
-      #displayDocumentList($includedPages false $blacklistedSpaces)
+      #displayDocumentList($includedPages false $NULL)
     #end
   </dd>
   ",
@@ -171,7 +171,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         $escapetool.xml($services.localization.render('core.viewers.information.noBacklinks'))
       </span>
     #else
-      #displayDocumentList($backlinks false $blacklistedSpaces)
+      #displayDocumentList($backlinks false $NULL)
     #end
   </dd>
   ",

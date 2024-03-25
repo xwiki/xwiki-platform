@@ -62,7 +62,7 @@
     <!--
       Keep the old behavior. The new version of hibernate tries to delete and recreate unique
       constraints when updating the database schema. The problem is that an exception is thrown
-      when the constraint to be deleted does not exists, which is the case with a new XWiki
+      when the constraint to be deleted does not exist, which is the case with a new XWiki
       instance.
       See https://hibernate.atlassian.net/browse/HHH-8162
     -->

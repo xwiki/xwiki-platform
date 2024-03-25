@@ -695,35 +695,7 @@ public class MockitoOldcore
                     reference = reference.setWikiReference(xcontext.getWikiReference());
                 }
 
-                if (document.isContentDirty() || document.isMetaDataDirty()) {
-                    document.setDate(new Date());
-                    if (document.isContentDirty()) {
-                        document.setContentUpdateDate(new Date());
-                        document.setContentAuthorReference(document.getAuthorReference());
-                    }
-                    document.incrementVersion();
-
-                    document.setContentDirty(false);
-                    document.setMetaDataDirty(false);
-
-                    if (supportRevisionStore) {
-                        // Save the document in the document archive.
-                        getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
-                    }
-                }
-                document.setNew(false);
-                document.setStore(getMockStore());
-
-                // Make sure the document is not restricted.
-                document.setRestricted(false);
-
-                XWikiDocument savedDocument = document.clone();
-
-                documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
-
-
-                // Set the document as it's original document
-                savedDocument.setOriginalDocument(savedDocument.clone());
+                saveDocument(reference, document, xcontext);
 
                 return null;
             }
@@ -881,27 +853,6 @@ public class MockitoOldcore
                     document.setComment(StringUtils.defaultString(comment));
                     document.setMinorEdit(minorEdit);
 
-                    if (document.isContentDirty() || document.isMetaDataDirty()) {
-                        Date ndate = new Date();
-                        document.setDate(ndate);
-                        if (document.isContentDirty()) {
-                            document.setContentUpdateDate(ndate);
-                            DocumentAuthors authors = document.getAuthors();
-                            authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
-                        }
-                        document.incrementVersion();
-
-                        document.setContentDirty(false);
-                        document.setMetaDataDirty(false);
-
-                        // Save the document in the document archive.
-                        if (supportRevisionStore) {
-                            getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
-                        }
-                    }
-                    document.setNew(false);
-                    document.setStore(getMockStore());
-
                     XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
 
                     if (previousDocument != null && previousDocument != document) {
@@ -920,27 +871,27 @@ public class MockitoOldcore
                         document.setOriginalDocument(originalDocument);
                     }
 
-                    // Make sure the document is not restricted.
-                    document.setRestricted(false);
+                    saveDocument(document.getDocumentReferenceWithLocale(), document, xcontext);
 
-                    XWikiDocument savedDocument = document.clone();
+                    XWikiDocument newOriginal = document.getOriginalDocument();
 
-                    documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+                    try {
+                        document.setOriginalDocument(originalDocument);
 
-                    if (isNew) {
                         if (notifyDocumentCreatedEvent) {
-                            getObservationManager().notify(new DocumentCreatedEvent(document.getDocumentReference()),
-                                document, getXWikiContext());
+                            if (isNew) {
+                                getObservationManager().notify(
+                                    new DocumentCreatedEvent(document.getDocumentReference()), document,
+                                    getXWikiContext());
+                            } else {
+                                getObservationManager().notify(
+                                    new DocumentUpdatedEvent(document.getDocumentReference()), document,
+                                    getXWikiContext());
+                            }
                         }
-                    } else {
-                        if (notifyDocumentUpdatedEvent) {
-                            getObservationManager().notify(new DocumentUpdatedEvent(document.getDocumentReference()),
-                                document, getXWikiContext());
-                        }
+                    } finally {
+                        document.setOriginalDocument(newOriginal);
                     }
-
-                    // Set the document as it's original document
-                    savedDocument.setOriginalDocument(savedDocument.clone());
 
                     return null;
                 }
@@ -1179,6 +1130,74 @@ public class MockitoOldcore
             when(this.documentReferenceUserReferenceSerializer.serialize(any(TestDocumentUserReference.class)))
                 .then(invocationOnMock -> invocationOnMock.<TestDocumentUserReference>getArgument(0).documentReference);
         }
+    }
+
+    private void saveDocument(DocumentReference reference, XWikiDocument document, XWikiContext xcontext)
+        throws XWikiException
+    {
+        boolean supportRevisionStore = this.componentManager.hasComponent(XWikiDocumentFilterUtils.class);
+
+        if (document.isContentDirty() || document.isMetaDataDirty()) {
+            document.setDate(new Date());
+            if (document.isContentDirty()) {
+                document.setContentUpdateDate(new Date());
+                DocumentAuthors authors = document.getAuthors();
+                authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
+            }
+            document.incrementVersion();
+
+            document.setContentDirty(false);
+            document.setMetaDataDirty(false);
+
+            if (supportRevisionStore) {
+                // Save the document in the document archive.
+                getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
+            }
+        } else {
+            if (supportRevisionStore) {
+                if (document.getDocumentArchive() != null) {
+                    getMockVersioningStore().saveXWikiDocArchive(document.getDocumentArchive(), false, xcontext);
+
+                    if (!containsVersion(document, document.getRCSVersion(), xcontext)) {
+                        getMockVersioningStore().updateXWikiDocArchive(document, false, xcontext);
+                    }
+                } else {
+                    try {
+                        document.getDocumentArchive(xcontext);
+
+                        if (!containsVersion(document, document.getRCSVersion(), xcontext)) {
+                            getMockVersioningStore().updateXWikiDocArchive(document, false, xcontext);
+                        }
+                    } catch (XWikiException e) {
+                        // this is a non critical error
+                    }
+                }
+            }
+        }
+        document.setNew(false);
+        document.setStore(getMockStore());
+
+        // Make sure the document is not restricted.
+        document.setRestricted(false);
+
+        XWikiDocument savedDocument = document.clone();
+
+        documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+
+        // Set the document as it's original document
+        savedDocument.setOriginalDocument(savedDocument.clone());
+    }
+
+    private boolean containsVersion(XWikiDocument doc, Version targetversion, XWikiContext context)
+        throws XWikiException
+    {
+        for (Version version : doc.getRevisions(context)) {
+            if (version.equals(targetversion)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected DocumentReference resolveDocument(String documentName) throws ComponentLookupException

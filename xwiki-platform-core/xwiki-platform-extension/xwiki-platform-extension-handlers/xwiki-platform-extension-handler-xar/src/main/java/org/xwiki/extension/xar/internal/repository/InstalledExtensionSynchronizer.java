@@ -20,7 +20,6 @@
 package org.xwiki.extension.xar.internal.repository;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -130,16 +129,16 @@ public class InstalledExtensionSynchronizer extends AbstractEventListener
         if (isXarExtension(source) || (data != null && data.stream().anyMatch(this::isXarExtension))) {
             InstalledExtension newSource = asXarInstalledExtension(source);
             Collection<InstalledExtension> newData =
-                data == null ? null : data.stream().map(this::asXarInstalledExtension).collect(Collectors.toList());
+                data == null ? null : data.stream().map(this::asXarInstalledExtension).toList();
             ObservationManager observationManager = this.observationManagerProvider.get();
-            if (event instanceof ExtensionInstalledEvent) {
-                observationManager.notify(new XarExtensionInstalledEvent((ExtensionInstalledEvent) event), newSource,
+            if (event instanceof ExtensionInstalledEvent extensionInstalledEvent) {
+                observationManager.notify(new XarExtensionInstalledEvent(extensionInstalledEvent), newSource,
                     newData);
-            } else if (event instanceof ExtensionUninstalledEvent) {
-                observationManager.notify(new XarExtensionUninstalledEvent((ExtensionUninstalledEvent) event),
+            } else if (event instanceof ExtensionUninstalledEvent extensionUninstalledEvent) {
+                observationManager.notify(new XarExtensionUninstalledEvent(extensionUninstalledEvent),
                     newSource, newData);
-            } else if (event instanceof ExtensionUpgradedEvent) {
-                observationManager.notify(new XarExtensionUpgradedEvent((ExtensionUpgradedEvent) event), newSource,
+            } else if (event instanceof ExtensionUpgradedEvent extensionUpgradedEvent) {
+                observationManager.notify(new XarExtensionUpgradedEvent(extensionUpgradedEvent), newSource,
                     newData);
             }
         }

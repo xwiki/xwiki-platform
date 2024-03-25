@@ -92,8 +92,10 @@ var init = function() {
   // Edit lock for the current document.
   XWiki.EditLock = new XWiki.DocumentLock();
 
-  // Lock the current document.
-  XWiki.EditLock.lock();
+  // Lock the current document if we're editing.
+  if (XWiki.editor) {
+    XWiki.EditLock.lock();
+  }
 
   return true;
 };

@@ -744,13 +744,11 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
                 }
                 break;
 
-            case LESS:
-            case LESS_OR_EQUALS:
+            case LESS, LESS_OR_EQUALS:
                 builder.append(toFilterQueryStringRange(null, condition));
                 break;
 
-            case GREATER:
-            case GREATER_OR_EQUALS:
+            case GREATER, GREATER_OR_EQUALS:
                 builder.append(toFilterQueryStringRange(condition, null));
                 break;
 

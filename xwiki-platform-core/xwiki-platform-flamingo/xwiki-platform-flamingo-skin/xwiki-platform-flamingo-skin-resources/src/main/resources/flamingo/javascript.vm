@@ -86,6 +86,7 @@
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
@@ -104,6 +105,9 @@
     },
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
     'selectize': ['jquery'],
+    'xwiki-document-lock': {
+      'exports': 'XWiki.DocumentLock'
+    },
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }
@@ -214,7 +218,6 @@ XWiki.docisnew = null;
 #end
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
-XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($foreach.count > 1),#end"$space"#end ];
 XWiki.hasEdit = $hasEdit;
 XWiki.hasProgramming = $hasProgramming;
 XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;

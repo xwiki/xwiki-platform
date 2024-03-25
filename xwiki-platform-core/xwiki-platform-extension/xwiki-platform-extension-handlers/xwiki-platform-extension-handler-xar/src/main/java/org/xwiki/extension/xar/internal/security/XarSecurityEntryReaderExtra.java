@@ -70,12 +70,8 @@ public class XarSecurityEntryReaderExtra implements SecurityEntryReaderExtra
         if (protection.isDeny() && entityReference.getType().ordinal() >= EntityType.DOCUMENT.ordinal()) {
             EntityReference reference = entityReference.extractReference(EntityType.DOCUMENT);
 
-            DocumentReference documentReference;
-            if (reference instanceof DocumentReference) {
-                documentReference = (DocumentReference) reference;
-            } else {
-                documentReference = new DocumentReference(reference);
-            }
+            DocumentReference documentReference = reference instanceof DocumentReference docReference ? docReference
+                : new DocumentReference(reference);
 
             // Edit protection
             if (!((XarInstalledExtensionRepository) this.xarRepository).isAllowed(documentReference, Right.EDIT)) {

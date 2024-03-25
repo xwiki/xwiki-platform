@@ -243,7 +243,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
    *
    * Deprecated: This macro relies only on REST API calls which don't allow all usecases to display notifications.
    * In particular, the macro won't benefits from the Skin Extension capabilities when displayed with it.
-   * It is strongly recommended to now use the XWikiAsyncNotificationMacro defined in the other JSX.
+   * It is strongly recommended to now use the XWikiAsyncNotificationsMacro defined in the other JSX.
    *
    * Except the first one, all the parameters are optional in the constructor. If they are not provided, the macro will
    * load them from the DOM element, where they should be present with the "data-" attributes.
@@ -289,7 +289,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
     self.pages = pages != undefined ? pages : self.macro.attr('data-pages');
     self.users = users != undefined ? users : self.macro.attr('data-users');
     self.tags = tags != undefined ? tags : self.macro.attr('data-tags');
-    console.warn("XWikiNotificationMacro is now deprecated. Please consider using XWikiAsyncNotificationMacro instead.");
+    console.warn("XWikiNotificationMacro is now deprecated. Please consider using XWikiAsyncNotificationsMacro instead.");
 
     /**
      * Function that load notifications.
@@ -403,6 +403,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       // Enable the "read" button
       var readButton = notif.find('.notification-event-read-button');
       if (!entry.read &amp;&amp; self.displayReadStatus) {
+        // Make sure the style of the notification is in line with its status.
+        notif.addClass('notification-event-unread');
         readButton.prop('disabled', false);
         readButton.removeClass('hidden');
       }

@@ -98,6 +98,9 @@
 
   @panel-bg:                            $theme.panelBackgroundColor;
   @panel-default-text:                  $theme.panelTextColor;
+  @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
+  @panel-header-text:                   $theme.panelHeaderTextColor;
+  ## Kept for backward compatibility
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
   @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
 
@@ -194,6 +197,7 @@
       "legend-border-color": "color",
       "panel-bg" : "color",
       "panel-default-text" : "color",
+      "panel-header-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
       "breadcrumb-separator": "escapedText",
@@ -225,13 +229,16 @@
   ## currently, it comes from the old color theme object (see colorThemeInit.vm)
   // Default
   @xwiki-border-color:                  $theme.borderColor;
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
+  @panel-header-text:                   $theme.panelHeaderTextColor;
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
   @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
   @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
+  ## Kept for backward compatibility
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
 
   ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
   ## Make sure the links are dark enough in the tmDrawer
@@ -258,9 +265,12 @@
   ## from an orangish yellow to complete brown. Instead, we change the text color to black.
   @btn-warning-color:                   #000;
   ## The boxes should have enough contrast by default, we make it lighter than bootstrap.
-  @state-danger-bg:                     #f8ecec;
-  @state-success-bg:                    #e5f3df;
-  @state-info-bg:                       #e1f1f9;
+  ## @alert-warning-bg default value from bootstrap does not pose contrast issues, so we don't override it.
+  @alert-danger-bg:                     #f8ecec;
+  @alert-success-bg:                    #e5f3df;
+  @alert-info-bg:                       #e1f1f9;
+  ## We override the @brand-danger value from bootstrap as it does not pass contrast checks on #fff
+  @brand-danger:                        #cc3333;
 #end
 
 ##############################################

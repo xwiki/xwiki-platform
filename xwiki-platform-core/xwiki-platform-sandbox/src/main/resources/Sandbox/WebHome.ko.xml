@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Sandbox</title>
+  <title>샌드박스</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -52,7 +52,7 @@
 
 이 예시는 [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] Wiki 페이지(headings, images, tables)에서 사용할 수 있습니다.
 
-= Headings =
+== Headings ==
 
 XWiki는 6가지 수준의 제목을 제공합니다. 페이지를 구성하는 데 사용할 수 있습니다.
 
@@ -66,7 +66,11 @@ XWiki는 6가지 수준의 제목을 제공합니다. 페이지를 구성하는 
 
 ====== Level 6 Heading 6 ======
 
-= Styles =
+{{info title="접근성 권장사항"}}
+위키에서 보조 기술 사용자에게 최상의 경험을 제공하려면 페이지 콘텐츠에서 제목의 첫 번째 수준을 사용하지 않아야 합니다.
+{{/info}}
+
+== Styles ==
 
 XWiki에서 지원하는 기본 스타일:
 
@@ -77,11 +81,11 @@ XWiki에서 지원하는 기본 스타일:
 * Text in ,,subscript,,
 * Text in ^^superscript^^
 
-= Lists =
+== Lists ==
 
 Wiki 페이지에서 다양한 유형의 목록을 만들 수 있습니다:
 
-== Unordered list ==
+=== Unordered list ===
 
 * Level 1
 ** Level 2
@@ -89,14 +93,14 @@ Wiki 페이지에서 다양한 유형의 목록을 만들 수 있습니다:
 ** Level 2
 * Level 1
 
-== Numbered list ==
+=== Numbered list ===
 
 1. Item
 11. Subitem
 111. Item
 1. Subitem
 
-== Mixed list ==
+=== Mixed list ===
 
 1. Item 1
 11. Item 2
@@ -104,23 +108,23 @@ Wiki 페이지에서 다양한 유형의 목록을 만들 수 있습니다:
 11*. Item 4
 1. Item 5
 
-= Tables =
+== Tables ==
 
 Wiki 페이지에 직접 테이블을 만들 수 있습니다:
 
-== 맨 위 행에 헤더가 있는 테이블 ==
+=== 맨 위 행에 헤더가 있는 테이블 ===
 
 |= table header |= table header |= table header
 | cell | cell | cell
 | cell | cell | cell
 
-== 맨 위 행과 왼쪽 열에 헤더가 있는 테이블 ==
+=== 맨 위 행과 왼쪽 열에 헤더가 있는 테이블 ===
 
 |= table header |= table header |= table header
 |= table header | cell | cell
 |= table header | cell | cell
 
-= 링크 =
+== 링크 ==
 
 XWiki를 사용하면 Wiki 또는 웹상의 다른 페이지에 대한 링크를 만들 수 있습니다:
 
@@ -134,17 +138,17 @@ XWiki를 사용하면 Wiki 또는 웹상의 다른 페이지에 대한 링크를
 
 attach:XWikiLogo.png
 
-= 이미지 =
+== 이미지 ==
 
 Wiki 페이지에 이미지를 삽입할 수 있습니다:
 
 image:XWikiLogo.png
 
-= 매크로 =
+== 매크로 ==
 
 매크로를 사용하면, Wiki 컨텐츠의 외관을 좋게 하고 Wiki 에 기능을 추가할 수 있습니다. 다음은 Wiki 페이지에서 매크로를 사용하는 방법의 2가지 예입니다:
 
-== 경고 매크로 ==
+=== 경고 매크로 ===
 
 이 매크로를 사용하면 특정 정보에 대한 사용자의 주의를 끌 수 있습니다:
 
@@ -152,7 +156,7 @@ image:XWikiLogo.png
 Hello World
 {{/warning}}
 
-== 목차 ==
+=== 목차 ===
 
 이 매크로는 Heading에 따라 자동으로 Wiki 페이지의 목차를 생성합니다:
 

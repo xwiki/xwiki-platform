@@ -34,6 +34,9 @@
 -->
 <template>
   <div class="livedata-layout">
+    <p class="livedata-layout-description" :id="descriptionId" v-if="hasDescription">
+      {{ description }}
+    </p>
 
       <!--
         We are using the <keep-alive> tag in order to keep the layout mounted
@@ -46,6 +49,7 @@
         <component
           v-if="layoutComponent"
           :is="layoutComponent"
+          :aria-describedby="descriptionId"
         ></component>
       </keep-alive>
 
@@ -79,6 +83,15 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
+    description() {
+      return this.data?.meta?.description;
+    },
+    hasDescription() {
+      return this.description && this.description !== '';
+    },
+    descriptionId() {
+      return `${this.logic.data.id}-description`;
+    }
   },
 
 
@@ -152,8 +165,3 @@ export default {
 
 };
 </script>
-
-
-<style>
-
-</style>

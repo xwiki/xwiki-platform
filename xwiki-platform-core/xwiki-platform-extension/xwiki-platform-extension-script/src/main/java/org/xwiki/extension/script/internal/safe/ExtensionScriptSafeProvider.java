@@ -31,7 +31,7 @@ import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide safe Extension.

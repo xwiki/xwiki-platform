@@ -79,7 +79,8 @@ widgets.ModalPopup = Class.create({
     }
     // Add the close button
     if (this.options.displayCloseButton) {
-      var closeButton = new Element('button', {'class': 'btn btn-default xdialog-close', 'title': 'Close'}).update("&#215;");
+      var closeButton = new Element('button', {'class': 'close xdialog-close', 'title': 'Close'})
+        .update("$!escapetool.javascript($services.icon.renderHTML('cross'))");
       closeButton.observe("click", this.closeDialog.bindAsEventListener(this));
       if (this.options.title) {
         title.insert({bottom: closeButton});
@@ -98,10 +99,10 @@ widgets.ModalPopup = Class.create({
     });
     switch(this.options.verticalPosition) {
       case "top":
-        this.dialogBox.setStyle({"top": "0"});
+        this.dialogBox.setStyle({"top": "30px"});
         break;
       case "bottom":
-        this.dialogBox.setStyle({"bottom": "0"});
+        this.dialogBox.setStyle({"bottom": "30px"});
         break;
       default:
         // TODO: smart alignment according to the actual height

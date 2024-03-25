@@ -22,7 +22,7 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
 
 /**
  * Represents the actions possible on the Users Administration Page.
@@ -32,14 +32,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class UsersAdministrationSectionPage extends AdministrationSectionPage
 {
-    private static final String USER_ACTION_XPATH_FORMAT =
-        "//table[@id = 'userstable']//td[contains(@class, 'name') and normalize-space(.) = '%s']"
-            + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
-
-    private static final String USER_DISABLED_XPATH_FORMAT =
-        "//table[@id = 'userstable']//div[contains(@class, 'disabled') and normalize-space(.) = '%s']";
-
-    public static final String ADMINISTRATION_SECTION_ID = "Users";
+    private static final String ADMINISTRATION_SECTION_ID = "Users";
 
     @FindBy(css = ".btn[data-target='#createUserModal']")
     private WebElement createUserButton;
@@ -47,7 +40,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     /**
      * The live table listing the users.
      */
-    private final LiveTableElement usersLiveTable;
+    private final LiveDataElement usersLiveData;
 
     /**
      * @since 4.2M1
@@ -61,7 +54,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public UsersAdministrationSectionPage()
     {
         super(ADMINISTRATION_SECTION_ID);
-        this.usersLiveTable = new LiveTableElement("userstable");
+        this.usersLiveData = new LiveDataElement("userstable");
     }
 
     public RegistrationModal clickAddNewUser()
@@ -74,83 +67,56 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
      * @return the live table that list the users
      * @since 4.3.1
      */
-    public LiveTableElement getUsersLiveTable()
+    public LiveDataElement getUsersLiveData()
     {
-        return this.usersLiveTable;
+        return this.usersLiveData;
     }
 
-    public DeleteUserConfirmationModal clickDeleteUser(String userName)
+    public DeleteUserConfirmationModal clickDeleteUser(int rowNumber)
     {
-        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "delete")))
-            .click();
+        getUsersLiveData().getTableLayout().clickAction(rowNumber, "delete");
         return new DeleteUserConfirmationModal();
     }
 
-    public UsersAdministrationSectionPage deleteUser(String userName)
+    public int getRowNumberByUsername(String userName)
     {
-        clickDeleteUser(userName).clickOk();
-        // The live table is refreshed.
-        this.usersLiveTable.waitUntilReady();
-        return this;
+        int rowNumber = getUsersLiveData().getTableLayout().getRowIndexForElement(By.xpath("//a[text()='" + userName + "']"));
+        return rowNumber;
     }
 
-    public boolean canDeleteUser(String userName)
+    public boolean canDeleteUser(int rowNumber)
     {
-        return !getDriver()
-            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "delete")))
-            .isEmpty();
+        return getUsersLiveData().getTableLayout().hasAction(rowNumber, "delete");
     }
 
-    public UsersAdministrationSectionPage disableUser(String userName)
+    public UsersAdministrationSectionPage disableUser(int rowNumber)
     {
-        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "disable")))
-            .click();
+
+        getUsersLiveData().getTableLayout().clickAction(rowNumber, "disable");
         this.waitForNotificationSuccessMessage("User account disabled");
-        this.usersLiveTable.waitUntilReady();
+        this.usersLiveData.getTableLayout().waitUntilReady();
         return this;
     }
 
-    public boolean isUserDisabled(String userName)
+    public boolean isUserDisabled(int rowNumber)
     {
-        return !getDriver()
-            .findElementsWithoutWaiting(By.xpath(String.format(USER_DISABLED_XPATH_FORMAT, userName)))
-            .isEmpty();
+        return !getUsersLiveData()
+            .getTableLayout()
+            .findElementsInRow(rowNumber, By.cssSelector("td[data-title='User'] div.user.disabled")).isEmpty();
     }
 
-    public boolean canDisableUser(String userName)
+    public boolean canDisableUser(int rowNumber)
     {
-        return !getDriver()
-            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "disable")))
-            .isEmpty();
+        return getUsersLiveData().getTableLayout().hasAction(rowNumber, "disable");
     }
 
-    public UsersAdministrationSectionPage enableUser(String userName)
+    public boolean canEnableUser(int rowNumber)
     {
-        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "enable")))
-            .click();
-        this.waitForNotificationSuccessMessage("User account enabled");
-        this.usersLiveTable.waitUntilReady();
-        return this;
+        return getUsersLiveData().getTableLayout().hasAction(rowNumber, "enable");
     }
 
-    public boolean canEnableUser(String userName)
+    public boolean canEditUser(int rowNumber)
     {
-        return !getDriver()
-            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "enable")))
-            .isEmpty();
-    }
-
-    public boolean canEditUser(String userName)
-    {
-        return !getDriver()
-            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "edit")))
-            .isEmpty();
-    }
-
-    public RegistrationModal clickEditUser(String userName)
-    {
-        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "edit")))
-            .click();
-        return new RegistrationModal();
+        return getUsersLiveData().getTableLayout().hasAction(rowNumber, "edit");
     }
 }

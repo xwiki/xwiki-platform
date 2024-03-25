@@ -49,12 +49,12 @@
         "homePage" : "Main.WebHome",
         "designSystem" : "shoelace"
     },
-    "Wiki30" : {
-        "name" : "Wiki30",
+    "Cristal" : {
+        "name" : "Cristal",
         "configType" : "XWiki",
         "serverRendering" : false,
         "offline" : false,
-        "baseURL" : "https://wiki30.demo.xwiki.com/xwiki",
+        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
         "baseRestURL" : "/rest/cristal/page?media=json",
         "homePage" : "Main.WebHome",
         "designSystem" : "vuetify"

@@ -17,12 +17,12 @@
   },
   "devDependencies": {
     "cross-env": "7.0.3",
-    "electron": "28.2.1",
-    "electron-builder": "24.9.1",
+    "electron": "29.1.5",
+    "electron-builder": "24.13.3",
     "rimraf": "5.0.5"
   },
   "dependencies": {
     "@cristal/lib": "workspace:^",
-    "electron-updater": "6.1.7"
+    "electron-updater": "6.1.8"
   }
 }

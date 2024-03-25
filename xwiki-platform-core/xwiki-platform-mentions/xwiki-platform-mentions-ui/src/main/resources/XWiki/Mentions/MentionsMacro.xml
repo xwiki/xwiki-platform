@@ -380,8 +380,8 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
 }
 
 .xwiki-mention.user.self {
-  background-color: $services.mentions.selfMentionsBackground;
-  color: $services.mentions.selfMentionsColor;
+  background-color: $services.mentions.selfMentionsColor;
+  color: $services.mentions.selfMentionsForeground;
   border: 0;
 }
 

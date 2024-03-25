@@ -32,14 +32,14 @@
     "reflect-metadata": "0.1.13",
     "vue-i18n": "9.8.0",
     "vue-router": "4.2.4",
-    "vuetify": "3.5.2"
+    "vuetify": "3.5.11"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "4.5.1",
     "rimraf": "5.0.5",
     "vite": "5.2.6",
     "vite-plugin-inspect": "0.8.3",
-    "vite-plugin-vuetify": "2.0.1",
+    "vite-plugin-vuetify": "2.0.3",
     "vue": "3.3.10",
     "vue-tsc": "1.8.27"
   },

@@ -32,6 +32,6 @@
     "vite": "5.2.6",
     "vite-plugin-dts": "3.6.4",
     "vite-plugin-inspect": "0.8.3",
-    "vite-plugin-vuetify": "2.0.1"
+    "vite-plugin-vuetify": "2.0.3"
   }
 }

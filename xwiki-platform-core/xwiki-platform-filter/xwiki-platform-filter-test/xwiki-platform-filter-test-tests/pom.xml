@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter-test</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.2.0</version>
   </parent>
   <artifactId>xwiki-platform-filter-test-tests</artifactId>
   <name>XWiki Platform - Filter - Tests - Functional Tests</name>

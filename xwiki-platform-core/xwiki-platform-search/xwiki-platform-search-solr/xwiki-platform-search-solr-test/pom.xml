@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.2.0</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-test</artifactId>
   <name>XWiki Platform - Search - Solr - Tests - Parent POM</name>

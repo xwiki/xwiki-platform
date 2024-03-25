@@ -44,7 +44,7 @@
   "devDependencies": {
     "@mdi/font": "7.2.96",
     "rimraf": "5.0.5",
-    "vite": "5.0.12",
+    "vite": "5.2.6",
     "vue-tsc": "1.8.27"
   }
 }

@@ -25,7 +25,7 @@
     "electron": "28.2.1",
     "rimraf": "5.0.5",
     "typescript": "5.3.3",
-    "vite": "5.0.12",
+    "vite": "5.2.6",
     "vue-tsc": "1.8.27"
   }
 }

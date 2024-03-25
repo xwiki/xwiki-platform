@@ -35,6 +35,7 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
@@ -808,9 +809,10 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(subPageReference).editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> {
-            setup.getDriver().findElement(By.cssSelector("html")).sendKeys(Keys.chord(Keys.CONTROL, "v"));
-            setup.getDriver().findElement(By.cssSelector("img")).click();
+        RichTextAreaElement richTextArea = editor.getRichTextArea();
+        richTextArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        richTextArea.verifyContent(content -> {
+            content.getImages().get(0).click();
         });
 
         // Verify that it's possible to edit a freshly pasted image.

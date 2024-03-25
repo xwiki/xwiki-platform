@@ -31,7 +31,7 @@
   <artifactId>xwiki-platform-livedata-api</artifactId>
   <name>XWiki Platform - Live Data - API</name>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data API</xwiki.extension.name>

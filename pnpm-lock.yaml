@@ -536,9 +536,6 @@ importers:
       '@cristal/rendering-wikimodel':
         specifier: workspace:^
         version: link:../wikimodel
-      '@types/marked':
-        specifier: 5.0.1
-        version: 5.0.1
       dompurify:
         specifier: 3.0.6
         version: 3.0.6
@@ -2117,10 +2114,6 @@ packages:
     dependencies:
       '@types/node': 18.19.14
     dev: true
-
-  /@types/marked@5.0.1:
-    resolution: {integrity: sha512-Y3pAUzHKh605fN6fvASsz5FDSWbZcs/65Q6xYRmnIP9ZIYz27T4IOmXfH9gWJV1dpi7f1e7z7nBGUTx/a0ptpA==}
-    dev: false
 
   /@types/mdast@4.0.3:
     resolution: {integrity: sha512-LsjtqsyF+d2/yFOYaN22dHZI1Cpwkrj+g06G8+qtUKlhovPW89YhqSnfKtMbkgmEtYpH2gydRNULd6y8mciAFg==}

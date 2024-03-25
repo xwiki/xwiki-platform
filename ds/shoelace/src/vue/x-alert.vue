@@ -1,6 +1,6 @@
 <template>
-  <sl-alert open :title="title" :variant="variant" :description="description">
-    {{ title }}
+  <sl-alert open :title="title" :variant="variant">
+    {{ description }}
   </sl-alert>
 </template>
 <script lang="ts">

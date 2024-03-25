@@ -2,6 +2,7 @@
   "name": "@cristal/dsshoelace",
   "version": "1.0.0",
   "types": "dist/index.d.ts",
+  "type": "module",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -16,7 +17,7 @@
     "prepack": "pnpm build",
     "build": "pnpm compile",
     "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
-    "test": "echo 'no test'",
+    "test": "vitest --run",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
@@ -26,8 +27,11 @@
     "vue": "3.4.21"
   },
   "devDependencies": {
+    "@cristal/dev-config": "workspace:*",
+    "@vue/test-utils": "2.4.4",
     "rimraf": "5.0.5",
     "vite": "5.2.6",
+    "vitest": "1.4.0",
     "vue-tsc": "1.8.27"
   }
 }

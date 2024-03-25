@@ -167,12 +167,21 @@ importers:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.3)
     devDependencies:
+      '@cristal/dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
+      '@vue/test-utils':
+        specifier: 2.4.4
+        version: 2.4.4(vue@3.4.21)
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
       vite:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
+      vitest:
+        specifier: 1.4.0
+        version: 1.4.0(happy-dom@12.10.3)
       vue-tsc:
         specifier: 1.8.27
         version: 1.8.27(typescript@5.4.3)
@@ -2376,7 +2385,7 @@ packages:
   /@vitest/snapshot@1.4.0:
     resolution: {integrity: sha512-saAFnt5pPIA5qDGxOHxJ/XxhMFKkUSBJmVt5VgDsAqPTX6JP326r5C/c9UuCMPoXNzuudTPsYDZCoJ5ilpqG2A==}
     dependencies:
-      magic-string: 0.30.6
+      magic-string: 0.30.8
       pathe: 1.1.2
       pretty-format: 29.7.0
     dev: true
@@ -5033,13 +5042,6 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /magic-string@0.30.6:
-    resolution: {integrity: sha512-n62qCLbPjNjyo+owKtveQxZFZTBm+Ms6YoGD23Wew6Vw337PElFNifQpknPruVRQV57kVShPnLGo9vWxVhpPvA==}
-    engines: {node: '>=12'}
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.4.15
-    dev: true
-
   /magic-string@0.30.8:
     resolution: {integrity: sha512-ISQTe55T2ao7XtlAStud6qwYPZjE4GK1S/BeVPus4jrq6JuOnQ00YKQC581RWhR122W7msZV263KzVeLoqidyQ==}
     engines: {node: '>=12'}
@@ -7304,7 +7306,7 @@ packages:
       execa: 8.0.1
       happy-dom: 12.10.3
       local-pkg: 0.5.0
-      magic-string: 0.30.6
+      magic-string: 0.30.8
       pathe: 1.1.2
       picocolors: 1.0.0
       std-env: 3.7.0

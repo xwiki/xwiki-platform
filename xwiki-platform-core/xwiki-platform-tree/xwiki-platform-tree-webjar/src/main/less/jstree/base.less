@@ -1,10 +1,10 @@
 // base jstree
 .jstree-node, .jstree-children, .jstree-container-ul { display:block; margin:0; padding:0; list-style-type:none; list-style-image:none; }
 .jstree-node { white-space:nowrap; }
-.jstree-anchor { display:inline-block; white-space:nowrap; padding:0 4px 0 1px; margin:0; vertical-align:top; }
+.jstree-anchor { display:inline-block; color:black; white-space:nowrap; padding:0 4px 0 1px; margin:0; vertical-align:top; }
 .jstree-anchor:focus { outline:0; }
-.jstree-anchor, .jstree-anchor:link, .jstree-anchor:visited, .jstree-anchor:hover, .jstree-anchor:active { text-decoration:none; }
-.jstree-icon { color:@text-color; display:inline-block; text-decoration:none; margin:0; padding:0; vertical-align:top; text-align:center; }
+.jstree-anchor, .jstree-anchor:link, .jstree-anchor:visited, .jstree-anchor:hover, .jstree-anchor:active { text-decoration:none; color:inherit; }
+.jstree-icon { display:inline-block; text-decoration:none; margin:0; padding:0; vertical-align:top; text-align:center; }
 .jstree-icon:empty { display:inline-block; text-decoration:none; margin:0; padding:0; vertical-align:top; text-align:center; }
 .jstree-ocl { cursor:pointer; }
 .jstree-leaf > .jstree-ocl { cursor:default; }
@@ -15,34 +15,6 @@
 .jstree-no-icons .jstree-themeicon,
 .jstree-anchor > .jstree-themeicon-hidden { display:none; }
 .jstree-hidden, .jstree-node.jstree-hidden { display:none; }
-
-.jstree-no-links {
-  .jstree-anchor:focus {
-    outline: 0;
-  }
-  .jstree-anchor,
-  .jstree-anchor:link,
-  .jstree-anchor:visited,
-  .jstree-anchor:hover,
-  .jstree-anchor:active {
-    color: inherit;
-    text-decoration: none;
-  }
-}
-
-.jstree-no-link {
-  &.jstree-anchor:focus {
-    outline: 0;
-  }
-  &.jstree-anchor,
-  &.jstree-anchor:link,
-  &.jstree-anchor:visited,
-  &.jstree-anchor:hover,
-  &.jstree-anchor:active {
-    color: inherit;
-    text-decoration: none;
-  }
-}
 
 // base jstree rtl
 .jstree-rtl {
@@ -66,6 +38,7 @@
 .jstree-contextmenu .jstree-anchor {
 	-webkit-user-select: none; /* disable selection/Copy of UIWebView */
 	-webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
+	user-select: none;
 }
 .vakata-context {
 	display:none;
@@ -81,6 +54,7 @@
 		}
 		> a:focus { outline:0; }
 	}
+	.vakata-context-no-icons { margin-left:0; }
 	.vakata-context-hover > a { position:relative; background-color:#e8eff7; box-shadow:0 0 2px #0a6aa1; }
 	.vakata-context-separator {
 		> a, > a:hover { background:white; border:0; border-top:1px solid #e2e3e3; height:1px; min-height:1px; max-height:1px; padding:0; margin:0 0 0 2.4em; border-left:1px solid #e0e0e0; text-shadow:0 0 0 transparent; box-shadow:0 0 0 transparent; border-radius:0; }

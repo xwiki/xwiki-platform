@@ -22,13 +22,13 @@
   "dependencies": {
     "@cristal/api": "workspace:^",
     "@cristal/rendering-wikimodel": "workspace:^",
-    "dompurify": "3.0.6",
+    "dompurify": "3.0.11",
     "inversify": "6.0.2",
     "marked": "11.2.0",
     "marked-base-url": "1.1.2"
   },
   "devDependencies": {
-    "@types/dompurify": "3.0.2",
+    "@types/dompurify": "3.0.5",
     "rimraf": "5.0.5",
     "vite": "5.2.7",
     "vue-tsc": "2.0.7"

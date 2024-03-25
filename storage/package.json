@@ -29,7 +29,7 @@
     "vue-i18n": "9.8.0"
   },
   "devDependencies": {
-    "@types/dompurify": "3.0.2",
+    "@types/dompurify": "3.0.5",
     "rimraf": "5.0.5",
     "vite": "5.2.7",
     "vue-tsc": "2.0.7"

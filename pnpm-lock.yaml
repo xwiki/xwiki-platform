@@ -636,8 +636,8 @@ importers:
         specifier: workspace:^
         version: link:../wikimodel
       dompurify:
-        specifier: 3.0.6
-        version: 3.0.6
+        specifier: 3.0.11
+        version: 3.0.11
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -649,8 +649,8 @@ importers:
         version: 1.1.2(marked@11.2.0)
     devDependencies:
       '@types/dompurify':
-        specifier: 3.0.2
-        version: 3.0.2
+        specifier: 3.0.5
+        version: 3.0.5
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -844,8 +844,8 @@ importers:
         version: 9.8.0(vue@3.4.21)
     devDependencies:
       '@types/dompurify':
-        specifier: 3.0.2
-        version: 3.0.2
+        specifier: 3.0.5
+        version: 3.0.5
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -2167,8 +2167,8 @@ packages:
     dependencies:
       '@types/ms': 0.7.34
 
-  /@types/dompurify@3.0.2:
-    resolution: {integrity: sha512-YBL4ziFebbbfQfH5mlC+QTJsvh0oJUrWbmxKMyEdL7emlHJqGR2Qb34TEFKj+VCayBvjKy3xczMFNhugThUsfQ==}
+  /@types/dompurify@3.0.5:
+    resolution: {integrity: sha512-1Wg0g3BtQF7sSb27fJQAKck1HECM6zV1EB66j8JH9i3LCjYabJa0FSdiSgsD5K/RbrsR0SiraKacLB+T8ZVYAg==}
     dependencies:
       '@types/trusted-types': 2.0.7
     dev: true
@@ -3678,8 +3678,8 @@ packages:
       esutils: 2.0.3
     dev: true
 
-  /dompurify@3.0.6:
-    resolution: {integrity: sha512-ilkD8YEnnGh1zJ240uJsW7AzE+2qpbOUYjacomn3AvJ6J4JhKGSZ2nh4wUIXPZrEPppaCLx5jFe8T89Rk8tQ7w==}
+  /dompurify@3.0.11:
+    resolution: {integrity: sha512-Fan4uMuyB26gFV3ovPoEoQbxRRPfTu3CvImyZnhGq5fsIEO+gEFLp45ISFt+kQBWsK5ulDdT0oV28jS1UrwQLg==}
     dev: false
 
   /dotenv-expand@10.0.0:

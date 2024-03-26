@@ -267,7 +267,7 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
             } else {
                 Instant saveInstant = dateValue.toInstant();
                 Instant now = Instant.now();
-                return (saveInstant.plus(tokenLifeTime, ChronoUnit.MINUTES).isBefore(now));
+                return saveInstant.plus(tokenLifeTime, ChronoUnit.MINUTES).isBefore(now);
             }
         }
         return result;

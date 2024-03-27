@@ -9,11 +9,12 @@
   "scripts": {
     "clean": "nx run-many -t clean",
     "dev": "nx dev @cristal/web",
-    "build": "nx run-many -t build",
+    "build": "nx run-many -t build --nxBail=true",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
     "start": "nx run @cristal/web:start",
-    "quickstart": "nx run @cristal/web:quickstart"
+    "quickstart": "nx run @cristal/web:quickstart",
+    "start:electron": "nx run @cristal/electron:start"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "7.4.0",

@@ -27,5 +27,9 @@
     "typescript": "5.4.3",
     "vite": "5.2.6",
     "vue-tsc": "2.0.7"
+  },
+  "dependencies": {
+    "@cristal/electron-storage": "workspace:^",
+    "electron": "29.1.5"
   }
 }

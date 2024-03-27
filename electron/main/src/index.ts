@@ -23,10 +23,12 @@
  *
  **/
 
-import { app } from "electron";
+import { app, BrowserWindow } from "electron";
 import "./security-restrictions";
-import { restoreOrCreateWindow } from "/@/mainWindow";
+import { restoreOrCreateWindow } from "./mainWindow";
 import { platform } from "node:process";
+// @ts-expect-error shouldn't happen but we need to generate the types for the whole project once.
+import load from "@cristal/electron-storage/main";
 
 /**
  * Prevent electron from running multiple instances.
@@ -53,16 +55,22 @@ app.on("window-all-closed", () => {
 });
 
 /**
- * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.
- */
-app.on("activate", restoreOrCreateWindow);
-
-/**
  * Create the application window when the background process is ready.
  */
 app
   .whenReady()
-  .then(restoreOrCreateWindow)
+  .then(() => {
+    load();
+    restoreOrCreateWindow();
+    /**
+     * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.
+     */
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        restoreOrCreateWindow();
+      }
+    });
+  })
   .catch((e) => console.error("Failed create window:", e));
 
 /**

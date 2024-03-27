@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": [
+      "node"
+    ]
+  },
+  "extends": "../../tsconfig.json",
+  "include": [
+    "./src/index.ts",
+    "./src/**/*"
+  ]
+}

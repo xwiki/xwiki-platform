@@ -39,4 +39,6 @@ CristalAppLoader.init(
   "/config.json",
   true,
   false,
+  "XWiki",
+  () => {},
 );

@@ -30,13 +30,13 @@ import type {
   WikiConfig,
   WrappingStorage,
 } from "@cristal/api";
-import { XWikiStorage } from "./xwikiStorage";
-import { XWikiWikiConfig } from "./XWikiWikiConfig";
-import { GitHubStorage } from "./githubStorage";
-import { GitHubWikiConfig } from "./GitHubWikiConfig";
+import { XWikiStorage } from "./xwiki/xwikiStorage";
+import { XWikiWikiConfig } from "./xwiki/XWikiWikiConfig";
+import { GitHubStorage } from "./github/githubStorage";
+import { GitHubWikiConfig } from "./github/GitHubWikiConfig";
 import { WrappingOfflineStorage } from "./wrappingOfflineStorage";
 import type OfflineStorage from "../api/offlineStorage";
-import DexieOfflineStorage from "./dexieOfflineStorage";
+import DexieOfflineStorage from "./dexie/dexieOfflineStorage";
 
 export default class ComponentInit {
   logger: Logger;

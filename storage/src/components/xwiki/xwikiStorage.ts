@@ -25,30 +25,18 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import type { Document, PageData, Storage, WikiConfig } from "@cristal/api";
+import type { Document, PageData } from "@cristal/api";
 import { DefaultPageData, JSONLDDocument, type Logger } from "@cristal/api";
+import { AbstractStorage } from "../abstractStorage";
 
 @injectable()
-export class XWikiStorage implements Storage {
-  public wikiConfig: WikiConfig;
-  public logger: Logger;
-
+export class XWikiStorage extends AbstractStorage {
   constructor(@inject<Logger>("Logger") logger: Logger) {
-    this.logger = logger;
-    this.logger.setModule("storage.components.xwikiStorage");
+    super(logger, "storage.components.xwikiStorage");
   }
 
   public async isStorageReady(): Promise<boolean> {
     return true;
-  }
-
-  setWikiConfig(wikiConfig: WikiConfig) {
-    this.logger.debug("Setting wiki Config: ", wikiConfig);
-    this.wikiConfig = wikiConfig;
-  }
-
-  getWikiConfig() {
-    return this.wikiConfig;
   }
 
   getPageRestURL(page: string, syntax: string): string {

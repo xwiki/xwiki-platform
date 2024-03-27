@@ -56,6 +56,7 @@ export class ContentTools {
           ContentTools.logger?.debug(event.target);
           ContentTools.logger?.debug(event.target.href);
           ContentTools.logger?.debug(location);
+          ContentTools.logger?.debug(location.origin);
           ContentTools.logger?.debug(location.hostname);
           event.preventDefault();
           // Case 1: the link is relative and/or points to the current host.

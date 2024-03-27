@@ -103,7 +103,7 @@ export class Worker implements MyWorker {
           console.log("Updating page ", pageName, type);
           const storage = wikiConfig.storage as WrappingStorage;
           const result = await storage.updatePageContent(pageName, type);
-          if (result == true) {
+          if (result) {
             console.log("Page updated. Calling back to main thread");
             this.fct(page);
           }

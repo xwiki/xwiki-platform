@@ -20,6 +20,7 @@
     "linux": "echo 'no task'"
   },
   "devDependencies": {
+    "@cristal/electron-storage": "workspace:*",
     "@types/node": "20.11.30",
     "rimraf": "5.0.5",
     "typescript": "5.4.3",

@@ -23,26 +23,27 @@
  *
  **/
 
-import { CristalAppLoader } from "@cristal/lib";
-import { ComponentInit } from "@cristal/electron-storage";
-import { Container } from "inversify";
+import type { Container } from "inversify";
+import type { Logger, Storage, WikiConfig } from "@cristal/api";
+import { FileSystemConfig } from "./components/FileSystemConfig";
+import FileSystemStorage from "./components/fileSystemStorage";
 
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  "./config.json",
-  true,
-  true,
-  "FileSystem",
-  (container: Container) => {
-    new ComponentInit(container);
-  },
-);
+export default class ComponentInit {
+  logger: Logger;
+
+  constructor(container: Container) {
+    this.logger = container.get<Logger>("Logger");
+    this.logger.setModule("electron.storage.components.componentsInit");
+
+    this.logger?.debug("Init Sample Module components begin");
+    container
+      .bind<WikiConfig>("WikiConfig")
+      .to(FileSystemConfig)
+      .whenTargetNamed("FileSystem");
+    container
+      .bind<Storage>("Storage")
+      .to(FileSystemStorage)
+      .whenTargetNamed("FileSystem");
+    this.logger?.debug("Init Sample Module components end");
+  }
+}

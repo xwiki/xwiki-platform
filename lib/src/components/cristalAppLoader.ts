@@ -26,6 +26,7 @@
 import { CristalLoader } from "@cristal/extension-manager";
 import { DefaultCristalApp } from "./DefaultCristalApp";
 import { type CristalApp } from "@cristal/api";
+import { Container } from "inversify";
 
 export class CristalAppLoader extends CristalLoader {
   public cristal: DefaultCristalApp;
@@ -34,10 +35,14 @@ export class CristalAppLoader extends CristalLoader {
     super(extensionList);
   }
 
-  public loadApp<T>(config: { [s: string]: T }, isElectron: boolean) {
+  public loadApp<T>(
+    config: { [s: string]: T },
+    isElectron: boolean,
+    configName: string,
+    additionalComponents?: () => void,
+  ) {
     const configMap = new Map<string, T>(Object.entries(config));
     this.cristal.setAvailableConfigurations(configMap);
-    let configName: string = "XWiki";
 
     if (isElectron) {
       const localConfigName = window.localStorage.getItem("currentApp");
@@ -74,12 +79,18 @@ export class CristalAppLoader extends CristalLoader {
     forceStaticMode: boolean,
     configPath: string,
     isElectron: boolean,
+    configName: string,
+    additionalComponents?: (container: Container) => void,
   ) {
     let staticMode = forceStaticMode;
     if (import.meta.env.MODE == "development" || staticMode) {
       staticMode = true;
       const StaticBuild = await import("../staticBuild");
-      StaticBuild.StaticBuild.init(this.container, staticMode);
+      StaticBuild.StaticBuild.init(
+        this.container,
+        staticMode,
+        additionalComponents,
+      );
     }
 
     await this.loadExtensions(true, staticMode);
@@ -95,7 +106,7 @@ export class CristalAppLoader extends CristalLoader {
 
     const response = await fetch(configPath);
     const config = await response.json();
-    this.loadApp(config, isElectron);
+    this.loadApp(config, isElectron, configName);
   }
 
   public static init(
@@ -103,9 +114,17 @@ export class CristalAppLoader extends CristalLoader {
     configPage: string,
     staticBuild: boolean,
     isElectron: boolean,
+    configName: string,
+    additionalComponents: (container: Container) => void,
   ) {
     const cristalLoader = new CristalAppLoader(extensionList);
     cristalLoader.initializeContainer();
-    cristalLoader.launchApp(staticBuild, configPage, isElectron);
+    cristalLoader.launchApp(
+      staticBuild,
+      configPage,
+      isElectron,
+      configName,
+      additionalComponents,
+    );
   }
 }

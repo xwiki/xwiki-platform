@@ -24,5 +24,6 @@
  **/
 
 import ComponentInit from "./components/componentsInit.js";
+import { AbstractStorage } from "./components/abstractStorage";
 
-export { ComponentInit };
+export { ComponentInit, AbstractStorage };

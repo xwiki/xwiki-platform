@@ -1,0 +1,34 @@
+{
+  "name": "@cristal/electron-storage",
+  "version": "1.0.0",
+  "types": "dist/main/index.d.ts",
+  "license": "AGPL-3.0",
+  "exports": {
+    ".": "./dist/default/main.umd.cjs",
+    "./preload": "./dist/preload/main.umd.cjs",
+    "./main": "./dist/main/main.umd.cjs"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "prepack": "pnpm build",
+    "build": "pnpm compile",
+    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && cp \"./package.json\" ./dist/",
+    "test": "echo 'no test'",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "@cristal/api": "workspace:^",
+    "@cristal/storage": "workspace:^",
+    "inversify": "6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "rimraf": "5.0.5",
+    "vite": "5.2.6",
+    "vite-plugin-node": "3.1.0",
+    "vue-tsc": "2.0.7"
+  },
+  "peerDependencies": {
+    "electron": "28.0.0"
+  }
+}

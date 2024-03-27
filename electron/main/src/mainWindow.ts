@@ -23,7 +23,7 @@
  *
  **/
 
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, shell } from "electron";
 import { join, resolve } from "node:path";
 
 async function createWindow() {
@@ -33,9 +33,19 @@ async function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false, // Sandbox disabled because the demo of preload script depend on the Node.js api
-      webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
+      webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's
+      // BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
       preload: join(app.getAppPath(), "./preload/dist/index.cjs"),
     },
+  });
+
+  // Uncomment to start electron debugger at startup.
+  // browserWindow.webContents.openDevTools();
+
+  // Allows for external links to open in the OS browser..
+  browserWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: "deny" };
   });
 
   /**

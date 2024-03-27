@@ -23,26 +23,24 @@
  *
  **/
 
-import { CristalAppLoader } from "@cristal/lib";
-import { ComponentInit } from "@cristal/electron-storage";
-import { Container } from "inversify";
+import { inject, injectable, named } from "inversify";
+import { CristalApp, DefaultWikiConfig, Logger, Storage } from "@cristal/api";
 
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  "./config.json",
-  true,
-  true,
-  "FileSystem",
-  (container: Container) => {
-    new ComponentInit(container);
-  },
-);
+@injectable()
+export class FileSystemConfig extends DefaultWikiConfig {
+  storage: Storage;
+  cristal: CristalApp;
+  constructor(
+    @inject<Logger>("Logger") logger: Logger,
+    @inject("Storage") @named("FileSystem") storage: Storage,
+    @inject("CristalApp") cristal: CristalApp,
+  ) {
+    super(logger);
+    this.storage = storage;
+    this.cristal = cristal;
+    this.storage.setWikiConfig(this);
+    if (this.homePage === "") {
+      this.homePage = "index.md";
+    }
+  }
+}

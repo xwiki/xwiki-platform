@@ -22,5 +22,6 @@ packages:
   - "electron/main"
   - "electron/preload"
   - "electron/renderer"
+  - "electron/storage"
   - "dev/config"
   - "sources/xwiki/mock-server"

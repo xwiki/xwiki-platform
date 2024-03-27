@@ -29,6 +29,7 @@ const config = {
       output: {
         entryFileNames: "[name].cjs",
       },
+      external: ["electron"],
     },
     emptyOutDir: true,
     reportCompressedSize: false,

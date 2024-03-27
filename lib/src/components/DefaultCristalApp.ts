@@ -41,8 +41,12 @@ import {
 } from "@cristal/api";
 import type { App, Component, Ref } from "vue";
 import { createApp } from "vue";
-import type { Router, RouteRecordRaw } from "vue-router";
-import { createRouter, createWebHashHistory } from "vue-router";
+import {
+  createRouter,
+  createWebHashHistory,
+  Router,
+  RouteRecordRaw,
+} from "vue-router";
 
 import "@mdi/font/css/materialdesignicons.css";
 
@@ -467,7 +471,7 @@ export class DefaultCristalApp implements CristalApp {
 
     this.router = createRouter({
       // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
-      history: createWebHashHistory(),
+      history: createWebHashHistory(), // TODO: we should use createWebHistory when not in electron.
       routes,
     });
 

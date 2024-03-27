@@ -11,9 +11,10 @@
     "electron": "cross-env MODE=production electron-builder build --config .electron-builder.config.js --dir --config.asar=false",
     "package": "pnpm prepackage && mkdir -p dist/@cristal && pnpm linux",
     "prepackage": "cross-env MODE=production electron-builder -mwl --config .electron-builder.config.js --dir --config.asar=false",
-    "linux": "electron-builder --linux deb tar.gz --config .electron-builder.config.js --dir --config.asar=false",
+    "linux": "electron-builder --linux deb tar.gz --config .electron-builder.config.js --dir --config.asar=true",
     "win": "electron-builder --win nsis --config .electron-builder.config.js --dir --config.asar=false",
-    "mac": "electron-builder --mac dmg --config .electron-builder.config.js --dir --config.asar=false"
+    "mac": "electron-builder --mac dmg --config .electron-builder.config.js --dir --config.asar=false",
+    "start": "electron ."
   },
   "devDependencies": {
     "cross-env": "7.0.3",
@@ -22,6 +23,7 @@
     "rimraf": "5.0.5"
   },
   "dependencies": {
+    "@cristal/electron-storage": "workspace:^",
     "@cristal/lib": "workspace:^",
     "electron-updater": "6.1.8"
   }

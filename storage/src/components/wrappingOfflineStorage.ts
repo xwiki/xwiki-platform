@@ -114,7 +114,7 @@ export class WrappingOfflineStorage implements WrappingStorage {
     }
   }
 
-  public async savePageContent(
+  private async savePageContent(
     page: string,
     syntax: string,
   ): Promise<PageData> {

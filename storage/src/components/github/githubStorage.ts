@@ -25,29 +25,21 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import type { Logger, PageData, Storage, WikiConfig } from "@cristal/api";
+import type { Logger, PageData, WikiConfig } from "@cristal/api";
 import { DefaultPageData } from "@cristal/api";
+import { AbstractStorage } from "../abstractStorage";
 
 @injectable()
-export class GitHubStorage implements Storage {
+export class GitHubStorage extends AbstractStorage {
   public wikiConfig: WikiConfig;
   public logger: Logger;
 
   constructor(@inject<Logger>("Logger") logger: Logger) {
-    this.logger = logger;
-    this.logger.setModule("storage.components.githubStorage");
+    super(logger, "storage.components.githubStorage");
   }
 
   public async isStorageReady(): Promise<boolean> {
     return true;
-  }
-
-  setWikiConfig(wikiConfig: WikiConfig) {
-    this.wikiConfig = wikiConfig;
-  }
-
-  getWikiConfig() {
-    return this.wikiConfig;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

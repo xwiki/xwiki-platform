@@ -23,7 +23,6 @@
  *
  **/
 
-// import { PageData } from "@cristal/api";
 import type { Table } from "dexie";
 import Dexie from "dexie";
 
@@ -34,7 +33,8 @@ export default class DexiePageStorage extends Dexie {
     super("pages_" + wikiName);
     this.version(2).stores({
       pages:
-        "id, name, content, document, css, js, document.name, document.headline, document.creator", // Primary key and indexed props
+        // Primary key and indexed props
+        "id, name, content, document, css, js, document.name, document.headline, document.creator",
     });
   }
 }

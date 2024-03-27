@@ -823,7 +823,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("a [[image:" + imageURL + "||height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
+        assertEquals("a [[image:" + imageURL + "||alt=\"Test alt\" height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -882,7 +882,7 @@ class ImageIT extends AbstractCKEditorIT
         wikiEditPage.sendKeys("{{html clean='false'}}\n"
             + "<div contenteditable=\"true\" id=\"copyme\">\n"
             + "  <p>\n"
-            + "    a <img src=\"" + imageURL + "\" > b\n"
+            + "    a <img src=\"" + imageURL + "\" alt=\"Test alt\"> b\n"
             + "  </p>\n"
             + "</div>\n"
             + "{{/html}}");

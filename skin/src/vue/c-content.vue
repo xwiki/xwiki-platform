@@ -56,6 +56,7 @@ let link = "/" + cristal?.getCurrentPage() + "/edit";
 let linkXWiki = "/" + cristal?.getCurrentPage() + "/editxwiki";
 let linkText = "/" + cristal?.getCurrentPage() + "/edittext";
 let linkMilkdown = "/" + cristal?.getCurrentPage() + "/editmilkdown";
+let linkProsemirror = "/" + cristal?.getCurrentPage() + "/editprosemirror";
 let serverSideRendering = cristal?.getWikiConfig().serverRendering;
 
 onMounted(() => {
@@ -101,6 +102,9 @@ onUpdated(() => {
           </x-menu-item>
           <x-menu-item :link="linkMilkdown" title="Milkdown Editor">
             <router-link :to="linkMilkdown">Milkdown Editor</router-link>
+          </x-menu-item>
+          <x-menu-item :link="linkProsemirror" title="Prosemirror Editor">
+            <router-link :to="linkProsemirror">Prosemirror Editor</router-link>
           </x-menu-item>
         </template>
       </x-menu>

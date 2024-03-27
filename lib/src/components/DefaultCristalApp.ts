@@ -421,6 +421,11 @@ export class DefaultCristalApp implements CristalApp {
         component: this.skinManager.getTemplate("edit"),
       } as RouteRecordRaw,
       {
+        path: "/:page/editprosemirror",
+        name: "editprosemirror",
+        component: this.skinManager.getTemplate("edit"),
+      } as RouteRecordRaw,
+      {
         path: "/xwiki/search",
         component: this.skinManager.getTemplate("search"),
       } as RouteRecordRaw,

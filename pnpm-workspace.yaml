@@ -14,6 +14,7 @@ packages:
   - "extensions/menubuttons"
   - "editors/wikitext"
   - "editors/milkdown"
+  - "editors/prosemirror"
   - "xwiki/remoteinlineeditor"
   - "lib"
   - "web"

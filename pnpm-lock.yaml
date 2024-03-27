@@ -797,8 +797,8 @@ importers:
   sources/xwiki/mock-server:
     dependencies:
       dotenv:
-        specifier: 16.4.1
-        version: 16.4.1
+        specifier: 16.4.5
+        version: 16.4.5
       express:
         specifier: 4.19.2
         version: 4.19.2
@@ -3649,8 +3649,8 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /dotenv@16.4.1:
-    resolution: {integrity: sha512-CjA3y+Dr3FyFDOAMnxZEGtnW9KBR2M0JvvUtXNW+dYJL5ROWxP9DUHCwgFqpMk0OXCc0ljhaNTr2w/kutYIcHQ==}
+  /dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
     dev: false
 

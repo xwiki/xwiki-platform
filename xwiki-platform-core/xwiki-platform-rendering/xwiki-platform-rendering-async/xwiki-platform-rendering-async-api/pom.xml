@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-async</artifactId>
-    <version>15.10.8</version>
+    <version>15.10.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-async-api</artifactId>
   <name>XWiki Platform - Rendering - Async - API</name>

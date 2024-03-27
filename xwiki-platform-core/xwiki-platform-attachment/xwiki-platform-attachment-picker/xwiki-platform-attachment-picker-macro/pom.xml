@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-picker</artifactId>
-    <version>15.10.8</version>
+    <version>15.10.9-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-attachment-picker-macro</artifactId>

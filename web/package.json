@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@mdi/font": "7.2.96",
-    "@playwright/test": "1.40.1",
+    "@playwright/test": "1.42.1",
     "@types/node": "20.11.30",
     "@vitejs/plugin-vue": "5.0.4",
     "npm-run-all2": "6.1.1",

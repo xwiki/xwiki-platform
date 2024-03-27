@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@cristal/api": "workspace:^",
-    "@shoelace-style/shoelace": "2.14.0",
+    "@shoelace-style/shoelace": "2.15.0",
     "inversify": "6.0.2",
     "vue": "3.4.21"
   },

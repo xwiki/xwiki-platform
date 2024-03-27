@@ -50,7 +50,8 @@ onMounted(async () => {
 
 <template>
   <div ref="editor" class="editor"></div>
-  <div ref="content" v-show="false" v-html="htmlContent"></div>
+  <!-- eslint-disable vue/no-v-html -->
+  <div v-show="false" ref="content" v-html="htmlContent"></div>
 </template>
 
 <style scoped>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>15.10.8-SNAPSHOT</version>
+    <version>15.10.8</version>
   </parent>
   <artifactId>xwiki-platform-crypto</artifactId>
   <name>XWiki Platform - Cryptographic Services</name>

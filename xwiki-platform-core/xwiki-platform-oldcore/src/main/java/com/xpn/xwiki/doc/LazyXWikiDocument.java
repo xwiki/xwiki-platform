@@ -329,6 +329,12 @@ public class LazyXWikiDocument extends XWikiDocument
     }
 
     @Override
+    public XDOM getPreparedXDOM()
+    {
+        return getDocument().getPreparedXDOM();
+    }
+
+    @Override
     public String getTags(XWikiContext context)
     {
         return getDocument().getTags(context);

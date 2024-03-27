@@ -208,14 +208,13 @@ public class AuthenticationScriptService implements ScriptService
 
     /**
      * Check that the given verification code is correct.
-     * Since a new verification code is generated (to avoid reusing a code several times), we also return the new code.
      * Note that we don't need to protect this API for programming rights: if the verificationCode is not correct a
      * {@link ResetPasswordException} is thrown and the verificationCode is reset. So a script attacker with wrong
-     * credentials cannot access the new verification code, or bruteforce it.
+     * credentials cannot access the verification code, or bruteforce it.
      *
      * @param user the user for which to check the verification code.
      * @param verificationCode the code to check.
-     * @return a newly generated verification code if it is correct.
+     * @return the same verification code if it is correct.
      * @throws ResetPasswordException if the code is not correct or if an error occurs.
      * @since 13.1RC1
      */

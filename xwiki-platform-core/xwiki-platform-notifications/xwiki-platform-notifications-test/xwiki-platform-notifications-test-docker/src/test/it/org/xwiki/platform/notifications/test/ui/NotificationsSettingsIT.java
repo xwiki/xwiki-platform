@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
 import org.xwiki.platform.notifications.test.po.NotificationsAdministrationPage;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
@@ -103,7 +104,7 @@ class NotificationsSettingsIT
     @AfterEach
     void tearDown(TestUtils testUtils)
     {
-        //testUtils.deletePage("XWiki", FIRST_USER_NAME);
+        testUtils.deletePage("XWiki", FIRST_USER_NAME);
     }
 
     @Test
@@ -254,7 +255,7 @@ class NotificationsSettingsIT
             NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
 
             // Create a page
-            testUtils.createPage(testReference.getLastSpaceReference().getName(), testReference.getName(), "", "");
+            testUtils.createPage(testReference, "", "");
             NotificationsTrayPage trayPage = new NotificationsTrayPage();
             trayPage.showNotificationTray();
 
@@ -272,10 +273,12 @@ class NotificationsSettingsIT
                 customPrefLiveData.getCustomNotificationFilterPreferences();
             assertEquals(1, preferences.size());
 
+            String pageName =
+                testUtils.serializeReference(testReference.removeParent(new WikiReference("xwiki")));
+
             // Filter 0
             assertEquals("Page only", preferences.get(0).getScope());
-            assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome",
-                preferences.get(0).getLocation());
+            assertEquals(pageName, preferences.get(0).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT,
                 preferences.get(0).getFilterAction());
             assertTrue(preferences.get(0).getEventTypes().isEmpty());
@@ -283,7 +286,7 @@ class NotificationsSettingsIT
             assertTrue(preferences.get(0).isEnabled());
 
             // back to the page
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.gotoPage(testReference);
             trayPage = new NotificationsTrayPage();
             // Unwatch the page
             trayPage.setPageOnlyWatchedState(false);
@@ -300,7 +303,7 @@ class NotificationsSettingsIT
             assertTrue(preferences.isEmpty());
 
             // back to the page
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.gotoPage(testReference);
             trayPage = new NotificationsTrayPage();
             trayPage.showNotificationTray();
 
@@ -318,8 +321,7 @@ class NotificationsSettingsIT
 
             // Filter 1
             assertEquals("Page and children", preferences.get(0).getScope());
-            assertEquals(testReference.getLastSpaceReference().getName() + ".WebHome",
-                preferences.get(0).getLocation());
+            assertEquals(pageName, preferences.get(0).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT,
                 preferences.get(0).getFilterAction());
             assertTrue(preferences.get(0).getEventTypes().isEmpty());
@@ -327,7 +329,7 @@ class NotificationsSettingsIT
             assertTrue(preferences.get(0).isEnabled());
 
             // back to the page
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.gotoPage(testReference);
             trayPage = new NotificationsTrayPage();
             trayPage.showNotificationTray();
 
@@ -346,27 +348,26 @@ class NotificationsSettingsIT
             assertEquals(2, preferences.size());
 
             // Filter 2
-            assertEquals("Page only", preferences.get(1).getScope());
-            assertEquals(testReference.getLastSpaceReference().getName() + "." + testReference.getName(),
-                preferences.get(1).getLocation());
+            assertEquals("Page only", preferences.get(0).getScope());
+            assertEquals(pageName, preferences.get(0).getLocation());
             assertEquals(CustomNotificationFilterPreference.FilterAction.IGNORE_EVENT,
-                preferences.get(1).getFilterAction());
-            assertTrue(preferences.get(1).getEventTypes().isEmpty());
-            assertTrue(preferences.get(1).getFormats().containsAll(List.of("Email", "Alert")));
-            assertTrue(preferences.get(1).isEnabled());
+                preferences.get(0).getFilterAction());
+            assertTrue(preferences.get(0).getEventTypes().isEmpty());
+            assertTrue(preferences.get(0).getFormats().containsAll(List.of("Email", "Alert")));
+            assertTrue(preferences.get(0).isEnabled());
 
             // Disable filter 2
-            preferences.get(1).setEnabled(false);
+            preferences.get(0).setEnabled(false);
             // Refresh the page
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             customPrefLiveData =
                 notificationsUserProfilePage.getCustomNotificationFilterPreferencesLiveData();
             preferences = customPrefLiveData.getCustomNotificationFilterPreferences();
             // Verify the change have been saved
-            assertFalse(preferences.get(1).isEnabled());
+            assertFalse(preferences.get(0).isEnabled());
 
             // Go back to the page to check how it impacts the watch
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.gotoPage(testReference);
             trayPage = new NotificationsTrayPage();
             trayPage.showNotificationTray();
             // Verify the whole status
@@ -384,7 +385,7 @@ class NotificationsSettingsIT
             preferences.get(0).delete();
 
             // Verify it's all like the beginning
-            testUtils.gotoPage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.gotoPage(testReference);
             trayPage = new NotificationsTrayPage();
             trayPage.showNotificationTray();
             assertFalse(trayPage.isPageOnlyWatched());
@@ -399,7 +400,7 @@ class NotificationsSettingsIT
             assertTrue(preferences.isEmpty());
         } finally {
             // Clean up
-            testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
+            testUtils.rest().delete(testReference);
 
             NotificationsUserProfilePage p = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
             CustomNotificationFilterPreferencesLiveDataElement customPrefLiveData =
@@ -585,7 +586,7 @@ class NotificationsSettingsIT
      */
     @Test
     @Order(5)
-    void customFiltersAndLiveData(TestUtils testUtils, TestReference testReference) throws Exception
+    void customFiltersAndLiveData(TestUtils testUtils) throws Exception
     {
         // Create pages for the filter locations
         SpaceReference lastSpaceReference = new SpaceReference("xwiki", NotificationsSettingsIT.class.getSimpleName());
@@ -759,13 +760,14 @@ class NotificationsSettingsIT
             NotificationsUserProfilePage.gotoPage(secondUserUsername);
         notificationsUserProfilePage.setAutoWatchMode(AbstractNotificationsSettingsPage.AutowatchMode.NEW);
 
+        SpaceReference newPagesSpaceRef = new SpaceReference("NewPages", lastSpaceReference);
         // Create multiple pages
         for (int i = 0; i < 15; i++) {
-            DocumentReference pageRef = new DocumentReference("Page_" + i, testReference.getLastSpaceReference());
+            DocumentReference pageRef = new DocumentReference("Page_" + i, newPagesSpaceRef);
             testUtils.rest().savePage(pageRef, "Content of page " + i, "Title of page " + i );
         }
         String pageSpaceName =
-            NotificationsSettingsIT.class.getSimpleName() + "." + testReference.getLastSpaceReference().getName();
+            NotificationsSettingsIT.class.getSimpleName() + "." + newPagesSpaceRef.getName();
 
         notificationsUserProfilePage =
             NotificationsUserProfilePage.gotoPage(secondUserUsername);
@@ -786,7 +788,7 @@ class NotificationsSettingsIT
         assertEquals("XWiki." + FIRST_USER_NAME, filterPreference.getLocation());
 
         customPrefLiveData.clearAllFilters();
-        customPrefLiveData.filterLocation(testReference.getLastSpaceReference().getName());
+        customPrefLiveData.filterLocation(newPagesSpaceRef.getName());
         // Click twice to order descending
         customPrefLiveData.sortLocation();
         customPrefLiveData.sortLocation();

@@ -91,8 +91,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(happy-dom@14.3.9)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   dev/config:
     devDependencies:
@@ -149,8 +149,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(happy-dom@14.3.9)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   ds/shoelace:
     dependencies:
@@ -183,8 +183,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(happy-dom@14.3.9)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   ds/vuetify:
     dependencies:
@@ -211,8 +211,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   editors/milkdown:
     dependencies:
@@ -368,8 +368,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   electron/preload:
     devDependencies:
@@ -389,8 +389,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   electron/renderer:
     dependencies:
@@ -414,8 +414,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   extension-manager:
     dependencies:
@@ -470,8 +470,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   lib:
     dependencies:
@@ -549,8 +549,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   macros:
     dependencies:
@@ -577,8 +577,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   rendering/rendering:
     dependencies:
@@ -611,8 +611,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   rendering/wikimodel:
     dependencies:
@@ -633,8 +633,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   sharedworker/api:
     dependencies:
@@ -658,8 +658,8 @@ importers:
         specifier: 4.0.2
         version: 4.0.2(comlink@4.4.1)(vite@5.2.6)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   sharedworker/impl:
     dependencies:
@@ -701,8 +701,8 @@ importers:
         specifier: 4.0.2
         version: 4.0.2(comlink@4.4.1)(vite@5.2.6)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   skin:
     dependencies:
@@ -747,8 +747,8 @@ importers:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.3)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   sources/xwiki/mock-server:
     dependencies:
@@ -809,8 +809,8 @@ importers:
         specifier: 5.2.6
         version: 5.2.6(@types/node@20.11.30)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   web:
     dependencies:
@@ -867,8 +867,8 @@ importers:
         specifier: 2.0.3
         version: 2.0.3(vite@5.2.6)(vue@3.4.21)(vuetify@3.5.12)
       vue-tsc:
-        specifier: 1.8.27
-        version: 1.8.27(typescript@5.4.3)
+        specifier: 2.0.7
+        version: 2.0.7(typescript@5.4.3)
 
   xwiki/remoteinlineeditor:
     dependencies:
@@ -2586,16 +2586,35 @@ packages:
       '@volar/source-map': 1.11.1
     dev: true
 
+  /@volar/language-core@2.1.5:
+    resolution: {integrity: sha512-u1OHmVkCFsJqNdaM2GKuMhE67TxcEnOqJNF+VtYv2Ji8DnrUaF4FAFSNxY+MRGICl+873CsSJVKas9TQtW14LA==}
+    dependencies:
+      '@volar/source-map': 2.1.5
+    dev: true
+
   /@volar/source-map@1.11.1:
     resolution: {integrity: sha512-hJnOnwZ4+WT5iupLRnuzbULZ42L7BWWPMmruzwtLhJfpDVoZLjNBxHDi2sY2bgZXCKlpU5XcsMFoYrsQmPhfZg==}
     dependencies:
       muggle-string: 0.3.1
     dev: true
 
+  /@volar/source-map@2.1.5:
+    resolution: {integrity: sha512-GIkAM6fHgDcTXcdH4i10fAiAZzO0HLIer8/pt3oZ9A0n7n4R5d1b2F8Xxzh/pgmgNoL+SrHX3MFxs35CKgfmtA==}
+    dependencies:
+      muggle-string: 0.4.1
+    dev: true
+
   /@volar/typescript@1.11.1:
     resolution: {integrity: sha512-iU+t2mas/4lYierSnoFOeRFQUhAEMgsFuQxoxvwn5EdQopw43j+J27a4lt9LMInx1gLJBC6qL14WYGlgymaSMQ==}
     dependencies:
       '@volar/language-core': 1.11.1
+      path-browserify: 1.0.1
+    dev: true
+
+  /@volar/typescript@2.1.5:
+    resolution: {integrity: sha512-zo9a3NrNMSkufIvHuExDGTfYv+zO7C5p2wg8fyP7vcqF/Qo0ztjb0ZfOgq/A85EO/MBc1Kj2Iu7PaOBtP++NMw==}
+    dependencies:
+      '@volar/language-core': 2.1.5
       path-browserify: 1.0.1
     dev: true
 
@@ -2706,6 +2725,24 @@ packages:
       computeds: 0.0.1
       minimatch: 9.0.3
       muggle-string: 0.3.1
+      path-browserify: 1.0.1
+      typescript: 5.4.3
+      vue-template-compiler: 2.7.15
+    dev: true
+
+  /@vue/language-core@2.0.7(typescript@5.4.3):
+    resolution: {integrity: sha512-Vh1yZX3XmYjn9yYLkjU8DN6L0ceBtEcapqiyclHne8guG84IaTzqtvizZB1Yfxm3h6m7EIvjerLO5fvOZO6IIQ==}
+    peerDependencies:
+      typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@volar/language-core': 2.1.5
+      '@vue/compiler-dom': 3.4.21
+      '@vue/shared': 3.4.21
+      computeds: 0.0.1
+      minimatch: 9.0.3
       path-browserify: 1.0.1
       typescript: 5.4.3
       vue-template-compiler: 2.7.15
@@ -5623,6 +5660,10 @@ packages:
     resolution: {integrity: sha512-ckmWDJjphvd/FvZawgygcUeQCxzvohjFO5RxTjj4eq8kw359gFF3E1brjfI+viLMxss5JrHTDRHZvu2/tuy0Qg==}
     dev: true
 
+  /muggle-string@0.4.1:
+    resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
+    dev: true
+
   /nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -7569,6 +7610,18 @@ packages:
     dependencies:
       '@volar/typescript': 1.11.1
       '@vue/language-core': 1.8.27(typescript@5.4.3)
+      semver: 7.5.4
+      typescript: 5.4.3
+    dev: true
+
+  /vue-tsc@2.0.7(typescript@5.4.3):
+    resolution: {integrity: sha512-LYa0nInkfcDBB7y8jQ9FQ4riJTRNTdh98zK/hzt4gEpBZQmf30dPhP+odzCa+cedGz6B/guvJEd0BavZaRptjg==}
+    hasBin: true
+    peerDependencies:
+      typescript: '*'
+    dependencies:
+      '@volar/typescript': 2.1.5
+      '@vue/language-core': 2.0.7(typescript@5.4.3)
       semver: 7.5.4
       typescript: 5.4.3
     dev: true

@@ -138,18 +138,7 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <criticality>allowed</criticality>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</old>
-                  <new>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</new>
-                  <superClass>org.xwiki.filter.instance.output.EntityInstanceOutputProperties</superClass>
-                  <justification>Not a breakage, the old DocumentInstanceOutputProperties content has been moved to the new EntityInstanceOutputProperties class and old class now inherits from the new one</justification>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

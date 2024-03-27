@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.ui;
+package org.xwiki.security.authentication.test.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,19 +60,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
     // by GreenMail running on the host.
     3025
-},
+    },
     properties = {
         // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
-        "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
-        // Pages created in the tests need to have PR since we ask for PR to send mails, so we need to exclude them from
-        // the PR checker.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\."
-            + "(ResetPassword|ResetPasswordComplete)"
+        "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml,notification-filter-preferences.hbm.xml",
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
-        "org.xwiki.platform:xwiki-platform-mail-send-storage"
+        "org.xwiki.platform:xwiki-platform-mail-send-storage",
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
     }
 )
 public class ResetPasswordIT
@@ -102,7 +99,7 @@ public class ResetPasswordIT
     @Test
     public void resetForgottenPassword(TestUtils setup) throws Exception
     {
-        setup.loginAsSuperAdmin();
+        setup.forceGuestUser();
 
         String userName = "testUser" + RandomStringUtils.randomAlphanumeric(6);
         String password = "password";
@@ -110,9 +107,6 @@ public class ResetPasswordIT
 
         // Create a user
         setup.createUser(userName, password, null);
-
-        // Make sure we are not logged in and go to the reset password page
-        setup.forceGuestUser();
         ResetPasswordPage resetPasswordPage = ResetPasswordPage.gotoPage();
 
         // Try to reset the password of a non existent user
@@ -242,6 +236,7 @@ public class ResetPasswordIT
 
     private void configureEmail(TestUtils setup, TestConfiguration testConfiguration)
     {
+        setup.loginAsSuperAdmin();
         setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host",
             testConfiguration.getServletEngine().getHostIP(), "port", "3025", "sendWaitTime", "0");
     }

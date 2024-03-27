@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.ui;
+package org.xwiki.security.authentication.test.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,6 +92,7 @@ class ForgotUsernameIT
 
     private void configureEmail(TestUtils setup, TestConfiguration testConfiguration)
     {
+        setup.loginAsSuperAdmin();
         setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host",
             testConfiguration.getServletEngine().getHostIP(), "port", "3025", "sendWaitTime", "0");
     }

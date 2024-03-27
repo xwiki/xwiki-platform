@@ -17,54 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.administration.test.ui;
+package org.xwiki.security.authentication.test.ui;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
- * All UI tests for the Administration feature.
+ * All UI tests for the Security Authentication feature.
  *
  * @version $Id$
- * @since 11.2RC1
+ * @since 16.3.0RC1
  */
 @UITest
 public class AllIT
 {
     @Nested
-    @DisplayName("Overall Administration UI")
-    class NestedAdministrationIT extends AdministrationIT
+    @DisplayName("Reset Password")
+    class NestedResetPasswordIT extends ResetPasswordIT
     {
     }
 
     @Nested
-    @DisplayName("ConfigurableClass")
-    class NestedConfigurableClassIT extends ConfigurableClassIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Users and Groups Rights Management")
-    class NestedUsersGroupsRightsManagementIT extends UsersGroupsRightsManagementIT
-    {
-    }
-
-    @Nested
-    @DisplayName("XAR Import")
-    class NestedXARImportIT extends XARImportIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Page Templates")
-    class NestedPageTemplatesIT extends PageTemplatesIT
-    {
-    }
-    
-    @Nested
-    @DisplayName("User registration")
-    class NestedRegisterIT extends RegisterIT
+    @DisplayName("Forgot Username")
+    class NestedForgotUsernameIT extends ForgotUsernameIT
     {
     }
 }

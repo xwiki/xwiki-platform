@@ -35,6 +35,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  *
  * @version $Id$
  * @since 16.3.0RC1
+ * @since 15.10.9
  */
 @Component
 @Singleton

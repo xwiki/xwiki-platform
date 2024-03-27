@@ -91,6 +91,13 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Search -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>

@@ -72,8 +72,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.4.21)
       vue-router:
-        specifier: 4.2.4
-        version: 4.2.4(vue@3.4.21)
+        specifier: 4.3.0
+        version: 4.3.0(vue@3.4.21)
     devDependencies:
       '@cristal/dev-config':
         specifier: workspace:*
@@ -110,7 +110,7 @@ importers:
         version: 1.11.0
       '@gouvminint/vue-dsfr':
         specifier: 5.8.0
-        version: 5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.4)(vue@3.4.21)
+        version: 5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.3.0)(vue@3.4.21)
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -124,8 +124,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.4.21)
       vue-router:
-        specifier: 4.2.4
-        version: 4.2.4(vue@3.4.21)
+        specifier: 4.3.0
+        version: 4.3.0(vue@3.4.21)
       vuetify:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.4.3)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0)(vue@3.4.21)
@@ -580,8 +580,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.4.21)
       vue-router:
-        specifier: 4.2.4
-        version: 4.2.4(vue@3.4.21)
+        specifier: 4.3.0
+        version: 4.3.0(vue@3.4.21)
       vuetify:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.4.3)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0)(vue@3.4.21)
@@ -735,8 +735,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.4.21)
       vue-router:
-        specifier: 4.2.4
-        version: 4.2.4(vue@3.4.21)
+        specifier: 4.3.0
+        version: 4.3.0(vue@3.4.21)
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -769,8 +769,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.4.21)
       vue-router:
-        specifier: 4.2.4
-        version: 4.2.4(vue@3.4.21)
+        specifier: 4.3.0
+        version: 4.3.0(vue@3.4.21)
       vuetify:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.4.3)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0)(vue@3.4.21)
@@ -874,8 +874,8 @@ importers:
         specifier: 9.8.0
         version: 9.8.0(vue@3.4.21)
       vue-router:
-        specifier: 4.2.4
-        version: 4.2.4(vue@3.4.21)
+        specifier: 4.3.0
+        version: 4.3.0(vue@3.4.21)
       vuetify:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.4.3)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0)(vue@3.4.21)
@@ -1324,7 +1324,7 @@ packages:
     engines: {node: '>=18.16.1'}
     dev: false
 
-  /@gouvminint/vue-dsfr@5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.2.4)(vue@3.4.21):
+  /@gouvminint/vue-dsfr@5.8.0(oh-vue-icons@1.0.0-rc3)(vue-router@4.3.0)(vue@3.4.21):
     resolution: {integrity: sha512-op14Tq3+iXLl8XU9dAwvhT/yvZu74nKABOSDsHTlq5KUyqBYOk7v2egGOVtnnM8w3u+UchCdGbys6a7nN3fUgQ==}
     engines: {node: '>=18.x.x', npm: '>=8.x.x'}
     peerDependencies:
@@ -1337,7 +1337,7 @@ packages:
       focus-trap-vue: 4.0.3(focus-trap@7.5.4)(vue@3.4.21)
       oh-vue-icons: 1.0.0-rc3(vue@3.4.21)
       vue: 3.4.21(typescript@5.4.3)
-      vue-router: 4.2.4(vue@3.4.21)
+      vue-router: 4.3.0(vue@3.4.21)
     dev: false
 
   /@humanwhocodes/config-array@0.11.14:
@@ -7625,8 +7625,8 @@ packages:
       '@vue/devtools-api': 6.5.1
       vue: 3.4.21(typescript@5.4.3)
 
-  /vue-router@4.2.4(vue@3.4.21):
-    resolution: {integrity: sha512-9PISkmaCO02OzPVOMq2w82ilty6+xJmQrarYZDkjZBfl4RvYAlt4PKnEX21oW4KTtWfa9OuO/b3qk1Od3AEdCQ==}
+  /vue-router@4.3.0(vue@3.4.21):
+    resolution: {integrity: sha512-dqUcs8tUeG+ssgWhcPbjHvazML16Oga5w34uCUmsk7i0BcnskoLGwjpa15fqMr2Fa5JgVBrdL2MEgqz6XZ/6IQ==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:

@@ -30,7 +30,7 @@
     "express": "4.19.2",
     "vue": "3.4.21",
     "vue-i18n": "9.8.0",
-    "vue-router": "4.2.4",
+    "vue-router": "4.3.0",
     "vuetify": "3.5.12"
   },
   "devDependencies": {

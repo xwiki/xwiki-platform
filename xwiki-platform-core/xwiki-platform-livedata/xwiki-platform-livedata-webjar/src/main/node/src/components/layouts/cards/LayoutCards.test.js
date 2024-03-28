@@ -34,6 +34,7 @@ import { describe, expect, it } from "vitest";
  *   provide: {
  *     logic: {
  *       canAddEntry: () => false,
+ *       getPageCount: () => 1,
  *       getEntryId: (e) => e.id,
  *       data: {
  *         data: {
@@ -59,11 +60,12 @@ function initWrapper({ options, afterEntryFetchWrapper } = {}) {
     global: {
       provide: {
         logic: {
-          canAddEntry: () => false, getEntryId: (e) => e.id, onEvent: (eventName, callback) => {
+          canAddEntry: () => false, getPageCount: () => 1, getEntryId: (e) => e.id, onEvent: (eventName, callback) => {
             if (afterEntryFetchWrapper) {
               afterEntryFetchWrapper.callback = callback;
             }
-          }, data: {
+          },
+          data: {
             data: {
               entries: [],
             },

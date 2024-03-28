@@ -34,7 +34,7 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination side="left" />
+        <LivedataPagination v-if="isMoreThanOnePage" side="left" />
       </template>
       <template #right>
         <LivedataPagination side="right" />
@@ -91,7 +91,7 @@
       <div v-if="entriesFetched && entries.length === 0" class="noentries-table">
         {{ $t("livedata.bottombar.noEntries") }}
       </div>
-      <LivedataPagination />
+      <LivedataPagination v-if="isMoreThanOnePage" />
     </LivedataBottombar>
   </div>
 </template>
@@ -141,6 +141,9 @@ export default {
     },
     canAddEntry() {
       return this.logic.canAddEntry();
+    },
+    isMoreThanOnePage () {
+      return this.logic.getPageCount() > 1
     },
   },
 

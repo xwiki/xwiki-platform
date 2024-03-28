@@ -812,6 +812,8 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         margin-top: 0;
         border-top-right-radius: 0;
         border-top-left-radius: 0;
+        overflow-wrap: break-word;
+        hyphens: auto;
         li {
           /* Text inside menu */
           color: @dropdown-link-color;

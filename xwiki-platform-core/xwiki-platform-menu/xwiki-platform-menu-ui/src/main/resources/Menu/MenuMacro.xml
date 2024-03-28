@@ -817,16 +817,14 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         li {
           /* Text inside menu */
           color: @dropdown-link-color;
+          padding: 3px 20px;
           /* Links inside menu */
           a {
             display: block;
-            padding: 3px 20px;
             clear: both;
             font-weight: normal;
             line-height: @line-height-base;
             color: @dropdown-link-color;
-            overflow: hidden;
-            text-overflow: ellipsis; // Displaying ... if the text is too long
             &amp;:hover, &amp;:focus-within {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               text-decoration: none;

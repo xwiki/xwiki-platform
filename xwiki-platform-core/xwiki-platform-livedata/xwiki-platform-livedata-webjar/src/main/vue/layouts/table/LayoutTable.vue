@@ -128,19 +128,23 @@ export default {
   inject: ["logic"],
   
   data: () => ({
-    entriesFetched: false
+    entriesFetched: false,
+    layoutLoaded: false
   }),
 
   computed: {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
     canAddEntry () { return this.logic.canAddEntry(); },
-    isMoreThanOnePage () { return this.logic.getPageCount() > 1 },
+    isMoreThanOnePage () { return (this.logic.getPageCount() > 1) || this.layoutLoaded },
   },
   
   mounted() {
     this.logic.onEvent('afterEntryFetch', () => {
       this.entriesFetched = true;
+    });
+    this.logic.onEvent("layoutLoaded", () => {
+      this.layoutLoaded = true;
     });
   }
 

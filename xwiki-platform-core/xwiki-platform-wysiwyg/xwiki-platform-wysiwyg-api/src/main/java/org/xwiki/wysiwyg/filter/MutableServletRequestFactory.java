@@ -19,9 +19,9 @@
  */
 package org.xwiki.wysiwyg.filter;
 
-import javax.servlet.ServletRequest;
-
 import org.xwiki.component.annotation.Role;
+
+import jakarta.servlet.ServletRequest;
 
 /**
  * A factory for mutable servlet requests. This factory is needed because concrete mutable servlet requests don't have a
@@ -38,6 +38,17 @@ public interface MutableServletRequestFactory
      * 
      * @param request The original servlet request to wrap.
      * @return a new mutable servlet request.
+     * @deprecated use {@link #newInstance(ServletRequest)} instead
      */
-    MutableServletRequest newInstance(ServletRequest request);
+    @Deprecated(since = "17-jakarta")
+    MutableServletRequest newInstance(javax.servlet.ServletRequest request);
+
+    /**
+     * Creates a new mutable servlet request.
+     * 
+     * @param request The original servlet request to wrap.
+     * @return a new mutable servlet request.
+     * @since 17-jakarta
+     */
+    MutableJakartaServletRequest newInstance(ServletRequest request);
 }

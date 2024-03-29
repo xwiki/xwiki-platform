@@ -22,10 +22,13 @@ package org.xwiki.container.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.xwiki.container.RedirectResponse;
 import org.xwiki.container.Response;
+import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletResponse;
+import org.xwiki.jakartabridge.servlet.internal.JavaxToJakartaHttpServletResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This is the implementation of {@link Response} for {@link HttpServletResponse}.
@@ -34,23 +37,58 @@ import org.xwiki.container.Response;
  */
 public class ServletResponse implements Response, RedirectResponse
 {
-    private HttpServletResponse httpServletResponse;
+    private final HttpServletResponse jakartaHttpServletResponse;
 
+    private javax.servlet.http.HttpServletResponse javaxHttpServletResponse;
+
+    /**
+     * @param jakartaHttpServletRequest the standard Jakarta {@link HttpServletRequest} instance
+     * @since 17-jakarta
+     */
     public ServletResponse(HttpServletResponse httpServletResponse)
     {
-        this.httpServletResponse = httpServletResponse;
+        this.jakartaHttpServletResponse = httpServletResponse;
     }
 
+    /**
+     * @param javaxHttpServletResponse the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
+     * @deprecated use {@link #ServletResponse(HttpServletResponse)} instead
+     */
+    @Deprecated(since = "17-jakarta")
+    public ServletResponse(javax.servlet.http.HttpServletResponse javaxHttpServletResponse)
+    {
+        this.javaxHttpServletResponse = javaxHttpServletResponse;
+        this.jakartaHttpServletResponse = new JakartaToJavaxHttpServletResponse(javaxHttpServletResponse);
+    }
+
+    /**
+     * @return the standard Jakarta {@link HttpServletResponse} instance
+     * @since 17-jakarta
+     */
+    public HttpServletResponse getJakartaHttpServletResponse()
+    {
+        return this.jakartaHttpServletResponse;
+    }
+
+    /**
+     * @return the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
+     * @deprecated use {@link #getJakartaHttpServletResponse()} instead
+     */
+    @Deprecated(since = "17-jakarta")
     public HttpServletResponse getHttpServletResponse()
     {
-        return this.httpServletResponse;
+        if (this.javaxHttpServletResponse == null) {
+            this.javaxHttpServletResponse = new JavaxToJakartaHttpServletResponse(this.jakartaHttpServletResponse);
+        }
+
+        return this.jakartaHttpServletResponse;
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException
     {
         try {
-            return this.httpServletResponse.getOutputStream();
+            return this.jakartaHttpServletResponse.getOutputStream();
         } catch (IllegalStateException ex) {
             return null;
         }
@@ -59,18 +97,18 @@ public class ServletResponse implements Response, RedirectResponse
     @Override
     public void setContentLength(int length)
     {
-        this.httpServletResponse.setContentLength(length);
+        this.jakartaHttpServletResponse.setContentLength(length);
     }
 
     @Override
     public void setContentType(String mimeType)
     {
-        this.httpServletResponse.setContentType(mimeType);
+        this.jakartaHttpServletResponse.setContentType(mimeType);
     }
 
     @Override
     public void sendRedirect(String location) throws IOException
     {
-        this.httpServletResponse.sendRedirect(location);
+        this.jakartaHttpServletResponse.sendRedirect(location);
     }
 }

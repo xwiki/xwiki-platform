@@ -19,28 +19,39 @@
  */
 package org.xwiki.container.servlet;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Role
 public interface ServletContainerInitializer
 {
-    void initializeRequest(HttpServletRequest request, Object xwikiContext)
-        throws ServletContainerException;
-    
-    void initializeRequest(HttpServletRequest request)
+    @Deprecated(since = "17-jakarta")
+    void initializeRequest(javax.servlet.http.HttpServletRequest request, Object xwikiContext)
         throws ServletContainerException;
 
-    void initializeResponse(HttpServletResponse response);
-    
-    void initializeSession(HttpServletRequest request);
+    @Deprecated(since = "17-jakarta")
+    void initializeRequest(javax.servlet.http.HttpServletRequest request) throws ServletContainerException;
+
+    @Deprecated(since = "17-jakarta")
+    void initializeResponse(javax.servlet.http.HttpServletResponse response);
+
+    @Deprecated(since = "17-jakarta")
+    void initializeSession(javax.servlet.http.HttpServletRequest request);
 
     /**
      * @deprecated use the notion of Environment instead
      */
     @Deprecated(since = "3.5M1")
-    void initializeApplicationContext(ServletContext servletContext);
+    void initializeApplicationContext(javax.servlet.ServletContext servletContext);
+
+    /**
+     * @param request the current request
+     * @param response the current response
+     * @since 17-jakarta
+     */
+    @Unstable
+    void initializeRequest(HttpServletRequest request, HttpServletResponse response) throws ServletContainerException;
 }

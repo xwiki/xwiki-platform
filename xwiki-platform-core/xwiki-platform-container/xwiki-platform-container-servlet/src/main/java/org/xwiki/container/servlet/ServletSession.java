@@ -24,6 +24,7 @@ import org.xwiki.container.Session;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+@Deprecated(since = "17-jakarta")
 public class ServletSession implements Session
 {
     private HttpSession httpSession;

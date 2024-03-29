@@ -158,6 +158,7 @@ public final class SavedRequestManager
      * @return the identifier of the saved request
      */
     @SuppressWarnings("unchecked")
+    @Deprecated(since = "17-jakarta")
     public static String saveRequest(HttpServletRequest request)
     {
         // Saved requests are stored in the request session
@@ -192,6 +193,7 @@ public final class SavedRequestManager
      *         request information
      */
     @SuppressWarnings("unchecked")
+    @Deprecated(since = "17-jakarta")
     public static String getOriginalUrl(HttpServletRequest request)
     {
         HttpSession session = request.getSession();

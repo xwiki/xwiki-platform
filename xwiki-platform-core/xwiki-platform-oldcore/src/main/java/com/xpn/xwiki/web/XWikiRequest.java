@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+@Deprecated(since = "17-jakarta")
 public interface XWikiRequest extends HttpServletRequest
 {
     String get(String name);

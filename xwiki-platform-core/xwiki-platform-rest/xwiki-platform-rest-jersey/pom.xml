@@ -84,8 +84,13 @@
       <artifactId>aopalliance</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-jakartabridge-servlet</artifactId>
+      <version>${commons.version}</version>
     </dependency>
   </dependencies>
 </project>

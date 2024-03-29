@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -42,10 +42,12 @@ import org.xwiki.observation.ObservationManager;
  * Manager in charge of keeping track of the {@link HttpSession}.
  * One of the role of this component is to properly call {@link HttpSession#invalidate()} on all sessions before
  * disposal of the component: this ensures that all listeners relying on the session disposal can be executed.
+ * <p>
+ * While the class is much older, the {@code @since} was moved to 17-jakarta because it implements a completely
+ * different API from Java point of view.
  *
  * @version $Id$
- * @since 14.5
- * @since 14.4.1
+ * @since 17-jakarta
  */
 @Component(roles = HttpSessionManager.class)
 @Singleton

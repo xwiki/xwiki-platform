@@ -50,6 +50,7 @@ import javax.servlet.http.Part;
  * @since 12.4RC1
  * @since 11.10.5
  */
+@Deprecated(since = "17-jakarta")
 public class WrappingXWikiRequest implements XWikiRequest
 {
     protected final XWikiRequest request;

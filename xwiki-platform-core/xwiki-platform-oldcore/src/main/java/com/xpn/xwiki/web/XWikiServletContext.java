@@ -23,11 +23,28 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.servlet.ServletContext;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
 
+import jakarta.servlet.ServletContext;
+
+/**
+ * Servlet based implementation of {@link XWikiEngineContext}.
+ * 
+ * @version $Id$
+ */
 public class XWikiServletContext implements XWikiEngineContext
 {
-    private ServletContext scontext;
+    private final ServletContext scontext;
+
+    /**
+     * @param scontext
+     * @deprecated use {@link #XWikiServletContext(ServletContext)} instead
+     */
+    @Deprecated(since = "17-jakarta")
+    public XWikiServletContext(javax.servlet.ServletContext scontext)
+    {
+        this.scontext = ServletBridge.toJakarta(scontext);
+    }
 
     public XWikiServletContext(ServletContext scontext)
     {

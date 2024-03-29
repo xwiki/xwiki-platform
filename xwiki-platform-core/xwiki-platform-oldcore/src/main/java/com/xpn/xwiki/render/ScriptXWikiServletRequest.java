@@ -37,6 +37,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * @since 12.2.1
  * @since 11.10.5
  */
+@Deprecated(since = "17-jakarta")
 public class ScriptXWikiServletRequest extends WrappingXWikiRequest
 {
     private final ContextualAuthorizationManager authorization;

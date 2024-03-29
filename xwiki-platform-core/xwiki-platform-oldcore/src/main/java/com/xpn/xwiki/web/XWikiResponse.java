@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpServletResponse;
 
+@Deprecated(since = "17-jakarta")
 public interface XWikiResponse extends HttpServletResponse
 {
     /**

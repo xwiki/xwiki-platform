@@ -27,15 +27,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
@@ -61,6 +61,9 @@ import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
  * safe as a session is, and it will not be available after the session is invalidated. Another consequence is that only
  * HTTP requests are saved.
  * </p>
+ * <p>
+ * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
+ * from Java point of view.
  * 
  * @version $Id$
  */
@@ -156,7 +159,6 @@ public class SavedRequestRestorerFilter implements Filter
          * @return an immutable Map containing parameter names as keys and parameter values as map values
          * @see javax.servlet.ServletRequest#getParameterMap()
          */
-        @SuppressWarnings("unchecked")
         @Override
         public Map<String, String[]> getParameterMap()
         {

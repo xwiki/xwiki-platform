@@ -27,9 +27,6 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Objects;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -47,6 +44,9 @@ import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.tika.internal.TikaUtils;
+
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Base class for {@link ResourceReferenceHandler}s that can handle servlet resource requests.
@@ -122,18 +122,19 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         // If the request contains an "If-Modified-Since" header and the requested resource has not been modified then
         // return a 304 Not Modified to tell the browser to use its cached version.
         Request request = this.container.getRequest();
-        if (request instanceof ServletRequest
-            && ((ServletRequest) request).getHttpServletRequest().getHeader("If-Modified-Since") != null
-            && isResourceCacheable(resourceReference))
-        {
+        if (request instanceof ServletRequest servletRequest
+            && servletRequest.getJakartaHttpServletRequest().getHeader("If-Modified-Since") != null
+            && isResourceCacheable(resourceReference)) {
             // The user probably used F5 to reload the page and the browser checks if there are changes.
             Response response = this.container.getResponse();
-            if (response instanceof ServletResponse) {
+            if (response instanceof ServletResponse servletResponse) {
                 // Return the 304 Not Modified.
-                ((ServletResponse) response).getHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                servletResponse.getJakartaHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -169,7 +170,7 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         throws ResourceReferenceHandlerException
     {
         InputStream resourceStream = rawResourceStream;
-        
+
         // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
         // content type without affecting the stream (Tika may need to read a few bytes from the start of the
         // stream, in which case it will mark & reset the stream).
@@ -189,8 +190,8 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
     }
 
     /**
-     * Computes the content type of the resource. By default the content type is inferred by {@link
-     * TikaUtils#detect(InputStream, String)} based on the resource content and name.
+     * Computes the content type of the resource. By default the content type is inferred by
+     * {@link TikaUtils#detect(InputStream, String)} based on the resource content and name.
      *
      * @param resourceStream the stream of the requested resource
      * @param resourceReference the reference of the request resource
@@ -198,8 +199,7 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
      * @throws IOException in case of error during the content type analysis
      * @since 13.3RC1
      */
-    protected String getContentType(InputStream resourceStream, R resourceReference)
-        throws IOException
+    protected String getContentType(InputStream resourceStream, R resourceReference) throws IOException
     {
         return TikaUtils.detect(resourceStream, getResourceName(resourceReference));
     }
@@ -228,7 +228,7 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         if (!(response instanceof ServletResponse)) {
             return;
         }
-        HttpServletResponse httpResponse = ((ServletResponse) response).getHttpServletResponse();
+        HttpServletResponse httpResponse = ((ServletResponse) response).getJakartaHttpServletResponse();
 
         // Cache the resource if possible.
         if (isResourceCacheable(resourceReference)) {
@@ -288,8 +288,9 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
         throws ResourceReferenceHandlerException
     {
         Response response = this.container.getResponse();
-        if (response instanceof ServletResponse) {
-            HttpServletResponse httpResponse = ((ServletResponse) response).getHttpServletResponse();
+        if (response instanceof ServletResponse servletResponse) {
+            HttpServletResponse httpResponse = servletResponse.getJakartaHttpServletResponse();
+
             try {
                 httpResponse.sendError(statusCode, String.format(message, parameters));
             } catch (IOException e) {

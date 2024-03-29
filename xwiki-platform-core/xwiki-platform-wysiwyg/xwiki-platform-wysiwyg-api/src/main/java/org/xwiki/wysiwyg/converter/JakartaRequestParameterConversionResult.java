@@ -22,8 +22,7 @@ package org.xwiki.wysiwyg.converter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.xwiki.wysiwyg.filter.MutableServletRequest;
-import org.xwiki.wysiwyg.internal.filter.http.JavaxToJakartaMutableHttpServletRequest;
+import org.xwiki.wysiwyg.filter.MutableJakartaServletRequest;
 
 /**
  * Simple POJO holding the result of a conversion performed with {@link RequestParameterConverter}. More specifically
@@ -31,13 +30,11 @@ import org.xwiki.wysiwyg.internal.filter.http.JavaxToJakartaMutableHttpServletRe
  * the conversion for each parameter, and a map of the output of the conversion for each parameter.
  *
  * @version $Id$
- * @since 14.10
- * @deprecated use {@link JakartaRequestParameterConversionResult} instead
+ * @since 17-jakarta
  */
-@Deprecated(since = "17-jakarta")
-public class RequestParameterConversionResult
+public class JakartaRequestParameterConversionResult
 {
-    private MutableServletRequest request;
+    private MutableJakartaServletRequest request;
 
     private Map<String, Throwable> errors;
 
@@ -48,7 +45,7 @@ public class RequestParameterConversionResult
      *
      * @param request a mutable copy of the original request used for the conversion
      */
-    public RequestParameterConversionResult(MutableServletRequest request)
+    public JakartaRequestParameterConversionResult(MutableJakartaServletRequest request)
     {
         this.request = request;
         this.errors = new LinkedHashMap<>();
@@ -56,22 +53,9 @@ public class RequestParameterConversionResult
     }
 
     /**
-     * Default constructor.
-     *
-     * @param result the jakarta result to copy
-     * @since 17-jakarta
-     */
-    public RequestParameterConversionResult(JakartaRequestParameterConversionResult result)
-    {
-        this.request = new JavaxToJakartaMutableHttpServletRequest(result.getRequest());
-        this.errors = result.getErrors();
-        this.output = result.getOutput();
-    }
-
-    /**
      * @return the mutable request
      */
-    public MutableServletRequest getRequest()
+    public MutableJakartaServletRequest getRequest()
     {
         return request;
     }

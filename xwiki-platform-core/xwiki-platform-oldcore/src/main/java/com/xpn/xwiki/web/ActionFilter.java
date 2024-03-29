@@ -24,14 +24,14 @@ import java.util.Enumeration;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +56,13 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  *
  * As a result, when clicking the button, the request is not sent to the form's target ({@code preview}), but is
  * actually forwarded internally to {@code /bin/saveandcontinue/The/Document}.
+ * <p>
+ * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
+ * from Java point of view.
  *
  * @version $Id$
  * @since 1.8M1
+ * @since 17-jakarta
  */
 public class ActionFilter implements Filter
 {
@@ -83,7 +87,6 @@ public class ActionFilter implements Filter
     {
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException
@@ -107,7 +110,8 @@ public class ActionFilter implements Filter
                     String targetURL = getTargetURL(hrequest, parameter);
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
                     if (dispatcher != null) {
-                        LOGGER.debug("Forwarding request to " + targetURL);
+                        LOGGER.debug("Forwarding request to [{}]", targetURL);
+
                         request.setAttribute(ATTRIBUTE_ACTION_DISPATCHED, "true");
                         dispatcher.forward(hrequest, response);
                         // Allow multiple calls to this filter as long as they are not nested.

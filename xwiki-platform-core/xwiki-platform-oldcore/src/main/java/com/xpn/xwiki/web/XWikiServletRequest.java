@@ -30,6 +30,7 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
+@Deprecated(since = "17-jakarta")
 public class XWikiServletRequest extends HttpServletRequestWrapper implements XWikiRequest
 {
     public XWikiServletRequest(HttpServletRequest request)

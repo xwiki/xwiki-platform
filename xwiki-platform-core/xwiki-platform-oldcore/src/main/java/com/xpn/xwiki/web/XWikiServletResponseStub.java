@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @version $Id$
  */
+@Deprecated(since = "17-jakarta")
 public class XWikiServletResponseStub implements XWikiResponse
 {
     private OutputStream outputStream;

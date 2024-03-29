@@ -39,7 +39,6 @@ export class CristalAppLoader extends CristalLoader {
     config: { [s: string]: T },
     isElectron: boolean,
     configName: string,
-    additionalComponents?: () => void,
   ) {
     const configMap = new Map<string, T>(Object.entries(config));
     this.cristal.setAvailableConfigurations(configMap);

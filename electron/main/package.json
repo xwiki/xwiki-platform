@@ -22,7 +22,6 @@
   "devDependencies": {
     "@types/node": "20.11.30",
     "cross-env": "7.0.3",
-    "electron": "29.1.5",
     "rimraf": "5.0.5",
     "typescript": "5.4.3",
     "vite": "5.2.6",
@@ -30,6 +29,6 @@
   },
   "dependencies": {
     "@cristal/electron-storage": "workspace:^",
-    "electron": "29.1.5"
+    "electron": "29.1.6"
   }
 }

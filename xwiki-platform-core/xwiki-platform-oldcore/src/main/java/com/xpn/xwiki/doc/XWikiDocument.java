@@ -32,6 +32,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,6 +79,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
@@ -147,6 +149,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -434,7 +437,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return Utils.getComponent(UserConfiguration.class);
     }
 
+    private static CacheControl getCacheControl()
+    {
+        return Utils.getComponent(CacheControl.class);
+    }
+
+    private static Transformation getMacroTransformation()
+    {
+        return Utils.getComponent(Transformation.class, "macro");
+    }
+
     private String title;
+
+    private Object preparedTitle;
+
+    private volatile LocalDateTime titlePrepareDate;
 
     /**
      * Reference to this document's parent.
@@ -692,6 +709,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * a costly operation that we don't want to repeat whenever some code ask for the XDOM information.
      */
     private XDOM xdomCache;
+
+    private volatile LocalDateTime xdomCachePrepareDate;
 
     /**
      * Use to store rendered documents in #getRenderedContent(). Do not inject the component here to avoid any simple
@@ -1274,7 +1293,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         if (notEqual) {
             // invalidate parsed xdom
-            this.xdomCache = null;
+            resetXDOM();
             setContentDirty(true);
             setWikiNode(null);
         }
@@ -1910,6 +1929,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return (this.title != null) ? this.title : "";
     }
 
+    @Override
+    public Object getPreparedTitle()
+    {
+        // If the content is prepared and it's allowed to use the cache, return it
+        if (this.titlePrepareDate != null) {
+            if (getCacheControl().isCacheReadAllowed(this.titlePrepareDate)) {
+                return this.preparedTitle;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void setPreparedTitle(Object preparedTitle)
+    {
+        this.preparedTitle = preparedTitle;
+        this.titlePrepareDate = LocalDateTime.now();
+    }
+
     /**
      * Get the rendered version of the document title. The title is extracted and then Velocity is applied on it and
      * it's then rendered using the passed Syntax. The following logic is used to extract the title:
@@ -1965,6 +2004,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setContentDirty(true);
         }
         this.title = title;
+        this.titlePrepareDate = null;
+        this.preparedTitle = null;
     }
 
     public String getFormat()
@@ -7597,8 +7638,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if (ObjectUtils.notEqual(this.syntax, syntax)) {
             this.syntax = syntax;
+
             // invalidate parsed xdom
-            this.xdomCache = null;
+            resetXDOM();
+            setContentDirty(true);
+            setWikiNode(null);
         }
     }
 
@@ -8906,6 +8950,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setSyntax(targetSyntax);
     }
 
+    private XDOM parseContentNoException()
+    {
+        try {
+            return parseContent(getContent());
+        } catch (Exception e) {
+            ErrorBlockGenerator errorBlockGenerator = Utils.getComponent(ErrorBlockGenerator.class);
+            return new XDOM(errorBlockGenerator.generateErrorBlocks(false, TM_FAILEDDOCUMENTPARSE,
+                "Failed to parse document content", null, e));
+        }
+    }
+
     /**
      * NOTE: This method caches the XDOM and returns a clone that can be safely modified.
      *
@@ -8915,16 +8970,48 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public XDOM getXDOM()
     {
         if (this.xdomCache == null) {
-            try {
-                this.xdomCache = parseContent(getContent());
-            } catch (XWikiException e) {
-                ErrorBlockGenerator errorBlockGenerator = Utils.getComponent(ErrorBlockGenerator.class);
-                return new XDOM(errorBlockGenerator.generateErrorBlocks(false, TM_FAILEDDOCUMENTPARSE,
-                    "Failed to parse document content", null, e));
-            }
+            this.xdomCache = parseContentNoException();
         }
 
         return this.xdomCache.clone();
+    }
+
+    @Override
+    public XDOM getPreparedXDOM()
+    {
+        LocalDateTime xdomPrepareDate = this.xdomCachePrepareDate;
+        XDOM xdom = this.xdomCache;
+
+        // If the content is prepared and it's allowed to use the cache, return it
+        if (xdomPrepareDate != null) {
+            if (getCacheControl().isCacheReadAllowed(xdomPrepareDate)) {
+                return xdom.clone();
+            }
+
+            // Start from scratch if it's not allowed to reuse the already prepared XDOM
+            xdom = null;
+        }
+
+        // Parse the content if not already done
+        if (xdom == null) {
+            xdom = parseContentNoException();
+        }
+
+        // Prepare the content
+        xdomPrepareDate = LocalDateTime.now();
+        getMacroTransformation().prepare(xdom);
+
+        // Update the cached content
+        this.xdomCache = xdom;
+        this.xdomCachePrepareDate = xdomPrepareDate;
+
+        return xdom.clone();
+    }
+
+    private void resetXDOM()
+    {
+        this.xdomCache = null;
+        this.xdomCachePrepareDate = null;
     }
 
     /**

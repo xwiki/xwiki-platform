@@ -42,7 +42,7 @@
     "rimraf": "5.0.5",
     "vite": "5.2.7",
     "vite-plugin-comlink": "4.0.2",
-    "vite-plugin-dts": "3.6.4",
+    "vite-plugin-dts": "3.8.1",
     "vite-plugin-inspect": "0.8.3",
     "vite-plugin-vuetify": "2.0.3",
     "vue-tsc": "2.0.7"

@@ -116,6 +116,12 @@ public @interface UITest
     String jdbcDriverVersion() default "";
 
     /**
+     * @return the docker image tag to use for the browser (if not specified, uses the "latest" tag)
+     * @since 16.3.0RC1
+     */
+    String browserTag() default "";
+
+    /**
      * @return true if VNC container is started and recording is done and saved on test exit
      * @since 10.10RC1
      */

@@ -66,6 +66,8 @@ public class UITestTestConfigurationResolver
 
     private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
 
+    private static final String BROWSERTAG_PROPERTY = "xwiki.test.ui.browserTag";
+
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
     private static final String WCAG_PROPERTY = "xwiki.test.ui.wcag";
@@ -98,6 +100,7 @@ public class UITestTestConfigurationResolver
         configuration.setDebug(resolveDebug(uiTestAnnotation.debug()));
         configuration.setOffline(resolveOffline(uiTestAnnotation.offline()));
         configuration.setDatabaseTag(resolveDatabaseTag(uiTestAnnotation.databaseTag()));
+        configuration.setBrowserTag(resolveBrowserTag(uiTestAnnotation.browserTag()));
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
@@ -226,6 +229,11 @@ public class UITestTestConfigurationResolver
     private String resolveJDBCDriverVersion(String jdbcDriverVersion)
     {
         return resolve(jdbcDriverVersion, JDBCDRIVERVERSION_PROPERTY);
+    }
+
+    private String resolveBrowserTag(String browserTag)
+    {
+        return resolve(browserTag, BROWSERTAG_PROPERTY);
     }
 
     private boolean resolveVNC(boolean vnc)

@@ -95,7 +95,7 @@
 
 #macro(displayNotificationPage $event)
   <div>
-    <div style="background-color: #f5f5f5; color: #777777; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
+    <div style="background-color: #f5f5f5; color: #707070; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
       #template('hierarchy_macros.vm')
       #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
     </div>
@@ -113,7 +113,7 @@
 
 #macro(displayNotificationDate $event)
   <div>
-    <small style="color: #777777; font-size: 0.8em;">
+    <small style="color: #767676; font-size: 0.8em;">
       $escapetool.xml($services.date.displayTimeAgo($event.dates.get(0)))
     </small>
   </div>
@@ -207,8 +207,8 @@
         #set($result = $result.replaceAll('<del>', '<del style="background-color: #ff9999; text-decoration: none;">'))
         #set($result = $result.replaceAll('class="diff-header"', 'style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;"'))
         #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;"'))
-        #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"'))
-        #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;"'))
+        #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid #E8E8E8; color: rgb(101, 101, 101); font-family: Monospace; text-align: right; vertical-align: top;"'))
+        #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: rgb(101, 101, 101); font-family: Monospace; padding: .4em .5em;"'))
         #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
         $result
       #end
@@ -256,7 +256,7 @@
       ## tools to display the title.
       #set ($title = $document.displayTitle)
     #end
-    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #ccc;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $title)
+    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #767676;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $title)
       #if ($ev.hasChildren())
         <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;">
         #foreach ($child in $ev.children)

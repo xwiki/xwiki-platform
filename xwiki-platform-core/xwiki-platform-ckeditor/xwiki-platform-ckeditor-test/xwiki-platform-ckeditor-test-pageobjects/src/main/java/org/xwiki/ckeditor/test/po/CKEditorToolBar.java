@@ -48,6 +48,25 @@ public class CKEditorToolBar extends BaseElement
         this.container = findContainer(editor);
     }
 
+    /**
+     * Click the numbered list action, by first unfolding the list menu and selecting the numbered list item.
+     *
+     * @since 15.10.9
+     * @since 16.3.0RC1
+     */
+    public void clickNumberedList()
+    {
+        clickButton("lists");
+        WebElement subMenuFrame = getDriver().findElement(By.cssSelector("iframe.cke_panel_frame"));
+
+        try {
+            getDriver().switchTo().frame(subMenuFrame);
+            getDriver().findElement(By.className("cke_menubutton__toolbar_numberedlist")).click();
+        } finally {
+            getDriver().switchTo().parentFrame();
+        }
+    }
+
     protected WebElement findContainer(CKEditor editor)
     {
         return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].ui.space('top').$;",

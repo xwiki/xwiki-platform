@@ -21,4 +21,6 @@
   // We want all suggestions right away
   "prHourlyLimit" : 0,
   "prConcurrentLimit" : 0,
+  // Prefix update commit with [Misc] by default so that only updates requiring a Jira issue need a message edit.
+  "commitMessageAction": "[Misc] Update"
 }

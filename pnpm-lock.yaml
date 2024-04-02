@@ -79,8 +79,8 @@ importers:
         specifier: workspace:*
         version: link:../dev/config
       reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
+        specifier: 0.2.2
+        version: 0.2.2
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -473,8 +473,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
+        specifier: 0.2.2
+        version: 0.2.2
       vue:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.3)
@@ -501,8 +501,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
+        specifier: 0.2.2
+        version: 0.2.2
       vue:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.3)
@@ -571,8 +571,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
+        specifier: 0.2.2
+        version: 0.2.2
       vue:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.3)
@@ -760,8 +760,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
+        specifier: 0.2.2
+        version: 0.2.2
       vue-i18n:
         specifier: 9.8.0
         version: 9.8.0(vue@3.4.21)
@@ -834,8 +834,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       reflect-metadata:
-        specifier: 0.1.13
-        version: 0.1.13
+        specifier: 0.2.2
+        version: 0.2.2
       vue:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.3)
@@ -6444,8 +6444,8 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /reflect-metadata@0.1.13:
-    resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
+  /reflect-metadata@0.2.2:
+    resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
 
   /remark-inline-links@7.0.0:
     resolution: {integrity: sha512-4uj1pPM+F495ySZhTIB6ay2oSkTsKgmYaKk/q5HIdhX2fuyLEegpjWa0VdJRJ01sgOqAFo7MBKdDUejIYBMVMQ==}

@@ -24,7 +24,7 @@
     "@cristal/sharedworker-api": "workspace:^",
     "dexie": "3.2.4",
     "inversify": "6.0.2",
-    "reflect-metadata": "0.1.13",
+    "reflect-metadata": "0.2.2",
     "vue": "3.4.21",
     "vue-i18n": "9.8.0"
   },

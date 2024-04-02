@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@cristal/dev-config": "workspace:*",
-    "reflect-metadata": "0.1.13",
+    "reflect-metadata": "0.2.2",
     "rimraf": "5.0.5",
     "vite": "5.2.7",
     "vitest": "1.4.0",

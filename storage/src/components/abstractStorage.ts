@@ -64,4 +64,19 @@ export abstract class AbstractStorage implements Storage {
   ): Promise<PageData>;
 
   abstract isStorageReady(): Promise<boolean>;
+
+  /**
+   * Save a page and its content to the give syntax.
+   *
+   * @param page the page to save
+   * @param content the content of the page
+   * @param syntax the syntax of the content
+   *
+   * @since 0.7
+   */
+  abstract save(
+    page: string,
+    content: string,
+    syntax: string,
+  ): Promise<unknown>;
 }

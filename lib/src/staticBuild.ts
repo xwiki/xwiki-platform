@@ -32,10 +32,7 @@ import { ComponentInit as MacrosComponentInit } from "@cristal/macros";
 import { ComponentInit as MenuButtonsComponentInit } from "@cristal/extension-menubuttons";
 import { ComponentInit as QueueWorkerComponentInit } from "@cristal/sharedworker-impl";
 import { ComponentInit as RenderingComponentInit } from "@cristal/rendering";
-import { ComponentInit as EditorWikiTextComponentInit } from "@cristal/editors-wikitext";
-import { ComponentInit as EditorMilkdownComponentInit } from "@cristal/editors-milkdown";
 import { ComponentInit as EditorProsemirrorComponentInit } from "@cristal/editors-prosemirror";
-import { ComponentInit as XWikiRemoteEditorComponentInit } from "@cristal/xwiki-remoteinlineeditor";
 import type { Container } from "inversify";
 
 export class StaticBuild {
@@ -57,9 +54,6 @@ export class StaticBuild {
       new MenuButtonsComponentInit(container);
       new QueueWorkerComponentInit(container);
       new RenderingComponentInit(container);
-      new EditorWikiTextComponentInit(container);
-      new EditorMilkdownComponentInit(container);
-      new XWikiRemoteEditorComponentInit(container);
       new EditorProsemirrorComponentInit(container);
     }
     if (additionalComponents) {

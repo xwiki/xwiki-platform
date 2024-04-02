@@ -50,4 +50,8 @@ export class GitHubWikiConfig extends DefaultWikiConfig {
       this.homePage = "README.md";
     }
   }
+
+  defaultPageName(): string {
+    return "README";
+  }
 }

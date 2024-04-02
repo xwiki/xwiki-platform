@@ -9,7 +9,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "prepack": "pnpm build",
+    "prepack": "vue-tsc --project tsconfig.json --noEmit && pnpm build",
     "build": "pnpm compile",
     "compile": "vite build",
     "test": "echo 'no test'",
@@ -20,7 +20,9 @@
     "@cristal/skin": "workspace:*",
     "inversify": "6.0.2",
     "prosemirror-commands": "1.5.2",
+    "prosemirror-example-setup": "1.2.2",
     "prosemirror-keymap": "1.2.2",
+    "prosemirror-markdown": "1.12.0",
     "prosemirror-model": "1.19.4",
     "prosemirror-schema-basic": "1.2.2",
     "prosemirror-state": "1.4.3",
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "typescript": "5.4.4",
-    "vite": "5.2.8"
+    "vite": "5.2.8",
+    "vue-tsc": "2.0.7"
   }
 }

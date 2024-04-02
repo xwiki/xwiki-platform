@@ -52,12 +52,12 @@ export class DefaultRenderer implements Renderer {
     }
   }
 
-  convert(
+  async convert(
     source: string,
     sourceSyntax: string,
     targetSyntax: string,
     wikiConfig: WikiConfig,
-  ): string {
+  ): Promise<string> {
     const syntaxRenderer = sourceSyntax + "_" + targetSyntax;
     this.logger.debug("Loading converter for ", syntaxRenderer);
     try {

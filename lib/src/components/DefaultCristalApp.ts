@@ -108,7 +108,7 @@ export class DefaultCristalApp implements CristalApp {
   }
 
   getCurrentPage(): string {
-    return this.page.name;
+    return this.page.name || this.wikiConfig.defaultPageName();
   }
 
   setCurrentPage(newPage: string, mode: string = "view") {
@@ -167,8 +167,9 @@ export class DefaultCristalApp implements CristalApp {
     const wikiConfig = this.availableConfigurations.get(configName);
     if (wikiConfig) {
       this.setWikiConfig(wikiConfig);
-      if (wikiConfig.designSystem != "")
+      if (wikiConfig.designSystem != "") {
         this.skinManager.setDesignSystem(wikiConfig.designSystem);
+      }
       if (!this.isElectron) {
         // We want to change the URL is non Electron setup
         window.location.href =
@@ -218,14 +219,16 @@ export class DefaultCristalApp implements CristalApp {
     return this.container.get<LoggerConfig>("LoggerConfig");
   }
 
-  renderContent(
+  async renderContent(
     source: string,
     sourceSyntax: string,
     targetSyntax: string,
     wikiConfig: WikiConfig,
-  ): string {
+  ): Promise<string> {
     // Protection from rendering errors
-    if (source == undefined) return "";
+    if (source == undefined) {
+      return "";
+    }
 
     this.logger.debug("Loading rendering module");
     try {
@@ -349,6 +352,10 @@ export class DefaultCristalApp implements CristalApp {
     return this.page.source;
   }
 
+  getCurrentSyntax(): string {
+    return this.page.document.getSource().encodingFormat;
+  }
+
   setContentRef(ref: Ref): void {
     this.currentContentRef = ref;
     this.logger?.debug("Received ref from VUE ", ref);
@@ -367,21 +374,28 @@ export class DefaultCristalApp implements CristalApp {
   }
 
   getPageFromHash(hash: string): string | null {
+    // TODO: this method must be deprecated, parsing the url like this is not ok
+    // and this should be replace by the user of vue router APIs.
     let page = null;
     const i1 = hash.indexOf("/");
     const i2 = hash.indexOf("/", i1 + 1);
 
     if (i1 > 0) {
-      if (i2 == -1) page = hash.substring(i1 + 1);
-      else page = hash.substring(i1 + 1, i2);
+      if (i2 == -1) {
+        page = hash.substring(i1 + 1);
+      } else {
+        page = hash.substring(i1 + 1, i2);
+      }
     }
     this.logger?.debug("Page from hash is : ", page);
     return page;
   }
 
-  getPage(): string {
+  private getPageFromRouter(): string {
     let page = this.getPageFromHash(location.hash);
-    if (page == null) page = this.wikiConfig.homePage;
+    if (page == null) {
+      page = this.wikiConfig.homePage;
+    }
     this.logger?.debug("Page is:", page);
     return page;
   }
@@ -390,7 +404,7 @@ export class DefaultCristalApp implements CristalApp {
     this.logger?.debug("Before vue");
 
     // initializing the page data
-    const initialPage = this.getPage();
+    const initialPage = this.getPageFromRouter();
     this.logger?.debug("Initial page is ", initialPage);
 
     this.page = new DefaultPageData("_jsonld", initialPage, "initial content");
@@ -402,32 +416,13 @@ export class DefaultCristalApp implements CristalApp {
       } as RouteRecordRaw,
       {
         path: "/:page/view",
+        name: "view",
         component: this.skinManager.getTemplate("content"),
       } as RouteRecordRaw,
       {
         path: "/:page/edit",
         component: this.skinManager.getTemplate("edit"),
         name: "edit",
-      } as RouteRecordRaw,
-      {
-        path: "/:page/edittext",
-        name: "edittext",
-        component: this.skinManager.getTemplate("edit"),
-      } as RouteRecordRaw,
-      {
-        path: "/:page/editxwiki",
-        name: "editxwiki",
-        component: this.skinManager.getTemplate("edit"),
-      } as RouteRecordRaw,
-      {
-        path: "/:page/editmilkdown",
-        name: "editmilkdown",
-        component: this.skinManager.getTemplate("edit"),
-      } as RouteRecordRaw,
-      {
-        path: "/:page/editprosemirror",
-        name: "editprosemirror",
-        component: this.skinManager.getTemplate("edit"),
       } as RouteRecordRaw,
       {
         path: "/xwiki/search",
@@ -470,8 +465,15 @@ export class DefaultCristalApp implements CristalApp {
     }
 
     this.router = createRouter({
-      // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
-      history: createWebHashHistory(), // TODO: we should use createWebHistory when not in electron.
+      /*
+       4. Provide the history implementation to use. We are using the hash
+       history for simplicity here. See
+       https://router.vuejs.org/guide/essentials/history-mode.html for more
+       details. The hash history is not the best for SEO, but does not require
+       anything special server-side (which is good for partability), and works
+       well with electron.
+      */
+      history: createWebHashHistory(),
       routes,
     });
 
@@ -577,9 +579,25 @@ export class DefaultCristalApp implements CristalApp {
         uixTemplates.push(uixComponents[i].getVueComponent());
       }
     } catch (e) {
-      if (e.message.indexOf("no matching bindings") == 0)
+      if (e.message.indexOf("no matching bindings") == 0) {
         this.logger?.debug("No uix entry found", e);
+      }
     }
     return uixTemplates;
+  }
+
+  async getPage(page: string): Promise<PageData> {
+    const isJsonLD = this.getWikiConfig().isSupported("jsonld");
+    const syntax = isJsonLD ? "jsonld" : "html";
+    const pageData = await this.getWikiConfig().storage.getPageContent(
+      page,
+      syntax,
+    );
+    if (isJsonLD) {
+      const document = pageData.document;
+      pageData.html = document.get("html");
+      pageData.source = document.get("text");
+    }
+    return pageData;
   }
 }

@@ -101,4 +101,8 @@ export class GitHubStorage extends AbstractStorage {
   async getEditField(): Promise<string> {
     return "";
   }
+
+  save(): Promise<unknown> {
+    throw new Error("Save not supported");
+  }
 }

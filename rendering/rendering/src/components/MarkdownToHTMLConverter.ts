@@ -70,9 +70,12 @@ export class MarkdownToHTMLConverter implements Converter {
     return MarkdownToHTMLConverter.converterName;
   }
 
-  public convert(source: string, wikiConfig: WikiConfig): string {
+  public async convert(
+    source: string,
+    wikiConfig: WikiConfig,
+  ): Promise<string> {
     let content = "";
-    if (this.markedInit == false) {
+    if (!this.markedInit) {
       marked.use(baseUrl(wikiConfig.baseURL)).use(macro);
       this.markedInit = true;
     }

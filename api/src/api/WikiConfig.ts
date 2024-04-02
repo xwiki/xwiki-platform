@@ -52,4 +52,10 @@ export interface WikiConfig {
   isSupported(format: string): boolean;
 
   initialize(): void;
+
+  /**
+   * The default page name for the current configuration.
+   * For instance, "README" for Github, or "Main.WebHome" for XWiki.
+   */
+  defaultPageName(): string;
 }

@@ -178,4 +178,8 @@ export class WrappingOfflineStorage implements WrappingStorage {
   ): Promise<string> {
     return await this.storage.getEditField(document, fieldName);
   }
+
+  save(page: string, content: string, syntax: string): Promise<unknown> {
+    return this.storage.save(page, content, syntax);
+  }
 }

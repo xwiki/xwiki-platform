@@ -43,10 +43,7 @@ export default class FileSystemStorage extends AbstractStorage {
   }
 
   async getPageContent(page: string, syntax: string): Promise<PageData> {
-    if (fileSystemStorage === undefined) {
-      // TODO: can probably be avoided.
-      throw new Error("...");
-    }
+    this.logger.error("PARAMS", "page", page, "syntax", syntax);
     const path = await fileSystemStorage.resolvePath(page, syntax);
     this.logger.error("PAGE", page);
     this.logger.error("SYNTAX", syntax);
@@ -68,5 +65,10 @@ export default class FileSystemStorage extends AbstractStorage {
 
   isStorageReady(): Promise<boolean> {
     return Promise.resolve(true);
+  }
+
+  async save(page: string, content: string, syntax: string) {
+    const path = await fileSystemStorage.resolvePath(page, syntax);
+    fileSystemStorage.savePage(path, content);
   }
 }

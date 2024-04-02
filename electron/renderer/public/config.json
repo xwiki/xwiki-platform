@@ -11,7 +11,7 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify"
@@ -21,7 +21,7 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": true,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify"
@@ -31,7 +31,7 @@
     "configType": "XWiki",
     "serverRendering": true,
     "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify"
@@ -41,7 +41,7 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "dsfr"
@@ -51,7 +51,7 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "shoelace"
@@ -101,7 +101,7 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "",
     "designSystem": "vuetify"
@@ -111,7 +111,7 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "",
     "designSystem": "shoelace"
@@ -121,7 +121,7 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
+    "baseURL": "http://localhost:8080/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "",
     "designSystem": "dsfr"

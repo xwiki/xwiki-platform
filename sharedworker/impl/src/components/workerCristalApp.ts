@@ -27,6 +27,7 @@ import type {
   CristalApp as CristalApp,
   Logger,
   LoggerConfig,
+  PageData,
   SkinManager,
   WikiConfig,
 } from "@cristal/api";
@@ -114,6 +115,9 @@ export class WorkerCristalApp implements CristalApp {
   getCurrentSource(): string {
     throw new Error("Method not implemented.");
   }
+  getCurrentSyntax(): string {
+    throw new Error("Method not implemented.");
+  }
   setCurrentPage(): void {
     throw new Error("Method not implemented.");
   }
@@ -126,6 +130,9 @@ export class WorkerCristalApp implements CristalApp {
   loadPage(): Promise<void> {
     throw new Error("Method not implemented.");
   }
+  getPage(): Promise<PageData> {
+    throw new Error("Method not implemented.");
+  }
   getLogger(): Logger {
     throw new Error("Method not implemented.");
   }
@@ -133,7 +140,7 @@ export class WorkerCristalApp implements CristalApp {
     throw new Error("Method not implemented.");
   }
 
-  renderContent(): string {
+  renderContent(): Promise<string> {
     throw new Error("Method not implemented.");
   }
 }

@@ -36,5 +36,5 @@ export interface Converter {
 
   isConverterReady(): Promise<boolean>;
 
-  convert(source: string, wikiConfig: WikiConfig): string;
+  convert(source: string, wikiConfig: WikiConfig): Promise<string>;
 }

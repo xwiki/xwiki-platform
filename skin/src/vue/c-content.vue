@@ -23,134 +23,96 @@
  *
 -->
 <script lang="ts" setup>
-import CTemplate from "./c-template.vue";
-import { inject, onMounted, onUpdated, ref } from "vue";
-import type { CristalApp, Logger } from "@cristal/api";
+import {
+  computed,
+  type ComputedRef,
+  inject,
+  onUpdated,
+  ref,
+  type Ref,
+  watch,
+} from "vue";
+import { useRoute } from "vue-router";
+import { type CristalApp, PageData } from "@cristal/api";
+import { marked } from "marked";
 import { ContentTools } from "./contentTools";
 
-const root = ref(null);
-const content = ref(null);
-const cristal = inject<CristalApp>("cristal");
-const pageStatus = ref({
-  currentContent: cristal?.getCurrentContent(),
-  css: [],
-  js: [],
-  html: "",
-  document: null,
-  withSheet: false,
-  sheet: "",
+const loading = ref(false);
+const error: Ref<Error | undefined> = ref(undefined);
+const currentPage: Ref<PageData | undefined> = ref(undefined);
+const currentPageName: ComputedRef<string> = computed(() => {
+  // TODO: define a proper abstraction.
+  return cristal?.getCurrentPage() || "XWiki.Main";
 });
-let logger: Logger | undefined = undefined;
 
-if (cristal != null) {
-  ContentTools.init(cristal);
-  logger = cristal.getLogger("skin.vue.content");
-  logger?.debug("cristal object content ref set");
-  cristal.setContentRef(pageStatus);
-  logger?.debug("Sheet is ", pageStatus.value.sheet);
-  logger?.debug("With Sheet is ", pageStatus.value.withSheet);
-} else {
-  console.error("cristal object not injected properly in c-content.vue");
+const contentRoot = ref(undefined);
+
+const content: ComputedRef<string> = computed(() => {
+  if (currentPage.value) {
+    const cpn: PageData = currentPage.value;
+    if (cpn.html && cpn.html.trim() !== "") {
+      return cpn.html;
+    } else {
+      // TODO: currently blindly convert the content to markdown.
+      console.log("marked", marked, cpn.source);
+      const parse = marked.parse(cpn.source);
+      console.log("parse", parse);
+      return parse;
+    }
+  } else {
+    return undefined;
+  }
+});
+
+const cristal: CristalApp = inject<CristalApp>("cristal")!;
+const logger = cristal.getLogger("skin.vue.content");
+
+const route = useRoute();
+
+async function fetchPage() {
+  loading.value = true;
+  try {
+    currentPage.value = await cristal.getPage(currentPageName.value);
+  } catch (e) {
+    console.error(e);
+    error.value = e;
+  } finally {
+    loading.value = false;
+  }
 }
 
-let serverSideRendering = cristal?.getWikiConfig().serverRendering;
-
-onMounted(() => {
-  const cristal = inject<CristalApp>("cristal");
-  logger?.debug("in mounted");
-
-  ContentTools.transformImages(cristal, "xwikicontent");
-  // ContentTools.transformScripts(cristal);
-});
-
-const currentPage = cristal?.getCurrentPage() || "XWiki.Main";
+watch(() => route.params.page, fetchPage, { immediate: true });
 
 onUpdated(() => {
-  const cristal = inject<CristalApp>("cristal");
-  logger?.debug("in updated");
-
-  logger?.debug("Sheet is ", pageStatus.value.sheet);
-  logger?.debug("With Sheet is ", pageStatus.value.withSheet);
+  ContentTools.transformImages(cristal, "xwikicontent");
 
   if (cristal && content.value != null) {
-    ContentTools.listenToClicks(content.value, cristal);
-    ContentTools.transformMacros(content.value, cristal);
+    ContentTools.listenToClicks(contentRoot.value!, cristal);
+    ContentTools.transformMacros(contentRoot.value!, cristal);
   }
-  ContentTools.loadCSS(pageStatus.value.css);
-  ContentTools.loadJS(pageStatus.value.js);
+  // ContentTools.loadCSS(pageStatus.value.css);
+  // ContentTools.loadJS(pageStatus.value.js);
 });
 </script>
 <template>
-  <article id="content" ref="root">
+  <div v-if="loading">LOADING</div>
+  <div v-else-if="error">{{ error }}</div>
+  <article v-else id="content" ref="root">
     <UIX uixname="content.before" />
     <div class="pagemenu">
-      <x-menu title="Edit">
-        <template #activator="{ props }">
-          <span v-bind="props"> Edit </span>
-        </template>
-        <template #default>
-          <x-menu-item title="Default Editor">
-            <router-link
-              :to="{
-                name: 'edit',
-                params: { page: currentPage },
-              }"
-              >Default Editor
-            </router-link>
-          </x-menu-item>
-          <x-menu-item title="Text Editor">
-            <router-link
-              :to="{
-                name: 'edittext',
-                params: { page: currentPage },
-              }"
-              >Text Editor
-            </router-link>
-          </x-menu-item>
-          <x-menu-item title="XWiki Editor">
-            <router-link
-              :to="{
-                name: 'editxwiki',
-                params: { page: currentPage },
-              }"
-              >XWiki Editor
-            </router-link>
-          </x-menu-item>
-          <x-menu-item title="Milkdown Editor">
-            <router-link
-              :to="{
-                name: 'editmilkdown',
-                params: { page: currentPage },
-              }"
-              >Milkdown Editor
-            </router-link>
-          </x-menu-item>
-          <x-menu-item title="Prosemirror Editor">
-            <router-link
-              :to="{
-                name: 'editprosemirror',
-                params: { page: currentPage },
-              }"
-              >Prosemirror Editor
-            </router-link>
-          </x-menu-item>
-        </template>
-      </x-menu>
+      <router-link
+        :to="{
+          name: 'edit',
+          params: { page: currentPageName },
+        }"
+        >Edit
+      </router-link>
     </div>
     <!-- Provide a target for the links listener, otherwise the links from other 
     elements of the component can be wrongly captured. -->
-    <div ref="content">
-      <template v-if="pageStatus.withSheet && !serverSideRendering">
-        <CTemplate
-          :name="pageStatus.sheet"
-          :document="pageStatus.document"
-          mode="view"
-        />
-      </template>
-      <template v-else>
-        <!-- eslint-disable vue/no-v-html -->
-        <div id="xwikicontent" v-html="pageStatus.currentContent" />
-      </template>
+    <div ref="contentRoot">
+      <!-- eslint-disable vue/no-v-html -->
+      <div id="xwikicontent" v-html="content" />
     </div>
     <UIX uixname="content.after" />
   </article>

@@ -24,12 +24,12 @@
  **/
 
 import {
-  DefaultWikiConfig,
   type CristalApp,
-  type Storage,
+  DefaultWikiConfig,
   type Logger,
+  type Storage,
 } from "@cristal/api";
-import { injectable, inject, named } from "inversify";
+import { inject, injectable, named } from "inversify";
 import "reflect-metadata";
 
 @injectable()
@@ -46,11 +46,20 @@ export class XWikiWikiConfig extends DefaultWikiConfig {
     this.cristal = cristal;
     this.storage = storage;
     this.storage.setWikiConfig(this);
-    if (this.homePage == "") this.homePage = "Main.WebHome";
+    if (this.homePage == "") {
+      this.homePage = "Main.WebHome";
+    }
   }
 
   isSupported(format: string): boolean {
-    if (format == "html" || format == "jsonld") return true;
-    else return false;
+    if (format == "html" || format == "jsonld") {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  defaultPageName(): string {
+    return "XWiki.Main";
   }
 }

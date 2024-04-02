@@ -186,4 +186,32 @@ export class XWikiStorage extends AbstractStorage {
       return "";
     }
   }
+
+  async save(page: string, content: string): Promise<unknown> {
+    const url = this.wikiConfig.baseURL;
+    const segments = ["rest", "wikis", "xwiki"];
+    const referenceParts = page.split(".");
+    for (let i = 0; i < referenceParts.length; i++) {
+      const segment = i < referenceParts.length - 1 ? "spaces" : "pages";
+      segments.push(segment);
+      segments.push(referenceParts[i]);
+    }
+
+    const fullUrl = `${url}/${segments.join("/")}`;
+
+    console.log("before fetch");
+    await fetch(fullUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // TODO: externalize credentials
+        Authorization: `Basic ${btoa("Admin:admin")}`,
+      },
+      // TODO: the syntax provided by the save is ignored and the content is always saved as markdown.
+      body: JSON.stringify({ content, syntax: "markdown/1.2" }),
+    });
+    console.log("after fetch");
+
+    return;
+  }
 }

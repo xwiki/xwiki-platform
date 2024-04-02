@@ -48,4 +48,15 @@ export interface Storage {
   getEditField(jsonArticle: object, fieldName: string): Promise<string>;
 
   isStorageReady(): Promise<boolean>;
+
+  /**
+   * Update the content of a given page with the provided content.
+   *
+   * @param page the page to save
+   * @param content the content of the page
+   * @return a promise on the save is done
+   *
+   * @since 0.7
+   */
+  save(page: string, content: string, syntax: string): Promise<unknown>;
 }

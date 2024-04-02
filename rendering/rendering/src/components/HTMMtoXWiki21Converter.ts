@@ -23,47 +23,53 @@
  *
  **/
 
-import type { Logger } from "@cristal/api";
-import type { Converter } from "../api/converter";
 import { inject, injectable } from "inversify";
-import { WikiModel } from "./wikimodel-teavm";
+import { Converter } from "../api/converter";
+import { Logger, WikiConfig } from "@cristal/api";
 
 @injectable()
-export class XWiki21ToHTMLConverter implements Converter {
-  public static converterName = "xwiki_html";
+export class HTMLToXWiki21Converter implements Converter {
+  public static converterName: "html_xwiki";
 
   private logger: Logger;
-  public wikimodel: WikiModel;
 
   constructor(@inject<Logger>("Logger") logger: Logger) {
     this.logger = logger;
-    this.logger.setModule("rendering.xwiki");
-    this.wikimodel = new WikiModel();
   }
 
-  public async isConverterReady(): Promise<boolean> {
-    return await this.wikimodel.isWikiModelLoaded();
+  async convert(source: string, wikiConfig: WikiConfig): Promise<string> {
+    this.logger.debug("Convert from", source, "using", wikiConfig);
+    /*
+     TODO: this conversion is theoretically possible by calling the xwiki
+      backend.
+     1. call /xwiki/rest/ and save the "XWiki-Form-Token" header
+     2. /xwiki/bin/get/CKEditor/HTMLConverter with the same parameters as
+     CKEditor when switching to code view.
+     Some limitations:
+     The server must return CORS headers + allow for authentication on CORS
+     requests + allow the XWiki-Form-Token header to be accessed on CORS
+     requests.
+    */
+    return "";
   }
 
-  public getSourceSyntax(): string {
-    return "xwiki/2.1";
+  getName(): string {
+    return HTMLToXWiki21Converter.converterName;
   }
 
-  public getTargetSyntax(): string {
+  getSourceSyntax(): string {
     return "html/5.0";
   }
 
-  public getVersion(): string {
-    return "1.0";
+  getTargetSyntax(): string {
+    return "xwiki/2.1";
   }
 
-  public getName(): string {
-    return XWiki21ToHTMLConverter.converterName;
+  getVersion(): string {
+    return "";
   }
 
-  public async convert(source: string): Promise<string> {
-    if (source == undefined) return "";
-
-    return this.wikimodel.parse(source);
+  isConverterReady(): Promise<boolean> {
+    return Promise.resolve(true);
   }
 }

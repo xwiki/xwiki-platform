@@ -28,7 +28,7 @@
 </template>
 <script lang="ts">
 import { inject, ref } from "vue";
-import type { Logger, PageData, CristalApp } from "@cristal/api";
+import type { CristalApp, Logger, PageData } from "@cristal/api";
 import { ContentTools } from "./contentTools";
 
 let currentContent = "Panel content";
@@ -50,9 +50,9 @@ export default {
       cristal
         .getWikiConfig()
         .storage.getPanelContent(panelName, "", "html")
-        .then(function (panelData: PageData) {
+        .then(async (panelData: PageData) => {
           if (panelData.html == "") {
-            panelData.html = cristal.renderContent(
+            panelData.html = await cristal.renderContent(
               panelData.source,
               panelData.syntax,
               "html",

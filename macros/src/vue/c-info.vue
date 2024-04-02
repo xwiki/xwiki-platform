@@ -42,7 +42,7 @@ export default {
   props: {
     macroData: { type: Object as PropType<MacroData>, required: true },
   },
-  setup(props) {
+  async setup(props) {
     const cristal = inject<CristalApp>("cristal");
     if (cristal != null && logger == null) {
       logger = cristal.getLogger("macro.warning");
@@ -52,7 +52,7 @@ export default {
     }
 
     let warningMacroData = props.macroData as MacroData;
-    let htmlFieldValue = cristal?.renderContent(
+    let htmlFieldValue = await cristal?.renderContent(
       warningMacroData.getMacroContent().toString(),
       "xwiki",
       "html",

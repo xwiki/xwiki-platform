@@ -33,5 +33,5 @@ export interface Renderer {
     sourceSyntax: string,
     targetSyntax: string,
     wikiConfig: WikiConfig,
-  ): string;
+  ): Promise<string>;
 }

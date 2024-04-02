@@ -39,16 +39,22 @@ export default {
   },
   data() {
     logger?.debug("Editor UIX components are ", comps);
-    if (!comps || comps.length == 0) return {};
-    else {
+    if (!comps || comps.length == 0) {
+      return {};
+    } else {
       let editComponent = null;
       logger?.debug("Using first editor UIX component ", comps);
       if (comps != null) {
-        for (let i = 0; i < comps.length; i++) {
-          logger?.debug("Route name ", this.$route.name);
-          logger?.debug("Component name ", comps[i].editorname);
-          if ("edit" + comps[i].editorname == this.$route.name) {
-            editComponent = comps[i];
+        for (const item of comps) {
+          // TODO: fix unsafe access to editorname
+          // TODO: the editor should be drawn from the configuration
+          // TODO: also, we shouldn't load all the editors when initializing the
+          // components manager, but instead load them lazily, or only load the
+          // ones allowed by the configuration (e.g., one for wysiwyg, and one
+          // for plain syntax edit).
+          if (item.editorname === "editorprosemirror") {
+            editComponent = item;
+            break;
           }
         }
       }
@@ -64,7 +70,6 @@ export default {
 };
 </script>
 <template>
-  Here in edit
   <article id="edit" ref="root">
     <UIX uixname="edit.before" />
     <component :is="component" />

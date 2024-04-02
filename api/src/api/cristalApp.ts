@@ -30,6 +30,7 @@ import type { Router } from "vue-router";
 import type { Logger } from "./logger";
 import type { LoggerConfig } from "./loggerConfig";
 import type { SkinManager } from "./skinManager";
+import { PageData } from "./PageData";
 
 export interface CristalApp {
   getApp(): App;
@@ -66,6 +67,12 @@ export interface CristalApp {
 
   getCurrentSource(): string;
 
+  /**
+   * Return the syntax of the current page.
+   * @since 0.7
+   */
+  getCurrentSyntax(): string;
+
   setCurrentPage(page: string, mode: string): void;
 
   setContentRef(ref: Ref): void;
@@ -73,6 +80,15 @@ export interface CristalApp {
   loadPageFromURL(url: string): Promise<void>;
 
   loadPage(): Promise<void>;
+
+  /**
+   * Return the requested page
+   * @param page a page identifier (e.g., a document reference for the XWiki
+   * backend, or a filename for the filesystem backend)
+   *
+   * @since 0.7
+   */
+  getPage(page: string): Promise<PageData>;
 
   getLogger(module: string): Logger;
 
@@ -83,5 +99,5 @@ export interface CristalApp {
     sourceSyntax: string,
     targetSyntax: string,
     wikiConfig: WikiConfig,
-  ): string;
+  ): Promise<string>;
 }

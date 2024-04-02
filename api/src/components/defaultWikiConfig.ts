@@ -116,4 +116,8 @@ export class DefaultWikiConfig implements WikiConfig {
       this.storage.isStorageReady();
     }
   }
+
+  defaultPageName(): string {
+    return "index";
+  }
 }

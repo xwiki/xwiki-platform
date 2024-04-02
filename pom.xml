@@ -1743,8 +1743,8 @@
       <pluginRepositories>
         <pluginRepository>
           <id>xwiki-snapshots</id>
-          <name>XWiki Nexus Plugin Snapshot Repository Proxy</name>
-          <url>https://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <name>XWiki Nexus Plugin Snapshot Repository</name>
+          <url>https://nexus-snapshots.xwiki.org/repository/snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>
@@ -1767,8 +1767,8 @@
       <repositories>
         <repository>
           <id>xwiki-snapshots</id>
-          <name>XWiki Nexus Snapshot Repository Proxy</name>
-          <url>https://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <name>XWiki Nexus Snapshot Repository</name>
+          <url>https://nexus-snapshots.xwiki.org/repository/snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>

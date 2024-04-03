@@ -142,7 +142,7 @@
       // Make sure we have a selected picture before going forward
       let selected = $(event.currentTarget).parents('.attachmentGroup').data('id');
       imageSelector.updateSelectedImageReferences([selected], picker);
-      // Validate the selection of the double click picture.
+      // Validate the selection of the picture interacted with.
       selectButton.trigger('click');
     }
     // Submit form on double click

@@ -1530,6 +1530,13 @@
                 <id>aopalliance:aopalliance</id>
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>jakarta.ws.rs:jakarta.ws.rs-api</id>
+                <features>
+                    javax.ws.rs:jsr311-api,
+                    org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec
+                </features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

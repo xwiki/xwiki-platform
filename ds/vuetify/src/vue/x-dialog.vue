@@ -2,8 +2,7 @@
 import { defineProps } from "vue";
 defineProps<{
   title: string;
-  type: number;
-  width: number;
+  width: string | number | undefined;
 }>();
 
 // const innerIsActive = ref(props.isActive);

@@ -23,16 +23,13 @@
  *
 -->
 <script lang="ts">
-import { inject, Component } from "vue";
+import { inject, Component, markRaw } from "vue";
 import { Logger, CristalApp } from "@cristal/api";
 
 let comps: Array<Component>;
 let logger: Logger;
 
 export default {
-  props: {
-    editorname: { type: String, required: true },
-  },
   setup() {
     let cristal = inject<CristalApp>("cristal");
     if (cristal) {
@@ -60,7 +57,7 @@ export default {
       }
       logger?.debug("Final component ", editComponent);
       return {
-        component: editComponent,
+        component: markRaw(editComponent),
       };
     }
   },

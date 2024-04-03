@@ -6,8 +6,6 @@ import "@shoelace-style/shoelace/dist/themes/light.css";
 import { defineProps } from "vue";
 defineProps<{
   title: string;
-  type: number;
-  width: number;
 }>();
 </script>
 <template>

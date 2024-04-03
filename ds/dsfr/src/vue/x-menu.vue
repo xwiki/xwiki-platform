@@ -8,8 +8,6 @@ import {
 
 defineProps<{
   title: string;
-  type: number;
-  width: number;
 }>();
 
 function toggle() {

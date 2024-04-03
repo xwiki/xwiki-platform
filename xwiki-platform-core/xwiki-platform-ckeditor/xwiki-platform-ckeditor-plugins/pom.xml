@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -59,6 +59,15 @@
       <artifactId>xwiki-platform-tree-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- This is needed for realtime editing. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <!-- Marked as optional because the realtime plugin is disabled by default. -->
+      <optional>true</optional>
     </dependency>
     <!-- This is used by the resource suggest picker on the link modal. -->
     <dependency>

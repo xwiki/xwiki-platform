@@ -469,6 +469,8 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
   'xwiki-events-bridge'
 ], function ($, xm, Vue, notifications, l10n) {
   Vue.component('DisplayerToggle', notifications.DisplayerToggle);
+  Vue.component('DisplayerScope', notifications.DisplayerScope);
+  Vue.component('DisplayerStaticList', notifications.DisplayerStaticList);
 
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
@@ -783,12 +785,13 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webjar', 'style.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 ######################################################
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
 &lt;div class="customFilterPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
-  &lt;div class="row"&gt;
+  &lt;div class="row xform"&gt;
     &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.custom.hint'))
     &lt;/p&gt;
@@ -799,40 +802,21 @@ require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch',
     &lt;/div&gt;
   &lt;/div&gt;
   #set ($sourceParameters = {
-    'translationPrefix': 'notifications.settings.filters.preferences.custom.table.',
-    'resultPage': 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
-    'eventType': '',
-    'format': '',
-    'type': 'custom'
+    'target': $wikimacro.parameters.target
   })
   #if ($wikimacro.parameters.target == 'user')
     #set ($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+  #else
+    #set ($discard = $sourceParameters.put('wiki', $services.model.serialize($services.wiki.getCurrentWikiReference(), 'default')))
   #end
-  #set ($liveDataConfig = {
-    'meta': {
-      'propertyDescriptors': [
-        { 'id': 'notificationFormats', 'displayer': 'html', 'filterable': false, 'sortable': false },
-        { 'id': 'isEnabled', 'displayer': 'toggle', 'filterable': false, 'sortable': false },
-        { 'id': 'name', 'displayer': 'html', 'filterable': false, 'sortable': false},
-        { 'id': 'filterType', 'filterable': false, 'sortable': false},
-        { 'id': 'eventTypes', 'displayer': 'html', 'filterable': false, 'sortable': false}
-      ],
-      'actions': [
-        {'id': 'delete', 'allowProperty': 'doc.viewable'}
-      ],
-      'entryDescriptor': {
-          'idProperty': 'filterPreferenceId'
-      }
-    }
-  })
   $services.liveData.render({
     'id': 'notificationCustomFilterPreferencesLiveData',
-    'properties': 'name,filterType,eventTypes,notificationFormats,isEnabled,_actions',
-    'source': 'liveTable',
+    'properties': 'filterPreferenceId,display,scope,location,filterType,eventTypes,notificationFormats,isEnabled,actions',
+    'source': 'notificationCustomFilters',
     'sourceParameters': $escapetool.url($sourceParameters),
-    'description': $services.localization.render('notifications.settings.filters.preferences.custom.table.description'),
-    'limit': 10
-  }, $liveDataConfig)
+    'limit': 10,
+    'sort': 'filterPreferenceId:desc'
+  })
 &lt;/div&gt;
 ######################################################
 ### ADD FILTER MODAL

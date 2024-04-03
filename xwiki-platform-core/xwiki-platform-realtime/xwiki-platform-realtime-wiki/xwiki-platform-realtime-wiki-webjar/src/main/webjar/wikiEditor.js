@@ -44,16 +44,16 @@ define('xwiki-realtime-wikiEditor', [
 
   var module = {}, editorId = 'wiki';
 
-  module.main = function(editorConfig, docKeys) {
-    var channel = docKeys[editorId],
-    eventsChannel = docKeys.events,
-    userdataChannel = docKeys.userdata;
+  module.main = function(editorConfig) {
+    var channel = editorConfig.channels[editorId],
+    eventsChannel = editorConfig.channels.events,
+    userdataChannel = editorConfig.channels.userdata;
 
     /**
      * Update the channel keys for reconnecting WebSocket.
      */
     var updateKeys = function() {
-      return docKeys._update().then(keys => {
+      return editorConfig.updateChannels().then(keys => {
         if (keys[editorId] && keys[editorId] !== channel) {
           channel = keys[editorId];
         }
@@ -83,14 +83,6 @@ define('xwiki-realtime-wikiEditor', [
     }
     // Disable while real-time framework is loading.
     allowRealtimeCheckbox.prop('disabled', true);
-
-    Saver.configure({
-      chainpad: ChainPad,
-      editorType: editorId,
-      editorName: 'Wiki',
-      isHTML: false,
-      mergeContent: realtimeConfig.enableMerge !== 0
-    });
 
     console.log("Creating realtime toggle");
 
@@ -204,13 +196,13 @@ define('xwiki-realtime-wikiEditor', [
       // Don't let the user edit until the editor is ready.
       module.setEditable(false);
 
-      var initializing = true;
+      var initializing = true,
 
       // List of pretty name of all users (mapped with their server ID).
-      var userData;
+      userData,
 
       // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
-      var toolbar;
+      toolbar;
 
       var setValueWithCursor = function(newValue) {
         var oldValue = canonicalize(editor.getValue());
@@ -224,48 +216,48 @@ define('xwiki-realtime-wikiEditor', [
         editor.setCursor(selects[0], selects[1]);
       };
 
-      var createSaver = function(info) {
-        // This function displays a message notifying users that there was a merge.
-        Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
-          toolbar.toolbar.find('.rt-toolbar-rightside'));
-        Saver.setLastSavedContent(editor.getValue());
-        Saver.create({
-          // Id of the Wiki edit mode form.
-          formId: 'edit',
+      function createSaver(info) {
+        const saver = new Saver({
+          editorType: editorId,
+          editorName: 'Wiki',
+          userList: info.userList,
+          userName: editorConfig.user.name,
+          network: info.network,
+          channel: eventsChannel,
           setTextValue: function(newText, toConvert, callback) {
             setValueWithCursor(newText);
             callback();
             realtimeOptions.onLocal();
+          },
+          getTextValue: function() {
+            return editor.getValue();
           },
           getSaveValue: function() {
             return {
               content: editor.getValue()
             };
           },
-          getTextValue: function() {
-            return editor.getValue();
-          },
           getTextAtCurrentRevision: function() {
             return $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'}))).then(data => {
               return data.content;
             });
           },
-          realtime: info.realtime,
-          userList: info.userList,
-          userName: editorConfig.userName,
-          network: info.network,
-          channel: eventsChannel,
           safeCrash: function(reason, debugLog) {
             module.onAbort(null, reason, debugLog);
           }
         });
-      };
+        // This function displays a message notifying users that there was a merge.
+        saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
+          toolbar.toolbar.find('.rt-toolbar-rightside'));
+        saver.setLastSavedContent(editor.getValue());
+        return saver;
+      }
 
       var realtimeOptions = {
         // Provide initial state...
         initialState: editor.getValue() || '',
-        websocketURL: editorConfig.WebsocketURL,
-        userName: editorConfig.userName,
+        websocketURL: editorConfig.webSocketURL,
+        userName: editorConfig.user.name,
         // The channel we will communicate over.
         channel,
         // The object responsible for encrypting the messages.
@@ -285,15 +277,15 @@ define('xwiki-realtime-wikiEditor', [
           });
         },
 
-        onReady: function(info) {
+        onReady: async function(info) {
           module.chainpad = info.realtime;
           module.leaveChannel = info.leave;
 
           // Update the user list to link the wiki name to the user id.
-          userData = UserData.start(info.network, userdataChannel, {
+          userData = await UserData.start(info.network, userdataChannel, {
             myId: info.myId,
-            userName: editorConfig.userName,
-            userAvatar: editorConfig.userAvatarURL,
+            userName: editorConfig.user.name,
+            userAvatar: editorConfig.user.avatarURL,
             onChange: info.userList.onChange,
             crypto: Crypto,
             editor: editorId
@@ -308,7 +300,7 @@ define('xwiki-realtime-wikiEditor', [
           allowRealtimeCheckbox.prop('disabled', false);
 
           this.onLocal();
-          createSaver(info);
+          module.saver = createSaver(info);
         },
 
         onRemote: function(info) {
@@ -338,12 +330,10 @@ define('xwiki-realtime-wikiEditor', [
           module.chainpad.abort();
           module.leaveChannel();
           module.aborted = true;
-          Saver.stop();
+          module.saver.stop();
           toolbar.failed();
           toolbar.toolbar.remove();
-          if (typeof userData.leave === 'function') {
-            userData.leave();
-          }
+          userData.stop?.();
           if (reason || debug) {
             ErrorBox.show(reason || 'disconnected', debug);
           }
@@ -372,11 +362,14 @@ define('xwiki-realtime-wikiEditor', [
       module.onAbort = realtimeOptions.onAbort;
       module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
 
-      var onChangeHandler = function() {
+      // Notify the others that we're editing in realtime.
+      editorConfig.setRealtimeEnabled(true);
+
+      function onChangeHandler() {
         // We can't destroy the dialog here because sometimes it's impossible to take an action during a merge conflict.
-        Saver.setLocalEditFlag(true);
+        module.saver.setLocalEditFlag(true);
         realtimeOptions.onLocal();
-      };
+      }
       editor.onChange(onChangeHandler);
     };
 

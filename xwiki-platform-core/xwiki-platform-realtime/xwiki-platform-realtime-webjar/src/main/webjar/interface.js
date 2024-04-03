@@ -38,12 +38,22 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
   }
 
   function createAllowRealtimeCheckbox(checked) {
-    const checkbox = $(
-      '<label class="realtime-allow-label text-nowrap">' +
-        '<input type="checkbox" class="realtime-allow"/>' +
-      '</label>'
-    ).appendTo('.buttons');
-    return checkbox.append(document.createTextNode(Messages.allowRealtime)).find('input').prop('checked', !!checked);
+    let allowRealtimeCheckbox = getAllowRealtimeCheckbox();
+    // Don't duplicate the checkbox if it already exists.
+    if (!allowRealtimeCheckbox.length) {
+      const wrapper = $(
+        '<label class="realtime-allow-label text-nowrap">' +
+          '<input type="checkbox" class="realtime-allow"/>' +
+        '</label>'
+      ).appendTo('.buttons');
+      allowRealtimeCheckbox = wrapper.append(document.createTextNode(Messages.allowRealtime)).find('input')
+        .prop('checked', !!checked);
+    }
+    return allowRealtimeCheckbox;
+  }
+
+  function getAllowRealtimeCheckbox() {
+    return $('input.realtime-allow[type="checkbox"]');
   }
 
   function createMergeMessageElement(container) {
@@ -58,7 +68,7 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
 
       const formattedMessage = Messages.get(messageKey, ...args);
 
-      console.log(formattedMessage);
+      console.debug(formattedMessage);
 
       // Set the message, handle all types.
       $merges.text(formattedMessage);
@@ -72,5 +82,5 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
     };
   }
 
-  return {uid, realtimeAllowed, createAllowRealtimeCheckbox, createMergeMessageElement};
+  return {uid, realtimeAllowed, createAllowRealtimeCheckbox, getAllowRealtimeCheckbox, createMergeMessageElement};
 });

@@ -717,6 +717,9 @@ a.search-result-highlightAll:after {
   cursor: pointer;
   line-height: 1.4em;
   margin: 0 .2em;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
 }
 
 .search-facet-header:after {
@@ -726,10 +729,9 @@ a.search-result-highlightAll:after {
   content: "";
   display: block;
   height: 0;
-  margin: 2.45em 0 0;
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
   width: 100%;
 }
 
@@ -761,11 +763,7 @@ a.search-result-highlightAll:after {
 
 .search-facet .search-facet-header .facet-toggler, button.facet-value-toggler {
   background: transparent;
-  float: right;
-}
-
-button.facet-value-toggler:not(:active) {
-  color: $theme.btn-primary-color;
+  transition: background-color .2s ease-in-out;
 }
 
 .search-facet .search-facet-header .facet-toggler:active, button.facet-value-toggler:active {
@@ -819,6 +817,7 @@ button.facet-value-toggler:not(:active) {
 }
 
 .search-facet-body .itemName,
+.search-facet-body .facet-value-toggler,
 .search-facet-body .more {
   /* Remove link styling */
   color: $theme.textColor;

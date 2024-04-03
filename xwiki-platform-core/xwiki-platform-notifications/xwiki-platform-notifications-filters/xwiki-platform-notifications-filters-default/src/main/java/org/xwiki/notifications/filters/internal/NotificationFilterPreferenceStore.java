@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -64,6 +65,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 public class NotificationFilterPreferenceStore
 {
     private static final String FILTER_PREFIX = "NFP_";
+    private static final String ID = "id";
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -76,6 +78,45 @@ public class NotificationFilterPreferenceStore
 
     @Inject
     private ObservationManager observation;
+
+    /**
+     * Retrieve the notification preference that corresponds to the given id and wiki.
+     *
+     * @param wikiReference the wiki for which to retrieve a notification preference
+     * @param filterPreferenceId a filter preference id
+     * @return the corresponding preference or {@link Optional#empty()} if none can be found
+     * @throws NotificationException if an error occurs
+     * @since 16.3.0RC1
+     */
+    public Optional<NotificationFilterPreference> getFilterPreference(String filterPreferenceId,
+        WikiReference wikiReference) throws NotificationException
+    {
+        Optional<NotificationFilterPreference> result = Optional.empty();
+        DefaultNotificationFilterPreference filterPreference = configureContextWrapper(wikiReference, () -> {
+            Query query;
+            try {
+                query = this.queryManager.createQuery(
+                    "select nfp from DefaultNotificationFilterPreference nfp where nfp.id = :id",
+                    Query.HQL);
+                query.setLimit(1);
+                query.bindValue(ID, filterPreferenceId);
+
+                List<DefaultNotificationFilterPreference> results = query.execute();
+                if (!results.isEmpty()) {
+                    return results.get(0);
+                }
+            } catch (QueryException e) {
+                throw new NotificationException(
+                    String.format("Error while retrieving notification with id [%s]", filterPreferenceId), e);
+            }
+            return null;
+        });
+        if (filterPreference != null) {
+            result = Optional.of(filterPreference);
+        }
+
+        return result;
+    }
 
     /**
      * Get the notification preference that corresponds to the given id and user.
@@ -354,7 +395,7 @@ public class NotificationFilterPreferenceStore
             try {
                 hibernateStore.executeWrite(context, session ->
                     session.createQuery("delete from DefaultNotificationFilterPreference where internalId in (:id)")
-                    .setParameter("id", internalFilterPreferenceIds)
+                    .setParameter(ID, internalFilterPreferenceIds)
                     .executeUpdate());
             } catch (XWikiException e) {
                 throw new NotificationException(

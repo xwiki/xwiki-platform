@@ -86,6 +86,7 @@
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
@@ -104,6 +105,9 @@
     },
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
     'selectize': ['jquery'],
+    'xwiki-document-lock': {
+      'exports': 'XWiki.DocumentLock'
+    },
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }
@@ -267,11 +271,13 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
         #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
       #end
     #end
-    $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
-      'forceSkinAction' : true,
-      'h' : $searchSuggestConfigHash.hashCode()
-    })##
-    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)##
+    <script src="${services.webjars.url(
+      'org.xwiki.platform:xwiki-platform-search-webjar',
+      'searchSuggest' + $jsExtension,
+      {'evaluate': true, 'h': $searchSuggestConfigHash.hashCode()})}" defer="defer"></script>##
+    $xwiki.linkx.use(
+      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
+      {'type': 'text/css', 'rel': 'stylesheet'})##
   #end
 #end
 #set($editActions = ['edit', 'inline', 'admin'])

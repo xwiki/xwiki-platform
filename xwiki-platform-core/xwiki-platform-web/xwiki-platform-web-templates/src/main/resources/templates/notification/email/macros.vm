@@ -188,38 +188,40 @@
       #set ($lastIndex = $event.events.size() - 1)
       #set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
     #end
-    ###
-    ### Prepare the diff
-    ###
-    #createDocumentDiff($origdoc, $newdoc, $docDiff)
-    #createDocumentDiffSummary($docDiff, $summary)
-    ###
-    ### Macro that replace CSS classes by inline styles
-    ###
-    #macro(displayhtmldiff $html)
-      #set($result = $html.trim())
-      #set($result = $result.replaceAll('class="diff-line diff-line-added"', 'style="background-color: #ccffcc;"'))
-      #set($result = $result.replaceAll('class="diff-line diff-line-deleted"', 'style="background-color: #ffcccc;"'))
-      #set($result = $result.replaceAll('class="diff-line diff-line-context"', 'style="background-color: #fff;"'))
-      ##set($result = $result.replaceAll('<dt', '<dt style="font-size: 1.2em; fontw-weight: bold;"'))
-      #set($result = $result.replaceAll('<ins>', '<ins style="background-color: #99ff99; text-decoration: none;">'))
-      #set($result = $result.replaceAll('<del>', '<del style="background-color: #ff9999; text-decoration: none;">'))
-      #set($result = $result.replaceAll('class="diff-header"', 'style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;"'))
-      #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;"'))
-      #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"'))
-      #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;"'))
-      #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
-      $result
-    #end
-    ###
-    ### Display the diff
-    ###
-    <div style="border-top: 1px dashed #e8e8e8; font-size: 0.9em;">
-      #define ($diffContent)
-        #displayDocumentDiff($docDiff)
+    #if ("$!newdoc" != "" || "$!origdoc" != "")
+      ###
+      ### Prepare the diff
+      ###
+      #createDocumentDiff($origdoc, $newdoc, $docDiff)
+      #createDocumentDiffSummary($docDiff, $summary)
+      ###
+      ### Macro that replace CSS classes by inline styles
+      ###
+      #macro(displayhtmldiff $html)
+        #set($result = $html.trim())
+        #set($result = $result.replaceAll('class="diff-line diff-line-added"', 'style="background-color: #ccffcc;"'))
+        #set($result = $result.replaceAll('class="diff-line diff-line-deleted"', 'style="background-color: #ffcccc;"'))
+        #set($result = $result.replaceAll('class="diff-line diff-line-context"', 'style="background-color: #fff;"'))
+        ##set($result = $result.replaceAll('<dt', '<dt style="font-size: 1.2em; fontw-weight: bold;"'))
+        #set($result = $result.replaceAll('<ins>', '<ins style="background-color: #99ff99; text-decoration: none;">'))
+        #set($result = $result.replaceAll('<del>', '<del style="background-color: #ff9999; text-decoration: none;">'))
+        #set($result = $result.replaceAll('class="diff-header"', 'style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;"'))
+        #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;"'))
+        #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid #E8E8E8; color: rgba(101, 101, 101, 0.5); font-family: Monospace; text-align: right; vertical-align: top;"'))
+        #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: rgba(101, 101, 101, 0.5); font-family: Monospace; padding: .4em .5em;"'))
+        #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
+        $result
       #end
-      #displayhtmldiff($diffContent.toString())
-    </div>
+      ###
+      ### Display the diff
+      ###
+      <div style="border-top: 1px dashed #e8e8e8; font-size: 0.9em;">
+        #define ($diffContent)
+          #displayDocumentDiff($docDiff)
+        #end
+        #displayhtmldiff($diffContent.toString())
+      </div>
+    #end
   #else
     #set ($lastVersion = $event.events[0].documentVersion)
     #set ($lastIndex = $event.events.size() - 1)

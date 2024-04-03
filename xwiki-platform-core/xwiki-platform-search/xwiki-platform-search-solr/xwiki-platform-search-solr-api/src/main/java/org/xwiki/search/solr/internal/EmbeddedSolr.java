@@ -50,6 +50,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
+import org.apache.solr.servlet.SolrDispatchFilter;
 import org.apache.solr.core.CoreDescriptor;
 import org.apache.solr.core.SolrCore;
 import org.xwiki.component.annotation.Component;
@@ -113,6 +114,9 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             } else {
                 updateHomeDirectory();
             }
+
+            // Solr expects the Solr home path to be indicated as system property
+            System.setProperty(SolrDispatchFilter.SOLR_INSTALL_DIR_ATTRIBUTE, this.solrHomePath.toString());
 
             // Validate and create the search core
             if (Files.exists(this.solrSearchCorePath)) {
@@ -243,7 +247,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         return this.container;
     }
 
-    private boolean isExpectedSolrVersion(File solrconfigFile)
+    private Version getLuceneVersion(File solrconfigFile)
     {
         XMLInputFactory factory = XMLInputFactory.newInstance();
         // Prevent any XXE attack by disabling DOCTYPE declarations (even though we control the solr config file and
@@ -257,10 +261,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
                 if (xmlReader.getLocalName().equals("luceneMatchVersion")) {
-                    String versionStr = xmlReader.getElementText();
-
-                    // Valid if the version used in the configuration is the currently bundled version
-                    return Version.LATEST.toString().equals(versionStr);
+                    return Version.parse(xmlReader.getElementText());
                 }
             }
         } catch (Exception e) {
@@ -269,7 +270,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
 
         // Not the right version or invalid configuration
-        return false;
+        return null;
     }
 
     private boolean isSearchCoreValid()
@@ -283,7 +284,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Check solrconfig.xml
         File solrconfigFile = this.solrSearchCorePath.resolve(SOLRCONFIG_PATH).toFile();
-        return solrconfigFile.exists() && isExpectedSolrVersion(solrconfigFile);
+        return solrconfigFile.exists() && Version.LATEST.equals(getLuceneVersion(solrconfigFile));
     }
 
     private void recreateSearchCore() throws IOException
@@ -366,10 +367,16 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 Path solrconfig = corePath.resolve(SOLRCONFIG_PATH);
 
                 // If Solr was upgraded, reset the solrconfig.xml
-                if (Files.exists(solrconfig) && !isExpectedSolrVersion(solrconfig.toFile())) {
-                    // Reset solr configuration
-                    try (InputStream stream = this.solrConfiguration.getMinimalCoreDefaultContent()) {
-                        copyCoreConfiguration(stream, corePath, true, Set.of(SOLRCONFIG_PATH));
+                if (Files.exists(solrconfig)) {
+                    Version luceneVersion = getLuceneVersion(solrconfig.toFile());
+
+                    // But only if it's the same major version (otherwise it needs to be migrated to a totally different
+                    // core)
+                    if (luceneVersion == null || getSolrMajorVersion() == luceneVersion.major) {
+                        // Reset solr configuration
+                        try (InputStream stream = this.solrConfiguration.getMinimalCoreDefaultContent()) {
+                            copyCoreConfiguration(stream, corePath, true, Set.of(SOLRCONFIG_PATH));
+                        }
                     }
                 }
             }

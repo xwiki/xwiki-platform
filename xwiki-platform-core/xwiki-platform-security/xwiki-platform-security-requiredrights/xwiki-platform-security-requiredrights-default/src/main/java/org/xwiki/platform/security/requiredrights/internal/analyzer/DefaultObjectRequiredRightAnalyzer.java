@@ -154,6 +154,10 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         String contentTypeString = textAreaClass.getContentType();
         TextAreaClass.ContentType contentType =
             TextAreaClass.ContentType.getByValue(contentTypeString);
+        if (contentType == null) {
+            // Default to wiki text like TextAreaClass does.
+            contentType = TextAreaClass.ContentType.WIKI_TEXT;
+        }
         PropertyInterface field = object.getField(propertyName);
 
         List<RequiredRightAnalysisResult> result = List.of();
@@ -162,7 +166,7 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
         if (!textAreaClass.isRestricted() && field instanceof BaseStringProperty) {
             String value = ((BaseStringProperty) field).getValue();
 
-            if (contentType != null && StringUtils.isNotBlank(value)) {
+            if (StringUtils.isNotBlank(value)) {
                 switch (contentType) {
                     case VELOCITY_CODE:
                         result = analyzeVelocityScriptValue(value, field.getReference(),
@@ -176,10 +180,10 @@ public class DefaultObjectRequiredRightAnalyzer implements RequiredRightAnalyzer
                             result = analyzeWikiContent(object, value, field.getReference());
                         }
                         break;
-                    case WIKI_TEXT:
-                        result = analyzeWikiContent(object, value, field.getReference());
+                    case PURE_TEXT:
                         break;
                     default:
+                        result = analyzeWikiContent(object, value, field.getReference());
                         break;
                 }
             }

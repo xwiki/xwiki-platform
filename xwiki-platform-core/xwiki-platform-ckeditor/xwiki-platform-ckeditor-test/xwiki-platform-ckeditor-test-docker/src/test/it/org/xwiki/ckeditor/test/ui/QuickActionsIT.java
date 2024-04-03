@@ -287,7 +287,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my info message");
@@ -306,7 +305,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my success message");
@@ -325,7 +323,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my warning message");
@@ -344,7 +341,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my error message");
@@ -451,7 +447,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
         new MacroDialogEditModal().waitUntilReady().clickSubmit();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
 
         assertSourceEquals("{{include/}}");
     }
@@ -470,7 +465,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
         new MacroDialogEditModal().waitUntilReady().clickSubmit();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
 
         assertSourceEquals("{{code language=\"none\"}}{{/code}}");
     }
@@ -486,7 +480,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
 
         assertSourceEquals("{{toc/}}\n");
     }
@@ -546,7 +539,6 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
         // We wait for the editor to update because the icon quick action is using a macro.
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
 
         assertSourceEquals("{{displayIcon name=\"wiki\"/}} ");
     }

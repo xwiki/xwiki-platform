@@ -172,7 +172,20 @@
 
   var scrollIntoViewAndFocusWidget = function(widget) {
     widget.wrapper.scrollIntoView();
-    (widget.editables.$content || widget).focus();
+    const placeholder = widget.wrapper.findOne('.macro-placeholder')?.$;
+    const selection = widget.editor.getSelection(/* forceRealSelection: */ true)?.getNative();
+    const firstNestedEditable = Object.values(widget.editables)[0];
+    // The selection ends up in the macro placeholder after inserting a macro widget, which is usually hidden so the
+    // selection is not visible. Let's move the caret at the start of the first nested editable in this case (for macros
+    // that can be edited inline).
+    if (placeholder?.contains(selection?.focusNode) && firstNestedEditable) {
+      // Place the caret at the start of the first nested editable.
+      let range = new CKEDITOR.dom.range(widget.editor.document);
+      range.moveToElementEditablePosition(firstNestedEditable);
+      range.select();
+    } else {
+      widget.focus();
+    }
   };
 })();
 

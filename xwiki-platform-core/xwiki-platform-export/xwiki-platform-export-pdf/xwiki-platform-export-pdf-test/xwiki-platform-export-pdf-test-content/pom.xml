@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf-test</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-test-content</artifactId>
   <name>XWiki Platform - Export - PDF - Test - Content</name>
@@ -66,7 +66,7 @@
       <!-- Used to test the integration with Numbered Headings Application. -->
       <groupId>org.xwiki.contrib.numbered.content</groupId>
       <artifactId>application-numbered-content-headings-ui</artifactId>
-      <version>1.9.2</version>
+      <version>1.10.1</version>
       <type>xar</type>
     </dependency>
     <!-- Used to test the PDF export of the code macro. -->

@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WindowType;
@@ -34,9 +35,9 @@ import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
+import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
@@ -58,7 +59,9 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 @UITest(
     properties = {
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        // Required to upload files during the real-time editing session.
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
     },
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
@@ -113,13 +116,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("John", selfPosition.getAvatarHint());
         assertTrue(selfPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + selfPosition.getAvatarURL());
-        selfPosition.waitForLocation(new Point(3, 18));
+        selfPosition.waitForLocation(new Point(4, 18));
 
         assertEquals(1, textArea.getCoeditorPositions().size());
 
         // Verify that the cursor indicator is updated when typing.
         textArea.sendKeys(Keys.ENTER, "two");
-        selfPosition.waitForLocation(new Point(3, 48));
+        selfPosition.waitForLocation(new Point(4, 48));
 
         // Verify the action buttons (Save and Cancel).
         editPage.clickSaveAndContinue();
@@ -129,15 +132,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Edit again and verify the Save and View button.
         viewPage.edit();
-        editPage = new RealtimeWYSIWYGEditPage();
-        editPage.getContenEditor().getRichTextArea().sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "three");
-        viewPage = editPage.clickSaveAndView();
+        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        new RealtimeCKEditor().getRichTextArea().sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "three");
+        viewPage = inplaceEditablePage.saveAndView();
         assertEquals("one\ntwo\nthree", viewPage.getContent());
 
         // Edit again to verify the autosave.
         viewPage.edit();
-        editPage = new RealtimeWYSIWYGEditPage();
-        textArea = editPage.getContenEditor().getRichTextArea();
+        inplaceEditablePage = new InplaceEditablePage();
+        editor = new RealtimeCKEditor();
+        textArea = editor.getRichTextArea();
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
         textArea.sendKeys("zero");
 
@@ -145,7 +149,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String saveStatus = editor.getToolBar().waitForAutoSave();
         assertTrue(saveStatus.startsWith("Saved:"), "Unexpected save status: " + saveStatus);
 
-        viewPage = editPage.clickCancel();
+        viewPage = inplaceEditablePage.cancel();
         assertEquals("zero\ntwo\nthree", viewPage.getContent());
     }
 
@@ -228,14 +232,14 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The first user is on the third line (paragraph).
         CoeditorPosition firstPosition =
-            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(3, 78));
+            secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 78));
         assertEquals("John", firstPosition.getAvatarHint());
         assertTrue(firstPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + firstPosition.getAvatarURL());
 
         // The second user is on the first line (paragraph).
         CoeditorPosition secondPosition =
-            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(3, 18));
+            secondTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 18));
         assertEquals("John", secondPosition.getAvatarHint());
         assertTrue(secondPosition.getAvatarURL().contains("noavatar.png"),
             "Unexpected avatar URL: " + secondPosition.getAvatarURL());
@@ -250,7 +254,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(firstTabHandle);
-        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(3, 48));
+        firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 48));
 
         // Verify that clicking on the coeditor indicator scrolls the editing area to the coeditor position.
         // But first we need to add enough paragraphs to make the editing area scrollable.
@@ -266,7 +270,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to the second tab and click on the coeditor indicator.
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.waitUntilTextContains("end");
-        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(3, 18 + 22 * 30));
+        firstPosition = secondTextArea.getCoeditorPosition(firstCoeditorId).waitForLocation(new Point(4, 18 + 22 * 30));
         assertFalse(firstPosition.isVisible(), "The coeditor position is visible before scrolling.");
         secondEditor.getToolBar().getCoeditor(firstCoeditorId).click();
         assertTrue(firstPosition.isVisible(), "The coeditor position is not visible after scrolling.");
@@ -308,7 +312,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         secondTextArea = secondEditor.getRichTextArea();
-        secondTextArea.waitUntilContentEditable();
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         secondTextArea.sendKeys("my info tex");
@@ -551,8 +554,19 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.sendKeys(Keys.ARROW_RIGHT);
+        // At this point the caret is inside the underline style, at the end. We could remove the underline style by
+        // pressing Ctrl+U, which would move the caret after the underline style, but this can lead to a flacky
+        // behavior, if a remote change arrives at the same time in the same paragraph (which is the point of this
+        // test). When this happens, the selection has to be restored because the remote change affects the selection
+        // (the caret container is modified directly leading to a change in the number of child nodes which requires an
+        // update of the DOM range that specifies the caret position). When the selection is restored the caret is
+        // placed back in the underline style, at the end (because the selection is saved and restored relative to the
+        // text found before the caret). In order to avoid this flacky behavior we first type some text, then select it
+        // and finally remove the underline style.
+        secondTextArea.sendKeys(" ");
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_LEFT));
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "u"));
-        secondTextArea.sendKeys(" end");
+        secondTextArea.sendKeys(Keys.ARROW_RIGHT, "end");
 
         //
         // First Tab
@@ -562,7 +576,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.sendKeys(Keys.ARROW_RIGHT, "er");
 
         firstTextArea.waitUntilTextContains("end");
-        String content = firstTextArea.getContent();
+        // Normalize the spaces because not all browsers behave the same (where some browser inserts a space another may
+        // insert a non-breaking space).
+        String content = firstTextArea.getContent().replace("&nbsp;", " ");
         assertTrue(content.contains("<strong>bolder</strong> <em>italic</em> <ins>underline</ins> end"),
             "Unexpected content: " + content);
     }
@@ -573,12 +589,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-
-        // Upload an image to test with.
-        String attachmentName = "image.gif";
-        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
-        setup.createPage(testReference, "", "");
-        setup.attachFile(testReference, attachmentName, getClass().getResourceAsStream("/" + attachmentName), false);
 
         //
         // First Tab
@@ -593,6 +603,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Second Tab
         //
 
+        // TODO: Find a way to open an incognito window that would allow us to login with a different user. Temporary
+        // attachments are stored in the user session so using two tabs where the same user is logged in doesn't allow
+        // us to verify that images uploaded by one user are visible to the other coeditors in the real-time session.
         String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
 
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
@@ -603,7 +616,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Insert the image with caption.
         ImageDialogSelectModal imageDialogSelectModal = secondEditor.getToolBar().insertImage();
-        imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
+        imageDialogSelectModal.switchToUploadTab().upload("/image.gif");
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
         imageDialogEditModal.clickInsert();
@@ -620,6 +633,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().switchTo().window(firstTabHandle);
         firstTextArea.waitUntilTextContains("Tree");
         firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ");
+
+        // Verify that the image uploaded from the second tab is visible in the first tab.
+        firstTextArea.verifyContent((content) -> {
+            Dimension imageSize = content.getImages().get(0).getSize();
+            assertEquals(20, imageSize.width);
+            assertEquals(20, imageSize.height);
+        });
 
         //
         // Second Tab
@@ -665,7 +685,6 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         firstTextArea.sendKeys("one");
@@ -698,31 +717,34 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(firstTabHandle);
+        // Wait for the content to be synchronized before applying the macro parameter changes, otherwise we might
+        // overwrite the text typed in the second tab.
+        firstTextArea.waitUntilTextContains("two");
         firstMacroEditModal.clickSubmit();
 
         // The content is reloaded when a macro is updated.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
 
         // Move to the information box title field and type something.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
-        firstTextArea.sendKeys(Keys.END, " title");
+        firstTextArea.sendKeys(Keys.ARROW_UP, Keys.END, " title");
 
         //
         // Second Tab
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
+
+        // The content was reloaded because the macro parameters have changed (from the first tab).
+        secondTextArea = secondEditor.getRichTextArea();
+
         secondTextArea.waitUntilTextContains("Some title");
         secondMacroEditModal.clickSubmit();
 
-        // The content is reloaded when a macro is updated.
+        // The content is again reloaded because we modified the macro parameters.
         secondTextArea = secondEditor.getRichTextArea();
-        secondTextArea.waitUntilContentEditable();
 
         // Move to the information box title field and type something.
-        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
-        secondTextArea.sendKeys(Keys.HOME);
+        secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
         secondTextArea.sendKeys(" cool");
 
@@ -894,10 +916,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
 
         // Select the default information message and delete it.
-        firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP, Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
 
         // Insert a nested error box.
         firstTextArea.sendKeys("inside", Keys.ENTER, "/err");
@@ -908,15 +929,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // The content is reloaded when a macro is inserted.
         firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.waitUntilContentEditable();
 
         // Replace the default error message.
-        firstTextArea.sendKeys(Keys.PAGE_DOWN, Keys.ARROW_UP, Keys.ARROW_UP, Keys.chord(Keys.SHIFT, Keys.HOME),
-            Keys.BACK_SPACE);
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         firstTextArea.sendKeys("nested");
 
         // Type some text after the information box.
-        firstTextArea.sendKeys(Keys.PAGE_DOWN, "after");
+        firstTextArea.sendKeys(Keys.ARROW_DOWN, "after");
 
         //
         // Second Tab

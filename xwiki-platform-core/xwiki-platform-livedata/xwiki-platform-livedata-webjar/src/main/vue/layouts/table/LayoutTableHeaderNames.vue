@@ -60,8 +60,7 @@
       <!-- Wrapper for the column header -->
       <div class="column-name">
         <!-- Property Name -->
-        <button 
-          class="handle"
+        <button type="button" class="handle"
           @click="sort(property)"
           @keydown.left="keyboardDragNDrop($event, -1)"
           @keydown.right="keyboardDragNDrop($event, 1)"
@@ -83,7 +82,8 @@
       <!--
           Specify the handle to resize properties
         -->
-      <button class="resize-handle btn btn-xs btn-default" :title="$t('livedata.action.resizeColumn.hint')"
+      <button type="button" class="resize-handle btn btn-xs btn-default"
+              :title="$t('livedata.action.resizeColumn.hint')"
               v-mousedownmove="mouseResizeColumnInit"
               @mousedownmove="mouseResizeColumn"
               @keydown.left="keyboardResizeColumn($event, -10)"

@@ -53,7 +53,6 @@ import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -86,7 +85,6 @@ import static org.xwiki.test.page.WikiMacroSetup.loadWikiMacro;
 @IconManagerScriptServiceComponentList
 @WikiMacroFactoryComponentClass
 @ComponentList({
-    ControlCharactersFilter.class,
     ModelScriptService.class,
     TestNoScriptMacro.class,
     TemporaryAttachmentsScriptService.class,

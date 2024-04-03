@@ -259,6 +259,8 @@ public class WCAGContext
 
     private String testMethodName;
 
+    private boolean stopOnError = true;
+
     /**
      * Sets the current test class name. This name is the string representation of the TestUI class in which the
      * current wcag validation happens.
@@ -449,6 +451,22 @@ public class WCAGContext
     public boolean isWCAGEnabled()
     {
         return this.wcagEnabled;
+    }
+
+    /**
+     * @param stopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public void setWCAGStopOnError(boolean stopOnError)
+    {
+        this.stopOnError = stopOnError;
+    }
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public boolean shouldWCAGStopOnError()
+    {
+        return this.stopOnError;
     }
 
     /**

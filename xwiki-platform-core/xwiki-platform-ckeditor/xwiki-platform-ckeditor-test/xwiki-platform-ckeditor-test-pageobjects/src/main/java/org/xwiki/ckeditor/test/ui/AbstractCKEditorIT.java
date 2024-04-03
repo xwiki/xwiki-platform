@@ -97,6 +97,14 @@ public abstract class AbstractCKEditorIT
 
     protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
     {
+        try {
+            // Dismiss the page leave confirmation modal if already open. We have to do this because we need to insert
+            // the page reload marker, see below, which is not possible while the modal is open.
+            setup.getDriver().switchTo().alert().dismiss();
+        } catch (Exception e) {
+            // The page leave confirmation modal wasn't open.
+        }
+
         if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
             // Leaving the edit mode with unsaved changes triggers the confirmation alert which stops the navigation.
             // Selenium doesn't wait for the new web page to be loaded after the alert is handled so we have to do this

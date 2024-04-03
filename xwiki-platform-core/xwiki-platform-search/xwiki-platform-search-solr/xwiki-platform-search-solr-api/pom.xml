@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -53,21 +53,9 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
     </dependency>
-    <!-- Solr core depends on a different version of Jetty which we exclude and thus we need to
-      pull the right version here. -->
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-alpn-java-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.http2</groupId>
-      <artifactId>http2-http-client-transport</artifactId>
-    </dependency>
-    <!-- Solr core depends on a different version of Restlet (than our Rest module) which we exclude and thus we need to
-      pull the right version here. -->
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet</artifactId>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-backward-codecs</artifactId>
     </dependency>
     <!-- Apache Commons -->
     <dependency>
@@ -120,8 +108,9 @@
     <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-server-core</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-core-search</artifactId>
       <version>${project.version}</version>
+      <type>zip</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -186,7 +175,8 @@
                 **/DefaultSolrIndexer.java,
                 **/SolrIndexEventListener.java,
                 **/AbstractSolrMetadataExtractor.java,
-                **/EmbeddedSolr.java
+                **/EmbeddedSolr.java,
+                **/SolrSchemaUtils.java
               </excludes>
             </configuration>
           </execution>
@@ -207,10 +197,10 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-core</artifactId>
+                  <artifactId>xwiki-platform-search-solr-server-core-search</artifactId>
                   <version>${project.version}</version>
-                  <type>jar</type>
-                  <destFileName>xwiki-platform-search-solr-server-core.zip</destFileName>
+                  <type>zip</type>
+                  <destFileName>xwiki-platform-search-solr-server-core-search.zip</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}/</outputDirectory>

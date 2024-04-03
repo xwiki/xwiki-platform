@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-security</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Security</name>
@@ -59,6 +59,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-rest</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

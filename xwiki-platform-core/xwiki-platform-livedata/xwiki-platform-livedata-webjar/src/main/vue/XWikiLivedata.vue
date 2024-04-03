@@ -66,9 +66,7 @@ Vue.use(VueTippy, {
   theme: 'light',
 });
 
-Vue.use(Vue2TouchEvents, {
-  disableClick: true
-})
+Vue.use(Vue2TouchEvents)
 
 
 

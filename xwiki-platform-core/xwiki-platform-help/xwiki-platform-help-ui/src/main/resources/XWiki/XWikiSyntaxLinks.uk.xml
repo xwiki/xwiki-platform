@@ -40,7 +40,7 @@
 
 == Посилання ==
 
-=== Посилання 1.0 ===
+=== 1.0 Links ===
 
 |=(% style="width:20%" %)Функція|=Синтаксис XWiki 1.0|=(% style="width:20%" %)Результат
 |Посилання на сторінку в поточному просторі|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
@@ -98,7 +98,7 @@
 * **##interWikiAlias##**:Необов'язковий [[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]] псевдонім, що визначено на карті InterWiki (Детальніше [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Це дійсне лише для назв вікі-сторінок. Наприклад: ##wikipedia##
 * **##parameters##**: Необов'язковий список параметрів, що передаються за посиланням. Наприклад: ##target="~_blank"## (відкрити в новому вікні)
 
-=== Посилання 2.1 ===
+=== 2.1 Links ===
 
 |=Функція|=Синтаксис XWiki 2.1|=Результат
 |Абсолютне посилання на сторінку ##PageB## розташованій у ##PageA##|{{{[[PageA.PageB]]}}}|[[PageB&gt;&gt;]]

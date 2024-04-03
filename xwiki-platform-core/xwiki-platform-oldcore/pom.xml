@@ -25,24 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
   <properties>
-    <xwiki.extension.features>
-      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      com.xpn.xwiki.platform:xwiki-core,
-
-      <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
-      org.xwiki.platform:xwiki-platform-filter-instance-oldcore,
-
-      <!-- A contrib extension to use with versions of oldcore which does not support authservice API -->
-      org.xwiki.contrib:authservice-backport-api,
-      org.xwiki.contrib:authservice-backport-default
-    </xwiki.extension.features>
+    <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
@@ -637,7 +627,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- To be remove if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <!-- To be removed if we stop declaring hibernate validator as oldcore runtime dependency -->
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>

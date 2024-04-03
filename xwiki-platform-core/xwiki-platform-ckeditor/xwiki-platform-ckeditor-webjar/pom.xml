@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-webjar</artifactId>
@@ -34,8 +34,18 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
-    <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-webjar</xwiki.extension.features>
+    <!-- This module has been moved from XWiki Contrib to platform. -->
+    <xwiki.extension.previousIds>org.xwiki.contrib:application-ckeditor-webjar</xwiki.extension.previousIds>
+    <!-- The list of extensions that this module either replaces or bundles:
+      * this module replaces the CKEditor Integration WebJar extension from XWiki Contrib
+      * this module bundles the CKEditor code (so it can be seen as a replacement for both the CKEditor default WebJar
+        and the CKEditor node module) -->
+    <xwiki.extension.features>
+      org.xwiki.contrib:application-ckeditor-webjar,
+      org.webjars:ckeditor/${ckeditor.version},
+      org.webjars.npm:ckeditor/${ckeditor.version},
+      ckeditor4/${ckeditor.version}
+    </xwiki.extension.features>
 
     <!-- The path to the folder where we clone the CKEditor sources. -->
     <ckeditor.path>${project.build.directory}/ckeditor4-${ckeditor.version}</ckeditor.path>
@@ -47,7 +57,7 @@
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
-        <version>1.8.0</version>
+        <version>1.8.1</version>
         <executions>
           <!-- Download the CKEditor sources for the version (tag) we want to use. -->
           <execution>

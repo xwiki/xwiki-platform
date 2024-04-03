@@ -19,9 +19,12 @@
  */
 package org.xwiki.search.solr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -30,11 +33,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.schema.AnalyzerDefinition;
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition;
-import org.apache.solr.client.solrj.request.schema.SchemaRequest;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
-import org.apache.solr.client.solrj.response.schema.SchemaResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.schema.BinaryField;
 import org.apache.solr.schema.BoolField;
 import org.apache.solr.schema.DatePointField;
@@ -47,7 +53,9 @@ import org.apache.solr.schema.StrField;
 import org.apache.solr.schema.TextField;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
+import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
 import org.xwiki.search.solr.internal.SolrSchemaUtils;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -138,25 +146,37 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     private static final String SOLR_VERSIONFIELDTYPE_VALUE = "defVal";
 
+    private static final int DEFAULT_MIGRATION_BATCH_ROWS = 100;
+
     @Inject
     protected ComponentDescriptor<SolrCoreInitializer> descriptor;
 
     @Inject
-    protected SolrSchemaUtils solrSchemaUtils;
+    protected SolrUtils solrUtils;
 
+    protected XWikiSolrCore core;
+
+    /**
+     * @deprecated use {@link #core} instead
+     */
+    @Deprecated(since = "16.1.0RC1")
     protected SolrClient client;
 
-    protected Map<String, FieldTypeRepresentation> types;
-
-    protected Map<String, Map<String, Object>> fields;
+    @Inject
+    private SolrSchemaUtils solrSchemaUtils;
 
     @Override
     public void initialize(SolrClient client) throws SolrException
     {
-        this.client = client;
-        this.solrSchemaUtils.setClient(getCoreName(), this.client);
+        initialize(new DefaultXWikiSolrCore(getCoreName(), getCoreName(), client));
+    }
 
-        // Make sure the base schema (mostly default types) in in sync with this version of XWiki
+    @Override
+    public void initialize(XWikiSolrCore core) throws SolrException
+    {
+        this.core = core;
+
+        // Make sure the base schema (mostly default types) is in sync with this version of XWiki
         initializeBaseSchema();
 
         // Make sure this core schema is created/migrated if needed
@@ -168,28 +188,12 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     protected Map<String, FieldTypeRepresentation> getFieldTypes(boolean force) throws SolrException
     {
-        if (this.types == null || force) {
-            SchemaResponse.FieldTypesResponse response;
-            try {
-                response = new SchemaRequest.FieldTypes().process(this.client);
-            } catch (Exception e) {
-                throw new SolrException("Failed to get the list of field types", e);
-            }
-
-            Map<String, FieldTypeRepresentation> map = new HashMap<>(response.getFieldTypes().size());
-
-            response.getFieldTypes().forEach(t -> map.put((String) t.getAttributes().get(FieldType.TYPE_NAME), t));
-
-            this.types = map;
-        }
-
-        return this.types;
+        return this.solrSchemaUtils.getFieldTypes(this.core, force);
     }
 
     protected Map<String, Map<String, Object>> getFields(boolean force) throws SolrException
     {
-        this.fields = this.solrSchemaUtils.getFields(getCoreName(), force);
-        return this.fields;
+        return this.solrSchemaUtils.getFields(this.core, force);
     }
 
     protected void initializeBaseSchema() throws SolrException
@@ -197,11 +201,13 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         Long xversion = getCurrentXWikiVersion();
 
         if (xversion == null) {
+            // Create the schema
             createBaseSchema();
 
             // Save scheme version
             setCurrentXWikiVersion(true);
         } else if (xversion.longValue() < SCHEMA_BASE_VERSION) {
+            // Migrate the schema
             migrateBaseSchema(xversion);
 
             // Update version
@@ -341,6 +347,164 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @throws SolrException when failing to migrate the schema
      */
     protected abstract void migrateSchema(long cversion) throws SolrException;
+
+    @Override
+    public void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        // Set the current core
+        this.core = targetCore;
+
+        // Migrate the field types
+        migrateFieldTypes(sourceCore, targetCore);
+
+        // Migrate the fields
+        migrateFields(sourceCore, targetCore);
+
+        // Copy the data
+        migrateData(sourceCore, targetCore);
+    }
+
+    private void migrateFieldTypes(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        Map<String, FieldTypeRepresentation> sourceTypes = this.solrSchemaUtils.getFieldTypes(sourceCore, false);
+        Map<String, FieldTypeRepresentation> targetTypes = this.solrSchemaUtils.getFieldTypes(targetCore, false);
+        for (Map.Entry<String, FieldTypeRepresentation> entry : sourceTypes.entrySet()) {
+            if (!targetTypes.containsKey(entry.getKey())) {
+                // Add the missing type
+                this.solrSchemaUtils.setFieldType(targetCore, entry.getValue(), true);
+            }
+        }
+
+        commit(targetCore);
+    }
+
+    private void migrateFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        migrateFields(sourceCore, targetCore, true);
+        migrateFields(sourceCore, targetCore, false);
+        migrateCopyFields(sourceCore, targetCore);
+
+        commit(targetCore);
+    }
+
+    private void migrateFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore, boolean dynamic) throws SolrException
+    {
+        Map<String, Map<String, Object>> sourceFields =
+            dynamic ? this.solrSchemaUtils.getDynamicFields(sourceCore, false)
+                : this.solrSchemaUtils.getFields(sourceCore, false);
+        Map<String, Map<String, Object>> targetFields =
+            dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
+                : this.solrSchemaUtils.getFields(targetCore, false);
+        for (Map.Entry<String, Map<String, Object>> entry : sourceFields.entrySet()) {
+            if (!targetFields.containsKey(entry.getKey())) {
+                // Add the missing type
+                this.solrSchemaUtils.setField(targetCore, entry.getValue(), dynamic, true);
+            }
+        }
+    }
+
+    private void migrateCopyFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        Map<String, Set<String>> sourceFields = this.solrSchemaUtils.getCopyFields(sourceCore, false);
+        Map<String, Set<String>> targetFields = this.solrSchemaUtils.getCopyFields(targetCore, false);
+        for (Map.Entry<String, Set<String>> entry : sourceFields.entrySet()) {
+            if (!targetFields.containsKey(entry.getKey())) {
+                // Add the missing type
+                this.solrSchemaUtils.addCopyField(targetCore, entry.getKey(), new ArrayList<>(entry.getValue()));
+            }
+        }
+    }
+
+    /**
+     * @return the number of document to retrieve at the same time when migrating the data
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    protected int getMigrationBatchRows()
+    {
+        return DEFAULT_MIGRATION_BATCH_ROWS;
+    }
+
+    private void migrateData(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        int batchSize = getMigrationBatchRows();
+
+        int size = 0;
+        do {
+            SolrQuery solrQuery = new SolrQuery();
+            solrQuery.setRows(batchSize);
+
+            QueryResponse response;
+            try {
+                response = sourceCore.getClient().query(solrQuery);
+            } catch (Exception e) {
+                throw new SolrException("Failed to search for entries in the source client", e);
+            }
+
+            SolrDocumentList result = response.getResults();
+            size = result.size();
+
+            if (size > 0) {
+                migrateData(response.getResults(), sourceCore, targetCore);
+            }
+        } while (size == batchSize);
+    }
+
+    private void migrateData(SolrDocumentList source, XWikiSolrCore sourceCore, XWikiSolrCore targetCore)
+        throws SolrException
+    {
+        for (SolrDocument sourceDocument : source) {
+            SolrInputDocument targetDocument = new SolrInputDocument();
+
+            // Convert the SolrDocument into a SolrInputDocument
+            migrate(sourceDocument, targetDocument);
+
+            // Save the document in the target core
+            try {
+                targetCore.getClient().add(targetDocument);
+            } catch (Exception e) {
+                throw new SolrException("Failed to save the document", e);
+            }
+        }
+
+        // Commit the new documents
+        commit(targetCore);
+
+        // Delete the migrated documents from the source
+        delete(source, sourceCore);
+        commit(sourceCore);
+    }
+
+    private void delete(SolrDocumentList documents, XWikiSolrCore core) throws SolrException
+    {
+        List<String> toDelete = documents.stream().map(this.solrUtils::getId).toList();
+
+        try {
+            core.getClient().deleteById(toDelete);
+        } catch (Exception e) {
+            throw new SolrException("Failed to delete the documents", e);
+        }
+    }
+
+    /**
+     * By default, just copy all SolrDocument fields to the SolrInputDocument as is. If the core is more compplex than
+     * that (e.g. some field are only indexed but not stored, so won't be part of SolrDocument, this method should be
+     * overwritten.
+     * 
+     * @param sourceDocument the document to copy
+     * @param targetDocument the new document
+     */
+    protected void migrate(SolrDocument sourceDocument, SolrInputDocument targetDocument)
+    {
+        // The map returned by #getFieldValueMap() does not implement #entrySet
+        for (String fieldName : sourceDocument.getFieldNames()) {
+            // Fix special fields:
+            // * _version_: internal Solr field used for atomic updates
+            if (!fieldName.equals("_version_")) {
+                targetDocument.setField(fieldName, sourceDocument.getFieldValue(fieldName));
+            }
+        }
+    }
 
     @Override
     public String getCoreName()
@@ -581,13 +745,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addField(String name, String type, boolean dynamic, Object... attributes) throws SolrException
     {
-        Map<String, Object> fieldAttributes = new HashMap<>();
-        fieldAttributes.put(SOLR_FIELD_NAME, name);
-        fieldAttributes.put(FieldType.TYPE, type);
-
-        MapUtils.putAll(fieldAttributes, attributes);
-
-        addField(fieldAttributes, dynamic);
+        this.solrSchemaUtils.setField(this.core, name, type, dynamic, true, attributes);
     }
 
     /**
@@ -599,15 +757,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addField(Map<String, Object> fieldAttributes, boolean dynamic) throws SolrException
     {
-        try {
-            if (dynamic) {
-                new SchemaRequest.AddDynamicField(fieldAttributes).process(this.client);
-            } else {
-                new SchemaRequest.AddField(fieldAttributes).process(this.client);
-            }
-        } catch (Exception e) {
-            throw new SolrException("Failed to add a field in the Solr core", e);
-        }
+        this.solrSchemaUtils.setField(this.core, fieldAttributes, dynamic, true);
     }
 
     /**
@@ -620,16 +770,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void deleteField(String fieldName, boolean dynamic) throws SolrException
     {
-        try {
-            if (dynamic) {
-                new SchemaRequest.DeleteDynamicField(fieldName).process(this.client);
-            } else {
-                new SchemaRequest.DeleteField(fieldName).process(this.client);
-            }
-        } catch (Exception e) {
-            throw new SolrException(
-                String.format("Failed to remove the field [%s] (dynamic: [%s])", fieldName, dynamic), e);
-        }
+        this.solrSchemaUtils.deleteField(this.core, fieldName, dynamic);
     }
 
     /**
@@ -862,7 +1003,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void setField(String name, String type, boolean dynamic, Object... attributes) throws SolrException
     {
-        this.solrSchemaUtils.setField(getCoreName(), name, type, dynamic, attributes);
+        this.solrSchemaUtils.setField(this.core, name, type, dynamic, attributes);
     }
 
     /**
@@ -875,8 +1016,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void setField(Map<String, Object> fieldAttributes, boolean dynamic) throws SolrException
     {
-
-        this.solrSchemaUtils.setField(getCoreName(), fieldAttributes, dynamic);
+        this.solrSchemaUtils.setField(this.core, fieldAttributes, dynamic);
     }
 
     /**
@@ -889,11 +1029,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addCopyField(String source, String... dest) throws SolrException
     {
-        try {
-            new SchemaRequest.AddCopyField(source, Arrays.asList(dest)).process(this.client);
-        } catch (Exception e) {
-            throw new SolrException("Failed to add a copy field in the Solr core", e);
-        }
+        this.solrSchemaUtils.addCopyField(this.core, source, dest);
     }
 
     /**
@@ -968,25 +1104,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void setFieldType(FieldTypeDefinition definition, boolean add) throws SolrException
     {
-        try {
-            if (add) {
-                new SchemaRequest.AddFieldType(definition).process(this.client);
-            } else {
-                new SchemaRequest.ReplaceFieldType(definition).process(this.client);
-            }
-
-            // Add it to the cache
-            FieldTypeRepresentation representation = new FieldTypeRepresentation();
-            representation.setAttributes(definition.getAttributes());
-            representation.setAnalyzer(definition.getAnalyzer());
-            representation.setIndexAnalyzer(definition.getIndexAnalyzer());
-            representation.setMultiTermAnalyzer(definition.getMultiTermAnalyzer());
-            representation.setQueryAnalyzer(definition.getQueryAnalyzer());
-            representation.setSimilarity(definition.getSimilarity());
-            this.types.put((String) definition.getAttributes().get(FieldType.TYPE_NAME), representation);
-        } catch (Exception e) {
-            throw new SolrException("Failed to add a field type in the Solr core", e);
-        }
+        this.solrSchemaUtils.setFieldType(this.core, definition, add);
     }
 
     /**
@@ -996,9 +1114,20 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void commit() throws SolrException
     {
-        this.solrSchemaUtils.commit(getCoreName());
-        // Reset the cache
-        this.types = null;
-        this.fields = null;
+        this.solrSchemaUtils.commit(this.core);
+    }
+
+    /**
+     * @param core the client to commit
+     * @throws SolrException when failing to commit
+     * @since 16.2.0RC1
+     */
+    protected void commit(XWikiSolrCore core) throws SolrException
+    {
+        try {
+            core.getClient().commit();
+        } catch (Exception e) {
+            throw new SolrException("Failed to commit", e);
+        }
     }
 }

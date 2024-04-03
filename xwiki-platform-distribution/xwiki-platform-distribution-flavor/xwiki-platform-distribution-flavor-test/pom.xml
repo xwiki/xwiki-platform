@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -249,14 +249,12 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Rights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=usersgroups.extensionrights
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=UserProfile
-                <!--/xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
-                  TODO https://jira.xwiki.org/browse/XWIKI-21772 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Registration
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Invitation
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Authentication
                 <!-- Extensions -->
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.Extensions
-                  TODO https://jira.xwiki.org/browse/XWIKI-21778 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.Extensions
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.ExtensionHistory
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.ExtensionUpdater
                 <!-- Look and feel -->
@@ -282,8 +280,7 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Delete
                 <!-- Editing -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Editing
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
-                  TODO https://jira.xwiki.org/browse/XWIKI-21773 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Syntaxes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=SyntaxHighlighting
@@ -293,15 +290,13 @@
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailGeneral
                 <!-- Search -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Search
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=searchSuggest
-                  TODO https://jira.xwiki.org/browse/XWIKI-21779 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=searchSuggest
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=IndexingUser
                 <!-- Social -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Likes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Mentions
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=MessageStream
-                <!-- /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Notifications
-                  TODO https://jira.xwiki.org/browse/XWIKI-21776 -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Notifications
                 <!-- Wikis -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.descriptor
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.templates

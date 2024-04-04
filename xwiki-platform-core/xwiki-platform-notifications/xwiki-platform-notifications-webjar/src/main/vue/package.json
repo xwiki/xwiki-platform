@@ -20,7 +20,7 @@
     "jsdom": "23.2.0",
     "prettier": "3.2.5",
     "terser": "5.28.1",
-    "vite": "5.2.6",
+    "vite": "5.2.8",
     "vue-template-compiler": "2.7.16",
     "jquery": "3.7.1"
   }

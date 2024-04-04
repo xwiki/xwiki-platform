@@ -147,7 +147,7 @@ public abstract class AbstractPageHistoryResourceImplTest
     @Test
     void getPageTranslationHistory() throws XWikiRestException, QueryException
     {
-        Query mockQuery = mock();
+        Query mockQuery = mock(Query.class);
         when(this.queryManager.createQuery(any(), eq(Query.XWQL))).thenReturn(mockQuery);
         when(mockQuery.bindValue(any(), any())).thenReturn(mockQuery);
         when(mockQuery.setOffset(anyInt())).thenReturn(mockQuery);

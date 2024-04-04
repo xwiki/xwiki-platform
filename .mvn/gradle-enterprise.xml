@@ -28,10 +28,7 @@
   </server>
   <buildScan>
     <publishIfAuthenticated>true</publishIfAuthenticated>
-    <!-- Always publish build scans on CI but on demand for devs so that we don't get false positives on ge.xwiki.org
-     due to local changes from users and so that it doesn't pollute the ge.xwiki.org data.
-     To force publishing a build scan: -Dscan -->
-    <publish>#{env['CI'] == null ? 'ON_DEMAND' : 'ALWAYS'}</publish>
+    <publish>ALWAYS</publish>
     <captureGoalInputFiles>true</captureGoalInputFiles>
     <!-- Use background scans only locally to avoid potential issues on CI (the ephemeral docker agent could terminate
          as soon as the build is finished and thus the upload may be terminated before it completes) -->

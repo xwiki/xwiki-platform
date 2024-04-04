@@ -158,4 +158,60 @@ class MentionPageTest extends PageTest
         verify(localizationScriptService).get("mentions.event.mention.description.DOCUMENT");
         verify(localizationScriptService).get("mentions.event.mention.description.COMMENT");
     }
+
+    /**
+     * Test the html returned by the mention notification template. For a functional test of the mention notification,
+     * see the {@code MentionIT} docker test.
+     * <p>
+     * This test checks the rendering of a single mention from another wiki.
+     */
+    @Test
+    void mentionNotificationTemplateOtherWiki() throws Exception
+    {
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+        VelocityManager velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
+        this.componentManager.registerComponent(ScriptService.class, "date", this.dateScriptService);
+
+        DocumentReference page1 = new DocumentReference("design", "XWiki", "Page1");
+        DocumentReference userPage1 = new DocumentReference("xwiki", "XWiki", "U1");
+        DocumentReference userPage2 = new DocumentReference("xwiki", "YWiki", "U2");
+        Date eventDate = new Date();
+
+        // Create and save page 1 with a title.
+        XWikiDocument xWikiDocument1 = this.xwiki.getDocument(page1, this.context);
+        xWikiDocument1.setTitle("Page 1 Title");
+        this.xwiki.saveDocument(xWikiDocument1, this.context);
+
+        // Mocking of the date script service.
+        when(this.dateScriptService.displayTimeAgo(eventDate)).thenReturn("one hundred years ago");
+
+        LocalizationScriptService localizationScriptService =
+                this.componentManager.getInstance(ScriptService.class, "localization");
+        when(localizationScriptService.get(any())).thenReturn(mock(Translation.class));
+
+        // Initialization of the velocity context.
+        DefaultEvent event1 = new DefaultEvent();
+        event1.setDate(eventDate);
+        event1.setUser(userPage1);
+        event1.setDocument(page1);
+
+        VelocityContext velocityContext = velocityManager.getVelocityContext();
+        CompositeEvent value = new CompositeEvent(event1);
+        velocityContext.put("compositeEvent", value);
+
+        Map<Object, Object> compositeEventParams = new HashMap<>();
+        compositeEventParams.put(event1, new MentionView()
+                .setLocation("DOCUMENT")
+                .setAuthorURL("/U1")
+                .setDocumentURL("/page1")
+                .setDocument(xWikiDocument1));
+        velocityContext.put("compositeEventParams", compositeEventParams);
+        velocityContext.put("xcontext", this.context);
+        // Template rendering.
+        String actual = templateManager.render("mentions/mention.vm");
+        String expected = IOUtils.toString(getClass().getResourceAsStream("/templates/mentions/mention2.html"),
+                UTF_8);
+
+        assertThat(actual, equalToCompressingWhiteSpace(expected));
+    }
 }

@@ -66,7 +66,9 @@
       $services.localization.render('mentions.event.mention.summary.plural', [$compositeEvent.events.size()])
     #end
     #if ($xcontext.getContext().getOriginalWikiId() != $compositeEvent.document.wikiReference.name)
-      <span class="text-muted">($services.wiki.getById($compositeEvent.document.wikiReference.name).prettyName)</span>
+      <span class="text-muted">
+        ($services.wiki.getById($compositeEvent.document.wikiReference.name).prettyName)
+      </span>
     #end
   </div>
   <div><small class="text-muted">$compositeEventDate</small></div>

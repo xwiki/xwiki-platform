@@ -37,26 +37,30 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($type == 'edit')
-  #set ($className = $object.getxWikiClass().name)
-  #if ($doc.fullName == $className)
-    ## We are editing the class so the title must be read from / written to the template document.
-    #set ($name = 'templateTitle')
-    #set ($value = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template").title)
-  #else
-    ## We are editing an application entry so the title must be read from / written to the current document.
-    #set ($name = 'title')
-    #set ($value = $tdoc.title)
-    #if ("$!value" == '')
-      #set ($value = $tdoc.documentReference.name)
-    #end
+#set ($className = $object.getxWikiClass().name)
+#if ($doc.fullName == $className)
+  ## We are editing the class so the title must be read from / written to the template document.
+  #set ($name = 'templateTitle')
+  #set ($value = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template").title)
+#else
+  ## We are editing an application entry so the title must be read from / written to the current document.
+  #set ($name = 'title')
+  #set ($value = $tdoc.title)
+  #if ("$!value" == '')
+    #set ($value = $tdoc.documentReference.name)
   #end
+#end
+#if ($type == 'edit')
   {{html clean="false"}}
   &lt;input type="text" name="$name" value="$!escapetool.xml($value)"
     ## The default value for an AppWithinMinutes field should be optional so we make only the actual page title
     ## mandatory and not the template title, which holds the default title value.
     #if ($name == 'title' &amp;&amp; $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)required #end
     data-validation-value-missing="$escapetool.xml($services.localization.render('core.validation.required.message'))"/&gt;
+  {{/html}}
+#elseif ("$!type" == 'hidden')
+  {{html clean="false"}}
+  &lt;input type="hidden" name="$name" value="$!escapetool.xml($value)"/>
   {{/html}}
 #elseif ("$!type" != '')
   ## Render the title of the current document.

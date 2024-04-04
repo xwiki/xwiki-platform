@@ -37,21 +37,21 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set ($className = $object.getxWikiClass().name)
+#if ($doc.fullName == $className)
+  ## We are editing the class so the content must be read from / written to the template document.
+  #set ($name = 'templateContent')
+  #set ($document = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template"))
+  ## Don't load the WYSIWYG editor when editing the class, because it's too heavy.
+  #set ($useWysiwygEditor = false)
+#else
+  ## We are editing an application entry so the content must be read from / written to the current document.
+  #set ($name = 'content')
+  #set ($document = $tdoc)
+  ## Use the preferred content editor.
+  #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
+#end
 #if ($type == 'edit')
-  #set ($className = $object.getxWikiClass().name)
-  #if ($doc.fullName == $className)
-    ## We are editing the class so the content must be read from / written to the template document.
-    #set ($name = 'templateContent')
-    #set ($editedDocument = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template"))
-    ## Don't load the WYSIWYG editor when editing the class, because it's too heavy.
-    #set ($useWysiwygEditor = false)
-  #else
-    ## We are editing an application entry so the content must be read from / written to the current document.
-    #set ($name = 'content')
-    #set ($editedDocument = $tdoc)
-    ## Use the preferred content editor.
-    #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
-  #end
   {{html clean="false"}}
   ## The "content" id is expected by some JavaScript and CSS code.
   #set ($id = 'content')
@@ -61,20 +61,24 @@
       #set ($toolBar = "#template('simpleedittoolbar.vm')")
       $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
       ## Display a simple textarea.
-      &lt;textarea id="$id" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
+      &lt;textarea id="$id" cols="80" rows="25" name="$name"&gt;$escapetool.xml($document.content)&lt;/textarea&gt;
   #end
   #if ($useWysiwygEditor)
-    $!services.edit.syntaxContent.wysiwyg($editedDocument.content, $editedDocument.syntax, {
+    $!services.edit.syntaxContent.wysiwyg($document.content, $document.syntax, {
       'id': "$id",
       'name': "$name",
       'rows': 25,
       'cols': 80,
       'full': true,
-      'restricted': $editedDocument.isRestricted()
+      'restricted': $document.isRestricted()
     })
   #else
     &lt;/div&gt;
   #end
+  {{/html}}
+#elseif ($type == 'hidden')
+  {{html clean="false"}}
+    &lt;input type="hidden" id="$id" name="$name" value="$!escapetool.xml($document.content)"/>
   {{/html}}
 #elseif ("$!type" != '')
   ## Display the content of the current document without using any sheet. We can't use the include macro here (with the

@@ -598,6 +598,9 @@ importers:
       '@cristal/xwiki-remoteinlineeditor':
         specifier: workspace:^
         version: link:../xwiki/remoteinlineeditor
+      '@mdi/font':
+        specifier: 7.4.47
+        version: 7.4.47
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -617,9 +620,6 @@ importers:
         specifier: 3.5.14
         version: 3.5.14(typescript@5.4.4)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0)(vue@3.4.21)
     devDependencies:
-      '@mdi/font':
-        specifier: 7.2.96
-        version: 7.2.96
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -908,9 +908,6 @@ importers:
         specifier: 3.5.14
         version: 3.5.14(typescript@5.4.4)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0)(vue@3.4.21)
     devDependencies:
-      '@mdi/font':
-        specifier: 7.2.96
-        version: 7.2.96
       '@playwright/test':
         specifier: 1.43.0
         version: 1.43.0
@@ -1597,9 +1594,9 @@ packages:
       - supports-color
     dev: true
 
-  /@mdi/font@7.2.96:
-    resolution: {integrity: sha512-e//lmkmpFUMZKhmCY9zdjRe4zNXfbOIJnn6xveHbaV2kSw5aJ5dLXUxcRt1Gxfi7ZYpFLUWlkG2MGSFAiqAu7w==}
-    dev: true
+  /@mdi/font@7.4.47:
+    resolution: {integrity: sha512-43MtGpd585SNzHZPcYowu/84Vz2a2g31TvPMTm9uTiCSWzaheQySUcSyUH/46fPnuPQWof2yd0pGBtzee/IQWw==}
+    dev: false
 
   /@microsoft/api-extractor-model@7.28.13(@types/node@20.12.4):
     resolution: {integrity: sha512-39v/JyldX4MS9uzHcdfmjjfS6cYGAoXV+io8B5a338pkHiSt+gy2eXQ0Q7cGFJ7quSa1VqqlMdlPrB6sLR/cAw==}

@@ -40,10 +40,10 @@
     "vue": "3.4.21",
     "vue-i18n": "9.8.0",
     "vue-router": "4.3.0",
-    "vuetify": "3.5.14"
+    "vuetify": "3.5.14",
+    "@mdi/font": "7.4.47"
   },
   "devDependencies": {
-    "@mdi/font": "7.2.96",
     "rimraf": "5.0.5",
     "vite": "5.2.8",
     "vue-tsc": "2.0.10"

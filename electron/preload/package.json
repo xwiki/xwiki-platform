@@ -23,7 +23,7 @@
     "@cristal/electron-storage": "workspace:*",
     "@types/node": "20.12.4",
     "rimraf": "5.0.5",
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "unplugin-auto-expose": "0.0.5",
     "vite": "5.2.7",
     "vue-tsc": "2.0.7"

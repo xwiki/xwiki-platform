@@ -23,7 +23,7 @@
     "@types/node": "20.12.4",
     "cross-env": "7.0.3",
     "rimraf": "5.0.5",
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "vite": "5.2.7",
     "vue-tsc": "2.0.7"
   },

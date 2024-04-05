@@ -28,7 +28,7 @@
     "vue": "3.4.21"
   },
   "devDependencies": {
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "vite": "5.2.7"
   }
 }

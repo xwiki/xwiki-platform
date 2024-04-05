@@ -90,9 +90,9 @@
     (% class="extensionSummary" %)
     #set($icon = $doc.getValue("icon"))
     #if ("$!{icon.trim()}" != "")
-      |[[image:${doc.getValue('icon')}]]|**{{{$doc.getValue("summary")}}}**
+      |[[image:${services.rendering.escape($doc.getValue('icon'), 'xwiki/2.1')}]]|**${services.rendering.escape($doc.getValue("summary"), 'xwiki/2.1')}**
     #else
-      |[[image:icon:cog]]|**{{{$doc.getValue("summary")}}}**
+      |[[image:icon:cog]]|**${services.rendering.escape($doc.getValue("summary"), 'xwiki/2.1')}**
     #end
 
     ## Viewing
@@ -116,14 +116,14 @@
       #if ("$!typeDisplay" == '')
         #set($typeDisplay = $type)
       #end
-      |(% class="label" width='30%' %)Type(%%)|$typeDisplay
+      |(% class="label" width='30%' %)Type(%%)|$services.rendering.escape($typeDisplay, 'xwiki/2.1')
       ##------- Category --------------
       #set($categoryDisplay = $extensionCategoryObject.getProperty('name').value)
       #if ("$!categoryDisplay" == '')
         #set($categoryDisplay = $category)
       #end
       #if ($categoryDisplay)
-      |(% class="label" width='30%' %)Category(%%)|$categoryDisplay
+      |(% class="label" width='30%' %)Category(%%)|$services.rendering.escape($categoryDisplay, 'xwiki/2.1')
       #end
       ##------- Developed By --------
       #set($authors = $doc.getValue("authors"))
@@ -134,7 +134,7 @@
         #end
       ##------- Active Installs --------
       #if ($doc.getValue('installedCount') &amp;&amp; $doc.getValue('showInstalledCount') != 0)
-        |(% class="label" %)Active Installs(%%)|$!doc.getValue('installedCount')
+        |(% class="label" %)Active Installs(%%)|$services.rendering.escape($!doc.getValue('installedCount'), 'xwiki/2.1')
       #end
       ##------- Rating --------
       |(% class="label" %)Rating(%%)|#displayFullRating($doc.documentReference)
@@ -142,15 +142,15 @@
       #set($website = $extension.getProperty("website").value)
       #if ("$!website" != '')
         |(% class="label" %)Website(%%)|#if ($website.length() &gt; 40)
-                                          [[{{{$website.substring(0, 40)...}}}&gt;&gt;url:$website]]
+                                          [[$services.rendering.escape($services.rendering.escape($website.substring(0, 40), 'xwiki/2.1'), 'xwiki/2.1')...&gt;&gt;$services.rendering.escape($website, 'xwiki/2.1')]]
                                         #else
-                                          $website
+                                          [[$services.rendering.escape($website, 'xwiki/2.1')]]
                                         #end
       #end
       ##------- License --------
       #set($licenseName = $doc.getValue("licenseName"))
       #if ("$!licenseName" != "")
-        |(% class="label" %)License(%%)|$licenseName
+        |(% class="label" %)License(%%)|$services.rendering.escape($licenseName, 'xwiki/2.1')
       #else
         |(% class="label" %)License(%%)|Unknown
       #end
@@ -178,21 +178,21 @@
           #set ($download = $lastVersionObject.getProperty("download").value)
           #if ("$!download" == '')
             #if ($doc.getAttachment("${id}-${version}.${type}"))
-              [[$services.icon.render('download')  Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="btn btn-primary"]]##
+              [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape("attach:${id}-${version}.${type}")||class="btn btn-primary"]]##
             #end
           #else
-            [[$services.icon.render('download')  Download v$version&gt;&gt;${download}||class="btn btn-primary"]]##
+            [[$services.icon.render('download')  Download v$services.rendering.escape($services.rendering.escape($version, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($download, 'xwiki/2.1')||class="btn btn-primary"]]##
           #end
         #end
         ##------- Source --------
         #set($source = $doc.getValue("source"))
         #if ("$!source" != "")
-          [[Sources&gt;&gt;${source}||class="btn btn-default"]]##
+          [[Sources&gt;&gt;$services.rendering.escape($source, 'xwiki/2.1')||class="btn btn-default"]]##
         #end
         ##------- Issues --------
         #set($issues = $doc.getValue("issueManagementURL"))
         #if ("$!issues" != "")
-          [[Issues&gt;&gt;${issues}||class="btn btn-default"]]##
+          [[Issues&gt;&gt;$services.rendering.escape($issues, 'xwiki/2.1')||class="btn btn-default"]]##
         #end
       )))
     {{/box}}
@@ -240,7 +240,7 @@
     |Category|#if($proxyExtensionObject)$doc.display('category', 'view')#else$doc.display('category')#end~
     |Summary|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end~
     ## FIXME: there seems to be a bug with custom displayer where they don't take into account the mode passed to display
-    |Authors|#if($proxyExtensionObject)$doc.getValue('authors')#else$doc.display('authors')#end~
+    |Authors|#if($proxyExtensionObject)$services.rendering.escape($doc.getValue('authors').toString(), 'xwiki/2.1')#else$doc.display('authors')#end~
     |License|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end~
     |Source|$doc.display('source')
     |Display Icon Location
@@ -255,9 +255,11 @@
     = Description =
     #if ($isViewMode)
       ## Make sure to resolve reference based on the right document
-      $doc.getValue("description")
+      {{context transformationContext="document" restricted=true}}
+        $doc.getValue('description')
+      {{/context}}
     #else
-      $doc.display("description")
+      $doc.display('description')
     #end
 
     #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
@@ -272,7 +274,7 @@
 
       #if ($isEditMode)
         ; Custom installation only
-        : $extension.customInstallationOnly
+        : $extension.display('customInstallationOnly', 'edit')
       #end
       ##
       ## Standard installation
@@ -288,9 +290,11 @@
       #if ($isEditMode)
         == Custom installation instructions
 
-        $extension.installation
+        $extension.display('installation', 'edit')
       #elseif ($extraInstallation != '')
-        $extraInstallation
+        {{context transformationContext="document" restricted=true}}
+          $extraInstallation
+        {{/context}}
       #end
     #end
 
@@ -299,7 +303,7 @@
       #set ($releaseNotes = [])
       #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
       #foreach ($versionObject in $versions)
-        #set ($notes = $!{versionObject.getProperty('notes').value})
+        #set ($notes = $!{versionObject.display('notes', 'read')})
         #set ($version = $!{versionObject.getProperty('version').value})
         #if ("$!notes" != '' &amp;&amp; "$!version" != '')
           #set ($discard = $releaseNotes.add([$version, $notes]))
@@ -310,16 +314,16 @@
       #if (!$releaseNotes.isEmpty())
         = Release Notes =
         #foreach ($entry in $releaseNotes)
-          == v$entry.get(0) ==
+          == v$services.rendering.escape($entry.get(0), 'xwiki/2.1') ==
           $entry.get(1)
         #end
       #end
 
-      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.version))
+      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.getValue('version')))
       #if ($extensionDependencies.size() &gt; 0)
         = Dependencies =
 
-         Dependencies for this extension (${extension.getProperty('id').value} ${doc.getValue('lastVersion')}):
+         Dependencies for this extension ($services.rendering.escape("${extension.getValue('id')} ${doc.getValue('lastVersion')}", 'xwiki/2.1')):
          #foreach($extensionDependency in $extensionDependencies)
           #set($dependencyDocumentName = $null)
           #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
@@ -327,9 +331,9 @@
             #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
           #end
           #if ($dependencyDocumentName)
-            * [[$extensionDependency.id&gt;&gt;$dependencyDocumentName]] $extensionDependency.constraint
+            * [[$services.rendering.escape($services.rendering.escape($extensionDependency.getValue('id'), 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$services.rendering.escape($dependencyDocumentName, 'xwiki/2.1')]] $services.rendering.escape($extensionDependency.getValue('constraint'), 'xwiki/2.1')
           #else
-            * $extensionDependency.id $extensionDependency.constraint
+            * $services.rendering.escape("${extensionDependency.getValue('id')} ${extensionDependency.getValue('constraint')}", 'xwiki/2.1')
           #end
         #end
       #end

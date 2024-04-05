@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@cristal/electron-storage": "workspace:*",
-    "@types/node": "20.12.3",
+    "@types/node": "20.12.4",
     "rimraf": "5.0.5",
     "typescript": "5.4.3",
     "unplugin-auto-expose": "0.0.5",

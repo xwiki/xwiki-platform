@@ -94,6 +94,37 @@ importers:
         specifier: 2.0.10
         version: 2.0.10(typescript@5.4.4)
 
+  core/icons:
+    dependencies:
+      bootstrap-icons:
+        specifier: 1.11.3
+        version: 1.11.3
+    devDependencies:
+      '@cristal/dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
+      '@vue/test-utils':
+        specifier: 2.4.5
+        version: 2.4.5
+      eslint:
+        specifier: 8.57.0
+        version: 8.57.0
+      rimraf:
+        specifier: 5.0.5
+        version: 5.0.5
+      vite:
+        specifier: 5.2.8
+        version: 5.2.8(@types/node@20.12.4)
+      vitest:
+        specifier: 1.4.0
+        version: 1.4.0(happy-dom@14.5.1)
+      vue:
+        specifier: 3.4.21
+        version: 3.4.21(typescript@5.4.4)
+      vue-tsc:
+        specifier: 2.0.10
+        version: 2.0.10(typescript@5.4.4)
+
   dev/config:
     devDependencies:
       vitest:
@@ -2927,6 +2958,10 @@ packages:
     requiresBuild: true
     optional: true
 
+  /bootstrap-icons@1.11.3:
+    resolution: {integrity: sha512-+3lpHrCw/it2/7lBL15VR0HEumaBss0+f/Lb6ZvHISn1mlK83jjFpooTLsMWbIjJMDjDjOExMsTxnXSIT4k4ww==}
+    dev: false
+
   /brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
     dependencies:
@@ -3846,7 +3881,7 @@ packages:
       file-entry-cache: 6.0.1
       find-up: 5.0.0
       glob-parent: 6.0.2
-      globals: 13.23.0
+      globals: 13.24.0
       graphemer: 1.4.0
       ignore: 5.2.4
       imurmurhash: 0.1.4

@@ -1,0 +1,43 @@
+{
+  "name": "@cristal/icons",
+  "version": "1.0.0",
+  "types": "dist/index.d.ts",
+  "license": "AGPL-3.0",
+  "main": "dist/main.bundle.dev.js",
+  "repository": {
+    "type": "git",
+    "directory": "skin",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "module": "dist/main.umd.cjs",
+  "type": "module",
+  "description": "Provide UI components to display icons.",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "vite build",
+    "test": "vitest --run",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+  },
+  "keywords": [
+    "icons"
+  ],
+  "dependencies": {
+    "bootstrap-icons": "1.11.3"
+  },
+  "devDependencies": {
+    "@cristal/dev-config": "workspace:*",
+    "@vue/test-utils": "2.4.5",
+    "eslint": "8.57.0",
+    "rimraf": "5.0.5",
+    "vite": "5.2.8",
+    "vitest": "1.4.0",
+    "vue": "3.4.21",
+    "vue-tsc": "2.0.10"
+  }
+}

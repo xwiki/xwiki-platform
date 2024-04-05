@@ -1,5 +1,6 @@
 packages:
   - "api"
+  - "core/icons"
   - "dev/config"
   - "ds/dsfr"
   - "ds/shoelace"

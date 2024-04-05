@@ -50,6 +50,22 @@ pnpm run build
 pnpm run test
 ```
 
+## Run Functional Tests with [Playwright](https://playwright.dev/)
+
+```sh
+pnpm run --filter ./web test:e2e
+## Or, if port 9000 is already used
+HTTP_PORT=9001 pnpm run --filter ./web test:e2e
+```
+
+After a playwright upgrade, the following commands need to be executed to make sure to have the system dependencies
+and browsers up to date.
+
+```sh
+pnpx playwright install
+pnpx playwright install-deps
+```
+
 ### Lint
 
 ```sh

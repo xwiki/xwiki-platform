@@ -28,6 +28,6 @@
   },
   "devDependencies": {
     "rimraf": "5.0.5",
-    "vite": "5.2.7"
+    "vite": "5.2.8"
   }
 }

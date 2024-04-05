@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.internal.tree.DefaultExtensionNode;
 import org.xwiki.extension.tree.ExtensionNode;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide safe ExtensionNode.

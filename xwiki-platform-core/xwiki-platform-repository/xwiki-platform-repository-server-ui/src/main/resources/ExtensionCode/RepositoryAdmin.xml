@@ -39,7 +39,7 @@
   <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
 {{velocity output="false"}}
-## Create the configuration object if it does not exists
+## Create the configuration object if it does not exist
 #if (!$repositoryConfigObj)
   #if ($repositoryConfigDoc.parent == '')
     $repositoryConfigDoc.setParent("ExtensionCode.RepositoryAdmin")

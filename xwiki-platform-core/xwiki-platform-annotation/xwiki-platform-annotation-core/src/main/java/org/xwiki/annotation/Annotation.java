@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.maintainer.AnnotationState;
-import org.xwiki.stability.Unstable;
 
 /**
  * This class wraps together the data needed to describe an annotation.
@@ -90,7 +89,6 @@ public class Annotation
      *
      * @since 13.10RC1
      */
-    @Unstable
     public static final String PLAIN_TEXT_START_OFFSET_FIELD = "plainTextStartOffset";
 
     /**
@@ -98,7 +96,6 @@ public class Annotation
      *
      * @since 13.10RC1
      */
-    @Unstable
     public static final String PLAIN_TEXT_END_OFFSET_FIELD = "plainTextEndOffset";
 
     /**

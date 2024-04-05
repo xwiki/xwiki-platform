@@ -70,7 +70,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
-        // TODO: Mail.MailResender can be removed on XWIKI-20557 is closed
+        // TODO: Mail.MailResender can be removed when XWIKI-20557 is closed
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:(MailIT\\..*|Mail\\.MailResender)",
         // Add the Scheduler plugin used by Mail Resender Scheduler Job
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"
@@ -264,7 +264,7 @@ class MailIT
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Status", "send_success");
         int count = tableLayout.countRows();
-        tableLayout.clickAction(1, "mailsendingaction_delete");
+        statusPage.clickAction(1, "mailsendingaction_delete");
 
         // Wait for the success message to be displayed
         statusPage.waitUntilContent("\\QThe mail has been deleted successfully\\E");
@@ -279,7 +279,7 @@ class MailIT
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Status", "send_error");
-        tableLayout.clickAction(1, "mailsendingaction_resend");
+        statusPage.clickAction(1, "mailsendingaction_resend");
 
         // Refresh the page and verify the mail to to@doe.com is in send_success state now
         statusPage = MailStatusAdministrationSectionPage.gotoPage();

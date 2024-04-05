@@ -42,7 +42,6 @@ import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.filesystem.StoreFilesystemOldcoreException;
@@ -66,7 +65,6 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Component
 @Singleton
 @Named("temporaryAttachments")
-@Unstable
 public class TemporaryAttachmentsScriptService implements ScriptService
 {
     @Inject
@@ -109,7 +107,6 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      *     filesize is reached)
      * @since 14.9RC1
      */
-    @Unstable
     public Attachment uploadTemporaryAttachment(DocumentReference documentReference, String fieldName, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException
     {
@@ -141,7 +138,6 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      *     attachments filenames ({@link XWikiAttachment#getFilename()})
      * @since 14.9RC1
      */
-    @Unstable
     public List<Attachment> listTemporaryAttachments(DocumentReference documentReference)
         throws StoreFilesystemOldcoreException
     {
@@ -164,7 +160,6 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      *     ({@link XWikiAttachment#getFilename()})
      * @since 14.9RC1
      */
-    @Unstable
     public List<Attachment> listAllAttachments(DocumentReference documentReference)
         throws StoreFilesystemOldcoreException
     {
@@ -199,7 +194,6 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @see #persistentAttachmentExists(Attachment)
      * @since 14.9RC1
      */
-    @Unstable
     public boolean temporaryAttachmentExists(Attachment attachment)
     {
         return this.temporaryAttachmentSessionsManager.getUploadedAttachment(attachment.getReference()).isPresent();
@@ -218,7 +212,6 @@ public class TemporaryAttachmentsScriptService implements ScriptService
      * @see #temporaryAttachmentExists(Attachment)
      * @since 14.9RC1
      */
-    @Unstable
     public boolean persistentAttachmentExists(Attachment attachment)
         throws StoreFilesystemOldcoreException
     {

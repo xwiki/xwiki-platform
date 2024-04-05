@@ -43,6 +43,7 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.uiextension.internal.DefaultUIExtensionManager;
+import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.script.UIExtensionScriptService;
 
@@ -73,6 +74,7 @@ import static org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponen
     DefaultWikiComponentManager.class,
     DefaultWikiComponentManagerContext.class,
     WikiUIExtensionComponentBuilder.class,
+    WikiUIExtension.class,
     DefaultContentParser.class,
     DefaultBlockAsyncRenderer.class,
     TestNoScriptMacro.class

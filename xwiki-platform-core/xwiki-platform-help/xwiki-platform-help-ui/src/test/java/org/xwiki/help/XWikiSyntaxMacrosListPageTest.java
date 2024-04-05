@@ -50,7 +50,6 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.DefaultSkinAccessBridge;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -68,14 +67,13 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
  * Page Test of the {@code XWiki.XWikiSyntaxMacrosList} document.
  *
  * @version $Id$
- * @since 16.4RC1
+ * @since 14.6RC1
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
 @ComponentList({
-    ControlCharactersFilter.class,
     // Start document initializer
     WikiMacroClassDocumentInitializer.class,
     DefaultContextStoreManager.class,

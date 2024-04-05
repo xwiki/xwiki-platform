@@ -64,7 +64,9 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
      */
     public static final String ID = "osv";
 
-    static final String PLATFORM_PREFIX = "org.xwiki.platform:";
+    private static final String PLATFORM_PREFIX = "org.xwiki.platform:";
+
+    private static final String CONTRIB_PREFIX = "org.xwiki.contrib";
 
     @Inject
     private Logger logger;
@@ -86,8 +88,8 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             .setPackage(new PackageObject()
                 .setEcosystem("Maven")
                 .setName(extensionId));
-        boolean isPlatform = extensionId.startsWith(PLATFORM_PREFIX);
-        if (!isPlatform) {
+        boolean isNotOnMavenCentralResult = isNotOnMavenCentral(extensionId);
+        if (!isNotOnMavenCentralResult) {
             // We currently have an issue regarding versions resolution of packages from xwiki-platform, because they 
             // are not published on maven central. Hence, we only filter explicitly by version for other group ids.
             queryObject.setVersion(version);
@@ -119,5 +121,18 @@ public class OsvExtensionSecurityAnalyzer implements ExtensionSecurityAnalyzer
             Thread.currentThread().interrupt();
             return null;
         }
+    }
+
+    /**
+     * Checks if the given extension ID is not available on Maven Central, based on its extension id. This test is
+     * useful because extensions that are not on maven central do not yield any results when requested with a version.
+     * Consequently, we need to request them without a version and filter out the relevant vulnerabilities ourselves.
+     *
+     * @param extensionId the ID of the extension to check
+     * @return {@code true} if the extension is not available on Maven Central, {@code false} otherwise
+     */
+    static boolean isNotOnMavenCentral(String extensionId)
+    {
+        return extensionId.startsWith(PLATFORM_PREFIX) || extensionId.startsWith(CONTRIB_PREFIX);
     }
 }

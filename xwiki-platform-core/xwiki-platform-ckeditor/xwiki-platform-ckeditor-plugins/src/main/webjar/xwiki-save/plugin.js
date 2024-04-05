@@ -75,6 +75,16 @@
           if (!data || !data['continue']) {
             submitInProgress = event.type === 'xwiki:actions:preview' || event.type === 'xwiki:actions:save';
             this.editors.forEach(function(editor) {
+              // The editor (its focus manager to be precise) is blurred (loses focus) with a delay (200ms by default).
+              // When the editor loses focus its content (HTML) can suffer changes (e.g. some placeholder text is added
+              // or removed, the 'cke_widget_focused' and 'cke_widget_editable_focused' CSS classes are removed, etc.).
+              // This means it's possible that the editor content is modified (becomes dirty) between the moment we
+              // reset the dirty flag and the moment we leave the edit mode, which will trigger the leave confirmation,
+              // unexpectedly. In order to overcome this we have to force the editor to lose focus immediately if the
+              // focus manager has a blur timer started (meaning that a blur is scheduled).
+              if (!editor.isDetached() && editor.focusManager?.hasFocus && editor.focusManager?._?.timer) {
+                editor.focusManager.blur(true);
+              }
               editor.resetDirty();
             });
           }

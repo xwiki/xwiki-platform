@@ -33,6 +33,7 @@ import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventL
 import org.xwiki.rendering.async.internal.block.DefaultBlockAsyncRenderer;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.uiextension.internal.DefaultUIExtensionManager;
+import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.filter.ExcludeFilter;
 import org.xwiki.uiextension.internal.filter.SelectFilter;
@@ -59,6 +60,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     UIExtensionScriptService.class,
     DefaultUIExtensionManager.class,
     WikiUIExtensionComponentBuilder.class,
+    WikiUIExtension.class,
     // Filters
     ExcludeFilter.class,
     SelectFilter.class,

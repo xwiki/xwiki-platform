@@ -28,7 +28,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component dedicated to perform refactoring of existing macros.
@@ -74,7 +73,6 @@ public interface MacroRefactoring
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.
      * @since 14.2RC1
      */
-    @Unstable
     Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
         throws MacroRefactoringException;

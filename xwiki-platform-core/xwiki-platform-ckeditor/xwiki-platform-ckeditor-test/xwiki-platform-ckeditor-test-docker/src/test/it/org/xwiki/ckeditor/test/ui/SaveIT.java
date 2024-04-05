@@ -19,12 +19,11 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
-import org.xwiki.ckeditor.test.po.CKEditor;
-import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.panels.test.po.DocumentInformationPanel;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -43,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 1.13
  */
 @UITest
-public class SaveIT
+public class SaveIT extends AbstractCKEditorIT
 {
     @BeforeAll
     public static void configure(TestUtils setup)
@@ -52,13 +51,17 @@ public class SaveIT
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg", "usertype", "Advanced");
     }
 
+    @AfterEach
+    void afterEach(TestUtils setup, TestReference testReference)
+    {
+        maybeLeaveEditMode(setup, testReference);
+    }
+
     @Test
     @Order(1)
     void save(TestUtils setup, TestReference testReference)
     {
-        WYSIWYGEditPage editPage = setup.gotoPage(testReference).editWYSIWYG();
-        CKEditor editor = new CKEditor("content").waitToLoad();
-        RichTextAreaElement textArea = editor.getRichTextArea();
+        WYSIWYGEditPage editPage = edit(setup, testReference);
         textArea.clear();
         textArea.sendKeys("xyz");
         editPage = editPage.clickSaveAndView().editWYSIWYG();
@@ -69,15 +72,14 @@ public class SaveIT
     @Order(2)
     void saveAfterSyntaxChange(TestUtils setup, TestReference testReference)
     {
-        setup.createPage(testReference, "[[label>>#target]]", "", "xwiki/2.0").edit();
+        setup.createPage(testReference, "[[label>>#target]]", "", "xwiki/2.0");
         // Wait for the WYSIWYG edit page to load.
-        WYSIWYGEditPage editPage = new WYSIWYGEditPage();
+        WYSIWYGEditPage editPage = edit(setup, testReference, false);
 
         // Type some text to verify that it isn't lost when we change the syntax.
-        CKEditor editor = new CKEditor("content").waitToLoad();
         // First move the cursor to the start before entering the text to ensure it is outside the link, being
         // outside the link is the initial state in Chrome but not in Firefox.
-        editor.getRichTextArea().sendKeys(Keys.HOME, "test ");
+        textArea.sendKeys(Keys.HOME, "test ");
 
         DocumentSyntaxPicker documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
         assertEquals("xwiki/2.0", documentSyntaxPicker.getSelectedSyntax());

@@ -54,6 +54,8 @@ $services.progress.endStep()
   $services.progress.startStep('Compute title to display and modify rendered content accordingly')
   #template("titlevars.vm")
   $services.progress.endStep()
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
   <div class="xcontent">
     $xcontext.dropPermissions()
     <div class="document-info">
@@ -68,6 +70,7 @@ $services.progress.endStep()
 #end
 #if ($request.outputTitle == 'true')
     </div>
-  </div>
+  </div>## xcontent
+  </main>## mainContentArea
 #end
 $services.progress.popLevel()

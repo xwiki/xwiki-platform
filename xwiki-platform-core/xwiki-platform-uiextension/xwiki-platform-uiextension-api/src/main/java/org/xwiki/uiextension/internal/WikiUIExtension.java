@@ -23,11 +23,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.rendering.RenderingException;
@@ -51,6 +53,8 @@ import static javax.script.ScriptContext.ENGINE_SCOPE;
  * @version $Id$
  * @since 4.2M3
  */
+@Component(roles = WikiUIExtension.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsyncRendererDecorator
 {
     /**
@@ -70,19 +74,21 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
      */
     public static final String CONTEXT_UIX_INLINE_KEY = "inline";
 
-    /**
-     * @see #WikiUIExtension
-     */
-    private final String id;
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private ScriptContextManager scriptContextManager;
 
     /**
      * @see #WikiUIExtension
      */
-    private final String extensionPointId;
+    private String id;
 
-    private final Provider<XWikiContext> xcontextProvider;
-
-    private final ScriptContextManager scriptContextManager;
+    /**
+     * @see #WikiUIExtension
+     */
+    private String extensionPointId;
 
     /**
      * Parameter manager for this extension.
@@ -90,26 +96,20 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
     private WikiUIExtensionParameters parameters;
 
     /**
-     * Default constructor.
-     *
      * @param baseObject the object containing panel setup
      * @param roleHint the role hint of the component to create
      * @param id the id of the extension
      * @param extensionPointId ID of the extension point this extension is designed for
-     * @param componentManager The XWiki content manager
-     * @throws ComponentLookupException If module dependencies are missing
-     * @throws WikiComponentException When failing to parse content
+     * @throws WikiComponentException when failing to parse content
+     * @since 15.9RC1
      */
-    public WikiUIExtension(BaseObject baseObject, String roleHint, String id, String extensionPointId,
-        ComponentManager componentManager) throws ComponentLookupException, WikiComponentException
+    public void initialize(BaseObject baseObject, String roleHint, String id, String extensionPointId)
+        throws WikiComponentException
     {
-        super(baseObject, UIExtension.class, roleHint, componentManager);
+        super.initialize(baseObject, UIExtension.class, roleHint);
 
         this.id = id;
         this.extensionPointId = extensionPointId;
-
-        this.xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-        this.scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
     }
 
     /**
@@ -184,10 +184,10 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        // Restore previous uix context in the XWiki and Velocity contexts. 
+        // Restore previous uix context in the XWiki and Velocity contexts.
         xcontext.put(CONTEXT_UIX_KEY, contexts.previousUIXContext);
-        this.scriptContextManager.getCurrentScriptContext()
-            .setAttribute(CONTEXT_UIX_KEY, contexts.previousScriptUIXContext, ENGINE_SCOPE);
+        this.scriptContextManager.getCurrentScriptContext().setAttribute(CONTEXT_UIX_KEY,
+            contexts.previousScriptUIXContext, ENGINE_SCOPE);
     }
 
     @Override
@@ -204,8 +204,8 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
     }
 
     /**
-     * Store the value of the contexts modified during {@link #before(boolean)} to restore them on {@link
-     * #after(PreviousContexts)}.
+     * Store the value of the contexts modified during {@link #before(boolean)} to restore them on
+     * {@link #after(PreviousContexts)}.
      */
     private final class PreviousContexts
     {

@@ -21,7 +21,6 @@ package org.xwiki.attachment.refactoring.event;
 
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event fired after an attachment is moved.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.2RC1
  */
-@Unstable
 public class AttachmentMovedEvent extends AbstractEntityCopyOrRenameEvent<AttachmentReference>
 {
     /**

@@ -57,7 +57,8 @@ image.lightbox.fullscreen.title=Fullscreen
 image.lightbox.gallery.title=Image gallery
 image.lightbox.nextSlide.title=Next image
 image.lightbox.prevSlide.title=Previous image
-image.lightbox.publisher.label=Image publisher</content>
+image.lightbox.publisher.label=Image publisher
+image.lightbox.toggler.label=Open the image actions</content>
   <object>
     <name>XWiki.Lightbox.LightboxTranslations</name>
     <number>0</number>

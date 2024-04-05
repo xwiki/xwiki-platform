@@ -475,9 +475,9 @@ public class DefaultMergeManager implements MergeManager
                                         }
                                     }
                                 } else {
-                                    // collision between DB and new: property to modify but does not exists in DB
+                                    // collision between DB and new: property to modify but does not exist in DB
                                     // Lets assume it's a mistake to fix
-                                    objectMergeResult.getLog().warn("Object [{}] does not exists",
+                                    objectMergeResult.getLog().warn("Object [{}] does not exist",
                                         newProperty.getReference());
 
                                     objectResult.safeput(diff.getPropName(), newProperty);

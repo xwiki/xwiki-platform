@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="">
+<xwikidoc version="1.5" reference="Image.Style.Code.Translations" locale="">
   <web>Image.Style.Code</web>
   <name>Translations</name>
   <language/>
@@ -41,7 +41,7 @@ image.style.admin.heading=Image Style Administration
 image.style.administration.imageStyleList.heading=Image Styles
 image.style.administation.newImageStyle.button=Create the image style
 image.style.administation.defaultImageStyle.button=Update the default image style
-image.style.imageStyleSheet.backToAdministration.link=Back to the administation
+image.style.imageStyleSheet.backToAdministration.link=Back to the administration
 image.style.administration.liveData.doc.title=Identifier
 image.style.administration.liveData._actions=Actions
 image.style.administration.liveData.prettyName=Pretty Name
@@ -52,7 +52,8 @@ image.style.administration.liveData.emptyvalue=
 image.style.administation.newImageStyle.label=New Image Style
 image.style.administation.newImageStyle.hint=Identifier of the new image style.
 image.style.administation.newImageStyle.placeHolder=Identifier
-Image.Style.Code.ImageStyleClass_adjustableAlignment=Adjustable Aligment
+image.style.administation.newImageStyle.normalizedTitle=The new image style, following the naming conventions is [{0}].
+Image.Style.Code.ImageStyleClass_adjustableAlignment=Adjustable Alignment
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=When checked, the user is allowed to customize the aligment of the image.
 Image.Style.Code.ImageStyleClass_adjustableBorder=Adjustable Border
 Image.Style.Code.ImageStyleClass_adjustableBorder_hint=When checked, the user is allowed to customize the border of the image.
@@ -73,15 +74,17 @@ Image.Style.Code.ImageStyleClass_defaultBorder_hint=When checked, the image has 
 Image.Style.Code.ImageStyleClass_defaultHeight=Default height
 Image.Style.Code.ImageStyleClass_defaultHeight_hint=The default height of the image. If the default width is left empty, it will be computed according to the image ratio. Otherwise, the image will have a fixed size.
 Image.Style.Code.ImageStyleClass_defaultTextWrap=Default Text Wrap
-Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=When checked, the tewt will wrap around the image by default.
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=When checked, the text will wrap around the image by default.
 Image.Style.Code.ImageStyleClass_defaultWidth=Default Width
-Image.Style.Code.ImageStyleClass_defaultWidth_hint=The default with of the image. If the default height is left empty, it will be computed according to the image ratio. Otherwise, the image will have a fixed size.
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=The default width of the image. If the default height is left empty, it will be computed according to the image ratio. Otherwise, the image will have a fixed size.
 Image.Style.Code.ImageStyleClass_prettyName=Pretty Name
 Image.Style.Code.ImageStyleClass_prettyName_hint=User oriented name of the image style.
 Image.Style.Code.ImageStyleClass_type=Type
 Image.Style.Code.ImageStyleClass_type_hint=The type of the image style (used as a css class).
 Image.Style.Code.ConfigurationClass_defaultStyle=Default Style
-Image.Style.Code.ConfigurationClass_defaultStyle_hint=The default image style for this wiki.</content>
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=The default image style for this wiki.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Force Default Style
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=When checked, the constraints of the default style are forced in the image configuration, and users are forced to choose a style.</content>
   <object>
     <name>Image.Style.Code.Translations</name>
     <number>0</number>

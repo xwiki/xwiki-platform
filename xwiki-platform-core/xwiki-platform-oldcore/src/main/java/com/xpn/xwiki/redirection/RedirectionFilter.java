@@ -20,7 +20,6 @@
 package com.xpn.xwiki.redirection;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,7 +31,6 @@ import com.xpn.xwiki.XWikiException;
  * @since 14.0RC1
  */
 @Role
-@Unstable
 public interface RedirectionFilter
 {
     /**

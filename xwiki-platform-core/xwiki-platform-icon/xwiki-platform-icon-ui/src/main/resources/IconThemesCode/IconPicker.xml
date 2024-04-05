@@ -601,7 +601,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   height: 80px;
   width: 100px;
   text-align: center;
-  border-radius: 4px;
+  border-radius: 7px;
   vertical-align: middle;
   overflow: hidden;
   padding: 10px;

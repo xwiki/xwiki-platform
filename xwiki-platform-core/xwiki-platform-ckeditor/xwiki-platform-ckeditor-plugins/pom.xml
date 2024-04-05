@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor Plugins for XWiki</xwiki.extension.name>
+    <!-- This module has been moved from XWiki Contrib to platform. -->
+    <xwiki.extension.previousIds>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.previousIds>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.features>
   </properties>
@@ -57,6 +59,15 @@
       <artifactId>xwiki-platform-tree-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- This is needed for realtime editing. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <!-- Marked as optional because the realtime plugin is disabled by default. -->
+      <optional>true</optional>
     </dependency>
     <!-- This is used by the resource suggest picker on the link modal. -->
     <dependency>
@@ -121,7 +132,9 @@
   </build>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)
+        and we're waiting for this issue https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker. -->
+      <id>integration-tests-chrome</id>
       <build>
         <!-- We need to filter jasmine-require-config.txt in order to resolve the project version. -->
         <testResources>
@@ -130,42 +143,6 @@
             <filtering>true</filtering>
           </testResource>
         </testResources>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>properties-maven-plugin</artifactId>
-            <version>1.0.0</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>set-system-properties</goal>
-                </goals>
-                <configuration>
-                  <properties>
-                    <property>
-                      <!-- Force a slightly older version of the Chrome Driver in case we don't have the latest Chrome
-                        installed locally. -->
-                      <name>wdm.chromeDriverVersion</name>
-                      <value>115.0.5790.102</value>
-                    </property>
-                    <property>
-                      <!-- Try to work around error: "[SEVERE]: bind() failed: Cannot assign requested address (99)" -->
-                      <name>webdriver.chrome.whitelistedIps</name>
-                      <value />
-                    </property>
-                  </properties>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)
-        and we're waiting for this issue https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker. -->
-      <id>integration-tests-chrome</id>
-      <build>
         <plugins>
           <plugin>
             <groupId>com.github.searls</groupId>

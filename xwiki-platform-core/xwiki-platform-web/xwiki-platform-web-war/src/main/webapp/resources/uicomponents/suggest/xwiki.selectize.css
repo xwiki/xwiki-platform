@@ -70,7 +70,7 @@
   margin-right: .3em;
 }
 img.xwiki-selectize-option-icon {
-  border-radius: 3px;
+  border-radius: 5px;
   max-height: 18px;
   max-width: 18px;
   vertical-align: text-top;
@@ -88,7 +88,7 @@ a.xwiki-selectize-option-label {
 .selectize-control.async-create > .selectize-input > div.xwiki-selectize-option {
   background-image: none;
   border-left: 2px solid transparent;
-  border-radius: 3px;
+  border-radius: 5px;
   padding-left: 3px;
   padding-right: 3px;
 }

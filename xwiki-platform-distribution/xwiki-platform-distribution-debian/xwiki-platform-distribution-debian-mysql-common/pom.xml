@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-mysql-common</artifactId>
   <name>XWiki Platform - Distribution - Debian - MySQL - Common</name>
@@ -37,9 +37,10 @@
     <xwiki.db.connection.url>jdbc:mysql://_DBC_DBSERVER_/_DBC_DBNAME_?useSSL=false&amp;amp;connectionTimeZone=LOCAL&amp;amp;allowPublicKeyRetrieval=true</xwiki.db.connection.url>
     <xwiki.db.connection.username>_DBC_DBUSER_</xwiki.db.connection.username>
     <xwiki.db.connection.password>_DBC_DBPASS_</xwiki.db.connection.password>
-    <xwiki.db.connection.driver_class>com.mysql.cj.jdbc.Driver</xwiki.db.connection.driver_class>
-    <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
-    <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
+    <xwiki.db.connection.driver_class>${xwiki.db.mysql.connection.driver_class}</xwiki.db.connection.driver_class>
+    <xwiki.db.hbm.xwiki>${xwiki.db.mysql.hbm.xwiki}</xwiki.db.hbm.xwiki>
+    <xwiki.db.hbm.feeds>${xwiki.db.mysql.hbm.feeds}</xwiki.db.hbm.feeds>
+
     <debian.package>xwiki-mysql-common</debian.package>
   </properties>
   <build>

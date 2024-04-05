@@ -744,19 +744,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
+      <panel-header-text>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>panel-default-text</name>
+        <name>panel-header-text</name>
         <number>46</number>
         <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
+        <prettyName>panel-header-text</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
+      </panel-header-text>
       <text-color>
         <customDisplay/>
         <disabled>0</disabled>
@@ -1625,7 +1625,7 @@
 @panel-inner-border:          @table-border-color;
 @panel-footer-bg:             #f5f5f5;
 
-@panel-default-text:          @gray-dark;
+@panel-default-text:          @text-color;
 @panel-default-border:        @table-border-color;
 @panel-default-heading-bg:    #f5f5f5;
 
@@ -2217,7 +2217,8 @@ input[type="checkbox"] {
   .close {
     color: @text-color;
   }
-}</lessCode>
+}
+</lessCode>
     </property>
     <property>
       <link-color/>
@@ -2253,7 +2254,7 @@ input[type="checkbox"] {
       <panel-bg/>
     </property>
     <property>
-      <panel-default-text/>
+      <panel-header-text/>
     </property>
     <property>
       <text-color/>

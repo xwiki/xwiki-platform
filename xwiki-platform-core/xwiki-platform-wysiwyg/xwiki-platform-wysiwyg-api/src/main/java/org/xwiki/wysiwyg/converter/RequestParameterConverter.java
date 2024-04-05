@@ -26,7 +26,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Check if the given request contains parameters that needs conversion and perform the needing conversion.
@@ -63,6 +62,5 @@ public interface RequestParameterConverter
      *         and errors that might have occurred
      * @since 14.10
      */
-    @Unstable
     RequestParameterConversionResult convert(ServletRequest request);
 }

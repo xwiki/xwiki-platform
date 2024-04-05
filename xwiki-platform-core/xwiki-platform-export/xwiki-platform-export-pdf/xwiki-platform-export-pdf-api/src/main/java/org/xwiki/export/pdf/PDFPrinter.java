@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Generic interface to print some data as PDF.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.5
  */
 @Role
-@Unstable
 public interface PDFPrinter<T>
 {
     /**

@@ -151,7 +151,8 @@
               $facetRequestValuesBackup.size())))
             #set ($discard = $facetRequestValues.removeAll($category.mediaTypes))
           #end
-          &lt;div class="mediaTypeCategory"&gt;#displaySearchFacetValue($category {} 'displaySearchFacetValue_mediaType')&lt;/div&gt;
+          &lt;div id="mediatype-$stringtool.remove($stringtool.substringBetween($category.name, '(', '\'), ' ')"
+            class="mediaTypeCategory"&gt;#displaySearchFacetValue($category {} 'displaySearchFacetValue_mediaType' true)&lt;/div&gt;
           ## When a media type is selected, it's category should be unselected.
           #set ($facetRequestValues = [])
           #if ($facetRequestValuesBackup)
@@ -159,7 +160,7 @@
               $facetRequestValuesBackup.size())))
             #set ($discard = $facetRequestValues.remove($category.name))
           #end
-          &lt;ul&gt;#displaySearchFacetValuesLimited($category.mediaTypesWithCounts {} 'displaySearchFacetValue_mediaType')&lt;/ul&gt;
+          &lt;ul&gt;#displaySearchFacetValuesLimited($category.mediaTypesWithCounts {} 'displaySearchFacetValue_mediaType' true)&lt;/ul&gt;
           ## Restore the selected values.
           #set ($facetRequestValues = $facetRequestValuesBackup)
         &lt;/li&gt;
@@ -290,10 +291,18 @@
     var category = $(this);
     var subtypes = category.next('ul');
     var selected = category.add(subtypes).find('.selected, input:checked').length &gt; 0;
-    !selected &amp;&amp; category.addClass('closed');
+    if (selected) {
+      category.addClass('expanded');
+      subtypes.attr('aria-expanded', 'true');
+    }
     subtypes.toggle(selected);
-    category.find('.itemCount').on('click', function(event) {
-      category.toggleClass('closed');
+    var togglerButton = category.find('.facet-value-toggler');
+    var dropdownID = category.attr('id') + '-dropdown';
+    subtypes.attr('id', dropdownID);
+    togglerButton.attr('aria-controls', dropdownID);
+    togglerButton.on('click', function() {
+      category.toggleClass('expanded');
+      subtypes.attr('aria-expanded', subtypes.attr('aria-expanded') === 'true' ? 'false' : 'true');
       subtypes.toggle();
     });
   };
@@ -436,26 +445,17 @@
 .search-facet-body .mediaTypeCategory {
   display: flex;
   flex-basis: 100%;
+  align-items: center;
 }
 
-.search-facet-body .mediaTypeCategory:hover {
+.search-facet-body .facet-value-toggler:hover {
   background-color: $theme.highlightColor;
 }
 
-.mediaTypeCategory .itemCount {
-  background: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'light-grey-disclosure-arrow-down.png')") no-repeat scroll 100% 50% transparent;
-  cursor: pointer;
-  padding-right: 9px;
+.mediaTypeCategory + ul {
+  flex-basis: 100%;
 }
-.mediaTypeCategory .itemCount:hover {
-  background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'dark-grey-disclosure-arrow-down.png')")
-}
-.mediaTypeCategory.closed .itemCount {
-  background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'light-grey-disclosure-arrow-left.png')")
-}
-.mediaTypeCategory.closed .itemCount:hover {
-  background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'dark-grey-disclosure-arrow-left.png')")
-}</code>
+</code>
     </property>
     <property>
       <contentType>CSS</contentType>

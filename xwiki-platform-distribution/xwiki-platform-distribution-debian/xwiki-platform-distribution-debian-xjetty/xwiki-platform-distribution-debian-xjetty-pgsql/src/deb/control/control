@@ -1,0 +1,14 @@
+Package: xwiki-xjetty-pgsql
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: xwiki-pgsql-common (= [[version]]), xwiki-xjetty-common (= [[version]])
+Provides: xwiki-xjetty-database
+Replaces: xwiki-xjetty-database
+Conflicts: xwiki-xjetty-database
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]
+Bugs: [[debian.bugs]]
+Homepage: [[debian.homepage]]

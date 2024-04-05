@@ -241,6 +241,7 @@ $xwiki.getUserName("xwiki:${username}")
  *   showAlias: false, // whether to show the user alias or not
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
+ *   displayLink: true // @since 15.9 ; whether to wrap the user name in a link to the user profile
  * }
  *#
 #macro (displayUser $arg $options)
@@ -256,7 +257,8 @@ $xwiki.getUserName("xwiki:${username}")
   #set ($macro.options = {
     'showAlias': false,
     'useInlineHTML': false,
-    'wrapAvatar': false
+    'wrapAvatar': false,
+    'displayLink': true
   })
   #if ($options.entrySet())
     #set ($discard = $macro.options.putAll($options))
@@ -306,13 +308,20 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($avatarWrapperStart = "<span class=""${type}-avatar-wrapper"">")
       #set ($avatarWrapperEnd = '</span>')
     #end
+    #set($userNameTagAttributes = "class=""${type}-name""")
+    #if ($macro.options.displayLink)
+      #set($userNameTag = 'a')
+      #set($userNameTagAttributes = "$userNameTagAttributes href=""$escapetool.xml($xwiki.getURL($userReference))""")
+    #else
+      #set($userNameTag = 'span')
+    #end
     ## We avoid the whitespace because the users are displayed as inline blocks.
     #set ($discard = $output.addAll([
       "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
         $avatarWrapperStart,
           "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
         $avatarWrapperEnd,
-        "<a class=""${type}-name"" href=""$escapetool.xml($xwiki.getURL($userReference))"">$escapedUserName</a>",
+        "<$userNameTag $userNameTagAttributes>$escapedUserName</$userNameTag>",
         $userAliasDisplay,
       "</$userTag>"
     ]))
@@ -332,6 +341,7 @@ $xwiki.getUserName("xwiki:${username}")
  *   showAlias: false, // whether to show the group alias or not
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the group or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
+ *   displayLink: true // @since 15.9 ; whether to wrap the group name in a link to the group profile
  * }
  *#
 #macro (displayGroup $arg $options)
@@ -391,7 +401,7 @@ $xwiki.getUserName("xwiki:${username}")
   #if(!$picturelist.containsKey("${username}--${size}"))
     #getUserAvatarURL($username $avatarURL $size)
     #if ($avatarURL.specified)
-      #set ($picture = "<img src='")
+      #set ($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
       #set ($picture = $picture.concat($escapetool.xml($avatarURL.url)))
       #set ($picture = $picture.concat("' alt='"))
       #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
@@ -757,7 +767,7 @@ $fn
     #end
     #foreach ($childDocName in $page.children)
       #set ($childDoc = $xwiki.getDocument($childDocName))
-      #if ($childDoc && !$blacklistedSpaces.contains($childDoc.getSpace()))
+      #if ($childDoc && ($services.user.properties.displayHiddenDocuments() || !$childDoc.isHidden()))
         #if ($withPageBreaks)
           #pagebreak()
         #end
@@ -800,7 +810,7 @@ $fn
 ### @param isLarge True if the panel should be larger (default: false)
 ### @param isHeaderHidden True if the header should be hidden (default: false)
 ###
-#macro(panelheader $title $isLarge $isHeaderHidden)
+#macro(panelheader $title $isLarge $isHeaderHidden $isNavigation)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style the Panels selectively using
 ## CSS.
 ## We want to avoid showing the "WebHome" suffix in the generated class since we're working to remove it from the UI
@@ -819,22 +829,36 @@ $fn
 ## We keep this class for compatibility purpose but the previous one should be used instead.
 #set ($deprecatedClassAttribute = $stringtool.toAlphaNumeric("$!paneldoc.documentReference.name"))
 #if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
-<div class="#if ($isLarge)large #{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute">
-<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>
+<div role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large #{end}panel
+expanded $!specialClassAttribute $!deprecatedClassAttribute"
+aria-label="$escapetool.xml($title)">
+<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>
 <div class="xwikipanelcontents">
 #else
-(% class="#if ($isLarge)large #{end}panel expanded $!specialClassAttribute $!deprecatedClassAttribute" %)(((
-{{html}}<h1 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h1>{{/html}}
+(% role="#if ($isNavigation)navigation#{else}complementary#{end}" class="#if ($isLarge)large#{end}panel
+expanded $!specialClassAttribute $!deprecatedClassAttribute"
+aria-label="$escapetool.xml($title)"
+%)(((
+{{html}}<h2 class="xwikipaneltitle#if ($isHeaderHidden) hidden#end">$title</h2>{{/html}}
 (% class="xwikipanelcontents" %)(((
 #end
 #end
 
-#macro(panelhiddenheader $title)
-#panelheader($title, false, true)
+#macro(largepanelheader $title)
+#panelheader($title, true, false, false)
 #end
 
-#macro(largepanelheader $title)
-#panelheader($title, true, false)
+#macro(panelhiddenheader $title)
+#panelheader($title, false, true, false)
+#end
+
+## Changes the semantic role of the panel.
+#macro(navigationPanelHeader $title)
+#panelheader($title, false, false, true)
+#end
+
+#macro(largeNavigationPanelHeader $title)
+#panelheader($title, true, false, true)
 #end
 
 ###
@@ -1089,14 +1113,14 @@ $html
  *
  * @param docNames list of document names.
  * @param displaySpaces true to group documents by space.
- * @param blacklistedSpaces spaces to exclude from the list.
+ * @param ignoredSpaces spaces to exclude from the list.
  *#
-#macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
+#macro(displayDocumentList $docNames $displaySpaces $ignoredSpaces)
   #set($documentList = [])
   #foreach($docName in $docNames)
     #if($xwiki.hasAccessLevel("view", $xcontext.user, $docName))
       #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
-      #if(!$blacklistedSpaces.contains($document.getSpace()))
+      #if(!$ignoredSpaces.contains($document.getSpace()) && ($services.user.properties.displayHiddenDocuments() || !$document.isHidden()))
         #set($discard = $documentList.add($document))
       #end
     #end

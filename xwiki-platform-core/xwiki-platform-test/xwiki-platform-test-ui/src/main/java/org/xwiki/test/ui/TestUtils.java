@@ -65,6 +65,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -87,6 +88,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
@@ -2037,7 +2039,8 @@ public class TestUtils
 
     /**
      * Set global xwiki configuration options (as if the xwiki.cfg file had been modified). This is useful for testing
-     * configuration options.
+     * configuration options. This requires the {@code Test.XWikiConfigurationPageForTest} page to have Programming
+     * Rights (if the PR checker is enabled, you'll need to exclude this reference so that it can have PR).
      *
      * @param configuration the configuration in {@link Properties} format. For example "param1=value2\nparam2=value2"
      * @throws IOException if an error occurs while parsing the configuration
@@ -2053,9 +2056,9 @@ public class TestUtils
                 + "ConfigurationSource\", \"xwikicfg\"))\n"
                 + "#set($props = $config.getProperties())\n");
 
-            // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
+        // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
         // with a different xwiki.cfg file for each test that requires a configuration change, we use the following
-        // trick: We create a document and we access the XWiki object with a Velocity script inside that document.
+        // trick: We create a document, and we access the XWiki object with a Velocity script inside that document.
         for (Map.Entry<Object, Object> param : properties.entrySet()) {
             sb.append("#set($discard = $props.put('").append(param.getKey()).append("', '")
                 .append(param.getValue()).append("'))\n");
@@ -2485,82 +2488,61 @@ public class TestUtils
             RestTestUtils.urlPrefix = newURLPrefix;
         }
 
-        private String toSpaceElement(Iterable<?> spaces)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            for (Object space : spaces) {
-                if (builder.length() > 0) {
-                    builder.append("/spaces/");
-                }
-
-                if (space instanceof EntityReference) {
-                    builder.append(((EntityReference) space).getName());
-                } else {
-                    builder.append(space.toString());
-                }
-            }
-
-            return builder.toString();
-        }
-
-        private String toSpaceElement(String spaceReference)
-        {
-            return toSpaceElement(
-                relativeReferenceResolver.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
-        }
-
         protected Object[] toElements(Page page)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
-            if (page.getWiki() != null) {
-                elements.add(page.getWiki());
-            } else {
-                elements.add(this.testUtils.getCurrentWiki());
-            }
-
-            // Add spaces
-            elements.add(toSpaceElement(page.getSpace()));
-
-            // Add name
-            elements.add(page.getName());
-
-            // Add translation
+            // Get locale
+            Locale locale;
             if (StringUtils.isNotEmpty(page.getLanguage())) {
-                elements.add(page.getLanguage());
+                locale = LocaleUtils.toLocale(page.getLanguage());
+            } else {
+                locale = null;
             }
 
-            return elements.toArray();
+            // Wiki
+            WikiReference wikiReference;
+            if (page.getWiki() != null) {
+                wikiReference = new WikiReference(page.getWiki());
+            } else {
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
+            }
+
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(page.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
+
+            // Document
+            DocumentReference documentReference = new DocumentReference(page.getName(), spaceReference, locale);
+
+            return toElements(documentReference);
         }
 
         public Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
+            // Wiki
+            WikiReference wikiReference;
             if (obj.getWiki() != null) {
-                elements.add(obj.getWiki());
+                wikiReference = new WikiReference(obj.getWiki());
             } else {
-                elements.add(this.testUtils.getCurrentWiki());
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
             }
 
-            // Add spaces
-            elements.add(toSpaceElement(obj.getSpace()));
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(obj.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
 
-            // Add name
-            elements.add(obj.getPageName());
+            // Document
+            DocumentReference documentReference = new DocumentReference(obj.getPageName(), spaceReference);
 
-            if (!onlyDocument) {
-                // Add class
-                elements.add(obj.getClassName());
-
-                // Add number
-                elements.add(obj.getNumber());
+            // Object
+            EntityReference finalReference;
+            if (onlyDocument) {
+                finalReference = documentReference;
+            } else {
+                String objectName = obj.getClassName() + '[' + obj.getNumber() + ']';
+                finalReference = new ObjectReference(objectName, documentReference);
             }
 
-            return elements.toArray();
+            return toElements(finalReference);
         }
 
         public Object[] toElements(EntityReference reference)
@@ -2907,15 +2889,34 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams) throws Exception
+        {
+            return get(reference, queryParams, true);
+        }
+
+        /**
          * Return object model of the passed reference or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(EntityReference reference, boolean failIfNotFound) throws Exception
         {
+            return get(reference, Map.of(), failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams, boolean failIfNotFound)
+            throws Exception
+        {
             Class<?> resource = getResourceAPI(reference);
 
-            return get(resource, reference, failIfNotFound);
+            return get(resource, queryParams, reference, failIfNotFound);
         }
 
         /**
@@ -2943,13 +2944,32 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference) throws Exception
+        {
+            return get(resourceURI, queryParams, reference, true);
+        }
+
+        /**
          * Return object model of the passed reference with the passed resource URI or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(Object resourceURI, EntityReference reference, boolean failIfNotFound) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, reference), false,
+            return get(resourceURI, Map.of(), reference, failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference,
+            boolean failIfNotFound) throws Exception
+        {
+            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
                 failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
 
             if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
@@ -3029,6 +3049,16 @@ public class TestUtils
         public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, toElements(reference));
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public GetMethod executeGet(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
+            throws Exception
+        {
+            return executeGet(resourceURI, queryParams, toElements(reference));
         }
 
         public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception

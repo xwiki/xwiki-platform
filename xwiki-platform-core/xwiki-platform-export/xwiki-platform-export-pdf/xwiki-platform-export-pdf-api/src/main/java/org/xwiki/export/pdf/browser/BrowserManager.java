@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Manages the web browser used for printing to PDF.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.8
  */
 @Role
-@Unstable
 public interface BrowserManager extends AutoCloseable
 {
     /**

@@ -19,7 +19,6 @@
  */
 package org.xwiki.index.test.ui;
 
-import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
 import org.junit.Before;
@@ -28,9 +27,6 @@ import org.xwiki.index.test.po.AllDocsPage;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
-import org.xwiki.test.ui.browser.IgnoreBrowsers;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
 import static org.junit.Assert.assertEquals;
@@ -133,64 +129,4 @@ public class AllDocsIT extends AbstractTest
         assertTrue(tree.hasDocument(spaceName, "Level.1", "Level{[(2)]}", "Level@3", "WebHome"));
     }
 
-    /**
-     * This test is against XWiki Enterprise XE-701 https://jira.xwiki.org/browse/XE-701 (fixed in 2.5M1) WARN: calling
-     * isReady() and waitUntilReady() from LiveTableElement.java inside this class fails.
-     */
-    @Test
-    @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177") })
-    public void attachmentsTabFilteringAndSorting() throws Exception
-    {
-        // Create 2 pages with attachments so that this test filter returns only one.
-        // Note that we need to be logged in.
-        getUtil().createPageWithAttachment(getTestClassName(), "Page", null, null, "attachment1.txt",
-            new ByteArrayInputStream("attachment content1".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
-        getUtil().createPageWithAttachment(getTestClassName(), "OtherPage", null, null, "attachment2.txt",
-            new ByteArrayInputStream("attachment content2".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
-
-        AllDocsPage docsPage = AllDocsPage.gotoPage();
-        LiveTableElement liveTable = docsPage.clickAttachmentsTab();
-
-        // Here we test if all the Columns are displayed.
-        assertTrue("No Type column found", liveTable.hasColumn("Type"));
-        assertTrue("No Name column found", liveTable.hasColumn("Name"));
-        assertTrue("No Location column found", liveTable.hasColumn("Location"));
-        assertTrue("No Size column found", liveTable.hasColumn("Size"));
-        assertTrue("No Date column found", liveTable.hasColumn("Date"));
-        assertTrue("No Author column found", liveTable.hasColumn("Author"));
-
-        assertEquals(2, liveTable.getRowCount());
-
-        // Filter by attachment file name.
-        liveTable.filterColumn("xwiki-livetable-allattachments-filter-2", "t1");
-        assertEquals(1, liveTable.getRowCount());
-        assertEquals("attachment1.txt", liveTable.getCell(liveTable.getRow(1), 2).getText());
-
-        // Clear the filter.
-        liveTable.filterColumn("xwiki-livetable-allattachments-filter-2", "");
-
-        // Filter by attachment location.
-        liveTable.filterColumn("xwiki-livetable-allattachments-filter-3", "th");
-        assertEquals(1, liveTable.getRowCount());
-        assertEquals(getTestClassName() + "OtherPage", liveTable.getCell(liveTable.getRow(1), 3).getText());
-
-        // Clear the filter.
-        liveTable.filterColumn("xwiki-livetable-allattachments-filter-3", "");
-
-        // Sort by attachment file name. The live table should be already sorted by file name ascending. This will
-        // reverse the order.
-        assertEquals("attachment2.txt", liveTable.getCell(liveTable.getRow(2), 2).getText());
-        liveTable.sortBy("Name");
-        assertEquals(2, liveTable.getRowCount());
-        assertEquals("attachment2.txt", liveTable.getCell(liveTable.getRow(1), 2).getText());
-
-        // Sort by attachment location.
-        liveTable.sortBy("Location");
-        assertEquals(getTestClassName() + "Page", liveTable.getCell(liveTable.getRow(2), 3).getText());
-        liveTable.sortBy("Location");
-        assertEquals(2, liveTable.getRowCount());
-        assertEquals(getTestClassName() + "Page", liveTable.getCell(liveTable.getRow(1), 3).getText());
-    }
 }

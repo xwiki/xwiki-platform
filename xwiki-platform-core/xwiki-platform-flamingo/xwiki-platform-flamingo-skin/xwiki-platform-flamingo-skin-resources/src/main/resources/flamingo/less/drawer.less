@@ -20,98 +20,143 @@
 @xwiki-drawer-menu-category-bg:          @xwiki-drawer-menu-item-seperator-color;
 @xwiki-drawer-menu-category-color:       lighten(@xwiki-drawer-menu-item-color, 10%);
 
-.drawer-overlay {
-  z-index: 5200;
-}
-
 .drawer--right .drawer-nav {
   right: -@xwiki-drawer-width;
 }
 
-.drawer-nav {
+
+
+#tmDrawer.drawer-nav {
   background-color: @xwiki-drawer-bg;
   width: @xwiki-drawer-width;
-  z-index: 5300;
+  right: 0;
+  overflow: hidden;
+  height: 100vh;
+  margin-right: -@xwiki-drawer-width;
+  transition: margin-right .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+  padding: 0;
+  border: 0;
+  overflow-y: auto;
+  // We overwrite max-height over browser defaults for dialog
+  max-height: 100vh;
+  
+  &::backdrop {
+    opacity: 0;
+    background-color: #fff - @xwiki-page-content-bg;
+    transition: opacity .6s cubic-bezier(0.190, 1.000, 0.220, 1.000);
+  }
 
-  // Brand =================================================================
-  .drawer-brand {
-    background-color: @xwiki-drawer-brand-bg;
-    border-bottom: 1px solid @xwiki-drawer-brand-border;
-    font-weight: 400;
-    line-height: inherit;
-    padding: 20px 16px;
-
-    a {
-      display: block;
-      color: @xwiki-drawer-brand-link-color;
-      padding: 0;
-
-      &:hover, &:focus {
-        color: @xwiki-drawer-brand-link-hover-color;
-        text-decoration: none;
-      }
-    }
-
-    // Avatar styling
-    img {
-      border-radius: 50%;
-      float: left;
-      height: 50px;
-      width: 50px;
-    }
-
-    .brand-links {
-      float: left;
-      margin-left: 16px;
-      margin-top: 8px;
-
-      a {
-        font-size: 14px;
-      }
-
-      // Resetting avatar styling
-      img {
-        border-radius: 0;
-        float: none;
-        height: auto;
-        width: auto;
-      }
-
-      .brand-user {
-        color: @xwiki-drawer-brand-user-color;
-        font-weight: 400;
-      }
+  &[open]:not(.drawer-transitioning) {
+    margin-right: 0;
+    &::backdrop {
+      opacity: 0.2;
     }
   }
 
+  & .drawer-menu {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 
-  // Menu Item =============================================================
-  a.drawer-menu-item {
-    font-size: @xwiki-drawer-menu-item-size;
-    font-weight: 400;
-    margin-top: 0;
-    padding: @xwiki-drawer-menu-item-padding;
-
-    &, &:hover, &:focus {
-      background-color: @xwiki-drawer-menu-item-bg;
-      color: @xwiki-drawer-menu-item-color;
+    & .drawer-menu-item {
+      font-size: 1rem;
+      display: block;
+      padding: .75rem;
       text-decoration: none;
+      color: @xwiki-drawer-menu-item-color;
     }
 
-    &:hover {
-      background-color: @xwiki-drawer-menu-item-hover-bg;
+    & .drawer-menu-item:hover {
       color: @xwiki-drawer-menu-item-hover-color;
+      background-color: transparent;
+    }
+
+    // Brand =================================================================
+    .drawer-brand {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      background-color: @xwiki-drawer-brand-bg;
+      border-bottom: 1px solid @xwiki-drawer-brand-border;
+      font-weight: 400;
+      line-height: inherit;
+      padding: 20px 16px;
+
+      a {
+        display: block;
+        color: @xwiki-drawer-brand-link-color;
+        padding: 0;
+
+        &:hover, &:focus {
+          color: @xwiki-drawer-brand-link-hover-color;
+          text-decoration: none;
+        }
+      }
+
+      // Avatar styling
+      img.avatar {
+        border-radius: 50%;
+        height: 50px;
+        width: 50px;
+        // Overwrite the default for img and avoid squishing down the avatar when the account name is too large
+        max-width: unset;
+      }
+
+      .brand-links {
+        flex-grow: 1;
+        margin-left: 16px;
+
+        a {
+          font-size: @font-size-base;
+        }
+
+        // Resetting avatar styling
+        img {
+          border-radius: 0;
+          float: none;
+          height: auto;
+          width: auto;
+        }
+
+        .brand-user {
+          color: @xwiki-drawer-brand-user-color;
+          font-weight: 400;
+          // Make sure we wrap the name whatever its length.
+          overflow-wrap: anywhere;
+        }
+      }
+    }
+
+    // Menu Item =============================================================
+    a.drawer-menu-item {
+      font-size: @xwiki-drawer-menu-item-size;
+      font-weight: 400;
+      margin-top: 0;
+      padding: @xwiki-drawer-menu-item-padding;
+
+      &, &:hover, &:focus {
+        background-color: @xwiki-drawer-menu-item-bg;
+        color: @xwiki-drawer-menu-item-color;
+        text-decoration: none;
+      }
+
+      &:hover {
+        background-color: @xwiki-drawer-menu-item-hover-bg;
+        color: @xwiki-drawer-menu-item-hover-color;
+      }
     }
   }
 
   // Sub Item =============================================================
   .drawer-dropdown-menu {
-    &.collapsing {
-      /* Overwrite display:none from drawer.js in order to enable the collapse transition. */
-      display: block;
-    }
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 
-    a {
+    a.drawer-menu-item {
       padding-left: @xwiki-drawer-menu-subitem-indent;
     }
   }

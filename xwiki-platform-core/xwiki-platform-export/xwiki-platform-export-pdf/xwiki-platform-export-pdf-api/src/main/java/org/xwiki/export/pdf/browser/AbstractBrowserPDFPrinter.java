@@ -22,6 +22,7 @@ package org.xwiki.export.pdf.browser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -42,7 +43,6 @@ import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter;
 import org.xwiki.export.pdf.internal.browser.CookieFilter.CookieFilterContext;
-import org.xwiki.stability.Unstable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,7 +52,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @version $Id$
  * @since 14.8
  */
-@Unstable
 public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 {
     @Inject
@@ -81,9 +80,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
                 throw new IOException("Failed to load the print preview URL: " + cookieFilterContext.getTargetURL());
             }
 
-            return browserTab.printToPDF(() -> {
-                browserTab.close();
-            });
+            return browserTab.printToPDF(browserTab::close);
         } catch (Exception e) {
             // Close the browser tab only if an exception is caught. Otherwise the tab will be closed after the PDF
             // input stream is read and closed.
@@ -102,11 +99,13 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         Cookie[] cookiesArray = getRequest().getCookies();
         List<Cookie> cookies = new LinkedList<>();
         if (cookiesArray != null) {
-            Stream.of(cookiesArray).forEach(cookie -> cookies.add(cookie));
+            Stream.of(cookiesArray).forEach(cookies::add);
         }
         this.cookieFilters.forEach(cookieFilter -> {
             try {
-                cookieFilter.filter(cookies, cookieFilterContext);
+                if (cookieFilter.isFilterRequired()) {
+                    cookieFilter.filter(cookies, cookieFilterContext);
+                }
             } catch (Exception e) {
                 this.logger.warn("Failed to apply cookie filter [{}]. Root cause is: [{}].", cookieFilter,
                     ExceptionUtils.getRootCauseMessage(e));
@@ -137,48 +136,57 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
      */
     private CookieFilterContext findCookieFilterContext(URL printPreviewURL, BrowserTab browserTab) throws IOException
     {
+        boolean isFilterRequired = this.cookieFilters.stream().anyMatch(CookieFilter::isFilterRequired);
         return getBrowserPrintPreviewURLs(printPreviewURL).stream()
-            .map(url -> this.getCookieFilterContext(url, browserTab)).flatMap(Optional::stream).findFirst()
+            .map(url -> this.getCookieFilterContext(url, isFilterRequired, browserTab)).flatMap(Optional::stream)
+            .findFirst()
             .orElseThrow(() -> new IOException("Couldn't find an alternative print preview URL that the web browser "
                 + "used for PDF printing can access."));
     }
 
     private List<URL> getBrowserPrintPreviewURLs(URL printPreviewURL) throws IOException
     {
-        List<URL> browserPrintPreviewURLs = new LinkedList<>();
-
-        // 1. Try first with the same URL as the user (this may work in a domain-based multi-wiki setup).
-        browserPrintPreviewURLs.add(printPreviewURL);
-
-        // 2. Try with the configured XWiki URI.
         try {
-            URI xwikiURI = this.configuration.getXWikiURI();
-            URIBuilder uriBuilder = new URIBuilder(printPreviewURL.toURI());
-            if (xwikiURI.getScheme() != null) {
-                uriBuilder.setScheme(xwikiURI.getScheme());
+            if (this.configuration.isXWikiURISpecified()) {
+                // Try only with the configured XWiki URI.
+                return List.of(getBrowserPrintPreviewURL(printPreviewURL));
+            } else {
+                // Try first with the same URL as the user (this may work in a domain-based multi-wiki setup). If it
+                // fails, try with the default XWiki URI.
+                return List.of(printPreviewURL, getBrowserPrintPreviewURL(printPreviewURL));
             }
-            if (xwikiURI.getHost() != null) {
-                uriBuilder.setHost(xwikiURI.getHost());
-            }
-            if (xwikiURI.getPort() != -1) {
-                uriBuilder.setPort(xwikiURI.getPort());
-            }
-            browserPrintPreviewURLs.add(uriBuilder.build().toURL());
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
-
-        return browserPrintPreviewURLs;
     }
 
-    private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, BrowserTab browserTab)
+    private URL getBrowserPrintPreviewURL(URL printPreviewURL) throws URISyntaxException, MalformedURLException
     {
-        return getBrowserIPAddress(targetURL, browserTab).map(browserIPAddress -> new CookieFilterContext()
+        URI xwikiURI = this.configuration.getXWikiURI();
+        URIBuilder uriBuilder = new URIBuilder(printPreviewURL.toURI());
+        if (xwikiURI.getScheme() != null) {
+            uriBuilder.setScheme(xwikiURI.getScheme());
+        }
+        if (xwikiURI.getHost() != null) {
+            uriBuilder.setHost(xwikiURI.getHost());
+        }
+        if (xwikiURI.getPort() != -1) {
+            uriBuilder.setPort(xwikiURI.getPort());
+        }
+        return uriBuilder.build().toURL();
+    }
+
+    private Optional<CookieFilterContext> getCookieFilterContext(URL targetURL, boolean isFilterRequired,
+        BrowserTab browserTab)
+    {
+        Optional<String> browserIPAddress = isFilterRequired ? getBrowserIPAddress(targetURL, browserTab)
+            : Optional.of(StringUtils.defaultString(getRequest().getHeader("X-Forwarded-For")));
+        return browserIPAddress.map(ip -> new CookieFilterContext()
         {
             @Override
             public String getBrowserIPAddress()
             {
-                return browserIPAddress;
+                return ip;
             }
 
             @Override
@@ -201,6 +209,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
                 }
             }
         } catch (IOException e) {
+            // Pass through.
         }
 
         return Optional.empty();

@@ -39,20 +39,20 @@ public class AllIT
     }
 
     @Nested
-    @DisplayName("Image Plugin")
-    class NestedImagePluginIT extends ImagePluginIT
+    @DisplayName("Image")
+    class NestedImageIT extends ImageIT
     {
     }
 
     @Nested
-    @DisplayName("TextArea Editor")
+    @DisplayName("TextArea Property Editor")
     class NestedTextAreaIT extends TextAreaIT
     {
     }
 
     @Nested
-    @DisplayName("Link Plugin")
-    class NestedLinkPluginIT extends LinkPluginIT
+    @DisplayName("Link")
+    class NestedLinkIT extends LinkIT
     {
     }
     
@@ -68,4 +68,15 @@ public class AllIT
     {
     }
     
+    @Nested
+    @DisplayName("Localization")
+    class NestedLocalizationIT extends LocalizationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Filter")
+    class NestedFilterIT extends FilterIT
+    {
+    }
 }

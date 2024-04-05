@@ -221,12 +221,15 @@ public class ListProperty extends BaseProperty implements Cloneable
         }
 
         if (list == null) {
-            setValueDirty(true);
             this.actualList = new ArrayList<>();
             this.list = new NotifyList(this.actualList, this);
-        } else {
+
+            setValueDirty(true);
+        } else if (!this.list.equals(list)) {
             this.list.clear();
             this.list.addAll(list);
+
+            setValueDirty(true);
         }
 
         // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is

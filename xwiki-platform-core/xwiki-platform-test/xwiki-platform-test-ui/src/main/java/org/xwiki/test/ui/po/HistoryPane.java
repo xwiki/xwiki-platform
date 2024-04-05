@@ -183,4 +183,30 @@ public class HistoryPane extends BaseElement
         getDriver().findElementWithoutWaiting(pane, By.xpath(".//input[@accesskey = 'c']")).click();
         return new ComparePage();
     }
+
+    /**
+     * @return the total number of versions contained in the history as returned by the live table
+     * @since 14.10.17
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    public int getNumberOfVersions()
+    {
+        String xpath = ".//div[@class='paginationFilter' and following-sibling::div[@id='historycontent']]";
+        WebElement paginationDiv = getDriver().findElementWithoutWaiting(By.xpath(xpath));
+        return Integer.parseInt(getDriver().findElementWithoutWaiting(paginationDiv, By.className("totalResultsNo"))
+            .getText());
+    }
+
+    /**
+     * @return {@code true} if the requested version is currently displayed in the history
+     * @since 14.10.17
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    public boolean hasVersion(String version)
+    {
+        String xpath = String.format(".//table//tr[contains(., '%s')]", version);
+        return getDriver().hasElementWithoutWaiting(pane, By.xpath(xpath));
+    }
 }

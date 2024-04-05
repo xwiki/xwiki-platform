@@ -1992,3 +1992,39 @@ document.observe("xwiki:dom:loaded", function() {
   interceptXMLHttpRequest();
   interceptFetch();
 })();
+
+/**
+ * Initializes the submit-once protection on the current page. Search for all form elements with a 'xwiki-submit-once'
+ * class on the document (or on an updated sub-part of the dom). For each form, once the form is submitted, disable all
+ * submit buttons. Note that currently we are expecting the form to be submitted without client side validation. It is
+ * not advised to add the xwiki-submit-once class on forms with client side validation. Also, note that the value of
+ * the disabled buttons will not be sent server side. Therefore, it is not advised to use the 'xwiki-submit-once' class
+ * when this value is required.
+ *
+ *  @since 14.10.18
+ *  @since 15.5.3
+ *  @since 15.8
+ */
+require(['jquery'], ($) => {
+  /**
+   * Initializes the root element by adding event listeners to all forms with the class 'xwiki-submit-once'.
+   * When a form is submitted, re-submission is prevented by disabling all submit buttons.
+   *
+   * @param {Element} rootElement - The root element where the forms are located
+   */
+  function init(rootElement) {
+    $(rootElement)
+      .find('form.xwiki-submit-once')
+      .off('submit.xwiki-submit-once')
+      .on('submit.xwiki-submit-once', (e) => {
+        // Prevents re-submission by disabling all buttons of the form.
+        $(e.target).find('input[type="submit"], input[type="image"], button[type="submit"]').prop('disabled', true);
+      });
+  }
+
+  $(document).on('xwiki:dom:updated', (event, data) => {
+    const containers = data?.elements || [document.documentElement];
+    containers.forEach(init);
+  });
+  $(() => init(document.documentElement));
+});

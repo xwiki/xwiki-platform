@@ -33,14 +33,15 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.async.internal.AbstractExecutedContentMacro;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
 import org.xwiki.rendering.macro.context.TransformationContextMode;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -50,9 +51,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Execute the macro's content in the context of another document's reference.
@@ -76,17 +74,13 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
     private static final String CONTENT_DESCRIPTION = "The content to execute";
 
     @Inject
-    private AuthorizationManager authorizationManager;
-
-    @Inject
     private TransformationManager transformationManager;
 
     @Inject
     private MacroContentWikiSourceFactory contentFactory;
 
     @Inject
-    @Named("macro")
-    private DocumentReferenceResolver<String> macroReferenceResolver;
+    private ContextMacroDocument documentHandler;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -97,18 +91,6 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
             ContextMacroParameters.class);
 
         setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
-    }
-
-    private void checkAccess(DocumentReference currentAuthor, DocumentReference referencedDocReference)
-        throws MacroExecutionException
-    {
-        // Current author must have view right on the target document to use it as context document
-        try {
-            this.authorizationManager.checkAccess(Right.VIEW, currentAuthor, referencedDocReference);
-        } catch (AccessDeniedException e) {
-            throw new MacroExecutionException("Author [" + currentAuthor
-                + "] is not allowed to access target document [" + referencedDocReference + "]", e);
-        }
     }
 
     @Override
@@ -155,17 +137,7 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
     private List<Block> executeContext(XDOM xdom, ContextMacroParameters parameters, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        DocumentReference referencedDocReference;
-        if (parameters.getDocument() != null) {
-            referencedDocReference =
-                this.macroReferenceResolver.resolve(parameters.getDocument(), context.getCurrentMacroBlock());
-            DocumentReference currentAuthor = this.documentAccessBridge.getCurrentAuthorReference();
-
-            // Make sure the author is allowed to use the target document
-            checkAccess(currentAuthor, referencedDocReference);
-        } else {
-            referencedDocReference = null;
-        }
+        DocumentReference referencedDocReference = this.documentHandler.getDocumentReference(parameters, context);
 
         // Reuse the very generic async rendering framework (even if we don't do async and caching) since it's
         // taking
@@ -191,7 +163,7 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
                 // the toc for the passed document instead of the current document).
                 DocumentModelBridge referencedDoc =
                     this.documentAccessBridge.getTranslatedDocumentInstance(referencedDocReference);
-                XDOM referencedXDOM = referencedDoc.getXDOM();
+                XDOM referencedXDOM = referencedDoc.getPreparedXDOM();
 
                 if (parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
                     // Get the XDOM from the referenced doc but with Transformations applied so that all macro are
@@ -219,6 +191,14 @@ public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParam
                 // Restore the context document
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
             }
+        }
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        if (macroBlock.getParameter("source") == null) {
+            this.parser.prepareContentWiki(macroBlock);
         }
     }
 }

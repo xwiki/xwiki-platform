@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.OfficeImporterTranslations" locale="ko">
+  <web>XWiki</web>
+  <name>OfficeImporterTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.OfficeImporter</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>office.createForm.type.name=사무실의 페이지
+office.createForm.type.description=Office 문서를 Wiki 페이지로 가져오기
+office.form.error.noDocument=Office 문서를 가져오려면 {0}작업 만들기{1}를 사용해야 합니다.
+office.import.document.hint=가져올 Office 문서를 선택합니다.
+office.import.target.hint=Office 문서의 내용을 가져올 페이지입니다.
+office.import.overwriteContent=기존 콘텐츠 덮어쓰기
+office.import.overwriteContent.hint=대상 페이지가 이미 존재합니다. 해당 콘텐츠를 덮어쓰거나 기존 콘텐츠에 추가할 수 있습니다.
+office.import.overwriteContent.confirmationMessage=대상 페이지의 콘텐츠를 덮어쓰시겠습니까?
+office.import.overwriteContent.confirmationAction=덮어쓰기
+office.import.headingLevelsToSplit.hint=선택한 제목 수준과 해당 섹션을 상위 페이지에서 연결된 별도의 하위 페이지로 가져옵니다.
+office.import.childPagesNaming.hint=가져온 콘텐츠가 분할될 때 생성되는 하위 페이지의 이름을 지정하는 방법을 선택합니다.
+office.import.terminalChildPages=터미널 하위 페이지
+office.import.terminalChildPages.hint=고급: 생성된 하위 페이지를 터미널로 만듭니다. 터미널 페이지는 자식을 가질 수 없으며 일반적으로 응용 프로그램, 개발 또는 이전 버전의 XWiki 에서 사용됩니다 .
+office.import.inProgress=Office 문서를 가져오는 중...
+office.import.done=Office 문서를 가져왔습니다
+office.import.failed=Office 가져오기 실패
+office.config.serverType.hint=Office 서버 유형입니다. 내부적으로(로컬) 관리하거나 외부(원격)로 관리할 수 있습니다.
+office.config.serverPort.hint=Office 서버 인스턴스에 연결하는 데 사용되는 포트 번호
+office.config.autoStart.hint=XWiki 시작 시 Office 서버가 자동으로 시작/연결되어야 하는지 지정
+office.config.serverPath.hint=Office 설치 경로
+office.config.serverState.connected=연결됨
+office.config.serverState.notConnected=연결되지 않은
+office.config.serverState.confError=잘못된 구성
+office.config.serverState.error=오류
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 14.10.2, 15.0RC1
+#######################################
+office.form.append.hint=문서가 이미 존재합니다! 기존 위키 페이지에 결과를 추가합니다
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

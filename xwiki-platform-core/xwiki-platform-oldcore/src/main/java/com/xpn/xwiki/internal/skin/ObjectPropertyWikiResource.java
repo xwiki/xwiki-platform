@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.net.URL;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -43,18 +44,27 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
 {
     private final String content;
 
+    private final Instant instant;
+
     public ObjectPropertyWikiResource(String path, ResourceRepository repository, ObjectPropertyReference reference,
-        DocumentReference authorReference, Provider<XWikiContext> xcontextProvider, String content)
+        DocumentReference authorReference, Provider<XWikiContext> xcontextProvider, String content, Instant instant)
     {
         super(path, path, reference.getName(), repository, reference, authorReference, xcontextProvider);
 
         this.content = content;
+        this.instant = instant;
     }
 
     @Override
-    protected StringInputSource getInputSourceInternal(XWikiDocument document)
+    public StringInputSource getInputSource() throws Exception
     {
         return new StringInputSource(this.content);
+    }
+
+    @Override
+    public Instant getInstant() throws Exception
+    {
+        return this.instant;
     }
 
     @Override

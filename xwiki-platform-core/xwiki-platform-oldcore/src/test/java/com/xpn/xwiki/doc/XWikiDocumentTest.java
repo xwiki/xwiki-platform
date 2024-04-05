@@ -21,7 +21,6 @@ package com.xpn.xwiki.doc;
 
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,13 +43,16 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -77,10 +79,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -125,9 +126,12 @@ public class XWikiDocumentTest
     @Mock
     private XWiki xWiki;
 
-    private XWikiStoreInterface xWikiStoreInterface;
+    @Mock
+    private VelocityEngine velocityEngine;
 
     private VelocityManager velocityManager;
+
+    private XWikiStoreInterface xWikiStoreInterface;
 
     private BaseClass baseClass;
 
@@ -145,10 +149,9 @@ public class XWikiDocumentTest
             this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);
         this.xWikiStoreInterface = this.componentManager.registerMockComponent(XWikiStoreInterface.class);
         this.velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
-        VelocityEngine mockVelocityEngine = this.componentManager.registerMockComponent(VelocityEngine.class);
         this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
 
-        when(velocityManager.getVelocityEngine()).thenReturn(mockVelocityEngine);
+        when(this.velocityManager.getVelocityEngine()).thenReturn(this.velocityEngine);
 
         Answer<Boolean> invocationVelocity = invocationOnMock -> {
             // Output the given text without changes.
@@ -157,7 +160,7 @@ public class XWikiDocumentTest
             writer.append(text);
             return true;
         };
-        when(mockVelocityEngine.evaluate(any(), any(), any(), any(String.class))).then(invocationVelocity);
+        when(this.velocityEngine.evaluate(any(), any(), any(), any(String.class))).then(invocationVelocity);
 
         DocumentReference documentReference = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
         this.document = new XWikiDocument(documentReference);
@@ -174,7 +177,7 @@ public class XWikiDocumentTest
         this.oldcore.getXWikiContext().put("isInRenderingEngine", true);
         when(mockXWikiVersioningStore.getXWikiDocumentArchive(any(), any())).thenReturn(null);
 
-        this.document.setStore(xWikiStoreInterface);
+        this.document.setStore(this.xWikiStoreInterface);
 
         when(this.xWikiMessageTool.get(any())).thenReturn("message");
         when(this.xWikiRightService.hasProgrammingRights(any())).thenReturn(true);
@@ -218,8 +221,6 @@ public class XWikiDocumentTest
 
         this.baseObject2 = this.baseObject.clone();
         this.document.addXObject(this.baseObject2);
-
-        when(xWikiStoreInterface.search(anyString(), anyInt(), anyInt(), any())).thenReturn(new ArrayList<>());
     }
 
     @Test
@@ -729,6 +730,24 @@ public class XWikiDocumentTest
             this.document.getRenderedContent("**bold**", "xwiki/2.0", this.oldcore.getXWikiContext()));
     }
 
+
+    /**
+     * Verify that if an error happens when evaluation the title, we fallback to the computed title.
+     */
+    @Test
+    void testRenderedTitleWhenVelocityError() throws XWikiVelocityException
+    {
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.SCRIPT), any(), any())).thenReturn(true);
+
+        this.document.setContent("Some content");
+        this.document.setTitle("some content that generate a velocity error");
+        when(this.velocityManager.compile(any(), any())).thenThrow(new XWikiVelocityException("message"));
+
+        assertEquals("Page", this.document.getRenderedTitle(this.oldcore.getXWikiContext()));
+
+        assertEquals("Failed to interpret title of document [Wiki:Space.Page].", this.logCapture.getLogEvent(0).getFormattedMessage());
+    }
+
     /**
      * @see "XWIKI-7515: 'getIncludedPages' in class com.xpn.xwiki.api.Document threw java.lang.NullPointerException"
      */
@@ -889,5 +908,19 @@ public class XWikiDocumentTest
             argThat(givenDoc -> givenDoc != XWikiDocumentTest.this.document), eq(context));
         assertNotNull(cloneArchive);
         assertNotSame(cloneArchive, documentArchive);
+    }
+
+    @Test
+    void setAuthor()
+    {
+        UserReference userReference = mock(UserReference.class);
+
+        this.document.setAuthor(userReference);
+
+        assertSame(userReference, this.document.getAuthors().getEffectiveMetadataAuthor());
+        assertSame(userReference, this.document.getAuthors().getOriginalMetadataAuthor());
+
+        assertNotSame(userReference, this.document.getAuthors().getContentAuthor());
+        assertNotSame(userReference, this.document.getAuthors().getCreator());
     }
 }

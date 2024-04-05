@@ -37,8 +37,6 @@ import com.xpn.xwiki.XWikiContext;
  */
 public class EnvironmentSkinResource extends AbstractSkinResource
 {
-    private final Environment environment;
-
     /**
      * Default constructor.
      *
@@ -52,9 +50,12 @@ public class EnvironmentSkinResource extends AbstractSkinResource
     public EnvironmentSkinResource(String path, String resourceName, ResourceRepository repository,
         Environment environment, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
-        super(path, resourceName, repository, xcontextProvider, urlConfiguration);
+        super(createId(path), path, resourceName, repository, environment, xcontextProvider, urlConfiguration);
+    }
 
-        this.environment = environment;
+    public static String createId(String path)
+    {
+        return "environment:" + path;
     }
 
     @Override

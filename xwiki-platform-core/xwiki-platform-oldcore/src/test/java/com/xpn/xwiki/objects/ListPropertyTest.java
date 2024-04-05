@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class ListPropertyTest
+class ListPropertyTest
 {
     @Test
-    public void dirtyFlagPropagation() throws Exception
+    void dirtyFlagPropagation() throws Exception
     {
         ListProperty p = new ListProperty();
 
@@ -61,7 +61,7 @@ public class ListPropertyTest
     }
 
     @Test
-    public void cloneListProperty() throws Exception
+    void cloneListProperty() throws Exception
     {
         ListProperty p = new ListProperty();
 
@@ -85,7 +85,7 @@ public class ListPropertyTest
      * Tests that the value that is saved in the database for a list property is not XML-encoded.
      */
     @Test
-    public void getTextValue()
+    void getTextValue()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("a<b>c", "1\"2'3", "x{y&z"));
@@ -97,7 +97,7 @@ public class ListPropertyTest
      * values.
      */
     @Test
-    public void toText()
+    void toText()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("c<b>a", "3\"2'1", "z{y&x"));
@@ -108,7 +108,7 @@ public class ListPropertyTest
      * Tests that {@link ListProperty#toFormString()} is XML-encoded.
      */
     @Test
-    public void toFormString()
+    void toFormString()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("o<n>e", "t\"w'o", "t{h&ree"));
@@ -119,7 +119,7 @@ public class ListPropertyTest
      * Tests that {@link ListProperty#toText()} properly joins values containing the separator itself.
      */
     @Test
-    public void toTextValuesWithEscapedSeparators()
+    void toTextValuesWithEscapedSeparators()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("a|b", "c|d", "e\\|f"));
@@ -127,7 +127,7 @@ public class ListPropertyTest
     }
 
     @Test
-    public void toListValuesWithBackslash()
+    void toListValuesWithBackslash()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("a\\b", "c"));

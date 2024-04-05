@@ -20,6 +20,7 @@
 package org.xwiki.internal.migration;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.internal.extension.XARExtensionIndex;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
@@ -62,7 +64,8 @@ public class R150000000XWIKI20285DataMigration extends AbstractDocumentsMigratio
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(150000000);
+        // Version updated because XWIKI-21091 was preventing the migration to work correctly on sub-wikis.
+        return new XWikiDBVersion(150700000);
     }
 
     @Override
@@ -72,7 +75,7 @@ public class R150000000XWIKI20285DataMigration extends AbstractDocumentsMigratio
     }
 
     @Override
-    protected List<String> selectDocuments() throws DataMigrationException
+    protected List<DocumentReference> selectDocuments() throws DataMigrationException
     {
         XWiki wiki = getXWikiContext().getWiki();
         try {
@@ -80,14 +83,19 @@ public class R150000000XWIKI20285DataMigration extends AbstractDocumentsMigratio
             // positive that wild be filtered out by the more accurate regex in
             // InvitationInternalDocumentParameterEscapingFixer.
             return wiki.getStore().getQueryManager()
-                .createQuery("where doc.content "
+                .createQuery("select doc.fullName, doc.language from Document doc where doc.content "
                     + "like '%{{info}}%services.localization.render%xe.invitation.internalDocument%{{/info}}%'", XWQL)
-                .<String>execute()
+                .<Object[]>execute()
                 .stream()
+                .flatMap(array -> {
+                    // Oracle returns null for the empty string. Therefore, we need to convert back the null value
+                    // to the empty string.
+                    String locale = Objects.toString(array[1], "");
+                    return resolveDocumentReference(String.valueOf(array[0]), locale).stream();
+                })
                 // Exclude document that are provided by extensions, because they are fixed using the usual xar upgrade
                 // mechanism.
-                .filter(documentReference -> !this.installedXARs.isExtensionDocument(
-                    this.documentReferenceResolver.resolve(documentReference)))
+                .filter(documentReference -> !this.installedXARs.isExtensionDocument(documentReference))
                 .collect(Collectors.toList());
         } catch (QueryException e) {
             throw new DataMigrationException(

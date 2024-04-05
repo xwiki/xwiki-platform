@@ -33,8 +33,8 @@ import org.xwiki.test.ui.po.diff.RenderedChanges;
  */
 public class ChangesPane extends BaseElement
 {
-    private final static String previousChangeSelector = "#changes-info-boxes > a.changes-arrow-left";
-    private final static String nextChangeSelector = "#changes-info-boxes > a.changes-arrow-right";
+    private final static String previousChangeSelector = "#changes-info-boxes > #changes-arrows-box > a.changes-arrow-left";
+    private final static String nextChangeSelector = "#changes-info-boxes > #changes-arrows-box > a.changes-arrow-right";
     private final static String previousFromVersionSelector = "#changes-info-box-from .changes-arrow:first-child";
     private final static String nextFromVersionSelector = "#changes-info-box-from .changes-arrow:last-child";
     private final static String previousToVersionSelector = "#changes-info-box-to .changes-arrow:first-child";
@@ -69,7 +69,7 @@ public class ChangesPane extends BaseElement
     /**
      * The comment for the to version.
      */
-    @FindBy(id = "changes-info-comment")
+    @FindBy(css = "#changes-info-box-to .changes-info-comment")
     private WebElement changeComment;
 
     @FindBy(css = "#changes-info-box-to .changes-version a:not(.changes-arrow)")

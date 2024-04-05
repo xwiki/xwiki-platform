@@ -77,6 +77,14 @@
     transform: translateZ(0);
   }
 }
+
+img + .lightbox-toggle {
+  min-width: @target-size-minimum;
+  min-height: @target-size-minimum;
+  vertical-align: top;
+  margin: 0 0 0 -@target-size-minimum;
+}
+
 #imageToolbarTemplate {
   display: none;
 }

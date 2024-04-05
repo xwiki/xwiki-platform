@@ -25,7 +25,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -428,7 +427,6 @@ public interface XWikiStoreInterface
      * @since 14.2RC1
      * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
      */
-    @Unstable
     @Deprecated(since = "14.8RC1")
     default List<DocumentReference> loadBacklinks(AttachmentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException

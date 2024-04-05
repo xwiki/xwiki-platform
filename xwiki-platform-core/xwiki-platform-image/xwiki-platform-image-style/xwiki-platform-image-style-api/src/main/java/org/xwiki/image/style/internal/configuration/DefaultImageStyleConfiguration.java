@@ -52,7 +52,7 @@ public class DefaultImageStyleConfiguration implements ImageStyleConfiguration
     @Inject
     @Named(ImageStyleConfigurationSource.HINT)
     private ConfigurationSource configurationSource;
-    
+
     @Inject
     private ExecutionContextManager contextManager;
 
@@ -65,6 +65,19 @@ public class DefaultImageStyleConfiguration implements ImageStyleConfiguration
     @Override
     public String getDefaultStyle(String wikiName, String documentReference) throws ImageStyleException
     {
+        return getConfiguration(wikiName, documentReference, "defaultStyle");
+    }
+
+    @Override
+    public boolean getForceDefaultStyle(String wikiName, String documentReference) throws ImageStyleException
+    {
+        Integer forceDefaultStyle = getConfiguration(wikiName, documentReference, "forceDefaultStyle");
+        return forceDefaultStyle != null && forceDefaultStyle == 1;
+    }
+
+    private <T> T getConfiguration(String wikiName, String documentReference, String forceDefaultStyle)
+        throws ImageStyleException
+    {
         try {
             this.contextManager.pushContext(new ExecutionContext(), false);
             XWikiContext context = this.xcontextProvider.get();
@@ -75,7 +88,7 @@ public class DefaultImageStyleConfiguration implements ImageStyleConfiguration
                 XWikiDocument doc = context.getWiki().getDocument(resolvedDocumentReference, context);
                 context.setDoc(doc);
             }
-            return this.configurationSource.getProperty("defaultStyle");
+            return this.configurationSource.getProperty(forceDefaultStyle);
         } catch (ExecutionContextException e) {
             throw new ImageStyleException("Failed to initialize the execution context", e);
         } catch (XWikiException e) {

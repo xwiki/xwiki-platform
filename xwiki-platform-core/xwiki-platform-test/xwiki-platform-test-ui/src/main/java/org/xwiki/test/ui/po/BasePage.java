@@ -600,7 +600,7 @@ public class BasePage extends BaseElement
     public String getErrorContent()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
             .getText();
     }
 
@@ -612,7 +612,7 @@ public class BasePage extends BaseElement
     public boolean hasLeftPanel(String panelTitle)
     {
         return getDriver().hasElementWithoutWaiting(
-            By.xpath("//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle + "']"));
+            By.xpath("//div[@id = 'leftPanels']/div/h2[@class = 'xwikipaneltitle' and text() = '" + panelTitle + "']"));
     }
 
     public boolean isForbidden()
@@ -634,7 +634,7 @@ public class BasePage extends BaseElement
     public String getXWikiMessageContent()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
             .getText();
     }
 
@@ -687,23 +687,31 @@ public class BasePage extends BaseElement
             return;
         }
 
-        long startTime = System.currentTimeMillis();
-        // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
-        // the cache is disabled.
-        if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
-            XWikiWebDriver driver = this.getDriver();
-            AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
-            Results axeResult = axeBuilder.analyze(driver);
-            wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
-            long stopTime = System.currentTimeMillis();
-            long deltaTime = stopTime - startTime;
-            LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
-                this.getPageURL(), this.getClass().getName(), deltaTime);
-            wcagContext.addWCAGTime(deltaTime);
-        } else {
-            // If the identifying pair is already in the cache, don't perform accessibility validation.
-            LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
-                this.getPageURL(), this.getClass().getName());
+        try {
+            long startTime = System.currentTimeMillis();
+            // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
+            // the cache is disabled.
+            if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
+                XWikiWebDriver driver = this.getDriver();
+                AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
+                Results axeResult = axeBuilder.analyze(driver);
+                wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+                long stopTime = System.currentTimeMillis();
+                long deltaTime = stopTime - startTime;
+                LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
+                    this.getPageURL(), this.getClass().getName(), deltaTime);
+                wcagContext.addWCAGTime(deltaTime);
+            } else {
+                // If the identifying pair is already in the cache, don't perform accessibility validation.
+                LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
+                    this.getPageURL(), this.getClass().getName());
+            }
+        } catch (Exception e) {
+            if (wcagContext.shouldWCAGStopOnError()) {
+                throw e;
+            } else {
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+            }
         }
     }
 

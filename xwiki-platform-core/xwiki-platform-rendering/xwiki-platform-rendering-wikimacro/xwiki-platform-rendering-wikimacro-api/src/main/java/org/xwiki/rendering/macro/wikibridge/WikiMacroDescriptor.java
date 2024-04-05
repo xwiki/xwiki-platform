@@ -29,7 +29,6 @@ import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * A {@link MacroDescriptor} for describing wiki macros.
@@ -91,7 +90,6 @@ public class WikiMacroDescriptor implements MacroDescriptor
          * @return this build
          * @since 14.6RC1
          */
-        @Unstable
         public Builder defaultCategories(Collection<String> defaultCategories)
         {
             // Copy the content of the passed set of default categories to be sure to not have a reference to a mutable 

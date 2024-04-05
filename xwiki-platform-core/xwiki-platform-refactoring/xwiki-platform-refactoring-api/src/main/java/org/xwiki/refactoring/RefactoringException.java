@@ -19,15 +19,12 @@
  */
 package org.xwiki.refactoring;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Any exception raised in refactoring related APIs.
  *
  * @version $Id$
  * @since 14.8RC1
  */
-@Unstable
 public class RefactoringException extends Exception
 {
     /**

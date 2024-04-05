@@ -52,6 +52,7 @@ image.style.administration.liveData.type.hint=Der Typ des Bildstils (wird als CS
 image.style.administation.newImageStyle.label=Neuer Bildstil
 image.style.administation.newImageStyle.hint=Kennung des neuen Bildstils.
 image.style.administation.newImageStyle.placeHolder=Kennung
+image.style.administation.newImageStyle.normalizedTitle=Der neue Bildstil, der den Namenskonventionen entspricht, lautet [{0}].
 Image.Style.Code.ImageStyleClass_adjustableAlignment=Einstellbare Ausrichtung
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Wenn diese Option aktiviert ist, kann der Benutzer die Ausrichtung des Bildes anpassen.
 Image.Style.Code.ImageStyleClass_adjustableBorder=Einstellbarer Rahmen
@@ -82,5 +83,7 @@ Image.Style.Code.ImageStyleClass_type=Typ
 Image.Style.Code.ImageStyleClass_type_hint=Der Typ des Bildstils (wird als CSS-Klasse verwendet).
 Image.Style.Code.ConfigurationClass_defaultStyle=Standardstil
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Der Standard-Bildstil für dieses Wiki.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Standard-Stil erzwingen
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Wenn dieses Kontrollkästchen aktiviert ist, werden die Einschränkungen des Standard-Stils in der Bildkonfiguration erzwungen, und die Benutzer sind gezwungen, einen Stil zu wählen.
 </content>
 </xwikidoc>

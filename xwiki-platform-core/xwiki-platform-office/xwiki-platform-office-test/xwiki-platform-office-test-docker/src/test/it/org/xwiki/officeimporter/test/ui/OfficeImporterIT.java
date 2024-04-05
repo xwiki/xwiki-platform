@@ -63,10 +63,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     properties = {
         // Add the FileUploadPlugin which is needed by the test to upload some office files to import
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference)
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.OfficeImporterAdmin"
     }
 )
-public class OfficeImporterIT
+class OfficeImporterIT
 {
     private TestUtils setup;
 
@@ -90,7 +92,7 @@ public class OfficeImporterIT
     }
 
     @Test
-    public void verifyImport(TestInfo info)
+    void verifyImport(TestInfo info)
     {
         verifyImports(info);
         verifySplitByHeadings(info);

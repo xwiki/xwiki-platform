@@ -376,7 +376,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      */
     private XDOM prepareWikiMacroContent()
     {
-        XDOM xdom = this.wikimacro.getContent().clone();
+        XDOM xdom = this.wikimacro.getPreparedContent().clone();
 
         // Macro code segment is always parsed into a separate xdom document. Now if this code segment starts with
         // another macro block, it will always be interpreted as a block macro regardless of the current wiki macro's
@@ -866,7 +866,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     private void transform(Block block, XDOM xdom, boolean async) throws TransformationException
     {
-        TransformationContext transformationContext = new TransformationContext(xdom, this.wikimacro.getSyntax());
+        TransformationContext transformationContext = new TransformationContext(xdom, this.wikimacro.getSourceSyntax());
         transformationContext.setTargetSyntax(this.targetSyntax);
         if (!async) {
             // In synchronized mode keep current transformation id

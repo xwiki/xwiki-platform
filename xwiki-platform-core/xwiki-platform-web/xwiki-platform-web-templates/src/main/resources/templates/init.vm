@@ -129,7 +129,7 @@
         color: #4D4D4D;
         border: 1px solid #E8E8E8;
         background-color: #FFF;
-        border-radius: 4px;
+        border-radius: 7px;
         box-shadow: 0px 0px 7px #E8E8E8;
         padding: 1em;
       }

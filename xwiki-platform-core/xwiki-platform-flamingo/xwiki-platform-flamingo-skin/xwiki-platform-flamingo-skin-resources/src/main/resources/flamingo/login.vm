@@ -36,8 +36,9 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
-<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
+<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform xwiki-submit-once">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
 #if("$!request.srid" != '')
   <input type="hidden" name="srid" value="$!escapetool.xml($request.srid)"/>
@@ -63,14 +64,15 @@
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('user')</span>
     ## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
-    <input class="form-control" type="text" id="j_username" size="60" name="j_username" value="" autofocus />
+    <input class="form-control" type="text" id="j_username" size="60" name="j_username" value=""
+      autocomplete='username' autofocus />
   </dd>
   <dt>
     <label for="j_password">$escapetool.xml($services.localization.render('password'))</label>
   </dt>
   <dd class="input-group">
     <span class="input-group-addon">$services.icon.renderHTML('lock')</span>
-    <input type="password" id="j_password" size="60" name="j_password" value="" />
+    <input type="password" id="j_password" size="60" name="j_password" value="" autocomplete='current-password'/>
   </dd>
   <dt></dt>
   <dd>
@@ -98,7 +100,7 @@
 </dl>
 #xwikimessageboxend()
 </form>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")
 #end

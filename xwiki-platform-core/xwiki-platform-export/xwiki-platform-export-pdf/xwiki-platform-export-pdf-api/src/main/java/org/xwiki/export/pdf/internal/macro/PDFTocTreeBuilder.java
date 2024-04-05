@@ -19,13 +19,19 @@
  */
 package org.xwiki.export.pdf.internal.macro;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.export.pdf.internal.job.DocumentRenderer;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.internal.macro.toc.TocBlockFilter;
 import org.xwiki.rendering.internal.macro.toc.TocTreeBuilder;
+import org.xwiki.rendering.internal.macro.toc.TreeParameters;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.macro.toc.TocEntriesResolver;
+import org.xwiki.rendering.macro.toc.TocEntryExtension;
 
 /**
  * Extends {@link TocTreeBuilder} in order to distinguish between headings that correspond to document titles and
@@ -38,19 +44,23 @@ import org.xwiki.rendering.listener.HeaderLevel;
 public class PDFTocTreeBuilder extends TocTreeBuilder
 {
     /**
-     * Creates a new instance that uses the given filter to generate the TOC anchors.
-     * 
-     * @param tocBlockFilter the filter to use to generate TOC anchors
+     * Initialize a PDF table of content tree builder.
+     *
+     * @param tocBlockFilter the filter to use to generate the toc anchors
+     * @param tocEntriesResolver the resolver to use to find the entries in a given {@link Block}
+     * @param extensions the extensions that will be called on each toc entry, allowing to add additional
+     *     information on the toc entries
      */
-    public PDFTocTreeBuilder(TocBlockFilter tocBlockFilter)
+    public PDFTocTreeBuilder(TocBlockFilter tocBlockFilter, TocEntriesResolver tocEntriesResolver,
+        List<TocEntryExtension> extensions)
     {
-        super(tocBlockFilter);
+        super(tocBlockFilter, tocEntriesResolver, extensions);
     }
 
     @Override
-    protected ListItemBlock createTocEntry(HeaderBlock headerBlock, String documentReference)
+    protected ListItemBlock createTocEntry(HeaderBlock headerBlock, TreeParameters parameters)
     {
-        ListItemBlock listItem = super.createTocEntry(headerBlock, documentReference);
+        ListItemBlock listItem = super.createTocEntry(headerBlock, parameters);
         if (HeaderLevel.LEVEL1.equals(headerBlock.getLevel())
             && !StringUtils.isEmpty(headerBlock.getParameter(DocumentRenderer.PARAMETER_DOCUMENT_REFERENCE))) {
             // The given header block corresponds to a document title, so it marks the beginning of a new document, when

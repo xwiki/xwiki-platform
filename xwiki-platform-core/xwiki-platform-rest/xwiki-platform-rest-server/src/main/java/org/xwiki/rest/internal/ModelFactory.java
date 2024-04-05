@@ -31,7 +31,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -280,7 +279,7 @@ public class ModelFactory
                 String firstPropertyName = propertyNames[0];
                 BaseClass baseClass = xwikiObject.getXClass(this.xcontextProvider.get());
                 PropertyInterface field = baseClass.getField(firstPropertyName);
-                // The property might not exist in the class. But if it does, it will be a PropertyClass. 
+                // The property might not exist in the class. But if it does, it will be a PropertyClass.
                 if (field != null) {
                     String classType = ((com.xpn.xwiki.objects.classes.PropertyClass) field).getClassType();
                     objectSummary.setHeadline(cleanupBeforeMakingPublic(classType, xwikiObject.get(firstPropertyName)));
@@ -305,11 +304,11 @@ public class ModelFactory
         String propertiesUri;
         if (useVersion) {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesAtPageVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
-                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
                 xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         }
 
@@ -397,12 +396,12 @@ public class ModelFactory
             if (useVersion) {
                 propertyUri = Utils
                     .createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
-                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                        toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
                         doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName())
                     .toString();
             } else {
                 propertyUri = Utils.createURI(baseUri, ObjectPropertyResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                    toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
                     xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
             }
             Link propertyLink = this.objectFactory.createLink();
@@ -426,13 +425,12 @@ public class ModelFactory
 
         if (useVersion) {
             objectUri = Utils.createURI(baseUri, ObjectAtPageVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
-                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
+                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
-            objectUri = Utils
-                .createURI(baseUri, ObjectResource.class, doc.getWiki(), Utils.getSpacesFromSpaceId(doc.getSpace()),
-                    doc.getDocumentReference().getName(), xwikiObject.getClassName(), xwikiObject.getNumber())
-                .toString();
+            objectUri = Utils.createURI(baseUri, ObjectResource.class, doc.getWiki(),
+                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         }
         Link objectLink = objectFactory.createLink();
         objectLink.setHref(objectUri);
@@ -493,23 +491,24 @@ public class ModelFactory
             space.setXwikiAbsoluteUrl(home.getExternalURL("view"));
         }
 
-        String pagesUri = Utils.createURI(baseUri, PagesResource.class, wikiName, spaces).toString();
+        List<String> restSpacesValue = toRestSpaces(spaces);
+
+        String pagesUri = Utils.createURI(baseUri, PagesResource.class, wikiName, restSpacesValue).toString();
         Link pagesLink = this.objectFactory.createLink();
         pagesLink.setHref(pagesUri);
         pagesLink.setRel(Relations.PAGES);
         space.getLinks().add(pagesLink);
 
         if (home != null) {
-            String homeUri =
-                Utils.createURI(baseUri, PageResource.class, wikiName, spaces, home.getDocumentReference().getName())
-                    .toString();
+            String homeUri = Utils.createURI(baseUri, PageResource.class, wikiName, restSpacesValue,
+                home.getDocumentReference().getName()).toString();
             Link homeLink = this.objectFactory.createLink();
             homeLink.setHref(homeUri);
             homeLink.setRel(Relations.HOME);
             space.getLinks().add(homeLink);
         }
 
-        String searchUri = Utils.createURI(baseUri, SpaceSearchResource.class, wikiName, spaces).toString();
+        String searchUri = Utils.createURI(baseUri, SpaceSearchResource.class, wikiName, restSpacesValue).toString();
         Link searchLink = this.objectFactory.createLink();
         searchLink.setHref(searchUri);
         searchLink.setRel(Relations.SEARCH);
@@ -533,15 +532,16 @@ public class ModelFactory
             Translation translation = this.objectFactory.createTranslation();
             translation.setLanguage(translations.getDefault());
 
-            String pageTranslationUri = Utils
-                .createURI(baseUri, PageResource.class, doc.getWiki(), spaces, doc.getDocumentReference().getName())
-                .toString();
+            List<String> restSpacesValue = toRestSpaces(spaces);
+
+            String pageTranslationUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(), restSpacesValue,
+                doc.getDocumentReference().getName()).toString();
             Link pageTranslationLink = this.objectFactory.createLink();
             pageTranslationLink.setHref(pageTranslationUri);
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
-            String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), spaces,
+            String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), restSpacesValue,
                 doc.getDocumentReference().getName()).toString();
             Link historyLink = this.objectFactory.createLink();
             historyLink.setHref(historyUri);
@@ -555,15 +555,17 @@ public class ModelFactory
             Translation translation = this.objectFactory.createTranslation();
             translation.setLanguage(locale.toString());
 
-            String pageTranslationUri = Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), locale).toString();
+            List<String> restSpacesValue = toRestSpaces(spaces);
+
+            String pageTranslationUri = Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(),
+                restSpacesValue, doc.getDocumentReference().getName(), locale).toString();
             Link pageTranslationLink = this.objectFactory.createLink();
             pageTranslationLink.setHref(pageTranslationUri);
             pageTranslationLink.setRel(Relations.PAGE);
             translation.getLinks().add(pageTranslationLink);
 
-            String historyUri = Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName(), locale).toString();
+            String historyUri = Utils.createURI(baseUri, PageTranslationHistoryResource.class, doc.getWiki(),
+                restSpacesValue, doc.getDocumentReference().getName(), locale).toString();
             Link historyLink = this.objectFactory.createLink();
             historyLink.setHref(historyUri);
             historyLink.setRel(Relations.HISTORY);
@@ -636,7 +638,8 @@ public class ModelFactory
         }
 
         List<String> spaces = Utils.getSpacesFromSpaceId(doc.getSpace());
-        String spaceUri = Utils.createURI(baseUri, SpaceResource.class, doc.getWiki(), spaces).toString();
+        List<String> restSpacesValue = toRestSpaces(spaces);
+        String spaceUri = Utils.createURI(baseUri, SpaceResource.class, doc.getWiki(), restSpacesValue).toString();
         Link spaceLink = this.objectFactory.createLink();
         spaceLink.setHref(spaceUri);
         spaceLink.setRel(Relations.SPACE);
@@ -644,7 +647,7 @@ public class ModelFactory
 
         if (parentExist) {
             String parentUri = Utils.createURI(baseUri, PageResource.class,
-                parentReference.getWikiReference().getName(), spaces, parentReference.getName()).toString();
+                parentReference.getWikiReference().getName(), restSpacesValue, parentReference.getName()).toString();
             Link parentLink = this.objectFactory.createLink();
             parentLink.setHref(parentUri);
             parentLink.setRel(Relations.PARENT);
@@ -659,8 +662,8 @@ public class ModelFactory
         pageSummary.getLinks().add(historyLink);
 
         if (!doc.getChildren().isEmpty()) {
-            String pageChildrenUri = Utils.createURI(baseUri, PageChildrenResource.class, doc.getWiki(), spaces,
-                doc.getDocumentReference().getName()).toString();
+            String pageChildrenUri = Utils.createURI(baseUri, PageChildrenResource.class, doc.getWiki(),
+                restSpacesValue, doc.getDocumentReference().getName()).toString();
             Link pageChildrenLink = this.objectFactory.createLink();
             pageChildrenLink.setHref(pageChildrenUri);
             pageChildrenLink.setRel(Relations.CHILDREN);
@@ -670,10 +673,10 @@ public class ModelFactory
         if (!doc.getComments().isEmpty()) {
             String commentsUri;
             if (useVersion) {
-                commentsUri = Utils.createURI(baseUri, CommentsVersionResource.class, doc.getWiki(), spaces,
+                commentsUri = Utils.createURI(baseUri, CommentsVersionResource.class, doc.getWiki(), restSpacesValue,
                     doc.getDocumentReference().getName(), doc.getVersion()).toString();
             } else {
-                commentsUri = Utils.createURI(baseUri, CommentsResource.class, doc.getWiki(), spaces,
+                commentsUri = Utils.createURI(baseUri, CommentsResource.class, doc.getWiki(), restSpacesValue,
                     doc.getDocumentReference().getName()).toString();
             }
 
@@ -739,8 +742,10 @@ public class ModelFactory
         PageSummary pageSummary = this.objectFactory.createPageSummary();
         toRestPageSummary(pageSummary, baseUri, doc, false, withPrettyNames);
 
-        String pageUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(),
-            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
+        String pageUri = Utils
+            .createURI(baseUri, PageResource.class, doc.getWiki(),
+                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName())
+            .toString();
         Link pageLink = this.objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -781,7 +786,6 @@ public class ModelFactory
             page.setOriginalMetadataAuthorName(
                 xwikiContext.getWiki().getUserName(originalAuthor, null, false, xwikiContext));
         }
-
 
         calendar = Calendar.getInstance();
         calendar.setTime(doc.getContentUpdateDate());
@@ -957,9 +961,10 @@ public class ModelFactory
 
         String wiki = documentReference.getWikiReference().getName();
         List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
+        List<String> restSpacesValue = toRestSpaces(spaces);
 
         String pageUri =
-            Utils.createURI(baseUri, PageResource.class, wiki, spaces, documentReference.getName()).toString();
+            Utils.createURI(baseUri, PageResource.class, wiki, restSpacesValue, documentReference.getName()).toString();
         Link pageLink = this.objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -967,10 +972,13 @@ public class ModelFactory
 
         String attachmentUri;
         if (versionURL) {
-            attachmentUri = Utils.createURI(baseUri, AttachmentVersionResource.class, wiki, spaces,
-                documentReference.getName(), xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
+            attachmentUri =
+                Utils
+                    .createURI(baseUri, AttachmentVersionResource.class, wiki, restSpacesValue,
+                        documentReference.getName(), xwikiAttachment.getFilename(), xwikiAttachment.getVersion())
+                    .toString();
         } else {
-            attachmentUri = Utils.createURI(baseUri, AttachmentResource.class, wiki, spaces,
+            attachmentUri = Utils.createURI(baseUri, AttachmentResource.class, wiki, restSpacesValue,
                 documentReference.getName(), xwikiAttachment.getFilename()).toString();
         }
 
@@ -980,7 +988,7 @@ public class ModelFactory
         attachment.getLinks().add(attachmentLink);
 
         Link attachmentMetadataLink = this.objectFactory.createLink();
-        attachmentMetadataLink.setHref(Utils.createURI(baseUri, AttachmentMetadataResource.class, wiki, spaces,
+        attachmentMetadataLink.setHref(Utils.createURI(baseUri, AttachmentMetadataResource.class, wiki, restSpacesValue,
             documentReference.getName(), xwikiAttachment.getFilename()).toString());
         attachmentMetadataLink.setRel(Relations.ATTACHMENT_METADATA);
         attachment.getLinks().add(attachmentMetadataLink);
@@ -1044,6 +1052,19 @@ public class ModelFactory
         } else {
             return "";
         }
+    }
+
+    private static List<String> toRestSpaces(List<String> spaces)
+    {
+        List<String> restSpaces = new ArrayList<>(spaces.size());
+        spaces.forEach(s -> {
+            if (!restSpaces.isEmpty()) {
+                restSpaces.add("spaces");
+            }
+            restSpaces.add(s);
+        });
+
+        return restSpaces;
     }
 
     /**
@@ -1217,8 +1238,7 @@ public class ModelFactory
         Iterable<LogEvent> logs;
         if (level != null) {
             LogLevel logLevel = LogLevel.valueOf(level.toUpperCase());
-            logs = logQueue.getLogEvents(logLevel).stream().filter(log -> log.getLevel() == logLevel)
-                .collect(Collectors.toList());
+            logs = logQueue.getLogEvents(logLevel).stream().filter(log -> log.getLevel() == logLevel).toList();
         } else if (fromLevel != null) {
             logs = logQueue.getLogEvents(LogLevel.valueOf(fromLevel.toUpperCase()));
         } else {
@@ -1278,12 +1298,11 @@ public class ModelFactory
             cleanedUpStringValue = null;
         } else {
             cleanedUpStringValue = serializePropertyValue(baseProperty);
-            // We obfuscate the email only if the obfuscation has been activated, and if the current user does not have 
+            // We obfuscate the email only if the obfuscation has been activated, and if the current user does not have
             // the right to edit the document containing the base property.
-            // A user allowed to edit a document has to view the unescaped email to be able to edit it correctly. 
+            // A user allowed to edit a document has to view the unescaped email to be able to edit it correctly.
             if (Objects.equals(type, "Email") && this.generalMailConfiguration.get().shouldObfuscate()
-                && !this.authorizationManagerProvider.get().hasAccess(Right.EDIT, baseProperty.getReference()))
-            {
+                && !this.authorizationManagerProvider.get().hasAccess(Right.EDIT, baseProperty.getReference())) {
                 try {
                     cleanedUpStringValue =
                         this.emailAddressObfuscator.get().obfuscate(InternetAddress.parse(cleanedUpStringValue)[0]);

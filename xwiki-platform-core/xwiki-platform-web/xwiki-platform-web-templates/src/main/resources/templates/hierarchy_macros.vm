@@ -246,14 +246,18 @@
 #end
 
 #macro (getHierarchyPathData_url $reference)
-  #if ($reference.type == 'OBJECT')
+  ## Extract the closest parent of type OBJECT (can be self), and if found use it to generate a link directly
+  ## to the object. We extract the reference so that entity reference with an OBJECT parent (e.g., an OBJECT_PROPERTY)
+  ## also generate a link to their object. 
+  #set ($objectReference = $!reference.extractFirstReference('OBJECT'))
+  #if ("$!objectReference" != "")
     #if ($services.security.authorization.hasAccess('edit', $reference))
-      #if ($reference.objectNumber)
-        #set ($objectNumber = $reference.objectNumber)
-        #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
+      #if ($objectReference.objectNumber)
+        #set ($objectNumber = $objectReference.objectNumber)
+        #set ($objectType = $services.model.serialize($objectReference.xClassReference, 'local'))
       #else
-        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
-        #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
+        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($objectReference.name, ']'), '['))
+        #set ($objectType = $stringtool.substringBeforeLast($objectReference.name, '['))
       #end
       #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
         'editor': 'object',

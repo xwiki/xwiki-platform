@@ -83,7 +83,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class LegacyDefaultNotificationParametersFactoryTest
+class LegacyDefaultNotificationParametersFactoryTest
 {
     private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "Foo");
 
@@ -220,7 +220,7 @@ public class LegacyDefaultNotificationParametersFactoryTest
     }
 
     @Test
-    public void valueOfIgnoreCase()
+    void valueOfIgnoreCase()
     {
         assertEquals(ParametersKey.CURRENT_WIKI, ParametersKey.valueOfIgnoreCase("currentwiki"));
         assertEquals(ParametersKey.CURRENT_WIKI, ParametersKey.valueOfIgnoreCase("current_wiki"));
@@ -231,7 +231,7 @@ public class LegacyDefaultNotificationParametersFactoryTest
     }
 
     @Test
-    public void createNotificationParameters() throws Exception
+    void createNotificationParameters() throws Exception
     {
         when(this.configuration.isEventPrefilteringEnabled()).thenReturn(false);
 
@@ -357,7 +357,7 @@ public class LegacyDefaultNotificationParametersFactoryTest
         parametersMap.remove(ParametersKey.CURRENT_WIKI);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
-        verify(wikiDescriptorManager, times(2)).getCurrentWikiId();
+        verify(wikiDescriptorManager, times(3)).getCurrentWikiId();
     }
 
     private DefaultNotificationFilterPreference getFilterPreference(String property, int number)

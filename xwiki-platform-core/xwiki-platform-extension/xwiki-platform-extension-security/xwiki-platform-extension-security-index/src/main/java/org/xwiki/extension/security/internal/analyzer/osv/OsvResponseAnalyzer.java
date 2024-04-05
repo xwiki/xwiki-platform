@@ -20,9 +20,11 @@
 package org.xwiki.extension.security.internal.analyzer.osv;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -42,8 +44,8 @@ import org.xwiki.extension.security.internal.analyzer.osv.model.response.VulnObj
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
 
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-import static org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer.PLATFORM_PREFIX;
 
 /**
  * Analyze the provided {@link OsvResponse} and return an {@link ExtensionSecurityAnalysisResult}.
@@ -55,7 +57,6 @@ import static org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSec
 @Singleton
 public class OsvResponseAnalyzer
 {
-
     @Inject
     private Logger logger;
 
@@ -79,23 +80,54 @@ public class OsvResponseAnalyzer
         }
 
         return new ExtensionSecurityAnalysisResult()
-            .setResults(matchingVulns.stream().map(vulnObject -> convert(vulnObject, new DefaultVersion(version)))
-                .collect(Collectors.toList()));
+            .setResults(
+                matchingVulns.stream().flatMap(vulnObject -> convert(vulnObject, new DefaultVersion(version)).stream())
+                    .collect(Collectors.toList()));
     }
 
-    private SecurityVulnerabilityDescriptor convert(VulnObject vulnObject, Version currentVersion)
+    private Optional<SecurityVulnerabilityDescriptor> convert(VulnObject vulnObject, Version currentVersion)
     {
-        return new SecurityVulnerabilityDescriptor()
-            .setId(vulnObject.getId())
-            .setURL(vulnObject.getMainURL())
-            .setSeverityScore(vulnObject.getSeverityCCSV3())
-            .setFixVersion(vulnObject.getMaxFixVersion(currentVersion).orElse(null));
+        return resolveId(vulnObject)
+            .map(id -> new SecurityVulnerabilityDescriptor()
+                .setId(id)
+                .setAliases(resolveAliases(vulnObject, id))
+                .setURL(vulnObject.getMainURL())
+                .setSeverityScore(vulnObject.getSeverityCCSV3())
+                .setFixVersion(vulnObject.getMaxFixVersion(currentVersion).orElse(null)));
+    }
+
+    private Set<String> resolveAliases(VulnObject vulnObject, String id)
+    {
+        Set<String> aliases = new HashSet<>();
+        aliases.add(vulnObject.getId());
+        aliases.addAll(vulnObject.getAliases());
+        aliases.remove(id);
+        return aliases;
+    }
+
+    /**
+     * Resolve the ID of the provided {@link VulnObject} by looking for an alias starting with "CVE-".
+     *
+     * @param vulnObject the vulnerability object
+     * @return an alias starting with "CVE-", or the original ID if no appropriate alias is found
+     */
+    private Optional<String> resolveId(VulnObject vulnObject)
+    {
+        Optional<String> first = vulnObject.getAliases()
+            .stream()
+            .filter(it -> startsWith(it, "CVE-"))
+            .findFirst();
+        if (first.isEmpty()) {
+            // We fall back to the first id if no CVE id is found.
+            first = vulnObject.getAliases().stream().findFirst();
+        }
+        return first;
     }
 
     private Optional<VulnObject> analyzeVulnerability(String mavenId, String version, VulnObject vuln)
     {
         Optional<VulnObject> rvuln = Optional.empty();
-        boolean isPlatform = mavenId.startsWith(PLATFORM_PREFIX);
+        boolean isPlatform = OsvExtensionSecurityAnalyzer.isNotOnMavenCentral(mavenId);
         if (!isPlatform || isMatchesOneRange(mavenId, version, vuln)) {
             rvuln = Optional.of(vuln);
         }

@@ -233,7 +233,7 @@
       #end
     #end
     <dt>
-      <label>$services.localization.render('core.create.type')</label>
+      <span class='label'>$services.localization.render('core.create.type')</span>
       <span class="xHint">$escapetool.xml($services.localization.render('core.create.type.hint'))</span>
     </dt>
     #set ($defaultValue = $request.type)
@@ -359,7 +359,7 @@
           ## need to show this information elsewhere. Even if the target page reference can't be modified by the user,
           ## they should still see where the page is going to be created.
           <dt>
-            <label>$escapetool.xml($services.localization.render('core.create.pageTitle'))</label>
+            <span class='label'>$escapetool.xml($services.localization.render('core.create.pageTitle'))</span>
           </dt>
           <dl>
             #set ($targetDocumentReference = $services.model.createDocumentReference($name, $spaceReference))

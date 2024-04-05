@@ -22,6 +22,7 @@ package org.xwiki.image.style.test.ui;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -37,6 +38,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -71,7 +74,7 @@ class ImageStyleIT
         testUtils.updateObject(new DocumentReference(wikiName, List.of("Image", "Style", "Code"), "Configuration"),
             "Image.Style.Code.ConfigurationClass", 0, "defaultStyle", "");
 
-        assertEquals("<MapN/>", getDefaultFromRest(testUtils, wikiReference));
+        assertEquals(Map.of(), getDefaultFromRest(testUtils, wikiReference));
 
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<styles xmlns=\"http://www.xwiki.org/imageStyle\"/>", getImageStylesFromRest(testUtils, wikiReference));
@@ -95,7 +98,7 @@ class ImageStyleIT
         assertEquals(defaultPrettyName, tableLayout.getCell("Pretty Name", 1).getText());
         assertEquals(type, tableLayout.getCell("Type", 1).getText());
 
-        assertEquals(String.format("<Map1><defaultStyle>%s</defaultStyle></Map1>", defaultName),
+        assertEquals(Map.of("forceDefaultStyle", "false", "defaultStyle", defaultName),
             getDefaultFromRest(testUtils, wikiReference));
 
         assertEquals(String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
@@ -105,8 +108,8 @@ class ImageStyleIT
             + "<prettyName>%s</prettyName>"
             + "<type>%s</type>"
             + "<adjustableSize>false</adjustableSize>"
-            + "<defaultWidth xsi:nil=\"true\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"/>"
-            + "<defaultHeight xsi:nil=\"true\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"/>"
+            + "<defaultWidth xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"true\"/>"
+            + "<defaultHeight xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"true\"/>"
             + "<adjustableBorder>false</adjustableBorder>"
             + "<defaultBorder>false</defaultBorder>"
             + "<adjustableAlignment>false</adjustableAlignment>"
@@ -117,13 +120,15 @@ class ImageStyleIT
             + "</styles>", defaultName, defaultPrettyName, type), getImageStylesFromRest(testUtils, wikiReference));
     }
 
-    private String getDefaultFromRest(TestUtils testUtils, WikiReference wikiReference) throws Exception
+    private Map<?, ?> getDefaultFromRest(TestUtils testUtils, WikiReference wikiReference) throws Exception
     {
         URI imageStylesResourceURI =
             testUtils.rest().createUri(ImageStylesResource.class, new HashMap<>(), wikiReference.getName());
-        GetMethod getMethod =
-            testUtils.rest().executeGet(UriBuilder.fromUri(imageStylesResourceURI).segment("default").build());
-        return getMethod.getResponseBodyAsString();
+        GetMethod getMethod = testUtils.rest().executeGet(UriBuilder.fromUri(imageStylesResourceURI)
+            .segment("default")
+            .queryParam("media", "json")
+            .build());
+        return new ObjectMapper().readValue(getMethod.getResponseBodyAsString(), Map.class);
     }
 
     private String getImageStylesFromRest(TestUtils testUtils, WikiReference wikiReference) throws Exception

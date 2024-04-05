@@ -232,21 +232,22 @@
 #panelheader($services.localization.render('panels.applications.title'))
 
 {{html}}
-&lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
+&lt;ul class="applicationsPanel nav"&gt;
   ## Get the blacklist configuration
   #set ($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode',
     'ApplicationsPanelConfiguration')))
   #displayAppPanelEntries('org.xwiki.platform.panels.Applications' $configDoc)
 &lt;/ul&gt;
-&lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
+&lt;ul class="applicationsPanel applicationsPanelMoreList nav"&gt;
   &lt;li&gt;
-    &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin',
-        'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton" title="$services.localization.render('panels.applications.more')"&gt;
+    #set ($panelId = 'applicationPanelMoreContainer' + $util.generateRandomString(10))
+    &lt;button class='applicationPanelMoreButton' aria-controls="$panelId"
+      title="$services.localization.render('panels.applications.more')" aria-expanded='false' &gt;
       &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;
       &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;
-    &lt;/a&gt;
-    &lt;div class="applicationPanelMoreContainer hidden"&gt;
-      &lt;ul class="nav nav-pills nav-stacked"&gt;
+    &lt;/button&gt;
+    &lt;div id="$panelId" class="applicationPanelMoreContainer hidden"&gt;
+      &lt;ul class="nav"&gt;
         #displayAppPanelEntries('org.xwiki.platform.panels.Applications.more')
       &lt;/ul&gt;
     &lt;/div&gt;
@@ -365,7 +366,6 @@ panels.MoreApplicationsButtonListener = Class.create({
 
     var moreAppsCount = this.container.select('.application-label').length;
     if (moreAppsCount &gt; 0) {
-      this.container.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
       this.isToggling = false;
       this.button.observe('click', function(e) {
         e.stop();
@@ -389,6 +389,7 @@ panels.MoreApplicationsButtonListener = Class.create({
         duration: 0.1,
         afterFinish: function() {
           this.isToggling = false;
+          this.button.setAttribute('aria-expanded','true');
         }.bind(this)
       });
     } else {
@@ -399,6 +400,7 @@ panels.MoreApplicationsButtonListener = Class.create({
         afterFinish: function() {
           this.container.addClassName('hidden');
           this.isToggling = false;
+          this.button.setAttribute('aria-expanded','false');
         }.bind(this)
       });
     }
@@ -532,10 +534,6 @@ require(['scriptaculous/effects'], function() {
     <property>
       <code>#template('colorThemeInit.vm')
 
-.applicationsPanelMoreList {
-  margin-top: 1em;
-}
-
 .applicationsPanel li img {
   float: left;
   width: 16px;
@@ -553,6 +551,30 @@ require(['scriptaculous/effects'], function() {
   margin-left: 0.1em;
 }
 
+.applicationPanelMoreButton {
+  padding: 0;
+  margin: 10px 0 0 0;
+  border: 0;
+  color: $theme.linkColor;
+  box-shadow: none;
+  background-color: transparent;
+  width: 100%;
+  display: flex;
+  text-align: left;
+}
+
+.applicationPanelMoreButton:hover,
+.applicationPanelMoreButton:focus {
+  background-color: $theme.highlightColor;
+}
+
+.applicationPanelMoreButton .application-label {
+  white-space: normal;
+  text-align: left;
+  display: inline;
+  margin-left: 20px;
+}
+
 .applicationPanelMoreContainer ul {
   margin-left: 5px;
 }
@@ -562,10 +584,26 @@ require(['scriptaculous/effects'], function() {
   line-height: 16px;
 }
 
-.applicationPanelMoreContainer > ul > li > a {
+.applicationPanelMoreContainer &gt; ul &gt; li &gt; a {
   display: flex;
   align-items: center;
-  gap: 1em;
+  margin-left: 15px;
+}
+
+.panel-width-Small .applicationPanelMoreContainer > ul > li > a {
+  gap: .5em;
+  text-align: left;
+  margin-left: 0;
+}
+
+.panel-width-Small .applicationPanelMoreButton {
+  flex-direction: column;
+  padding: 0;
+  text-align: center;
+}
+
+.panel-width-Small .applicationPanelMoreButton .application-label {
+  text-align: center;
 }
 
 .panel-width-Small .panel.Applications {
@@ -613,22 +651,9 @@ require(['scriptaculous/effects'], function() {
   padding: 0;
 }
 
-.panel-width-Small .applicationPanelMoreContainer ul {
+.panel .applicationPanelMoreContainer ul {
   padding: 0;
   margin: 0;
-  background-color: $theme.pageContentBackgroundColor;
-}
-
-.panel-width-Small .applicationPanelMoreContainer ul li:hover {
-  background-color: $theme.highlightColor;
-}
-
-.panel-width-Small .applicationPanelMoreContainer ul li:hover a {
-  color: $theme.textPrimaryColor;
-}
-
-.panel-width-Small .applicationPanelMoreContainer > ul > li > a {
-  justify-content: center;
 }
 
 .panel-width-Small .application-img {
@@ -641,24 +666,24 @@ require(['scriptaculous/effects'], function() {
 }
 
 .panel-width-Medium .applicationsPanel &gt; li &gt; a,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a,
 .panel-width-Large .applicationsPanel &gt; li &gt; a,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a {
   padding: 0;
 }
 
 .panel-width-Medium .applicationsPanel &gt; li &gt; a:hover,
 .panel-width-Medium .applicationsPanel &gt; li &gt; a:focus,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:hover,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:focus,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button:hover,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button:focus,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:hover,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:focus,
 .panel-width-Large .applicationsPanel &gt; li &gt; a:hover,
 .panel-width-Large .applicationsPanel &gt; li &gt; a:focus,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:hover,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:focus,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button:hover,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button:focus,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:focus {
   background-color: transparent;
@@ -667,7 +692,7 @@ require(['scriptaculous/effects'], function() {
 
 /* Phone case */
 @media (max-width: 768px) {
-  .panel-width-Small .applicationsPanel > li {
+  .panel-width-Small .applicationsPanel &gt; li {
     float: left;
     width: 33%;
   }
@@ -680,7 +705,7 @@ require(['scriptaculous/effects'], function() {
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
-  .panel-width-Small .applicationsPanel > li {
+  .panel-width-Small .applicationsPanel &gt; li {
     float: left;
     width: 20%;
   }
@@ -694,24 +719,15 @@ require(['scriptaculous/effects'], function() {
 
 /* for colibri */
 
-.skin-colibri .applicationPanelMoreContainer ul {
-  margin-left: 0;
-}
-
-.skin-colibri .panel-width-Medium .applicationPanelMoreContainer ul,
-.skin-colibri .panel-width-Large .applicationPanelMoreContainer ul {
-  margin-left: 20px;
-}
-
 .skin-colibri .panel-width-Small .applicationsPanel {
   margin: 0;
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li {
   padding: 15px 0;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  border-radius: 7px;
   margin: 1px 0;
 }
 

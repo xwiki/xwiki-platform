@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Extension.Security.Code.Translations" locale="ru">
+  <web>XWiki.Extension.Security.Code</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Extension.Security.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>extension.security.admin.title=Уязвимости
+extension.security.indexed.started=Индексация началась в {0}.
+extension.security.indexed.on=Индексировано {0}. Любые расширения, установленные после этой даты, или уязвимости безопасности, выпущенные после этой даты, не будут отображаться. Новые проверки безопасности выполняются периодически.
+extension.security.indexed.nojob=Не удалось найти ни одной предыдущей индексации.
+extension.security.admin.generalWarning=Обратите внимание, что данная проверка безопасности не охватывает все установленные расширения. Расширения, которые не могут быть обновлены через Менеджер расширений, в настоящее время не учитываются.
+extension.security.admin.configuration.title=Конфигурация
+extension.security.admin.environment.explanation=Расширения, перечисленные в этом разделе, имеют известные уязвимости, но находятся за пределами границ XWiki. Это означает, что расширения предоставляются окружением, в котором работает XWiki (например, движком сервлетов), и не могут быть устранены путем обновления XWiki или одного из его расширений.
+extension.security.notification.message=Мы выявили {0} расширений с известными уязвимостями, подробности смотри в отчете {1}
+extension.security.experimental.warning=Имейте в виду, что это расширение в настоящее время является экспериментальным и может привести к представлению неточного анализа. Поэтому, прежде чем предпринимать какие-либо действия, следует внимательно ознакомиться с представленными результатами. 
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Сканирование включено
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Если флажок снят, проверка безопасности больше не будет выполняться
+XWiki.Extension.Security.Code.ConfigClass_scanDelay=Задержка сканирования
+XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Количество часов ожидания между двумя сканированиями безопасности (по умолчанию: 24 часа)
+XWiki.Extension.Security.Code.ConfigClass_scanURL=URL сканирования
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=URL который будет использоваться в качестве удаленного источника для сканирования безопасности ( по умолчанию: https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=URL рецензий
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=URL используемый в качестве удаленного источника для рецензий проверок безопасности (по умолчанию: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
+</content>
+  </xwikidoc>

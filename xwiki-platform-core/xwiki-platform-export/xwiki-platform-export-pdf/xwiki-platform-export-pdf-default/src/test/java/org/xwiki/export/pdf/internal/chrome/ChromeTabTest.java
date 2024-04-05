@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
 import com.github.kklisura.cdt.protocol.commands.IO;
@@ -76,6 +77,9 @@ class ChromeTabTest
     @Mock(name = "browserDevToolsService")
     private ChromeDevToolsService browserDevToolsService;
 
+    @Mock
+    private PDFExportConfiguration configuration;
+
     private ChromeTab chromeTab;
 
     @Captor
@@ -92,8 +96,9 @@ class ChromeTabTest
     {
         when(this.tabDevToolsService.getRuntime()).thenReturn(this.runtime);
         when(this.tabDevToolsService.getPage()).thenReturn(this.page);
+        when(this.configuration.getChromeRemoteDebuggingTimeout()).thenReturn(10);
 
-        this.chromeTab = new ChromeTab(this.tabDevToolsService, this.browserDevToolsService);
+        this.chromeTab = new ChromeTab(this.tabDevToolsService, this.browserDevToolsService, this.configuration);
     }
 
     @Test
@@ -179,7 +184,7 @@ class ChromeTabTest
         when(this.runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
             /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
             /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
-            /* throwOnSideEffect */ false, /* timeout */ ChromeManager.REMOTE_DEBUGGING_TIMEOUT * 1000.0,
+            /* throwOnSideEffect */ false, /* timeout */ 10000.0,
             /* disableBreaks */ true, /* replMode */ false, /* allowUnsafeEvalBlockedByCSP */ false,
             /* uniqueContextId */ null)).thenReturn(evaluate);
 
@@ -205,7 +210,7 @@ class ChromeTabTest
         when(this.runtime.evaluate(/* expression */ pageReadyPromise, /* objectGroup */ null,
             /* includeCommandLineAPI */ false, /* silent */ false, /* contextId */ null, /* returnByValue */ true,
             /* generatePreview */ false, /* userGesture */ false, /* awaitPromise */ true,
-            /* throwOnSideEffect */ false, /* timeout */ ChromeManager.REMOTE_DEBUGGING_TIMEOUT * 1000.0,
+            /* throwOnSideEffect */ false, /* timeout */ 10000.0,
             /* disableBreaks */ true, /* replMode */ false, /* allowUnsafeEvalBlockedByCSP */ false,
             /* uniqueContextId */ null)).thenReturn(evaluate);
 

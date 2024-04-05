@@ -89,7 +89,7 @@ public class LESSSkinFileResourceReferenceTest
 
         // Verify
         assertNotNull(caughtException);
-        assertEquals("The template [not-existing-file.less] does not exists.", caughtException.getMessage());
+        assertEquals("The template [not-existing-file.less] does not exist.", caughtException.getMessage());
     }
 
     @Test

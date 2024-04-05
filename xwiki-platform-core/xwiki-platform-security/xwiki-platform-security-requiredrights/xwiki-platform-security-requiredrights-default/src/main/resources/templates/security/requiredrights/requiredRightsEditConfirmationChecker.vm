@@ -1,0 +1,142 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Since 15.9RC1
+## Present a summary of the required rights raised for the current user when trying to edit a document
+##!source.syntax=xwiki/2.1
+{{velocity output='false'}}
+#template("display_macros.vm")
+#template("hierarchy_macros.vm")
+#macro (displayResults $analysis)
+  #foreach ($entry in $analysis.entrySet())
+
+  {{html}}
+    #set ($entityReference = $entry.key)
+    #define($elementUrl)
+      #getHierarchyPathData_url($entityReference)
+      $url
+    #end
+    #if ($entityReference.type == 'DOCUMENT')
+      #set ($translatedDocument = $xwiki.getDocument($entityReference).translatedDocument)
+      #set ($entityLabel = $translatedDocument.plainTitle)
+    #else
+      #set ($entityLabel = $entityReference.name)
+    #end
+    <h3 class="group-title">
+      <a href="$escapetool.xml($elementUrl)">
+        $escapetool.xml($entityLabel)
+      </a>
+    </h3>
+    #foreach($res in $entry.value)
+    <div class="panel-group" id="required-rights-result-list${counter}" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading${counter}">
+        <span class="panel-title">
+          <a role="button"
+             data-toggle="collapse"
+             data-parent="#required-rights-result-list${counter}"
+             href="#collapse${counter}"
+             aria-expanded="false"
+             aria-controls="collapse${counter}">
+            <span class="icon-collapsed">$services.icon.renderHTML('caret-right')</span>
+            <span class="icon-expanded">$services.icon.renderHTML('caret-down')</span>
+            $services.rendering.render($res.summaryMessage, 'html/5.0')
+          </a>
+        </span>
+        </div>
+        <div id="collapse${counter}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading${counter}">
+          <div class="panel-body">
+            $services.rendering.render($res.detailedMessage, 'html/5.0')
+          </div>
+        </div>
+      </div>
+    </div>
+      #set ($counter = $counter + 1)
+    #end
+  {{/html}}
+  #end
+#end
+#macro(displayRightsSentence $rightsMap $translationKey)
+  #set ($footnoteChar = $services.localization.render('security.requiredrights.confirmationChecker.footnoteChar'))
+  #if(!$rightsMap.isEmpty())
+  {{html}}
+    <div>
+      #set ($translatedMessage = $services.localization.render($translationKey))
+      <p>$escapetool.xml($translatedMessage)</p>
+      <ul>
+      #foreach ($entry in $rightsMap.entrySet())
+        <li>$entry.key#if ($entry.value)<sup>$escapetool.xml($footnoteChar)</sup>#end</li>
+      #end
+      </ul>
+    </div>
+  {{/html}}
+
+  #end
+#end
+#set ($counter = 0)
+#initRequiredSkinExtensions()
+#set ($discard = $xwiki.ssrx.use('css/security/requiredrights/requiredRightsEditConfirmationChecker.css'))
+#set ($discard = $xwiki.jsrx.use('js/security/requiredrights/requiredRightsEditConfirmationChecker.js'))
+{{/velocity}}
+
+{{velocity}}
+#displayRightsSentence($analysisResults.getAddedRights() 'security.requiredrights.confirmationChecker.addedRights')
+#displayRightsSentence($analysisResults.getRemovedRights() 'security.requiredrights.confirmationChecker.removedRights')
+#if ($analysisResults.hasRightWithManualReviewNeeded())
+  #set ($footnoteMessage = 
+    $services.localization.render( 'security.requiredrights.confirmationChecker.footnoteSentence', [
+      $services.localization.render('security.requiredrights.confirmationChecker.footnoteChar')
+    ]))
+  $services.rendering.escape($footnoteMessage, 'xwiki/2.1')
+
+#end
+#if ($analysisResults.hasAdded() || $analysisResults.hasRemoved())##
+{{html}}
+<a href="#" class="required-rights-advanced-toggle" aria-controls="requiredRightsResults" aria-expanded="false">
+  <span class="toggle-expand">
+    $services.icon.renderHTML('caret-right')
+    $escapetool.xml($services.localization.render('security.requiredrights.confirmationChecker.showDetails'))
+  </span>
+  <span class="toggle-collapse hidden">
+    $services.icon.renderHTML('caret-down')
+    $escapetool.xml($services.localization.render('security.requiredrights.confirmationChecker.hideDetails'))
+  </span>
+</a>
+{{/html}}
+
+(% class='hidden required-rights-results' aria-labelledby="advanced-toggle" aria-expanded="false" %)(((
+  #if ($analysisResults.hasAdded())
+    ((({{translation key='security.requiredrights.confirmationChecker.advanced.explanations.addedRights'/}})))
+    #displayResults($analysisResults.getAddedAsMap())
+  #end
+  #if($analysisResults.hasAdded() && $analysisResults.hasRemoved())
+    \\
+  #end
+  #if($analysisResults.hasRemoved())
+    ((({{translation key='security.requiredrights.confirmationChecker.advanced.explanations.removedRights'/}})))
+    #displayResults($analysisResults.getRemovedAsMap())
+  #end
+  )))
+#end
+{{/velocity}}
+
+{{velocity output='false'}}
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+{{/velocity}}

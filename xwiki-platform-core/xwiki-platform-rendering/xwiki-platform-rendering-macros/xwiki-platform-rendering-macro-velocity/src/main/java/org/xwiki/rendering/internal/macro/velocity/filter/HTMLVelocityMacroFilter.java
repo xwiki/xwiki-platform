@@ -31,10 +31,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
+import org.xwiki.velocity.VelocityTemplate;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
+import org.xwiki.velocity.internal.util.VelocityBlock.VelocityType;
 import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
-import org.xwiki.velocity.internal.util.VelocityBlock.VelocityType;
 
 /**
  * Replace each white space/new lines group by a space and inject $nl and $sp bindings in {@link VelocityContext} which
@@ -92,12 +93,35 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
     }
 
     @Override
-    public String before(String content, VelocityContext velocityContext)
+    public boolean isPreparationSupported()
+    {
+        return true;
+    }
+
+    private void before(VelocityContext velocityContext)
     {
         // Add bindings
         velocityContext.put(BINDING_NEWLINE, NEWLINE);
         velocityContext.put(BINDING_SPACE, SPACE);
+    }
 
+    @Override
+    public String before(String content, VelocityContext velocityContext)
+    {
+        before(velocityContext);
+
+        return prepare(content);
+    }
+
+    @Override
+    public void before(VelocityTemplate content, VelocityContext velocityContext)
+    {
+        before(velocityContext);
+    }
+
+    @Override
+    public String prepare(String content)
+    {
         return clean(content);
     }
 

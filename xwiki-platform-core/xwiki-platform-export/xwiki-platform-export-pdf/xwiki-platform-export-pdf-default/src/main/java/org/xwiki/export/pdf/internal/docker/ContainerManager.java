@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -98,7 +97,7 @@ public class ContainerManager implements Initializable
         // The previous name filtering doesn't perform exact matching (it's more of a partial / contains search).
         containers = containers.stream().filter(container -> {
             return Arrays.asList(container.getNames()).contains("/" + containerName);
-        }).collect(Collectors.toList());
+        }).toList();
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
@@ -157,10 +156,11 @@ public class ContainerManager implements Initializable
      * @param imageName the image to use for the new container
      * @param containerName the name to associate with the created container
      * @param parameters the parameters to specify when creating the container
+     * @param envVars the environment variables to set when creating the container
      * @param hostConfig the host configuration
      * @return the id of the created container
      */
-    public String createContainer(String imageName, String containerName, List<String> parameters,
+    public String createContainer(String imageName, String containerName, List<String> parameters, List<String> envVars,
         HostConfig hostConfig)
     {
         this.logger.debug("Creating a Docker container with name [{}] using image [{}] and having parameters [{}].",
@@ -168,9 +168,9 @@ public class ContainerManager implements Initializable
 
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
             List<ExposedPort> exposedPorts =
-                hostConfig.getPortBindings().getBindings().keySet().stream().collect(Collectors.toList());
+                hostConfig.getPortBindings().getBindings().keySet().stream().toList();
             CreateContainerResponse container = createContainerCmd.withName(containerName).withLabels(DEFAULT_LABELS)
-                .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
+                .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).withEnv(envVars).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
             return container.getId();
         }

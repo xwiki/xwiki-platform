@@ -120,7 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('panels.siblings.title'))
+#navigationPanelHeader($services.localization.render('panels.siblings.title'))
 ## Escape special characters in macro parameter values.
 #set ($homeName = $services.model.getEntityReference('DOCUMENT', 'default').name)
 #set ($spaceHome = $services.model.createEntityReference($homeName, 'DOCUMENT', $doc.documentReference.parent))

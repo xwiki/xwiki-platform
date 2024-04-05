@@ -246,6 +246,10 @@
     originalViewPrototype = CKEDITOR.tools.copy(View.prototype);
 
   Object.assign(AutoComplete.prototype, {
+    attach: function() {
+      originalAutoCompletePrototype.attach.apply(this, arguments);
+      this.view.element.setAttribute('aria-label', this.view.editor.localization.get('xwiki-slash.dropdown.hint'));
+    },
     open: function() {
       originalAutoCompletePrototype.open.apply(this, arguments);
       // Include the query in the view so that we can properly wait for the auto-complete drop-down in our integration

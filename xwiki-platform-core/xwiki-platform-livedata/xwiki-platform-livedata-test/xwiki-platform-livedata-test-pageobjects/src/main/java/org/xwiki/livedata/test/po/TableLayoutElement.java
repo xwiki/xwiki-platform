@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -69,12 +70,24 @@ public class TableLayoutElement extends BaseElement
      * continuing. The default behavior being to use the typed text as the selected value without waiting.
      */
     public static final String FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS = "selectized.waitForSuggestions";
-    
+
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
 
     private static final String CLASS_HTML_ATTRIBUTE = "class";
 
     private final LiveDataElement liveData;
+
+    private static final Pattern PAGINATION_SENTENCE_PATTERN =
+        Pattern.compile("^Entries (?<firstEntry>\\d+) - (?<lastEntry>\\d+) out of (?<totalEntries>\\d+)$");
+
+    /**
+     * @return the list of rows {@link WebElement}s
+     * @since 16.1.0RC1
+     */
+    public List<WebElement> getRows()
+    {
+        return getRoot().findElements(By.cssSelector("tbody > tr"));
+    }
 
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
@@ -436,7 +449,7 @@ public class TableLayoutElement extends BaseElement
      *
      * @param expectedRowCount the number of expected rows
      * @param timeout a custom timeout before stopping the wait and raising an error
-     * @param refresh if {@code true}, the 
+     * @param refresh if {@code true}, the
      */
     public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout, boolean refresh)
     {
@@ -449,7 +462,7 @@ public class TableLayoutElement extends BaseElement
             if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
-            
+
             // And the count of row is greater than the expected count.
             int count = countRows();
             LOGGER.info("TableLayoutElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
@@ -519,7 +532,12 @@ public class TableLayoutElement extends BaseElement
             }
         } else if (classes.contains("filter-text")) {
             element.clear();
-            element.sendKeys(content);
+            if (content.isEmpty()) {
+                // Make sure we generate some actual key events so LD notices the empty filter.
+                element.sendKeys(" ", Keys.BACK_SPACE);
+            } else {
+                element.sendKeys(content);
+            }
         } else if (classes.contains("filter-date")) {
             element.click();
             DateRangePicker picker = new DateRangePicker(element);
@@ -535,6 +553,23 @@ public class TableLayoutElement extends BaseElement
         if (wait) {
             waitUntilReady();
         }
+    }
+
+    /**
+     * Sort by the specified column and wait for the data to load.
+     *
+     * @param columnLabel the label of the column to sort
+     * @since 15.9RC1
+     */
+    public void sortBy(String columnLabel)
+    {
+        int columnIndex = findColumnIndex(columnLabel);
+
+        WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
+            + "(%d) .sort-icon", columnIndex)));
+        element.click();
+
+        waitUntilReady();
     }
 
     /**
@@ -602,6 +637,20 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Return the list of {@link WebElement} of a column by its label.
+     *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
+     * @return the list of {@link WebElement} of the request column
+     * @since 15.9RC1
+     * @since 15.5.3
+     */
+    public List<WebElement> getAllCells(String columnLabel)
+    {
+        int columnNumber = findColumnIndex(columnLabel);
+        return getRoot().findElements(By.cssSelector(String.format("tbody tr td:nth-child(%d)", columnNumber)));
+    }
+
+    /**
      * Get the 1-based row index of an element, relative to the number of currently displayed rows.
      *
      * @param by the selector of the searched element
@@ -643,6 +692,24 @@ public class TableLayoutElement extends BaseElement
             .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
     }
 
+    private String getPaginationEntriesString()
+    {
+        return getRoot().findElement(By.className("pagination-current-entries")).getText().trim();
+    }
+
+    private java.util.regex.Matcher getPaginationMatcher()
+    {
+        return PAGINATION_SENTENCE_PATTERN.matcher(getPaginationEntriesString());
+    }
+
+    public long getTotalEntries()
+    {
+        java.util.regex.Matcher paginationMatcher = getPaginationMatcher();
+        if (!paginationMatcher.matches()) {
+            throw new IllegalStateException("Matcher does not match: " + getPaginationEntriesString());
+        }
+        return Long.parseLong(paginationMatcher.group("totalEntries"));
+    }
 
     /**
      * Clicks on an action button identified by its name, on a given row.
@@ -652,9 +719,29 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        getRoot().findElement(By.cssSelector(
-            String.format("tbody tr:nth-child(%d) [name='%s']", rowNumber, actionName)))
-            .click();
+        clickAction(rowNumber, getActionSelector(actionName));
+    }
+
+    /**
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 16.2.0RC1
+     */
+    public boolean hasAction(int rowNumber, String actionName)
+    {
+        return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
+    }
+
+    /**
+     * Clicks on an action based on a row and the provided selector.
+     *
+     * @param rowNumber the row number, for instance 3 for the third row
+     * @param selector the selector to find the action element in the row
+     */
+    public void clickAction(int rowNumber, By selector)
+    {
+        findElementInRow(rowNumber, selector).click();
     }
 
     /**
@@ -696,8 +783,25 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement findElementInRow(int rowNumber, By by)
     {
-        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)))
-            .findElement(by);
+        return getRowElement(rowNumber).findElement(by);
+    }
+
+    /**
+     * Return a list of elements matching a given selector in a row.
+     *
+     * @param rowNumber the number of the row to search on (starting at index 1)
+     * @param by the selector of the elements to search for
+     * @return the list of matched elements
+     * @since 16.2.0RC1
+     */
+    public List<WebElement> findElementsInRow(int rowNumber, By by)
+    {
+        return getRowElement(rowNumber).findElements(by);
+    }
+
+    private WebElement getRowElement(int rowNumber)
+    {
+        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)));
     }
 
     /**
@@ -742,6 +846,16 @@ public class TableLayoutElement extends BaseElement
     public Matcher<WebElement> getWebElementCellWithLinkMatcher(String text, String link)
     {
         return new CellWithLinkMatcher(text, link);
+    }
+
+    /**
+     * @param columnLabel The label of the column to check for
+     * @return If the given column exists
+     * @since 15.9RC1
+     */
+    public boolean hasColumn(String columnLabel)
+    {
+        return findColumnIndex(columnLabel) >= 0;
     }
 
     /**
@@ -934,5 +1048,10 @@ public class TableLayoutElement extends BaseElement
             uri = initialUri;
         }
         return uri.toASCIIString();
+    }
+
+    private static By getActionSelector(String actionName)
+    {
+        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
     }
 }

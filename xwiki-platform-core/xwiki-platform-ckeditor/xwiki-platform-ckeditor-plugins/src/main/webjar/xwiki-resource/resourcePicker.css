@@ -47,7 +47,7 @@
 
 .resourcePicker .resourceDisplay {
   background-color: $theme.backgroundSecondaryColor;
-  border-radius: 4px;
+  border-radius: 7px;
   border: 1px solid $theme.borderColor;
   margin: 6px 0;
   padding: 6px 22px 6px 6px;

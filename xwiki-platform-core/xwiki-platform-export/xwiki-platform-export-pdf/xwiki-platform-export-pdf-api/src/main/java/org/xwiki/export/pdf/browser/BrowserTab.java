@@ -25,15 +25,12 @@ import java.net.URL;
 
 import javax.servlet.http.Cookie;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a web browser tab.
  * 
  * @version $Id$
  * @since 14.8
  */
-@Unstable
 public interface BrowserTab extends AutoCloseable
 {
     /**

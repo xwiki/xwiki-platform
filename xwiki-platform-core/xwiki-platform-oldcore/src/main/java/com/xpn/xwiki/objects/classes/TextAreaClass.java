@@ -37,7 +37,6 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -362,7 +361,6 @@ public class TextAreaClass extends StringClass
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public boolean isRestricted()
     {
         return getIntValue(RESTRICTED, 0) == 1;
@@ -378,7 +376,6 @@ public class TextAreaClass extends StringClass
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public void setRestricted(boolean restricted)
     {
         setIntValue(RESTRICTED, restricted ? 1 : 0);

@@ -50,7 +50,7 @@ Here are a number of test pages you can play with:
 
 以下是 [[XWiki 語法&gt;&gt;XWiki.XWikiSyntax]] 中的語法使用示範，you can use in wiki pages (headings, images, tables).
 
-= 標題 =
+== 標題 ==
 
 XWiki 提供六階層標題，你可以使用它們來組織你的頁面。
 
@@ -64,7 +64,7 @@ XWiki 提供六階層標題，你可以使用它們來組織你的頁面。
 
 ====== 標題 6 ======
 
-= Styles =
+== Styles ==
 
 Basic styles are supported in XWiki:
 
@@ -75,11 +75,11 @@ Basic styles are supported in XWiki:
 * 文字 ,,下標,,
 * 文字 ^^上標^^
 
-= 列表 =
+== 列表 ==
 
 You can create various types of lists in your wiki pages:
 
-== 符號列表 ==
+=== 符號列表 ===
 
 * Level 1
 ** Level 2
@@ -87,14 +87,14 @@ You can create various types of lists in your wiki pages:
 ** Level 2
 * Level 1
 
-== Numbered list ==
+=== Numbered list ===
 
 1. Item
 11. Subitem
 111. Item
 1. Subitem
 
-== 混合的列表 ==
+=== 混合的列表 ===
 
 1. Item 1
 11. Item 2
@@ -102,23 +102,23 @@ You can create various types of lists in your wiki pages:
 11*. Item 4
 1. Item 5
 
-= 表格 =
+== 表格 ==
 
 You can create tables right into wiki pages:
 
-== Table with headers in the top row ==
+=== Table with headers in the top row ===
 
 |= table header |= table header |= table header
 | cell | cell | cell
 | cell | cell | cell
 
-== Table with headers in the top row and left column ==
+=== Table with headers in the top row and left column ===
 
 |= table header |= table header |= table header
 |= table header | cell | cell
 |= table header | cell | cell
 
-= 鏈結 =
+== 鏈結 ==
 
 XWiki allows you to create links to other pages in your wiki or on the web:
 
@@ -128,23 +128,23 @@ XWiki allows you to create links to other pages in your wiki or on the web:
 * [[http://www.xwiki.org]] -&gt; you can link to wiki pages or to external websites
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; link labels work for exernal links too
 
-= 圖片 =
+== 圖片 ==
 
 You can insert images in your wiki pages:
 
 [[image:XWikiLogo.png]]
 
-= 巨集 =
+== 巨集 ==
 
 Macros allow you to make wiki content look better and to add additional features to your wiki. Here are 2 examples of how macros can be used in wiki pages:
 
-== 警告巨集 ==
+=== 警告巨集 ===
 
 This macro allows you to draw users’ attention to a specific piece of information:
 
 {{warning}}Hello World{{/warning}}
 
-== 目錄 ==
+=== 目錄 ===
 
 This macro automatically generates a table of contents of your wiki page based on headings:
 

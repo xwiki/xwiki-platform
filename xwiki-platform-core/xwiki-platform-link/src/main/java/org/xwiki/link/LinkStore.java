@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow accessing the links extracted from various entities.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.8RC1
  */
 @Role
-@Unstable
 public interface LinkStore
 {
     // TODO: also introduce an API (#getLinks) to get all types of links and not only entities

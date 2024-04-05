@@ -20,11 +20,14 @@
 package org.xwiki.export.pdf.internal.chrome;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.AdditionalAnswers;
 import org.mockito.Mock;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -34,6 +37,7 @@ import com.github.kklisura.cdt.protocol.commands.Target;
 import com.github.kklisura.cdt.protocol.types.browser.Version;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
 import com.github.kklisura.cdt.services.ChromeService;
+import com.github.kklisura.cdt.services.exceptions.ChromeServiceException;
 import com.github.kklisura.cdt.services.types.ChromeTab;
 import com.github.kklisura.cdt.services.types.ChromeVersion;
 
@@ -42,7 +46,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -59,6 +66,9 @@ class ChromeManagerTest
     @MockComponent
     private ChromeServiceFactory chromeServiceFactory;
 
+    @MockComponent
+    private PDFExportConfiguration configuration;
+
     @Mock
     private ChromeService chromeService;
 
@@ -71,6 +81,8 @@ class ChromeManagerTest
     @BeforeEach
     void configure() throws Exception
     {
+        when(this.configuration.getChromeRemoteDebuggingTimeout()).thenReturn(1);
+
         when(this.chromeService.getVersion()).thenReturn(this.chromeVersion);
         when(this.chromeServiceFactory.createBrowserDevToolsService(this.chromeVersion))
             .thenReturn(this.browserDevToolsService);
@@ -135,5 +147,65 @@ class ChromeManagerTest
         when(this.chromeService.getTabs()).thenReturn(Arrays.asList(firstTab, secondTab));
 
         assertNotNull(this.chromeManager.createIncognitoTab());
+    }
+
+    @Test
+    void dispose() throws Exception
+    {
+        this.chromeManager.dispose();
+
+        assertFalse(this.chromeManager.isConnected());
+
+        try {
+            this.chromeManager.createIncognitoTab();
+            fail("The Chrome Manager shouldn't be able to create a new incognito tab after being disposed.");
+        } catch (IllegalStateException e) {
+            assertEquals("The Chrome web browser is not connected.", e.getMessage());
+        }
+
+        try {
+            this.chromeManager.connect("localhost", 9222);
+            fail("The Chrome Manager shouldn't be able to connect after being disposed.");
+        } catch (IllegalStateException e) {
+            assertEquals("The Chrome Manager must be initialized before making a connection.", e.getMessage());
+        }
+    }
+
+    @Test
+    void connectWithTimeout() throws Exception
+    {
+        // Increase the timeout so that it tries multiple times (it waits 2s before retrying).
+        when(this.configuration.getChromeRemoteDebuggingTimeout()).thenReturn(3);
+
+        when(this.chromeServiceFactory.createChromeService("localhost", 9222)).thenReturn(this.chromeService);
+        when(this.chromeService.getVersion()).thenThrow(new ChromeServiceException("Remote Chrome is not available."));
+
+        try {
+            this.chromeManager.connect("localhost", 9222);
+            fail("We shouldn't be able to connect if we can't get the browser version.");
+        } catch (TimeoutException e) {
+            assertEquals("Timeout waiting for Chrome remote debugging to become available."
+                + " Waited [4] seconds. Root cause: [ChromeServiceException: Remote Chrome is not available.]", e.getMessage());
+        }
+
+        // It should have tried twice to get the version.
+        verify(this.chromeService, times(2)).getVersion();
+    }
+
+    @Test
+    void isConnectedWithTimeout() throws Exception {
+        // First we connect to the Chrome remote debugging and then we simulate that it doesn't respond before the
+        // configured timeout.
+        when(this.chromeServiceFactory.createChromeService("localhost", 9222)).thenReturn(this.chromeService);
+        this.chromeManager.connect("localhost", 9222);
+        int delay = 5000;
+        doAnswer(AdditionalAnswers.answersWithDelay(delay, invocation -> this.chromeVersion)).when(this.chromeService)
+            .getVersion();
+
+        long start = System.currentTimeMillis();
+        assertFalse(this.chromeManager.isConnected());
+        long waitTime = System.currentTimeMillis() - start;
+        // The timeout is 1 second (less than the delay) so it should abort the request before it gets a response.
+        assertTrue(waitTime < delay, "The timeout was ignored.");
     }
 }

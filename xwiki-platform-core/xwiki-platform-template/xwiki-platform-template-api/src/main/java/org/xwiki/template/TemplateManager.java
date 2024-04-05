@@ -27,7 +27,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.skin.Skin;
-import org.xwiki.stability.Unstable;
 
 /**
  * Internal toolkit to experiment on wiki-based templates.
@@ -99,7 +98,6 @@ public interface TemplateManager
      * @return the {@link Block} result of the template execution
      * @since 14.0RC1
      */
-    @Unstable
     default Block executeNoException(Template template, boolean inline)
     {
         return executeNoException(template);
@@ -125,7 +123,6 @@ public interface TemplateManager
      * @return the {@link Block} result of the template execution
      * @since 14.0RC1
      */
-    @Unstable
     default Block executeNoException(String templateName, boolean inline)
     {
         return executeNoException(templateName);
@@ -150,7 +147,6 @@ public interface TemplateManager
      * @throws Exception when failing to parse the template
      * @since 14.0RC1
      */
-    @Unstable
     default Block execute(Template template, boolean inline) throws Exception
     {
         return execute(template);
@@ -174,7 +170,6 @@ public interface TemplateManager
      * @throws Exception when failing to parse the template
      * @since 14.0RC1
      */
-    @Unstable
     default Block execute(String templateName, boolean inline) throws Exception
     {
         return execute(templateName);
@@ -200,7 +195,6 @@ public interface TemplateManager
      * @return the result of the execution of the template in the current target syntax
      * @since 14.0RC1
      */
-    @Unstable
     default String renderNoException(String templateName, boolean inline)
     {
         return renderNoException(templateName);
@@ -224,7 +218,6 @@ public interface TemplateManager
      * @throws Exception when failing to render the template
      * @since 14.0RC1
      */
-    @Unstable
     default String render(String templateName, boolean inline) throws Exception
     {
         return render(templateName);
@@ -247,7 +240,6 @@ public interface TemplateManager
      * @param writer the writer containing the result of the execution and rendering
      * @since 14.0RC1
      */
-    @Unstable
     default void renderNoException(Template template, boolean inline, Writer writer)
     {
         renderNoException(template, writer);
@@ -269,7 +261,6 @@ public interface TemplateManager
      * @param writer the writer containing the result of the execution and rendering
      * @since 14.0RC1
      */
-    @Unstable
     default void renderNoException(String templateName, boolean inline, Writer writer)
     {
         renderNoException(templateName, writer);
@@ -293,7 +284,6 @@ public interface TemplateManager
      * @throws Exception when failing to render the template
      * @since 14.0RC1
      */
-    @Unstable
     default void render(Template template, boolean inline, Writer writer) throws Exception
     {
         render(template, writer);
@@ -317,7 +307,6 @@ public interface TemplateManager
      * @throws Exception when failing to render the template
      * @since 14.0RC1
      */
-    @Unstable
     default void render(String templateName, boolean inline, Writer writer) throws Exception
     {
         render(templateName, writer);
@@ -345,7 +334,6 @@ public interface TemplateManager
      * @throws Exception when failing to render the template
      * @since 14.0RC1
      */
-    @Unstable
     default String renderFromSkin(String templateName, Skin skin, boolean inline) throws Exception
     {
         return renderFromSkin(templateName, skin);
@@ -373,7 +361,6 @@ public interface TemplateManager
      * @throws Exception when failing to render the template
      * @since 14.0RC1
      */
-    @Unstable
     default void renderFromSkin(String templateName, Skin skin, boolean inline, Writer writer) throws Exception
     {
         renderFromSkin(templateName, skin, writer);
@@ -438,10 +425,30 @@ public interface TemplateManager
      * @return the template
      * @throws Exception if an error occurred during template instantiation
      * @since 14.0RC1
+     * @deprecated use {@link #createStringTemplate(String, String, DocumentReference, DocumentReference)} instead
      */
+    @Deprecated(since = "15.9RC1")
     default Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
         throws Exception
     {
         return createStringTemplate(content, author);
+    }
+
+    /**
+     * Create a new template using a given content and a specific author and source document.
+     *
+     * @param id the identifier of the template
+     * @param content the template content
+     * @param author the template author
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return the template
+     * @throws Exception if an error occurred during template instantiation
+     * @since 15.9
+     */
+    default Template createStringTemplate(String id, String content, DocumentReference author,
+        DocumentReference sourceReference) throws Exception
+    {
+        return createStringTemplate(content, author, sourceReference);
     }
 }

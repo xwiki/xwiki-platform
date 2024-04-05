@@ -82,7 +82,16 @@
   #else
     #set ($spanClass = "diff-decision")
   #end
-  <span class="$spanClass" id="$spanId">$stringtool.join($value, "<br/>")</span>
+
+## We do not want the renderer to add any extra spaces or linebreaks in this output.
+#* *#<span class="$spanClass" id="$spanId">##
+#*   *##foreach ($v in $value)
+#*     *#$escapetool.xml($v)##
+#*     *##if ($foreach.hasNext)
+#*       *#<br/>##
+#*     *##end
+#*   *##end
+#* *#</span>
 #end
 
 #macro (displayPropertyDiff $propertyName $previousValue $newValue $_obfuscate $conflicts $realPropertyName)
@@ -331,34 +340,38 @@
 #end
 
 #macro (createDocumentDiff $oldDoc $newDoc $return)
-  #set ($objectDiffs = [])
-  #set ($tagsDiff = $NULL)
-  #foreach ($objectDiff in $doc.getObjectDiff($oldDoc, $newDoc))
-    #if ($objectDiff.get(0).className == 'XWiki.TagClass')
-      #set ($tagsDiff = $objectDiff)
-    #else
-      #set ($discard = $objectDiffs.add($objectDiff))
-    #end
-  #end
-  #set ($classDiff = $doc.getClassDiff($oldDoc, $newDoc))
-  #if ($classDiff && $classDiff.size() > 0)
-    #set ($classDiff = $classDiff.get(0))
-  #end
-  #set ($documentReference = $oldDoc.documentReference)
-  #if (!$documentReference)
-    #set ($documentReference = $newDoc.documentReference)
+  #set ($docInstance = $oldDoc)
+  #if ("$!docInstance" == "")
+    #set ($docInstance = $newDoc)
   #end
   #set ($return = $NULL)
-  #setVariable("$return" {
-    'documentReference': $documentReference,
-    'oldDoc': $oldDoc,
-    'newDoc': $newDoc,
-    'metaData': $doc.getMetaDataDiff($oldDoc, $newDoc),
-    'tags': $tagsDiff,
-    'attachments': $doc.getAttachmentDiff($oldDoc, $newDoc),
-    'objects': $objectDiffs,
-    'classProperties': $classDiff
-  })
+  #if ("$!docInstance" != "")
+    #set ($objectDiffs = [])
+    #set ($tagsDiff = $NULL)
+    #foreach ($objectDiff in $docInstance.getObjectDiff($oldDoc, $newDoc))
+      #if ($objectDiff.get(0).className == 'XWiki.TagClass')
+        #set ($tagsDiff = $objectDiff)
+      #else
+        #set ($discard = $objectDiffs.add($objectDiff))
+      #end
+    #end
+    #set ($classDiff = $docInstance.getClassDiff($oldDoc, $newDoc))
+    #if ($classDiff && $classDiff.size() > 0)
+      #set ($classDiff = $classDiff.get(0))
+    #end
+    #set ($documentReference = $docInstance.documentReference)
+
+    #setVariable("$return" {
+      'documentReference': $documentReference,
+      'oldDoc': $oldDoc,
+      'newDoc': $newDoc,
+      'metaData': $docInstance.getMetaDataDiff($oldDoc, $newDoc),
+      'tags': $tagsDiff,
+      'attachments': $docInstance.getAttachmentDiff($oldDoc, $newDoc),
+      'objects': $objectDiffs,
+      'classProperties': $classDiff
+    })
+  #end
 #end
 
 #macro (displayDocumentDiff $docDiff $conflicts)
@@ -575,15 +588,33 @@
         $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($targetDoc.date)])
       #end
     </div> ## changes-info-content
+    <div class="changes-info-comment">
+      $escapetool.xml($services.localization.render('core.viewers.diff.editComment'))
+      #if ("$targetDoc.comment" == '')
+        $escapetool.xml($services.localization.render('core.viewers.diff.noEditComment'))
+      #else
+        $escapetool.xml($targetDoc.comment)
+      #end
+    </div> ## changes-info-comment
   #end
 #end
 
 #macro (displayDocumentChangesHeader $from $to)
   <div id="changes-info">
     <div id="changes-info-boxes">
-      #if ("$!from.previousLink" != '')
-        <a href="$from.previousLink" class="changes-arrow-left"
-          title="$escapetool.xml($services.localization.render('core.viewers.diff.previousChange'))">&lt;</a>
+      #if ("$!from.previousLink" != '' || "$!to.nextLink" != '')
+        <div id='changes-arrows-box'>
+          #if ("$!from.previousLink" != '')
+            <a href="$from.previousLink" class="btn btn-default changes-arrow-left">
+              $services.icon.renderHTML('left') $from.previousLabel
+            </a>
+          #end
+          #if ("$!to.nextLink" != '')
+            <a href="$to.nextLink" class="btn btn-default changes-arrow-right">
+              $to.nextLabel $services.icon.renderHTML('right')
+            </a>
+          #end
+        </div>
       #end
       <div id="changes-info-box-from" class="changes-info-box">
         #displayDocumentVersionInfo($from.doc $from.version $from.previousVersionLink $from.nextVersionLink 'core.viewers.diff.from')
@@ -591,19 +622,7 @@
       <div id="changes-info-box-to" class="changes-info-box">
         #displayDocumentVersionInfo($to.doc $to.version $to.previousVersionLink $to.nextVersionLink 'core.viewers.diff.to')
       </div> ## changes-info-box-to
-      #if ("$!to.nextLink" != '')
-        <a href="$to.nextLink" class="changes-arrow-right"
-          title="$escapetool.xml($services.localization.render('core.viewers.diff.nextChange'))">&gt;</a>
-      #end
     </div> ## changes-info-boxes
-    <div id="changes-info-comment">
-      $escapetool.xml($services.localization.render('core.viewers.diff.editComment'))
-      #if ("$!to.doc.comment" == '')
-        $escapetool.xml($services.localization.render('core.viewers.diff.noEditComment'))
-      #else
-        $escapetool.xml($to.doc.comment)
-      #end
-    </div> ## changes-info-comment
   </div> ## changes-info
 #end
 
@@ -612,17 +631,20 @@
   #if (!$headingLevel)
     #set ($headingLevel = 2)
   #end
-  #createDocumentDiff($origdoc $newdoc $docDiff)
-  #createDocumentDiffSummary($docDiff $summary)
-  <h$headingLevel>
-    $escapetool.xml($services.localization.render('web.history.changes.summary'))
-  </h$headingLevel>
-  #displayDocumentDiffSummary($summary)
-  #if ($summary.entries.size() > 0)
+  ## If both docs are null we don't display anything
+  #if ("$!origdoc" != "" || "$!newdoc" != "")
+    #createDocumentDiff($origdoc $newdoc $docDiff)
+    #createDocumentDiffSummary($docDiff $summary)
     <h$headingLevel>
-      $escapetool.xml($services.localization.render('web.history.changes.details'))
+      $escapetool.xml($services.localization.render('web.history.changes.summary'))
     </h$headingLevel>
-    #displayDocumentDiff($docDiff $conflictsList)
+    #displayDocumentDiffSummary($summary)
+    #if ($summary.entries.size() > 0)
+      <h$headingLevel>
+        $escapetool.xml($services.localization.render('web.history.changes.details'))
+      </h$headingLevel>
+      #displayDocumentDiff($docDiff $conflictsList)
+    #end
   #end
 #end
 

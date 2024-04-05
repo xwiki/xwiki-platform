@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a User Interface Extension.
@@ -62,7 +61,6 @@ public interface UIExtension
      * @return the {@link Block} that must be rendered when this extension is displayed
      * @since 14.0RC1
      */
-    @Unstable
     default Block execute(boolean inline)
     {
         return execute();

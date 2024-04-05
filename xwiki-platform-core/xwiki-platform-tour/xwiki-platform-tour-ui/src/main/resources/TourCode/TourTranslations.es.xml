@@ -1,0 +1,99 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="es">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content># App name
+tour.app.name=Tour
+
+# Class fields
+TourCode.TourClass_description=Descripción
+TourCode.TourClass_isActive=Activo
+TourCode.TourClass_targetPage=Página destino
+
+# Live table generic keys
+tour.livetable.doc.title=Nombre del tour
+tour.livetable._actions=Acciones
+tour.livetable._actions.edit=Editar
+tour.livetable._actions.delete=Borrar
+tour.livetable._actions.launch=Lanzar
+tour.livetable.emptyvalue=-
+
+# Live table specific keys
+tour.livetable.description=Descripción
+tour.livetable.isActive=Activo
+tour.livetable.targetPage=Página destino
+tour.livetable.targetClass=Clase destino
+
+# Tour popover
+tour.popover.previous=« Ant
+tour.popover.next=Sig »
+tour.popover.end=Fin del tour
+tour.popover.show=Mostrar tour
+tour.popover.show.hint=Puedes volver a ver el tour cuando lo desees, clicando en este botón
+
+# Steps
+TourCode.StepClass_order=Orden
+TourCode.StepClass_element=Elemento (selector CSS que identifica un elemento)
+TourCode.StepClass_title=Título
+TourCode.StepClass_content=Contenido
+TourCode.StepClass_backdrop=Fondo
+TourCode.StepClass_placement=Colocación
+TourCode.StepClass_targetPage=Página destino
+TourCode.StepClass_action=Acción destino
+TourCode.StepClass_queryString=Cadena de consulta
+tour.steps=Pasos
+tour.steps.new_step=Paso nuevo
+tour.steps.add_step=Añadir paso
+tour.steps.edit_step=Editar paso
+tour.steps.save_step=Guardar
+tour.steps.delete_confirm=¿Estás seguro de querer borrar el paso?
+tour.steps.delete_done=¡Borrar paso realizado!
+tour.steps.deleting=Borrando paso...
+tour.steps.yes=Sí
+tour.steps.no=No
+tour.steps.edit=Editar
+tour.steps.delete=Borrar
+
+# Upgrade
+tour.upgrade.title=Actualizar
+tour.upgrade.successList=Se ha convertido con éxito las páginas siguientes:
+tour.upgrade.successNothing=¡No tienes nada que actualizar!
+
+# Template
+tour.template.name=Tour
+tour.template.description=Tour paso a paso</content>
+</xwikidoc>

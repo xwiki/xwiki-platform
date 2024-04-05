@@ -35,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.4RC1
  */
-@Unstable
 public class AttachmentGalleryPickerMacroParameters
 {
     private String id;

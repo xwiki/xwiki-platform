@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,11 +33,19 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
+import org.xwiki.flamingo.skin.test.po.RestoreStatusPage;
+import org.xwiki.flamingo.skin.test.po.UndeletePage;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -49,10 +58,12 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests the Delete Page feature.
@@ -232,26 +243,27 @@ class DeletePageIT
 
     /**
      * Test that when you delete a page and you select "affect children", it delete children properly. It also test the
-     * opposite.
+     * opposite. Further, this tests the batch restore.
      *
      * @since 7.2RC1
      */
     @Test
     @Order(7)
-    void deleteChildren(TestUtils setup, TestReference reference, TestInfo info)
+    void deleteChildren(TestUtils setup, TestReference parentReference, TestInfo info)
     {
         // Initialize the parent
-        DocumentReference parentReference = reference;
         ViewPage parentPage = setup.createPage(parentReference, "Content", "Parent");
 
         // Test 1: Try to delete it to make sure we don't have the "affect children" option yet
-        ConfirmationPage confirmationPage = parentPage.deletePage();
+        DeletePageConfirmationPage confirmationPage = parentPage.deletePage();
         assertFalse(confirmationPage.hasAffectChildrenOption());
 
         // Initialize the children pages
-        final int NB_CHILDREN = 3;
-        DocumentReference[] childrenReferences = new DocumentReference[NB_CHILDREN];
-        for (int i = 0; i < NB_CHILDREN; ++i) {
+        final int nbChildren = 3;
+        DocumentReference[] childrenReferences = new DocumentReference[nbChildren];
+        assertTrue(info.getTestClass().isPresent());
+        assertTrue(info.getTestMethod().isPresent());
+        for (int i = 0; i < nbChildren; ++i) {
             childrenReferences[i] = new DocumentReference("xwiki",
                 Arrays.asList(info.getTestClass().get().getSimpleName(), info.getTestMethod().get().getName(),
                     "Child_" + (i + 1)), "WebHome");
@@ -263,6 +275,20 @@ class DeletePageIT
         confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
+        confirmationPage.openAffectChildrenPanel();
+        TableLayoutElement affectChildrenLiveData = new LiveDataElement("deleteSpaceIndex").getTableLayout();
+        assertEquals(nbChildren, affectChildrenLiveData.countRows());
+        for (int i = 1; i <= nbChildren; i++) {
+            SpaceReference childSpaceReference = childrenReferences[i - 1].getLastSpaceReference();
+            affectChildrenLiveData.assertCellWithLink("Title", String.format("Child %d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertCellWithLink("Location", String.format("Child_%d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertRow("Date", hasItem(affectChildrenLiveData.getDatePatternMatcher()));
+            affectChildrenLiveData.assertCellWithLink("Last Author", "superadmin",
+                setup.getURL(new DocumentReference("xwiki", "XWiki", "superadmin")));
+        }
+
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
         assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
@@ -270,7 +296,7 @@ class DeletePageIT
         ViewPage page = setup.gotoPage(parentReference);
         assertFalse(page.exists());
         // But not the children 
-        for (int i = 0; i < NB_CHILDREN; ++i) {
+        for (int i = 0; i < nbChildren; ++i) {
             page = setup.gotoPage(childrenReferences[i]);
             assertTrue(page.exists());
         }
@@ -286,9 +312,57 @@ class DeletePageIT
         page = setup.gotoPage(parentReference);
         assertFalse(page.exists());
         // And also the children
-        for (int i = 0; i < NB_CHILDREN; ++i) {
+        for (int i = 0; i < nbChildren; ++i) {
             page = setup.gotoPage(childrenReferences[i]);
             assertFalse(page.exists());
+        }
+
+        // Test 4: test batch restore
+        setup.gotoPage(parentReference);
+        DeletePageOutcomePage outcomePage = new DeletePageOutcomePage();
+        outcomePage.clickBatchLink();
+        UndeletePage undeletePage = new UndeletePage();
+
+        // Go back and forward again to test clicking the cancel link.
+        outcomePage = undeletePage.clickCancel();
+        outcomePage.clickBatchLink();
+        undeletePage = new UndeletePage();
+
+        assertTrue(undeletePage.hasBatch());
+        undeletePage.setBatchIncluded(true);
+        undeletePage.toggleBatchPanel();
+
+        assertEquals("superadmin", undeletePage.getPageDeleter());
+        String deletedBatchId = undeletePage.getDeletedBatchId();
+        try {
+            UUID deletedBatchUUID = UUID.fromString(deletedBatchId);
+            assertNotNull(deletedBatchUUID);
+        } catch (IllegalArgumentException e) {
+            fail("Batch id is not a valid UUID: " + deletedBatchId);
+        }
+
+        TableLayoutElement liveDataTable = undeletePage.getDeletedBatchLiveData().getTableLayout();
+        assertEquals(nbChildren + 1, liveDataTable.countRows());
+        liveDataTable.assertRow(UndeletePage.LIVE_DATA_PAGE, "Parent");
+        for (int i = 0; i < nbChildren; ++i) {
+            liveDataTable.assertRow(UndeletePage.LIVE_DATA_PAGE, "Child " + (i + 1));
+        }
+        // Assert that we have at least some actions. Testing individual items is not so easy because the action URLs
+        // are not what the LD page object expects.
+        liveDataTable.assertRow(UndeletePage.LIVE_DATA_ACTIONS, "RestoreDelete");
+
+        // Trigger the actual restore.
+        RestoreStatusPage restoreStatusPage = undeletePage.clickRestore();
+        restoreStatusPage.waitUntilFinished();
+        assertEquals("Done.", restoreStatusPage.getInfoMessage());
+        page = restoreStatusPage.gotoRestoredPage();
+
+        // Check the page have been effectively restored.
+        assertTrue(page.exists());
+        // And also the children have been restored.
+        for (int i = 0; i < nbChildren; ++i) {
+            page = setup.gotoPage(childrenReferences[i]);
+            assertTrue(page.exists());
         }
     }
 
@@ -672,7 +746,8 @@ class DeletePageIT
      */
     @Test
     @Order(13)
-    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference) throws Exception
+    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference,
+        TestConfiguration testConfiguration) throws Exception
     {
         DocumentReference backlinkDocumentReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
@@ -682,6 +757,9 @@ class DeletePageIT
         testUtils.createPage(backlinkDocumentReference,
             String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference)), "Backlink document");
         testUtils.createPage(newTargetReference, "", "New target");
+
+        // Wait for Solr indexing to complete as backlink information from Solr is needed
+        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
 
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -709,7 +787,8 @@ class DeletePageIT
      */
     @Test
     @Order(14)
-    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference) throws Exception
+    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference, TestConfiguration testConfiguration)
+        throws Exception
     {
         DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         String backlinkDocContent = String.format("[[Link>>doc:%s]]", testUtils.serializeReference(reference));
@@ -717,6 +796,9 @@ class DeletePageIT
         testUtils.createPage(reference, PAGE_CONTENT, PAGE_TITLE);
         // Create backlink.
         testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
+
+        // Wait for Solr indexing to complete as backlink information from Solr is needed
+        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
 
         // Delete page without specifying a new target.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -742,7 +824,8 @@ class DeletePageIT
      */
     @Test
     @Order(15)
-    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference) throws Exception
+    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference,
+        TestConfiguration testConfiguration) throws Exception
     {
         DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
         String childFullName = testUtils.serializeReference(childReference).split(":")[1];
@@ -756,6 +839,9 @@ class DeletePageIT
         String format = "[[Parent>>doc:%s]] [[Child>>doc:%s]]";
         testUtils.createPage(backlinkDocReference,
             String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
+
+        // Wait for Solr indexing to complete as backlink information from Solr is needed
+        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
 
         // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
         ViewPage parentPage = testUtils.gotoPage(parentReference);
@@ -777,5 +863,12 @@ class DeletePageIT
         assertEquals("New target", parentPage.getDocumentTitle());
         ViewPage childPage = testUtils.gotoPage(childReference);
         assertEquals("Child", childPage.getDocumentTitle());
+    }
+
+    private String computedHostURL(TestConfiguration testConfiguration)
+    {
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
+        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
+            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

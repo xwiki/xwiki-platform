@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+#########################
+# Restart XWiki
+#########################
+
+# Restart XWiki service
+deb-systemd-invoke restart xwiki.service

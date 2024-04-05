@@ -56,6 +56,7 @@
       <number>1</number>
       <picker>0</picker>
       <prettyName>Cover</prettyName>
+      <restricted>0</restricted>
       <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
@@ -73,6 +74,7 @@
       <number>4</number>
       <picker>0</picker>
       <prettyName>Footer</prettyName>
+      <restricted>0</restricted>
       <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
@@ -90,6 +92,7 @@
       <number>3</number>
       <picker>0</picker>
       <prettyName>Header</prettyName>
+      <restricted>0</restricted>
       <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
@@ -97,6 +100,24 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </header>
+    <metadata>
+      <contenttype>FullyRenderedText</contenttype>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>Text</editor>
+      <hint>XWiki.PDFExport.TemplateClass_metadata.hint</hint>
+      <name>metadata</name>
+      <number>5</number>
+      <picker>0</picker>
+      <prettyName>Metadata</prettyName>
+      <restricted>0</restricted>
+      <rows>20</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </metadata>
     <toc>
       <contenttype>FullyRenderedText</contenttype>
       <customDisplay/>
@@ -107,6 +128,7 @@
       <number>2</number>
       <picker>0</picker>
       <prettyName>Table of Contents</prettyName>
+      <restricted>0</restricted>
       <rows>20</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>

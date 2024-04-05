@@ -309,18 +309,19 @@
   #template('startpage.vm')
   #template('refactoring_macros.vm')
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
     #template("hierarchy.vm")
-    #if ("$!request.copyId" != '')
-      ## Display the copy status
-      #handleCopyStatusRequest
-    #elseif ($doc.isNew())
-      $response.setStatus(404)
-      #error($services.localization.render('core.rename.nonexistingDocument'))
-    #else
-      #handleCopyRequest
-    #end
-  </div>## mainContentArea
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+    <main id="mainContentArea">
+      #if ("$!request.copyId" != '')
+        ## Display the copy status
+        #handleCopyStatusRequest
+      #elseif ($doc.isNew())
+        $response.setStatus(404)
+        #error($services.localization.render('core.rename.nonexistingDocument'))
+      #else
+        #handleCopyRequest
+      #end
+    </main>## mainContentArea
   </div>## main
   #template('endpage.vm')
 #end

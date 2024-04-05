@@ -41,16 +41,17 @@
 #macro(displayContent $deletecontent)
 #template("startpage.vm")
 <div class="main">
-  <div id="mainContentArea">
-    #template("hierarchy.vm")
-    #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
-    #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
-    <div class="xcontent">
-      #template('contentheader.vm')
-      $deletecontent
-      <div class="clearfloats"></div>
-    </div> ## xcontent
-  </div>## mainContentArea
+  #template("hierarchy.vm")
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
+  #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
+  #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
+  <div class="xcontent">
+    #template('contentheader.vm')
+    $deletecontent
+    <div class="clearfloats"></div>
+  </div> ## xcontent
+  </main> ##mainContentArea
 </div>## main
 #template("endpage.vm")
 #end
@@ -121,11 +122,15 @@
 ##            DISPLAY CONFIRMATION PAGE
 #######################################################
 #macro(displayConfirmationPage)
-  <form id="delete" class="xform" action="$doc.getURL('delete', "$!{languageparams}")" method="post">
+  <form id="delete" action="$doc.getURL('delete', "$!{languageparams}")" method="post">
     #getChildren()
-    #displayNewTargetOption()
-    #getChildren_legacy()
-    #displayConfirmMessage()
+    ## If xform is a parent of getChildren, the ".xform field" css is also applied on the page size limit select, making it 
+    ## badly displayed.
+    <div class="xform">
+      #displayNewTargetOption()
+      #getChildren_legacy()
+      #displayConfirmMessage()
+    </div>
   </form>
 #end
 #######################################################
@@ -170,21 +175,19 @@
         ##
         ## List the documents to be deleted using a livetable
         ##
-        #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
-        #set ($colprops = {
-          'doc.title'    : { 'link' : 'view' },
-          'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
-          'doc.author'   : { 'link' : 'author' }
-        })
-        ## Note: we also display translations in the table since we want to show to the user all the pages that will
-        ## be deleted (including translations and hidden pages).
-        #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
-        #set ($options = { 
-          'url' : "$doc.getURL('get', $urlParameters)",
+        #set ($sourceParameters = {
           'translationPrefix' : 'platform.index.',
-          'outputOnlyHtml' : true
+          'template' : 'getdocuments.vm',
+          'childrenOf': $doc.space,
+          'queryFilters': 'unique',
+          '$doc': $doc.documentReference
         })
-        #livetable('deleteSpaceIndex' $collist $colprops $options)
+        $services.liveData.render({
+          'id': 'deleteSpaceIndex',
+          'source': 'liveTable',
+          'sourceParameters': $escapetool.url($sourceParameters),
+          'properties': 'doc.title,doc.location,doc.date,doc.author'
+        })
       #end
       #displayPanel('panel-children', 'panel-default', $heading, $body)
     #end

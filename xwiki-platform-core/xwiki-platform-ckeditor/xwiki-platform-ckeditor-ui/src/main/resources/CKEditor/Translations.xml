@@ -119,8 +119,8 @@ ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
 ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
 ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
 
-ckeditor.plugin.icon.iconsFetchFailed=Failed to retreive the icon list.
-ckeditor.plugin.icon.iconThemesFetchFailed=Failed to retreive the available icon themes.
+ckeditor.plugin.icon.iconsFetchFailed=Failed to retrieve the icon list.
+ckeditor.plugin.icon.iconThemesFetchFailed=Failed to retrieve the available icon themes.
 
 ckeditor.plugin.image.imageEditor.standardTab.title=Standard
 ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced
@@ -234,6 +234,7 @@ ckeditor.plugin.slash.action.table_cell_delete.hint=Remove the current table cel
 ckeditor.plugin.slash.action.table_delete.hint=Remove the current table from the content.
 
 ckeditor.plugin.slash.placeholder=Type / for quick actions...
+ckeditor.plugin.slash.dropdown.hint=Select the item to autocomplete.
 
 ckeditor.plugin.focusedplaceholder.placeholder.body=Body
 ckeditor.plugin.focusedplaceholder.placeholder.address=Address
@@ -463,16 +464,22 @@ ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
 */
 define(['ckeditor'], function(ckeditor) {
   const translations = $jsontool.serialize($translations);
-  const locale = $jsontool.serialize($xcontext.locale.toString());
   for (const [pluginName, pluginTranslations] of Object.entries(translations)) {
     if (ckeditor.plugins.get(pluginName)) {
       // The specified plugin is already defined.
-      ckeditor.plugins.setLang(pluginName, locale, pluginTranslations);
+      // The CKEditor's lang plugin's detect function gives us the locale code currently
+      // used by ckeditor, in case CKEditor falls back to an other one, we still want
+      // to inject the translations in the running localization.
+      ckeditor.plugins.setLang(pluginName, ckeditor.lang.detect(), pluginTranslations);
     } else {
       // The specified plugin is not defined yet (it could be an external plugin).
       ckeditor.on('instanceCreated', event =&gt; {
         event.editor.on('langLoaded', event =&gt; {
-          if (event.editor.langCode === locale) {
+          // CKEditor uses '-' (dash) as locale separator.
+          const locale = $jsontool.serialize($xcontext.locale.toString().toLowerCase().replace('_', '-'));
+          // We need to check against the initally configured language and not the one in use
+          // because CKEditor might have fallen back to another locale.
+          if (event.editor.config.language === locale) {
             event.editor.lang[pluginName] = pluginTranslations;
           }
         });

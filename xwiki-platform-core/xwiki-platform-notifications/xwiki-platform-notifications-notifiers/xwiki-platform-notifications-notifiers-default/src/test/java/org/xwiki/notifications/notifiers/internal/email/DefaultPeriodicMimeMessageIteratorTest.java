@@ -37,6 +37,7 @@ import org.mockito.internal.util.collections.Sets;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.Event;
+import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -213,7 +214,7 @@ class DefaultPeriodicMimeMessageIteratorTest
         when(compositeEvent1UserA.getUsers()).thenReturn(Sets.newSet(userB));
         when(compositeEvent1UserC.getUsers()).thenReturn(Sets.newSet(userB));
 
-        MimeMessage message = mock(MimeMessage.class);
+        ExtendedMimeMessage message = mock(ExtendedMimeMessage.class);
         when(this.factory.createMessage(TEMPLATE_REFERENCE, factoryParameters)).thenReturn(message, message);
 
         when(this.defaultNotificationEmailRenderer.renderHTML(eq(compositeEvent1UserA), anyString()))

@@ -1101,7 +1101,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 .gallery_attachmentbox {
   background: $theme.pageContentBackgroundColor;
   border: 1px solid $theme.borderColor;
-  border-radius: 5px;
+  border-radius: 8px;
   float: left;
   margin: ${boxMargin}px;
   overflow: hidden;
@@ -1123,7 +1123,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 .gallery_attachmenttitle {
   background: $theme.backgroundSecondaryColor;
   border-bottom: 1px dotted $theme.borderColor;
-  border-radius: 5px 5px 0px 0px;
+  border-radius: 8px 8px 0px 0px;
   font-size: 85%;
   padding: 3px ${boxPadding}px;
   overflow: hidden;

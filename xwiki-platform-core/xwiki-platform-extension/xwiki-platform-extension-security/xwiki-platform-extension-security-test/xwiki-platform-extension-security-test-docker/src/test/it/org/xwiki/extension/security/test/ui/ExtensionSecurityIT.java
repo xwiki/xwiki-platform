@@ -41,7 +41,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.Matchers.hasItem;
-import static org.xwiki.extension.security.test.po.ExtensionVulnerabilitiesAdminPage.getToExtensionVulnerabilitiesAdmin;
+import static org.xwiki.extension.security.test.po.ExtensionVulnerabilitiesAdminPage.goToExtensionVulnerabilitiesAdmin;
 
 /**
  * Overall Extension Security UI tests.
@@ -59,14 +59,14 @@ class ExtensionSecurityIT
         String scanURL = createSecurityVulnerabilitiesSource(setup, testReference);
         String reviewsURL = createSecurityReviewsSource(setup, testReference);
 
-        getToExtensionVulnerabilitiesAdmin()
+        goToExtensionVulnerabilitiesAdmin()
             .setScanURL(scanURL)
             .setReviewsURL(reviewsURL)
             .saveConfig();
 
         ExtensionAdministrationPage.gotoPage().startIndex();
 
-        LiveDataElement liveData = getToExtensionVulnerabilitiesAdmin().getLiveData();
+        LiveDataElement liveData = goToExtensionVulnerabilitiesAdmin().getLiveData();
 
         // Wait for a row to be present in the Live Data (meaning that the indexation is done).
         TableLayoutElement tableLayout = liveData.getTableLayout();
@@ -77,13 +77,13 @@ class ExtensionSecurityIT
                 + "org.xwiki.platform:xwiki-platform-administration-ui/")));
         tableLayout.assertRow("Wikis", "xwiki");
         tableLayout.assertRow("Max CVSS", "9.9");
-        tableLayout.assertRow("CVE IDs", "GHSA-4v38-964c-xjmw  (9.9) \n"
-            + "Display reviews for GHSA-4v38-964c-xjmw\n"
+        tableLayout.assertRow("CVE IDs", "CVE-2023-29510 (9.9)\n"
+            + "Display reviews for CVE-2023-29510\n"
             + "\n"
-            + "GHSA-9j36-3cp4-rh4j  (9.9) \n"
-            + "Display reviews for GHSA-9j36-3cp4-rh4j\n"
+            + "CVE-2023-29514 (9.9)\n"
+            + "Display reviews for CVE-2023-29514\n"
             + "\n"
-            + "GHSA-mgjw-2wrp-r535  (8.8) ");
+            + "CVE-2022-23616 (8.8)");
         tableLayout.assertRow("Latest Fix Version", "140.10.2");
     }
 

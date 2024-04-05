@@ -853,9 +853,16 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
               }
             }
             /* When in dropdown we also have a link, reset the duplicated padding */
-            &amp; &gt; span &gt; a {
+            &amp; &gt; .xDropdown-header &gt; span &gt; a {
               padding: 0;
               display: inherit;
+            }
+            /* Reposition the toggle when in a dropdown of fixed size
+              to avoid eating away at the bit of space we have for the text. */
+            &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle {
+              position: absolute;
+              right: 0;
+              top: 0;
             }
           }
           /* Separator horizontal inside menu */

@@ -120,7 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('xe.panels.shortcuts'))
+#navigationPanelHeader($services.localization.render('xe.panels.shortcuts'))
 (% class="panelitem" %)[[$services.localization.render('comments')&gt;&gt;?viewer=comments]](%%)##
 (% class="pitemseparator" %) ~| (%%)##
 (% class="panelitem" %)[[$services.localization.render('attachments')&gt;&gt;?viewer=attachments]](%%)##

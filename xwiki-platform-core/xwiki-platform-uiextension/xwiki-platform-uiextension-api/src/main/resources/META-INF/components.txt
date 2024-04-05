@@ -1,5 +1,7 @@
 org.xwiki.uiextension.internal.DefaultUIExtensionManager
 org.xwiki.uiextension.internal.UIExtensionClassDocumentInitializer
+org.xwiki.uiextension.internal.UIExtensionRequiredRightsAnalyzer
+org.xwiki.uiextension.internal.WikiUIExtension
 org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder
 org.xwiki.uiextension.internal.filter.ExcludeFilter
 org.xwiki.uiextension.internal.filter.SelectFilter

@@ -1,0 +1,266 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="AppWithinMinutes.Translations" locale="ko">
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Home page
+platform.appwithinminutes.homePageTitle=몇 분 안에 앱
+platform.appwithinminutes.description=XWiki 의 강력한 구조화된 데이터 관리 시스템을 기반으로 몇 분 안에 협업 웹 애플리케이션을 생성하세요 .
+platform.appwithinminutes.createAppButtonLabel=애플리케이션 생성
+platform.appwithinminutes.appsLiveTableHeading=응용
+platform.appwithinminutes.appsLiveTable.doc.title=애플리케이션
+platform.appwithinminutes.appsLiveTable.doc.author=마지막 저자
+platform.appwithinminutes.appsLiveTable.doc.date=업데이트 날짜
+platform.appwithinminutes.appsLiveTable._actions=행위
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=공간 관리 권한을 부여합니다.
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=스스로 만드시 오!
+
+### Wizard step
+platform.appwithinminutes.wizardStepHeading=단계 {0} - {1}
+appWithinMinutes.wizardStep.name.name=이름
+appWithinMinutes.wizardStep.name.title=애플리케이션 이름 지정
+appWithinMinutes.wizardStep.name.description=애플리케이션 이름을 선택하세요
+appWithinMinutes.wizardStep.structure.name=구조
+appWithinMinutes.wizardStep.structure.title=데이터 구조화
+appWithinMinutes.wizardStep.structure.description=애플리케이션 데이터 설명
+appWithinMinutes.wizardStep.entries.name=항목
+appWithinMinutes.wizardStep.entries.title=데이터 찾기
+appWithinMinutes.wizardStep.entries.description=데이터를 저장할 위치를 선택하세요
+appWithinMinutes.wizardStep.presentation.name=프레젠테이션
+appWithinMinutes.wizardStep.presentation.title=애플리케이션 홈 페이지 사용자 정의
+appWithinMinutes.wizardStep.presentation.description=애플리케이션 홈 페이지 사용자 정의
+platform.appwithinminutes.wizardStepNextButtonLabel=다음 단계
+platform.appwithinminutes.wizardStepNextButtonTip=다음 단계로 이동
+platform.appwithinminutes.wizardStepFinishButtonLabel=마치다
+platform.appwithinminutes.wizardStepFinishButtonTip=애플리케이션 홈페이지로 이동
+platform.appwithinminutes.wizardStepPreviousButtonLabel=이전 단계
+platform.appwithinminutes.wizardStepPreviousButtonTip=이전 단계로 이동
+platform.appwithinminutes.wizardStepHelpTitle=단계
+platform.appwithinminutes.wizardStepHelpDescription=이 마법사는 애플리케이션을 생성하는 과정을 안내합니다. 수행할 단계는 다음과 같습니다:
+
+### Wizard Step 1: Application Name
+appWithinMinutes.createApp.location.label=위치
+appWithinMinutes.createApp.location.hint=애플리케이션이 생성될 페이지 계층 구조의 위치입니다.
+appWithinMinutes.createApp.parent.label=부모의
+appWithinMinutes.createApp.parent.hint=새 애플리케이션의 상위입니다. 최상위 애플리케이션을 생성하려면 이 필드를 비워 두세요.
+appWithinMinutes.createApp.parent.placeholder=경로.대상.부모
+appWithinMinutes.codeSpace.title=암호
+appWithinMinutes.codeSpace.description=애플리케이션 코드가 있는 곳입니다.
+appWithinMinutes.codeSpace.hiddenPagesInfo=현재 사용자 프로필 설정이 이를 금지하더라도 숨겨진 페이지도 나열됩니다. 그렇지 않으면 기본적으로 모두 숨겨져 있기 때문에 응용 프로그램 코드 페이지가 표시되지 않습니다.
+platform.appwithinminutes.appNamePageTitle=애플리케이션 생성
+platform.appwithinminutes.appNameLabel=애플리케이션 이름
+platform.appwithinminutes.appNameHint=애플리케이션 이름은 홈페이지 URL 과 애플리케이션 코드가 저장되는 위치를 결정합니다.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=애플리케이션 홈페이지 URL
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=애플리케이션 코드 위치
+platform.appwithinminutes.appNameIsUsedWarning=이 애플리케이션은 이미 존재합니다. 다음 단계로 이동하면 기존 애플리케이션을 편집하게 됩니다.
+platform.appwithinminutes.appNameEmptyError=애플리케이션 이름을 입력해 주세요.
+
+### Wizard Step 2: Application Structure
+platform.appwithinminutes.classEditorPaletteTitle=필드 팔레트
+platform.appwithinminutes.classEditorPaletteHint=팔레트에서 필드를 끌어다 놓아 데이터를 입력하는 데 사용할 양식을 만듭니다.
+platform.appwithinminutes.classEditorCanvasHint=팔레트에서 필드를 끌어서 이 영역에 놓습니다.
+platform.appwithinminutes.classEditorUpdateTemplateLabel=템플릿 업데이트
+platform.appwithinminutes.classEditorUpdateTemplateHint=템플릿({0})은 기본 필드 값을 저장합니다.
+platform.appwithinminutes.classEditorUpdateSheetLabel=시트 업데이트
+platform.appwithinminutes.classEditorUpdateSheetHint=시트({0})는 구조화된 데이터를 표시하고 편집하는 데 사용됩니다.
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=번역 업데이트
+platform.appwithinminutes.classEditorUpdateTranslationsHint=필드 예쁜 이름과 목록 값({0})의 번역을 업데이트합니다.
+platform.appwithinminutes.classEditorMultipleSheetsWarning=이 수업에는 여러 시트가 있습니다.
+platform.appwithinminutes.classEditorDuplicateFieldNameError=클래스에는 동일한 이름을 가진 두 개의 필드가 있습니다: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=기본값 업데이트
+platform.appwithinminutes.classEditorBindSheetSaveComment=클래스 시트 바인딩
+platform.appwithinminutes.classEditorSheetSaveComment=수업 시트 업데이트
+platform.appwithinminutes.classEditorTranslationsSaveComment=번역 업데이트
+platform.appwithinminutes.classEditorStandardCategoryName=기준
+platform.appwithinminutes.classEditorPickersCategoryName=피커
+platform.appwithinminutes.classEditorDocumentCategoryName=페이지
+platform.appwithinminutes.classEditorAdvancedCategoryName=고급의
+platform.appwithinminutes.classEditorDBListFieldName=데이터베이스 목록
+platform.appwithinminutes.classEditorGroupsFieldName=그룹
+platform.appwithinminutes.classEditorUsersFieldName=사용자
+platform.appwithinminutes.classEditorDateFieldName=날짜
+platform.appwithinminutes.classEditorStaticListFieldName=정적 목록
+platform.appwithinminutes.classEditorBooleanFieldName=부울
+platform.appwithinminutes.classEditorNumberFieldName=숫자
+platform.appwithinminutes.classEditorTextAreaFieldName=긴 텍스트
+platform.appwithinminutes.classEditorStringFieldName=짧은 텍스트
+platform.appwithinminutes.classEditorContentFieldName=콘텐츠
+platform.appwithinminutes.classEditorTitleFieldName=제목
+platform.appwithinminutes.classEditorPageFieldName=페이지
+platform.appwithinminutes.classEditorDeleteFieldLabel=삭제
+platform.appwithinminutes.classEditorConfigureFieldLabel=구성
+platform.appwithinminutes.classEditorPreviewFieldLabel=시사
+platform.appwithinminutes.classEditorPreviewFieldHint=구성 패널 숨기기 및 변경 사항 적용
+platform.appwithinminutes.classEditorMoveFieldLabel=이동하다
+platform.appwithinminutes.classEditorMoveFieldHint=드래그 앤 드롭하여 순서를 변경하세요
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=기본값
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=좋아요
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=분명한
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=지금
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=오늘
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=값
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=추가하다
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=삭제
+appWithinMinutes.templateProviderEditor.hint=애플리케이션 항목은 구조화된 데이터가 포함된 위키 페이지입니다.
+appWithinMinutes.templateProviderEditor.icon.hint=애플리케이션 항목 과 연관된 아이콘입니다 .
+appWithinMinutes.templateProviderEditor.description.hint=애플리케이션 항목 에 대한 간단한 설명입니다 .
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=항목을 생성 할 위치
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=위치를 선택하지 않으면 모든 페이지에서 항목을 생성할 수 있습니다.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=항목을 생성할 위치
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=위치를 선택하지 않으면 Wiki의 어느 위치에나 항목을 만들 수 있습니다.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=진입 위치를 강요하지 마세요
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=위에 지정된 위치는 제안용으로만 사용하여 사용자가 애플리케이션 항목을 생성할 때 다른 위치를 선택할 수 있도록 합니다 .
+appWithinMinutes.templateProviderEditor.terminal.hint=애플리케이션 항목이 터미널 페이지여야 하는지 여부입니다.
+
+### Wizard Step 3: Application Presentation
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=응용 분야
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=일반 열
+platform.appwithinminutes.liveTableEditorHelpTitle=팁
+platform.appwithinminutes.liveTableEditorHelpDescription=일반 라이브 테이블 열은 애플리케이션 구조와 독립적입니다. 이는 애플리케이션 데이터를 보유하는 페이지에 대한 정보를 제공합니다.
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=페이지 제목
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=애플리케이션 데이터가 포함된 페이지의 제목
+platform.appwithinminutes.liveTableEditorDocNameColumnName=페이지 이름
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=애플리케이션 데이터가 포함된 페이지 이름
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=위치
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=애플리케이션 데이터가 포함된 페이지의 위치
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=마지막 저자
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=애플리케이션 데이터를 마지막으로 편집한 사용자
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=창조자
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=애플리케이션 데이터를 생성한 사용자
+platform.appwithinminutes.liveTableEditorDocDateColumnName=날짜
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=애플리케이션 데이터가 마지막으로 편집된 날짜
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=생산 일
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=애플리케이션 데이터가 생성된 날짜
+platform.appwithinminutes.liveTableEditorActionsColumnName=행위
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=편집, 삭제 등 애플리케이션 데이터에 대해 수행할 수 있는 작업 목록
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=첨부파일
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=데이터 페이지의 첨부 파일에 대한 링크를 표시하는 특수 열
+platform.appwithinminutes.liveTableEditorImagesColumnName=이미지
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=데이터 페이지에 첨부된 이미지를 표시하는 특수 열
+platform.appwithinminutes.liveTableEditorAvatarColumnName=화신
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=사용자 아바타를 표시하는 특수 열입니다. XWiki .XWikiUsers 클래스 에 바인딩된 테이블에 대해서만 작동합니다
+platform.appwithinminutes.liveTableEditorTitleHint=애플리케이션 홈 페이지, 애플리케이션 패널 및 라이브 테이블, 이동 경로 등에 표시되는 애플리케이션 제목입니다.
+platform.appwithinminutes.liveTableEditorDescriptionHint=애플리케이션 데이터와 함께 라이브 테이블 위에 홈페이지에 표시될 콘텐츠입니다. 이를 사용하여 응용 프로그램을 설명합니다.
+platform.appwithinminutes.liveTableEditorColumnsHint=애플리케이션 홈 페이지에 표시되는 라이브 테이블에 포함할 열을 선택하세요.
+platform.appwithinminutes.liveTableEditorSaveComment=라이브테이블 업데이트
+platform.appwithinminutes.liveTableEditorMoveColumnHint=드래그 앤 드롭하여 순서를 변경하세요
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=삭제
+platform.appwithinminutes.liveTableEditorAddColumnHint=선택한 열 추가
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=일부 열은 더 이상 사용되지 않습니다. 해당 응용 프로그램 필드가 삭제되었기 때문일 수 있습니다. 제거하시겠습니까?&lt;a href=""&gt;예&lt;/a&gt; / &lt;a href=""&gt;아니요&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=상
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=애플리케이션 아이콘입니다. 아이콘 선택기에서 아이콘을 선택하거나 첨부된 이미지를 참조할 수 있습니다.
+
+### Wizard Step 4: Application home page
+platform.appwithinminutes.appLiveTableHeading=항목
+platform.appwithinminutes.appLiveTableEditEntryActionName=편집하다
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=삭제
+platform.appwithinminutes.appHomePageActionsHeading=행위
+platform.appwithinminutes.appHomePageAddEntryLabel=추가하다
+platform.appwithinminutes.appHomePageAddEntryHint=새 항목 추가
+platform.appwithinminutes.appHomePageEntryNameLabel=항목 이름:
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=모든 항목 삭제
+platform.appwithinminutes.appHomePageEditAppLabel=애플리케이션 수정
+platform.appwithinminutes.appHomePageTranslateAppLabel=신청서 번역
+platform.appwithinminutes.appHomePageDeleteAppLabel=애플리케이션 삭제
+platform.appwithinminutes.appHomePageMovedWarning=코드를 업데이트하지 않고 이름을 바꾸거나 이동했기 때문에 애플리케이션이 올바르게 작동하지 않을 수 있습니다. 코드를 업데이트하려면 애플리케이션을 편집하고 다음 단계를 따르세요.
+platform.appwithinminutes.appHomePageNoScriptRight=애플리케이션을 생성하거나 편집하는 데 필요한 스크립트 권한이 없습니다. 계속하면 응용 프로그램이 제대로 작동하지 않을 수 있습니다.
+AppWithinMinutes.LiveTableClass_description=설명
+AppWithinMinutes.LiveTableClass_columns=라이브 테이블 열
+
+### Delete application dialog
+platform.appwithinminutes.deleteAppConfirmation=애플리케이션 {0} 및 해당 항목 이 모두 삭제됩니다. 너 정말 계속하고 싶니?
+platform.appwithinminutes.deleteAppEntriesConfirmation=애플리케이션 {0}의 모든 항목이 삭제됩니다. 너 정말 계속하고 싶니?
+platform.appwithinminutes.deleteAppDoesNotExistError=지정한 애플리케이션이 존재하지 않습니다.
+platform.appwithinminutes.deleteAppInvalidAppError=지정된 이름은 유효한 App Within Minutes 애플리케이션이 아닙니다.
+platform.appwithinminutes.deleteAppNotSpecifiedError=애플리케이션 이름이 지정되지 않았습니다.
+
+### Rename Application
+appWithinMinutes.renameApp.label=응용 프로그램 이름 바꾸기
+appWithinMinutes.renameApp.close=닫기
+appWithinMinutes.renameApp.changeAppTitleInfo=애플리케이션 홈 페이지를 편집하기만 하면 애플리케이션 이름을 바꾸지 않고도 애플리케이션 제목을 변경할 수 있습니다.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=애플리케이션 이름을 바꾸면 애플리케이션 코드가 다시 생성됩니다. 결과적으로 코드 사용자 정의를 덮어쓰게 됩니다.
+appWithinMinutes.renameApp.newName.label=새 이름
+appWithinMinutes.renameApp.pageExistsError=선택한 위치에 이 이름을 가진 페이지가 이미 존재합니다.
+appWithinMinutes.renameApp.locationForbiddenError=선택한 위치로 애플리케이션을 이동할 수 없습니다.
+appWithinMinutes.renameApp.location.label=새로운 위치
+appWithinMinutes.renameApp.location.hint=애플리케이션을 이동할 페이지 계층 구조의 위치입니다.
+appWithinMinutes.renameApp.parent.label=새 상위
+appWithinMinutes.renameApp.parent.hint=새로운 상위 페이지. 애플리케이션을 페이지 계층 구조의 맨 위로 이동하려면 이 필드를 비워 두세요.
+appWithinMinutes.renameApp.inProgress=애플리케이션 이름을 바꾸는 중...
+appWithinMinutes.renameApp.done=애플리케이션 이름이 변경됨
+appWithinMinutes.renameApp.failed=애플리케이션 이름을 바꾸지 못했습니다
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=응용클래스
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=애플리케이션 데이터 위치
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=공간
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=애플리케이션 항목이 포함된 공간의 이름
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=페이지 전체 이름
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=애플리케이션 항목이 포함된 페이지 이름 (공간 이름이 앞에 붙음)
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=이름
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=애플리케이션 이름 지정
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=애플리케이션 이름을 선택하세요
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=구조
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=데이터 구조화
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=애플리케이션 데이터 설명
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=프레젠테이션
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=애플리케이션 홈페이지 맞춤설정
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=애플리케이션 홈페이지 사용자 정의
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=애플리케이션 이름
+appWithinMinutes.classEditor.title={0} 구조
+appWithinMinutes.templateProviderEditor.title={0} 항목
+</content>
+  </xwikidoc>

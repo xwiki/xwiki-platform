@@ -92,6 +92,9 @@ class ClassSheetIT
         // Add a property.
         ClassEditPage classEditor = classSheetPage.clickDefineClassLink();
         classEditor.addProperty("color", "String").setPrettyName("Your favorite color");
+        // Test that adding a property with an existing name returns a notification error.
+        classEditor.addPropertyWithoutWaiting("color", "String");
+        classEditor.waitForNotificationErrorMessage("Property color already exists");
         classEditor.clickSaveAndView();
 
         // Add a new property.

@@ -20,7 +20,6 @@
 package org.xwiki.annotation.rights;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Service to provide functions to check access rights to annotations actions (viewing, adding annotations, editing).
@@ -76,7 +75,6 @@ public interface AnnotationRightService
      * @return {@code true} if the user can upload the attachment, {@code false} otherwise
      * @since 14.10
      */
-    @Unstable
     default boolean canUploadAttachment(String target, String userName)
     {
         return false;

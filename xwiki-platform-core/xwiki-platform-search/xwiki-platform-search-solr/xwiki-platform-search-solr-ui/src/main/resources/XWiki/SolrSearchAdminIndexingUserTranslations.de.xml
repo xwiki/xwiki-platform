@@ -45,7 +45,7 @@ admin.indexinguser.explanation.part1=Der Indexer läuft im Hintergrund, normaler
 admin.indexinguser.explanation.part2=Um den korrekten Titel in den Suchergebnissen anzeigen zu können, ist es notwendig, dem Indexer einen Benutzer zuzuweisen, der Zugriff auf die Vorlagenseiten hat. Es wird empfohlen, ein eigenes, gesperrtes Benutzerkonto ohne besondere Rechte einzurichten.
 admin.indexinguser.explanation.security.head=Sicherheitshinweis:
 admin.indexinguser.explanation.security.content=Die Verwendung eines Kontos mit mehr Ansichtsrechten als andere Benutzer kann zum Durchsickern von Seitentiteln von Seiten führen, die diese Benutzer normalerweise nicht sehen.
-admin.indexinguser.explanation.part3=Änderungen an dieser Einstellung werden nur auf Seiten angewendet, die nach der Änderung indiziert werden; für eine konsistente Anwendung der Änderung wird eine vollständige Neuindizierung empfohlen.  
+admin.indexinguser.explanation.part3=Änderungen an dieser Einstellung werden nur auf Seiten angewendet, die nach der Änderung indiziert werden; für eine konsistente Anwendung der Änderung wird eine vollständige Neuindizierung empfohlen.
 admin.indexinguser.explanation.mainwikionly=Diese Einstellung kann nur im Hauptwiki vorgenommen werden, da der Solr-Indexer vom Hauptwiki aus läuft.
 
 ## keys used by the configuration class

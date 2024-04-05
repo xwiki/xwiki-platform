@@ -4,3 +4,5 @@ org.xwiki.livedata.internal.DefaultLiveDataSourceManager
 org.xwiki.livedata.internal.MapLiveDataConfigurationResolver
 org.xwiki.livedata.internal.StringLiveDataConfigurationResolver
 org.xwiki.livedata.script.LiveDataScriptService
+org.xwiki.livedata.internal.LiveDataRenderer
+org.xwiki.livedata.internal.LiveDataRendererConfiguration

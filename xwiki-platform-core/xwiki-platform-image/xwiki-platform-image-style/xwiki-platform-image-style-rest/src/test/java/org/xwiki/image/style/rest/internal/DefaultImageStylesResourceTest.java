@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Provider;
+import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,9 +42,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiResponse;
 
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -100,17 +100,20 @@ class DefaultImageStylesResourceTest
     void getDefaultStyleIdentifier() throws Exception
     {
         when(this.imageStyleConfiguration.getDefaultStyle("wiki", "xwiki:Space.Page")).thenReturn("defaultStyle");
-        assertEquals(Map.of("defaultStyle", "defaultStyle"),
-            this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
+        assertEquals(Map.of(
+            "defaultStyle", "defaultStyle",
+            "forceDefaultStyle", "false"
+        ), this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page").getEntity());
     }
 
     @Test
     void getDefaultStyleIdentifierNotFound() throws Exception
     {
         when(this.imageStyleConfiguration.getDefaultStyle("wiki", "xwiki:Space.Page")).thenReturn("");
-        assertEquals(Map.of(), this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page"));
-        verify(this.response).setStatus(NO_CONTENT.getStatusCode());
-    }
+        Response response = this.imageStylesResource.getDefaultStyleIdentifier("wiki", "xwiki:Space.Page");
+        assertEquals(Map.of(), response.getEntity());
+        assertEquals(OK.getStatusCode(), response.getStatus());
+   }
 
     private String toJson(Styles wiki) throws JsonProcessingException
     {

@@ -118,6 +118,7 @@ public class RightsFilterListener extends AbstractEventListener
             BaseObject rightObject = i < rights.size() ? rights.get(i) : null;
 
             if (originalRightObject != null) {
+                document.getXObjectsToRemove().remove(originalRightObject);
                 if (rightObject != null) {
                     rightObject.apply(originalRightObject, true);
                 } else {

@@ -20,8 +20,11 @@
 package org.xwiki.annotation.test.ui;
 
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -30,6 +33,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -76,7 +80,9 @@ class AnnotationsIT
         setup.login(USER_NAME, USER_PASS);
     }
 
+    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
+    @Order(4)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
@@ -115,6 +121,7 @@ class AnnotationsIT
     }
 
     @Test
+    @Order(2)
     void addAndDeleteAnnotations(TestUtils setup, TestReference testReference)
     {
         AnnotatableViewPage annotatableViewPage =
@@ -157,6 +164,7 @@ class AnnotationsIT
      * are shown This test is against XAANNOTATIONS-17
      */
     @Test
+    @Order(1)
     void annotationsShouldNotBeShownInXWiki10Syntax(TestUtils setup, TestReference testReference)
     {
         AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(
@@ -167,5 +175,29 @@ class AnnotationsIT
         assertTrue(annotatableViewPage.checkIfAnnotationsAreDisabled());
         annotatableViewPage.simulateCTRL_M();
         annotatableViewPage.waitforAnnotationWarningNotification();
+    }
+
+    @Test
+    @Order(3)
+    void showAnnotationsByClickingOnAQuote(TestUtils setup, TestReference testReference)
+    {
+        // Adds 200 'a' after the content to make sure the content is not on-screen when the comment pane is visible.
+        // The intent is to make sure that clicking on the annotation quote makes the use jump to the corresponding 
+        // annotation (by following the anchor).
+        String paddedContent = IntStream.rangeClosed(0, 200)
+            .mapToObj(i -> "a")
+            .collect(Collectors.joining("\n", CONTENT, ""));
+        AnnotatableViewPage annotatableViewPage =
+            new AnnotatableViewPage(setup.createPage(testReference, paddedContent, null));
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+
+        // Force a page refresh to avoid having the annotations displayed.
+        setup.getDriver().navigate().refresh();
+
+        CommentsTab commentsTab = new ViewPage().openCommentsDocExtraPane();
+        commentsTab.clickOnAnnotationQuote(0);
+        annotatableViewPage = new AnnotatableViewPage(new ViewPage());
+        annotatableViewPage.waitForAnnotationsDisplayed();
+        assertTrue(annotatableViewPage.getAnnotationTextById(0).isDisplayed());
     }
 }

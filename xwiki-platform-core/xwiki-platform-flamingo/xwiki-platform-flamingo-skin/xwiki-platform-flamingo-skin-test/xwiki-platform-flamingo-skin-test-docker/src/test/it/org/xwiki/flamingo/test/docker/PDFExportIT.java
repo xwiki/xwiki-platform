@@ -91,10 +91,8 @@ class PDFExportIT
             assertEquals(String.format("%sxwiki/bin/download/Sandbox/WebHome/XWikiLogo.png?rev=1.1", this.prefix),
                 links.get("XWikiLogo.png"));
 
-            // Ideally we should be asserting for a value of 1 (for the embedded XWikiLogo.png image) but it seems the
-            // PDF contains 2 image objects (for some reason I don't understand ATM - they seem to be variations of the
-            // same image - the logo - in color, in black and white, etc).
-            assertEquals(2, document.getImages().size());
+            // The PDF document should contain the XWikiLogo.png image embedded in the Sandbox home page.
+            assertEquals(1, document.getImages().size());
         }
     }
 

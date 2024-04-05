@@ -26,19 +26,21 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
     #template('hierarchy.vm')
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+    <main id="mainContentArea">
     #set($titleToDisplay = $escapetool.xml($doc.getPlainTitle()))
     #template('contentheader.vm')
     #error($services.localization.render('core.rename.nonexistingDocument'))
-  </div>## mainContentArea
+    </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
     #template('hierarchy.vm')
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+    <main id="mainContentArea">
     #set($titleToDisplay = $services.localization.render('core.export.pdf.options.title'))
     #template('contentheader.vm')
     <form id="pdfExportOptions" class="xform half" action="$escapetool.xml($doc.getURL('export'))">
@@ -143,7 +145,7 @@
       </div>
     </form>
     <div class="clearfloats"></div>
-  </div>## mainContentArea
+    </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

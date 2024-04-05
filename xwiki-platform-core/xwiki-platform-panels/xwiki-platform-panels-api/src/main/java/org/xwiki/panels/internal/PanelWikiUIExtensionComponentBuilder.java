@@ -24,11 +24,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
@@ -49,15 +48,12 @@ import com.xpn.xwiki.objects.BaseObject;
 @Named(PanelClassDocumentInitializer.CLASS_REFERENCE_STRING)
 public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectComponentBuilder
 {
-    /**
-     * The component manager.
-     */
-    @Inject
-    private ComponentManager componentManager;
-
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentResolver;
+
+    @Inject
+    private Provider<PanelWikiUIExtension> panelProvider;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -74,9 +70,11 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiBaseObjectCompo
         try {
             String id = this.serializer.serialize(baseObject.getDocumentReference());
 
-            return Collections
-                .<WikiComponent>singletonList(new PanelWikiUIExtension(baseObject, id, this.componentManager));
-        } catch (ComponentLookupException e) {
+            PanelWikiUIExtension panel = this.panelProvider.get();
+            panel.initialize(baseObject, id);
+
+            return Collections.<WikiComponent>singletonList(panel);
+        } catch (Exception e) {
             throw new WikiComponentException(
                 String.format("Failed to initialize Panel UI extension [%s]", baseObject.getReference()), e);
         }

@@ -180,8 +180,6 @@ com.xpn.xwiki.objects.meta.TextAreaMetaClass
 com.xpn.xwiki.objects.meta.UsersMetaClass
 com.xpn.xwiki.objects.meta.TimezoneMetaClass
 com.xpn.xwiki.pdf.impl.PDFResourceResolver
-com.xpn.xwiki.render.DefaultVelocityManager
-com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.script.parentchild.ParentChildScriptService
 com.xpn.xwiki.store.XWikiCacheStore
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
@@ -269,9 +267,15 @@ org.xwiki.internal.template.ActionTemplateRequirement
 org.xwiki.internal.migration.R150000000XWIKI20285DataMigration
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer
+500:org.xwiki.internal.velocity.XWikiVelocityManager
+org.xwiki.internal.script.XWikiScriptContextInitializer
 org.xwiki.security.authservice.internal.AuthServiceConfiguration
 org.xwiki.security.authservice.internal.AuthServiceConfigurationClassInitializer
 org.xwiki.security.authservice.internal.AuthServiceConfigurationInvalidator
 org.xwiki.security.authservice.internal.AuthServiceManager
 org.xwiki.security.authservice.internal.StandardXWikiAuthServiceComponent
 org.xwiki.security.authservice.script.AuthServiceScriptService
+org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker
+org.xwiki.evaluation.internal.DefaultObjectEvaluator
+org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
+org.xwiki.internal.document.DocumentOverrideListener

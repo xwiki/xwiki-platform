@@ -38,19 +38,18 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.AuthenticationAction;
-import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
 import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.RetrieveUsernameException;
 import org.xwiki.security.authentication.RetrieveUsernameManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
 import org.xwiki.user.UserReference;
@@ -208,14 +207,13 @@ public class AuthenticationScriptService implements ScriptService
 
     /**
      * Check that the given verification code is correct.
-     * Since a new verification code is generated (to avoid reusing a code several times), we also return the new code.
      * Note that we don't need to protect this API for programming rights: if the verificationCode is not correct a
      * {@link ResetPasswordException} is thrown and the verificationCode is reset. So a script attacker with wrong
-     * credentials cannot access the new verification code, or bruteforce it.
+     * credentials cannot access the verification code, or bruteforce it.
      *
      * @param user the user for which to check the verification code.
      * @param verificationCode the code to check.
-     * @return a newly generated verification code if it is correct.
+     * @return the same verification code if it is correct.
      * @throws ResetPasswordException if the code is not correct or if an error occurs.
      * @since 13.1RC1
      */
@@ -251,7 +249,6 @@ public class AuthenticationScriptService implements ScriptService
      * @since 13.10.10
      * @since 14.4.6
      */
-    @Unstable
     public void retrieveUsernameAndSendEmail(String userEmail) throws RetrieveUsernameException
     {
         Set<UserReference> users = this.retrieveUsernameManager.findUsers(userEmail);

@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service for the attachment validation. Provide the attachment validation configuration values.
@@ -45,7 +44,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named("attachmentValidation")
-@Unstable
 public class AttachmentValidationScriptService implements ScriptService
 {
     @Inject

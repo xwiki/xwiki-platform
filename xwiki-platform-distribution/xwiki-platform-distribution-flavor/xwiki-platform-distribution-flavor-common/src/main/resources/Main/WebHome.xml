@@ -35,13 +35,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>= Welcome to your wiki =
+  <content>== Welcome to your wiki ==
 
 XWiki is the best tool to organize your knowledge. A //wiki// is organized in a hierarchy of //pages//. You can create multiple wikis, each with its own set of pages.
 
 XWiki can be used as a knowledge base (support, documentation, sales, etc.), for collaborative workspaces or even as a complete intranet.
 
-= The basics =
+== The basics ==
 
 To make the most out of your wiki, log-in and:
 
@@ -53,22 +53,22 @@ Use the {{displayIcon name="home"/}} breadcrumbs located above the title to //na
 
 You can also use the [[Sandbox&gt;&gt;Sandbox.WebHome]] for more demo content and generally a place to experiment with your wiki's features. 
 
- {{box}}Learn more on how to use XWiki with the {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+ {{box}}Learn more on how to use XWiki with the [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
 (% class="row" %)
 (((
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Extend your wiki =
+== Extend your wiki ==
 
-To extend the power and functionalities of your wiki with the features that //you// need, head over to the {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} where you can search for and install extensions.
+To extend the power and functionalities of your wiki with the features that //you// need, head over to the [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] where you can search for and install extensions.
 
 To browse through the 900+ community contributed extensions available for XWiki, head over to the [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
 )))
 
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Create your application =
+== Create your application ==
 
 Go beyond the available extensions and define the //structure// of your data based on //your// needs, creating //your// own applications with [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM). 
 

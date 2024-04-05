@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-integration</artifactId>
   <name>XWiki Platform - Test - Integration Tests Framework</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Integration Tests Framework</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.28</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.27</xwiki.jacoco.instructionRatio>
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
@@ -86,10 +86,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jaxrs</artifactId>
     </dependency>
     <!-- Replace org.json:json for license reasons -->
     <dependency>

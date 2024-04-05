@@ -77,7 +77,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     'label': $services.localization.render('core.register.password'),
     'params': {
       'type': 'password',
-      'autocomplete': 'off',
+      'autocomplete': 'new-password',
       'size': '60'
     },
     'validate': {
@@ -94,7 +94,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     'label': $services.localization.render('core.register.passwordRepeat'),
     'params': {
       'type': 'password',
-      'autocomplete': 'off',
+      'autocomplete': 'new-password',
       'size': '60'
     },
     'validate': {
@@ -305,6 +305,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 #end
 #*
  * Server side validation, this is necessary for security and because not everyone has Javascript
+ * FIXME: In the future this should be removed and a Java API should be used instead, and probably perform the check
+ *  directly in the RegisterAction.
  *
  * @param $fields The array of fields to validate.
  * @param $request An XWikiRequest object which made the register request, used to get parameters.
@@ -387,68 +389,57 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #end ## CSRF check
 #end##macro
 
-#*
- * Get the configuration from the configuration object.
- *
- * @param $configDocumentName The name of the document to get the configuration from.
- *###
-#macro(loadConfig, $configDocumentName)
-  #set($configurationClassName = 'XWiki.Registration')
-  #set($configDocument = $xwiki.getDocument($configDocumentName))
+#macro(_loadPasswordOptions $return)
   #set ($passwordOptions = {})
+  #set ($passwordOptions.passwordLength = $services.security.registration.passwordMinimumLength)
+  #set ($passwordRules = $services.security.registration.passwordRules)
+  #set($passwordOptions.passwordRuleOneLowerCaseEnabled = $passwordRules.contains('ONE_LOWER_CASE_CHARACTER'))
+  #set($passwordOptions.passwordRuleOneUpperCaseEnabled = $passwordRules.contains('ONE_UPPER_CASE_CHARACTER'))
+  #set($passwordOptions.passwordRuleOneNumberEnabled = $passwordRules.contains('ONE_NUMBER_CHARACTER'))
+  #set($passwordOptions.passwordRuleOneSymbolEnabled = $passwordRules.contains('ONE_SYMBOL_CHARACTER'))
+  #setVariable("$return" $passwordOptions)
+#end
+
+#*
+ * Get the configuration to use for registration.
+ *###
+#macro(_loadConfig $return)
+  #set ($registrationConfig = {})
+  #set($registrationConfig.loginButton = $services.security.registration.isLoginEnabled())
+  #set($registrationConfig.autoLogin = $services.security.registration.isAutoLoginEnabled())
+  #set($registrationConfig.requireCaptcha = $services.security.registration.isCaptchaRequired())
+  #set($registrationConfig.useEmailVerification = $services.security.registration.isEmailValidationRequired())
+  #_loadPasswordOptions($passwordOptions)
+  #set ($registrationConfig.passwordOptions = $passwordOptions)
+  ## FIXME: All remaining values should probably also be retrieved from API
+  #set($configurationClassName = 'XWiki.Registration')
+  #set ($configDocumentName = 'XWiki.RegistrationConfig')
+  #set($configDocument = $xwiki.getDocument($configDocumentName))
   #if(!$configDocument || !$configDocument.getObject($configurationClassName))
   ## No config document, load defaults.
-    #set($heading = "$services.localization.render('core.register.title')")
-    #set($welcomeMessage = "$services.localization.render('core.register.welcome')")
-    #set($useLiveValidation = true)
-    #set($defaultFieldOkayMessage = "$services.localization.render('core.validation.valid.message')")
-    #set($loginButton = true)
-    #set($defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
+    #set($registrationConfig.heading = "$services.localization.render('core.register.title')")
+    #set($registrationConfig.welcomeMessage = "$services.localization.render('core.register.welcome')")
+    #set($registrationConfig.defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
     #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
-    #set($registrationSuccessMessage = '{{info}}$services.localization.render("core.register.successful", ["[[${userFullName}>>${userSpace}${userName}]]", ${userName}]){{/info}}')
-    #set($passwordOptions.passwordLength = 6)
-    #set($passwordOptions.passwordRuleOneLowerCaseEnabled = false)
-    #set($passwordOptions.passwordRuleOneUpperCaseEnabled = false)
-    #set($passwordOptions.passwordRuleOneNumberEnabled = false)
-    #set($passwordOptions.passwordRuleOneSymbolEnabled = false)
+    #set($userSpace = 'XWiki.')
+
+    #set($userLink = $xwiki.getUserName("$userSpace$userName"))
+    #define($registrationSuccessMessage)
+      #set($message = $services.localization.render('core.register.successful', 'xwiki/2.1', ['USERLINK', $userName]))
+      #set($userLink = $xwiki.getUserName("$userSpace$userName"))
+      {{info}}$message.replace('USERLINK', "{{html clean=false}}$userLink{{/html}}"){{/info}}
+    #end
+    #set ($registrationConfig.registrationSuccessMessage = $registrationSuccessMessage)
   #else
     #set($configObject = $configDocument.getObject($configurationClassName))
     #if ($xcontext.action == 'register')
-      #set ($heading = "(% id='document-title'%)((( = #evaluate($configObject.getProperty('heading').getValue()) = )))(%%)")
+      #set ($registrationConfig.heading = "(% id='document-title'%)((( = #evaluate($configObject.getProperty('heading').getValue()) = )))(%%)")
     #else
-      #set ($heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")
+      #set ($registrationConfig.heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")
     #end
-    #set($welcomeMessage = "#evaluate($configObject.getProperty('welcomeMessage').getValue())")
-    #if($configObject.getProperty('liveValidation_enabled').getValue() == 1)
-      #set($useLiveValidation = true)
-    #end
-    #set($defaultFieldOkayMessage = "#evaluate($configObject.getProperty('liveValidation_defaultFieldOkMessage').getValue())")
-    #if($configObject.getProperty('loginButton_enabled').getValue() == 1)
-      #set($loginButton = true)
-    #end
-    #if($configObject.getProperty('loginButton_autoLogin_enabled').getValue() == 1)
-      #set($autoLogin = true)
-    #end
-    #set($defaultRedirect = "#evaluate($configObject.getProperty('defaultRedirect').getValue())")
-    #set($registrationSuccessMessage = "$configObject.getProperty('registrationSuccessMessage').getValue()")
-    #if($configObject.getProperty('requireCaptcha').getValue() == 1)
-      #set($requireCaptcha = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneLowerCaseEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneLowerCaseEnabled = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneUpperCaseEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneUpperCaseEnabled = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneNumberEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneNumberEnabled = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneSymbolEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneSymbolEnabled = true)
-    #end
-    #set($passwordOptions.passwordLength = $configObject.getProperty('passwordLength').getValue())
-    #if ("$!passwordOptions.passwordLength" == "" || $passwordOptions.passwordLength <= 1)
-      #set ($passwordOptions.passwordLength = 6)
-    #end
+    #set($registrationConfig.welcomeMessage = "#evaluate($configObject.getProperty('welcomeMessage').getValue())")
+    #set($registrationConfig.defaultRedirect = "#evaluate($configObject.getProperty('defaultRedirect').getValue())")
+    #set($registrationConfig.registrationSuccessMessage = "$configObject.getProperty('registrationSuccessMessage').getValue()")
   #end
+  #setVariable("$return" $registrationConfig)
 #end

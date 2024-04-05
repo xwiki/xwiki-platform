@@ -48,12 +48,12 @@ public interface XarEntryType
         OVERWRITE,
 
         /**
-         * If what already exist is non standard don't touch it.
+         * If what already exists is non standard don't touch it.
          */
         SKIP,
 
         /**
-         * If anything already exist don't touch it.
+         * If anything already exists don't touch it.
          */
         SKIP_ALLWAYS
     }

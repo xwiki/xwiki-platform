@@ -1,0 +1,101 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="ru">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content># App name
+tour.app.name=Тур
+
+# Class fields
+TourCode.TourClass_description=Описание
+TourCode.TourClass_isActive=Активный
+TourCode.TourClass_targetPage=Целевая страница
+
+# Live table generic keys
+tour.livetable.doc.title=Название тура
+tour.livetable._actions=Действия
+tour.livetable._actions.edit=Правка
+tour.livetable._actions.delete=Удалить
+tour.livetable._actions.launch=Запуск
+tour.livetable.emptyvalue=-
+
+# Live table specific keys
+tour.livetable.description=Описание
+tour.livetable.isActive=Активный
+tour.livetable.targetPage=Целевая страница
+tour.livetable.targetClass=Целевой класс
+
+# Tour popover
+tour.popover.previous=« Предыдущий
+tour.popover.next=Следующий »
+tour.popover.end=Конец тура
+tour.popover.quit=Прекратить тур
+tour.popover.show=Показать тур
+tour.popover.show.hint=Вы можете перезапустить тур в любой момент, нажав на эту кнопку
+
+# Steps
+TourCode.StepClass_order=Порядок
+TourCode.StepClass_element=Элемент (CSS-селектор, идентифицирующий элемент)
+TourCode.StepClass_title=Заголовок
+TourCode.StepClass_content=Содержание
+TourCode.StepClass_backdrop=Задний фон
+TourCode.StepClass_placement=Размещение
+TourCode.StepClass_targetPage=Целевая страница
+TourCode.StepClass_action=Целевое действие
+TourCode.StepClass_queryString=Строка запроса
+tour.steps=Шаги
+tour.steps.new_step=Новый шаг
+tour.steps.add_step=Добавить шаг
+tour.steps.edit_step=Править шаг
+tour.steps.save_step=Сохранить
+tour.steps.delete_confirm=Вы уверены, что хотите удалить шаг?
+tour.steps.delete_done=Шаг удалён!
+tour.steps.deleting=Удаление шага...
+tour.steps.yes=Да
+tour.steps.no=Нет
+tour.steps.edit=Правка
+tour.steps.delete=Удалить
+
+# Upgrade
+tour.upgrade.title=Обновление
+tour.upgrade.successList=Следующие страницы были успешно преобразованы:
+tour.upgrade.successNothing=Нечего обновлять!
+
+# Template
+tour.template.name=Тур
+tour.template.description=Пошаговый тур
+</content>
+</xwikidoc>

@@ -17,851 +17,634 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('xwiki-realtime-wysiwygEditor', [
+define('xwiki-realtime-wysiwyg', [
   'jquery',
   'xwiki-realtime-config',
   'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
-  'hyper-json',
-  'xwiki-realtime-cursor',
   'xwiki-realtime-userData',
   'xwiki-realtime-typingTests',
-  'json.sortify',
   'xwiki-realtime-interface',
   'xwiki-realtime-saver',
   'chainpad',
   'xwiki-realtime-crypto',
-  'diff-dom',
-  'deferred!ckeditor'
+  'xwiki-realtime-wysiwyg-patches'
 ], function (
   /* jshint maxparams:false */
-  $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, Hyperjson, Cursor, UserData, TypingTest, JSONSortify,
-  Interface, Saver, Chainpad, Crypto, diffDOM, ckeditorPromise
+  $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver,
+  ChainPad, Crypto, Patches
 ) {
   'use strict';
 
-  var editorId = 'wysiwyg', module = {
-    Hyperjson
+  const EDITOR_TYPE = 'wysiwyg';
+
+  const ConnectionStatus = {
+    // Before trying to connect to the realtime session, and after leaving it.
+    DISCONNECTED: 0,
+    // While trying to connect to the realtime session.
+    CONNECTING: 1,
+    // After successfully connecting to the realtime session, as long as the edited content can be patched.
+    CONNECTED: 2,
+    // While connected to the realtime session, when the edited content can't be patched (e.g. because the content is
+    // being refreshed after a macro was inserted, which requires server-side rendering).
+    PAUSED: 3
   };
 
-  var hasClass = function(actual, expectedList, some) {
-    var actualList = (actual || '').split(/\s+/);
-    if (typeof expectedList === 'string') {
-      expectedList = [expectedList];
-    }
-    return expectedList[some ? 'some' : 'every'](expectedClass => actualList.indexOf(expectedClass) >= 0);
-  };
+  class RealtimeEditor {
+    constructor(editor, realtimeContext) {
+      this._editor = editor;
+      this._realtimeContext = realtimeContext;
 
-  // Filter attributes in the serialized elements.
-  var macroFilter = function(hj) {
-    // Send a widget ID == 0 to avoid a fight between broswers about it and prevent the container from having the
-    // "selected" class (blue border).
-    if (hasClass(hj[1].class, ['cke_widget_wrapper', 'cke_widget_block'])) {
-      hj[1].class = 'cke_widget_wrapper cke_widget_block';
-      hj[1]['data-cke-widget-id'] = '0';
-    } else if (hasClass(hj[1].class, ['cke_widget_wrapper', 'cke_widget_inline'])) {
-      hj[1].class = 'cke_widget_wrapper cke_widget_inline';
-      hj[1]['data-cke-widget-id'] = '0';
-    } else if (hj[1]['data-macro'] && hasClass(hj[1].class, 'macro')) {
-      // Don't send the "upcasted" attribute which can be removed, generating a shjson != shjson2 error.
-      delete hj[1]['data-cke-widget-upcasted'];
-    } else if (hasClass(hj[1].class, ['cke_widget_drag_handler', 'cke_image_resizer'], /* some */ true)) {
-      // Remove the title attribute of the drag&drop icons since they are localized and create fights over the language
-      // to use.
-      delete hj[1].title;
-    }
-    delete hj[1]['aria-label'];
-    return hj;
-  };
+      // The editor wrapper used to smoothly update (patch) the edited content without losing the caret position.
+      this._patchedEditor = new Patches(editor);
 
-  var bodyFilter = function(hj) {
-    if (hj[0] === 'BODY') {
-      // The "style" contains the padding created for the user position indicators. We don't want to share that value
-      // since it is related to the new userdata channel and not the content channel.
-      hj[1].style = undefined;
-      // "contenteditable" in the body is changed during initialization, we should not get the new value from the wire.
-      if (hj[1].contenteditable) {
-        hj[1].contenteditable = 'false';
+      // The channel used to synchronize the edited content (notify others when you make a change and be notified when
+      // others make changes).
+      this._channel = realtimeContext.channels[EDITOR_TYPE];
+
+      // The channel used to synchronize the content (auto)save (notify others when you save and be notified when others
+      // save, in order to avoid merge conflicts and creating unnecessary document revisions).
+      this._eventsChannel = realtimeContext.channels.events;
+
+      // The channel used to synchronize the user caret position (notify others when your caret position changes and be
+      // notified when others' caret position changes).
+      this._userDataChannel = realtimeContext.channels.userdata;
+  
+      Interface.realtimeAllowed(realtimeContext.realtimeEnabled);
+      this._createAllowRealtimeCheckbox();
+
+      this._connection = {
+        status: ConnectionStatus.DISCONNECTED
+      };
+
+      if (realtimeContext.realtimeEnabled) {
+        this._startRealtimeSync();
       }
     }
-    return hj;
-  };
 
-  /**
-   * Catch `type="_moz"` before it goes over the wire.
-   */
-  var brFilter = function(hj) {
-    if (hj[1].type === '_moz') {
-      hj[1].type = undefined;
+    setEditable(editable) {
+      this._editor.setReadOnly(!editable);
+      $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
     }
-    return hj;
-  };
 
-  var hjFilter = function(hj) {
-    hj = brFilter(hj);
-    hj = bodyFilter(hj);
-    hj = macroFilter(hj);
-    return hj;
-  };
-
-  var stringifyDOM = window.stringifyDOM = function(dom) {
-    return JSONSortify(Hyperjson.fromDOM(dom, shouldSerialize, hjFilter));
-  };
-
-  var shouldSerialize = function(el) {
-    return !isNonRealtime(el) && !isMacroStuff(el);
-  };
-
-  var isNonRealtime = function(element) {
-    return hasClass(element?.getAttribute?.('class'), 'rt-non-realtime');
-  };
-
-  // Filter elements to serialize.
-  var isMacroStuff = function(element) {
-    var isMac = typeof element.getAttribute === 'function' &&
-      (element.getAttribute('data-cke-hidden-sel') || /cke_widget_drag/.test(element.getAttribute('class')) ||
-        hasClass(element.getAttribute('class'), 'cke_image_resizer'));
-    return isMac;
-  };
-
-  var waitForEditorInstance = function(name) {
-    name = name || 'content';
-    return ckeditorPromise.then(ckeditor => new Promise((resolve, reject) => {
-      var editor = ckeditor.instances[name];
-      if (editor) {
-        if (editor.status === 'ready') {
-          resolve(editor);
+    async lockDocument() {
+      const getDocumentLock = new Promise((resolve, reject) => {
+        if (XWiki.DocumentLock) {
+          resolve(XWiki.DocumentLock);
         } else {
-          editor.on('instanceReady', resolve.bind(null, editor));
+          require(['xwiki-document-lock'], resolve, reject);
         }
-      } else {
-        ckeditor.on('instanceReady', function (event) {
-          if (event.editor.name === name) {
-            resolve(event.editor);
-          }
-        });
-      }
-    }));
-  };
+      });
+      XWiki.DocumentLock = await getDocumentLock;
+      XWiki.EditLock = new XWiki.DocumentLock();
+      return XWiki.EditLock.lock();
+    }
 
-  module.main = function(editorConfig, docKeys, useRt) {
-    var channel = docKeys[editorId];
-    var eventsChannel = docKeys.events;
-    var userdataChannel = docKeys.userdata;
+    _startRealtimeSync() {
+      this._connection.status = ConnectionStatus.CONNECTING;
+
+      // List of pretty names of all users (mapped with their server ID).
+      this._connection.userData = {};
+
+      // Don't let the user edit until the real-time framework is ready.
+      this.setEditable(false);
+
+      this._connection.realtimeInput = ChainPadNetflux.start(this._getRealtimeOptions());
+
+      // Notify the others that we're editing in realtime.
+      this._realtimeContext.setRealtimeEnabled(true);
+  
+      // Listen to local changes and propagate them to the other users.
+      this._editor.onChange(() => {
+        if (this._connection.status === ConnectionStatus.CONNECTED) {
+          this._saver.destroyDialog();
+          this._saver.setLocalEditFlag(true);
+          this._onLocal();
+        }
+      });
+
+      this._editor.onLock(this._onLock.bind(this));
+      this._editor.onUnlock(() => {
+        // The editor is usually unlocked after the content is refreshed (e.g. after a macro is inserted). We execute
+        // our handler on the next tick because our handler can trigger a new refresh (e.g. if we received remote
+        // changes that either add a new macro or modify the parameters of an existing macro), and we want to avoid
+        // executing "nested" refresh (async) commands because CKEditor doesn't handle them well.
+        setTimeout(this._onUnlock.bind(this), 0);
+      });
+
+      // Leave the realtime session and stop the autosave when the editor is destroyed. We have to do this because the
+      // editor can be destroyed without the page being reloaded (e.g. when editing in-place).
+      this._editor.onBeforeDestroy(() => {
+        // Notify the others that we're not editing anymore.
+        this._realtimeContext.destroy();
+        this._onAbort();
+      });
+
+      // Export the typing tests to the window.
+      // Call like `test = easyTest()`
+      // Terminate the test like `test.cancel()`
+      window.easyTest = this._easyTest.bind(this);
+    }
 
     /**
      * Update the channels keys for reconnecting WebSocket.
      */
-    var updateKeys = function() {
-      return docKeys._update().then(keys => {
-        if (keys[editorId] && keys[editorId] !== channel) {
-          channel = keys[editorId];
-        }
-        if (keys.events && keys.events !== eventsChannel) {
-          eventsChannel = keys.events;
-        }
-        if (keys.userdata && keys.userdata !== userdataChannel) {
-          userdataChannel = keys.userdata;
-        }
-        return keys;
-      });
-    };
-
-    Interface.realtimeAllowed(useRt);
-    // Don't display the checkbox in the following cases:
-    // * useRt 0 (instead of true/false) => we can't connect to the websocket service
-    // * realtime is disabled and we're not an advanced user
-    if (useRt !== 0 && (useRt || editorConfig.isAdvancedUser)) {
-      var allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
-      allowRealtimeCheckbox.on('change', function() {
-        if (allowRealtimeCheckbox.prop('checked')) {
-          Interface.realtimeAllowed(true);
-          // TODO: Join the RT session without reloading the page?
-          window.location.href = editorConfig.rtURL;
-        } else {
-          editorConfig.displayDisableModal(function(state) {
-            if (!state) {
-              allowRealtimeCheckbox.prop('checked', true);
-            } else {
-              Interface.realtimeAllowed(false);
-              module.onAbort();
-            }
-          });
-        }
-      });
+    async _updateChannels() {
+      const channels = await this._realtimeContext.updateChannels();
+      this._channel = channels[EDITOR_TYPE] || this._channel;
+      this._eventsChannel = channels.events || this._eventsChannel;
+      this._userDataChannel = channels.userdata || this._userDataChannel;
+      return channels;
     }
 
-    if (!useRt) {
-      // When someone is offline, they may have left their tab open for a long time and the lock may have disappeared.
-      // We're refreshing it when the editor is focused so that other users will know that someone is editing the
-      // document.
-      waitForEditorInstance().then(editor => {
-        editor.on('focus', function() {
-          XWiki.EditLock = new XWiki.DocumentLock();
-          XWiki.EditLock.lock();
-        });
-      });
-    }
-
-    if (!Interface.realtimeAllowed()) {
-      console.log('Realtime is disallowed. Quitting');
-      return;
-    }
-
-    Saver.configure({
-      chainpad: ChainPad,
-      editorType: editorId,
-      editorName: 'WYSIWYG',
-      isHTML: true,
-      mergeContent: realtimeConfig.enableMerge !== 0
-    });
-    
-    // Fix the magic line issue.
-    var fixMagicLine = function(editor) {
-      if (editor.plugins.magicline) {
-        var ml = editor.plugins.magicline.backdoor ? editor.plugins.magicline.backdoor.that.line.$ :
-          editor._.magiclineBackdoor.that.line.$;
-        [ml, ml.parentElement].forEach(function(el) {
-          el.setAttribute('class', 'rt-non-realtime');
-        });
-      }
-    },
-
-    // User position indicator style.
-    userIconStyle = [
-      '<style>',
-      '.rt-user-position {',
-        'position : absolute;',
-        'width : 15px;',
-        'height: 15px;',
-        'display: inline-block;',
-        'background : #CCCCFF;',
-        'border : 1px solid #AAAAAA;',
-        'text-align : center;',
-        'line-height: 15px;',
-        'font-size: 11px;',
-        'font-weight: bold;',
-        'color: #3333FF;',
-        'user-select: none;',
-      '}',
-      '</style>'
-    ].join('\n');
-
-    var whenReady = function(editor) {
-      var initializing = true, editableContent, cursor,
-
-      initEditableContent = function() {
-        // Disable temporary attachment upload for now.
-        if (editor.config['xwiki-upload']) {
-          editor.config['xwiki-upload'].isTemporaryAttachmentSupported = false;
-        }
-        editableContent = editor.editable().$;
-        cursor = Cursor(editableContent);
-        $('head', editableContent.ownerDocument).append(userIconStyle);
-        fixMagicLine(editor);
-      };
-
-      // Initialize the editable content when the editor is ready.
-      initEditableContent();
-
-      var afterRefresh = [];
-      editor.on('afterCommandExec', function(event) {
-        if (event?.data?.name === 'xwiki-refresh') {
-          initializing = false;
-          realtimeOptions.onLocal();
-          afterRefresh.forEach(item => item());
-          afterRefresh = [];
-          // Re-initialize the editable content after it is refreshed.
-          initEditableContent();
-        }
-      });
-
-      var setEditable = module.setEditable = function(editable) {
-        editableContent.setAttribute('contenteditable', editable);
-        $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
-      };
-
-      // Don't let the user edit until the real-time framework is ready.
-      setEditable(false);
-
-      var forbiddenTags = [
-        'SCRIPT',
-        'IFRAME',
-        'OBJECT',
-        'APPLET',
-        'VIDEO',
-        'AUDIO'
-      ],
-      preDiffFilters = [
-        // Don't accept attributes that begin with 'on' these are probably listeners, and we don't want to send scripts
-        // over the wire.
-        info => {
-          if (['addAttribute', 'modifyAttribute'].indexOf(info.diff.action) !== -1 && /^on/.test(info.diff.name)) {
-            return `Rejecting forbidden element attribute with name (${info.diff.name})`;
-          }
-        },
-
-        // Reject any elements which would insert any one of our forbidden tag types: script, iframe, object, applet,
-        // video or audio.
-        info => {
-          if (['addElement', 'replaceElement'].indexOf(info.diff.action) !== -1) {
-            if (info.diff.element && forbiddenTags.indexOf(info.diff.element.nodeName) !== -1) {
-              return `Rejecting forbidden tag of type (${info.diff.element.nodeName})`;
-            } else if (info.diff.newValue && forbiddenTags.indexOf(info.diff.newValue.nodeType) !== -1) {
-              return `Rejecting forbidden tag of type (${info.diff.newValue.nodeName})`;
-            }
-          }
-        },
-
-        // Reject the rt-non-realtime class (magic line).
-        info => 'removeElement' === info.diff.action && isNonRealtime(info.node),
-
-        // Reject the CKEditor drag and resize handlers.
-        info => hasClass(info.node?.getAttribute?.('class'),
-          ['cke_widget_drag_handler_container', 'cke_widget_drag_handler', 'cke_image_resizer'], true),
-
-        // Don't change the aria-label properties because they depend on the browser locale and they can create fights.
-        info => info.diff.name === "aria-label" &&
-          ['modifyAttribute', 'removeAttribute', 'addAttribute'].indexOf(info.diff.action) !== -1,
-
-        // The "style" attribute in the "body" contains the padding used to display the user position indicators. It's
-        // not related to the content channel, but to the userdata channel.
-        info => info.node?.tagName === 'BODY' && (info.diff.action === 'modifyAttribute' ||
-          (info.diff.action === 'removeAttribute' && info.diff.name === 'style'))
-      ],
-
-      DD = new diffDOM.DiffDOM({
-        preDiffApply: function(info) {
-          // Apply our filters.
-          if (preDiffFilters.some(filter => {
-            var result = filter(info);
-            if (typeof result === 'string') {
-              console.log(result);
-            }
-            return result;
-          })) {
-            // Reject the change.
-            return true;
-          }
-
-          //
-          // Cursor indicators
-          //
-
-          // No use trying to recover the cursor if it doesn't exist.
-          if (!cursor.exists()) {
-            return;
-          }
-
-          // Frame is either 0, 1, 2, or 3, depending on which cursor frames were affected: none, first, last, or both.
-          var frame = info.frame = cursor.inNode(info.node);
-
-          if (!frame) {
-            return;
-          }
-
-          if (typeof info.diff.oldValue === 'string' && typeof info.diff.newValue === 'string') {
-            var pushes = cursor.pushDelta(info.diff.oldValue, info.diff.newValue);
-            if (frame & 1) {
-              // Push cursor start if necessary.
-              if (pushes.commonStart < cursor.Range.start.offset) {
-                cursor.Range.start.offset += pushes.delta;
-              }
-            }
-            if (frame & 2) {
-              // Push cursor end if necessary.
-              if (pushes.commonStart < cursor.Range.end.offset) {
-                cursor.Range.end.offset += pushes.delta;
-              }
-            }
-          }
-        },
-
-        postDiffApply: function(info) {
-          if (info.frame) {
-            if (info.node) {
-              if (info.frame & 1) {
-                cursor.fixStart(info.node);
-              }
-              if (info.frame & 2) {
-                cursor.fixEnd(info.node);
-              }
-            } else {
-              console.error("info.node did not exist");
-            }
-
-            var sel = cursor.makeSelection();
-            var range = cursor.makeRange();
-
-            cursor.fixSelection(sel, range);
-          }
-        }
-      }),
-
-      // List of pretty name of all users (mapped with their server ID).
-      userData = {},
-      // List of users still connected to the channel (server IDs).
-      userList,
-      // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
-      toolbar,
-
-      fixMacros = function() {
-        var dataValues = {};
-        var $elements = $(editableContent.ownerDocument).find('[data-cke-widget-data]');
-        $elements.each(function(idx, element) {
-          dataValues[idx] = $(element).attr('data-cke-widget-data');
-        });
-        editor.widgets.instances = {};
-        editor.widgets.checkWidgets();
-        $elements.each(function(idx, element) {
-          $(element).attr('data-cke-widget-data', dataValues[idx]);
-        });
-      },
-
-      // Apply patches and try not to lose the cursor in the process!
-      applyHjson = function(shjson) {
-        var userDocStateDom = Hyperjson.toDOM(JSON.parse(shjson));
-        userDocStateDom.setAttribute('contenteditable', 'true');
-        // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
-        var patch = DD.diff(diffDOM.nodeToObj(editableContent), diffDOM.nodeToObj(userDocStateDom));
-        DD.apply(editableContent, patch);
-        try {
-          fixMacros();
-        } catch (e) {
-          console.log("Unable to fix the macros.", e);
-        }
-      },
-
-      findMacroComments = function(el) {
-        var arr = [];
-        for (var i = 0; i < el.childNodes.length; i++) {
-          var node = el.childNodes[i];
-          if (node.nodeType === 8 && node.data && /startmacro/.test(node.data)) {
-            arr.push(node);
+    _createAllowRealtimeCheckbox() {
+      const realtimeEnabled = this._realtimeContext.realtimeEnabled;
+      // Don't display the checkbox in the following cases:
+      // * realtimeEnabled 0 (instead of true/false) => we can't connect to the websocket service
+      // * realtime is disabled and we're not an advanced user
+      if (realtimeEnabled !== 0 && (realtimeEnabled || this._realtimeContext.user.advanced)) {
+        const allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
+        const realtimeToggleHandler = () => {
+          if (allowRealtimeCheckbox.prop('checked')) {
+            // Disable the checkbox while we're fetching the channels.
+            allowRealtimeCheckbox.prop('disabled', true);
+            // We need to fetch the channels before we can connect to the realtime session because:
+            // * the channels might have been closed since we left the realtime session
+            // * the channels might have changed since we last connected to the realtime session
+            // * the channels might not have been created yet because we started editing with realtime disabled.
+            this._updateChannels().then(() => {
+              Interface.realtimeAllowed(true);
+              this._startRealtimeSync();
+            }).catch(() => {
+              // We failed to fetch the channels so we can't connect to the realtime session.
+              allowRealtimeCheckbox.prop('checked', false);
+            }).finally(() => {
+              // Re-enable the checkbox so that the user can try again.
+              allowRealtimeCheckbox.prop('disabled', false);
+            });
           } else {
-            arr.push.apply(arr, findMacroComments(node));
-          }
-        }
-        return arr;
-      },
-
-      createSaver = function(info) {
-        Saver.lastSaved.mergeMessage = Interface.createMergeMessageElement(
-          toolbar.toolbar.find('.rt-toolbar-rightside'));
-        Saver.setLastSavedContent(editor._.previousModeData);
-        var saverCreateConfig = {
-          // Id of the wiki page form.
-          formId: window.XWiki.editor === 'wysiwyg' ? 'edit' : 'inline',
-          setTextValue: function(newText, toConvert, callback) {
-            var andThen = function(data) {
-              var doc = new DOMParser().parseFromString(data, 'text/html');
-              cursor.update();
-              doc.body.setAttribute('contenteditable', 'true');
-              // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
-              var patch = DD.diff(diffDOM.nodeToObj(editableContent), diffDOM.nodeToObj(doc.body));
-              DD.apply(editableContent, patch);
-
-              // If available, transform the HTML comments for XWiki macros into macros before saving
-              // (<!--startmacro:{...}-->). We can do that by using the "xwiki-refresh" command provided the by
-              // CKEditor Integration application.
-              if (editor.plugins['xwiki-macro'] && findMacroComments(editableContent).length > 0) {
-                initializing = true;
-                editor.execCommand('xwiki-refresh');
-                afterRefresh.push(callback);
+            this._realtimeContext.displayDisableModal((state) => {
+              if (!state) {
+                allowRealtimeCheckbox.prop('checked', true);
               } else {
-                callback();
-                realtimeOptions.onLocal();
+                Interface.realtimeAllowed(false);
+                this._onAbort();
               }
-            };
-            if (toConvert) {
-              var object = {
-                wiki: XWiki.currentWiki,
-                space: XWiki.currentSpace,
-                page: XWiki.currentPage,
-                convert: true,
-                text: newText
-              };
-              $.post(editorConfig.htmlConverterUrl, object).then(andThen).catch(() => {
-                var debugLog = {
-                  state: editorId + '/convertHTML',
-                  postData: object
-                };
-                module.onAbort(null, 'converthtml', JSON.stringify(debugLog));
-              });
-            } else {
-              andThen(newText);
-            }
-          },
-          getSaveValue: function() {
-            return {
-              content: editor.getData(),
-              RequiresHTMLConversion: 'content',
-              'content_syntax': 'xwiki/2.1'
-            };
-          },
-          getTextValue: function() {
-            try {
-              return editor.getData();
-            } catch (e) {
-              editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
-              return null;
-            }
-          },
-          realtime: info.realtime,
-          userList: info.userList,
-          userName: editorConfig.userName,
-          network: info.network,
-          channel: eventsChannel,
-          safeCrash: function(reason, debugLog) {
-            module.onAbort(null, reason, debugLog);
+            });
           }
         };
-        Saver.create(saverCreateConfig);
-      },
-
-      getXPath = function(element) {
-        var xpath = '';
-        for ( ; element && element.nodeType == 1; element = element.parentNode ) {
-          var id = $(element.parentNode).children(element.tagName).index(element) + 1;
-          id = id > 1 ? '[' + id + ']' : '';
-          xpath = '/' + element.tagName.toLowerCase() + id + xpath;
-        }
-        return xpath;
-      },
-
-      getPrettyName = function(userName) {
-        return userName ? userName.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) { 
-          return decodeURIComponent(one);
-        }) : userName;
-      };
-
-      editor.on('toDataFormat', function(evt) {
-        var root = evt.data.dataValue;
-        var toRemove = [];
-        var toReplaceMacro = [];
-        root.forEach( function( node ) {
-          if (node.name === "style") {
-            window.myNode = node;
-            toRemove.push(node);
-          }
-          if (typeof node.hasClass === "function") {
-            if (node.hasClass('rt-non-realtime')) {
-              toRemove.push(node);
-            } else if (node.hasClass('macro') &&
-                node.attributes &&
-                node.attributes['data-macro'] &&
-                node.parent &&
-                node.parent.attributes &&
-                node.parent.attributes.contenteditable === "false") {
-              toReplaceMacro.push(node);
-            }
-          }
-        }, null, true );
-        toRemove.forEach(function (el) {
-        if (!el) { return; }
-          el.forEach(function (node) {
-            node.remove();
-          });
+        allowRealtimeCheckbox.on('change', realtimeToggleHandler);
+        this._editor.onBeforeDestroy(() => {
+          allowRealtimeCheckbox.off('change', realtimeToggleHandler);
         });
-        var macroWidget;
-        for (var widget in editor.widgets.instances) {
-          if (widget.name && widget.name === 'xwiki-macro') {
-            macroWidget = widget;
-            break;
-          }
-        }
-        if (macroWidget) {
-          toReplaceMacro.forEach(function (el) {
-            var container = el.parent;
-            var newNode = macroWidget.downcast(el);
-            var index = container.parent.children.indexOf(container);
-            container.parent.children[index] = newNode;
-          });
-        }
-      }, null, null, 12 );
+      }
+    }
 
-      var changeUserIcons = function(newdata) {
-        if (!realtimeConfig.marginAvatar) {
+    async _createSaver(info, userName) {
+      const saverConfig = {
+        editorType: EDITOR_TYPE,
+        editorName: 'WYSIWYG',
+        // Id of the wiki page form.
+        formId: RealtimeEditor._getFormId(),
+        userList: info.userList,
+        userName,
+        network: info.network,
+        channel: this._eventsChannel,
+        setTextValue: (newText) => {
+          this._patchedEditor.setHTML(newText, true);
+        },
+        getTextValue: () => {
+          try {
+            return this._editor.getOutputHTML();
+          } catch (e) {
+            this._editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
+            return null;
+          }
+        },
+        getSaveValue: () => {
+          const fieldName = this._editor.getFormFieldName();
+          return {
+            [fieldName]: this._editor.getOutputHTML(),
+            RequiresHTMLConversion: fieldName,
+            [`${fieldName}_syntax`]: 'xwiki/2.1'
+          };
+        },
+        getTextAtCurrentRevision: (revision) => {
+          return $.get(XWiki.currentDocument.getURL('get', $.param({
+            xpage:'get',
+            outputSyntax:'annotatedhtml',
+            outputSyntaxVersion:'5.0',
+            transformations:'macro',
+            rev:revision
+          })));
+        },
+        safeCrash: (reason, debugLog) => {
+          this._onAbort(null, reason, debugLog);
+        }
+      };
+      this._saver = await new Saver(saverConfig).toBeReady();
+      this._saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
+        this._connection.toolbar.toolbar.find('.rt-toolbar-rightside'));
+      this._saver.setLastSavedContent(this._editor.getOutputHTML());
+    }
+
+    static _getFormId() {
+      if (window.XWiki.editor === 'wysiwyg') {
+        if (window.XWiki.contextaction === 'view') {
+          return 'inplace-editing';
+        } else {
+          return 'edit';
+        }
+      } else {
+        return 'inline';
+      }
+    }
+
+    _changeUserIcons(newdata) {
+      if (!realtimeConfig.marginAvatar) {
+        return;
+      }
+
+      // If no new data (someone has just joined or left the channel), get the latest known values.
+      const updatedData = newdata || this._connection.userData;
+
+      const ownerDocument = this._editor.getContentWrapper().ownerDocument;
+      $(ownerDocument).find('.rt-user-position').remove();
+      const positions = {};
+      this._connection.userList.users.filter(id => updatedData[id]?.['cursor_' + EDITOR_TYPE]).forEach(id => {
+        const data = updatedData[id];
+        const name = RealtimeEditor._getPrettyName(data.name);
+        // Set the user position.
+        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], this._editor.getContentWrapper(), null,
+          XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        if (!element) {
           return;
         }
-
-        // If no new data (someone has just joined or left the channel), get the latest known values.
-        var updatedData = newdata || userData;
-
-        $(editableContent.ownerDocument).find('.rt-user-position').remove();
-        var positions = {};
-        var requiredPadding = 0;
-        userList.users.filter(id => updatedData[id]?.['cursor_' + editorId]).forEach(id => {
-          var data = updatedData[id];
-          var name = getPrettyName(data.name);
-          // Set the user position.
-          var element = editableContent.ownerDocument.evaluate(data['cursor_' + editorId],
-            editableContent.ownerDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-          if (!element) {
-            return;
-          }
-          var pos = $(element).offset();
-          if (!positions[pos.top]) {
-            positions[pos.top] = [id];
-          } else {
-            positions[pos.top].push(id);
-          }
-          var index = positions[pos.top].length - 1;
-          var posTop = pos.top + 3;
-          var posLeft = index * 16;
-          requiredPadding = Math.max(requiredPadding, (posLeft + 10));
-          var $indicator;
-          if (data.avatar) {
-            $indicator = $('<img alt=""/>').attr('src', data.avatar);
-          } else {
-            $indicator = $('<div></div>').text(name.substring(0, 1));
-          }
-          $indicator.addClass('rt-non-realtime rt-user-position').attr({
-            id: 'rt-user-' + id,
-            title: name,
-            contenteditable: 'false'
-          }).css({
-            'left': posLeft + 'px',
-            'top': posTop + 'px'
-          });
-          $('html', editableContent.ownerDocument).append($indicator);
+        const top = $(element).position().top;
+        if (!positions[top]) {
+          positions[top] = [id];
+        } else {
+          positions[top].push(id);
+        }
+        let $indicator;
+        if (data.avatar) {
+          $indicator = $('<img alt=""/>').attr('src', data.avatar);
+        } else {
+          $indicator = $('<div></div>').text(name.substring(0, 1));
+        }
+        $indicator.addClass('rt-non-realtime rt-user-position').attr({
+          id: 'rt-user-' + id,
+          title: name,
+          contenteditable: 'false'
+        }).css({
+          // Use the default top value (which is normally the top padding of the rich text area) if the element holding
+          // the caret has 0 or negative top value (this can happen for instance if the caret is directly under the root
+          // element, e.g. the BODY element for the standalone edit mode).
+          'top': top > 0 ? top + 'px' : ''
         });
+        $(this._editor.getContentWrapper()).after($indicator);
+      });
+    }
 
-        $(editableContent).css('padding-left', requiredPadding === 0 ? '' : ((requiredPadding + 15) + 'px'));
-      };
-
-      var isFirstOnReadyCall = true;
-
-      var realtimeOptions = {
-        initialState: stringifyDOM(editableContent) || '{}',
-        websocketURL: editorConfig.WebsocketURL,
-        userName: editorConfig.userName,
-        channel: channel,
+    _getRealtimeOptions() {
+      return {
+        initialState: this._patchedEditor.getHyperJSON() || '{}',
+        websocketURL: this._realtimeContext.webSocketURL,
+        userName: this._realtimeContext.user.name,
+        channel: this._channel,
         crypto: Crypto,
-        network: editorConfig.network,
+        network: this._realtimeContext.network,
 
-        // OT
-        //patchTransformer: Chainpad.NaiveJSONTransformer
+        // Operational Transformation
+        // The synchronization is done on JSON so we need to make sure the output of the synchronization is always
+        // valid JSON.
+        patchTransformer: ChainPad.NaiveJSONTransformer,
 
-        onRemote: function(info) {
-          if (initializing) {
-            return;
-          }
-
-          var shjson = info.realtime.getUserDoc();
-
-          // Remember where the cursor is.
-          cursor.update();
-
-          // Build a DOM from HJSON, diff, and patch the editor.
-          applyHjson(shjson);
-
-          var shjson2 = stringifyDOM(editableContent);
-          if (shjson2 !== shjson) {
-            console.error('shjson2 !== shjson');
-            var diff = Chainpad.Diff.diff(shjson, shjson2);
-            console.log(shjson, diff);
-            module.chainpad.contentUpdate(shjson2);
-          }
-        },
-
-        onInit: function(info) {
-          userList = info.userList;
-          var config = {
-            userData,
-            onUsernameClick: function(id) {
-              const editableContentLocation = editableContent.ownerDocument.defaultView.location;
-              const baseHref = editableContentLocation.href.split('#')[0] || '';
-              editableContentLocation.href = baseHref + '#rt-user-' + id;
-            }
-          };
-          toolbar = Toolbar.create({
-            '$container': $('#cke_1_toolbox'),
-            myUserName: info.myID,
-            realtime: info.realtime,
-            getLag: info.getLag,
-            userList: info.userList,
-            config
-          });
-          // When someone leaves, if they used Save&View, it removes the locks from the document. We're going to add it
-          // again to be sure new users will see the lock page and be able to join.
-          var oldUsers = JSON.parse(JSON.stringify(userList.users || []));
-          userList.change.push(function() {
-            if (userList.length) {
-              // If someone has left, try to get the lock.
-              if (oldUsers.some(user => userList.users.indexOf(user) === -1)) {
-                XWiki.EditLock = new XWiki.DocumentLock();
-                XWiki.EditLock.lock();
-              }
-              oldUsers = JSON.parse(JSON.stringify(userList.users || []));
-            }
-          });
-        },
-
-        onReady: function(info) {
-          if (!initializing) {
-            return;
-          }
-
-          $.extend(module, {
-            chainpad: info.realtime,
-            leaveChannel: info.leave,
-            realtimeOptions
-          });
-          var shjson = module.chainpad.getUserDoc();
-
-          if (isFirstOnReadyCall) {
-            isFirstOnReadyCall = false;
-            // Update the user list to link the wiki name to the user id.
-            var userdataConfig = {
-              myId: info.myId,
-              userName: editorConfig.userName,
-              userAvatar: editorConfig.userAvatarURL,
-              onChange: userList.onChange,
-              crypto: Crypto,
-              editor: editorId,
-              getCursor: function() {
-                var selection = editor.getSelection();
-                if (!selection) {
-                  return '';
-                }
-                var ranges = selection.getRanges();
-                if (!ranges || !ranges[0] || !ranges[0].startContainer || !ranges[0].startContainer.$) {
-                  return '';
-                }
-                var node = ranges[0].startContainer.$;
-                node = (node.nodeName === '#text') ? node.parentNode : node;
-                var xpath = getXPath(node);
-                return xpath;
-              }
-            };
-            if (!realtimeConfig.marginAvatar) {
-              delete userdataConfig.getCursor;
-            }
-
-            userData = UserData.start(info.network, userdataChannel, userdataConfig);
-            userList.change.push(changeUserIcons);
-          }
-
-          applyHjson(shjson);
-
-          console.log('Unlocking editor');
-          initializing = false;
-          setEditable(true);
-          module.chainpad.start();
-
-          realtimeOptions.onLocal();
-          createSaver(info);
-        },
-
-        onAbort: function(info, reason, debug) {
-          console.log("Aborting the session!");
-          var msg = reason || 'disconnected';
-          module.chainpad.abort();
+        validateContent: (content) => {
           try {
-            // Don't break if the channel doesn't exist anymore.
-            module.leaveChannel();
-          } catch (e) {}
-          module.aborted = true;
-          editorConfig.abort();
-          Saver.stop();
-          toolbar.failed();
-          toolbar.toolbar.remove();
-          if (typeof userData.leave === 'function') {
-            userData.leave();
-          }
-          changeUserIcons({});
-          if (allowRealtimeCheckbox.prop('checked') && !module.aborted) {
-            ErrorBox.show(msg, debug);
+            JSON.parse(content || '{}');
+            return true;
+          } catch (e) {
+            console.error("Failed to parse JSON content, rejecting patch.", {
+              content,
+              error: e
+            });
+            return false;
           }
         },
 
-        onConnectionChange: function(info) {
-          if (module.aborted) {
-            return;
-          }
-          console.log('Connection status: ' + info.state);
-          toolbar.failed();
-          if (info.state) {
-            initializing = true;
-            toolbar.reconnecting(info.myId);
-          } else {
-            module.chainpad.abort();
-            setEditable(false);
-          }
-        },
-
-        beforeReconnecting: function(callback) {
-          var oldChannel = channel;
-          updateKeys().then(() => {
-            if (channel !== oldChannel) {
-              editorConfig.onKeysChanged();
-              setEditable(false);
-              allowRealtimeCheckbox.prop('checked', false);
-              module.onAbort();
-            } else {
-              callback(channel, stringifyDOM(editableContent));
-            }
-          });
-        },
+        onInit: this._onInit.bind(this),
+        onReady: this._onReady.bind(this),
 
         // This function resets the realtime fields after coming back from source mode.
-        onLocalFromSource: function() {
-          // Re-initialize the editable content when coming back from source mode because the WYSIWYG area is recreated.
-          initEditableContent();
-          this.onLocal();
+        onLocalFromSource: () => {
+          this._onLocal();
         },
 
-        onLocal: function() {
-          if (initializing) {
-            return;
-          }
-          // Stringify the JSON and send it into ChainPad.
-          var shjson = stringifyDOM(editableContent);
-          module.chainpad.contentUpdate(shjson);
+        onLocal: this._onLocal.bind(this),
+        onRemote: this._onRemote.bind(this),
+        onConnectionChange: this._onConnectionChange.bind(this),
+        beforeReconnecting: this._beforeReconnecting.bind(this),
+        onAbort: this._onAbort.bind(this),
+      };
+    }
 
-          if (module.chainpad.getUserDoc() !== shjson) {
-            console.error("realtime.getUserDoc() !== shjson");
-          }
+    _onInit(info) {
+      // List of users still connected to the channel (server IDs).
+      this._connection.userList = info.userList;
+      const config = {
+        userData: this._connection.userData,
+        onUsernameClick: (id) => {
+          const editableContentLocation = this._editor.getContentWrapper().ownerDocument.defaultView.location;
+          const baseHref = editableContentLocation.href.split('#')[0] || '';
+          editableContentLocation.href = baseHref + '#rt-user-' + id;
         }
       };
-
-      module.onAbort = realtimeOptions.onAbort;
-
-      module.realtimeInput = ChainPadNetflux.start(realtimeOptions);
-
-      // Hitting enter makes a new line, but places the cursor inside of the <br> instead of the <p>. This makes it such
-      // that you cannot type until you click, which is rather unnacceptable. If the cursor is ever inside such a <br>,
-      // you probably want to push it out to the parent element, which ought to be a paragraph tag. This needs to be
-      // done on keydown, otherwise the first such keypress will not be inserted into the P.
-      editableContent.addEventListener('keydown', cursor.brFix);
-
-      editor.on('change', function() {
-        Saver.destroyDialog();
-        if (!initializing) {
-          Saver.setLocalEditFlag(true);
-        }
-        realtimeOptions.onLocal();
+      // The real-time toolbar, showing the list of connected users, the merge message, the spinner and the lag.
+      this._connection.toolbar = Toolbar.create({
+        '$container': $(this._editor.getToolBar()),
+        myUserName: info.myID,
+        realtime: info.realtime,
+        getLag: info.getLag,
+        userList: info.userList,
+        config
       });
+      // When someone leaves, if they used Save&View, it removes the locks from the document. We're going to add it
+      // again to be sure new users will see the lock page and be able to join.
+      let oldUsers = JSON.parse(JSON.stringify(info.userList.users || []));
+      info.userList.change.push(() => {
+        if (info.userList.length) {
+          // If someone has left, try to get the lock.
+          if (oldUsers.some(user => info.userList.users.indexOf(user) === -1)) {
+            this.lockDocument();
+          }
+          oldUsers = JSON.parse(JSON.stringify(info.userList.users || []));
+        }
+      });
+    }
 
-      // Export the typing tests to the window.
-      // call like `test = easyTest()`
-      // terminate the test like `test.cancel()`
-      window.easyTest = function () {
-        cursor.update();
-        var start = cursor.Range.start;
-        var test = TypingTest.testInput(editableContent, start.el, start.offset, realtimeOptions.onLocal);
-        realtimeOptions.onLocal();
-        return test;
+    async _onReady(info) {
+      if (this._connection.status !== ConnectionStatus.CONNECTING) {
+        return;
+      }
+
+      this._connection.chainpad = info.realtime;
+
+      if (!this._connection.isOnReadyPreviouslyCalled) {
+        this._connection.isOnReadyPreviouslyCalled = true;
+        // Update the user list to link the wiki name to the user id.
+        const userDataConfig = {
+          myId: info.myId,
+          userName: this._realtimeContext.user.name,
+          userAvatar: this._realtimeContext.user.avatarURL,
+          onChange: this._connection.userList.onChange,
+          crypto: Crypto,
+          editor: EDITOR_TYPE,
+          getCursor: () => {
+            const selection = this._editor.getSelection();
+            let node = selection?.rangeCount && selection.getRangeAt(0).startContainer;
+            if (!node) {
+              return '';
+            }
+            node = (node.nodeName === '#text') ? node.parentNode : node;
+            return this._getXPath(node);
+          }
+        };
+        if (!realtimeConfig.marginAvatar) {
+          delete userDataConfig.getCursor;
+        }
+
+        this._connection.userData = await UserData.start(info.network, this._userDataChannel, userDataConfig);
+        this._connection.userList.change.push(this._changeUserIcons.bind(this));
+      }
+
+      await this._createSaver(info, this._realtimeContext.user.name);
+
+      this._connection.status = ConnectionStatus.CONNECTED;
+
+      // Initialize the edited content with the content from the realtime session.
+      await this._onRemote(info);
+
+      console.debug('Unlocking editor');
+      this.setEditable(true);
+    }
+
+    _onLocal(localContent) {
+      if (this._connection.status !== ConnectionStatus.CONNECTED) {
+        return;
+      }
+      if (typeof localContent !== 'string') {
+        // Stringify the JSON and send it into ChainPad.
+        localContent = this._patchedEditor.getHyperJSON();
+      }
+      console.debug('Push local content: ' + localContent);
+      this._connection.chainpad.contentUpdate(localContent);
+
+      const remoteContent = this._connection.chainpad.getUserDoc();
+      if (remoteContent !== localContent) {
+        console.warn('Unexpected remote content after synchronization: ', {
+          expected: localContent,
+          actual: remoteContent,
+          diff: ChainPad.Diff.diff(localContent, remoteContent)
+        });
+      }
+    }
+
+    async _onRemote(info) {
+      if (this._connection.status !== ConnectionStatus.CONNECTED) {
+        return;
+      }
+
+      let remoteContent = info.realtime.getUserDoc();
+      console.debug('Received remote content: ' + remoteContent);
+
+      // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they had
+      // to be reloaded, e.g. rendering macros have to be rendered server-side).
+      await this._patchedEditor.setHyperJSON(remoteContent);
+
+      // The remote content might have changed while we were waiting for the local content to be updated. If that was
+      // the case then the local content should have been merged when the editor was unlocked.
+      remoteContent = info.realtime.getUserDoc();
+
+      const localContent = this._patchedEditor.getHyperJSON();
+      if (localContent !== remoteContent) {
+        console.warn('Unexpected local content after synchronization: ', {
+          expected: remoteContent,
+          actual: localContent,
+          diff: ChainPad.Diff.diff(remoteContent, localContent)
+        });
+      }
+    }
+
+    _onConnectionChange(info) {
+      if (this._connection.status === ConnectionStatus.DISCONNECTED) {
+        return;
+      }
+      console.debug('Connection status: ' + info.state);
+      this._connection.toolbar.failed();
+      if (info.state) {
+        this._connection.status = ConnectionStatus.CONNECTING;
+        this._connection.toolbar.reconnecting(info.myId);
+      } else {
+        this._connection.chainpad.abort();
+        this.setEditable(false);
+      }
+    }
+
+    _beforeReconnecting(callback) {
+      const oldChannel = this._channel;
+      this._updateChannels().then(() => {
+        if (this._channel === oldChannel) {
+          // The Netflux channel used before the WebSocket connection closed is still available so we can still use it.
+          callback(this._channel, this._patchedEditor.getHyperJSON());
+        } else {
+          // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
+          // abort the current realtime session.
+          this.setEditable(false);
+          this._onAbort();
+          if (!this._saver.getLocalEditFlag()) {
+            // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
+            // Netflux channel.
+            this._startRealtimeSync();
+          } else {
+            // We can't rejoin the realtime session using the new Netflux channel because we would lose the unsaved
+            // local changes. Let the user decide what to do.
+            Interface.getAllowRealtimeCheckbox().prop('checked', false);
+            this._realtimeContext.displayReloadModal();
+          }
+        }
+      });
+    }
+
+    _onAbort(info, reason, debug) {
+      if (this._connection.status === ConnectionStatus.DISCONNECTED) {
+        // We already left the realtime session.
+        return;
+      }
+
+      console.debug("Aborting the realtime session!");
+      this._connection.status = ConnectionStatus.DISCONNECTED;
+
+      // Stop the realtime content synchronization (leave the WYSIWYG editor Netflux channel associated with the edited
+      // document field).
+      this._connection.realtimeInput.stop();
+
+      // Notify the others that we're editing offline (outside of the realtime session).
+      this._realtimeContext.setRealtimeEnabled(false);
+
+      // Stop the autosave (and leave the events Netflux channel associated with the edited document).
+      this._saver.stop();
+
+      // Remove the realtime toolbar.
+      this._connection.toolbar.failed();
+      this._connection.toolbar.toolbar.remove();
+
+      // Stop receiving user caret updates (leave the user data Netflux channel associated with the edited document).
+      this._connection.userData.stop?.();
+      // And remove the user caret indicators.
+      this._changeUserIcons({});
+
+      // Typing tests require the realtime session to be active.
+      delete window.easyTest;
+
+      // Cleanup connection data.
+      this._connection = {
+        status: ConnectionStatus.DISCONNECTED
       };
 
-      return editor;
+      if (reason || debug) {
+        ErrorBox.show(reason || 'disconnected', debug);
+      }
+    }
+
+    _onLock() {
+      if (this._connection.status === ConnectionStatus.CONNECTED) {
+        this._connection.status = ConnectionStatus.PAUSED;
+        this._connection.remoteContentBeforeLock = this._connection.chainpad.getUserDoc();
+      }
+    }
+
+    _onUnlock() {
+      if (this._connection.status === ConnectionStatus.PAUSED) {
+        this._connection.status = ConnectionStatus.CONNECTED;
+        const remoteContentAfterLock = this._connection.chainpad.getUserDoc();
+        const localContentAfterLock = this._patchedEditor.getHyperJSON();
+        if (remoteContentAfterLock === this._connection.remoteContentBeforeLock) {
+          // We didn't receive any remote changes while the editor was locked.
+          if (localContentAfterLock !== this._connection.remoteContentBeforeLock) {
+            // The local content has changed while the editor was locked (e.g. because one of the inserted macros is
+            // editable in-place and its rendering added nested editable areas).
+            this._onLocal();
+          }
+        } else if (localContentAfterLock === this._connection.remoteContentBeforeLock) {
+          // The local content didn't change while the editor was locked, but we received remote changes. Let's apply
+          // them.
+          this._onRemote({
+            realtime: this._connection.chainpad
+          });
+        } else {
+          // The local content and the remote content have diverged. We need a 3-way merge.
+          this._onLocal(Patches.merge(this._connection.remoteContentBeforeLock, remoteContentAfterLock,
+            localContentAfterLock));
+          this._onRemote({
+            realtime: this._connection.chainpad
+          });
+        }
+      }
+    }
+
+    _easyTest() {
+      let container, offset;
+      const selection = this._editor.getSelection();
+      const range = selection?.rangeCount && selection.getRangeAt(0);
+      if (range) {
+        container = range.startContainer;
+        offset = range.startOffset;
+      }
+      const test = TypingTest.testInput(this._editor.getContentWrapper(), container, offset, this._onLocal.bind(this));
+      this._onLocal();
+      return test;
+    }
+
+    _getXPath(element) {
+      let xpath = [];
+      const root = this._editor.getContentWrapper();
+      while (element && element.nodeType === Node.ELEMENT_NODE && element !== root) {
+        let index = $(element.parentNode).children(element.tagName).index(element) + 1;
+        // Specify the index only if it's not the first element of its kind.
+        index = index > 1 ? '[' + index + ']' : '';
+        xpath.push(element.tagName.toLowerCase() + index);
+        element = element.parentNode;
+      }
+      // The returned XPath must be relative to the content wrapper because the HTML structure beyond that is different
+      // for different edit modes (e.g. the standalone edit mode uses an iframe where the content wrapper is the BODY
+      // element while the in-place edit mode uses a DIV element).
+      if (element === root) {
+        xpath.push('.');
+      }
+      // The path needs to start from the top-most element.
+      xpath = xpath.reverse();
+      return xpath.join('/');
+    }
+  
+    static _getPrettyName(userName) {
+      return userName ? userName.replace(/^.*-([^-]*)%2d\d*$/, function(all, one) { 
+        return decodeURIComponent(one);
+      }) : userName;
+    }
+  }
+
+  window.REALTIME_DEBUG = window.REALTIME_DEBUG || {};
+  window.REALTIME_DEBUG.logs = [];
+  ['debug', 'error', 'info', 'log', 'trace', 'warn'].forEach(level => {
+    const original = console[level];
+    console[level] = function (...args) {
+      original(...args);
+      window.REALTIME_DEBUG.logs.push([level, ...args]);
     };
+  });
 
-    return waitForEditorInstance().then(whenReady);
-  };
-
-  return module;
+  return RealtimeEditor;
 });

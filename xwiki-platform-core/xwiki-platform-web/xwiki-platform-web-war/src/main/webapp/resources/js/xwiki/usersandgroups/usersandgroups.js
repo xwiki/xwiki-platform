@@ -18,20 +18,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /* this represent a triple state checkbox */
-
-define('users-and-groups-translation-keys', {
-  prefix: 'platform.core.rightsManagement.',
-  keys: [
-    "allowed",
-    "denied",
-    "undefined"
-  ]
-});
-
+/*!
+#set ($iconNames = ['check', 'cross'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
+#[[*/
+// Start JavaScript-only code.
+(function(icons) {
+  "use strict";
+define('users-and-groups-translation-keys', { keys: [
+  "platform.core.rightsManagement.allowed",
+  "platform.core.rightsManagement.denied",
+  "platform.core.rightsManagement.undefined",
+  "rightsmanager.denyrightforcurrentuser",
+  "rightsmanager.clearrightforcurrentuserinstead",
+  "rightsmanager.clearrightforcurrentuser",
+  "rightsmanager.denyrightforgroup",
+  "rightsmanager.clearrightforgroupinstead",
+  "rightsmanager.clearrightforgroup",
+  "rightsmanager.denyrightforuorg",
+  "rightsmanager.clearrightforuorg",
+  "platform.core.rightsManagement.saveFailure",
+  "platform.core.rightsManagement.ajaxFailure"
+]});
 window.MSCheckbox = Class.create({
   /**
     * @todo Make confirmations generic.
-    * @todo L10N
     * @todo Send the state number, or a generic map {state => sendValue}
     * @todo Configuration: automatic save, or just change the value.
     * @todo "Busy" icon when saving.
@@ -41,62 +55,65 @@ window.MSCheckbox = Class.create({
     */
   initialize: function(domNode, right, saveUrl, defaultState, table, idx)
   {
-    this.table = table;
-    this.idx = idx;
-    if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
-      this.currentUorG = this.table.fetchedRows[this.idx].fullname;
-      this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
-    } else {
-      // guest users
-      this.currentUorG = window.unregUser;
-      this.isUserInGroup = false;
-    }
-    this.right = right;
-    this.saveUrl = saveUrl;
-    this.defaultState = defaultState;
-    this.state = defaultState;
-    this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
-    this.nrstates = this.states.length;
-    this.images = [
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')",
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')",
-      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"
-    ];
+    require(['xwiki-l10n!users-and-groups-translation-keys'], (l10n) => {
+      this._l10n = l10n; 
+      this.table = table;
+      this.idx = idx;
+      if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
+        this.currentUorG = this.table.fetchedRows[this.idx].fullname;
+        this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
+      } else {
+        // guest users
+        this.currentUorG = window.unregUser;
+        this.isUserInGroup = false;
+      }
+      this.right = right;
+      this.saveUrl = saveUrl;
+      this.defaultState = defaultState;
+      this.state = defaultState;
+      this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
+      this.nrstates = this.states.length;
+      this.stateClasses = [
+        "none",
+        "yes",
+        "no"
+      ];
 
-    
-    
-    this.button = document.createElement("button");
-    this.button.className = "rights-edit";
-    this.button.addEventListener('click', this.createClickHandler(this));
-    
-    var img = document.createElement("img");
-    
-    this.button.appendChild(img);
-    
-    $(domNode).appendChild(this.button);
-    this.draw(this.state);
+      this.button = document.createElement("button");
+      this.button.className = "btn btn-default btn-xs rights-edit";
+      this.button.addEventListener('click', this.createClickHandler(this));
+
+      $(domNode).appendChild(this.button);
+      this.draw();
+    });
   },
-
-  /**
-    * @todo Draw with the current this.state, don't pass as an argument.
-    */
-  draw: function(state)
+  
+  draw: function()
   {
-    //Change display image
-    var img = this.button.firstChild;
-    img.src = this.images[state];
+    //Change the display icon
+    if(this.state === 0) {
+      this.button.innerHTML = '';
+    }
+    if(this.state === 1) {
+      this.button.innerHTML = icons.check;
+    }
+    if(this.state === 2) {
+      this.button.innerHTML = icons.cross;
+    }
+
+    this.button.classList.add(this.stateClasses[this.state]);
     
     //Update the description of the button for accessibility.
     var button = this.button;
-    require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
-      var alts = [
-        l10n['undefined'],
-        l10n['allowed'],
-        l10n['denied']
-      ];
-      img.alt = alts[state];
-      button.title = alts[state];
-    });
+    var state = this.state;
+
+    var alts = [
+      this._l10n['platform.core.rightsManagement.undefined'],
+      this._l10n['platform.core.rightsManagement.allowed'],
+      this._l10n['platform.core.rightsManagement.denied']
+    ];
+    button.title = alts[state];
+
   },
 
   nextState: function(){
@@ -105,13 +122,16 @@ window.MSCheckbox = Class.create({
 
   next: function()
   {
+    // Reinitialize class list
+    this.button.classList.remove(this.stateClasses[this.state]);
+    
     this.state = this.nextState();
     if (this.table != undefined) {
       // TODO: Just update the cache, don't invalidate the row, once the rights are as stored as an
       // array, and not as a string.
       delete this.table.fetchedRows[this.idx];
     }
-    this.draw(this.state);
+    this.draw();
   },
 
   /* Confirmation cases:
@@ -122,6 +142,7 @@ window.MSCheckbox = Class.create({
    */
   createClickHandler: function(self)
   {
+    const l10n = this._l10n;
     return function(event) {
       event.preventDefault();
       if (self.req) {
@@ -134,9 +155,9 @@ window.MSCheckbox = Class.create({
       // 1. The current user is clearing / denying himself any right.
       if (self.currentUorG == window.currentUser) {
         if (nxtst == 2) {
-          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforcurrentuser'))".replace('__right__', self.right);
+          var denymessage = l10n['rightsmanager.denyrightforcurrentuser'].replace('__right__', self.right);
           if (!confirm(denymessage)) {
-            var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforcurrentuserinstead'))".replace('__right__', self.right);
+            var clearmessage = l10n['rightsmanager.clearrightforcurrentuserinstead'].replace('__right__', self.right);
             if (confirm(clearmessage)) {
               action = "clear";
               self.state = 2;
@@ -146,7 +167,7 @@ window.MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforcurrentuser'))".replace('__right__', self.right);
+          var clearmessage = l10n['rightsmanager.clearrightforcurrentuser'].replace('__right__', self.right);
           if (!confirm(clearmessage)) {
             return;
           }
@@ -155,10 +176,10 @@ window.MSCheckbox = Class.create({
       // 2. The current user is clearing / denying any rights for a group he belongs to.
       else if (self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
         if (nxtst == 2) {
-          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforgroup'))".replace(/__right__/g, self.right);
+          var denymessage = l10n['rightsmanager.denyrightforgroup'].replace(/__right__/g, self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
-            var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforgroupinstead'))".replace(/__right__/g, self.right);
+            var clearmessage = l10n['rightsmanager.clearrightforgroupinstead'].replace(/__right__/g, self.right);
             clearmessage = clearmessage.replace('__name__', self.currentUorG);
             if (confirm(clearmessage)) {
               action = "clear";
@@ -169,7 +190,7 @@ window.MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforgroup'))".replace(/__right__/g, self.right);
+          var clearmessage = l10n['rightsmanager.clearrightforgroup'].replace(/__right__/g, self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -179,13 +200,13 @@ window.MSCheckbox = Class.create({
       // 3. The current user is is clearing / denying admin right for any user / group.
       else if (self.right == "admin") {
         if (nxtst == 2) {
-          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforuorg'))".replace('__right__', self.right);
+          var denymessage = l10n['rightsmanager.denyrightforuorg'].replace('__right__', self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
             return;
           }
         } else if (nxtst == 0) {
-          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforuorg'))".replace('__right__', self.right);
+          var clearmessage = l10n['rightsmanager.clearrightforuorg'].replace('__right__', self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -215,13 +236,13 @@ window.MSCheckbox = Class.create({
             //if an error occurred while trying to save a right rule, display an alert
             // and refresh the page, since probably the user does not have the right to perform
             // that action
-            alert("$services.localization.render('platform.core.rightsManagement.saveFailure')");
+            alert(l10n['platform.core.rightsManagement.saveFailure']);
             var rURL = unescape(window.location.pathname);
             window.location.href = rURL;
           }
         },
         onFailure: function() {
-          alert("$services.localization.render('platform.core.rightsManagement.ajaxFailure')");
+          alert(l10n['platform.core.rightsManagement.ajaxFailure']);
         },
         onComplete: function() {
           delete self.req;
@@ -230,6 +251,7 @@ window.MSCheckbox = Class.create({
     }
   }
 });
+}).apply(']]#', $jsontool.serialize([$icons]));
 
 /**
   * user list element creator. Used in adminusers.vm.
@@ -442,15 +464,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
   } else {
     username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('rightsmanager.username'))");
   }
-  var title = (row.title || row.username);
-  if (row.wikiname == "local") {
-    var a = document.createElement('a');
-    a.href = userurl;
-    a.appendChild(document.createTextNode(title));
-    username.appendChild( a );
-  } else {
-    username.appendChild(document.createTextNode(title));
-  }
+  username.innerHTML = row.userDisplayer;
 
   // We directly retrieve the right names from the livetable headers.
   var rightsNames = [];
@@ -550,22 +564,20 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     var saveURL = "$xwiki.getURL('XWiki.XWikiPreferences', 'save')";
     var config = "XWiki.XWikiPreferences";
     var objNum = "0";
-    if (saveDocumentURL != undefined && saveDocumentURL.length > 0) {
+    if (saveDocumentURL !== undefined && saveDocumentURL.length > 0) {
       saveURL = saveDocumentURL;
     }
-    if (configurationClassName != undefined && configurationClassName.length > 0) {
+    if (configurationClassName !== undefined && configurationClassName.length > 0) {
       config = configurationClassName;
     }
-    if (objectNumber != undefined) {
+    if (objectNumber !== undefined) {
       objNum = objectNumber;
     }
     var pivot = self;
-    var newAlt = "yes";
-    var newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
+    var newChecked = "checked";
     var setValue = "1";
-    if (self.getAttribute('alt') == "yes") {
-      newAlt = "no";
-      newSrc = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
+    if (self.getAttribute('checked') === "checked") {
+      newChecked = "";
       setValue = "0";
     }
     var paramMap = {};
@@ -574,8 +586,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
     paramMap["parameters"]["ajax"] = "1";
     paramMap["parameters"]["comment"] = "$services.localization.render('authenticate_viewedit_savecomment')";
     paramMap["onSuccess"] = function() {
-      pivot.alt = newAlt;
-      pivot.src = newSrc;
+      pivot.setAttribute('checked',newChecked);
     }
     new Ajax.Request(saveURL, paramMap);
   };
@@ -597,7 +608,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "0"},
           onSuccess: function() {
             pivot.alt = "no";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
         }});
       } else {
         new Ajax.Request(url, {
@@ -605,7 +615,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "0"},
           onSuccess: function() {
             pivot.alt = "no";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
         }});
       }
     } else {
@@ -615,7 +624,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
           onSuccess: function() {
             pivot.alt = "yes";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
         }});
       } else {
         new Ajax.Request(url, {
@@ -623,7 +631,6 @@ function setGuestExtendedRights(self)
           parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
           onSuccess: function() {
             pivot.alt = "yes";
-            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
         }});
       }
     }

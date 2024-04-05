@@ -56,7 +56,7 @@
   background-color: $theme.pageContentBackgroundColor;
   border: 1px solid $theme.borderColor;
   /* Same border radius as the button. */
-  border-radius: 3px;
+  border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   /* Hidden by default. */
   display: none;

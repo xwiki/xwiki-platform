@@ -56,15 +56,15 @@ public class EditRightsPane extends BaseElement
     /** The possible states of an access right box. */
     public enum State
     {
-        NONE("/xwiki/resources/js/xwiki/usersandgroups/img/none.png"),
-        ALLOW("/xwiki/resources/js/xwiki/usersandgroups/img/allow.png"),
-        DENY("/xwiki/resources/js/xwiki/usersandgroups/img/deny1.png");
+        NONE("none"),
+        ALLOW("yes"),
+        DENY("no");
 
-        String imageURL;
+        String buttonClass;
 
-        State(String imageURL)
+        State(String buttonClass)
         {
-            this.imageURL = imageURL;
+            this.buttonClass = buttonClass;
         }
 
         State getNextState()
@@ -72,12 +72,12 @@ public class EditRightsPane extends BaseElement
             return values()[(ordinal() + 1) % values().length];
         }
 
-        static State getButtonImageState(WebElement button)
+        static State getButtonState(WebElement button)
         {
             for (State s : values()) {
                 //  The URL may contain query string parameters (e.g. starting with 11.1RC1 the resource URLs can now
                 //  contain a query parameter to avoid cache issue) and we don't care about that to identify the state.
-                if ((button.getAttribute("src").contains(s.imageURL))) {
+                if ((button.getAttribute("class").contains(s.buttonClass))) {
                     return s;
                 }
             }
@@ -119,9 +119,9 @@ public class EditRightsPane extends BaseElement
      */
     public State getGuestRight(String rightName)
     {
-        final By iconLocator = By.xpath(String.format("//tr[@id='unregistered']/td[@data-title='%s']/button/img", rightName));
-        final WebElement icon = getDriver().findElement(iconLocator);
-        return State.getButtonImageState(icon);
+        final By buttonLocator = By.xpath(String.format("//tr[@id='unregistered']/td[@data-title='%s']/button", rightName));
+        final WebElement button = getDriver().findElement(buttonLocator);
+        return State.getButtonState(button);
     }
 
     public State getRight(String entityName, Right right)
@@ -139,19 +139,19 @@ public class EditRightsPane extends BaseElement
      */
     public State getRight(String entityName, String rightName)
     {
-        final By iconLocator =
+        final By buttonLocator =
             By.xpath(String.format(
-                "//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '%s')]"
-                    + "/../../td[@data-title='%s']/button/img",
+                "//*[@id='usersandgroupstable-display']//tr[./td[@class='username']//a[contains(@href, '%s')]]"
+                    + "/td[@data-title='%s']/button",
                 entityName, rightName));
-        final WebElement icon = getDriver().findElement(iconLocator);
-        return State.getButtonImageState(icon);
+        final WebElement button = getDriver().findElement(buttonLocator);
+        return State.getButtonState(button);
     }
 
     public boolean hasEntity(String entityName)
     {
         return getDriver().hasElementWithoutWaiting(
-            By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '" + entityName
+            By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']//a[contains(@href, '" + entityName
             + "')]"));
     }
 
@@ -172,15 +172,15 @@ public class EditRightsPane extends BaseElement
             getDriver().executeJavascript(
                 "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
             final By buttonLocator = By.xpath(
-                String.format("*//tr[@id='unregistered']/td[@data-title='%s']/button/img", rightName));
+                String.format("*//tr[@id='unregistered']/td[@data-title='%s']/button", rightName));
             final WebElement button = getDriver().findElement(buttonLocator);
-            State currentState = State.getButtonImageState(button);
+            State currentState = State.getButtonState(button);
             button.click();
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "src",
-                currentState.getNextState().imageURL);
+            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "class",
+                currentState.getNextState().buttonClass);
         } finally {
             getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
         }
@@ -211,15 +211,15 @@ public class EditRightsPane extends BaseElement
                 "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
             final By buttonLocator =
                 By.xpath(
-                    String.format("//*[@id='usersandgroupstable-display']//td[@class='username']"
-                        + "/a[contains(@href, '%s')]/../../td[@data-title='%s']/button/img", entityName, rightName));
+                    String.format("//*[@id='usersandgroupstable-display']//tr[./td[@class='username']"
+                        + "//a[contains(@href, '%s')]]/td[@data-title='%s']/button", entityName, rightName));
             final WebElement button = getDriver().findElement(buttonLocator);
-            State currentState = State.getButtonImageState(button).getNextState();
+            State currentState = State.getButtonState(button).getNextState();
             button.click();
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "src", currentState.imageURL);
+            getDriver().waitUntilElementContainsAttributeValue(buttonLocator, "class", currentState.buttonClass);
         } finally {
             getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
         }

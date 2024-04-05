@@ -92,6 +92,8 @@ XWiki.PDFExport.TemplateClass_header=Header
 XWiki.PDFExport.TemplateClass_header.hint=The information displayed at the top of each page, except for the cover page. E.g. the title
 XWiki.PDFExport.TemplateClass_footer=Footer
 XWiki.PDFExport.TemplateClass_footer.hint=The information displayed at the bottom of each page, except for the cover page. E.g. the number of the page
+XWiki.PDFExport.TemplateClass_metadata=Metadata
+XWiki.PDFExport.TemplateClass_metadata.hint=The script that is evaluated for each wiki page included in the PDF export to produce the metadata to display in the PDF header or footer. The metadata is specified using a special binding named metadata whose value is a Map&lt;String, String&gt;. The metadata ends up in the HTML as attributes of the heading used to display the title of each wiki page.
 
 XWiki.PDFExport.ConfigurationClass_templates=Templates
 XWiki.PDFExport.ConfigurationClass_templates.hint=The list of PDF templates the user can select from when exporting wiki pages to PDF.

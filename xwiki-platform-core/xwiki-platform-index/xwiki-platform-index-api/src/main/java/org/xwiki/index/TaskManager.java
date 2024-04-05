@@ -24,7 +24,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.index.internal.TaskData;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide the operations to interact with the task manager.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.1RC1
  */
 @Role
-@Unstable
 public interface TaskManager
 {
     /**
@@ -74,7 +72,6 @@ public interface TaskManager
      * @return the number of tasks grouped by task type for a given wiki
      * @since 14.2
      */
-    @Unstable
     default Map<String, Long> getQueueSizePerType(String wikiId)
     {
         return Map.of();

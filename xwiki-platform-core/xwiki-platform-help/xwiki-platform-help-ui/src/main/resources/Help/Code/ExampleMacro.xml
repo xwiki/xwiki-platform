@@ -149,7 +149,7 @@
 .macroexample &gt; .tab-content {
   border: 1px solid #DDD;
   border-top: 0 none;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 7px 7px;
   padding: 1em;
 }</code>
     </property>

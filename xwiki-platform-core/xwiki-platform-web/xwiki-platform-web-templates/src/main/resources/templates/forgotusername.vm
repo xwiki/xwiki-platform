@@ -36,7 +36,8 @@
     </div> ## xwikimessage
 #end
 <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
       #set($email = "$!request.get('e')")
       #if($email == '' || !$services.csrf.isTokenValid($request.form_token))
         #forgotUsernameBoxStart("default")
@@ -81,6 +82,6 @@
             #forgotUsernameBoxEnd()
           #end
       #end
-  </div>## mainContentArea
+  </main>## mainContentArea
 </div>## main
 #template("endpage.vm")

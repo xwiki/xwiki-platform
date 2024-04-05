@@ -24,7 +24,6 @@ import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.AbstractCancelableEvent;
 import org.xwiki.observation.event.filter.EventFilter;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for all document related {@link org.xwiki.observation.event.Event}.
@@ -92,7 +91,6 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
      * @since 14.4.2
      * @since 14.5
      */
-    @Unstable
     public DocumentReference getDocumentReference()
     {
         return this.documentReference;

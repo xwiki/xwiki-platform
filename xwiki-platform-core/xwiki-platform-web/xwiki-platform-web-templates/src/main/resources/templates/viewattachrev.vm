@@ -19,7 +19,8 @@
 ## ---------------------------------------------------------------------------
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 <h3>$services.localization.render("core.viewers.attachments.revisions", [$escapetool.html($attachment.filename)])</h3>
 #if ("$tdoc.realLocale" != '')
 #set($lang = "&language=${tdoc.realLocale}")
@@ -52,6 +53,6 @@
     </tr>
 #end
 </table>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")

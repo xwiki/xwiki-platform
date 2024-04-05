@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -36,7 +35,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * @version $Id$
  * @since 14.2
  */
-@Unstable
 @Named("taskConsumer")
 @Component
 @Singleton

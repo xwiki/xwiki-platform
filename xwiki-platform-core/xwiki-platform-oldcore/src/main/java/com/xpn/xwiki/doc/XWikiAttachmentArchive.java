@@ -36,7 +36,6 @@ import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
 import org.suigeneris.jrcs.util.ToString;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -63,7 +62,7 @@ public class XWikiAttachmentArchive implements Cloneable
 
     /** The underlying JRCS archive. */
     private Archive archive;
-
+    
     /**
      * @return the id of the attachment which this archive is associated with.
      */
@@ -104,7 +103,6 @@ public class XWikiAttachmentArchive implements Cloneable
      * @return the cloned attachment archive
      * @since 14.2RC1
      */
-    @Unstable
     public XWikiAttachmentArchive clone(XWikiAttachment attachment, XWikiContext context)
     {
         ListAttachmentArchive newArchive = new ListAttachmentArchive(Arrays.stream(this.getVersions())
@@ -285,16 +283,36 @@ public class XWikiAttachmentArchive implements Cloneable
     /**
      * Update the archive.
      *
-     * @param context the XWikiContext for the request used to load the correct attachment content from the database.
+     * @param context the XWiki context
      * @throws XWikiException if anything goes wrong.
      * @since 7.1M1
      */
     public void updateArchive(final XWikiContext context) throws XWikiException
     {
+        XWikiAttachment currentAttachment = getAttachment();
+
+        // Update the current attachment
+        currentAttachment.incrementVersion();
+        currentAttachment.setDate(new Date());
+
+        addCurrentAttachment(context);
+    }
+
+    /**
+     * Add the current attachment to the archive as is. To also incremented version of the attachment, use
+     * {@link #updateArchive(XWikiContext)} instead.
+     * 
+     * @param context the XWiki context
+     * @throws XWikiException if anything goes wrong.
+     * @since 16.2.0RC1
+     * @since 15.10.8
+     */
+    public void addCurrentAttachment(XWikiContext context) throws XWikiException
+    {
+        XWikiAttachment currentAttachment = getAttachment();
+
         try {
-            this.attachment.incrementVersion();
-            this.attachment.setDate(new Date());
-            final Object[] lines = ToString.stringToArray(this.attachment.toStringXML(true, false, context));
+            final Object[] lines = ToString.stringToArray(currentAttachment.toStringXML(true, false, context));
 
             if (this.archive != null) {
                 this.archive.addRevision(lines, "");
@@ -306,7 +324,7 @@ public class XWikiAttachmentArchive implements Cloneable
             // characters (JRCS is very fragile and breaks easily if a wrong value is used)
             this.archive.findNode(this.archive.getRevisionVersion()).setAuthor("xwiki");
         } catch (Exception e) {
-            Object[] args = { getAttachment().getFilename() };
+            Object[] args = {getAttachment().getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
         }

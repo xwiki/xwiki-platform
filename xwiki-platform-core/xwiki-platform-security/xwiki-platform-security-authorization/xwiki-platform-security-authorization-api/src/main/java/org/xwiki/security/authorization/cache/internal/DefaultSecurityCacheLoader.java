@@ -213,7 +213,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
 
         // Public access could not appear in any group, no need to load it carefully, just optimized here
         if (user.getOriginalReference() == null) {
-            groups = loadGroupsOfPublicUser(user, entityWiki);
+            groups = loadPublicUser(user, entityWiki);
         } else {
             groups = loadGroupsOfUserOrGroup(user, userWiki, entityWiki, new ArrayDeque<>());
         }
@@ -365,16 +365,12 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         return groups;
     }
 
-    private Collection<GroupSecurityReference> loadGroupsOfPublicUser(UserSecurityReference user,
-        SecurityReference entityWiki)
-        throws AuthorizationException
+    private Collection<GroupSecurityReference> loadPublicUser(UserSecurityReference user, SecurityReference entityWiki)
     {
-        // Ensure that the main wiki entry is actually a user entry as the security cache only accepts user entries
-        // as user parent.
-        if (getSecurityCache().getImmediateGroupsFor(user) == null) {
-            // Main wiki entry should be loaded
-            loadUserEntry(user, null);
-        }
+        // Don't load the actual user as the security entry reader doesn't load rules for the guest user, and we would
+        // thus risk inserting a main wiki entry without rules which would be a serious issue. However, the main wiki
+        // entry should already have been loaded while loading the hierarchy of the entity.
+
         if (entityWiki != null) {
             // Ensure there is a Public shadow in the subwiki of the checked entity
             try {

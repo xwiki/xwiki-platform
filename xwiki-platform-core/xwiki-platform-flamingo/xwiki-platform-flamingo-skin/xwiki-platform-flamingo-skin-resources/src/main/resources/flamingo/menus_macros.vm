@@ -31,7 +31,8 @@
 ###    Toplevel Menu
 ###
 #macro(xwikitopmenustart)
-  <nav class="navbar navbar-default actionmenu"
+  ## Set as an HTML header for accessibility best practices.
+  <header class="navbar navbar-default actionmenu"
   aria-label="$escapetool.xml($services.localization.render('core.menu.navbar.label'))">
     <div class="container-fluid">
       ## Brand and toggle get grouped for better mobile display
@@ -50,7 +51,7 @@
 #macro(xwikitopmenuend)
       </div>## /.navbar-collapse
     </div> ## / container-fluid
-  </nav>
+  </header>
 #end
 
 ###

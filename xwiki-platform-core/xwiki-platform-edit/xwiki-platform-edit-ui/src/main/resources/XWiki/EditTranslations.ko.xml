@@ -40,7 +40,7 @@
 edit.inplace.page.lockFailed=페이지를 잠그지 못했습니다.
 edit.inplace.page.loadFailed=페이지를 로드하지 못했습니다.
 edit.inplace.page.renderFailed=페이지를 렌더링하지 못했습니다.
-edit.inplace.page.translate.messageBefore=이 페이지(원본)의 {0} 번역이 {1}(현재 장소)에서 아직 번역되지 않았기 때문에 편집 중입니다.
+edit.inplace.page.translate.messageBefore=이 페이지가 아직 {1}(현재 로케일)로 번역되지 않았기 때문에 이 페이지(원본 버전)의 {0} 번역을 편집 중입니다.
 edit.inplace.page.translate.messageAfter={0}번역을 편집 중입니다. 페이지 제목을 번역하는 것부터 시작합니다.
 edit.inplace.actionButtons.loadFailed=작업 버튼을 읽지 못했습니다.
 

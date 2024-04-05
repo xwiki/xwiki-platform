@@ -19,6 +19,10 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,11 +33,13 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.Network;
+import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
@@ -44,6 +50,7 @@ import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -51,10 +58,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for PDF export.
@@ -68,9 +71,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-resource-temporary",
         // Code macro highlighting works only if Jython is a core extension. It's not enough to use language=none in our
         // test because we want to reproduce a bug in Paged.js where white-space between highlighted tokens is lost.
-        "org.python:jython-slim"
+        // TODO: Remove when https://jira.xwiki.org/browse/XWIKI-17972 is fixed
+        "org.python:jython-slim",
+        // The image plugin that performs the server-side image resize is not registered until the server is restarted
+        // so we need to make it a core extension.
+        "org.xwiki.platform:xwiki-platform-image-processing-plugin"
     },
-    resolveExtraJARs = true
+    resolveExtraJARs = true,
+    // We need the Office server because we want to be able to test how the Office macro is exported to PDF.
+    office = true,
+    properties = {
+        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference).
+        // Enabling debug logs also requires PR.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
+            + ".*:(XWiki\\.OfficeImporterAdmin|PDFExportIT\\.EnableDebugLogs)",
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.image.ImagePlugin",
+    }
 )
 @ExtendWith(PDFExportExecutionCondition.class)
 class PDFExportIT
@@ -105,6 +121,7 @@ class PDFExportIT
 
         // Make sure we start with the default settings.
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage().reset();
+        adminSection.getTemplatesInput().sendKeys("custom").waitForSuggestions().selectByVisibleText("CustomTemplate");
         adminSection.getGeneratorSelect().selectByVisibleText("Chrome Docker Container");
 
         if (!testConfiguration.getServletEngine().isOutsideDocker()) {
@@ -163,8 +180,8 @@ class PDFExportIT
             // Author image.
             List<PDFImage> coverPageImages = pdf.getImagesFromPage(0);
             assertEquals(1, coverPageImages.size());
-            assertEquals(160, coverPageImages.get(0).getWidth());
-            assertEquals(160, coverPageImages.get(0).getHeight());
+            assertEquals(160, coverPageImages.get(0).getRawWidth());
+            assertEquals(160, coverPageImages.get(0).getRawHeight());
 
             //
             // Verify the table of contents page.
@@ -212,11 +229,20 @@ class PDFExportIT
             assertTrue(contentPageText.contains("Child\nSection 1\nContent of first section.\n"),
                 "Child document content missing: " + contentPageText);
 
-            // The content of the child document shows an image.
+            // The content of the child document shows the same image multiple times.
             List<PDFImage> contentPageImages = pdf.getImagesFromPage(3);
-            assertEquals(1, contentPageImages.size());
-            assertEquals(512, contentPageImages.get(0).getWidth());
-            assertEquals(512, contentPageImages.get(0).getHeight());
+            assertEquals(3, contentPageImages.size());
+
+            // Verify the images included in the PDF are not resized server-side (we know the image width is specified
+            // in the source wiki syntax and we enabled the server-side image resize by default).
+            assertEquals(512, contentPageImages.get(0).getRawWidth());
+            assertEquals(512, contentPageImages.get(0).getRawHeight());
+            assertEquals(512, contentPageImages.get(2).getRawWidth());
+            assertEquals(512, contentPageImages.get(2).getRawHeight());
+
+            // For the second image we force the server-side resize.
+            assertEquals(100, contentPageImages.get(1).getRawWidth());
+            assertEquals(100, contentPageImages.get(1).getRawHeight());
         }
     }
 
@@ -272,7 +298,7 @@ class PDFExportIT
         templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: "));
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
-        templateEditPage.setHeader(templateEditPage.getHeader().replace("$esc", "Chapter: $esc"));
+        templateEditPage.setHeader(templateEditPage.getHeader().replaceFirst("<span ", "Chapter: <span "));
         templateEditPage.setFooter(templateEditPage.getFooter().replaceFirst("<span ", "Page <span "));
         templateEditPage.clickSaveAndContinue();
 
@@ -616,10 +642,9 @@ class PDFExportIT
             assertEquals(2, pdf.getNumberOfPages());
 
             String content = pdf.getTextFromPage(1);
-            assertEquals("FormFields\n2 / 2\n" + "Title modified\n"
-                + " Blue  Yellow  Red\n" + "Paris\n" + "Comedy\nDrama\nRomance\n"
-                + "description modified\n" + "Submit\n"
-                + "TITLE\n" + " ENABLED\n" + "COLOR\n" + "CITY\n" + "GENRE\n" + "DESCRIPTION\n", content);
+            assertEquals("FormFields\n2 / 2\n" + "Title modified\n" + " Blue  Yellow  Red\n" + "Paris\n"
+                + "Comedy\nDrama\nRomance\n" + "description modified\n" + "Submit\n" + "TITLE\n" + " ENABLED\n"
+                + "COLOR\n" + "CITY\n" + "GENRE\n" + "DESCRIPTION\n", content);
         }
     }
 
@@ -787,8 +812,8 @@ class PDFExportIT
         throws Exception
     {
         Callable<Void> verifyPDFExport = () -> {
-            ViewPage viewPage = setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent",
-                "Child"), "WebHome"));
+            ViewPage viewPage =
+                setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent", "Child"), "WebHome"));
             PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
             try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
@@ -841,6 +866,315 @@ class PDFExportIT
 
             // Verify the content page.
             assertEquals("Section 1\nContent of first section.\n", pdf.getTextFromPage(1));
+        }
+    }
+
+    @Test
+    @Order(17)
+    void floatingImage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "FloatingImage"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should normally have 5 pages (the cover page plus 4 content pages) but out workaround for
+            // https://jira.xwiki.org/browse/XWIKI-21201 (Floating images and the text around them can be cut from the
+            // PDF export) generates more content pages (6) because the content is split into print pages as if the
+            // images are not floating.
+            assertEquals(7, pdf.getNumberOfPages());
+
+            //
+            // First content page.
+            //
+
+            // The first content page doesn't have any image because the first floating image didn't fit.
+            List<PDFImage> images = pdf.getImagesFromPage(1);
+            assertEquals(0, images.size());
+
+            //
+            // Second content page.
+            //
+
+            // The second content page should have the first floating image.
+            images = pdf.getImagesFromPage(2);
+            assertEquals(1, images.size());
+            assertEquals(450, Math.round(images.get(0).getHeight()));
+
+            // The first image is floating to the left.
+            assertEquals(36, Math.round(images.get(0).getOffsetLeft()));
+
+            // The paragraph after the image should be on the same page.
+            String text = pdf.getTextFromPage(2);
+            assertTrue(
+                text.startsWith(
+                    "Floating Image\n3 / 7\n" + "Donec sed ante interdum, finibus urna eget, ultricies purus."),
+                "Unexpected content: " + text);
+
+            //
+            // Third content page.
+            //
+
+            // The third content page should have the second floating image.
+            images = pdf.getImagesFromPage(3);
+            assertEquals(1, images.size());
+            assertEquals(442, Math.round(images.get(0).getHeight()));
+
+            // The second image is floating to the right.
+            assertEquals(403, Math.round(images.get(0).getOffsetLeft()));
+
+            // The paragraph after the image should be on the same page.
+            text = pdf.getTextFromPage(3);
+            // The content should start with this paragraph normally, but due to our workaround some content from the
+            // second page is moved to the third page.
+            assertTrue(text.contains("In aliquet tortor odio."), "Unexpected content: " + text);
+
+            //
+            // Fifth content page (should have been the fourth, but due to our workaround the PDF has more pages).
+            //
+
+            // The fifth (should have been the fourth) content page has the third floating image.
+            images = pdf.getImagesFromPage(5);
+            assertEquals(1, images.size());
+            assertEquals(457, Math.round(images.get(0).getHeight()));
+
+            // The third image is floating to the left.
+            assertEquals(36, Math.round(images.get(0).getOffsetLeft()));
+
+            // The text after the image should be on the same page (this image is inline between text).
+            text = pdf.getTextFromPage(5);
+            // The content should start with this text normally, but due to our workaround some content from the
+            // previous page is moved to this page.
+            assertTrue(text.contains("Nullam porta leo felis, ac viverra ante consectetur a."),
+                "Unexpected content: " + text);
+        }
+    }
+
+    @Test
+    @Order(18)
+    void longTableCell(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LongTableCell"));
+        String expectedContent = viewPage.getContent();
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 4 pages: the cover page and 3 content pages.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            String firstPageContent = pdf.getTextFromPage(1).substring("LongTableCell\n2 / 4\n".length());
+            String secondPageContent = pdf.getTextFromPage(2).substring("LongTableCell\n3 / 4\n".length());
+            String thirdPageContent = pdf.getTextFromPage(3).substring("LongTableCell\n4 / 4\n".length());
+
+            // Verify that we don't lose content when a long table cell is split between multiple print pages.
+            String fragment = firstPageContent.substring(firstPageContent.length() - 40, firstPageContent.length())
+                + secondPageContent.substring(0, 40);
+            fragment = fragment.replace("\n", " ");
+            assertTrue(expectedContent.contains(fragment), "Missing content: " + fragment);
+
+            fragment = secondPageContent.substring(secondPageContent.length() - 40, secondPageContent.length())
+                + thirdPageContent.substring(0, 40);
+            fragment = fragment.replace("\n", " ");
+            assertTrue(expectedContent.contains(fragment), "Missing content: " + fragment);
+        }
+    }
+
+    @Test
+    @Order(19)
+    void largeTable(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeTable"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(39, pdf.getNumberOfPages());
+
+            // Verify the content of the last page.
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
+            // Verify that the text from the last cell is present.
+            assertTrue(text.contains("1000, 10"), "Unexpected content: " + text);
+        }
+    }
+
+    /**
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-21295">Some large documents may be exported only partially now
+     *      with the new PDF Export</a>
+     */
+    @Test
+    @Order(20)
+    void largeExcelImport(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "LargeExcelImport"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // Verify the number of pages.
+            assertEquals(55, pdf.getNumberOfPages());
+
+            // Verify the content of the last page.
+            String text = pdf.getTextFromPage(pdf.getNumberOfPages() - 1).replace("\n", " ");
+            // Verify that the text from the last table row is present.
+            assertTrue(text.contains("Reuters US Online Report - Technology end"), "Unexpected content: " + text);
+            assertTrue(text.contains("with a special focus on the US.end"), "Unexpected content: " + text);
+            assertTrue(text.contains("English end"), "Unexpected content: " + text);
+            assertTrue(text.contains("Pictures and graphics end"), "Unexpected content: " + text);
+            assertTrue(text.contains("delivered via the internet end"), "Unexpected content: " + text);
+        }
+    }
+
+    @Test
+    @Order(21)
+    void singlePageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+
+        // Check single page export first.
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        exportTreeModal.export();
+
+        // Use the custom template which displays the page tags in the PDF footer.
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+        exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one content page.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the metadata is displayed only once (only in the footer of the content page).
+            assertEquals(1, StringUtils.countMatches(pdf.getText(), "Tags:"));
+
+            // Verify the tags are displayed in the footer of the content page.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent\nTags: science, technology 3 / 3\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(22)
+    void multiPageExportWithCustomTemplateShowingMetadata(TestUtils setup, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"));
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child page in the export because we want to verify a multi-page export.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
+        exportTreeModal.export();
+
+        // Use the custom template which displays the page tags in the PDF footer.
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+        exportOptions.getTemplateSelect().selectByVisibleText("CustomTemplate");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            // Verify the metadata is displayed only twice (only in the footer of the two content pages).
+            assertEquals(2, StringUtils.countMatches(pdf.getText(), "Tags:"));
+
+            // Verify the page corresponding to the parent document.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertTrue(contentPageText.startsWith("Parent\nTags: science, technology 3 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+
+            // Verify the page corresponding to the child document.
+            contentPageText = pdf.getTextFromPage(3);
+            assertTrue(contentPageText.startsWith("Child\nTags: biology, ecology 4 / 4\n"),
+                "Unexpected header and footer on the content page: " + contentPageText);
+        }
+    }
+
+    @Test
+    @Order(23)
+    void exportPageWithCustomSheetApplied(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "Parent"), "WebHome"), "view",
+            "sheet=PDFExportIT.Sheet");
+        ViewPage viewPage = new ViewPage();
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child page in the export because we want to verify that the custom sheet (specified in the query
+        // string) is applied only to the current page (on which the export action is triggered).
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.Parent.Child.WebHome").select();
+        exportTreeModal.export();
+
+        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+            // We should have 4 pages: cover page, table of contents, one page for the parent document and one page for
+            // the child document.
+            assertEquals(4, pdf.getNumberOfPages());
+
+            // Verify the page corresponding to the parent document.
+            String contentPageText = pdf.getTextFromPage(2);
+            assertEquals("Title: Parent\n3 / 4\nTitle: Parent\nContent:\nChapter 1\n"
+                + "Content of first chapter. Current user is xwiki:XWiki.John.\nLink to child page.\nloaded!\n",
+                contentPageText);
+
+            // Verify the page corresponding to the child document.
+            contentPageText = pdf.getTextFromPage(3);
+            assertEquals("Child\n4 / 4\nChild\nSection 1\nContent of first section.\n", contentPageText);
+        }
+    }
+
+    @Test
+    @Order(24)
+    void officeMacro(TestUtils setup, TestConfiguration testConfiguration) throws Exception
+    {
+        // Connect the wiki to the office server if it is not already done.
+        setup.loginAsSuperAdmin();
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Content", "Office Server");
+        OfficeServerAdministrationSectionPage officeServerAdministrationSectionPage =
+            new OfficeServerAdministrationSectionPage();
+        if (!"Connected".equals(officeServerAdministrationSectionPage.getServerState())) {
+            officeServerAdministrationSectionPage.startServer();
+        }
+
+        setup.login("John", "pass");
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "OfficeMacro"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one content page.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the text from the content page.
+            assertEquals("OfficeMacro\n3 / 3\nThis is a word with image\n", pdf.getTextFromPage(2));
+
+            // Verify that the images are present.
+            List<PDFImage> images = pdf.getImagesFromPage(2);
+            // The first image is the presentation (ppt) slide. The second image is from the word document.
+            assertEquals(2, images.size());
+
+            // The presenation slide.
+            assertEquals(800, images.get(0).getRawWidth());
+            assertEquals(449, images.get(0).getRawHeight());
+
+            // The image from the word document.
+            assertEquals(81, images.get(1).getRawWidth());
+            assertEquals(81, images.get(1).getRawHeight());
+        }
+    }
+
+    @Test
+    @Order(25)
+    void ampersandInPageTitle(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.createPage(new LocalDocumentReference("A&B=C", testReference), "Page with & in title.", "A&B=C");
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and one content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            // Verify the text from the content page.
+            assertEquals("A&B=C\n2 / 2\nPage with & in title.\n", pdf.getTextFromPage(1));
         }
     }
 

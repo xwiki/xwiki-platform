@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Like.LikeTranslations" locale="ko">
+  <web>XWiki.Like</web>
+  <name>LikeTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>LikeTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rightsmanager.like=좋다
+like.unlike.modal.title=확인과 달리
+like.unlike.modal.body={0} 페이지에 대한 좋아요를 삭제하시겠습니까?
+like.unlike.modal.closeButton=닫다
+like.unlike.modal.unlikeButton=페이지 좋아요
+like.unlike.modal.viewLikersButton=좋아요
+like.newlike.success=페이지가 좋아요를 받았습니다.
+like.newlike.error=페이지에 좋아요를 누르는 중에 오류가 발생했습니다.
+like.unlike.success=페이지에 좋아요 표시가 취소되었습니다.
+like.unlike.error=페이지 좋아요 취소를 시도하는 중에 오류가 발생했습니다.
+like.userprofile.menu=좋아요를 누른 페이지
+like.button.title=이 페이지의 좋아요 수: {0}
+like.button.title.like=현재 페이지에 좋아요를 클릭하세요. 이 페이지의 좋아요 수: {0}.
+like.button.title.unlike=현재 페이지를 취소하려면 클릭하세요. 이 페이지의 좋아요 수: {0}.
+like.likers.empty=아직 이 페이지를 좋아하는 사람이 없습니다.
+like.likers.number={0}명이 이 페이지를 좋아합니다:
+like.likers.title={0}을(를) 좋아하는 사람들
+like.livetable.column.title=제목
+like.livetable.column.location=위치
+like.livetable.column.likes=좋아요
+like.configuration.heading=좋아요 환경설정
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=좋아요 버튼 항상 표시
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=사용자에게 버튼과 상호 작용할 권한이 없더라도 버튼을 표시합니다. 좋아요 카운터를 항상 표시하려면 이 옵션을 사용하세요.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=캐시 용량
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=캐시에 보관된 좋아요 정보의 수입니다. 이 옵션 변경 사항을 적용하려면 XWiki를 다시 시작해야 합니다 .
+XWiki.Like.LikeConfigurationClass_enabled=좋아요 기능 활성화
+XWiki.Like.LikeConfigurationClass_enabled.hint=선택을 취소하면 좋아요 기능이 비활성화되고 좋아요와 관련된 정보가 숨겨집니다.
+</content>
+  </xwikidoc>

@@ -47,15 +47,18 @@ import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.wai
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // The Solr store is not ready yet to be installed as extension
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
         // Required to ensure that the notifications rest endpoints are registered before XWikiJaxRsApplication is 
         // initialized.
         "org.xwiki.platform:xwiki-platform-notifications-rest"
-    }, resolveExtraJARs = true)
+    },
+    resolveExtraJARs = true
+)
 class MentionsIT
 {
     private static final String U1_USERNAME = "U1";

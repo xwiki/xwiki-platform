@@ -59,7 +59,7 @@
   #else
     &lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
   #end
-  &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale" xml:lang="$xcontext.locale"&gt;
+  &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()"&gt;
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
       ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the 
@@ -199,7 +199,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#body[contenteditable="true"] {
+      <code>body[role="textbox"] {
   /* We use padding (instead of margin) in order to support Bootstrap grid layouts and accomodate for the use of
   negative margins used by the .row class. */
   /* We need more space at the bottom in order to be sure that the magic line is visible all the time (see CKEDITOR-283:
@@ -219,7 +219,7 @@ a[data-linktype="create"] {
 }
 a[data-linktype="create"]::after {
   background-color: #08C;
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
   content: "?";
   display: inline-block;
@@ -262,13 +262,6 @@ del span.cke_widget_inline {
 ins del span.cke_widget_inline,
 del ins span.cke_widget_inline {
   text-decoration-line: underline line-through;
-}
-
-/* Prevent the horizontal scroll bar on IE11. We already limit the image width from the skin (in order to have
-  responsive images) but this is not enough for IE11 because the image element has a wrapper.
-  See CKEDITOR-143: Horizontal scroll bar displayed when inserting a large image on IE11 */
-.cke_widget_image {
-  max-width: 100%;
 }</code>
     </property>
     <property>

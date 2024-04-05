@@ -2778,41 +2778,6 @@ public class XWiki extends Api
         return this.xwiki.getUniquePageName(space, name, getXWikiContext());
     }
 
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @param params Parameters in Javascropt added to the tooltip config
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message, String params)
-    {
-        return this.xwiki.addTooltip(html, message, params, getXWikiContext());
-    }
-
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message)
-    {
-        return this.xwiki.addTooltip(html, message, getXWikiContext());
-    }
-
-    /**
-     * Inserts the tooltip Javascript
-     *
-     * @return
-     */
-    public String addTooltipJS()
-    {
-        return this.xwiki.addTooltipJS(getXWikiContext());
-    }
-
     /*
      * Inserts a Mandatory asterix
      */

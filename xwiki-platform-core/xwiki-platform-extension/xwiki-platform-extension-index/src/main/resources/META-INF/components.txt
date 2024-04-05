@@ -7,3 +7,4 @@ org.xwiki.extension.index.internal.ExtensionInstallListener
 org.xwiki.extension.index.internal.job.ExtensionIndexJob
 org.xwiki.extension.index.internal.job.ExtensionIndexJobScheduler
 org.xwiki.extension.index.internal.migration.R150501000XWIKI21136DataMigration
+org.xwiki.extension.index.internal.listener.ExtensionIndexCleanupListener

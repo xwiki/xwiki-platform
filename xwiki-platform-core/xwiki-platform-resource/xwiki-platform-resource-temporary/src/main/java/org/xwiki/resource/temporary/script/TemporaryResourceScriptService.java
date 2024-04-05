@@ -31,7 +31,6 @@ import org.xwiki.resource.script.ResourceScriptService;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -44,7 +43,6 @@ import org.xwiki.url.ExtendedURL;
 @Component
 @Named(TemporaryResourceScriptService.ROLE_HINT)
 @Singleton
-@Unstable
 public class TemporaryResourceScriptService implements ScriptService
 {
     /**

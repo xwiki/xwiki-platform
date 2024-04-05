@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide an interface for interacting with user notification filters preferences.
@@ -117,6 +118,22 @@ public interface NotificationFilterPreferenceManager
      * @since 9.11.9
      */
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
+
+    /**
+     * Delete a set of filter preferences.
+     * @param user the user to use
+     * @param filterPreferenceIds ids of the filter preferences
+     * @throws NotificationException if an error happens
+     *
+     * @since 15.10.2
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    default void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        // Do nothing
+    }
 
     /**
      * Delete a filter preference.

@@ -24,7 +24,8 @@
 $response.setStatus(409)
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 #if($xwiki.exists("XWiki.DocumentAlreadyExist"))
     $xwiki.includeForm("XWiki.DocumentAlreadyExist",false)
 #else
@@ -33,6 +34,6 @@ $!exception
 #xwikimessageboxend()
 #end
 <div class="clearfloats"></div>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")

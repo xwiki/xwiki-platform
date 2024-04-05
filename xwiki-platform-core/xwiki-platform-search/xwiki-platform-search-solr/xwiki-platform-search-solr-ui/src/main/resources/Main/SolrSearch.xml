@@ -43,42 +43,6 @@
 {{velocity}}
 #handleSolrSearchRequest
 {{/velocity}}</content>
-  <attachment>
-    <filename>dark-grey-disclosure-arrow-down.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJUlEQVQIW2OIjIz8jwszAAkGbBJAwACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==</content>
-    <filesize>94</filesize>
-  </attachment>
-  <attachment>
-    <filename>dark-grey-disclosure-arrow-left.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJ0lEQVQI1y3GMQEAIAwDsGy4RCCiMDOOciU1Nsy6MHSgA33qh7RJH1DfCDMFeFsmAAAAAElFTkSuQmCC</content>
-    <filesize>96</filesize>
-  </attachment>
-  <attachment>
-    <filename>light-grey-disclosure-arrow-down.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzYJEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC</content>
-    <filesize>93</filesize>
-  </attachment>
-  <attachment>
-    <filename>light-grey-disclosure-arrow-left.png</filename>
-    <mimetype>image/png</mimetype>
-    <author>xwiki:XWiki.Admin</author>
-    <version>1.1</version>
-    <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJUlEQVQI1zXKsQ0AIADDMLf//8ZJMFRMzpAc4HbQQQeVH5abwwPlkgTcUkPn+AAAAABJRU5ErkJggg==</content>
-    <filesize>94</filesize>
-  </attachment>
   <object>
     <name>Main.SolrSearch</name>
     <number>0</number>
@@ -229,8 +193,8 @@
     updateExpandCollapseAllFacetsState(facetsContainer);
 
     // Expand/Collapse toggle for each facet.
-    facetsContainer.find('.search-facet-header').on('click', function(event) {
-      $(event.target).parent('.search-facet').toggleClass('expanded');
+    facetsContainer.find('.facet-toggler').on('click', function(event) {
+      $(event.target).parents('.search-facet').toggleClass('expanded');
       updateExpandCollapseAllFacetsState(facetsContainer);
     });
 
@@ -684,7 +648,7 @@ a.search-result-highlightAll:after {
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   /* Leave space for the bottom shadow. */
   margin-bottom: 1em;
-  border-radius: 4px;
+  border-radius: 7px;
 }
 /* Colibri skin doesn't have the grid system. */
 .skin-colibri .search-facets {
@@ -749,11 +713,13 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-header {
-  background: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-left.png')") no-repeat scroll 100% 50% transparent;
   color: $theme.titleColor;
   cursor: pointer;
   line-height: 1.4em;
   margin: 0 .2em;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
 }
 
 .search-facet-header:after {
@@ -763,10 +729,9 @@ a.search-result-highlightAll:after {
   content: "";
   display: block;
   height: 0;
-  margin: 2.45em 0 0;
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
   width: 100%;
 }
 
@@ -796,8 +761,30 @@ a.search-result-highlightAll:after {
   padding: .1em .2em;
 }
 
-.search-facet.expanded .search-facet-header {
-  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
+.search-facet .search-facet-header .facet-toggler, button.facet-value-toggler {
+  background: transparent;
+  transition: background-color .2s ease-in-out;
+}
+
+.search-facet .search-facet-header .facet-toggler:active, button.facet-value-toggler:active {
+  box-shadow: unset;
+}
+
+.search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
+.search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
+  transform: rotate(90deg);
+}
+
+.search-facet.expanded .search-facet-header .facet-toggler > span, .expanded > button.facet-value-toggler > span,
+.search-facet.expanded .search-facet-header .facet-toggler > img, .expanded > button.facet-value-toggler > img {
+  transform: rotate(0deg);
+}
+
+@media not (prefers-reduced-motion) {
+  .search-facet .search-facet-header .facet-toggler > span, button.facet-value-toggler > span,
+  .search-facet .search-facet-header .facet-toggler > img, button.facet-value-toggler > img {
+    transition: transform 0.2s ease;
+  }
 }
 
 .search-facet.expanded .search-facet-body {
@@ -830,6 +817,7 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-body .itemName,
+.search-facet-body .facet-value-toggler,
 .search-facet-body .more {
   /* Remove link styling */
   color: $theme.textColor;

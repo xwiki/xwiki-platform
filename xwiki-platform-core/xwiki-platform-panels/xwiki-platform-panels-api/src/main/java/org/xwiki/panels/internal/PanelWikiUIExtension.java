@@ -22,11 +22,13 @@ package org.xwiki.panels.internal;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.rendering.RenderingException;
@@ -50,31 +52,30 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 4.3M1
  */
+@Component(roles = PanelWikiUIExtension.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class PanelWikiUIExtension extends AbstractWikiUIExtension implements BlockAsyncRendererDecorator
 {
     private static final String SP_PANELDOC = "paneldoc";
 
-    private final ScriptContextManager scriptContextManager;
+    @Inject
+    private ScriptContextManager scriptContextManager;
 
-    private final Provider<XWikiContext> xcontextProvider;
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * @param baseObject the object containing panel setup
      * @param id the ID of this UI extension
-     * @param componentManager The XWiki content manager
-     * @throws ComponentLookupException If module dependencies are missing
      * @throws WikiComponentException When failing to parse content
+     * @since 15.9RC1
      */
-    public PanelWikiUIExtension(BaseObject baseObject, String id, ComponentManager componentManager)
-        throws ComponentLookupException, WikiComponentException
+    public void initialize(BaseObject baseObject, String id) throws WikiComponentException
     {
-        super(baseObject, UIExtension.class, id, componentManager);
+        super.initialize(baseObject, UIExtension.class, id);
 
         // TODO: handle scope dynamically, in the meantime it's hardcoded to "global" for backward compatibility
         this.scope = WikiComponentScope.GLOBAL;
-
-        this.scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
-        this.xcontextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
     }
 
     @Override

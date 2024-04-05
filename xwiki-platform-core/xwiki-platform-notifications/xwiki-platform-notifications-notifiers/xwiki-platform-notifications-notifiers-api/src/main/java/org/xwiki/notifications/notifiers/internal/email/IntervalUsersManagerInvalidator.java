@@ -31,11 +31,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.user.internal.UserPropertyConstants;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
@@ -60,6 +63,7 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
     private static final EntityReference INTERVAL_OBJECT =
         BaseObjectReference.any("XWiki.Notifications.Code.NotificationEmailPreferenceClass");
 
+    // @formatter:off
     private static final List<Event> EVENT_LIST = Arrays.asList(
         new XObjectAddedEvent(USER_OBJECT),
         new XObjectDeletedEvent(USER_OBJECT),
@@ -69,6 +73,7 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
         new XObjectDeletedEvent(INTERVAL_OBJECT),
         new WikiDeletedEvent()
     );
+    // @formatter:on
 
     @Inject
     private IntervalUsersManager users;
@@ -87,7 +92,19 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
         if (event instanceof WikiDeletedEvent) {
             this.users.invalidateWiki(((WikiDeletedEvent) event).getWikiId());
         } else {
-            this.users.invalidateUser(((XWikiDocument) source).getDocumentReference());
+            XWikiDocument document = (XWikiDocument) source;
+
+            // Invalidate only if the user is or was active
+            if (isActive(document) || isActive(document.getOriginalDocument())) {
+                this.users.invalidateUser(((XWikiDocument) source).getDocumentReference());
+            }
         }
+    }
+
+    private boolean isActive(XWikiDocument document)
+    {
+        BaseObject userObject = document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE);
+
+        return userObject != null && userObject.getIntValue(UserPropertyConstants.ACTIVE, 0) == 1;
     }
 }

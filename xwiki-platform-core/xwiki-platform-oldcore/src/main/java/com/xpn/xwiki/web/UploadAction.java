@@ -40,7 +40,6 @@ import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -65,7 +64,6 @@ public class UploadAction extends XWikiAction
      * The prefix of the accepted file input field name.
      * @since 14.10
      */
-    @Unstable
     public static final String FILE_FIELD_NAME = "filepath";
 
     /** Logging helper object. */

@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
 Enables and configures the Jetty server.
@@ -60,6 +60,9 @@ etc/jetty.xml
 
 ## Max response content write length that is buffered (in bytes)
 # jetty.httpConfig.outputAggregationSize=8192
+
+## If HTTP/1.x persistent connections should be enabled
+# jetty.httpConfig.persistentConnectionsEnabled=true
 
 ## Max request headers size (in bytes)
 # jetty.httpConfig.requestHeaderSize=8192

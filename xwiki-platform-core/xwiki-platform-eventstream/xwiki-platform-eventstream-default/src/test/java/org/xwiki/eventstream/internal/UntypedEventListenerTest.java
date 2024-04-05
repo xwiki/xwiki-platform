@@ -120,7 +120,7 @@ public class UntypedEventListenerTest
         templateManager = mocker.getInstance(TemplateManager.class);
         template = mock(Template.class);
         xdom = mock(XDOM.class);
-        when(templateManager.createStringTemplate(anyString(), any())).thenReturn(template);
+        when(templateManager.createStringTemplate(anyString(), any(), any(), any())).thenReturn(template);
         when(templateManager.execute(template)).thenReturn(xdom);
     }
 

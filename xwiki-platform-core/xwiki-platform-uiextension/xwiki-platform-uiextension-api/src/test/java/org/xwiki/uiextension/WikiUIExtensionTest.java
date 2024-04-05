@@ -25,8 +25,6 @@ import org.apache.commons.collections.MapUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
@@ -44,7 +42,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.uiextension.internal.WikiUIExtension;
 
@@ -105,11 +103,11 @@ class WikiUIExtensionTest
     @MockComponent
     private ScriptContext scriptContext;
 
-    @InjectComponentManager
-    private ComponentManager componentManager;
-
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @InjectMockComponents
+    private WikiUIExtension wikiUIX;
 
     private BaseObject baseObject;
 
@@ -127,33 +125,34 @@ class WikiUIExtensionTest
 
     @Test
     void createWikiUIExtension()
-        throws ComponentLookupException, WikiComponentException, JobException, RenderingException
+        throws WikiComponentException, JobException, RenderingException
     {
         when(this.contentParser.parse("", Syntax.XWIKI_2_1, DOC_REF)).thenReturn(XDOM.EMPTY);
 
-        WikiUIExtension wikiUIX = new WikiUIExtension(this.baseObject, "roleHint", "id", "epId", this.componentManager);
-        wikiUIX.setScope(WikiComponentScope.WIKI);
+        this.wikiUIX.initialize(this.baseObject, "roleHint", "id", "epId");
+        this.wikiUIX.setScope(WikiComponentScope.WIKI);
 
-        assertEquals("roleHint", wikiUIX.getRoleHint());
-        assertEquals("id", wikiUIX.getId());
-        assertEquals("epId", wikiUIX.getExtensionPointId());
-        assertEquals(AUTHOR_REFERENCE, wikiUIX.getAuthorReference());
-        assertEquals(UIExtension.class, wikiUIX.getRoleType());
-        assertEquals(WikiComponentScope.WIKI, wikiUIX.getScope());
-        assertEquals(MapUtils.EMPTY_MAP, wikiUIX.getParameters());
+        assertEquals("roleHint", this.wikiUIX.getRoleHint());
+        assertEquals("id", this.wikiUIX.getId());
+        assertEquals("epId", this.wikiUIX.getExtensionPointId());
+        assertEquals(AUTHOR_REFERENCE, this.wikiUIX.getAuthorReference());
+        assertEquals(UIExtension.class, this.wikiUIX.getRoleType());
+        assertEquals(WikiComponentScope.WIKI, this.wikiUIX.getScope());
+        assertEquals(MapUtils.EMPTY_MAP, this.wikiUIX.getParameters());
 
         when(this.blockAsyncRendererExecutor.execute(any(BlockAsyncRendererConfiguration.class)))
             .thenReturn(new WordBlock(""));
 
-        assertEquals(new WordBlock(""), wikiUIX.execute());
+        assertEquals(new WordBlock(""), this.wikiUIX.execute());
     }
 
     @Test
     void render() throws Exception
     {
-        WikiUIExtension wikiUIX = new WikiUIExtension(this.baseObject, "roleHint", "id", "epId", this.componentManager);
+        this.wikiUIX.initialize(this.baseObject, "roleHint", "id", "epId");
+
         BlockAsyncRenderer blockAsyncRenderer = mock(BlockAsyncRenderer.class);
-        wikiUIX.render(blockAsyncRenderer, true, true);
+        this.wikiUIX.render(blockAsyncRenderer, true, true);
         InOrder inOrder = inOrder(this.scriptContext);
         inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNotNull(), eq(ENGINE_SCOPE));
         inOrder.verify(this.scriptContext).setAttribute(eq("uix"), isNull(), eq(ENGINE_SCOPE));

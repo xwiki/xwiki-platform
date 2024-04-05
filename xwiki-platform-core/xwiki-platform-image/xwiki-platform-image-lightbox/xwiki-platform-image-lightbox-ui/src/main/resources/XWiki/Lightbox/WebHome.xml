@@ -402,6 +402,13 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
     </property>
     <property>
       <content>{{velocity}}
+#macro (lightboxTogglerTemplate)
+  &lt;button class='lightbox-toggle btn btn-xs sr-only'
+    aria-label="$escapetool.xml($services.localization.render('image.lightbox.toggler.label'))"&gt;
+    $services.icon.renderHTML('more-vertical')
+  &lt;/button&gt;
+#end
+
 #macro (lightboxHTMLTemplate)
 #set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
 #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
@@ -510,6 +517,7 @@ bundles=blueimp-gallery,blueimp-helper,blueimp-gallery-fullscreen,blueimp-galler
   #set ($discard = $xwiki.jsx.use('XWiki.Lightbox.WebHome'))
   #set ($config = {})
   #set ($discard = $config.put('HTMLTemplate', "#lightboxHTMLTemplate"))
+  #set ($discard = $config.put('togglerTemplate', "#lightboxTogglerTemplate"))
   {{html clean="false"}}
   &lt;script id="lightbox-config" type="application/json"&gt;$jsontool.serialize($config).replace('&amp;lt;', '\u003C')
   &lt;/script&gt;

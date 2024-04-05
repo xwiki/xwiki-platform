@@ -44,6 +44,7 @@ administration.sectionTitle=Адміністрування: {0}
 administration.sectionTitle.page=Адміністрування сторінки: {0}
 administration.sectionTitle.wiki=Адміністрування Вікі: {0}
 administration.sectionTitle.global=Глобальне адміністрування: {0}
+administration.menu.label=Розділи адміністрування.
 administration.menu.search.hint=Шукати...
 administration.menu.search.noResults=Немає результатів.
 
@@ -92,7 +93,7 @@ admin.title=Назва
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Заборонити користувачам створювати вікі-сторінки з порожнім заголовком.
 XWiki.XWikiPreferences_editor.hint=Виберіть тип редактора, який буде використовуватися за умовчанням для редагування вмісту сторінки.
 XWiki.XWikiPreferences_editcomment.hint=Дозволити введення повідомлення під час створення нової версії сторінки.
-### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Сторінка не буде збережена після кожної внесеної зміни, доки не буде надано коротке повідомлення про зміни.
 XWiki.XWikiPreferences_minoredit.hint=Дозволити сторінкам мати основні (x.1) і незначні (1.x) версії. Незначні версії можна переглянути за допомогою кнопки "Показати незначні зміни" у розділі сторінки "Історія".
 admin.wysiwyg.description=Вибір редактора WYSIWYG за умовчанням і його налаштування.
 XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Синтаксис розмітки, що використовується за умовчанням для вмісту сторінки під час створення нової вікі-сторінки.

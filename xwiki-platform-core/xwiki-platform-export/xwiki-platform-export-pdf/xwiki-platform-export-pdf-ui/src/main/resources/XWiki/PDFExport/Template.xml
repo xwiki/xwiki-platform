@@ -61,6 +61,7 @@
         <number>1</number>
         <picker>0</picker>
         <prettyName>Cover</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -78,6 +79,7 @@
         <number>4</number>
         <picker>0</picker>
         <prettyName>Footer</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -95,6 +97,7 @@
         <number>3</number>
         <picker>0</picker>
         <prettyName>Header</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -102,6 +105,24 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </header>
+      <metadata>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <hint>XWiki.PDFExport.TemplateClass_metadata.hint</hint>
+        <name>metadata</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Metadata</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </metadata>
       <toc>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
@@ -112,6 +133,7 @@
         <number>2</number>
         <picker>0</picker>
         <prettyName>Table of Contents</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -136,27 +158,19 @@
 {{/html}}</footer>
     </property>
     <property>
-      <header>{{velocity}}
-{{html clean="false"}}
-#if ("$!request.jobId" != '' &amp;&amp; $services.job.getJobStatus($request.jobId.split('/')).request.isWithTitle())
-  ## The title is extracted from the rendered content.
-  &lt;span class="pdf-chapter-name"&gt;&lt;/span&gt;
-#else
-  $escapetool.xml($tdoc.plainTitle)
-#end
-{{/html}}
-{{/velocity}}</header>
+      <header>{{html clean="false"}}
+&lt;span class="pdf-chapter-name"&gt;&lt;/span&gt;
+{{/html}}</header>
+    </property>
+    <property>
+      <metadata/>
     </property>
     <property>
       <toc>(% id="Hcore.pdf.tableOfContents" %)
 = {{translation key="core.pdf.tableOfContents"/}} =
 
 {{velocity}}
-#if ("$!request.jobId" != '')
-  {{pdftoc jobId="$services.rendering.escape($request.jobId, 'xwiki/2.1')" /}}
-#else
-  {{toc reference="$services.rendering.escape($doc.documentReference, 'xwiki/2.1')" depth="3" /}}
-#end
+{{pdftoc jobId="$!services.rendering.escape($request.jobId, 'xwiki/2.1')" /}}
 {{/velocity}}</toc>
     </property>
   </object>

@@ -20,6 +20,7 @@
 package org.xwiki.ckeditor.test.po.image.edit;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
@@ -76,12 +77,20 @@ public class ImageDialogStandardEditForm extends BaseElement
      */
     public String getCurrentImageStyle()
     {
-        return getImageStylesElement()
-            .getSelectedSuggestions()
-            .stream()
-            .findFirst()
-            .map(SuggestInputElement.SuggestionElement::getValue)
-            .orElseThrow(() -> new RuntimeException("Unexpected empty suggestions list."));
+        return getCurrentImageStyleInternal(SuggestInputElement.SuggestionElement::getValue);
+    }
+
+    /**
+     * Returns the label of the currently selected value of the image styles field.
+     *
+     * @return the label of the currently selected value
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.8RC1
+     */
+    public String getCurrentImageStyleLabel()
+    {
+        return getCurrentImageStyleInternal(SuggestInputElement.SuggestionElement::getLabel);
     }
 
     /**
@@ -100,5 +109,15 @@ public class ImageDialogStandardEditForm extends BaseElement
         SuggestInputElement suggestInputElement = new SuggestInputElement(element);
         suggestInputElement.click().waitForSuggestions();
         return suggestInputElement;
+    }
+
+    private String getCurrentImageStyleInternal(Function<SuggestInputElement.SuggestionElement, String> getValue)
+    {
+        return getImageStylesElement()
+            .getSelectedSuggestions()
+            .stream()
+            .findFirst()
+            .map(getValue)
+            .orElseThrow(() -> new RuntimeException("Unexpected empty suggestions list."));
     }
 }

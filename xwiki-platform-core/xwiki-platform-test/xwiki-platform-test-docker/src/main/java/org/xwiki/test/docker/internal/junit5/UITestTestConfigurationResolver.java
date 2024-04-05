@@ -64,9 +64,13 @@ public class UITestTestConfigurationResolver
 
     private static final String JDBCDRIVERVERSION_PROPERTY = "xwiki.test.ui.jdbcDriverVersion";
 
+    private static final String BROWSERTAG_PROPERTY = "xwiki.test.ui.browserTag";
+
     private static final String VNC_PROPERTY = "xwiki.test.ui.vnc";
 
     private static final String WCAG_PROPERTY = "xwiki.test.ui.wcag";
+
+    private static final String WCAG_STOP_ON_ERROR_PROPERTY = "xwiki.test.ui.wcagStopOnError";
 
     private static final String PROPERTIES_PREFIX_PROPERTY = "xwiki.test.ui.properties.";
 
@@ -92,10 +96,12 @@ public class UITestTestConfigurationResolver
         configuration.setDebug(resolveDebug(uiTestAnnotation.debug()));
         configuration.setOffline(resolveOffline(uiTestAnnotation.offline()));
         configuration.setDatabaseTag(resolveDatabaseTag(uiTestAnnotation.databaseTag()));
+        configuration.setBrowserTag(resolveBrowserTag(uiTestAnnotation.browserTag()));
         configuration.setServletEngineTag(resolveServletEngineTag(uiTestAnnotation.servletEngineTag()));
         configuration.setJDBCDriverVersion(resolveJDBCDriverVersion(uiTestAnnotation.jdbcDriverVersion()));
         configuration.setVNC(resolveVNC(uiTestAnnotation.vnc()));
         configuration.setWCAG(resolveWCAG(uiTestAnnotation.wcag()));
+        configuration.setWCAGStopOnError(resolveWCAGStopOnError(uiTestAnnotation.wcagStopOnError()));
         configuration.setProperties(resolveProperties(uiTestAnnotation.properties()));
         configuration.setExtraJARs(resolveExtraJARs(uiTestAnnotation.extraJARs()));
         configuration.setResolveExtraJARs(resolveResolveExtraJARs(uiTestAnnotation.resolveExtraJARs()));
@@ -219,6 +225,11 @@ public class UITestTestConfigurationResolver
         return resolve(jdbcDriverVersion, JDBCDRIVERVERSION_PROPERTY);
     }
 
+    private String resolveBrowserTag(String browserTag)
+    {
+        return resolve(browserTag, BROWSERTAG_PROPERTY);
+    }
+
     private boolean resolveVNC(boolean vnc)
     {
         return resolve(vnc, VNC_PROPERTY);
@@ -227,6 +238,11 @@ public class UITestTestConfigurationResolver
     private boolean resolveWCAG(boolean wcag)
     {
         return resolve(wcag, WCAG_PROPERTY);
+    }
+
+    private boolean resolveWCAGStopOnError(boolean wcagStopOnError)
+    {
+        return resolve(wcagStopOnError, WCAG_STOP_ON_ERROR_PROPERTY);
     }
 
     private boolean resolveOffice(boolean office)

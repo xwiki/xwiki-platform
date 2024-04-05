@@ -8,6 +8,8 @@
 500:org.xwiki.rendering.internal.util.XWikiErrorBlockGenerator
 500:org.xwiki.rendering.internal.wiki.XWikiWikiModel
 500:org.xwiki.rendering.internal.macro.XWikiHTMLRawBlockFilter
+org.xwiki.rendering.internal.macro.HTMLMacroRequiredRightsAnalyzer
+org.xwiki.rendering.internal.macro.RawMacroRequiredRightsAnalyzer
 org.xwiki.rendering.internal.resolver.AttachmentResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.DefaultResourceReferenceEntityReferenceResolver
 org.xwiki.rendering.internal.resolver.DocumentResourceReferenceEntityReferenceResolver

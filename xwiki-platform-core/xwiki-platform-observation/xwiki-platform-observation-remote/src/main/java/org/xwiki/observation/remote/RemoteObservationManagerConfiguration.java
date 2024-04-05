@@ -22,7 +22,6 @@ package org.xwiki.observation.remote;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide configuration for remote observation manager.
@@ -53,7 +52,6 @@ public interface RemoteObservationManagerConfiguration
      *     provisioning an identifier (e.g., a component implemented before 14.1RC1)
      * @since 14.1RC1
      */
-    @Unstable
     default String getId()
     {
         return null;

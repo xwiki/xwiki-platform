@@ -1,4 +1,0 @@
-content	foxwiki	core/src/main/resources/content/
-overlay	chrome://browser/content/browser.xul	chrome://foxwiki/content/browser.xul
-
-locale	foxwiki	en-UK	core/src/main/resources/locale/en-UK/

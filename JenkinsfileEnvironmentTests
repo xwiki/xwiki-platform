@@ -46,6 +46,11 @@ if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
     // Aborting so that the build isn't displayed as successful, as we want to focus on the failing env tests builds.
     currentBuild.result = 'ABORTED'
   }
+} else if (params.type && params.type != 'none' && params.type != 'docker-latest') {
+  // Always build docker-all and docker-unsupported, as they execute only every week and every month and it's unlikely
+  // there's been no changes since their last execution. We could check specifically for that but it's simpler to just
+  // always execute them!
+  buildDocker(params.type)
 } else if (params.type && params.type != 'none') {
   // Only execute if the "XWiki/xwiki-platform/<current branch>" job's last execution date is later than this current
   // job's last execution date. In other words, don't re-run the environment tests if there's been no source code

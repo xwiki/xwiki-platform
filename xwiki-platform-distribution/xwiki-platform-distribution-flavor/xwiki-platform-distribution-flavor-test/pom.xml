@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -243,20 +243,68 @@
               <!-- Used only in webstandards tests -->
               <urlsToTestAsAdmin>
                 /xwiki/bin/admin/XWiki/XWikiPreferences
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=General
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Presentation
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Registration
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Programming
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Rights
+                <!-- Users and rights -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Users
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Groups
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Templates
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.OfficeImporterAdmin
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Annotations
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Rights
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=usersgroups.extensionrights
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=UserProfile
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=userdirectory
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Registration
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Invitation
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Authentication
+                <!-- Extensions -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.Extensions
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.ExtensionHistory
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.ExtensionUpdater
+                <!-- Look and feel -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Themes
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=menu.name
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Panels.PanelWizard
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.applications
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=panels.navigation
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Presentation
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=image.style
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=lightbox
+                <!-- Content -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Templates
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Localization
+                /xwiki/bin/import/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Import
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Export
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=export.pdf
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Programming
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Annotations
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=XWiki.OfficeImporterAdmin
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=documentanalysis
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=attachmentsrestriction
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Delete
+                <!-- Editing -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Editing
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=WYSIWYG
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Syntaxes
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=nameStrategies
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=SyntaxHighlighting
+                <!-- Mail -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailSend
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailStatus
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=emailGeneral
+                <!-- Search -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Search
-                /xwiki/bin/import/XWiki/Import?editor=globaladmin&amp;section=Import
-                /xwiki/bin/admin/XWiki/Export?editor=globaladmin&amp;section=Export
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=searchSuggest
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=IndexingUser
+                <!-- Social -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Likes
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Mentions
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=MessageStream
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Notifications
+                <!-- Wikis -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.descriptor
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.templates
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.rights
+                <!-- Other -->
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Logging
+                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=captcha
+
                 /xwiki/bin/edit/XWiki/XWikiPreferences?editor=wysiwyg
                 /xwiki/bin/edit/XWiki/XWikiPreferences?editor=wiki
                 /xwiki/bin/edit/XWiki/XWikiPreferences?editor=object
@@ -452,6 +500,7 @@
   <modules>
     <module>xwiki-platform-distribution-flavor-test-misc</module>
     <module>xwiki-platform-distribution-flavor-test-pageobjects</module>
+    <module>xwiki-platform-distribution-flavor-test-security</module>
     <module>xwiki-platform-distribution-flavor-test-ui</module>
     <module>xwiki-platform-distribution-flavor-test-webstandards</module>
     <module>xwiki-platform-distribution-flavor-test-escaping</module>

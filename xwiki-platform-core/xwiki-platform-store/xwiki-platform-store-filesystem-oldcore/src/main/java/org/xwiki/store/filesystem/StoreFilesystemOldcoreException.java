@@ -19,15 +19,12 @@
  */
 package org.xwiki.store.filesystem;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception for the Store - Filesystem - Old Core module.
  *
  * @version $Id$
  * @since 14.9RC1
  */
-@Unstable
 public class StoreFilesystemOldcoreException extends Exception
 {
     /**

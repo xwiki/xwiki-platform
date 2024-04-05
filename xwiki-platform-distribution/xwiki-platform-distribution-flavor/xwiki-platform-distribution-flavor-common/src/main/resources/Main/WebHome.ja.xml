@@ -35,13 +35,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>= あなたのウィキへようこそ =
+  <content>== あなたのウィキへようこそ ==
 
 XWikiは知識をまとめるのに最適なツールです。//ウィキ//は複数の//ページ//の階層からなります。それぞれページをもつ複数のウィキを作成することができます。
 
 XWikiは（サポート、ドキュメンテーション、セールスなどについての）ナレッジベースとして、ワークスペースでの共同作業、あるいはイントラネットに利用できます。
 
-= 基本事項 =
+== 基本事項 ==
 
 ウィキを活用するには、ログイン後、
 
@@ -53,22 +53,22 @@ XWikiは（サポート、ドキュメンテーション、セールスなどに
 
 [[サンドボックス&gt;&gt;Sandbox.WebHome]]には、より多くのデモコンテンツがあります。また、サンドボックスはウィキの機能を試す際にも使用できます。
 
- {{box}}XWikiの使い方については、{{velocity}}[[スタートガイド&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}もご覧ください。{{/box}}
+ {{box}}XWikiの使い方については、[[スタートガイド&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]]もご覧ください。{{/box}}
 
 (% class="row" %)
 (((
 (% class="col-xs-12 col-sm-6" %)
 (((
-= ウィキを拡張 =
+== ウィキを拡張 ==
 
-{{velocity}}[[エクステンションマネージャー&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}から拡張機能を検索してインストールすると、//あなた//が必要な機能を追加してウィキの性能を向上させることができます。
+[[エクステンションマネージャー&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]]から拡張機能を検索してインストールすると、//あなた//が必要な機能を追加してウィキの性能を向上させることができます。
 
 コミュニティーが作成した900個以上の拡張機能は、[[拡張機能レポジトリ&gt;&gt;http://extensions.xwiki.org]]から確認できます。
 )))
 
 (% class="col-xs-12 col-sm-6" %)
 (((
-= アプリケーションを作成 =
+== アプリケーションを作成 ==
 
 利用可能な拡張機能を超えて、あなたのデータの//構造//を//あなたの//ニーズに基づき規定し、 [[App Within Minutes&gt;&gt;AppWithinMinutes]]（AWM）で//あなた//自身のアプリケーションを作ることができます。
 

@@ -441,7 +441,8 @@ define('editInPlace', [
         options.afterEdit(xwikiDocument);
         return xwikiDocument;
       }).finally(() =&gt; {
-        $('#xwikicontent').removeClass('loading');
+        // Remove the aria-expanded attribute which is incorrect for role=textbox
+        $('#xwikicontent').removeClass('loading').removeAttr('aria-expanded');
       // Then wait for an action (save, cancel, reload) only if the editors were loaded successfuly.
       }).then(maybeSave)
       // Then unlock the document both when the edit ended with success and with a failure.
@@ -694,6 +695,8 @@ define('editInPlace', [
     viewContent.trigger('xwiki:actions:view', {document: xwikiDocument});
     $('#document-title h1').html(xwikiDocument.renderedTitle);
     viewContent.html(xwikiDocument.renderedContent);
+    // Reset the editor to let others know that we're no editing anymore.
+    XWiki.editor = '';
     if (!reload) {
       // If the user has canceled the edit then the restored page content may include the section edit links. Show them
       // in case they were hidden.
@@ -716,6 +719,8 @@ define('editInPlace', [
     // for editing the document content in place and one for editing the document syntax in-place) and we don't want
     // them to interfere (e.g. canceling one form shouldn't cancel the other forms).
     $('#xwikicontent').closest('.xcontent').addClass('form');
+    // Let others know which editor is used for the page content.
+    XWiki.editor = config.editMode;
     return initActionButtons(xwikiDocument).then(initTitleEditor).then(initContentEditor)
       .then(startRealTimeEditingSession);
   };
@@ -889,7 +894,13 @@ define('editInPlace', [
       reloadEditor: function() {
         var actionButtons = $('.inplace-editing-buttons');
         if (actionButtons.is(':visible')) {
-          actionButtons.trigger('xwiki:actions:reload');
+          // This function is called after the document save confirmation is received, if the save was done by merge. We
+          // register our reload listener from a document saved listener, but we're using promises which are
+          // asynchronous so the reload listener is actually registered with a delay. For this reason we trigger the
+          // reload event with a delay to ensure our reload listener is called.
+          setTimeout(function() {
+            actionButtons.trigger('xwiki:actions:reload');
+          }, 0);
         } else {
           return originalAjaxSaveAndContinue.reloadEditor.apply(this, arguments);
         }
@@ -950,6 +961,8 @@ define('editInPlace', [
       viewContent.focus();
     }
     var data = $.extend({}, config, {
+      // Use the same name as for the standalone editor, in order to be consistent.
+      editorName: 'content',
       document: xwikiDocument,
       // The content editor is loaded on demand, asynchronously.
       deferred: $.Deferred()
@@ -1337,6 +1350,7 @@ input#document-title-input {
   /* Preserve the heading styles. */
   color: inherit;
   font-size: inherit;
+  background-color: @body-bg;
   /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
   height: @font-size-document-title * @headings-line-height + 2 * (1 + @document-title-input-padding-vertical);
   line-height: @headings-line-height;

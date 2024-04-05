@@ -1,0 +1,327 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="ko">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=비활성화된 플러그인
+CKEditor.ConfigClass_removePlugins.hint=비활성화된 플러그인 목록입니다.
+CKEditor.ConfigClass_removeButtons=비활성화된 도구 모음 기능
+CKEditor.ConfigClass_removeButtons.hint=비활성화된 도구 모음 기능 목록입니다.
+CKEditor.ConfigClass_linkShowAdvancedTab=링크: 고급 탭 표시
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=ID, 이름, 클래스 또는 스타일과 같은 링크 속성을 설정할 수 있습니다.
+CKEditor.ConfigClass_linkShowTargetTab=링크: 대상 탭 표시
+CKEditor.ConfigClass_linkShowTargetTab.hint=링크 대상 속성을 설정할 수 있습니다(예: 새 탭에서 링크 열기).
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=JavaScript 스킨 확장 로드
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=일부 렌더링 매크로는 JavaScript 코드를 사용하여 표시됩니다. JavaScript 코드를 로드하면 편집기의 WYSIWYG 측면이 향상되지만 JavaScript 코드가 CKEditor 코드를 방해하거나 매크로 출력 경계 외부의 내용을 변경하는 경우 문제가 발생할 수 있습니다.
+CKEditor.ConfigClass_advanced=고급 구성
+CKEditor.ConfigClass_advanced.hint=JavaScript 코드 조각을 작성하여 구성 개체를 직접 수정할 수 있습니다. 사용 가능한 구성 속성 목록은 {0}CKEditor 문서 {1}를 확인하세요.
+ckeditor.content.placeholder=여기에 입력을 시작하세요...
+ckeditor.admin.saveComment=관리에서 CKEditor 구성을 업데이트했습니다
+ckeditor.admin.reset=초기화
+ckeditor.admin.reset.hint=기본 구성 복원
+ckeditor.admin.reset.confirmation=기본 구성을 복원하시겠습니까? 모든 변경사항이 손실됩니다.
+ckeditor.plugin.link.options=옵션
+ckeditor.plugin.link.anchor=닻
+ckeditor.plugin.link.queryString=쿼리 문자열
+ckeditor.plugin.link.defaultLabel=링크 라벨을 입력하세요
+ckeditor.plugin.link.openInNewTab=새 탭에서 링크 열기
+ckeditor.plugin.link.upload=첨부파일 업로드
+ckeditor.plugin.link.uploadHint=새로 업로드된 첨부파일에 대한 링크입니다.
+ckeditor.plugin.link.uploadProgress={0} 업로드 중...
+ckeditor.plugin.link.uploadSuccess={0}을(를) 업로드했습니다
+ckeditor.plugin.link.uploadError={0}을(를) 업로드하지 못했습니다
+ckeditor.plugin.list.listType.none=없음
+ckeditor.plugin.macro.placeholder=매크로:{0}
+ckeditor.plugin.macro.buttonHint=XWiki 매크로
+ckeditor.plugin.macro.editButtonHint=매크로 편집
+ckeditor.plugin.macro.refreshFailed=수정된 콘텐츠를 새로고침하지 못했습니다.
+ckeditor.plugin.macro.dedicatedInsertButtonHint={0} 매크로 삽입
+ckeditor.plugin.macro.installPending={0} {1} 설치 중...
+ckeditor.plugin.macro.installSuccessful=각 결과에서 일치된 내용을 추출하여 표시합니다.
+ckeditor.plugin.macro.installFailed={0} {1}을(를) 설치하지 못했습니다.
+ckeditor.plugin.office.importer.title=Office 파일 가져오기
+ckeditor.plugin.office.importer.filePath=파일 경로
+ckeditor.plugin.office.importer.filePath.hint=가져올 Office 파일을 선택합니다. 파일이 이 페이지에 업로드 및 첨부되고 해당 내용이 페이지 콘텐츠에 삽입됩니다.
+ckeditor.plugin.office.importer.filterStyles=필터 스타일
+ckeditor.plugin.office.importer.filterStyles.hint=글꼴, 색상, 정렬, 여백과 같은 텍스트 스타일을 필터링합니다. 제목 수준, 단락, 목록 및 표를 포함한 콘텐츠 구조가 유지됩니다.
+ckeditor.plugin.office.importer.useOfficeViewer=오피스 뷰어 사용
+ckeditor.plugin.office.importer.useOfficeViewer.hint=가져온 후 Office 파일의 콘텐츠를 편집할 계획이 없거나 현재 편집 중인 콘텐츠와 Office 파일의 콘텐츠를 혼합하지 않으려는 경우 이 옵션을 선택하세요.
+ckeditor.plugin.office.importer.required=필수의
+ckeditor.plugin.office.importer.import=불러오기
+ckeditor.plugin.office.importer.inProgress=Office 파일을 가져오는 중...
+ckeditor.plugin.office.importer.done=Office 파일을 성공적으로 가져왔습니다.
+ckeditor.plugin.office.importer.fail=Office 가져오기에 실패했습니다.
+ckeditor.plugin.office.importer.noUploadURL=파일 업로드 URL이 구성되지 않았습니다.
+ckeditor.plugin.office.importer.failedToLoadForm=다음 픽스업이 번역에 적용되었습니다: 너비가 0인 공간.
+ckeditor.plugin.resource.notSpecified={0}이 지정되지 않았습니다.
+ckeditor.plugin.save.leaveConfirmationMessage=저장되지 않은 변경사항이 있습니다. 삭제하시겠습니까?
+ckeditor.plugin.save.failed=CKEditor 내부 오류로 인해 콘텐츠를 저장할 수 없습니다. 중요한 변경 사항을 복사하고 편집기를 다시 로드해야 합니다.
+ckeditor.plugin.source.conversionFailed=변환을 수행하지 못했습니다.
+ckeditor.plugin.toolbar.basicStyles=기본 스타일
+ckeditor.plugin.toolbar.lists=기울기
+ckeditor.plugin.toolbar.bulletedlist=글머리 기호 목록
+ckeditor.plugin.toolbar.numberedlist=번호 매기기 목록
+ckeditor.plugin.toolbar.insert=끼워 넣다
+ckeditor.plugin.toolbar.horizontalrule=분할기
+ckeditor.plugin.toolbar.specialchar=특수문자
+ckeditor.plugin.toolbar.infoBox=정보 상자
+ckeditor.plugin.toolbar.successBox=성공 상자
+ckeditor.plugin.toolbar.warningBox=경고 상자
+ckeditor.plugin.toolbar.errorBox=오류 상자
+ckeditor.plugin.toolbar.toc=목차
+ckeditor.plugin.toolbar.include=페이지 포함
+ckeditor.plugin.toolbar.code=코드 조각
+ckeditor.plugin.toolbar.otherMacros=기타 매크로
+ckeditor.plugin.syntax.update.inProgress=WYSIWYG 편집기 업데이트
+ckeditor.plugin.syntax.update.done=WYSIWYG 편집기가 업데이트되었습니다
+ckeditor.plugin.syntax.update.failed=WYSIWYG 편집기를 업데이트하지 못했습니다
+ckeditor.plugin.syntax.wysiwygModeUnsupported=WYSIWYG 편집 모드는 {0} 구문에서 지원되지 않습니다.
+ckeditor.plugin.icon.iconsFetchFailed=아이콘 목록을 검색하지 못했습니다.
+ckeditor.plugin.icon.iconThemesFetchFailed=사용 가능한 아이콘 테마를 검색하지 못했습니다.
+ckeditor.plugin.image.imageEditor.standardTab.title=기준
+ckeditor.plugin.image.imageEditor.advancedTab.title=고급의
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=이미지 스타일
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=이미지에 적용할 스타일을 선택하세요.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=대체 텍스트
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=이미지를 표시할 수 없는 경우 이미지에 대한 대체 텍스트를 정의합니다.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=표제
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=이미지 캡션을 활성화하고 정의합니다.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=이미지 캡션을 활성화하고 정의합니다.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=크기
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=너비
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=키
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=이미지 크기를 정의합니다.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=국경
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=체크하면 이미지에 테두리가 표시됩니다
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=조정
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=이미지 정렬을 정의합니다.
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=없음
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=시작
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=센터
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=끝
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=텍스트 감싸기
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=선택하면 텍스트가 이미지 주위로 둘러싸입니다.
+ckeditor.plugin.image.imageSelector.treeTab.title=나무
+ckeditor.plugin.image.imageSelector.uploadTab.title=업로드
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=파일
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=페이지에 추가할 로컬 파일을 선택합니다.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=업로드
+ckeditor.plugin.image.imageSelector.iconTab.title=상
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=상
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=이미지로 표시할 아이콘의 식별자입니다.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=수용하다
+ckeditor.plugin.image.imageSelector.urlTab.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=표시할 이미지의 URL 입니다 .
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+ckeditor.plugin.image.slash.currentPageBadge=이 페이지
+ckeditor.plugin.image.slash.externalBadge=외부
+ckeditor.plugin.image.slash.loading=로드 중...
+ckeditor.plugin.image.slash.upload=이미지 업로드
+ckeditor.plugin.image.slash.uploadProgress=0} 업로드 중...
+ckeditor.plugin.image.slash.uploadSuccess=0}을(를) 업로드했습니다
+ckeditor.plugin.image.slash.uploadError=0}을(를) 업로드하지 못했습니다
+ckeditor.plugin.slash.group.Layout=공들여 나열한 것
+ckeditor.plugin.slash.group.Content=콘텐츠
+ckeditor.plugin.slash.group.Formatting=서식 지정
+ckeditor.plugin.slash.group.Navigation=항해
+ckeditor.plugin.slash.group.Actions=행위
+ckeditor.plugin.slash.group.Table=테이블
+ckeditor.plugin.slash.group.Macro=매크로
+ckeditor.plugin.slash.action.h1.hint=제목의 첫 번째 수준입니다.
+ckeditor.plugin.slash.action.h2.hint=두 번째 수준의 제목입니다.
+ckeditor.plugin.slash.action.h3.hint=세 번째 수준의 제목입니다.
+ckeditor.plugin.slash.action.h4.hint=네 번째 수준의 제목입니다.
+ckeditor.plugin.slash.action.h5.hint=제목의 다섯 번째 수준입니다.
+ckeditor.plugin.slash.action.h6.hint=제목의 여섯 번째 수준입니다.
+ckeditor.plugin.slash.action.p.name=절
+ckeditor.plugin.slash.action.p.hint=일반 텍스트 단락을 만듭니다.
+ckeditor.plugin.slash.action.ul.hint=간단한 글머리 기호 목록을 만듭니다.
+ckeditor.plugin.slash.action.ol.hint=번호가 매겨진 목록을 만듭니다.
+ckeditor.plugin.slash.action.table.hint=페이지에 간단한 표 형식의 콘텐츠를 추가하세요.
+ckeditor.plugin.slash.action.blockquote.name=인용하다
+ckeditor.plugin.slash.action.blockquote.hint=인용문을 표시하십시오.
+ckeditor.plugin.slash.action.info.hint=중요한 메시지를 강조하세요.
+ckeditor.plugin.slash.action.info.defaultContent=여기에 정보 메시지를 입력하세요.
+ckeditor.plugin.slash.action.success.hint=작업 완료로 표시하세요.
+ckeditor.plugin.slash.action.success.defaultContent=여기에 성공 메시지를 입력하세요.
+ckeditor.plugin.slash.action.warning.hint=경고 메시지를 작성하세요.
+ckeditor.plugin.slash.action.warning.defaultContent=여기에 경고 메시지를 입력하세요.
+ckeditor.plugin.slash.action.error.hint=오류 메시지를 작성합니다.
+ckeditor.plugin.slash.action.error.defaultContent=여기에 오류 메시지를 입력하세요.
+ckeditor.plugin.slash.action.hr.hint=콘텐츠 블록 사이에 주제별 구분을 표시합니다. 예를 들어 스토리의 장면 변경, 섹션 내 주제 전환 등이 있습니다.
+ckeditor.plugin.slash.action.a.hint=다른 페이지에 대한 링크를 만듭니다.
+ckeditor.plugin.slash.action.img.hint=이미지를 삽입하거나 업로드하세요.
+ckeditor.plugin.slash.action.icon.name=상
+ckeditor.plugin.slash.action.icon.hint=아이콘을 삽입하세요.
+ckeditor.plugin.slash.action.mention.name=언급하다
+ckeditor.plugin.slash.action.mention.hint=누군가에게 알림을 보내도록 멘션하세요.
+ckeditor.plugin.slash.action.emoji.name=Emoji
+ckeditor.plugin.slash.action.emoji.hint=삽입할 이모티콘을 선택하세요.
+ckeditor.plugin.slash.action.code.hint=코드 조각을 작성합니다.
+ckeditor.plugin.slash.action.toc.hint=콘텐츠 섹션의 개요를 제공합니다.
+ckeditor.plugin.slash.action.include.hint=다른 페이지의 콘텐츠를 포함합니다.
+ckeditor.plugin.slash.action.macros.name=매크로 찾아보기
+ckeditor.plugin.slash.action.macros.hint=필요한 매크로를 찾아보세요.
+ckeditor.plugin.slash.action.find.hint=특정 텍스트의 여러 항목을 바꿉니다.
+ckeditor.plugin.slash.action.table_row_before.hint=현재 행 앞에 새 테이블 행을 삽입합니다.
+ckeditor.plugin.slash.action.table_row_after.hint=현재 테이블 행 뒤에 새 테이블 행을 삽입합니다.
+ckeditor.plugin.slash.action.table_row_delete.name=행 삭제
+ckeditor.plugin.slash.action.table_row_delete.hint=현재 테이블 행을 제거합니다.
+ckeditor.plugin.slash.action.table_col_before.hint=현재 테이블 열 앞에 새 테이블 열을 삽입합니다.
+ckeditor.plugin.slash.action.table_col_after.hint=현재 테이블 열 뒤에 새 테이블 열을 삽입합니다.
+ckeditor.plugin.slash.action.table_col_delete.name=열 삭제
+ckeditor.plugin.slash.action.table_col_delete.hint=현재 테이블 열을 제거합니다.
+ckeditor.plugin.slash.action.table_cell_split_horizontal.hint=현재 테이블 셀을 가로로 분할합니다.
+ckeditor.plugin.slash.action.table_cell_split_vertical.hint=현재 테이블 셀을 세로로 분할합니다.
+ckeditor.plugin.slash.action.table_cell_merge_right.name=셀 오른쪽 병합
+ckeditor.plugin.slash.action.table_cell_merge_right.hint=현재 테이블 셀을 다음 셀과 병합합니다.
+ckeditor.plugin.slash.action.table_cell_merge_down.name=아래로 셀 병합
+ckeditor.plugin.slash.action.table_cell_merge_down.hint=현재 테이블 셀을 아래 셀과 병합합니다.
+ckeditor.plugin.slash.action.table_cell_before.hint=현재 테이블 셀 앞에 새 테이블 셀을 삽입합니다.
+ckeditor.plugin.slash.action.table_cell_after.hint=현재 셀 뒤에 새 테이블 셀을 삽입합니다.
+ckeditor.plugin.slash.action.table_cell_delete.name=셀 삭제
+ckeditor.plugin.slash.action.table_cell_delete.hint=현재 테이블 셀을 제거합니다.
+ckeditor.plugin.slash.action.table_delete.hint=콘텐츠에서 현재 테이블을 제거합니다.
+ckeditor.plugin.slash.placeholder=빠른 작업을 위해 /를 입력하세요...
+ckeditor.plugin.slash.dropdown.hint=자동완성할 항목을 선택하세요.
+ckeditor.plugin.focusedplaceholder.placeholder.body=몸
+ckeditor.plugin.focusedplaceholder.placeholder.address=주소
+ckeditor.plugin.focusedplaceholder.placeholder.aside=곁에
+ckeditor.plugin.focusedplaceholder.placeholder.footer=보행인
+ckeditor.plugin.focusedplaceholder.placeholder.header=머리글
+ckeditor.plugin.focusedplaceholder.placeholder.h1=제목 1
+ckeditor.plugin.focusedplaceholder.placeholder.h2=제목 2
+ckeditor.plugin.focusedplaceholder.placeholder.h3=제목 3
+ckeditor.plugin.focusedplaceholder.placeholder.h4=제목 4
+ckeditor.plugin.focusedplaceholder.placeholder.h5=제목 5
+ckeditor.plugin.focusedplaceholder.placeholder.h6=제목 6
+ckeditor.plugin.focusedplaceholder.placeholder.main=메인 콘텐츠
+ckeditor.plugin.focusedplaceholder.placeholder.nav=항해
+ckeditor.plugin.focusedplaceholder.placeholder.section=부분
+ckeditor.plugin.focusedplaceholder.placeholder.blockquote=인용하다
+ckeditor.plugin.focusedplaceholder.placeholder.dl=정의 목록
+ckeditor.plugin.focusedplaceholder.placeholder.dt=정의 항목
+ckeditor.plugin.focusedplaceholder.placeholder.dd=설명
+ckeditor.plugin.focusedplaceholder.placeholder.figcaption=표제
+ckeditor.plugin.focusedplaceholder.placeholder.figure=수치
+ckeditor.plugin.focusedplaceholder.placeholder.ol=주문목록
+ckeditor.plugin.focusedplaceholder.placeholder.ul=순서가 없는 목록
+ckeditor.plugin.focusedplaceholder.placeholder.menu=메뉴(순서가 지정되지 않은 목록)
+ckeditor.plugin.focusedplaceholder.placeholder.li=목록 항목
+ckeditor.plugin.focusedplaceholder.placeholder.p=절
+ckeditor.plugin.focusedplaceholder.placeholder.pre=사전 형식화됨
+ckeditor.plugin.focusedplaceholder.placeholder.caption=제목
+ckeditor.plugin.focusedplaceholder.placeholder.th=머리글
+ckeditor.plugin.focusedplaceholder.placeholder.td=셀
+ckeditor.inline.failedToInit=CKEditor를 초기화하지 못했습니다.
+ckeditor.upload.error.csrf=CSRF 토큰이 누락되었습니다.
+ckeditor.upload.error.emptyReturn=파일을 업로드하는 중 오류가 발생했습니다. 구성된 최대 업로드 크기를 초과했을 수 있습니다.
+modal.ok=좋아요
+modal.cancel=취소
+modal.close=닫다
+resource.attach.label=부착
+resource.attach.placeholder=Path.To.Page@attachment.png
+resource.data.label=날짜 URI
+resource.doc.label=페이지
+resource.doc.placeholder=Path.To.Page
+resource.icon.label=상
+resource.mailto.label=메일 주소
+resource.mailto.placeholder=user@example.org
+resource.path.label=길
+resource.path.placeholder=경로/대상/파일
+resource.unc.label=UNC 경로
+resource.unc.placeholder=/서버/공유/경로/대상/파일
+resource.unknown.label=알려지지 않은
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=사용자
+resource.user.placeholder=별명
+resourcePicker.attach.hint=첨부파일을 선택하세요
+resourcePicker.doc.hint=페이지를 선택하세요
+entityResourceSuggester.doc.placeholder=페이지 찾기...
+entityResourceSuggester.attach.placeholder=첨부파일 찾기...
+entityResourcePicker.select=선택하다
+entityResourcePicker.doc.title=페이지 선택
+entityResourcePicker.attach.title=첨부파일 선택
+macroSelector.title=매크로 선택
+macroSelector.filter.text.placeholder=필터링할 입력
+macroSelector.filter.category.all=모든 매크로
+macroSelector.filter.category.other=다른
+macroSelector.filter.category.notinstalled=설치되지 않음
+macroSelector.failedToRetrieveMacros=사용 가능한 매크로 목록을 검색하지 못했습니다.
+macroSelector.select=선택하다
+macroSelector.recommended=추천
+macroSelector.install=설치하다
+macroSelector.install.confirm=0} {1} 확장 프로그램을 설치하려고 합니다. 너 정말 계속하고 싶니 ?
+macroSelector.install.notAllowed=이 확장 프로그램을 설치할 수 없습니다
+macroSelector.filter.category.placeholder=카테고리를 선택하세요...
+macroEditor.title=매크로 편집
+macroEditor.more=더
+macroEditor.changeMacro=매크로 변경
+macroEditor.submit=제출하다
+macroEditor.content=콘텐츠
+macroEditor.noParameters=이 매크로에는 매개변수가 없습니다.
+macroEditor.descriptorRequestFailed=0} 매크로 설명자를 검색하지 못했습니다.
+macroEditor.installRequestFailed=0} 매크로를 설치하지 못했습니다.
+
+
+imageEditor.modal.changeImage.button=이미지 변경
+imageEditor.modal.loadFail.message=이미지 편집기 양식을 검색하지 못했습니다.
+imageEditor.modal.title=이미지 편집
+imageEditor.modal.insertButton=끼워 넣다
+imageEditor.modal.updateButton=업데이트
+imageEditor.modal.initialization.fail=이미지 선택 양식을 검색하지 못했습니다.
+imageEditor.modal.outscaleWarning=크기 중 하나가 원본 이미지({0})보다 큽니다. 그 결과 표시된 이미지의 품질이 저하될 수 있습니다.
+imageSelector.modal.title=이미지 선택
+imageSelector.modal.selectButton=선택하다
+imageSelector.modal.loadFail.message=이미지 선택 양식을 검색하지 못했습니다.
+imageSelector.modal.fileUpload.success=파일 업로드가 성공했습니다.
+imageSelector.modal.fileUpload.fail=파일 업로드에 실패했습니다.
+imageSelector.modal.fileUpload.abort=파일 업로드가 중단되었습니다.
+imageSelector.modal.initialization.fail=이미지 선택 양식을 검색하지 못했습니다.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10
+imageEditor.modal.backToEditor.button=뒤쪽에
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=문서 트리
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

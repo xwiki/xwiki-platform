@@ -65,16 +65,7 @@
       #end
     </div>
     <div class="notification-description">
-      #if ($compositeEvent.users.size() == 1)
-        $services.localization.render("notifications.events.${compositeEvent.type}.description.by.1user", ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
-      #else
-        <div>
-          $services.localization.render("notifications.events.${compositeEvent.type}.description.by.users", [$compositeEvent.users.size()])
-        </div>
-        <div>
-          #displayNotificationEventUsers($compositeEvent.users, true, true)
-        </div>
-      #end
+      #displayCompositeEventDescription($compositeEvent false)
       <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
     </div>
   #end
@@ -110,11 +101,17 @@
       #end
     </div>
     <div class="col-xs-9 notification-content">
+      <button class="notification-event-read-button btn btn-xs hidden"
+              aria-label="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
+              title="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
+              disabled="disabled">
+        $services.icon.renderHTML('check')
+      </button>
       $content
       #if ($stringtool.isNotBlank($details))
         <button class="btn btn-xs toggle-notification-event-details" type="submit"
-                aria-label="$services.localization.render('notifications.macro.showEventDetails')"
-                title="$services.localization.render('notifications.macro.showEventDetails')">
+                aria-label="$escapetool.xml($services.localization.render('notifications.macro.showEventDetails'))"
+                title="$escapetool.xml($services.localization.render('notifications.macro.showEventDetails'))">
           <span class="fa fa-ellipsis-h"></span>
         </button>
       #end
@@ -242,4 +239,45 @@ $xwiki.getPlainUserName($user)##
     <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
   #end
   #displayNotificationEventSkeleton($icon, 'comment', $content, '')
+#end
+
+#macro(displayCompositeEventDescription $compositeEvent $forEmail)
+  #set ($baseTranslationPrefix = "${compositeEvent.type}")
+  #set ($fallbackTranslationPrefix = "notifications.events.${compositeEvent.type}")
+  #set ($fallbackTranslationSuffix = "description")
+  #set ($descriptionTranslation = $NULL)
+  #if ($compositeEvent.users.size() == 1)
+    #set ($translationSuffix = "description.by.1user")
+    #set ($translationKeys = [
+      "${baseTranslationPrefix}.${translationSuffix}",
+      "${fallbackTranslationPrefix}.${translationSuffix}",
+      "${baseTranslationPrefix}.${fallbackTranslationSuffix}",
+      "${fallbackTranslationPrefix}.${fallbackTranslationSuffix}"
+    ])
+    #if ($forEmail)
+      #set ($translationParameters = ["#displayEmailNotificationEventUsers($compositeEvent.users, true, false)"])
+    #else
+      #set ($translationParameters = ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
+    #end
+    $services.localization.render($translationKeys,$translationParameters)
+  #else
+  <div>
+    #set ($translationSuffix = "description.by.users")
+    #set ($translationParameters = [$compositeEvent.users.size()])
+    #set ($translationKeys = [
+      "${baseTranslationPrefix}.${translationSuffix}",
+      "${fallbackTranslationPrefix}.${translationSuffix}",
+      "${baseTranslationPrefix}.${fallbackTranslationSuffix}",
+      "${fallbackTranslationPrefix}.${fallbackTranslationSuffix}"
+    ])
+    $services.localization.render($translationKeys,$translationParameters)
+  </div>
+  <div>
+    #if ($forEmail)
+      #displayEmailNotificationEventUsers($compositeEvent.users, true, true)
+    #else
+      #displayNotificationEventUsers($compositeEvent.users, true, true)
+    #end
+  </div>
+  #end
 #end

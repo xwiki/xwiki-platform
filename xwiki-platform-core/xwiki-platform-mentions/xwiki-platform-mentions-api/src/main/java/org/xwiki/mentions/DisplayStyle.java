@@ -19,8 +19,6 @@
  */
 package org.xwiki.mentions;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * List of the different display style of the user mentions.
  *
@@ -51,7 +49,6 @@ public enum DisplayStyle
      * @since 14.4.2
      * @since 14.5
      */
-    @Unstable
     public static DisplayStyle getOrDefault(String style)
     {
         if (style == null) {

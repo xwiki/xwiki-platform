@@ -19,13 +19,14 @@
  */
 package org.xwiki.notifications.filters.internal;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.inject.Provider;
 
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -33,6 +34,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -47,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -63,9 +70,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class NotificationFilterPreferenceStoreTest
 {
-    private static final String PREVIOUS_WIKI_ID = "previousWikiId";
-
-    private static final String MAIN_WIKI_ID = "mainWikiId";
+    private static final WikiReference CURRENT_WIKI_REFERENCE = new WikiReference("current");
+    private static final WikiReference MAIN_WIKI_REFERENCE = new WikiReference("main");
 
     @InjectMockComponents
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
@@ -77,7 +83,10 @@ class NotificationFilterPreferenceStoreTest
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @MockComponent
-    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
+    private ObservationManager observationManager;
+
+    @MockComponent
+    private QueryManager queryManager;
 
     @Mock
     private XWikiContext context;
@@ -89,14 +98,14 @@ class NotificationFilterPreferenceStoreTest
     private Session session;
 
     @Mock
-    private Query query;
+    private org.hibernate.query.Query query;
 
     @BeforeEach
     void setUp() throws XWikiException
     {
         when(this.contextProvider.get()).thenReturn(this.context);
-        when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID);
-        when(this.context.getMainXWiki()).thenReturn(MAIN_WIKI_ID);
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
+        when(this.context.getMainXWiki()).thenReturn(MAIN_WIKI_REFERENCE.getName());
         XWiki wiki = mock(XWiki.class);
         when(this.context.getWiki()).thenReturn(wiki);
         when(wiki.getHibernateStore()).thenReturn(this.hibernateStore);
@@ -115,20 +124,15 @@ class NotificationFilterPreferenceStoreTest
         when(this.query.setParameter(anyString(), any())).thenReturn(this.query);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void deleteFilterPreference(boolean useMainStore) throws Exception
+    @Test
+    void deleteWikiFilterPreferences() throws Exception
     {
-        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
-        if (useMainStore) {
-            when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID, MAIN_WIKI_ID);
-        }
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
 
-        this.notificationFilterPreferenceStore.deleteFilterPreference(new WikiReference("wikiid"));
+        WikiReference wikiReference = new WikiReference("wikiid");
+        this.notificationFilterPreferenceStore.deleteFilterPreference(wikiReference);
 
-        if (useMainStore) {
-            verify(this.context).setWikiId(MAIN_WIKI_ID);
-        }
+        verify(this.context).setWikiReference(wikiReference);
         verify(this.session).createQuery("delete from DefaultNotificationFilterPreference "
             + "where page like :wikiPrefix "
             + "or pageOnly like :wikiPrefix "
@@ -137,78 +141,74 @@ class NotificationFilterPreferenceStoreTest
         verify(this.query).setParameter("wikiPrefix", "wikiid:%");
         verify(this.query).setParameter("wikiId", "wikiid");
         verify(this.query).executeUpdate();
-        if (useMainStore) {
-            verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
-        }
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void deleteFilterPreferenceHibernateException(boolean useMainStore) throws Exception
+    @Test
+    void deleteWikiFilterPreferenceHibernateException() throws Exception
     {
-        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
 
         when(this.hibernateStore.executeWrite(same(context), any())).thenThrow(XWikiException.class);
-        if (useMainStore) {
-            when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID, MAIN_WIKI_ID);
-        }
 
+        WikiReference wikiReference = new WikiReference("wikiid");
         NotificationException notificationException = assertThrows(NotificationException.class,
             () -> this.notificationFilterPreferenceStore.deleteFilterPreference(
-                new WikiReference("wikiid")));
+                wikiReference));
 
         assertEquals("Failed to delete the notification preferences for wiki [wikiid]",
             notificationException.getMessage());
         assertEquals(XWikiException.class, notificationException.getCause().getClass());
 
-        if (useMainStore) {
-            verify(this.context).setWikiId(MAIN_WIKI_ID);
-        }
-        if (useMainStore) {
-            verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
-        }
+        verify(this.context).setWikiReference(wikiReference);
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void deleteFilterPreferences(boolean useMainStore) throws Exception
+    @Test
+    void deleteAllUserFilterPreferences() throws Exception
     {
         DocumentReference unknownUserDocumentReference = new DocumentReference("xwiki", "XWiki", "UnknownUser");
-
-        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
         when(this.entityReferenceSerializer.serialize(unknownUserDocumentReference))
             .thenReturn("xwiki:XWiki.UnknownUser");
-        if (useMainStore) {
-            when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID, MAIN_WIKI_ID);
-        }
 
         this.notificationFilterPreferenceStore.deleteFilterPreferences(unknownUserDocumentReference);
 
-        if (useMainStore) {
-            verify(this.context).setWikiId(MAIN_WIKI_ID);
-        }
         verify(this.session).createQuery("delete from DefaultNotificationFilterPreference where owner = :user "
             + "or user = :user");
         verify(this.query).setParameter("user", "xwiki:XWiki.UnknownUser");
         verify(this.query).executeUpdate();
-        if (useMainStore) {
-            verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
-        }
+
+        verify(this.context).setWikiReference(new WikiReference("xwiki"));
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void deleteFilterPreferencesHibernateException(boolean useMainStore) throws Exception
+    @Test
+    void deleteUserFilterPreferences() throws Exception
+    {
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
+        Set<Long> internalIds = Set.of(12L, 14L, 23434L, 3243L, 223L);
+        Set<String> filterIds = Set.of("NFP_12", "NFP_14", "NFP_23434", "NFP_3243", "NFP_223");
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
+        this.notificationFilterPreferenceStore.deleteFilterPreferences(userReference, filterIds);
+        verify(this.session).createQuery(
+            "delete from DefaultNotificationFilterPreference where internalId in (:id)");
+        verify(this.query).setParameter("id", internalIds);
+        verify(this.query).executeUpdate();
+        verify(this.context).setWikiReference(new WikiReference("xwiki"));
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
+        verify(this.observationManager).notify(
+            any(NotificationFilterPreferenceDeletedEvent.class), eq(userReference), eq(filterIds));
+    }
+
+    @Test
+    void deleteUserFilterPreferencesHibernateException() throws Exception
     {
         DocumentReference unknownUserDocumentReference = new DocumentReference("xwiki", "XWiki", "UnknownUser");
-
-        when(this.filterPreferenceConfiguration.useMainStore()).thenReturn(useMainStore);
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
         when(this.entityReferenceSerializer.serialize(unknownUserDocumentReference))
             .thenReturn("xwiki:XWiki.UnknownUser");
         when(this.hibernateStore.executeWrite(same(context), any())).thenThrow(XWikiException.class);
-        if (useMainStore) {
-            when(this.context.getWikiId()).thenReturn(PREVIOUS_WIKI_ID, MAIN_WIKI_ID);
-        }
 
         NotificationException notificationException = assertThrows(NotificationException.class,
             () -> this.notificationFilterPreferenceStore.deleteFilterPreferences(unknownUserDocumentReference));
@@ -217,11 +217,70 @@ class NotificationFilterPreferenceStoreTest
             notificationException.getMessage());
         assertEquals(XWikiException.class, notificationException.getCause().getClass());
 
-        if (useMainStore) {
-            verify(this.context).setWikiId(MAIN_WIKI_ID);
-        }
-        if (useMainStore) {
-            verify(this.context).setWikiId(PREVIOUS_WIKI_ID);
-        }
+        verify(this.context).setWikiReference(new WikiReference("xwiki"));
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
+    }
+
+    @Test
+    void deleteUserFilterPreference() throws NotificationException
+    {
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
+        long internalId = 84523;
+        String filterId = "NFP_" + internalId;
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
+        this.notificationFilterPreferenceStore.deleteFilterPreference(userReference, filterId);
+        verify(this.session).createQuery(
+            "delete from DefaultNotificationFilterPreference where internalId in (:id)");
+        verify(this.query).setParameter("id", Set.of(internalId));
+        verify(this.query).executeUpdate();
+        verify(this.context).setWikiReference(new WikiReference("xwiki"));
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
+        verify(this.observationManager).notify(
+            any(NotificationFilterPreferenceDeletedEvent.class), eq(userReference), eq(Set.of(filterId)));
+    }
+
+    @Test
+    void deleteWikiFilterPreference() throws NotificationException
+    {
+        WikiReference wikiReference = new WikiReference("foo");
+        long internalId = 74;
+        String filterId = "NFP_" + internalId;
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
+        this.notificationFilterPreferenceStore.deleteFilterPreference(wikiReference, filterId);
+        verify(this.session).createQuery(
+            "delete from DefaultNotificationFilterPreference where internalId in (:id)");
+        verify(this.query).setParameter("id", Set.of(internalId));
+        verify(this.query).executeUpdate();
+        verify(this.context).setWikiReference(wikiReference);
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
+        verify(this.observationManager).notify(
+            any(NotificationFilterPreferenceDeletedEvent.class), eq(wikiReference), eq(filterId));
+    }
+
+    @Test
+    void getPreferencesOfUser() throws QueryException, NotificationException
+    {
+        DocumentReference userRef = new DocumentReference("subwiki", "XWiki", "Foo");
+        String serializedRef = "subwiki:XWiki.Foo";
+
+        when(this.entityReferenceSerializer.serialize(userRef)).thenReturn(serializedRef);
+
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
+        DefaultNotificationFilterPreference pref1 = mock(DefaultNotificationFilterPreference.class);
+        DefaultNotificationFilterPreference pref2 = mock(DefaultNotificationFilterPreference.class);
+
+        Query xwikiQuery = mock(Query.class);
+        when(this.queryManager.createQuery("select nfp from DefaultNotificationFilterPreference nfp "
+                + "where nfp.owner = :owner order by nfp.id", Query.HQL)).thenReturn(xwikiQuery);
+        when(xwikiQuery.bindValue(any(String.class), any())).thenReturn(xwikiQuery);
+        when(xwikiQuery.execute()).thenReturn(List.of(pref1, pref2));
+
+        assertEquals(List.of(pref1, pref2), this.notificationFilterPreferenceStore.getPreferencesOfUser(userRef));
+
+        verify(this.context).setWikiReference(new WikiReference("subwiki"));
+        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
+        verify(xwikiQuery).bindValue("owner", serializedRef);
+        verify(pref1).setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
+        verify(pref2).setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
     }
 }

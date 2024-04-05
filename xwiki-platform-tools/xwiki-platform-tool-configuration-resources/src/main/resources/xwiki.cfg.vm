@@ -54,6 +54,9 @@
 
 #-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
 #-# group's document?
+#-# 0: XWiki.XWikiAllGroup behaves like any other group and, by default, new users are added to it (you can change that using xwiki.users.initialGroups)
+#-# 1: All users are considered members of the XWiki.XWikiAllGroup group no matter what it actually contains
+#-# The default is 0.
 # xwiki.authentication.group.allgroupimplicit=0
 
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document
@@ -313,10 +316,9 @@ xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 #-# 1: the authentication is done for each request.
 # xwiki.authentication.always=0
 
-#-# Cookie encryption keys. You SHOULD replace these values with any random string,
-#-# as long as the length is the same.
-xwiki.authentication.validationKey=totototototototototototototototo
-xwiki.authentication.encryptionKey=titititititititititititititititi
+#-# Cookie encryption keys. They are randomly generated and stored when not specified.
+# xwiki.authentication.validationKey=totototototototototototototototo
+# xwiki.authentication.encryptionKey=titititititititititititititititi
 
 #-# Comma separated list of domains for which authentication cookies are set. This
 #-# concerns mostly wiki farms. The exact meaning is that when a user logs in, if
@@ -325,8 +327,8 @@ xwiki.authentication.encryptionKey=titititititititititititititititi
 #-# is set for the exact domain name of the wiki.
 #-#
 #-# For example, suppose the cookiedomains is set to "mydomain.net". If I log in
-#-# on wiki1.xwiki.com, then the cookie will be set for the entire mydomain.net
-#-# domain, and if I visit wiki2.xwiki.com I will still be authenticated. If I log
+#-# on wiki1.mydomain.net, then the cookie will be set for the entire mydomain.net
+#-# domain, and if I visit wiki2.mydomain.net I will still be authenticated. If I log
 #-# in on wiki1.otherdomain.net, then I will only be authenticated on
 #-# wiki1.otherdomain.net, and not on wiki2.otherdomain.net.
 #-#

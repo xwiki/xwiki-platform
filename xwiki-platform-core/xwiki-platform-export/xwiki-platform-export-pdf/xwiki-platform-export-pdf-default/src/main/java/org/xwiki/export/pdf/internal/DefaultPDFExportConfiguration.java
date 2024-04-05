@@ -49,6 +49,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
 {
     private static final String SCHEME_SEPARATOR = "//";
 
+    private static final String PROPERTY_XWIKI_URI = "xwikiURI";
+
+    private static final String PROPERTY_XWIKI_HOST = "xwikiHost";
+
+    private static final String XWIKI_PROPERTIES_PREFIX = "export.pdf.";
+
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource xwikiProperties;
@@ -64,9 +70,9 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     @Override
     public String getChromeDockerImage()
     {
-        // Chrome fails to load web pages and crashes due to net::ERR_INSUFFICIENT_RESOURCES when using the latest
-        // version of the zenika/alpine-chrome image. See https://github.com/Zenika/alpine-chrome/issues/222
-        return getProperty("chromeDockerImage", "zenika/alpine-chrome:102");
+        // We use a fixed version of Chrome, instead of latest, for which we know the tests are passing (reproducible
+        // builds), because Chrome changes often lead to changes in the PDF export output.
+        return getProperty("chromeDockerImage", "zenika/alpine-chrome:115");
     }
 
     @Override
@@ -94,11 +100,18 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
     }
 
     @Override
+    public int getChromeRemoteDebuggingTimeout()
+    {
+        return getProperty("chromeRemoteDebuggingTimeout",
+            PDFExportConfiguration.super.getChromeRemoteDebuggingTimeout());
+    }
+
+    @Override
     public URI getXWikiURI() throws URISyntaxException
     {
         // The old way to configure the XWiki URI was through the "xwikiHost" property. We keep supporting it for
         // backward compatibility with old XWiki instances that have this configuration set.
-        String xwikiURI = getProperty("xwikiURI", getProperty("xwikiHost", "host.xwiki.internal"));
+        String xwikiURI = getProperty(PROPERTY_XWIKI_URI, getProperty(PROPERTY_XWIKI_HOST, DEFAULT_XWIKI_HOST));
         // We allow the scheme to be omitted when configuring the XWiki URI (falls back to the scheme used when the PDF
         // export was triggered) but we need to add the scheme separator for the URI to be valid and to make sure the
         // host is not parsed as the path.
@@ -106,6 +119,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
             xwikiURI = SCHEME_SEPARATOR + xwikiURI;
         }
         return new URI(xwikiURI);
+    }
+
+    @Override
+    public boolean isXWikiURISpecified()
+    {
+        return hasProperty(PROPERTY_XWIKI_URI) || hasProperty(PROPERTY_XWIKI_HOST);
     }
 
     @Override
@@ -155,7 +174,12 @@ public class DefaultPDFExportConfiguration implements PDFExportConfiguration
         if (this.configDocument.containsKey(key)) {
             return this.configDocument.getProperty(key, defaultValue);
         } else {
-            return this.xwikiProperties.getProperty("export.pdf." + key, defaultValue);
+            return this.xwikiProperties.getProperty(XWIKI_PROPERTIES_PREFIX + key, defaultValue);
         }
+    }
+
+    private boolean hasProperty(String key)
+    {
+        return this.configDocument.containsKey(key) || this.xwikiProperties.containsKey(XWIKI_PROPERTIES_PREFIX + key);
     }
 }

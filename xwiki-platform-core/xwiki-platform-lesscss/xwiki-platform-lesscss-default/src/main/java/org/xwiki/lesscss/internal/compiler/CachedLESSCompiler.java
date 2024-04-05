@@ -117,7 +117,8 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
                     documentReference = null;
                 }
 
-                lessCode = evaluate(lessCode, skin, authorReference, documentReference);
+                lessCode =
+                    evaluate(lessResourceReference.toString(), lessCode, skin, authorReference, documentReference);
             }
 
             // Compile the LESS code
@@ -139,7 +140,7 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
         }
     }
 
-    private String evaluate(String source, String skin, DocumentReference authorReference,
+    private String evaluate(String id, String source, String skin, DocumentReference authorReference,
         DocumentReference documentReference) throws Exception
     {
         // Get the XWiki object
@@ -154,7 +155,8 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
                 xcontext.put(SKIN_CONTEXT_KEY, skin);
             }
 
-            Template template = this.templateManager.createStringTemplate(source, authorReference, documentReference);
+            Template template =
+                this.templateManager.createStringTemplate(id, source, authorReference, documentReference);
 
             StringWriter result = new StringWriter();
             this.templateManager.renderNoException(template, result);

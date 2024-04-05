@@ -48,8 +48,5 @@ public class XWikiWebappResourceLoaderInitializer implements ResourceLoaderIniti
         velocityProperties.setProperty(
             RuntimeConstants.RESOURCE_LOADER + '.' + RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER_CLASS,
             XWikiWebappResourceLoader.class.getName());
-
-        // Add macros.vm as default template
-        velocityProperties.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");
     }
 }

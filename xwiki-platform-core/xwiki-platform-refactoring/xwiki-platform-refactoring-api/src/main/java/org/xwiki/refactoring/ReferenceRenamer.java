@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow to replace references during rename/move refactoring operations.
@@ -58,7 +57,6 @@ public interface ReferenceRenamer
      * @return {@code true} if the given {@link Block} was modified
      * @since 14.2RC1
      */
-    @Unstable
     default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
     {

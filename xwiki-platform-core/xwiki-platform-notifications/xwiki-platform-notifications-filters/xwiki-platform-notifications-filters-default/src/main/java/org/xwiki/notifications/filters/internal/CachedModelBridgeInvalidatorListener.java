@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
@@ -52,7 +53,7 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
 
     @Inject
     @Named("cached")
-    private ModelBridge bridge;
+    private FilterPreferencesModelBridge bridge;
 
     @Inject
     private DocumentReferenceResolver<String> resolver;
@@ -77,12 +78,18 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
             if (owner != null) {
                 if (StringUtils.contains(owner, ':')) {
                     // Assume it's a document reference
-                    ((CachedModelBridge) this.bridge).invalidatePreferencefilter(this.resolver.resolve(owner));
+                    ((CachedFilterPreferencesModelBridge) this.bridge)
+                        .invalidatePreferencefilter(this.resolver.resolve(owner));
                 } else {
                     // Assume it's a wiki reference
-                    ((CachedModelBridge) this.bridge).invalidatePreferencefilter(new WikiReference(owner));
+                    ((CachedFilterPreferencesModelBridge) this.bridge)
+                        .invalidatePreferencefilter(new WikiReference(owner));
                 }
             }
+        } else if (source instanceof DocumentReference) {
+            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter((DocumentReference) source);
+        } else if (source instanceof WikiReference) {
+            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter((WikiReference) source);
         }
     }
 }

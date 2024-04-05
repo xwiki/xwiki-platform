@@ -53,7 +53,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
@@ -305,7 +304,6 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @return the diff type for emails configured for the given user
      * @since 14.10
      */
-    @Unstable
     public NotificationEmailDiffType getDiffType(UserReference user)
     {
         return emailUserPreferenceManager.getDiffType(user);
@@ -315,7 +313,6 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @return the email notification interval configured for the current user
      * @since 14.10
      */
-    @Unstable
     public NotificationEmailInterval getInterval()
     {
         return emailUserPreferenceManager.getInterval();
@@ -326,7 +323,6 @@ public class NotificationPreferenceScriptService implements ScriptService
      * @return the notification email interval configured for the given user
      * @since 14.10
      */
-    @Unstable
     public NotificationEmailInterval getInterval(UserReference user)
     {
         return emailUserPreferenceManager.getInterval(user);

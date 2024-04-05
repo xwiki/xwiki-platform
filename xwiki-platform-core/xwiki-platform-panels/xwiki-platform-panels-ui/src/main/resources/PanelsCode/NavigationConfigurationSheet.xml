@@ -696,7 +696,7 @@ ul.exclusion-filter-pages {
 
 ul.exclusion-filter-pages li {
   border: 1px solid @xwiki-border-color;
-  border-radius: 6px;
+  border-radius: @border-radius-large;
   display: inline-block;
   margin-bottom: .5em;
   margin-right: .5em;

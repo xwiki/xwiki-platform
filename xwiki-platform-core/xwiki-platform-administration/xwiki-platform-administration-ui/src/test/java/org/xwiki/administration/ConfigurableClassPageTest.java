@@ -135,7 +135,7 @@ class ConfigurableClassPageTest extends PageTest
 
         Document htmlPage = renderHTMLPage(CONFIGURABLE_CLASS);
         assertEquals(String.format("admin.customize %s:", MY_SECTION_SERIALIZED),
-            htmlPage.selectFirst("h1").text());
+            htmlPage.selectFirst("h2").text());
     }
 
     @Test

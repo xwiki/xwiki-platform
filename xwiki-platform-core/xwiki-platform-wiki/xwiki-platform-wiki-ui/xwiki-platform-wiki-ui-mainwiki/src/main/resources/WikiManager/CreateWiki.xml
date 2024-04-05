@@ -85,7 +85,7 @@
 #macro(wizardHeader $title $currentStepNumber)
   ## Display a step name in the header
   #macro(wizardHeaderStep $name $number $currentStepNumber)
-    &lt;li&gt;&lt;span class="number #if($currentStepNumber==$number)active#end"&gt;$number&lt;/span&gt; &lt;span class="name #if($currentStepNumber==$number)active#end"&gt;$name&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;span class="btn btn-xs number #if($currentStepNumber==$number)step-active#end"&gt;$number&lt;/span&gt; &lt;span class="name #if($currentStepNumber==$number)step-active#end"&gt;$name&lt;/span&gt;&lt;/li&gt;
   #end
 
   &lt;div class="wizard-header"&gt;
@@ -1608,14 +1608,14 @@ require(['jquery'], function($) {
 
 .ui-progress-background {
   background-color: transparent;
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 10px 10px 10px 10px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) inset, 0 1px 0 0 $theme.pageContentBackgroundColor;
   height: 8px;
 }
 
 .ui-progress-bar {
   background-color: $theme.backgroundSecondaryColor;
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 10px 10px 10px 10px;
   height: 8px;
 }
 

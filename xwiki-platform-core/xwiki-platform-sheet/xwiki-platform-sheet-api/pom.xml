@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-sheet</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-sheet-api</artifactId>
   <name>XWiki Platform - Sheet - API</name>
   <description>The sheet API used by XWiki platform. Provides the SheetManager interface which can be used to retrieve
     class and document sheets.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
     </properties>
   <dependencies>
     <dependency>

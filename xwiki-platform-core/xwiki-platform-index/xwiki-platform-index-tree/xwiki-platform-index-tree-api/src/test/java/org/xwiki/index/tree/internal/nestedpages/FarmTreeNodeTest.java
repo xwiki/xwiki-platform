@@ -19,6 +19,10 @@
  */
 package org.xwiki.index.tree.internal.nestedpages;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,11 +39,8 @@ import org.xwiki.properties.converter.Converter;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link FarmTreeNode}.
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class FarmTreeNodeTest
+class FarmTreeNodeTest
 {
     @InjectMockComponents
     private FarmTreeNode farmTreeNode;
@@ -60,15 +61,16 @@ public class FarmTreeNodeTest
     private Converter<EntityReference> entityTreeNodeIdConverter;
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
-        when(this.wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("one", "two", "three"));
+        when(this.wikiDescriptorManager.getAll()).thenReturn(Arrays.asList(new WikiDescriptor("one", null),
+            new WikiDescriptor("two", null), new WikiDescriptor("three", null)));
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "wiki:two"))
             .thenReturn(new WikiReference("two"));
     }
 
     @Test
-    public void getChildCount()
+    void getChildCount()
     {
         assertEquals(3, this.farmTreeNode.getChildCount("anyId"));
 
@@ -83,7 +85,7 @@ public class FarmTreeNodeTest
     }
 
     @Test
-    public void getChildren()
+    void getChildren()
     {
         assertEquals(Arrays.asList("wiki:one", "wiki:two", "wiki:three"), this.farmTreeNode.getChildren("foo", 0, 5));
         assertEquals(Arrays.asList("wiki:two"), this.farmTreeNode.getChildren("foo", 1, 1));
@@ -94,7 +96,7 @@ public class FarmTreeNodeTest
     }
 
     @Test
-    public void getParent()
+    void getParent()
     {
         assertNull(this.farmTreeNode.getParent("anyId"));
     }

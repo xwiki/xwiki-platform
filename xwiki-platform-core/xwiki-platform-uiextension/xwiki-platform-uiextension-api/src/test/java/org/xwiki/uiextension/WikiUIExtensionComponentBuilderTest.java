@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.Test;
@@ -43,10 +44,15 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.uiextension.internal.WikiUIExtension;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.velocity.VelocityEngine;
@@ -67,7 +73,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @OldcoreTest
-public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
+@ComponentList(WikiUIExtension.class)
+class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 {
     @MockComponent
     private JobProgressManager jobProgressManager;
@@ -89,6 +96,12 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
 
     @MockComponent
     private LoggerConfiguration loggerConfiguration;
+
+    @MockComponent
+    private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    private AuthorizationManager authorizationManager;
 
     @InjectMockComponents
     private WikiUIExtensionComponentBuilder builder;
@@ -125,6 +138,13 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
         componentManager.registerMockComponent(Transformation.class, "macro");
         componentManager.registerMockComponent(ContentParser.class);
 
+        when(this.authorExecutor.call(any(), any(), any())).thenAnswer(invocation -> {
+            Callable<?> callable = invocation.getArgument(0);
+            return callable.call();
+        });
+
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOC_REF)).thenReturn(true);
+
         // The document holding the UI extension object.
         this.componentDoc = mock(XWikiDocument.class, "xwiki:XWiki.MyUIExtension");
         when(this.componentDoc.getDocumentReference()).thenReturn(DOC_REF);
@@ -135,7 +155,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     }
 
     @Test
-    public void buildGlobalComponentsWithoutPR()
+    void buildGlobalComponentsWithoutPR()
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "global");
         Throwable exception = assertThrows(WikiComponentException.class, () -> {
@@ -145,7 +165,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     }
 
     @Test
-    public void buildWikiLevelComponentsWithoutAdminRights()
+    void buildWikiLevelComponentsWithoutAdminRights()
     {
         BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "wiki");
         Throwable exception = assertThrows(WikiComponentException.class, () -> {
@@ -156,7 +176,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     }
 
     @Test
-    public void buildComponents(ComponentManager componentManager) throws Exception
+    void buildComponents(ComponentManager componentManager) throws Exception
     {
         BaseObject extensionObject = createExtensionObject("name", "extensionPointId", "content",
             "key=value=foo\nkey2=value2\nempty=\n\n=invalid", "user");
@@ -194,6 +214,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
         BaseObjectReference objectReference =
             new BaseObjectReference(new ObjectReference("XWiki.UIExtensionClass[0]", DOC_REF));
         when(extensionObject.getReference()).thenReturn(objectReference);
+        when(extensionObject.getDocumentReference()).thenReturn(DOC_REF);
 
         when(extensionObject.getOwnerDocument()).thenReturn(this.componentDoc);
 

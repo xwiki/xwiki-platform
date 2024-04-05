@@ -19,12 +19,10 @@
  */
 package org.xwiki.uiextension.internal;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.wiki.WikiComponentException;
+import javax.inject.Inject;
+
 import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiComponent;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,8 +37,6 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.uiextension.UIExtension;
 
-import com.xpn.xwiki.objects.BaseObject;
-
 /**
  * Base class to automate things common to most implementations of {@link UIExtension}.
  * 
@@ -51,32 +47,17 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
 {
     private static final String TM_FAILEDUIX = "uiextension.error.failed";
 
-    protected final JobProgressManager progress;
+    @Inject
+    protected JobProgressManager progress;
 
-    protected final ErrorBlockGenerator errorBlockGenerator;
+    @Inject
+    protected ErrorBlockGenerator errorBlockGenerator;
 
-    protected final AsyncContext asyncContext;
+    @Inject
+    protected AsyncContext asyncContext;
 
-    protected final RenderingContext renderingContext;
-
-    /**
-     * @param baseObject the object containing ui extension setup
-     * @param roleType the role Type implemented
-     * @param roleHint the role hint for this role implementation
-     * @param componentManager The XWiki content manager
-     * @throws ComponentLookupException If module dependencies are missing
-     * @throws WikiComponentException When failing to parse content
-     */
-    public AbstractWikiUIExtension(BaseObject baseObject, Type roleType, String roleHint,
-        ComponentManager componentManager) throws ComponentLookupException, WikiComponentException
-    {
-        super(baseObject, roleType, roleHint, componentManager);
-
-        this.progress = componentManager.getInstance(JobProgressManager.class);
-        this.errorBlockGenerator = componentManager.getInstance(ErrorBlockGenerator.class);
-        this.asyncContext = componentManager.getInstance(AsyncContext.class);
-        this.renderingContext = componentManager.getInstance(RenderingContext.class);
-    }
+    @Inject
+    protected RenderingContext renderingContext;
 
     @Override
     protected String getContentPropertyName()
@@ -130,9 +111,12 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
 
     protected BlockAsyncRendererConfiguration configure(boolean inline)
     {
+        // Prepare the block if it's not the case yet
+        XDOM transformedBlock = getPreparedContent();
+
         // We need to clone the block to avoid transforming the original and make it useless after the first
         // transformation
-        XDOM transformedBlock = this.xdom.clone();
+        transformedBlock = transformedBlock.clone();
 
         BlockAsyncRendererConfiguration executorConfiguration =
             new BlockAsyncRendererConfiguration(Arrays.asList("uix", getId()), transformedBlock);

@@ -37,6 +37,9 @@ public class DrawerMenu extends BaseElement
 
     @FindBy(id = "tmDrawerActivator")
     private WebElement activator;
+    
+    @FindBy(id = "tmDrawer")
+    private WebElement drawerContainer;
 
     public void toggle()
     {
@@ -108,7 +111,10 @@ public class DrawerMenu extends BaseElement
 
     private void waitForDrawer(boolean visible)
     {
-        getDriver().waitUntilCondition(
-            ExpectedConditions.attributeToBe(this.activator, "aria-expanded", String.valueOf(visible)));
+        if (visible) {
+            getDriver().waitUntilCondition(ExpectedConditions.visibilityOf(this.drawerContainer));
+        } else {
+            getDriver().waitUntilCondition(ExpectedConditions.invisibilityOf(this.drawerContainer));
+        }
     }
 }

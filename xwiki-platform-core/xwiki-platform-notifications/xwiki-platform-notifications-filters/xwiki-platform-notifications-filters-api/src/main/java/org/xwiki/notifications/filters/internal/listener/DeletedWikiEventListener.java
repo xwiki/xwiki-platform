@@ -29,7 +29,7 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -54,7 +54,7 @@ public class DeletedWikiEventListener extends AbstractEventListener
      */
     @Named("cached")
     @Inject
-    private Provider<ModelBridge> modelBridgeProvider;
+    private Provider<FilterPreferencesModelBridge> modelBridgeProvider;
 
     @Inject
     private Logger logger;

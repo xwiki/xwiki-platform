@@ -20,7 +20,6 @@
 package org.xwiki.export.pdf.job;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Used to create and initialize {@link PDFExportJobRequest} instances.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.5
  */
 @Role
-@Unstable
 public interface PDFExportJobRequestFactory
 {
     /**

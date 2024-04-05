@@ -22,7 +22,6 @@ package org.xwiki.export.pdf.internal.job;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,15 +33,11 @@ import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
-import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
-import org.xwiki.job.AbstractJob;
-import org.xwiki.job.GroupedJob;
-import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -54,21 +49,8 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(PDFExportJob.JOB_TYPE)
-public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobStatus> implements GroupedJob
+public class PDFExportJob extends AbstractPDFExportJob
 {
-    /**
-     * The PDF export job type.
-     */
-    public static final String JOB_TYPE = "export/pdf";
-
-    /**
-     * Used to check access permissions.
-     * 
-     * @see #hasAccess(Right, EntityReference)
-     */
-    @Inject
-    private AuthorizationManager authorization;
-
     @Inject
     private DocumentRenderer documentRenderer;
 
@@ -89,23 +71,8 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
     @Inject
     private PDFExportConfiguration configuration;
 
-    @Override
-    public String getType()
-    {
-        return JOB_TYPE;
-    }
-
-    @Override
-    public JobGroupPath getGroupPath()
-    {
-        return new JobGroupPath(Arrays.asList("export", "pdf"));
-    }
-
-    @Override
-    protected PDFExportJobStatus createNewStatus(PDFExportJobRequest request)
-    {
-        return new PDFExportJobStatus(getType(), request, this.observationManager, this.loggerManager);
-    }
+    @Inject
+    private PrintPreviewURLBuilder printPreviewURLBuilder;
 
     @Override
     protected void runInternal() throws Exception
@@ -129,6 +96,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         this.progressManager.pushLevelProgress(documentReferences.size(), this);
 
         try {
+            // We use the same rendering parameters for all the documents included in this PDF export.
+            DocumentRendererParameters rendererParameters = getDocumentRendererParameters();
+
             // The max content size configuration is expressed in kilobytes (KB), so we approximate the actual limit by
             // multiplying with 1000 (bytes).
             int maxContentSize = this.configuration.getMaxContentSize() * 1000;
@@ -139,7 +109,7 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
                 } else {
                     this.progressManager.startStep(this);
                     if (hasAccess(Right.VIEW, documentReference)) {
-                        contentSize += render(documentReference);
+                        contentSize += render(documentReference, rendererParameters);
                         // We enforce the maximum content size (if specified) only when multiple pages are exported
                         // because for computing the aggregated table of contents we're currently keeping in memory the
                         // XDOM of each of the included pages which for large exports can take a considerable amount of
@@ -161,13 +131,25 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         }
     }
 
-    private int render(DocumentReference documentReference) throws Exception
+    private DocumentRendererParameters getDocumentRendererParameters()
+    {
+        DocumentRendererParameters rendererParameters =
+            new DocumentRendererParameters().withTitle(this.request.isWithTitle());
+        DocumentReference templateReference = this.request.getTemplate();
+        if (templateReference != null && hasAccess(Right.VIEW, templateReference)) {
+            rendererParameters.withMetadataReference(new ObjectPropertyReference("metadata",
+                new ObjectReference("XWiki.PDFExport.TemplateClass[0]", templateReference)));
+        }
+        return rendererParameters;
+    }
+
+    private int render(DocumentReference documentReference, DocumentRendererParameters rendererParameters)
+        throws Exception
     {
         // TODO: Don't render the same document twice.
         // TODO: Collect the XDOMs only when the table of content is requested.
         // TODO: Keep only the headings in the collected XDOMs in order to reduce the memory footprint.
-        DocumentRenderingResult renderingResult =
-            this.documentRenderer.render(documentReference, this.request.isWithTitle());
+        DocumentRenderingResult renderingResult = this.documentRenderer.render(documentReference, rendererParameters);
         this.status.getDocumentRenderingResults().add(renderingResult);
 
         // We approximate the size by counting the characters, which take 1 byte most of the time. We don't have to be
@@ -175,25 +157,9 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         return renderingResult.getHTML().length();
     }
 
-    /**
-     * Check access rights taking into account the job request.
-     * 
-     * @param right the access right to check
-     * @param reference the target entity reference
-     * @return return {@code true} if the current user or the entity author have the specified access right on the
-     *         specified entity, depending on the job request
-     */
-    private boolean hasAccess(Right right, EntityReference reference)
-    {
-        return ((!this.request.isCheckRights()
-            || this.authorization.hasAccess(right, this.request.getUserReference(), reference))
-            && (!this.request.isCheckAuthorRights()
-                || this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)));
-    }
-
     private void saveAsPDF() throws IOException
     {
-        URL printPreviewURL = (URL) this.request.getContext().get("request.url");
+        URL printPreviewURL = this.printPreviewURLBuilder.getPrintPreviewURL(this.request);
         try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
             if (!this.status.isCanceled()) {
                 this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor-test</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
   <name>XWiki Platform - CKEditor - Tests - Docker</name>
@@ -77,6 +77,29 @@
       <artifactId>xwiki-platform-extension-index</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <!-- We need this for the WYSIWYG editor administration section where CKEditor injects its configuration pane. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <!-- We need this to test how the Children Macro is displayed in edit mode. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-macro</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- Used by the image plugin to search for resources. (This is not in xwiki-platform-ckeditor-ui because it breaks the flavor.) -->
+    <!-- See https://github.com/xwiki/xwiki-platform/pull/2280#discussion_r1284086007 -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -95,22 +118,6 @@
       <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-    </dependency>
-    <!-- Required for tests involving solr indexation (e.g., page/attachment search in link insertions). -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Used by the image plugin to search for resources. (This is not in xwiki-platform-ckeditor-ui because it breaks the flavor.) -->
-    <!-- See https://github.com/xwiki/xwiki-platform/pull/2280#discussion_r1284086007 -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>xar</type>
     </dependency>
     <!-- Required for tests involving subwikis. -->
     <dependency>

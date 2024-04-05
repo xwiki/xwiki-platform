@@ -61,7 +61,7 @@ public class ApplicationTemplateProviderEditPage extends ApplicationEditPage
      */
     public ApplicationHomeEditPage clickNextStep()
     {
-        clickSaveAndView(isNewDocument());
+        clickSaveAndView(true);
         return new ApplicationHomeEditPage();
     }
 

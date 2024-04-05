@@ -22,15 +22,19 @@ package com.xpn.xwiki.objects;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dom4j.Element;
+import org.xwiki.evaluation.ObjectEvaluator;
+import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -308,6 +312,12 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
             BaseClass bclass = getXClass(context);
+            // Bulletproofing: in theory the BaseObject is defined with a xclass reference allowing to resolve it
+            // however, it's possible that the reference is not set, in which case we might still find the info
+            // in the old object.
+            if (bclass == null) {
+                bclass = oldObject.getXClass(context);
+            }
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : pclass.getClassType();
 
@@ -428,5 +438,21 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         }
 
         super.mergeField(currentElement, previousElement, newElement, configuration, context, mergeResult);
+    }
+
+    /**
+     * Evaluates the properties of an object using a matching implementation of {@link ObjectEvaluator}.
+     *
+     * @return a Map storing the evaluated properties
+     * @throws ObjectEvaluatorException if the evaluation fails
+     * @since 14.10.21
+     * @since 15.5.5
+     * @since 15.10.2
+     */
+    @Unstable
+    public Map<String, String> evaluate() throws ObjectEvaluatorException
+    {
+        ObjectEvaluator objectEvaluator = Utils.getComponent(ObjectEvaluator.class);
+        return objectEvaluator.evaluate(this);
     }
 }

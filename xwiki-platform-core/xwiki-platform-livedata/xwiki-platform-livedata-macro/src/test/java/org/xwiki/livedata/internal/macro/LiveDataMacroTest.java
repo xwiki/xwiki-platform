@@ -22,11 +22,12 @@ package org.xwiki.livedata.internal.macro;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
 import org.xwiki.context.internal.DefaultExecution;
@@ -35,6 +36,8 @@ import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Filter;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
+import org.xwiki.livedata.internal.LiveDataRenderer;
+import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
 import org.xwiki.livedata.macro.LiveDataMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.renderer.html5.HTML5Renderer;
@@ -43,8 +46,12 @@ import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageRender
 import org.xwiki.rendering.internal.renderer.xhtml.image.DefaultXHTMLImageTypeRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkRenderer;
 import org.xwiki.rendering.internal.renderer.xhtml.link.DefaultXHTMLLinkTypeRenderer;
+import org.xwiki.rendering.internal.transformation.DefaultRenderingContext;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -63,7 +70,7 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
 
 /**
  * Unit tests for {@link LiveDataMacro}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -83,7 +90,9 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
     MathMLDefinitions.class,
     SVGDefinitions.class,
     DefaultExecution.class,
-    LiveDataMacroConfiguration.class
+    LiveDataRendererConfiguration.class,
+    LiveDataRenderer.class,
+    DefaultRenderingContext.class
 })
 class LiveDataMacroTest
 {
@@ -102,7 +111,17 @@ class LiveDataMacroTest
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
+    @MockComponent
+    @Named("jsfx")
+    private SkinExtension jsfx;
+
     private PrintRendererFactory rendererFactory;
+
+    @Mock
+    private MacroTransformationContext context;
+
+    @Mock
+    private TransformationContext transformationContext;
 
     @BeforeEach
     void before(MockitoComponentManager componentManager) throws Exception
@@ -110,16 +129,10 @@ class LiveDataMacroTest
         this.rendererFactory = componentManager.getInstance(PrintRendererFactory.class, "html/5.0");
 
         when(this.defaultConfigResolver.resolve(any(LiveDataConfiguration.class)))
-            .thenAnswer(new Answer<LiveDataConfiguration>()
-            {
-                @Override
-                public LiveDataConfiguration answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return invocation.getArgument(0);
-                }
-            });
+            .thenAnswer(invocation -> invocation.getArgument(0));
 
         when(this.stringConfigResolver.resolve("{}")).thenReturn(new LiveDataConfiguration());
+        when(this.context.getTransformationContext()).thenReturn(this.transformationContext);
     }
 
     @Test
@@ -129,7 +142,7 @@ class LiveDataMacroTest
         String expected = "<div class=\"liveData loading\" data-config=\"" + escapeXML(expectedConfig) + "\" "
             + "data-config-content-trusted=\"true\"></div>";
 
-        List<Block> blocks = this.liveDataMacro.execute(new LiveDataMacroParameters(), null, null);
+        List<Block> blocks = this.liveDataMacro.execute(new LiveDataMacroParameters(), null, this.context);
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 
@@ -158,10 +171,11 @@ class LiveDataMacroTest
         expectedConfig.append("      {'id':'table'},".trim());
         expectedConfig.append("      {'id':'cards'}".trim());
         expectedConfig.append("    ],".trim());
+        expectedConfig.append("    'defaultLayout':'table',".trim());
         expectedConfig.append("    'pagination':{".trim());
         expectedConfig.append("      'pageSizes':[15,25,50],".trim());
         expectedConfig.append("      'showPageSizeDropdown':true".trim());
-        expectedConfig.append("    }".trim());
+        expectedConfig.append("    },'description':'A description'".trim());
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 
@@ -180,8 +194,9 @@ class LiveDataMacroTest
         parameters.setLayouts("table, cards");
         parameters.setShowPageSizeDropdown(true);
         parameters.setPageSizes("15, 25, 50");
+        parameters.setDescription("A description");
 
-        List<Block> blocks = this.liveDataMacro.execute(parameters, null, null);
+        List<Block> blocks = this.liveDataMacro.execute(parameters, null, this.context);
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 
@@ -227,7 +242,7 @@ class LiveDataMacroTest
         String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
             + "data-config-content-trusted=\"false\"></div>", escapeXML(json(expectedConfig.toString())));
 
-        List<Block> blocks = this.liveDataMacro.execute(parameters, "{...}", null);
+        List<Block> blocks = this.liveDataMacro.execute(parameters, "{...}", this.context);
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 

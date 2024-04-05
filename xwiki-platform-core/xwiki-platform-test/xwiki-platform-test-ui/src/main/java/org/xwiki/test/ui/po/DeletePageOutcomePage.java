@@ -39,6 +39,9 @@ public class DeletePageOutcomePage extends ViewPage
     @FindBy(xpath = "//p[@class='xwikimessage']")
     private WebElement message;
 
+    @FindBy(xpath = "//table[@class='centered']/tbody/tr/td[3]/a")
+    private WebElement batchLink;
+
     /**
      * Return first page deleted deleter.
      * @since 3.2M3
@@ -195,5 +198,15 @@ public class DeletePageOutcomePage extends ViewPage
         } else {
             return deletedPagesEntries.get(actualEntryNumber).clickView();
         }
+    }
+
+    /**
+     * Clicks on the batch link. Goes to the undelete action.
+     *
+     * @since 15.8RC1
+     */
+    public void clickBatchLink()
+    {
+        this.batchLink.click();
     }
 }

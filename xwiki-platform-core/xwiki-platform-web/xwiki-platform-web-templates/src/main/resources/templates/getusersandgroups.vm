@@ -162,6 +162,7 @@ $response.setContentType("application/json")
     #end
   #end ## foreach rights object
   #set($row = {})
+  #set($isLocalUser = ($wikiname == 'local'))
   #set($discard = $row.put("username", $user.documentReference.name))
   #set($discard = $row.put("fullname", $username))
   #set($discard = $row.put("title"   , $user.title))
@@ -169,6 +170,13 @@ $response.setContentType("application/json")
   #set($discard = $row.put("userurl" , $xwiki.getURL($user.fullName)))
   #set($discard = $row.put("allows"  , $allows.keySet()))
   #set($discard = $row.put("denys"   , $denys.keySet()))
+  #if ($uorg == "users")
+    #set($discard = $row.put("userDisplayer",
+      "#displayUser($user.documentReference, {'displayLink': $isLocalUser, 'showAlias': true})"))
+  #else
+    #set($discard = $row.put("userDisplayer",
+      "#displayGroup($user.documentReference, {'displayLink': $isLocalUser, 'showAlias': true})"))
+  #end
   #if ($uorg == "groups")
     #set($discard = $row.put("isuseringroup", $xwiki.getUser().isUserInGroup($user.fullName)))
   #else

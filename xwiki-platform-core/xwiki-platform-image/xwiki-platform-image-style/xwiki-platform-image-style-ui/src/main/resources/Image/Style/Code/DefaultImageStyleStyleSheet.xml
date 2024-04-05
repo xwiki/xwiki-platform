@@ -212,7 +212,11 @@ figure.image figcaption {
 }
 
 /* CKEditor specific style. */
-span[data-cke-display-name="image"] .cke_widget_element {
+
+/*
+Resize the wrapper on hover to keep the widget move handler at the right place.
+ */
+span[data-cke-display-name="image"]:hover .cke_widget_element {
   display: block;
 }
 

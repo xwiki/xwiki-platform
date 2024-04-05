@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.skin;
 
 import java.io.InputStream;
+import java.time.Instant;
 
 import javax.inject.Provider;
 
@@ -51,9 +52,21 @@ public class ClassLoaderSkinResource extends AbstractSkinResource
     public ClassLoaderSkinResource(String path, String resourceName, ResourceRepository repository,
         ClassLoader classloader, Provider<XWikiContext> xcontextProvider, URLConfiguration urlConfiguration)
     {
-        super(path, resourceName, repository, xcontextProvider, urlConfiguration);
+        super(createId(classloader, path), path, resourceName, repository, null, xcontextProvider, urlConfiguration);
 
         this.classLoader = classloader;
+    }
+
+    private static String createId(ClassLoader classloader, String path)
+    {
+        return "classloader:" + classloader.getName() + ':' + path;
+    }
+
+    @Override
+    public Instant getInstant() throws Exception
+    {
+        // TODO: return the date of the package file holding the resource
+        return null;
     }
 
     @Override

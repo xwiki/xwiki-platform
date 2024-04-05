@@ -24,7 +24,6 @@ import javax.validation.constraints.Min;
 import org.xwiki.export.pdf.internal.macro.PDFTocMacro;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.stability.Unstable;
 
 /**
  * The parameters supported by {@link PDFTocMacro}.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4.2
  * @since 14.5
  */
-@Unstable
 public class PDFTocMacroParameters
 {
     private String jobId;

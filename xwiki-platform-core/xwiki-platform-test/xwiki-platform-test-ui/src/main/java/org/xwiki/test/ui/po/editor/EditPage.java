@@ -55,6 +55,9 @@ public class EditPage extends BasePage
     @FindBy(name = "action_cancel")
     protected WebElement cancel;
 
+    @FindBy(id = "doAutosave")
+    protected WebElement autoSaveCheckbox;
+
     @FindBy(id = "editcolumn")
     protected WebElement currentEditorDiv;
 
@@ -220,6 +223,14 @@ public class EditPage extends BasePage
     public WebElement getSaveAndViewButton()
     {
         return save;
+    }
+
+    /**
+     * @return the checkbox used to toggle auto-save
+     */
+    public WebElement getAutoSaveCheckbox()
+    {
+        return this.autoSaveCheckbox;
     }
 
     public ViewPage clickCancel()

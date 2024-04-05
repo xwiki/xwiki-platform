@@ -1,0 +1,372 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PDFExportIT.CustomTemplate" locale="">
+  <web>PDFExportIT</web>
+  <name>CustomTemplate</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>CustomTemplate</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content/>
+  <object>
+    <name>PDFExportIT.CustomTemplate</name>
+    <number>0</number>
+    <className>XWiki.PDFExport.TemplateClass</className>
+    <guid>f32175df-7be1-4ec5-98a8-9dbfec1db66d</guid>
+    <class>
+      <name>XWiki.PDFExport.TemplateClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cover>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <hint>XWiki.PDFExport.TemplateClass_cover.hint</hint>
+        <name>cover</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Cover</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </cover>
+      <footer>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <hint>XWiki.PDFExport.TemplateClass_footer.hint</hint>
+        <name>footer</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>Footer</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </footer>
+      <header>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <hint>XWiki.PDFExport.TemplateClass_header.hint</hint>
+        <name>header</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Header</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </header>
+      <metadata>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <hint>XWiki.PDFExport.TemplateClass_metadata.hint</hint>
+        <name>metadata</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>Metadata</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </metadata>
+      <toc>
+        <contenttype>FullyRenderedText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <hint>XWiki.PDFExport.TemplateClass_toc.hint</hint>
+        <name>toc</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Table of Contents</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </toc>
+    </class>
+    <property>
+      <cover>{{velocity}}
+{{html clean="false"}}
+&lt;h1&gt;$escapetool.xml($tdoc.plainTitle)&lt;/h1&gt;
+#set ($versionInfo = $escapetool.xml($services.localization.render('export.pdf.templates.default.versionInfo',
+  [$tdoc.version, '__author__', $xwiki.formatDate($tdoc.date)])))
+&lt;p&gt;$versionInfo.replace('__author__', "#displayUser($tdoc.authorReference {'useInlineHTML': true})")&lt;/p&gt;
+{{/html}}
+{{/velocity}}</cover>
+    </property>
+    <property>
+      <footer>{{html clean="false"}}
+&lt;div&gt;Tags: &lt;span class="pdf-chapter-tags"&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div&gt;
+  &lt;span class="pdf-page-number"&gt;&lt;/span&gt; / &lt;span class="pdf-page-count"&gt;&lt;/span&gt;
+&lt;/div&gt;
+{{/html}}</footer>
+    </property>
+    <property>
+      <header>{{html clean="false"}}
+&lt;span class="pdf-chapter-name"&gt;&lt;/span&gt;
+{{/html}}</header>
+    </property>
+    <property>
+      <metadata>{{velocity output="false"}}
+$metadata.putAll({
+  'data-tags': $stringtool.join($doc.getTagList(), ', ')
+})
+{{/velocity}}</metadata>
+    </property>
+    <property>
+      <toc>(% id="Hcore.pdf.tableOfContents" %)
+= {{translation key="core.pdf.tableOfContents"/}} =
+
+{{velocity}}
+{{pdftoc jobId="$!services.rendering.escape($request.jobId, 'xwiki/2.1')" /}}
+{{/velocity}}</toc>
+    </property>
+  </object>
+  <object>
+    <name>PDFExportIT.CustomTemplate</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>b43075a5-128d-4a66-b10b-d7bd3b773bbe</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>@media print {
+  /**
+   * Cover Page
+   */
+  .pdf-cover {
+    border-top: 1px solid @nav-tabs-border-color;
+    border-bottom: 1px solid @nav-tabs-border-color;
+    margin-top: 3in;
+  }
+  .pdf-cover h1 {
+    font-weight: bolder;
+  }
+
+  /**
+   * Table of Contents
+   */
+  /* Distinguish the table of contents entries that correspond to document titles from those that correspond to headings
+    found in the document content. */
+  .pdf-toc &gt; ul &gt; li[data-xwiki-document-reference] {
+    margin-top: 1em;
+
+    &gt; span {
+      font-weight: bolder;
+    }
+  }
+
+  /**
+   * Header
+   */
+  .pdf-chapter-name:before {
+    content: string(chapter-name);
+  }
+
+  /**
+   * Footer
+   */
+  .pagedjs_margin-content .pdf-footer {
+    display: flex !important;
+  }
+  .pdf-footer &gt; div {
+    flex-grow: 1;
+  }
+  .pdf-footer &gt; div:first-child {
+    text-align: left;
+  }
+  .pdf-footer &gt; div:last-child {
+    text-align: right;
+  }
+  .pdf-chapter-tags:before {
+    content: string(chapter-tags);
+  }
+
+  /**
+   * Content
+   */
+  /* Marks the beginning of a new XWiki document. */
+  h1[data-xwiki-document-reference] {
+    /* Distinguish document titles from the rest of the level 1 headings that may appear in the document content. */
+    font-weight: bolder;
+    string-set: chapter-name content(text);
+    string-set: chapter-tags attr(data-tags);
+
+    /* Start each XWiki document on a new print page. */
+    &amp; ~ h1[data-xwiki-document-reference] {
+      break-before: page;
+    }
+  }
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

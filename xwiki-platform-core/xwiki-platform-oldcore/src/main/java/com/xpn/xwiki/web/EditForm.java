@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.util.Util;
@@ -468,7 +467,6 @@ public class EditForm extends XWikiForm
      * @return a list of filenames that should be attached.
      * @since 14.3RC1
      */
-    @Unstable
     public List<String> getTemporaryUploadedFiles()
     {
         return temporaryUploadedFiles;

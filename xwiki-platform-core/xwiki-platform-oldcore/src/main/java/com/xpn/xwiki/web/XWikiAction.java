@@ -935,7 +935,6 @@ public abstract class XWikiAction implements LegacyAction
      * @return {@code true} if the action supports redirections, {@code false} otherwise
      * @since 14.0RC1
      */
-    @Unstable
     protected boolean supportRedirections()
     {
         return false;

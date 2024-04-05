@@ -24,13 +24,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -40,11 +44,14 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationSettler;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityEntryReader;
+import org.xwiki.security.authorization.SecurityRule;
 import org.xwiki.security.authorization.SecurityRuleEntry;
 import org.xwiki.security.authorization.cache.ConflictingInsertionException;
+import org.xwiki.security.authorization.cache.ParentEntryEvictedException;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.internal.UserBridge;
@@ -55,7 +62,9 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -150,5 +159,85 @@ public class DefaultSecurityCacheLoaderTest
         assertEquals(securityAccessEntry, this.securityCacheLoader.load(user, entity));
 
         verify(securityCache).add(securityAccessEntry, null);
+    }
+
+    /**
+     * Tests that the security cache loader doesn't load a rule with empty rules when loading the rules for the guest
+     * user.
+     */
+    @Test
+    public void loadForGuestLoadsRulesForMainWiki()
+        throws ComponentLookupException, AuthorizationException, ParentEntryEvictedException,
+        ConflictingInsertionException
+    {
+        UserSecurityReference user = this.securityReferenceFactory.newUserReference(null);
+        SecurityReference entity = this.securityReferenceFactory.newEntityReference(new DocumentReference("wiki",
+            "Space", "Document"));
+
+        // Mock the security access entry returned by the authorization settler
+        SecurityAccessEntry securityAccessEntry = mock(SecurityAccessEntry.class);
+        AuthorizationSettler authorizationSettler = mocker.getInstance(AuthorizationSettler.class);
+        when(authorizationSettler.settle(eq(user), any(), any())).thenReturn(securityAccessEntry);
+
+        SecurityEntryReader securityEntryReader = mocker.getInstance(SecurityEntryReader.class);
+        // Store SecurityRuleEntry instances for each level of the hierarchy
+        SecurityRule documentRule = mock(SecurityRule.class);
+        SecurityRuleEntry documentRuleEntry = mock();
+        when(documentRuleEntry.getReference()).thenReturn(entity);
+        when(documentRuleEntry.getRules()).thenReturn(List.of(documentRule));
+
+        SecurityRule spaceRule = mock(SecurityRule.class);
+        SecurityRuleEntry spaceRuleEntry = mock();
+        when(spaceRuleEntry.getReference()).thenReturn(entity.getParentSecurityReference());
+        when(spaceRuleEntry.getRules()).thenReturn(List.of(spaceRule));
+
+        SecurityRule mainWikiRule = mock(SecurityRule.class);
+        SecurityRuleEntry mainWikiRuleEntry = mock();
+        when(mainWikiRuleEntry.getReference()).thenReturn(entity.getWikiReference());
+        when(mainWikiRuleEntry.getRules()).thenReturn(List.of(mainWikiRule));
+
+        Deque<SecurityRuleEntry> hierarchy = new LinkedList<>();
+        hierarchy.push(mainWikiRuleEntry);
+        hierarchy.push(spaceRuleEntry);
+        hierarchy.push(documentRuleEntry);
+
+        // Special entry for the guest user
+        SecurityRuleEntry guestUserSecurityEntry = mock();
+        when(guestUserSecurityEntry.getReference()).thenReturn(user);
+        when(guestUserSecurityEntry.getRules()).thenReturn(List.of());
+
+        when(securityEntryReader.read(any())).thenAnswer(invocation -> {
+            SecurityReference reference = invocation.getArgument(0);
+            SecurityRuleEntry result;
+            if (reference.getOriginalReference() == null) {
+                result = guestUserSecurityEntry;
+            } else if (reference.getType() == EntityType.WIKI) {
+                result = mainWikiRuleEntry;
+            } else if (reference.getType() == EntityType.SPACE) {
+                result = spaceRuleEntry;
+            } else if (reference.getType() == EntityType.DOCUMENT) {
+                result = documentRuleEntry;
+            } else {
+                throw new IllegalArgumentException("Unexpected reference type: " + reference.getType());
+            }
+
+            assertEquals(reference, result.getReference());
+            return result;
+        });
+
+        assertEquals(securityAccessEntry, this.securityCacheLoader.load(user, entity));
+
+        // Verify that rules were loaded in the correct order
+        SecurityCache securityCache = mocker.getInstance(org.xwiki.security.authorization.cache.SecurityCache.class);
+        InOrder inOrder = inOrder(securityCache);
+        inOrder.verify(securityCache).get(entity.getWikiReference());
+        inOrder.verify(securityCache).add(mainWikiRuleEntry);
+        inOrder.verify(securityCache).get(entity.getParentSecurityReference());
+        inOrder.verify(securityCache).add(spaceRuleEntry);
+        inOrder.verify(securityCache).get(entity);
+        inOrder.verify(securityCache).add(documentRuleEntry);
+        inOrder.verify(securityCache).add(securityAccessEntry, null);
+        inOrder.verifyNoMoreInteractions();
+        verify(authorizationSettler).settle(user, Collections.emptySet(), hierarchy);
     }
 }

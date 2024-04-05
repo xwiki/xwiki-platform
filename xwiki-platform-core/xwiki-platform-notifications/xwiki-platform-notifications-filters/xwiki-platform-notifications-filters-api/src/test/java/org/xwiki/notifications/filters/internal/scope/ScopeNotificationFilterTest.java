@@ -269,7 +269,7 @@ class ScopeNotificationFilterTest
         NotificationFilterPreference prefζ = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
                 documentReference, NotificationFilterType.INCLUSIVE, null);
         when(prefζ.getProviderHint()).thenReturn("userProfile");
-        when(prefζ.getStartingDate()).thenReturn(new Date(99));
+        when(prefζ.getStartingDate()).thenReturn(new Date(99000));
 
         Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefγ, prefζ);
 
@@ -283,42 +283,42 @@ class ScopeNotificationFilterTest
         // Test with wikiA:SpaceE (filtered by γ & ζ)
         Event event1 = mock(Event.class);
         when(event1.getSpace()).thenReturn(new SpaceReference("SpaceE", wikiReference));
-        when(event1.getDate()).thenReturn(new Date(100));
+        when(event1.getDate()).thenReturn(new Date(100000));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
                 this.scopeNotificationFilter.filterEvent(event1, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceB.DocumentJ (kept by γ)
         Event event2 = mock(Event.class);
         when(event2.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceB", "DocumentJ"));
-        when(event2.getDate()).thenReturn(new Date(100));
+        when(event2.getDate()).thenReturn(new Date(100000));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
                 this.scopeNotificationFilter.filterEvent(event2, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiB:SpaceK.DocumentL (filtered by γ & ζ)
         Event event3 = mock(Event.class);
         when(event3.getDocument()).thenReturn(new DocumentReference("wikiB", "SpaceK", "DocumentL"));
-        when(event3.getDate()).thenReturn(new Date(100));
+        when(event3.getDate()).thenReturn(new Date(100000));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
                 this.scopeNotificationFilter.filterEvent(event3, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceM.DocumentN (kept by ζ)
         Event event4 = mock(Event.class);
         when(event4.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
-        when(event4.getDate()).thenReturn(new Date(100));
+        when(event4.getDate()).thenReturn(new Date(100000));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
                 this.scopeNotificationFilter.filterEvent(event4, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceM.DocumentN sent before ζ has been created
         Event event5 = mock(Event.class);
         when(event5.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
-        when(event5.getDate()).thenReturn(new Date(98));
+        when(event5.getDate()).thenReturn(new Date(98000));
         assertEquals(NotificationFilter.FilterPolicy.FILTER,
             this.scopeNotificationFilter.filterEvent(event5, user, filterPreferences, NotificationFormat.ALERT));
 
         // Test with wikiA:SpaceM.DocumentN sent at the date ζ has been created
         Event event6 = mock(Event.class);
         when(event6.getDocument()).thenReturn(new DocumentReference("wikiA", "SpaceM", "DocumentN"));
-        when(event6.getDate()).thenReturn(new Date(99));
+        when(event6.getDate()).thenReturn(new Date(99000));
         assertEquals(NotificationFilter.FilterPolicy.NO_EFFECT,
             this.scopeNotificationFilter.filterEvent(event6, user, filterPreferences, NotificationFormat.ALERT));
     }

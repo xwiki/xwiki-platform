@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-pgsql-common</artifactId>
   <name>XWiki Platform - Distribution - Debian - Postgres SQL - Common</name>
@@ -36,10 +36,11 @@
     <xwiki.db.connection.url>jdbc:postgresql:_DBC_DBNAME_</xwiki.db.connection.url>
     <xwiki.db.connection.username>_DBC_DBUSER_</xwiki.db.connection.username>
     <xwiki.db.connection.password>_DBC_DBPASS_</xwiki.db.connection.password>
-    <xwiki.db.connection.driver_class>org.postgresql.Driver</xwiki.db.connection.driver_class>
-    <xwiki.db.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.hbm.xwiki>
-    <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
-    <xwiki.db.hbm.virtualMode>schema</xwiki.db.hbm.virtualMode>
+    <xwiki.db.connection.driver_class>${xwiki.db.pgsql.connection.driver_class}</xwiki.db.connection.driver_class>
+    <xwiki.db.hbm.xwiki>${xwiki.db.pgsql.hbm.xwiki}</xwiki.db.hbm.xwiki>
+    <xwiki.db.hbm.feeds>${xwiki.db.pgsql.hbm.feeds}</xwiki.db.hbm.feeds>
+    <xwiki.db.hbm.virtualMode>${xwiki.db.pgsql.hbm.virtualMode}</xwiki.db.hbm.virtualMode>
+
     <debian.package>xwiki-pgsql-debian</debian.package>
   </properties>
   <build>

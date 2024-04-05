@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
@@ -51,15 +51,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>vue</artifactId>
-      <version>2.7.14</version>
-      <exclusions>
-        <!-- Excluded because this dependency is 1) not used at runtime since all out components are pre-compiled 2) 
-        not currently deployable on webjars.org (see https://github.com/webjars/webjars/issues/1976)  -->
-        <exclusion>
-          <groupId>org.webjars.npm</groupId>
-          <artifactId>vue__compiler-sfc</artifactId>
-        </exclusion>
-      </exclusions>
+      <scope>runtime</scope>
     </dependency>
     <!-- Used by the date filter. -->
     <dependency>
@@ -159,7 +151,6 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.12.0</version>
         <executions>
           <execution>
             <id>install-node-and-npm</id>
@@ -167,7 +158,8 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v18.17.1</nodeVersion>
+              <nodeVersion>${node.version}</nodeVersion>
+              <npmVersion>${npm.version}</npmVersion>
             </configuration>
           </execution>
           <execution>
@@ -195,6 +187,16 @@
             </goals>
             <configuration>
               <arguments>run test</arguments>
+            </configuration>
+            <phase>test</phase>
+          </execution>
+          <execution>
+            <id>npm-run-lint</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run lint</arguments>
             </configuration>
             <phase>test</phase>
           </execution>

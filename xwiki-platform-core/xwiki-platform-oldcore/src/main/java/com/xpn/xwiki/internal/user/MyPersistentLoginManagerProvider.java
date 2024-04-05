@@ -65,8 +65,9 @@ public class MyPersistentLoginManagerProvider implements Provider<PersistentLogi
         setIfSpecified("encryptionalgorithm", persistentLoginManager::setEncryptionAlgorithm);
         setIfSpecified("encryptionmode", persistentLoginManager::setEncryptionMode);
         setIfSpecified("encryptionpadding", persistentLoginManager::setEncryptionPadding);
-        setIfSpecified("validationKey", persistentLoginManager::setValidationKey);
-        setIfSpecified("encryptionKey", persistentLoginManager::setEncryptionKey);
+
+        persistentLoginManager.setValidationKey(this.authenticationConfiguration.getValidationKey());
+        persistentLoginManager.setEncryptionKey(this.authenticationConfiguration.getEncryptionKey());
 
         return persistentLoginManager;
     }

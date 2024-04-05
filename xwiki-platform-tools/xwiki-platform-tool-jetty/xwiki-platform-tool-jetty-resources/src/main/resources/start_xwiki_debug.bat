@@ -75,12 +75,14 @@ if "%JAVA_PATH%"=="" set JAVA_PATH=java
 REM Handle the case when JAVA_HOME is set by the user
 if not "%JAVA_HOME%" == "" set JAVA_PATH=%JAVA_HOME%\bin\java.exe
 
-REM TODO: Remove once https://jira.xwiki.org/browse/XWIKI-19034 is fixed. In summary we need this to allow the XWiki
+REM TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 is fixed. In summary we need this to allow the XWiki
 REM code or 3rd party code to use reflection to access private variables (setAccessible() calls).
 REM See https://tinyurl.com/tdhkn6mp
 set XWIKI_OPENS_LANG=--add-opens java.base/java.lang=ALL-UNNAMED
+set XWIKI_OPENS_IO=--add-opens java.base/java.io=ALL-UNNAMED
 set XWIKI_OPENS_UTIL=--add-opens java.base/java.util=ALL-UNNAMED
-set XWIKI_OPTS=%XWIKI_OPENS_LANG% %XWIKI_OPENS_UTIL% %XWIKI_OPTS%
+set XWIKI_OPENS_CONCURRENT=--add-opens java.base/java.util.concurrent=ALL-UNNAMED
+set XWIKI_OPTS=%XWIKI_OPENS_LANG% %XWIKI_OPENS_IO% %XWIKI_OPENS_UTIL% %XWIKI_OPENS_CONCURRENT% %XWIKI_OPTS%
 
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}

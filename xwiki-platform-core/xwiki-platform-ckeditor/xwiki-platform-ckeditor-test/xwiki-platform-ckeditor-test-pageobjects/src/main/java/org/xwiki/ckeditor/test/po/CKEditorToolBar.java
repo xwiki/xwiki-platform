@@ -19,6 +19,8 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.function.Predicate;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
@@ -34,7 +36,7 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class CKEditorToolBar extends BaseElement
 {
-    private final WebElement container;
+    protected final WebElement container;
 
     /**
      * Create a new tool bar instance for the given editor.
@@ -43,7 +45,32 @@ public class CKEditorToolBar extends BaseElement
      */
     public CKEditorToolBar(CKEditor editor)
     {
-        this.container = getDriver().findElementWithoutWaiting(editor.getContainer(), By.className("cke_top"));
+        this.container = findContainer(editor);
+    }
+
+    /**
+     * Click the numbered list action, by first unfolding the list menu and selecting the numbered list item.
+     *
+     * @since 15.10.9
+     * @since 16.3.0RC1
+     */
+    public void clickNumberedList()
+    {
+        clickButton("lists");
+        WebElement subMenuFrame = getDriver().findElement(By.cssSelector("iframe.cke_panel_frame"));
+
+        try {
+            getDriver().switchTo().frame(subMenuFrame);
+            getDriver().findElement(By.className("cke_menubutton__toolbar_numberedlist")).click();
+        } finally {
+            getDriver().switchTo().parentFrame();
+        }
+    }
+
+    protected WebElement findContainer(CKEditor editor)
+    {
+        return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].ui.space('top').$;",
+            editor.getName());
     }
 
     /**
@@ -86,9 +113,15 @@ public class CKEditorToolBar extends BaseElement
         return new LinkDialog();
     }
 
-    private void clickButton(String feature)
+    protected void clickButton(String feature)
     {
         getDriver().findElementWithoutWaiting(this.container, By.className("cke_button__" + feature)).click();
+    }
+
+    protected boolean hasButton(String feature, Predicate<WebElement> predicate)
+    {
+        return getDriver().findElementsWithoutWaiting(this.container, By.className("cke_button__" + feature)).stream()
+            .anyMatch(predicate);
     }
 
     /**
@@ -99,5 +132,21 @@ public class CKEditorToolBar extends BaseElement
         clickButton("source");
         // Wait for the conversion between HTML and wiki syntax (source) to be done.
         getDriver().waitUntilElementDisappears(this.container, By.cssSelector(".cke_button__source_icon.loading"));
+    }
+
+    /**
+     * @return {@code true} if the Source button is present on the toolbar and is enabled, {@code false} otherwise
+     */
+    public boolean canToggleSourceMode()
+    {
+        return hasButton("source", sourceButton -> sourceButton.isDisplayed() && sourceButton.isEnabled());
+    }
+
+    /**
+     * @return the element containing the tool bar
+     */
+    protected WebElement getContainer()
+    {
+        return this.container;
     }
 }

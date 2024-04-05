@@ -24,7 +24,6 @@ import java.util.Date;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -249,7 +248,6 @@ public interface XWikiRecycleBinStoreInterface
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     default void checkAccess(Right right, UserReference userReference, XWikiDeletedDocument deletedDocument) throws
         AuthorizationException
     {
@@ -266,7 +264,6 @@ public interface XWikiRecycleBinStoreInterface
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     default boolean hasAccess(Right right, UserReference userReference, XWikiDeletedDocument deletedDocument)
     {
         return false;

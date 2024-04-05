@@ -291,6 +291,50 @@ define('xwiki-ckeditor', [
     object[key] = newValue;
   };
 
+  // See XWIKI-21351: Macros using RequireJS are not properly displayed by the standalone WYSIWYG editor even when
+  // JavaScript is enabled.
+  //
+  // For each CKEditor instance that uses a separate DOM document for the edited content (i.e. classical iframe-based
+  // editor) we overwrite the appendChild and insertBefore functions of the initial HEAD element in order to make sure
+  // that RequireJS appends the script tags to the current HEAD element (because the HEAD element is overwritten each
+  // time the edited content is reloaded, like when inserting a macro or switching between Source and WYSIWYG modes).
+  //
+  // We have to overwrite both appendChild and insertBefore because depending on the presence of the BASE element
+  // RequireJS uses one or the other.
+  ckeditor.on('instanceReady', ({editor}) =&gt; {
+    if (editor.document.$ !== document) {
+      // This editor instance is using a separate DOM document for editing which means it's a standalone editor.
+      const initialHead = editor.document.$.head;
+      const originalAppendChild = initialHead.appendChild;
+      initialHead.appendChild = function() {
+        const currentHead = editor.document.$.head;
+        if (currentHead !== initialHead) {
+          // The edited content has been reloaded. Append to the current HEAD.
+          return currentHead.appendChild.apply(currentHead, arguments);
+        } else {
+          // Still using the initial HEAD so preserve the default behavior.
+          originalAppendChild.apply(initialHead, arguments);
+        }
+      };
+      const originalInsertBefore = initialHead.insertBefore;
+      initialHead.insertBefore = function(newChild, existingChild) {
+        const currentHead = editor.document.$.head;
+        if (currentHead !== initialHead) {
+          // The edited content has been reloaded. Normally the given existingChild should be a child of the initial
+          // HEAD element (not the current one), but better check to be sure.
+          if (existingChild.parentNode === currentHead) {
+            return currentHead.insertBefore(newChild, existingChild);
+          } else {
+            return currentHead.appendChild.apply(newChild);
+          }
+        } else {
+          // Still using the initial HEAD so preserve the default behavior.
+          return originalInsertBefore.apply(initialHead, arguments);
+        }
+      };
+    }
+  });
+
   return $.Deferred().resolve(ckeditor).promise();
 });</code>
     </property>
@@ -784,7 +828,7 @@ a.cke_button.cke_button__insert &gt; span.cke_button_icon.cke_button__insert_ico
  */
 ul.cke_autocomplete_panel {
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
+  border-radius: @border-radius-base;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   font: inherit;
   padding: 5px 0;
@@ -836,7 +880,7 @@ ul.cke_autocomplete_panel {
   width: 14px;
 }
 .ckeditor-autocomplete-item-icon-wrapper img {
-  border-radius: 3px;
+  border-radius: @border-radius-small;
   max-height: 14px;
   max-width: 14px;
   vertical-align: text-top;
@@ -855,7 +899,7 @@ ul.cke_autocomplete_panel {
   justify-content: center;
 }
 .ckeditor-autocomplete-item-preview-wrapper img {
-  border-radius: 3px;
+  border-radius: @border-radius-small;
   max-height: 64px;
   max-width: 64px;
   vertical-align: text-top;

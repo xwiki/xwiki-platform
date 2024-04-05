@@ -18,7 +18,8 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 <div class="row document-header">
-  <div class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end">
+  <section class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end"
+    aria-label="$escapetool.xml($services.localization.render('core.document.header.info.label'))">
     ## --------------------------------------------------------
     ## Display UI Extensions before the title element
     ## --------------------------------------------------------
@@ -44,11 +45,12 @@
         #end
       </div>
     #end
-  </div>
+  </section>
   #if($displayContentMenu)
-    <div class="document-menu col-xs-12 col-md-5">
+    <nav class="document-menu col-xs-12 col-md-5"
+      aria-label="$escapetool.xml($services.localization.render('core.document.header.menu.nav.label'))">
       #template("menus_content.vm")
-    </div>
+    </nav>
   #end
 </div>
 ## Display a warning regarding restricted mode for advanced users or when there is an actual error to not to confuse

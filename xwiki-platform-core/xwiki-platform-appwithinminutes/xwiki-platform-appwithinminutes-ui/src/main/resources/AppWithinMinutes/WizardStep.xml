@@ -43,15 +43,15 @@
   &lt;div class="wizard-header"&gt;
     #set ($stepNumber = $awmSteps.indexOf($stepId) + 1)
     #set ($stepTitle = $services.localization.render("appWithinMinutes.wizardStep.${stepId}.title"))
-    &lt;h1&gt;$services.localization.render('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])&lt;/h1&gt;
+    &lt;h2&gt;$services.localization.render('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])&lt;/h2&gt;
     &lt;ul class="steps"&gt;
       #foreach ($step in $awmSteps)
         #set ($index = $foreach.index + 1)
-        #set ($extraClassName = "#if ($stepNumber == $index) active#elseif ($stepNumber &gt; $index) done#end")
+        #set ($extraClassName = "#if ($stepNumber == $index) step-active#elseif ($stepNumber &gt; $index) step-done#end")
         &lt;li&gt;
-          &lt;span class="number$extraClassName"&gt;
+          &lt;span class="btn btn-xs number$extraClassName"&gt;
             #if ($stepNumber &gt; $index)
-              &amp;${escapetool.h}10004;
+              $services.icon.renderHTML('check')
             #else
               $index
             #end

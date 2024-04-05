@@ -25,7 +25,6 @@ import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,7 +38,6 @@ import com.xpn.xwiki.objects.BaseProperty;
  * @version $Id$
  * @since 14.3RC1
  */
-@Unstable
 public abstract class AbstractXClassConfigurationSource extends AbstractDocumentConfigurationSource
 {
     @Override

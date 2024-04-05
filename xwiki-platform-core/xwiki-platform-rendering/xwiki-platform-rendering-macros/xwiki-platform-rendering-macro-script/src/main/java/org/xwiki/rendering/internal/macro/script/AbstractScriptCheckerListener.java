@@ -25,9 +25,9 @@ import java.util.List;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
 
 /**
  * Abstract base class for listeners that need to perform some checks just before a script macro is executed. Subclasses

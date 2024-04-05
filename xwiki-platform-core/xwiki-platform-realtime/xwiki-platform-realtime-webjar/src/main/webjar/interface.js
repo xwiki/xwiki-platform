@@ -22,12 +22,12 @@
 define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-messages'], function($, Messages) {
   'use strict';
 
-  var uid = function() {
+  function uid() {
     return 'realtime-uid-' + String(Math.random()).substring(2);
-  };
+  }
 
-  var allowed = false;
-  var realtimeAllowed = function(bool) {
+  let allowed = false;
+  function realtimeAllowed(bool) {
     if (arguments.length) {
       // Change the value.
       allowed = !!bool;
@@ -35,30 +35,40 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
       $('#autosaveControl').toggle(!allowed);
     }
     return allowed;
-  };
+  }
 
-  var createAllowRealtimeCheckbox = function(checked) {
-    var checkbox = $(
-      '<label class="realtime-allow-label text-nowrap">' +
-        '<input type="checkbox" class="realtime-allow"/>' +
-      '</label>'
-    ).appendTo('.buttons');
-    return checkbox.append(document.createTextNode(Messages.allowRealtime)).find('input').prop('checked', !!checked);
-  };
+  function createAllowRealtimeCheckbox(checked) {
+    let allowRealtimeCheckbox = getAllowRealtimeCheckbox();
+    // Don't duplicate the checkbox if it already exists.
+    if (!allowRealtimeCheckbox.length) {
+      const wrapper = $(
+        '<label class="realtime-allow-label text-nowrap">' +
+          '<input type="checkbox" class="realtime-allow"/>' +
+        '</label>'
+      ).appendTo('.buttons');
+      allowRealtimeCheckbox = wrapper.append(document.createTextNode(Messages.allowRealtime)).find('input')
+        .prop('checked', !!checked);
+    }
+    return allowRealtimeCheckbox;
+  }
 
-  var createMergeMessageElement = function(container) {
-    var $merges = $('<div class="realtime-merge"></div>').attr('id', uid()).prependTo(container);
+  function getAllowRealtimeCheckbox() {
+    return $('input.realtime-allow[type="checkbox"]');
+  }
 
-    var timeout;
+  function createMergeMessageElement(container) {
+    const $merges = $('<div class="realtime-merge"></div>').attr('id', uid()).prependTo(container);
+
+    let timeout;
 
     // Drop a method into the lastSaved object which handles messages.
     return function (messageKey, args) {
       // Keep multiple message sequences from fighting over resources.
       clearTimeout(timeout);
 
-      var formattedMessage = Messages.get.apply(Messages, [messageKey, ...args]);
+      const formattedMessage = Messages.get(messageKey, ...args);
 
-      console.log(formattedMessage);
+      console.debug(formattedMessage);
 
       // Set the message, handle all types.
       $merges.text(formattedMessage);
@@ -70,7 +80,7 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
         });
       }, 10000);
     };
-  };
+  }
 
-  return {uid, realtimeAllowed, createAllowRealtimeCheckbox, createMergeMessageElement};
+  return {uid, realtimeAllowed, createAllowRealtimeCheckbox, getAllowRealtimeCheckbox, createMergeMessageElement};
 });

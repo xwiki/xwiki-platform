@@ -398,7 +398,7 @@
 
 .templateProviderSheet .paths .path-add {
   border: 1px dashed $theme.borderColor;
-  border-radius: 4px;
+  border-radius: 7px;
   cursor: pointer;
   padding: 7px 15px;
 }

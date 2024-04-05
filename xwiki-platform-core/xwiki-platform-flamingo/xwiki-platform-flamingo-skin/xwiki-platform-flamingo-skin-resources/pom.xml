@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -91,6 +91,13 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Search -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>requirejs</artifactId>
@@ -118,11 +125,6 @@
       <artifactId>Keypress</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>drawer</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>iscroll</artifactId>
       <version>5.2.0</version>
@@ -139,7 +141,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>moment-timezone</artifactId>
-      <version>0.5.34</version>
+      <version>0.5.43</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -165,6 +167,19 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-refactoring-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Live Data macro -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

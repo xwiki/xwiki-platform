@@ -24,28 +24,23 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.job.internal.InstallJob;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rest.internal.ModelFactory;
-import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.extension.RestExtensionInstaller;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
+
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getComponentManager;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getTestConfiguration;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getXWikiURL;
 
 /**
  * Finds all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are not
@@ -57,8 +52,6 @@ import org.xwiki.test.integration.maven.MavenResolver;
  */
 public class ExtensionInstaller
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionInstaller.class);
-
     private static final String XAR = "xar";
 
     private static final String JAR = "jar";
@@ -67,8 +60,6 @@ public class ExtensionInstaller
 
     private final ExtensionContext context;
 
-    private ComponentManager componentManager;
-
     private ArtifactResolver artifactResolver;
 
     private MavenResolver mavenResolver;
@@ -76,6 +67,8 @@ public class ExtensionInstaller
     private TestConfiguration testConfiguration;
 
     private MavenTimestampVersionConverter mavenVersionConverter;
+
+    private RestExtensionInstaller restExtensionInstaller;
 
     /**
      * Initialize the Component Manager which is later needed to perform the REST calls.
@@ -87,13 +80,11 @@ public class ExtensionInstaller
     public ExtensionInstaller(ExtensionContext context, ArtifactResolver artifactResolver, MavenResolver mavenResolver)
     {
         this.context = context;
-
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
-        this.testConfiguration = DockerTestUtils.getTestConfiguration(context);
-        this.componentManager = DockerTestUtils.getComponentManager(context);
-
+        this.testConfiguration = getTestConfiguration(context);
         this.mavenVersionConverter = new MavenTimestampVersionConverter();
+        this.restExtensionInstaller = new RestExtensionInstaller(getComponentManager(context), this.mavenResolver);
     }
 
     /**
@@ -130,7 +121,8 @@ public class ExtensionInstaller
         List<String> namespaces) throws Exception
     {
         Set<ExtensionId> extensions = new LinkedHashSet<>();
-        String xwikiVersion = this.mavenResolver.getPlatformVersion();
+        String commonsVersion = this.mavenResolver.getCommonsVersion();
+        String platformVersion = this.mavenResolver.getPlatformVersion();
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones), since they're not been installed
         // in WEB-INF/lib.
@@ -138,7 +130,7 @@ public class ExtensionInstaller
             this.testConfiguration.isResolveExtraJARs());
         this.mavenResolver.addCloverJAR(extraArtifacts);
         Collection<ArtifactResult> distributionArtifactResults =
-            this.artifactResolver.getDistributionDependencies(xwikiVersion, extraArtifacts);
+            this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
         List<ExtensionId> distributionExtensionIds = new ArrayList<>();
         for (ArtifactResult artifactResult : distributionArtifactResults) {
             Artifact artifact = artifactResult.getArtifact();
@@ -218,75 +210,7 @@ public class ExtensionInstaller
     public void installExtensions(Collection<ExtensionId> extensions, UsernamePasswordCredentials credentials,
         String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
-        String xwikiRESTURL = String.format("%s/rest", DockerTestUtils.getXWikiURL(this.context));
-
-        // Resolve the extensions versions if needed
-        List<ExtensionId> resolvedExtensions = new ArrayList<>(extensions.size());
-        for (ExtensionId extensionId : extensions) {
-            String version;
-            if (extensionId.getVersion() == null) {
-                // TODO: search the version of the extension in the dependency tree
-                version = this.mavenResolver.getModelFromCurrentPOM().getVersion();
-            } else {
-                version = this.mavenResolver.replacePropertiesFromCurrentPOM(extensionId.getVersion().getValue());
-            }
-
-            resolvedExtensions.add(new ExtensionId(extensionId.getId(), version));
-        }
-
-        // Install the extensions
-        try {
-            installExtensions(xwikiRESTURL, resolvedExtensions, credentials, installUserReference, namespaces,
-                failOnExist);
-        } catch (Exception e) {
-            throw new Exception(String.format("Failed to install Extension(s) into XWiki at [%s]", xwikiRESTURL), e);
-        }
-    }
-
-    private void installExtensions(String xwikiRESTURL, Collection<ExtensionId> extensions,
-        UsernamePasswordCredentials credentials, String installUserReference, List<String> namespaces,
-        boolean failOnExist) throws Exception
-    {
-        InstallRequest installRequest = new InstallRequest();
-
-        // Set a job id to save the job result
-        installRequest.setId("extension", "provision", UUID.randomUUID().toString());
-
-        installRequest.setInteractive(false);
-        installRequest.setFailOnExist(failOnExist);
-
-        // Set the extension list to install
-        for (ExtensionId extensionId : extensions) {
-            if (CollectionUtils.isNotEmpty(namespaces)) {
-                LOGGER.info("...Adding extension [{}] to the list of extensions to provision on namespaces {}...",
-                    extensionId, namespaces);
-            } else {
-                LOGGER.info("...Adding extension [{}] to the list of extensions to provision...", extensionId);
-            }
-            installRequest.addExtension(extensionId);
-        }
-
-        // Set the namespaces into which to install the extensions
-        if (namespaces == null || namespaces.isEmpty()) {
-            installRequest.addNamespace("wiki:xwiki");
-        } else {
-            for (String namespace : namespaces) {
-                installRequest.addNamespace(namespace);
-            }
-        }
-
-        // Set any user for installing pages (if defined)
-        if (installUserReference != null) {
-            installRequest.setProperty("user.reference", new DocumentReference("xwiki", "XWiki", "superadmin"));
-        }
-
-        JobExecutor jobExecutor = new JobExecutor();
-        JobRequest request = getModelFactory().toRestJobRequest(installRequest);
-        jobExecutor.execute(InstallJob.JOBTYPE, request, xwikiRESTURL, credentials);
-    }
-
-    private ModelFactory getModelFactory() throws Exception
-    {
-        return this.componentManager.getInstance(ModelFactory.class);
+        this.restExtensionInstaller.installExtensions(getXWikiURL(this.context), extensions, credentials,
+            installUserReference, namespaces, failOnExist);
     }
 }

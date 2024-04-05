@@ -9,3 +9,5 @@ org.xwiki.extension.security.internal.configuration.ConfigClassMandatoryInitiali
 org.xwiki.extension.security.ExtensionSecurityScriptService
 org.xwiki.extension.security.internal.configuration.DocConfigurationSource
 org.xwiki.extension.security.internal.ExtensionSecuritySolrClient
+org.xwiki.extension.security.internal.BackwardDependenciesResolver
+org.xwiki.extension.security.ExtensionSecurityConfigMandatoryDocumentInitializer

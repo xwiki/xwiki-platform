@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import org.openqa.selenium.By;
@@ -547,9 +548,22 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementHasTextContent(final By locator, final String expectedValue)
     {
+        waitUntilElementHasTextContent(() -> findElement(locator), expectedValue);
+    }
+
+    /**
+     * Waits until the given element has a certain value as its inner text.
+     *
+     * @param getElement an arbitrary supplier for the element to wait on. {@link WebElement#getText()} is called on
+     *     the returned value and compared to the expected value
+     * @param expectedValue the content value to wait for
+     * @since 15.10RC1
+     */
+    public void waitUntilElementHasTextContent(Supplier<WebElement> getElement, String expectedValue)
+    {
         waitUntilCondition(driver -> {
             try {
-                WebElement element = driver.findElement(locator);
+                WebElement element = getElement.get();
                 return Objects.equals(expectedValue, element.getText());
             } catch (NotFoundException | StaleElementReferenceException e) {
                 // In case of NotFoundException, the element is not yet present in the DOM.
@@ -684,6 +698,16 @@ public class XWikiWebDriver extends RemoteWebDriver
         executeScript(String.format("window.scrollTo(%d, %d)", xCoord, yCoord));
     }
 
+    /**
+     * Overwrites {@link WebDriver#findElement(By)} to make sure the found element is visible by scrolling it into view.
+     * This means that calling this method can have side effects on the User Interface. If the element you're looking
+     * for doesn't have to be visible in the viewport then you should use {@link #findElementWithoutScrolling(By)}
+     * instead.
+     * <p>
+     * Also node that this method is called internally by APIs such as
+     * {@code ExpectedConditions#presenceOfElementLocated()} so if you don't want the scrolling then you should
+     * implement your own {@link ExpectedCondition} using {@link #findElementWithoutScrolling(By)}.
+     */
     @Override
     public WebElement findElement(By by)
     {

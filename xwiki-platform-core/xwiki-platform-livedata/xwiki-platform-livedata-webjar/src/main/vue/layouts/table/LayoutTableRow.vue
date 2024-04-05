@@ -22,7 +22,10 @@
   It format an entry as an html row, with an entry selector on the left
 -->
 <template>
-  <tr>
+  <tr 
+      :data-livedata-entry-index="entryIdx"
+      :data-livedata-entry-id="logic.getEntryId(entry)"
+  >
 
     <!-- Entry Select -->
     <td
@@ -69,6 +72,17 @@ export default {
 
   props: {
     entry: Object,
+    /**
+     * Index of the entry in the entries array.
+     * @since 14.10.20
+     * @since 15.5.5
+     * @since 15.10.1
+     * @since 16.0.0RC1
+     */
+    entryIdx: {
+      type: Number,
+      required: true
+    }
   },
 
   computed: {

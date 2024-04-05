@@ -106,7 +106,7 @@
     &lt;select id="pdfGenerator"&gt;
       #foreach ($pdfGenerator in ['userBrowser', 'chromeDockerContainer', 'remoteChrome'])
         &lt;option value="$escapetool.xml($pdfGenerator)"
-            #if ($pdfGenerator == $selectedPDFGenerator)selected="selected"#end
+            #if ($pdfGenerator == $selectedPDFGenerator)selected="selected" #end
             title="$escapetool.xml($services.localization.render("export.pdf.generator.${pdfGenerator}.hint"))"&gt;
           $escapetool.xml($services.localization.render("export.pdf.generator.${pdfGenerator}.label"))
         &lt;/option&gt;
@@ -159,8 +159,12 @@
       &lt;/dl&gt;
     &lt;/fieldset&gt;
   &lt;/dd&gt;
-  #displayPDFExportConfigProperty('pageReadyTimeout', {'min': 0, 'max': 2147483647})
-  #displayPDFExportConfigProperty('maxContentSize', {'min': 0, 'max': 2147483647})
+  #set ($maxSigned32BitInteger = 2147483647)
+  ## We ask the user to specify the page ready timeout in seconds but we actually need the milliseconds value so we
+  ## multiply it by 1000, thus we need to lower the upper limit. Note that the final value is passed to JavaScript's
+  ## setTimeout whose delay parameter max value is 2^31-1 (i.e. 32 bit integer, with one sign bit).
+  #displayPDFExportConfigProperty('pageReadyTimeout', {'min': 0, 'max': $mathtool.idiv($maxSigned32BitInteger, 1000)})
+  #displayPDFExportConfigProperty('maxContentSize', {'min': 0, 'max': $maxSigned32BitInteger})
   #displayPDFExportConfigProperty('replaceFOP')
 #end
 {{/velocity}}

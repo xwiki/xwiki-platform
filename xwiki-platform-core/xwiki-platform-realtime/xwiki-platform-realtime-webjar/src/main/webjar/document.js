@@ -24,7 +24,7 @@ define('xwiki-realtime-document', [
 ], function($, meta, realtimeConfig) {
   'use strict';
 
-  var channelListAPI = {
+  const channelListAPI = {
     getByPath: function(path) {
       return this.filter(channel => JSON.stringify(channel.path) === JSON.stringify(path))[0];
     },
@@ -34,7 +34,7 @@ define('xwiki-realtime-document', [
     }
   };
 
-  var document = {
+  const document = {
     // Initialize the document fields based on the meta information available on page load.
     documentReference: meta.documentReference,
     language: meta.locale,
@@ -98,7 +98,7 @@ define('xwiki-realtime-document', [
     },
 
     getChannels: function(params) {
-      var url = new XWiki.Document(this.documentReference).getRestURL('channels');
+      const url = new XWiki.Document(this.documentReference).getRestURL('channels');
       params = $.extend({
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()

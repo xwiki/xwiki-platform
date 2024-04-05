@@ -19,29 +19,37 @@
  */
 package org.xwiki.export.pdf.internal.chrome;
 
-import java.net.URI;
-import java.util.Arrays;
-
-import javax.inject.Named;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.xwiki.export.pdf.PDFExportConfiguration;
-import org.xwiki.export.pdf.browser.BrowserManager;
-import org.xwiki.export.pdf.internal.docker.ContainerManager;
-import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
-
-import com.github.dockerjava.api.model.HostConfig;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.export.pdf.PDFExportConfiguration;
+import org.xwiki.export.pdf.browser.BrowserManager;
+import org.xwiki.export.pdf.internal.docker.ContainerManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.github.dockerjava.api.model.HostConfig;
 
 /**
  * Unit tests for {@link ChromeManagerManager}.
@@ -64,6 +72,9 @@ class ChromeManagerManagerTest
     @MockComponent
     private ContainerManager containerManager;
 
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     HostConfig hostConfig;
 
     private String containerId = "8f55a905efec";
@@ -80,11 +91,19 @@ class ChromeManagerManagerTest
 
         mockNetwork("bridge");
 
+        List<String> envVars = Collections.singletonList("CHROMIUM_FLAGS=\"\"");
+
         when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
-            this.configuration.getChromeDockerContainerName(),
-            Arrays.asList("--no-sandbox", "--remote-debugging-address=0.0.0.0",
-                "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort()),
-            this.hostConfig)).thenReturn(this.containerId);
+            this.configuration.getChromeDockerContainerName(), getChromeParams(), envVars, this.hostConfig))
+            .thenReturn(this.containerId);
+    }
+
+    private List<String> getChromeParams()
+    {
+        return Arrays.asList("--remote-debugging-address=0.0.0.0",
+            "--remote-debugging-port=" + this.configuration.getChromeRemoteDebuggingPort(),
+            "--remote-allow-origins=http://localhost:" + this.configuration.getChromeRemoteDebuggingPort(),
+            "--disable-dev-shm-usage", "about:blank");
     }
 
     private void mockNetwork(String networkIdOrName)
@@ -95,6 +114,7 @@ class ChromeManagerManagerTest
         this.hostConfig = mock(HostConfig.class);
         when(this.containerManager.getHostConfig(networkIdOrName, this.configuration.getChromeRemoteDebuggingPort()))
             .thenReturn(this.hostConfig);
+        when(this.hostConfig.withSecurityOpts(any(List.class))).thenReturn(this.hostConfig);
         when(this.hostConfig.withExtraHosts("xwiki-host:host-gateway"))
             .thenReturn(this.hostConfig);
     }
@@ -194,5 +214,33 @@ class ChromeManagerManagerTest
         verify(this.chromeManager, times(3)).connect("remote-chrome",
             this.configuration.getChromeRemoteDebuggingPort());
         verify(this.chromeManager, times(3)).close();
+    }
+
+    @Test
+    void getWithSandboxFails() throws Exception
+    {
+        when(this.containerManager.maybeReuseContainerByName(this.configuration.getChromeDockerContainerName()))
+            .thenReturn(null);
+        int port = this.configuration.getChromeRemoteDebuggingPort();
+        RuntimeException exception = new RuntimeException("Test exception");
+        doThrow(exception).when(this.chromeManager).connect("localhost", port);
+
+        List<String> envVars = Collections.singletonList("CHROMIUM_FLAGS=\"\"");
+        List<String> parameters = new ArrayList<>();
+        parameters.add("--no-sandbox");
+        parameters.addAll(getChromeParams());
+        when(this.containerManager.createContainer(this.configuration.getChromeDockerImage(),
+            this.configuration.getChromeDockerContainerName(), parameters, envVars, this.hostConfig))
+            .thenReturn(this.containerId);
+
+        try {
+            this.chromeManagerManager.get();
+            fail("Getting the Chrome manager should have failed.");
+        } catch (Exception e) {
+            assertEquals(exception, e.getCause());
+        }
+        assertEquals("Starting Chrome headless with sandbox mode disabled.", this.logCapture.getMessage(0));
+
+        verify(this.containerManager, times(2)).startContainer(this.containerId);
     }
 }

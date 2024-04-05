@@ -108,6 +108,18 @@ class DefaultImageStyleConfigurationTest
         verify(this.context).setWikiId("wiki");
         verify(this.context).setDoc(this.doc);
         verify(this.contextManager).popContext();
+        verify(this.configurationSource).getProperty("defaultStyle");
+    }
+
+    @Test
+    void getForceDefaultStyle() throws Exception
+    {
+        this.configuration.getForceDefaultStyle("wiki", DOCUMENT_REFERENCE_STR);
+        verify(this.contextManager).pushContext(any(ExecutionContext.class), eq(false));
+        verify(this.context).setWikiId("wiki");
+        verify(this.context).setDoc(this.doc);
+        verify(this.contextManager).popContext();
+        verify(this.configurationSource).getProperty("forceDefaultStyle");
     }
 
     @Test

@@ -36,9 +36,18 @@ import org.xwiki.stability.Unstable;
  * @since 14.5
  */
 @Role
-@Unstable
 public interface PDFExportConfiguration
 {
+    /**
+     * The default host used by the headless Chrome to access XWiki.
+     */
+    String DEFAULT_XWIKI_HOST = "host.xwiki.internal";
+
+    /**
+     * The default URI used by the headless Chrome to access XWiki.
+     */
+    String DEFAULT_XWIKI_URI = "//" + DEFAULT_XWIKI_HOST;
+
     /**
      * @return the Docker image used to create the Docker container running the headless Chrome web browser; defaults to
      *         "{@code zenika/alpine-chrome:latest}"
@@ -76,6 +85,17 @@ public interface PDFExportConfiguration
     int getChromeRemoteDebuggingPort();
 
     /**
+     * @return the number of seconds to wait for the Chrome remote debugging service to responde before giving up
+     * @since 14.10.16
+     * @since 15.5.2
+     * @since 15.7
+     */
+    default int getChromeRemoteDebuggingTimeout()
+    {
+        return 10;
+    }
+
+    /**
      * @return the base URI that the headless Chrome browser should use to access the XWiki instance (i.e. the print
      *         preview page); the host (domain or IP address) is mandatory but the scheme and port number are optional
      *         (they default on the scheme and port number used when triggering the PDF export); defaults to
@@ -88,6 +108,25 @@ public interface PDFExportConfiguration
      * @since 15.7RC1
      */
     URI getXWikiURI() throws URISyntaxException;
+
+    /**
+     * @return {@code true} if the XWiki URI is specified in the configuration, {@code false} if the default XWiki URI
+     *         is used
+     * @since 14.10.22
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    default boolean isXWikiURISpecified()
+    {
+        try {
+            return !getXWikiURI().toString().equals(DEFAULT_XWIKI_URI);
+        } catch (URISyntaxException e) {
+            // If the XWiki URI cannot be parsed then most likely it is specified (basically we expect the default XWiki
+            // URI to be valid).
+            return true;
+        }
+    }
 
     /**
      * @return {@code true} if the PDF export should be performed server-side, e.g. using a headless Chrome web browser

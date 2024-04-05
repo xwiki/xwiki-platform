@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -34,12 +34,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.restlet.Request;
-import org.restlet.data.Form;
-import org.restlet.ext.servlet.ServletUtils;
-import org.restlet.representation.InputRepresentation;
-import org.restlet.representation.Representation;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rest.JAXRSUtils;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
@@ -58,6 +54,9 @@ public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>, 
 
     private static final String COMMENT_REPLYTO_FIELD_NAME = "replyTo";
 
+    @Inject
+    private JAXRSUtils jaxrs;
+
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
@@ -69,36 +68,18 @@ public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>, 
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
         throws IOException, WebApplicationException
     {
+        MultivaluedMap<String, String> form = this.jaxrs.readForm(mediaType, annotations, entityStream);
+
         ObjectFactory objectFactory = new ObjectFactory();
         Comment comment = objectFactory.createComment();
 
-        Representation representation =
-            new InputRepresentation(entityStream, org.restlet.data.MediaType.APPLICATION_WWW_FORM);
-        Form form = new Form(representation);
-
-        /*
-         * If the form is empty then it might have happened that some filter has invalidated the entity stream. Try to
-         * read data using getParameter()
-         */
-        if (form.getNames().isEmpty()) {
-            HttpServletRequest httpServletRequest = ServletUtils.getRequest(Request.getCurrent());
-
-            try {
-                comment.setReplyTo(Integer.parseInt(httpServletRequest.getParameter(COMMENT_REPLYTO_FIELD_NAME)));
-            } catch (NumberFormatException e) {
-                // Just ignore, there won't be a reply to.
-            }
-            comment.setText(httpServletRequest.getParameter(COMMENT_TEXT_FIELD_NAME));
-        } else {
-            try {
-                comment.setReplyTo(Integer.parseInt(form.getFirstValue(COMMENT_REPLYTO_FIELD_NAME)));
-            } catch (NumberFormatException e) {
-                // Just ignore, there won't be a reply to.
-            }
-            comment.setText(form.getFirstValue(COMMENT_TEXT_FIELD_NAME));
+        try {
+            comment.setReplyTo(Integer.parseInt(form.getFirst(COMMENT_REPLYTO_FIELD_NAME)));
+        } catch (NumberFormatException e) {
+            // Just ignore, there won't be a reply to.
         }
+        comment.setText(form.getFirst(COMMENT_TEXT_FIELD_NAME));
 
         return comment;
     }
-
 }

@@ -1,0 +1,43 @@
+[
+  {
+    "name": "HTML",
+    "extensions": [
+      "html"
+    ],
+    "mediaType": "text/html",
+    "inputFamily": "WEB",
+    "storeProperties": {
+      "SPREADSHEET": {
+        "FilterName": "HTML (StarCalc)"
+      },
+      "PRESENTATION": {
+        "FilterName": "impress_html_Export",
+        "FilterData": {
+          "PublishMode": 0
+        }
+      },
+      "TEXT": {
+        "FilterName": "HTML (StarWriter)"
+      },
+      "WEB": {
+        "FilterName": "HTML (StarWriter)"
+      }
+    }
+  },
+  {
+    "name": "Rich Text Format",
+    "extensions": [
+      "rtf"
+    ],
+    "mediaType": "text/rtf",
+    "inputFamily": "TEXT",
+    "storeProperties": {
+      "TEXT": {
+        "FilterName": "Rich Text Format"
+      },
+      "WEB": {
+        "FilterName": "Rich Text Format"
+      }
+    }
+  }
+]

@@ -137,11 +137,11 @@ public class XWikiDockerExtension extends AbstractExtension
             // See https://github.com/testcontainers/testcontainers-java/issues/2253
             setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
         }
-        if (testConfiguration.isDebug()) {
-            // Debug: get logs when starting the sshd container
+        if (testConfiguration.isVerbose()) {
+            // Get logs when starting the sshd container
             setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
                 TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
-            // Debug: get logs when starting the vnc container
+            // Get logs when starting the vnc container
             setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
                 TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
         }
@@ -153,7 +153,7 @@ public class XWikiDockerExtension extends AbstractExtension
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
         ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration.isOffline(),
-            testConfiguration.isDebug(), repositoryResolver);
+            testConfiguration.isVerbose(), repositoryResolver);
         MavenResolver mavenResolver =
             new MavenResolver(testConfiguration.getProfiles(), artifactResolver, repositoryResolver);
 
@@ -278,7 +278,11 @@ public class XWikiDockerExtension extends AbstractExtension
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideo(extensionContext);
+        try {
+            saveScreenshotAndVideo(extensionContext);
+        } catch (Exception e) {
+            LOGGER.error("Failed to save the video", e);
+        }
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
         displayAgentName();
@@ -318,11 +322,13 @@ public class XWikiDockerExtension extends AbstractExtension
 
         PersistentTestContext testContext = loadPersistentTestContext(extensionContext);
 
-        // End the wcag validation process.
-        testContext.getUtil().getWCAGUtils().endWCAGValidation();
+        if (testContext != null) {
+            // End the wcag validation process.
+            testContext.getUtil().getWCAGUtils().endWCAGValidation();
 
-        // Shutdown the test context
-        shutdownPersistentTestContext(testContext);
+            // Shutdown the test context
+            shutdownPersistentTestContext(testContext);
+        }
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
@@ -402,8 +408,10 @@ public class XWikiDockerExtension extends AbstractExtension
             testConfiguration.getServletEngine().getInternalPort()));
 
         // Setup the wcag validation context.
-        testContext.getUtil().getWCAGUtils().setupWCAGValidation(testConfiguration.isWCAG(),
-            extensionContext.getTestClass().get().getName());
+        testContext.getUtil().getWCAGUtils().setupWCAGValidation(
+            testConfiguration.isWCAG(),
+            extensionContext.getTestClass().get().getName(),
+            testConfiguration.shouldWCAGStopOnError());
 
 
         // - the one used by RestTestUtils, i.e. outside of any container

@@ -19,6 +19,15 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Arrays;
@@ -50,15 +59,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.export.DocumentSelectionResolver;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultPDFExportJobRequestFactory}.
@@ -140,12 +140,6 @@ class DefaultPDFExportJobRequestFactoryTest
         DocumentReference templateReference = new DocumentReference("test", "Some", "Template");
         when(this.currentDocumentReferenceResolver.resolve("Some.Template")).thenReturn(templateReference);
 
-        URL printPreviewURL = new URL("http://localhost:8080/xwiki/bin/export/Some/Page?key=value#hash");
-        String queryString = "format=html-print&xpage=get&outputSyntax=plain&async=true&"
-            + "sheet=XWiki.PDFExport.Sheet&jobId=export%2Fpdf%2Ftest&color=red";
-        when(this.xcontext.getURLFactory().createExternalURL("Some", "Page", "export", queryString, "foo", "test",
-            this.xcontext)).thenReturn(printPreviewURL);
-
         URL baseURL = new URL("http://localhost:8080/xwiki/bin/view/Some/Page?color=red#foo");
         when(this.xcontext.getURLFactory().createExternalURL("Some", "Page", "view", "color=red", "foo", "test",
             this.xcontext)).thenReturn(baseURL);
@@ -178,9 +172,9 @@ class DefaultPDFExportJobRequestFactoryTest
         @SuppressWarnings("unchecked")
         Map<String, String[]> requestParameters =
             (Map<String, String[]>) request.getContext().get("request.parameters");
-        assertEquals(Collections.singleton("key"), requestParameters.keySet());
-        assertEquals(Collections.singletonList("value"), Arrays.asList(requestParameters.get("key")));
-        assertEquals(printPreviewURL, request.getContext().get("request.url"));
+        assertEquals(Collections.singleton("color"), requestParameters.keySet());
+        assertEquals(Collections.singletonList("red"), Arrays.asList(requestParameters.get("color")));
+        assertEquals(baseURL, request.getContext().get("request.url"));
         assertEquals(baseURL, request.getBaseURL());
 
         assertEquals(selectedDocuments, request.getDocuments());

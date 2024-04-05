@@ -338,7 +338,55 @@ public class DefaultNotificationParametersFactoryTest
         parametersMap.remove(ParametersKey.CURRENT_WIKI);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
-        verify(wikiDescriptorManager, times(2)).getCurrentWikiId();
+        verify(this.wikiDescriptorManager, times(3)).getCurrentWikiId();
+    }
+
+    @Test
+    void createNotificationParametersDontUseUserPreferences() throws Exception
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mywiki");
+        NotificationParameters expectedNotificationParameters = new NotificationParameters();
+        expectedNotificationParameters.format = NotificationFormat.ALERT;
+        expectedNotificationParameters.preferences = List.of(
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(1))
+        );
+        expectedNotificationParameters.filters = new HashSet<>(this.filterList);
+
+        DefaultNotificationFilterPreference filterPreference = getFilterPreference("WIKI", 0);
+        filterPreference.setWiki("mywiki");
+        expectedNotificationParameters.filterPreferences = List.of(
+            new ScopeNotificationFilterPreference(filterPreference, this.entityReferenceResolver)
+        );
+        
+        assertEquals(expectedNotificationParameters, this.parametersFactory.createNotificationParameters(Map.of(
+            ParametersKey.USE_USER_PREFERENCES, "false"
+        )));
+    }
+
+    @Test
+    void createNotificationParametersDontUseUserPreferencesWithSpace() throws Exception
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
+        NotificationParameters expectedNotificationParameters = new NotificationParameters();
+        expectedNotificationParameters.format = NotificationFormat.ALERT;
+        expectedNotificationParameters.preferences = List.of(
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(1))
+        );
+        expectedNotificationParameters.filters = new HashSet<>(this.filterList);
+
+        DefaultNotificationFilterPreference filterPreference0 = getFilterPreference("SPACE", 0);
+        filterPreference0.setPage("mywiki@@s1");
+        expectedNotificationParameters.filterPreferences = List.of(
+            new ScopeNotificationFilterPreference(filterPreference0, this.entityReferenceResolver)
+        );
+
+        assertEquals(expectedNotificationParameters, this.parametersFactory.createNotificationParameters(Map.of(
+            ParametersKey.USE_USER_PREFERENCES, "false",
+            ParametersKey.SPACES, "s1"
+        )));
     }
 
     private DefaultNotificationFilterPreference getFilterPreference(String property, int number)

@@ -21,12 +21,7 @@ package org.xwiki.export.pdf.internal.job;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,9 +33,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.export.pdf.PDFExportConfiguration;
@@ -131,14 +123,30 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         Map<String, Serializable> pdfExportContext =
             this.contextStoreManager.save(this.contextStoreManager.getSupportedEntries());
 
-        URL printPreviewURL = getPrintPreviewURL(request.getId());
+        // Some scripts or macros might want to produce a different output when the content is rendered for PDF export,
+        // compared to what is rendered in view mode.
         pdfExportContext.put(XWikiContextContextStore.PROP_ACTION, EXPORT);
-        pdfExportContext.put(XWikiContextContextStore.PROP_REQUEST_PARAMETERS,
-            (Serializable) getRequestParameters(printPreviewURL.getQuery()));
-        pdfExportContext.put(XWikiContextContextStore.PROP_REQUEST_URL, printPreviewURL);
 
         request.setContext(pdfExportContext);
         request.setBaseURL(getBaseURL());
+    }
+
+    private URL getBaseURL()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiRequest httpRequest = xcontext.getRequest();
+
+        // Get the query string and hash that were used when the user triggered the PDF export.
+        String queryString = Objects.toString(httpRequest.get(PDF_QUERY_STRING), "");
+        String hash = Objects.toString(httpRequest.get(PDF_HASH), "");
+
+        // We want the base URL to be the URL from where the user triggered the PDF export.
+        DocumentReference documentReference = xcontext.getDoc().getDocumentReference();
+        return xcontext.getURLFactory().createExternalURL(
+            this.localStringEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference()),
+            // We assume the action was view, since most of the time the PDF export is triggered from view mode.
+            documentReference.getName(), "view", queryString, hash, documentReference.getWikiReference().getName(),
+            xcontext);
     }
 
     private void readPDFExportOptionsFromHTTPRequest(PDFExportJobRequest request)
@@ -159,77 +167,5 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
             .sorted(this.documentReferenceComparator).collect(Collectors.toList()));
 
         request.setFileName(xcontext.getDoc().getRenderedTitle(Syntax.PLAIN_1_0, xcontext) + ".pdf");
-    }
-
-    private Map<String, String[]> getRequestParameters(String queryString)
-    {
-        Map<String, List<String>> params = new LinkedHashMap<>();
-        for (NameValuePair pair : URLEncodedUtils.parse(queryString, StandardCharsets.UTF_8)) {
-            List<String> values = params.getOrDefault(pair.getName(), new ArrayList<>());
-            values.add(pair.getValue());
-            params.put(pair.getName(), values);
-        }
-
-        Map<String, String[]> parameters = new LinkedHashMap<>();
-        for (Map.Entry<String, List<String>> entry : params.entrySet()) {
-            parameters.put(entry.getKey(), entry.getValue().toArray(new String[entry.getValue().size()]));
-        }
-
-        return parameters;
-    }
-
-    private URL getPrintPreviewURL(List<String> jobId)
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        XWikiRequest httpRequest = xcontext.getRequest();
-
-        String originalQueryString = Objects.toString(httpRequest.get(PDF_QUERY_STRING), "");
-        String queryString = getPrintPreviewQueryString(jobId, originalQueryString);
-
-        // The request URL hash (fragment identifier) is not sent to the server but in the case of server-side PDF
-        // export we need it as it can influence the behavior of the JavaScript code when the PDF template is loaded in
-        // the headless web browser. In order to overcome this we receive the hash as a request parameter.
-        String hash = Objects.toString(httpRequest.get(PDF_HASH), "");
-
-        // We want the documents to be rendered with the same parameters (query string) and hash (anchor or fragment
-        // identifier) as in print preview mode (what is used to generate the PDF in the end). For this the saved
-        // request URL should use the specified query string and hash.
-        DocumentReference documentReference = xcontext.getDoc().getDocumentReference();
-        return xcontext.getURLFactory().createExternalURL(
-            this.localStringEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference()),
-            documentReference.getName(), EXPORT, queryString, hash, documentReference.getWikiReference().getName(),
-            xcontext);
-    }
-
-    private String getPrintPreviewQueryString(List<String> jobId, String originalQueryString)
-    {
-        List<NameValuePair> printPreviewParams = Arrays.asList(
-            new BasicNameValuePair("format", "html-print"),
-            new BasicNameValuePair("xpage", "get"),
-            new BasicNameValuePair("outputSyntax", "plain"),
-            // Asynchronous rendering is disabled by default on the export action so we need to force it.
-            new BasicNameValuePair("async", "true"),
-            new BasicNameValuePair("sheet", "XWiki.PDFExport.Sheet"),
-            new BasicNameValuePair("jobId", StringUtils.join(jobId, '/'))
-        );
-        return URLEncodedUtils.format(printPreviewParams, StandardCharsets.UTF_8) + '&' + originalQueryString;
-    }
-
-    private URL getBaseURL()
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        XWikiRequest httpRequest = xcontext.getRequest();
-
-        // Get the query string and hash that were used when the user triggered the PDF export.
-        String queryString = Objects.toString(httpRequest.get(PDF_QUERY_STRING), "");
-        String hash = Objects.toString(httpRequest.get(PDF_HASH), "");
-
-        // We want the base URL to be the URL from where the user triggered the PDF export.
-        DocumentReference documentReference = xcontext.getDoc().getDocumentReference();
-        return xcontext.getURLFactory().createExternalURL(
-            this.localStringEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference()),
-            // We assume the action was view, since most of the time the PDF export is triggered from view mode.
-            documentReference.getName(), "view", queryString, hash, documentReference.getWikiReference().getName(),
-            xcontext);
     }
 }

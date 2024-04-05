@@ -219,11 +219,18 @@
   #else
     #set ($facetPrettyName = $facetField.name)
   #end
-  &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt;
+  &lt;div class="search-facet-header"&gt;
+    &lt;span id="$escapetool.xml($facetField.name)-toggler-hint"&gt;$escapetool.xml($facetPrettyName)&lt;/span&gt;
+    &lt;button class="btn btn-xs facet-toggler"
+      aria-controls="$escapetool.xml($facetField.name)-dropdown"
+      aria-labelledby="$escapetool.xml($facetField.name)-toggler-hint"&gt;
+      $services.icon.renderHTML('caret-down')
+    &lt;/button&gt;
+  &lt;/div&gt;
 #end
 
 #macro (displaySearchFacetBody $facetField)
-  &lt;div class="search-facet-body"&gt;
+  &lt;div id="$escapetool.xml($facetField.name)-dropdown" class="search-facet-body"&gt;
     #set ($facetDisplayer = $solrConfig.facetDisplayers.get($facetField.name))
     #if (!$facetDisplayer &amp;&amp; $facetField.name.startsWith('property.'))
       ## Choose a facet displayer based on the property type.
@@ -273,6 +280,10 @@
 #end
 
 #macro (displaySearchFacetValue $facetValue $customQueryStringParameters $customValueDisplayer)
+  #displaySearchFacetValue($facetValue $customQueryStringParameters $customValueDisplayer false)
+#end
+
+#macro (displaySearchFacetValue $facetValue $customQueryStringParameters $customValueDisplayer $displayToggler)
   #set ($selectedValues = [])
   #if ($facetRequestValues)
     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
@@ -304,6 +315,12 @@
     #end
   &lt;/a&gt;
   &lt;div class="itemCount"&gt;$facetValue.count&lt;/div&gt;
+  #if ($displayToggler)
+    &lt;button class="btn btn-xs facet-value-toggler"&gt;
+      &lt;span class='sr-only'&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
+      $services.icon.renderHTML('caret-down')
+    &lt;/button&gt;
+  #end
 #end
 
 #**

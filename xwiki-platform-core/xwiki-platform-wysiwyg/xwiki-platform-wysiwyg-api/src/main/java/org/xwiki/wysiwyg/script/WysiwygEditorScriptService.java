@@ -42,7 +42,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
@@ -132,7 +131,6 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return The syntax identifier of the rendered HTML.
      * @since 14.1RC1
      */
-    @Unstable
     public Syntax getHTMLSyntax()
     {
         return Syntax.ANNOTATED_HTML_5_0;
@@ -188,7 +186,6 @@ public class WysiwygEditorScriptService implements ScriptService
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public String parseAndRender(String html, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
         XWikiDocument securityDocument = createSecurityDocument();
@@ -305,7 +302,6 @@ public class WysiwygEditorScriptService implements ScriptService
      * @since 14.4.7
      * @since 13.10.11
      */
-    @Unstable
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
         XWikiDocument securityDocument = createSecurityDocument();

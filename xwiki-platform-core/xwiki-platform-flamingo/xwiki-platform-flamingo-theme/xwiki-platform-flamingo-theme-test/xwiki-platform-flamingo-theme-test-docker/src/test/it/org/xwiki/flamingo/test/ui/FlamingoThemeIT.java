@@ -159,7 +159,7 @@ class FlamingoThemeIT
         assertCustomThemeColors(new ViewPage());
 
         // Click on the 'customize' button to edit the theme to verify it works
-        presentationAdministrationSectionPage.clickOnCustomize();
+        presentationAdministrationSectionPage.clickOnCustomizeColorTheme();
         EditThemePage editThemePage = new EditThemePage();
         assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();

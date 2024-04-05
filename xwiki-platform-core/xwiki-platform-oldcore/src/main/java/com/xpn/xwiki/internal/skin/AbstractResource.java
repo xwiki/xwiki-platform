@@ -38,7 +38,7 @@ public abstract class AbstractResource<I extends InputSource> implements Resourc
 
     protected String resourceName;
 
-    public AbstractResource(String id, String path, String resourceName, ResourceRepository repository)
+    protected AbstractResource(String id, String path, String resourceName, ResourceRepository repository)
     {
         this.id = id;
         this.path = path;

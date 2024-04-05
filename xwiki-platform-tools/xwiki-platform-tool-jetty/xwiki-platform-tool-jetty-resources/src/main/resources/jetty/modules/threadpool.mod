@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
 Enables and configures the Server ThreadPool.
@@ -47,7 +47,7 @@ etc/jetty-threadpool.xml
 #jetty.threadPool.reservedThreads=-1
 
 ## Whether to use virtual threads, if the runtime supports them.
-## Deprecated, use Jetty module 'threadpool-virtual-preview' instead.
+## Deprecated, use Jetty module 'threadpool-virtual' instead.
 #jetty.threadPool.useVirtualThreads=false
 
 ## Thread idle timeout (in milliseconds).

@@ -74,7 +74,8 @@
 ##  Content (if empty wiki display Import)
 ##-----------------------------------------
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 #set ($force = $!request.get('force'))
 #if (!$hasAdmin)
   $response.setStatus(403)
@@ -118,7 +119,7 @@
   #end
 #end
 <div class="clearfloats"></div>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 ##-------------------------------------------------
 ##  End page

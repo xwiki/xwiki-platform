@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
-import org.xwiki.stability.Unstable;
 
 /**
  * This is a version of an {@link AbstractEventListener} that skips automatically all events that are remote:
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4RC1
  * @since 13.10.7
  */
-@Unstable
 public abstract class AbstractLocalEventListener extends AbstractEventListener
 {
     @Inject

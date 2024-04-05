@@ -30,18 +30,18 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Home</title>
+  <title>홈</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>= Wiki에 오신 것을 환영합니다 =
+  <content>== Wiki에 오신 것을 환영합니다 ==
 
 XWiki는 지식을 정리하는 최고의 도구입니다. //wiki//는 //pages//의 계층으로 구성됩니다. 각각 고유한 페이지 집합을 가진 여러 Wiki를 만들 수 있습니다.
 
 XWiki는 지식 기반(support, documentation, sales 등)의 협업 작업 공간 또는 완전한 인트라넷으로 사용할 수 있습니다.
 
-= 기본 =
+== 기본 ==
 
 Wiki를 최대한 활용하려면, 로그인하고 다음 작업을 수행합니다:
 
@@ -53,22 +53,22 @@ Wiki를 최대한 활용하려면, 로그인하고 다음 작업을 수행합니
 
 당신은 또한 [[Sandbox&gt;&gt;Sandbox.WebHome]] 사용하여 더 많은 데모 콘텐츠를 볼 수 있으며 일반적으로 Wiki의 기능을 실험할 수 있습니다.
 
-{{box}}XWiki를 사용하는 방법에 대한 자세한 내용 {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+{{box}}XWiki를 사용하는 방법에 대한 자세한 내용 [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
 (% class="row" %)
 (((
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Extend your wiki =
+== Extend your wiki ==
 
-//당신이// 필요한 기능을 사용하여 Wiki의 파워와 기능을 확장하려면, 확장기능을 검색하여 설치할 수 있는{{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}로 이동합니다.
+//당신이// 필요한 기능을 사용하여 Wiki의 파워와 기능을 확장하려면, 확장기능을 검색하여 설치할 수 있는[[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]]로 이동합니다.
 
 XWiki에서 사용할 수 있는 900 이상의 커뮤니티 기여 확장을 참조하려면, [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]]로 이동합니다.
 )))
 
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Create your application =
+== Create your application ==
 
 사용 가능한 확장 기능뿐만 아니라 필요에 따라 데이터 구조를 정의하여 [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM)과 같은 기능을 통해 자체 애플리케이션을 생성할 수 있습니다.
 

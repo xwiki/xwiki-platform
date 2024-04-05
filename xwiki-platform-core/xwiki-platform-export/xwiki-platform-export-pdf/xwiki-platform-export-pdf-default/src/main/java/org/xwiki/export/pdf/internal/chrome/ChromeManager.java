@@ -21,6 +21,12 @@ package org.xwiki.export.pdf.internal.chrome;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
@@ -31,6 +37,11 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserManager;
 import org.xwiki.export.pdf.browser.BrowserTab;
 
@@ -50,13 +61,8 @@ import com.github.kklisura.cdt.services.types.ChromeVersion;
 @Component
 @Named("chrome")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class ChromeManager implements BrowserManager
+public class ChromeManager implements BrowserManager, Initializable, Disposable
 {
-    /**
-     * The number of seconds to wait for Chrome remote debugging before giving up.
-     */
-    static final int REMOTE_DEBUGGING_TIMEOUT = 10;
-
     @Inject
     private Logger logger;
 
@@ -74,9 +80,30 @@ public class ChromeManager implements BrowserManager
      */
     private ChromeDevToolsService browserDevToolsService;
 
+    /**
+     * The executor service used to make requests to the Chrome remote debugging service. We need this because the
+     * {@link ChromeService} implementation we rely on makes the HTTP requests using {@link java.net.HttpURLConnection}
+     * without setting any timeout which in some cases can lead to the thread being blocked indefinitely. The executor
+     * service allows us to overcome this by setting a timeout when waiting for {@link Future} results.
+     */
+    private ExecutorService executorService;
+
+    @Inject
+    private PDFExportConfiguration configuration;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.executorService = Executors.newCachedThreadPool();
+    }
+
     @Override
     public void connect(String host, int remoteDebuggingPort) throws TimeoutException
     {
+        if (this.executorService == null) {
+            throw new IllegalStateException("The Chrome Manager must be initialized before making a connection.");
+        }
+
         if (this.browserDevToolsService != null) {
             throw new IllegalStateException(
                 "Chrome is already connected. Please close the current connection before establishing a new one.");
@@ -86,7 +113,7 @@ public class ChromeManager implements BrowserManager
         this.chromeService = this.chromeServiceFactory.createChromeService(host, remoteDebuggingPort);
 
         // Create a new WebSocket session.
-        ChromeVersion chromeVersion = waitForChromeService(REMOTE_DEBUGGING_TIMEOUT);
+        ChromeVersion chromeVersion = waitForChromeService(this.configuration.getChromeRemoteDebuggingTimeout());
         this.browserDevToolsService = this.chromeServiceFactory.createBrowserDevToolsService(chromeVersion);
     }
 
@@ -94,15 +121,20 @@ public class ChromeManager implements BrowserManager
     public boolean isConnected()
     {
         try {
+            return getWithTimeout(() ->
             // Check the HTTP connection first.
-            return this.chromeService != null && this.chromeService.getVersion() != null
+            this.chromeService != null && this.chromeService.getVersion() != null
             // Then check the WebSocket connection.
-                && this.browserDevToolsService != null && this.browserDevToolsService.getBrowser().getVersion() != null;
+                && this.browserDevToolsService != null
+                && this.browserDevToolsService.getBrowser().getVersion() != null);
+        } catch (InterruptedException e) {
+            handleInterruptedException(e);
         } catch (Exception e) {
             this.logger.debug("The Chrome web browser is not connected. Root cause: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
-            return false;
         }
+
+        return false;
     }
 
     private ChromeVersion waitForChromeService(int timeoutSeconds) throws TimeoutException
@@ -110,23 +142,21 @@ public class ChromeManager implements BrowserManager
         this.logger.debug("Waiting [{}] seconds for Chrome to accept remote debugging connections.", timeoutSeconds);
 
         int timeoutMillis = timeoutSeconds * 1000;
-        long start = System.currentTimeMillis();
+        int retryIntervalSeconds = 2;
         Exception exception = null;
+        long start = System.currentTimeMillis();
 
         while (System.currentTimeMillis() - start < timeoutMillis) {
             try {
-                return this.chromeService.getVersion();
+                return getWithTimeout(() -> this.chromeService.getVersion());
             } catch (Exception e) {
                 exception = e;
-                this.logger.debug("Chrome remote debugging not available. Root cause: [{}]. Retrying in 2s.",
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Chrome remote debugging not available. Root cause: [{}]. Retrying in {}s.",
+                    ExceptionUtils.getRootCauseMessage(e), retryIntervalSeconds);
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(retryIntervalSeconds * 1000L);
                 } catch (InterruptedException ie) {
-                    this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
-                        ExceptionUtils.getRootCauseMessage(e));
-                    // Restore the interrupted state.
-                    Thread.currentThread().interrupt();
+                    handleInterruptedException(ie);
                 }
             }
         }
@@ -147,32 +177,107 @@ public class ChromeManager implements BrowserManager
             throw new IllegalStateException("The Chrome web browser is not connected.");
         }
 
-        this.logger.debug("Creating incognito tab.");
-        Target browserTarget = this.browserDevToolsService.getTarget();
+        Exception exception = null;
+        try {
+            return getWithTimeout(() -> {
+                this.logger.debug("Creating incognito tab.");
+                Target browserTarget = this.browserDevToolsService.getTarget();
 
-        String browserContextId = browserTarget.createBrowserContext(true, null, null);
-        this.logger.debug("Created browser context [{}].", browserContextId);
+                String browserContextId = browserTarget.createBrowserContext(true, null, null);
+                this.logger.debug("Created browser context [{}].", browserContextId);
 
-        String tabTargetId = browserTarget.createTarget("", null, null, browserContextId, false, false, false);
-        this.logger.debug("Created incognito tab [{}].", tabTargetId);
+                String tabTargetId = browserTarget.createTarget("", null, null, browserContextId, false, false, false);
+                this.logger.debug("Created incognito tab [{}].", tabTargetId);
 
-        Optional<ChromeTab> tab =
-            this.chromeService.getTabs().stream().filter(t -> tabTargetId.equals(t.getId())).findFirst();
-        if (tab.isPresent()) {
-            return new org.xwiki.export.pdf.internal.chrome.ChromeTab(
-                this.chromeService.createDevToolsService(tab.get()), this.browserDevToolsService);
-        } else {
-            throw new IOException(String.format("The incognito tab [%s] we just created is missing.", tabTargetId));
+                Optional<ChromeTab> tab =
+                    this.chromeService.getTabs().stream().filter(t -> tabTargetId.equals(t.getId())).findFirst();
+                if (tab.isPresent()) {
+                    return new org.xwiki.export.pdf.internal.chrome.ChromeTab(
+                        this.chromeService.createDevToolsService(tab.get()), this.browserDevToolsService,
+                        this.configuration);
+                } else {
+                    throw new IOException(
+                        String.format("The incognito tab [%s] we just created is missing.", tabTargetId));
+                }
+            });
+        } catch (InterruptedException e) {
+            exception = e;
+            // Restore the interrupted state.
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException | TimeoutException e) {
+            exception = e;
         }
+
+        throw new IOException("Failed to create incognito tab.", exception);
     }
 
     @Override
     public void close()
     {
+        // The Chrome Manager instance can be reused after being closed, by reconnecting to the Chrome remote debugging
+        // service.
         this.chromeService = null;
         if (this.browserDevToolsService != null) {
             this.browserDevToolsService.close();
             this.browserDevToolsService = null;
         }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // The Chrome Manager instance is unusable after being disposed.
+        close();
+        if (this.executorService != null) {
+            shutdownExecutorServiceAndAwaitTermination();
+            this.executorService = null;
+        }
+    }
+
+    /**
+     * Shutdown the Executor Service used to make requests to the Chrome remote debugging service and await for the
+     * current tasks to terminate. Code adapted from the {@link ExecutorService}'s usage examples.
+     */
+    private void shutdownExecutorServiceAndAwaitTermination()
+    {
+        // Disable new tasks from being submitted.
+        this.executorService.shutdown();
+        try {
+            int timeout = this.configuration.getChromeRemoteDebuggingTimeout();
+            // Wait a while for existing tasks to terminate.
+            if (!this.executorService.awaitTermination(timeout, TimeUnit.SECONDS)) {
+                // Cancel currently executing tasks.
+                this.executorService.shutdownNow();
+                // Wait a while for tasks to respond to being cancelled.
+                if (!this.executorService.awaitTermination(timeout, TimeUnit.SECONDS)) {
+                    this.logger.error("Chrome Manager's Executor Service did not terminate.");
+                }
+            }
+        } catch (InterruptedException e) {
+            // (Re-)Cancel if current thread also interrupted.
+            this.executorService.shutdownNow();
+            // Preserve interrupt status.
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private <T> T getWithTimeout(Callable<T> request) throws InterruptedException, ExecutionException, TimeoutException
+    {
+        if (this.executorService != null) {
+            Future<T> future = this.executorService.submit(request);
+            return future.get(this.configuration.getChromeRemoteDebuggingTimeout(), TimeUnit.SECONDS);
+        } else {
+            throw new IllegalStateException("The Chrome Manager must be initialized before making any requests.");
+        }
+    }
+
+    private void handleInterruptedException(InterruptedException e)
+    {
+        if (this.logger.isWarnEnabled()) {
+            this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+        // Restore the interrupted state.
+        Thread.currentThread().interrupt();
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf</artifactId>
-    <version>15.7-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-default</artifactId>
   <name>XWiki Platform - Export - PDF - Default</name>
@@ -34,7 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PDF Export Default API Implementation</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
     <!-- This extension needs to be installed on the root namespace because it uses a configuration source,
       PDFExportConfigurationSource, that uses a fixed cache id so it doesn't allow multiple instances (e.g. one per
       wiki). We could change the implementation to use a dynamic cache id based on the namespace where the configuration
@@ -98,21 +98,8 @@
       <groupId>com.github.kklisura.cdt</groupId>
       <artifactId>cdt-java-client</artifactId>
       <version>4.0.0</version>
-      <exclusions>
-        <!-- Chrome Developer Tools Java client depends on WebSocket API 1.1 which we can't use yet because we support
-          an older version of Jetty (9.4.x). Fortunately, it seems that the code is compatible with the WebSocket API
-          1.0 version that comes from our parent POM so we can force it for now. -->
-        <exclusion>
-          <groupId>javax.websocket</groupId>
-          <artifactId>javax.websocket-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
-    <!-- Replaces the 1.1 version coming as transitive dependency of cdt-java-client, see above. -->
-    <dependency>
-      <groupId>javax.websocket</groupId>
-      <artifactId>javax.websocket-api</artifactId>
-    </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

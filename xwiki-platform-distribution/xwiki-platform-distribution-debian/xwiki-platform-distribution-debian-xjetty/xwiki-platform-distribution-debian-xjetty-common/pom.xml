@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-distribution-debian-xjetty</artifactId>
+    <version>16.3.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-distribution-debian-xjetty-common</artifactId>
+  <name>XWiki Platform - Distribution - Debian - XJetty - Common</name>
+  <packaging>deb</packaging>
+  <description>XWiki XJetty common package</description>
+  <properties>
+    <debian.package>xwiki-xjetty-common</debian.package>
+
+    <jetty.filter.path>${project.build.directory}/jetty-filter</jetty.filter.path>
+    <jetty.path>${project.build.directory}/jetty</jetty.path>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
+      <version>16.3.0-SNAPSHOT</version>
+      <type>war</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+      <version>16.3.0-SNAPSHOT</version>
+      <type>zip</type>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <!-- Unpack the Jetty files to filter -->
+          <execution>
+            <id>unzip-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+                  <version>${platform.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${jetty.filter.path}</outputDirectory>
+              <includes>**/start_xwiki*.*</includes>
+            </configuration>
+          </execution>
+          <!-- Unpack the the Jetty files -->
+          <execution>
+            <id>unzip-jetty</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
+                  <version>${platform.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${jetty.path}</outputDirectory>
+              <excludes>**/start_xwiki*.*</excludes>
+            </configuration>
+          </execution>
+          <!-- Unpack the ROOT webapp -->
+          <execution>
+            <id>unzip-jettyrootwebapp</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
+                  <version>${platform.version}</version>
+                  <type>war</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${jetty.path}/webapps/root</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Filter a few files to replace variable -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>filter-jetty</id>
+            <!-- here the phase you need -->
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${jetty.path}</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>${jetty.filter.path}</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Produce deb package -->
+      <plugin>
+        <artifactId>jdeb</artifactId>
+        <groupId>org.vafer</groupId>
+        <configuration>
+          <dataSet combine.children="append">
+            <data>
+              <src>${project.basedir}/src/deb/resources/</src>
+              <type>directory</type>
+              <mapper>
+                <type>perm</type>
+                <prefix />
+              </mapper>
+              <conffile>true</conffile>
+            </data>
+            <data>
+              <src>${jetty.path}</src>
+              <type>directory</type>
+              <mapper>
+                <type>perm</type>
+                <prefix>/usr/lib/xwiki-jetty</prefix>
+              </mapper>
+            </data>
+
+            <!-- Add XWiki as Jetty webapp -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki-jetty/webapps/xwiki</linkName>
+              <linkTarget>/usr/lib/xwiki</linkTarget>
+            </data>
+
+            <!-- Redirect log to /var/log/xwiki -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki-jetty/logs</linkName>
+              <linkTarget>/var/log/xwiki</linkTarget>
+            </data>
+
+            <!-- Custom Jetty context configuration -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
+            </data>
+          </dataSet>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

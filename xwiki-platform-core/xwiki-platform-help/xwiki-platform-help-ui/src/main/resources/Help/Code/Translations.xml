@@ -149,7 +149,7 @@ help.start.title=Getting Started
 help.templates.article.description=Article page
 help.templates.article.title=Article
 help.templates.create.description=Integrate structure and macros in an existing page, and transform it in a template.
-help.templates.create.tip={0}Template Providers{1}  expose templates on the Create Page dialog so that the users can use them.
+help.templates.create.tip={0}Template Providers{1} expose templates on the Create Page dialog so that the users can use them.
 help.templates.create.title=Create your template
 help.templates.description=Templates are predefined pages that are copied when creating a new page.
 help.templates.encyclopedia.description=Encyclopedia page
@@ -192,6 +192,7 @@ help.videos.videoCard5.topic2=Learn how to use your application
 help.videos.videoCard6.title=Add / Remove Extensions
 help.videos.videoCard6.topic1=Discover how to add/remove extensions using the Extension Manager
 help.videos.videoCard6.topic2=Discover the XWiki Administration UI
+help.videos.hint=This video showcases XWiki features with a subtitled screencast without audio indications. The following documentation links provide a text alternative to this video.
 help.videos.watch=Watch
 
 ## Example Macro

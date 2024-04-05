@@ -20,7 +20,6 @@
 package org.xwiki.lesscss.resources;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Extends {@link LESSResourceReference} with wiki entity specific information.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 14.0RC1
  */
-@Unstable
 public interface WikiLESSResourceReference extends LESSResourceReference
 {
     /**

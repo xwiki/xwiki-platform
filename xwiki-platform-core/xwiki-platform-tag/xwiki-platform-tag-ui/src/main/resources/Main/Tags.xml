@@ -85,7 +85,7 @@ $xwiki.ssx.use('Main.Tags')##
       === $services.localization.render('xe.tag.alldocs', ["//${wikiEscapedTag}//"]) ===
 
       #if ($list.size()&gt; 0)
-        {{html}}#displayDocumentList($list false $blacklistedSpaces){{/html}}
+        {{html}}#displayDocumentList($list false $NULL){{/html}}
       #else
         (% class='noitems' %)$services.localization.render('xe.tag.notags')
       #end

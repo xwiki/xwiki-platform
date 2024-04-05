@@ -23,7 +23,8 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 #if($message)
 <div id="xwikimessage">$message</div>
 #end
@@ -31,6 +32,6 @@
 #template("recyclebinlist.vm")
 #xwikimessageboxend()
 <div class="clearfloats"></div>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")

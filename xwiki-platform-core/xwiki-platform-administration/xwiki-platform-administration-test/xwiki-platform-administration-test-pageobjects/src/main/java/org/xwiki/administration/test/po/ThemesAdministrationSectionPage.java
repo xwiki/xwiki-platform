@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -43,10 +45,16 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     private WebElement iconThemeInput;
 
     @FindBy(xpath = "//label[@class='colorTheme']//a[contains(text(), 'Customize')]")
-    private WebElement customizeButton;
+    private WebElement customizeColorThemeButton;
 
     @FindBy(xpath = "//a[contains(text(), 'Manage color themes')]")
     private WebElement manageColorThemesButton;
+
+    @FindBy(xpath = "//select[@id='XWiki.XWikiPreferences_0_skin']")
+    private WebElement skinInput;
+
+    @FindBy(xpath = "//label[@class='skin']//a[contains(text(), 'Customize')]")
+    private WebElement customizeSkinButton;
 
     /**
      * Default constructor.
@@ -160,11 +168,11 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     /**
      * Click on the 'customize' button
      */
-    public void clickOnCustomize()
+    public void clickOnCustomizeColorTheme()
     {
         getDriver().waitUntilElementIsVisible(
                 By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
-        customizeButton.click();
+        customizeColorThemeButton.click();
     }
 
     /**
@@ -175,5 +183,21 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     public void manageColorThemes()
     {
         manageColorThemesButton.click();
+    }
+
+    /**
+     * @since 15.9RC1
+     */
+    public void setSkin(String skinReference)
+    {
+        new SuggestInputElement(this.skinInput).sendKeys(skinReference).waitForSuggestions().sendKeys(Keys.ENTER);
+    }
+
+    /**
+     * @since 15.9RC1
+     */
+    public void clickOnCustomizeSkin()
+    {
+        this.customizeSkinButton.click();
     }
 }

@@ -1,0 +1,93 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Applications.Movies.Code.MoviesTranslations" locale="ko">
+  <web>Help.Applications.Movies.Code</web>
+  <name>MoviesTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>MoviesClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+Help.Applications.Movies.Code.MoviesClass_title1=제목
+Help.Applications.Movies.Code.MoviesClass_longText1=포스터
+Help.Applications.Movies.Code.MoviesClass_staticList1=장르
+Help.Applications.Movies.Code.MoviesClass_staticList1_action=행동
+Help.Applications.Movies.Code.MoviesClass_staticList1_comedy=코메디
+Help.Applications.Movies.Code.MoviesClass_staticList1_drama=드라마
+Help.Applications.Movies.Code.MoviesClass_staticList1_horror=공포
+Help.Applications.Movies.Code.MoviesClass_staticList1_musical=뮤지컬
+Help.Applications.Movies.Code.MoviesClass_staticList1_romance=로맨스
+Help.Applications.Movies.Code.MoviesClass_staticList1_sf=SF
+Help.Applications.Movies.Code.MoviesClass_staticList1_thriller=스릴러
+Help.Applications.Movies.Code.MoviesClass_date1=출시일
+Help.Applications.Movies.Code.MoviesClass_number1=런타임(분)
+Help.Applications.Movies.Code.MoviesClass_boolean1=본
+Help.Applications.Movies.Code.MoviesClass_databaseList1=감독
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Charlie\ Chaplin=찰리 채플린
+Help.Applications.Movies.Code.MoviesClass_databaseList1_Help.Applications.Contributors.Frank\ Capra=프랭크 카프라
+Help.Applications.Movies.Code.MoviesClass_content1=줄거리
+
+# Live table generic keys
+movies.livetable.doc.title=페이지 제목
+movies.livetable.doc.name=페이지 이름
+movies.livetable.doc.space=공간
+movies.livetable.doc.fullname=페이지 전체 이름
+movies.livetable.doc.location=위치
+movies.livetable.doc.author=마지막 저자
+movies.livetable.doc.creator=창조자
+movies.livetable.doc.date=날짜
+movies.livetable.doc.creationDate=생산 일
+movies.livetable._avatar=화신
+movies.livetable._images=이미지
+movies.livetable._attachments=첨부파일
+movies.livetable._actions=행위
+movies.livetable._actions.edit=편집하다
+movies.livetable._actions.delete=삭제
+movies.livetable.emptyvalue=-
+
+# Live table specific keys
+movies.livetable.title1=제목
+movies.livetable.longText1=포스터
+movies.livetable.staticList1=장르
+movies.livetable.date1=출시일
+movies.livetable.number1=런타임(분)
+movies.livetable.boolean1=본
+movies.livetable.databaseList1=감독
+movies.livetable.content1=줄거리
+
+# Other keys
+movies.entry.name=영화 산업
+
+# Deprecated keys
+movies.dataSpace.title=데이터
+</content>
+  </xwikidoc>

@@ -299,17 +299,19 @@
   #set ($count = $services.extension.index.security.getVulnerableExtensionsCount())
   #if ($count &gt; 0)
     #set ($discard = $xwiki.ssx.use('XWiki.Extension.Security.Code.NotificationAlert'))
-      {{error}}
-        #set ($securityVulnerabilitiesTitle = $services.localization.render('extension.security.admin.title'))
-        #set ($securityListUrl = $xwiki.getURL(
-          'XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&amp;section=XWiki.Extension.Security.Code.Admin'))
-        #set ($htmlLink =
-          "&lt;a href='$escapetool.xml($securityListUrl)'&gt;$escapetool.xml($securityVulnerabilitiesTitle)&lt;/a&gt;")
-        #set ($parameters = [$count, $htmlLink])
-        {{html wiki='false'}}
+    #set ($securityVulnerabilitiesTitle = $services.localization.render('extension.security.admin.title'))
+    #set ($securityListUrl = $xwiki.getURL(
+      'XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&amp;section=XWiki.Extension.Security.Code.Admin'))
+    #set ($htmlLink =
+      "&lt;a href='$escapetool.xml($securityListUrl)'&gt;$escapetool.xml($securityVulnerabilitiesTitle)&lt;/a&gt;")
+    #set ($parameters = [$count, $htmlLink])
+    {{html wiki='false' clean='false'}}
+      &lt;li&gt;
+        &lt;div class='box errormessage'&gt;
           $services.localization.render('extension.security.notification.message', $parameters)
-      {{/html}}
-    {{/error}}
+        &lt;/div&gt;
+      &lt;/li&gt;
+    {{/html}}
   #end
 #end
 {{/velocity}}</content>

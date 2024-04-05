@@ -24,7 +24,6 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration values for the attachment validation.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10
  */
 @Role
-@Unstable
 public interface AttachmentValidationConfiguration
 {
     /**

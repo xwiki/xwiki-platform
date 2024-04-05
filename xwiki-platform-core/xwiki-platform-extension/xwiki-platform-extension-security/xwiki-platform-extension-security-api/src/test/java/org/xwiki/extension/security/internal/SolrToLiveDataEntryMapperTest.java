@@ -22,20 +22,21 @@ package org.xwiki.extension.security.internal;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.script.ScriptContext;
 
 import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.index.internal.ExtensionIndexStore;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -66,9 +67,6 @@ class SolrToLiveDataEntryMapperTest
     private DocumentAccessBridge documentAccessBridge;
 
     @MockComponent
-    private ContextualLocalizationManager l10n;
-
-    @MockComponent
     private ExtensionIndexStore extensionIndexStore;
 
     @MockComponent
@@ -77,6 +75,8 @@ class SolrToLiveDataEntryMapperTest
     @MockComponent
     private TemplateManager templateManager;
 
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Mock
     private SolrDocument doc;
@@ -89,8 +89,10 @@ class SolrToLiveDataEntryMapperTest
     {
         when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(this.scriptContext);
         when(this.templateManager.renderNoException("extension/security/liveData/cveID.vm"))
-            .thenReturn("template content");
-        
+            .thenReturn("cveId template content");
+        when(this.templateManager.renderNoException("extension/security/liveData/advice.vm"))
+            .thenReturn("advice template content");
+
         when(this.extensionIndexStore.getExtensionId(this.doc)).thenReturn(new ExtensionId("org.test:ext", "7.5"));
         when(this.doc.get(FieldUtils.NAME)).thenReturn("Ext Name");
         when(this.solrUtils.get(FieldUtils.NAME, this.doc)).thenReturn("Ext Name");
@@ -102,15 +104,15 @@ class SolrToLiveDataEntryMapperTest
             "wiki:xwiki",
             "{root}",
             "wiki:s1"));
-        when(this.l10n.getTranslationPlain("translation.key")).thenReturn("Translation Value");
         assertEquals(Map.of(
-            "cveID", "template content",
+            "cveID", "cveId template content",
             "fixVersion", "",
             "maxCVSS", 5.0,
-            "advice", "Translation Value",
+            "advice", "advice template content",
             "name",
             "<a href='null' title='Ext Name'>Ext Name</a><br/><span class='xHint' title='org.test:ext/7.5'>org.test:ext/7.5</span>",
-            "wikis", "xwiki, s1"
+            "wikis", "xwiki, s1",
+            "extensionId", "org.test:ext/7.5"
         ), this.mapper.mapDocToEntries(this.doc));
     }
 }

@@ -48,4 +48,10 @@ public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermission
     {
         return !context.getTransformationContext().isRestricted() && getAuthorizationManager().hasAccess(Right.SCRIPT);
     }
+
+    @Override
+    public Right getRequiredRight(ScriptMacroParameters parameters)
+    {
+        return Right.SCRIPT;
+    }
 }

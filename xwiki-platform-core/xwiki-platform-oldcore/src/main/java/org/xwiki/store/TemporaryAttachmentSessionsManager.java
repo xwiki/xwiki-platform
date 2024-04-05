@@ -29,7 +29,6 @@ import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,7 +42,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 14.3RC1
  */
-@Unstable
 @Role
 public interface TemporaryAttachmentSessionsManager
 {
@@ -75,7 +73,6 @@ public interface TemporaryAttachmentSessionsManager
      *     filesize is reached)
      * @since 14.9RC1
      */
-    @Unstable
     XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException;
 
@@ -91,7 +88,6 @@ public interface TemporaryAttachmentSessionsManager
      * @throws TemporaryAttachmentException in case of problem when performing the link
      * @since 14.10
      */
-    @Unstable
     void temporarilyAttach(XWikiAttachment attachment, DocumentReference documentReference)
         throws TemporaryAttachmentException;
 
@@ -159,7 +155,6 @@ public interface TemporaryAttachmentSessionsManager
      * @param fileNames the names of the uploaded files to attach
      * @since 14.10
      */
-    @Unstable
     default void attachTemporaryAttachmentsInDocument(XWikiDocument document, List<String> fileNames)
     {
     }

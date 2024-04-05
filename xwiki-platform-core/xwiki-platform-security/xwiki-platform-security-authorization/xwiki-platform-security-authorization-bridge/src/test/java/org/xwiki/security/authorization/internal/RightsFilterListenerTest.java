@@ -39,6 +39,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 
 /**
@@ -135,5 +136,27 @@ public class RightsFilterListenerTest
 
         assertNotEquals(before, document);
         assertEquals(document.getOriginalDocument(), document);
+    }
+
+    @Test
+    void removedDeniedRightObject() throws XWikiException, AccessDeniedException
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        document.setOriginalDocument(document.clone());
+        BaseObject rightObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, oldcore.getXWikiContext());
+        rightObject.setStringValue("levels", "view");
+        document.setOriginalDocument(document.clone());
+        document.removeXObjects(XWikiRightsDocumentInitializer.CLASS_REFERENCE);
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.VIEW, null,
+            document.getDocumentReference());
+
+        XWikiDocument before = document.clone();
+        this.listener.onEvent(new UserUpdatingDocumentEvent(), document, null);
+
+        assertEquals(document.getOriginalDocument(), document);
+        assertTrue(document.getXObjectsToRemove().isEmpty());
+        assertNotEquals(before, document);
     }
 }

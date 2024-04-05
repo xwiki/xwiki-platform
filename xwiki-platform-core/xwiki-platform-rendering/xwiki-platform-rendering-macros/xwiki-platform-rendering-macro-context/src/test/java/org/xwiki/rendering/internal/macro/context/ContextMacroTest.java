@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.context;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
@@ -44,6 +45,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
 import org.xwiki.rendering.macro.context.TransformationContextMode;
 import org.xwiki.rendering.syntax.Syntax;
@@ -78,7 +80,7 @@ import static org.mockito.Mockito.when;
  * @since 8.3RC1
  */
 @ComponentTest
-@ComponentList(TestEnvironment.class)
+@ComponentList({TestEnvironment.class, ContextMacroDocument.class})
 class ContextMacroTest
 {
     private static final DocumentReference AUTHOR = new DocumentReference("wiki", "XWiki", "author");
@@ -248,7 +250,7 @@ class ContextMacroTest
             DocumentModelBridge dmb = mock(DocumentModelBridge.class);
             when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
             targetXDOM = new XDOM(Arrays.asList(new WordBlock("word")), metadata);
-            when(dmb.getXDOM()).thenReturn(targetXDOM);
+            when(dmb.getPreparedXDOM()).thenReturn(targetXDOM);
 
             parameters.setDocument("target");
             parameters.setTransformationContext(mode);
@@ -282,5 +284,15 @@ class ContextMacroTest
             assertSame(targetXDOM, configuration.getXDOM());
         }
         assertEquals(restrictedContext ? true : restricted, configuration.isResricted());
+    }
+
+    @Test
+    void prepare() throws MacroPreparationException
+    {
+        MacroBlock macroBlock = new MacroBlock("cotext", Map.of(), false);
+
+        this.macro.prepare(macroBlock);
+
+        verify(this.parser).prepareContentWiki(macroBlock);
     }
 }

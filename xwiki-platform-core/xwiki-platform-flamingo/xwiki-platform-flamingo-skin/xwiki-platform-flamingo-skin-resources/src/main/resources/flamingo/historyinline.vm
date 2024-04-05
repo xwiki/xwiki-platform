@@ -34,9 +34,7 @@
 #set ($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
 #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-#set ($versions = $tdoc.getRevisions($criteria))
-#set ($discard = $collectiontool.reverseModifiable($versions))
-#set ($totalVersions = $versions.size())
+#set ($totalVersions = $tdoc.getRevisionsCount($criteria))
 #if ($totalVersions == 0)
   #warning ($services.localization.render('core.viewers.history.empty'))
 #else
@@ -137,11 +135,11 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #end
     #if ($displayCompare)
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))">
-        <label class="hidden" for="rev1_$version">$escapetool.xml($services.localization.render('core.viewers.history.from'))</label>
+        <label class="sr-only" for="rev1_$version">$escapetool.xml($services.localization.render('core.viewers.history.from'))</label>
         <input type="radio" name="rev1" id="rev1_$version" value="$version" #if ($foreach.count==2) checked="checked" #end/>
       </td>
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))">
-        <label class="hidden" for="rev2_$version">$escapetool.xml($services.localization.render('core.viewers.history.to'))</label>
+        <label class="sr-only" for="rev2_$version">$escapetool.xml($services.localization.render('core.viewers.history.to'))</label>
         <input type="radio" name="rev2" id="rev2_$version" value="$version" #if ($foreach.count==1) checked="checked" #end/>
       </td>
     #end

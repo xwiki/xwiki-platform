@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po.editor;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -39,6 +40,15 @@ public class PreviewableEditPage extends EditPage
     public WebElement getPreviewButton()
     {
         return this.preview;
+    }
+
+    /**
+     * @return {@code true} if the preview button is present and displayed, {@code false} otherwise.
+     */
+    public boolean hasPreviewButton()
+    {
+        return getDriver().findElementsWithoutWaiting(By.name("action_preview")).stream()
+            .anyMatch(WebElement::isDisplayed);
     }
 
     /**

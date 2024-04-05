@@ -19,6 +19,11 @@
  */
 // Bridge custom XWiki events between Prototype.js and jQuery.
 define(['jquery'], function($) {
+  if (!window.Prototype) {
+    // Prototype.js is not loaded so there's no need to bridge the events.
+    return;
+  }
+
   var oldJQueryTrigger = $.event.trigger;
   var oldPrototypeFire = Element.fire;
 

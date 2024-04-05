@@ -237,9 +237,17 @@ public class DefaultTemplateManager implements TemplateManager
     }
 
     @Override
+    @Deprecated(since = "15.9RC1")
     public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
         throws Exception
     {
-        return this.templateManager.createStringTemplate(content, author, sourceReference);
+        return createStringTemplate("Unknown template", content, author, sourceReference);
+    }
+
+    @Override
+    public Template createStringTemplate(String id, String content, DocumentReference author,
+        DocumentReference sourceReference) throws Exception
+    {
+        return this.templateManager.createStringTemplate(id, content, author, sourceReference);
     }
 }

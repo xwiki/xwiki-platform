@@ -39,6 +39,11 @@ public class WCAGUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(WCAGUtils.class);
 
+    private static final String FILENAME_OVERVIEW = "wcagOverview.txt";
+    private static final String FILENAME_INCOMPLETE = "wcagIncompletes.txt";
+    private static final String FILENAME_WARNING = "wcagWarnings.txt";
+    private static final String FILENAME_FAILING = "wcagFails.txt";
+
     /**
      * Cached accessibility results.
      */
@@ -47,10 +52,12 @@ public class WCAGUtils
     /**
      * @param wcag true if WCAG tests must be executed, false otherwise
      * @param testClassName the PO class name to use for logging and reporting
+     * @param stopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
      */
-    public void setupWCAGValidation(boolean wcag, String testClassName)
+    public void setupWCAGValidation(boolean wcag, String testClassName, boolean stopOnError)
     {
         this.wcagContext.setWCAGEnabled(wcag);
+        this.wcagContext.setWCAGStopOnError(stopOnError);
         if (wcag) {
             LOGGER.info("WCAG validation is enabled.");
             wcagContext.setTestClassName(testClassName);
@@ -91,8 +98,11 @@ public class WCAGUtils
     }
 
     /**
-     * Writes the WCAG validation results into a report file.
-     *
+     * Writes the WCAG validation results into report files. There are four files:
+     * * wcagOverview : overview of the results, contains stats and will always be generated.
+     * * wcagIncomplete : list of the results that are Incomplete and need further manual inspection.
+     * * wcagWarnings : list of the results that are violations, not failing the build.
+     * * wcagFails : list of the results that are violations, failing the build.
      * @throws IOException if the directory creation fails
      */
     public void writeWCAGResults() throws IOException
@@ -102,29 +112,36 @@ public class WCAGUtils
             getWCAGContext().getTestClassName(), totalTime);
 
         File wcagDir = new File(getWCAGReportPathOnHost());
+        Files.createDirectory(wcagDir.toPath());
+        File overviewFile = new File(wcagDir, WCAGUtils.FILENAME_OVERVIEW);
+        WCAGContext.writeWCAGReportToFile(overviewFile, this.wcagContext.buildOverview());
+
+        if (this.wcagContext.hasWCAGIncomplete()) {
+            LOGGER.error(
+                "There are [{}] incomplete accessibility checks in the test suite. See [{}/{}] for more details.",
+                this.wcagContext.getWCAGIncompleteCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_INCOMPLETE);
+            File incompleteFile = new File(wcagDir, WCAGUtils.FILENAME_INCOMPLETE);
+            WCAGContext.writeWCAGReportToFile(incompleteFile, this.wcagContext.buildIncompleteReport());
+        }
         if (this.wcagContext.hasWCAGWarnings()) {
-            String outputName = "wcagWarnings.txt";
             LOGGER.warn("There are [{}] accessibility warnings in the test suite. See [{}/{}] for more details.",
-                this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), outputName);
+                this.wcagContext.getWCAGWarnCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_WARNING);
             logViolationCount(false);
-            if (!wcagDir.exists()) {
-                Files.createDirectory(wcagDir.toPath());
-            }
-            File warningsFile = new File(wcagDir, outputName);
+            File warningsFile = new File(wcagDir, WCAGUtils.FILENAME_WARNING);
             WCAGContext.writeWCAGReportToFile(warningsFile, this.wcagContext.buildWarningsReport());
         }
         if (this.wcagContext.hasWCAGFails()) {
-            if (!wcagDir.exists()) {
-                Files.createDirectory(wcagDir.toPath());
-            }
-            String outputName = "wcagFails.txt";
-            LOGGER.error("There are [{}] accessibility fails in the test suite.", this.wcagContext.getWCAGFailCount());
+            LOGGER.error("There are [{}] accessibility fails in the test suite. See [{}/{}] for more details.",
+                this.wcagContext.getWCAGFailCount(), getWCAGReportPathOnHost(), WCAGUtils.FILENAME_FAILING);
             logViolationCount(true);
-            File failsFile = new File(wcagDir, outputName);
+            File failsFile = new File(wcagDir, WCAGUtils.FILENAME_FAILING);
             WCAGContext.writeWCAGReportToFile(failsFile, this.wcagContext.buildFailsReport());
         }
     }
 
+    /**
+     * Logs the number of violations at the level of the test suite.
+     */
     private void logViolationCount(boolean isFailingViolations)
     {
         Map<String, Integer> violationCounts = wcagContext.getViolationCountPerRule();

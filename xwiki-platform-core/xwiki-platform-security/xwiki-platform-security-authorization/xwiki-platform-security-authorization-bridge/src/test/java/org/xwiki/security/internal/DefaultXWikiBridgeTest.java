@@ -19,6 +19,8 @@
  */
 package org.xwiki.security.internal;
 
+import java.util.Map;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.PageReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -35,7 +38,11 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -87,5 +94,49 @@ public class DefaultXWikiBridgeTest
             this.oldcore.getXWikiContext());
 
         assertEquals(documentReference, this.bridge.toCompatibleEntityReference(pageReference));
+    }
+
+    @Test
+    void toCompatibleEntityReferenceWithParameters()
+    {
+        SpaceReference parentReference = new SpaceReference("wiki", "space");
+        DocumentReference documentReference = new DocumentReference("page", parentReference, Map.of("param", "value"));
+        DocumentReference noParameterReference = new DocumentReference("page", parentReference);
+
+        when(this.currentResolver.resolve(any(), eq(EntityType.DOCUMENT)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        EntityReference actual = this.bridge.toCompatibleEntityReference(documentReference);
+        assertEquals(noParameterReference, actual);
+        assertNotEquals(documentReference, actual);
+        assertSame(parentReference, actual.getParent());
+    }
+
+    @Test
+    void toCompatibleEntityReferenceWithRecursiveParameters()
+    {
+        EntityReference wikiReference = new EntityReference("wiki", EntityType.WIKI, Map.of("wiki", "wikiValue"));
+        EntityReference spaceReference = new EntityReference("space", EntityType.SPACE, wikiReference,
+            Map.of("space", "spaceValue"));
+        DocumentReference documentReference = new DocumentReference("page", spaceReference, Map.of("param", "value"));
+        DocumentReference noParameterReference = new DocumentReference("wiki", "space", "page");
+
+        when(this.currentResolver.resolve(any(), eq(EntityType.DOCUMENT)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        EntityReference actual = this.bridge.toCompatibleEntityReference(documentReference);
+        assertEquals(noParameterReference, actual);
+        assertNotEquals(documentReference, actual);
+    }
+
+    @Test
+    void toCompatibleEntityReferenceWithoutParametersReturnsSame()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+        when(this.currentResolver.resolve(any(), eq(EntityType.DOCUMENT)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        assertSame(documentReference, this.bridge.toCompatibleEntityReference(documentReference));
     }
 }

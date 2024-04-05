@@ -1,1 +1,4 @@
 org.xwiki.rendering.internal.macro.context.ContextMacro
+org.xwiki.rendering.internal.macro.context.ContextMacroDocument
+org.xwiki.rendering.internal.macro.context.ContextMacroRequiredRightsAnalyzer
+

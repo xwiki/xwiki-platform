@@ -449,16 +449,23 @@ public class DefaultNotificationParametersFactory
         enableAllEventTypes(notificationParameters);
 
         String wikis = parameters.get(ParametersKey.WIKIS);
+        String pages = parameters.get(ParametersKey.PAGES);
+        String spaces = parameters.get(ParametersKey.SPACES);
+        // For legacy reason, we need to consider that by default, in the absence of any watched entity (i.e., wiki, 
+        // space or page), the whole wiki is watched.
+        // Otherwise, only the events matching an explicitly defined filter would be allowed.
+        String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
+        if (StringUtils.isEmpty(wikis) && StringUtils.isEmpty(spaces) && StringUtils.isEmpty(pages)) {
+            wikis = currentWikiId;
+        }
         String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
 
         if (StringUtils.isEmpty(currentWiki)) {
-            currentWiki = wikiDescriptorManager.getCurrentWikiId();
+            currentWiki = currentWikiId;
         }
 
-        handleLocationParameter(parameters.get(ParametersKey.PAGES), notificationParameters,
-            NotificationFilterProperty.PAGE, currentWiki);
-        handleLocationParameter(parameters.get(ParametersKey.SPACES), notificationParameters,
-            NotificationFilterProperty.SPACE, currentWiki);
+        handleLocationParameter(pages, notificationParameters, NotificationFilterProperty.PAGE, currentWiki);
+        handleLocationParameter(spaces, notificationParameters, NotificationFilterProperty.SPACE, currentWiki);
         handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
 
         handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);

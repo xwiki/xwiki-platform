@@ -154,6 +154,15 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String SUFFIX_PROP_REQUEST_REMOTE_ADDR = "remoteAddr";
 
     /**
+     * The suffix of the entry containing the request session.
+     * 
+     * @since 14.10.18
+     * @since 15.5.3
+     * @since 15.9RC1
+     */
+    public static final String SUFFIX_PROP_REQUEST_SESSION = "session";
+
+    /**
      * The suffix of the entry containing the request wiki.
      * 
      * @since 10.11RC1
@@ -201,6 +210,15 @@ public class XWikiContextContextStore extends AbstractContextStore
      * @since 14.10
      */
     public static final String PROP_REQUEST_REMOTE_ADDR = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_REMOTE_ADDR;
+
+    /**
+     * Name of the entry containing the request session.
+     * 
+     * @since 14.10.18
+     * @since 15.5.3
+     * @since 15.9RC1
+     */
+    public static final String PROP_REQUEST_SESSION = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_SESSION;
 
     /**
      * Name of the entry containing the request wiki.
@@ -271,7 +289,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     {
         super(PROP_WIKI, PROP_USER, PROP_LOCALE, PROP_ACTION, PROP_REQUEST_BASE, PROP_REQUEST_URL,
             PROP_REQUEST_PARAMETERS, PROP_REQUEST_HEADERS, PROP_REQUEST_COOKIES, PROP_REQUEST_REMOTE_ADDR,
-            PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE, PROP_DOCUMENT_REVISION);
+            PROP_REQUEST_SESSION, PROP_REQUEST_WIKI, PROP_DOCUMENT_REFERENCE, PROP_DOCUMENT_REVISION);
     }
 
     @Override
@@ -349,6 +367,10 @@ public class XWikiContextContextStore extends AbstractContextStore
                         saveRequestRemoteAddr(contextStore, request);
                         break;
 
+                    case SUFFIX_PROP_REQUEST_SESSION:
+                        saveRequestSession(contextStore, request);
+                        break;
+
                     case SUFFIX_PROP_REQUEST_WIKI:
                         contextStore.put(key, xcontext.getOriginalWikiId());
                         break;
@@ -418,6 +440,11 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_REMOTE_ADDR, request.getRemoteAddr());
     }
 
+    private void saveRequestSession(Map<String, Serializable> contextStore, XWikiRequest request)
+    {
+        contextStore.put(PROP_REQUEST_SESSION, new SerializableHttpSessionWrapper(request.getSession()));
+    }
+
     private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
     {
         saveRequestURL(contextStore, request);
@@ -425,6 +452,7 @@ public class XWikiContextContextStore extends AbstractContextStore
         saveRequestHeaders(contextStore, request);
         saveRequestCookies(contextStore, request);
         saveRequestRemoteAddr(contextStore, request);
+        saveRequestSession(contextStore, request);
     }
 
     @Override
@@ -602,6 +630,10 @@ public class XWikiContextContextStore extends AbstractContextStore
 
         // TODO: customize the document with what's in the contextStore if any
 
-        xcontext.setDoc(document);
+        // Put a cloned document in the context so that it's not confused with the document coming from the document
+        // cache. The same is done by XWiki#prepareDocuments(). This ensures for instance that the sheet specified in
+        // the execution context is applied only to the context document and not to the document retrieved from the
+        // cache.
+        xcontext.setDoc(document.clone());
     }
 }

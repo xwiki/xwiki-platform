@@ -52,6 +52,7 @@ image.style.administration.liveData.type.hint=Тип стиля изображе
 image.style.administation.newImageStyle.label=Новый стиль изображений
 image.style.administation.newImageStyle.hint=Идентификатор нового стиля изображений.
 image.style.administation.newImageStyle.placeHolder=Идентификатор
+image.style.administation.newImageStyle.normalizedTitle=Новый стиль изображения, в соответствии с соглашениями об именовании, имеет вид [{0}].
 Image.Style.Code.ImageStyleClass_adjustableAlignment=Настраиваемое выравнивание
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Если галочка установлена, пользователь может настраивать выравнивание изображения.
 Image.Style.Code.ImageStyleClass_adjustableBorder=Настраиваемая рамка
@@ -82,5 +83,7 @@ Image.Style.Code.ImageStyleClass_type=Тип
 Image.Style.Code.ImageStyleClass_type_hint=Тип стиля изображений (используется как класс css).
 Image.Style.Code.ConfigurationClass_defaultStyle=Стиль по умолчанию
 Image.Style.Code.ConfigurationClass_defaultStyle_hint=Стиль изображений по умолчанию для этой вики.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Сохранять стиль по умолчанию
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Если флажок установлен, то в конфигурации изображения принудительно сохраняются настройки стиля по умолчанию, и пользователю придется изменять стиль самостоятельно.
 </content>
 </xwikidoc>

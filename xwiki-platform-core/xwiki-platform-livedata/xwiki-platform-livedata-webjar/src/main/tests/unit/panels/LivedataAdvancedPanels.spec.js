@@ -23,7 +23,7 @@ import Vue from "vue";
 
 describe('LivedataAdvancedPanels.vue', () => {
   it('Renders the given panel', async () => {
-    let component = Vue.component('test', {
+    let component = Vue.component('LdTest', {
       template: '<span>Hello World from {{ panel.id }}!</span>',
       props: {panel: Object}
     });

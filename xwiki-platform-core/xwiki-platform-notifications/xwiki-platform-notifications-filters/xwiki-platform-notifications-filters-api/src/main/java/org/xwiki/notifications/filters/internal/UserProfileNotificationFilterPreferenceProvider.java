@@ -52,58 +52,65 @@ public class UserProfileNotificationFilterPreferenceProvider implements Notifica
 
     @Inject
     @Named("cached")
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(DocumentReference user) throws NotificationException
     {
-        return this.modelBridge.getFilterPreferences(user);
+        return this.filterPreferencesModelBridge.getFilterPreferences(user);
     }
 
     @Override
     public Set<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
         throws NotificationException
     {
-        return this.modelBridge.getFilterPreferences(wikiReference);
+        return this.filterPreferencesModelBridge.getFilterPreferences(wikiReference);
     }
 
     @Override
     public void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> filterPreferences)
         throws NotificationException
     {
-        this.modelBridge.saveFilterPreferences(user, filterPreferences);
+        this.filterPreferencesModelBridge.saveFilterPreferences(user, filterPreferences);
     }
 
     @Override
     public void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException
     {
-        this.modelBridge.deleteFilterPreference(user, filterPreferenceId);
+        this.filterPreferencesModelBridge.deleteFilterPreference(user, filterPreferenceId);
+    }
+
+    @Override
+    public void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        this.filterPreferencesModelBridge.deleteFilterPreferences(user, filterPreferenceIds);
     }
 
     @Override
     public void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
-        this.modelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
+        this.filterPreferencesModelBridge.deleteFilterPreference(wikiReference, filterPreferenceId);
     }
 
     @Override
     public void setFilterPreferenceEnabled(DocumentReference user, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {
-        this.modelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
+        this.filterPreferencesModelBridge.setFilterPreferenceEnabled(user, filterPreferenceId, enabled);
     }
 
     @Override
     public void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {
-        this.modelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
+        this.filterPreferencesModelBridge.setFilterPreferenceEnabled(wikiReference, filterPreferenceId, enabled);
     }
 
     @Override
     public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
     {
-        this.modelBridge.setStartDateForUser(user, startDate);
+        this.filterPreferencesModelBridge.setStartDateForUser(user, startDate);
     }
 }

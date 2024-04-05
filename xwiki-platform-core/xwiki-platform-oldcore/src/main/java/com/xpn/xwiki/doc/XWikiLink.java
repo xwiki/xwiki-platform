@@ -21,7 +21,6 @@ package com.xpn.xwiki.doc;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -88,7 +87,6 @@ public class XWikiLink
      * @param type the type of the used entity
      * @since 14.2RC1
      */
-    @Unstable
     public XWikiLink(long docId, String link, String fullName, String type)
     {
         this.setDocId(docId);
@@ -103,7 +101,6 @@ public class XWikiLink
      * @return the synthetic id of this deleted attachment. Uniquely identifies a link
      * @since 14.2RC1
      */
-    @Unstable
     public long getId()
     {
         return this.id;
@@ -165,7 +162,6 @@ public class XWikiLink
      * @param type the type of the link (e.g., document or attachment)
      * @since 14.2RC1
      */
-    @Unstable
     public void setType(String type)
     {
         this.type = type;
@@ -175,7 +171,6 @@ public class XWikiLink
      * @return the type of the link (e.g., document or attachment)
      * @since 14.2RC1
      */
-    @Unstable
     public String getType()
     {
         return this.type;
@@ -185,7 +180,6 @@ public class XWikiLink
      * @param attachmentName the name of the attachment if the link is an attachment, {@code null} otherwise
      * @since 14.2RC1
      */
-    @Unstable
     public void setAttachmentName(String attachmentName)
     {
         this.attachmentName = attachmentName;
@@ -195,7 +189,6 @@ public class XWikiLink
      * @return the name of the attachment if the link is an attachment, {@code null} otherwise
      * @since 14.2RC1
      */
-    @Unstable
     public String getAttachmentName()
     {
         return this.attachmentName;

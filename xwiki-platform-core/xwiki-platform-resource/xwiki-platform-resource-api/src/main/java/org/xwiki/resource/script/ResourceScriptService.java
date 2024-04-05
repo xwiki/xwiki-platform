@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the Resource API to server-side scripts.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(ResourceScriptService.ROLE_HINT)
 @Singleton
-@Unstable
 public class ResourceScriptService implements ScriptService
 {
     /**

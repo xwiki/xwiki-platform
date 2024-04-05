@@ -357,76 +357,54 @@ dl.export-tree-legend dt + dd {
 
 // Viewer = changes -----------------------------------------------------------
 #changes-info {
-  background-color: @xwiki-background-secondary-color;
-  border: @border-width solid @xwiki-border-color;
   margin-top: (@grid-gutter-width / 2);
   margin-bottom: (@grid-gutter-width / 2);
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
   position: relative;
-  /* Background arrow */
-  &:before {
-    background: @xwiki-page-content-bg;
-    height: 2em;
-    right: 50%;
-    top: 4em;
-    width: 2em;
-  }
-  &:after {
-    border-bottom: 2em solid transparent;
-    border-left: 3em solid @xwiki-page-content-bg;
-    border-top: 2em solid transparent;
-    left: 50%;
-    top: 3em;
-  }
-  &:before, &:after {
-    content: "";
-    display: block;
-    position: absolute;
-  }
 }
 
 #changes-info-boxes {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  column-gap: 5vw;
+  row-gap: 1vh;
 }
 
 .changes-info-box {
   flex: 1;
-  padding: 0 (@main-padding / 2);
-}
-
-.changes-info-box, #changes-info-comment {
+  padding: (@main-padding / 4) (@main-padding / 2);
+  background-color: @xwiki-background-secondary-color;
+  border-radius: @border-radius-large;
   text-align: center;
 }
 
 .changes-info-title {
   .h3;
-}
-
-@media (max-width: @screen-xs-max) {
-  #changes-info:before, #changes-info:after {
-    display: none; /* Hide the arrow for small resolutions */
-  }
+  margin-top: 0;
 }
 
 .changes-version {
   white-space: nowrap;
 }
 
+.changes-arrow {
+  font-size: inherit;
+}
+
 .changes-arrow, .changes-arrow-left, .changes-arrow-right {
   &, &:hover, &:active, &:visited, &:focus {
-    color: @xwiki-page-content-bg;
-    text-decoration: none;
+    vertical-align: baseline;
     font-weight: 700;
   }
 }
 
-.changes-arrow-left, .changes-arrow-right {
-  font-size: 7em;
-  line-height: 1;
+#changes-arrows-box {
+  font-size: 1.5em;
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .changes-body > .changes-body-header {
@@ -502,6 +480,11 @@ a.html-diff-context-toggle {
 // Tree Webjar (XWIKI-15089) ---------------------------------------------------
 .skin-flamingo .jstree-xwiki .jstree-clicked {
   background-color: @nav-link-hover-bg; /* $theme.highlightColor */
+  border-radius: @border-radius-small;
+}
+
+.skin-flamingo .jstree-xwiki .jstree-anchor:hover {
+  border-radius: @border-radius-small;
 }
 
 .previewdiff-diff-options {

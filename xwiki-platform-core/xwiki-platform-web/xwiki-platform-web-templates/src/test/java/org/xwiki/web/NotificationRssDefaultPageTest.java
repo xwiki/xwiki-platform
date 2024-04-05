@@ -20,17 +20,23 @@
 package org.xwiki.web;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.script.ScriptContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.script.EventStreamScriptService;
+import org.xwiki.localization.script.LocalizationScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
@@ -60,6 +66,12 @@ class NotificationRssDefaultPageTest extends PageTest
 
     private static final String RSS_TEMPLATE = "notification/rss/default.vm";
 
+    @Mock
+    private EventStreamScriptService eventStreamScriptService;
+
+    @Mock
+    private LocalizationScriptService localizationScriptService;
+
     private TemplateManager templateManager;
 
     private ScriptContext scriptContext;
@@ -70,6 +82,8 @@ class NotificationRssDefaultPageTest extends PageTest
         this.scriptContext = this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class)
             .getCurrentScriptContext();
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "eventstream", this.eventStreamScriptService);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "localization", this.localizationScriptService);
     }
 
     @Test
@@ -88,6 +102,21 @@ class NotificationRssDefaultPageTest extends PageTest
         Date testDate = mock(Date.class);
         when(this.oldcore.getSpyXWiki().formatDate(testDate, null, this.context)).thenReturn("<formattedDate>");
 
+        // Mock the application name
+        String eventType = "test&type";
+        RecordableEventDescriptor recordableEventDescriptor = mock(RecordableEventDescriptor.class);
+        when(this.eventStreamScriptService.getDescriptorForEventType(eventType, true))
+            .thenReturn(recordableEventDescriptor);
+        when(recordableEventDescriptor.getApplicationName()).thenReturn("eventType.translationKey");
+        when(this.localizationScriptService.render("eventType.translationKey")).thenReturn("RSS Event Test&Type");
+        when(this.localizationScriptService.render("notifications.events.by", Syntax.HTML_5_0, List.of("First & Name")))
+            .thenReturn("Event by: [First &amp; Name]");
+
+        String expectedDiffLink = "<a href='http://null:0/xwiki/bin/view/Test/?viewer=changes&#38;rev1=1.1&#38;"
+            + "rev2=2.1'>2.1</a>";
+        when(this.localizationScriptService.render("notifications.rss.seeChanges", List.of(expectedDiffLink)))
+            .thenReturn(String.format("See changes: [%s]", expectedDiffLink));
+
         Event testEvent = new DefaultEvent();
         testEvent.setApplication("test&app");
         testEvent.setType("test&type");
@@ -98,15 +127,15 @@ class NotificationRssDefaultPageTest extends PageTest
         this.scriptContext.setAttribute("event", new CompositeEvent(testEvent), ScriptContext.GLOBAL_SCOPE);
         String result = this.templateManager.render(RSS_TEMPLATE);
         assertEquals("<p>\n"
-            + "  <strong>test&#38;app: [test&#38;type]</strong>\n"
+            + "  <strong>RSS Event Test&#38;Type</strong>\n"
             + "      <a href=\"http://null:0/xwiki/bin/view/Test/\">Hello &amp; Co</a>\n"
             + "    .<br/>\n"
-            + "  notifications.events.by [First &amp; Name]\n"
+            + "  Event by: [First &amp; Name]\n"
             + "</p>\n"
             + "<p>\n"
             + "  &#60;formattedDate&#62;\n"
             + "<br/>\n"
-            + "  notifications.rss.seeChanges "
+            + "  See changes: "
             + "[<a href='http://null:0/xwiki/bin/view/Test/?viewer=changes&#38;rev1=1.1&#38;rev2=2.1'>2.1</a>]\n"
             + "</p>", result.trim());
     }

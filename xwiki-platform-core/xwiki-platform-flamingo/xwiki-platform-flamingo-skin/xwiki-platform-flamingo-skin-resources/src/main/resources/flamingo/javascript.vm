@@ -61,6 +61,7 @@
 ## Note that we have to declare momentjs as a RequireJS package in order to be able to load momentjs locales on demand
 ## using RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
 ##
+#set ($jqueryMigrateId = 'org.webjars.npm:jquery-migrate')
 #set ($requireConfig = {
   'packages': [
     {
@@ -76,16 +77,16 @@
   'paths': {
     'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
-    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/drawer${jsExtension}""))",
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
-    'jquery-migrate': "#removeJsSuffix($services.webjars.url('jquery-migrate', ""jquery-migrate${jsExtension}""))",
+    'jquery-migrate': "#removeJsSuffix($services.webjars.url($jqueryMigrateId, ""dist/jquery-migrate${jsExtension}""))",
     'jsTree': "#removeJsSuffix($services.webjars.url('jstree', ""jstree${jsExtension}""))",
     'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
     'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
     'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
     'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
     'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
@@ -104,6 +105,9 @@
     },
     'scriptaculous/dragdrop': ['scriptaculous/effects'],
     'selectize': ['jquery'],
+    'xwiki-document-lock': {
+      'exports': 'XWiki.DocumentLock'
+    },
     'xwiki-entityReference': {
       'exports': 'XWiki'
     }
@@ -112,7 +116,7 @@
   'config': {}
 })
 #set ($jQueryModuleId = 'jQueryNoConflict')
-#if ($services.extension.installed.getInstalledExtension('org.webjars:jquery-migrate', "wiki:$xcontext.database"))
+#if ($services.extension.installed.getInstalledExtension($jqueryMigrateId, "wiki:$xcontext.database"))
   #set ($jQueryModuleId = 'jquery-migrate')
   ## The minified version of jquery-migrate is expecting a global 'jQuery' variable to be defined (even though it also
   ## uses RequireJS to access jQuery). The unminified version is only relying on RequireJS so it doesn't have this
@@ -189,20 +193,6 @@ if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
     disablePrototypeJS('hide', pluginsToDisable);
   });
 }
-require(['jquery', 'iscroll', 'drawer'], function($, IScroll) {
-  // Unfortunately drawer doesn't declare the dependency on iscroll and expects it to be defined as a global variable.
-  window.IScroll = IScroll;
-  $(function() {
-    // Note that the 'drawer-open' and 'drawer-close' CSS classes are added before the open and close animations end
-    // which prevents us from using them in automated tests. We need something more reliable so we listen to
-    // 'drawer.opened' and 'drawer.closed' events and add our own markers.
-    $('.drawer-nav').closest('body').drawer().on('drawer.opened', function(event) {
-      $('#tmDrawerActivator').attr('aria-expanded', 'true');
-    }).on('drawer.closed', function(event) {
-      $('#tmDrawerActivator').attr('aria-expanded', 'false');
-    });
-  });
-});
 ##
 ## Pass useful contextual information from the server to the client using the global XWiki object.
 ##
@@ -228,7 +218,6 @@ XWiki.docisnew = null;
 #end
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
-XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($foreach.count > 1),#end"$space"#end ];
 XWiki.hasEdit = $hasEdit;
 XWiki.hasProgramming = $hasProgramming;
 XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;
@@ -282,11 +271,13 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
         #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
       #end
     #end
-    $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
-      'forceSkinAction' : true,
-      'h' : $searchSuggestConfigHash.hashCode()
-    })##
-    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)##
+    <script src="${services.webjars.url(
+      'org.xwiki.platform:xwiki-platform-search-webjar',
+      'searchSuggest' + $jsExtension,
+      {'evaluate': true, 'h': $searchSuggestConfigHash.hashCode()})}" defer="defer"></script>##
+    $xwiki.linkx.use(
+      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
+      {'type': 'text/css', 'rel': 'stylesheet'})##
   #end
 #end
 #set($editActions = ['edit', 'inline', 'admin'])
@@ -296,7 +287,10 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)##
 #end
 #if($services.async.isEnabled())
-  $xwiki.jsfx.use("uicomponents/async/async.js", true)##
+  $xwiki.jsfx.use("uicomponents/async/async.js", {
+    'forceSkinAction': true,
+    'wysiwyg': true
+  })##
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions

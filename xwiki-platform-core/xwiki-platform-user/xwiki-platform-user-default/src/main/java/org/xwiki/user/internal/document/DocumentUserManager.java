@@ -24,10 +24,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.user.UserException;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
@@ -37,6 +35,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 
 /**
  * Document-based implementation of {@link UserManager}.
@@ -49,12 +48,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DocumentUserManager implements UserManager
 {
-    private static final LocalDocumentReference USERS_XCLASS_REFERENCE =
-        new LocalDocumentReference("XWiki", "XWikiUsers");
-
-    @Inject
-    private Logger logger;
-
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
 
@@ -92,7 +85,8 @@ public class DocumentUserManager implements UserManager
         boolean result;
         try {
             XWikiDocument document = xwiki.getDocument(userDocumentReference, xcontext);
-            result = !document.isNew() && document.getXObject(USERS_XCLASS_REFERENCE) != null;
+            result = !document.isNew()
+                && document.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE) != null;
         } catch (Exception e) {
             throw new UserException(
                 String.format("Failed to check if document [%s] holds an XWiki user or not. ", userDocumentReference),

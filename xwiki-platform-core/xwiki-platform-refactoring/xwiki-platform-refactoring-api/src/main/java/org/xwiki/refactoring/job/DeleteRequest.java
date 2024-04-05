@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Job request for deleting a page.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.4.2
  * @since 14.5
  */
-@Unstable
 public class DeleteRequest extends EntityRequest
 {
     /**

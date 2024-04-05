@@ -26,15 +26,17 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     #error($services.localization.render('core.rename.nonexistingDocument'))
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.export.pdf.options.title')</h1></div>
     <form id="pdfExportOptions" class="xform half" action="$escapetool.xml($doc.getURL('export'))">
       <div class="hidden">
@@ -138,7 +140,7 @@
       </div>
     </form>
     <div class="clearfloats"></div>
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

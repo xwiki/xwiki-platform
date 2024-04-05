@@ -30,8 +30,9 @@
     <!-- Always publish build scans on CI but on demand for devs so that we don't get false positives on ge.xwiki.org
      due to local changes from users and so that it doesn't pollute the ge.xwiki.org data.
      To force publishing a build scan: -Dscan -->
-     <publishing>
+    <publishing>
       <onlyIf><![CDATA[env['CI'] != null]]></onlyIf>
+      <onlyIf><![CDATA[authenticated]]></onlyIf>
     </publishing>
     <captureGoalInputFiles>true</captureGoalInputFiles>
     <!-- Use background scans only locally to avoid potential issues on CI (the ephemeral docker agent could terminate

@@ -28,7 +28,7 @@
     "eslint-plugin-vue": "9.24.0",
     "nx": "18.2.3",
     "prettier": "3.2.5",
-    "rollup": "4.14.0",
+    "rollup": "4.14.1",
     "typescript": "5.4.4",
     "vite": "5.2.8",
     "vite-plugin-dts": "3.8.1",

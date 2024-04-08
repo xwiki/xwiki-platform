@@ -41,6 +41,6 @@
     "vite-plugin-inspect": "0.8.3",
     "vite-plugin-vuetify": "2.0.3",
     "vue": "3.4.21",
-    "vue-tsc": "2.0.10"
+    "vue-tsc": "2.0.11"
   }
 }

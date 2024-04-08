@@ -26,6 +26,6 @@
     "typescript": "5.4.4",
     "unplugin-auto-expose": "0.2.4",
     "vite": "5.2.8",
-    "vue-tsc": "2.0.10"
+    "vue-tsc": "2.0.11"
   }
 }

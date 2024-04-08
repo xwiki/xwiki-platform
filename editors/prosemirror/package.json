@@ -32,6 +32,6 @@
   "devDependencies": {
     "typescript": "5.4.4",
     "vite": "5.2.8",
-    "vue-tsc": "2.0.7"
+    "vue-tsc": "2.0.11"
   }
 }

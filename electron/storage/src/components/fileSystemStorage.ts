@@ -43,11 +43,7 @@ export default class FileSystemStorage extends AbstractStorage {
   }
 
   async getPageContent(page: string, syntax: string): Promise<PageData> {
-    this.logger.error("PARAMS", "page", page, "syntax", syntax);
     const path = await fileSystemStorage.resolvePath(page, syntax);
-    this.logger.error("PAGE", page);
-    this.logger.error("SYNTAX", syntax);
-    this.logger.error("PATH", path);
     return fileSystemStorage.readPage(path || "");
   }
 

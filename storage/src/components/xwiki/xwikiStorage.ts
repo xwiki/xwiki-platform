@@ -199,7 +199,6 @@ export class XWikiStorage extends AbstractStorage {
 
     const fullUrl = `${url}/${segments.join("/")}`;
 
-    console.log("before fetch");
     await fetch(fullUrl, {
       method: "PUT",
       headers: {
@@ -210,7 +209,6 @@ export class XWikiStorage extends AbstractStorage {
       // TODO: the syntax provided by the save is ignored and the content is always saved as markdown.
       body: JSON.stringify({ content, syntax: "markdown/1.2" }),
     });
-    console.log("after fetch");
 
     return;
   }

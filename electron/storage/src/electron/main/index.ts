@@ -13,7 +13,6 @@ function resolvePath(wikiName: string, id: string): string {
   // we also need to provide the actual page name).
   // We also need to decide if we define some sort of default page name (e.g., index).
   const homedir = app.getPath("home");
-  console.trace("resolvePath", "wikiName", wikiName, "id", id);
   let paths = wikiName;
   if (wikiName === "index") {
     paths = "";

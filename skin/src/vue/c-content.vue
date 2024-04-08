@@ -51,21 +51,20 @@ const content: ComputedRef<string> = computed(() => {
   if (currentPage.value) {
     const cpn: PageData = currentPage.value;
     if (cpn.html && cpn.html.trim() !== "") {
-      return cpn.html;
+      return cpn.html as string;
     } else {
       // TODO: currently blindly convert the content to markdown.
       console.log("marked", marked, cpn.source);
       const parse = marked.parse(cpn.source);
       console.log("parse", parse);
-      return parse;
+      return parse as string;
     }
   } else {
-    return undefined;
+    return "";
   }
 });
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
-const logger = cristal.getLogger("skin.vue.content");
 
 const route = useRoute();
 
@@ -90,13 +89,17 @@ onUpdated(() => {
     ContentTools.listenToClicks(contentRoot.value!, cristal);
     ContentTools.transformMacros(contentRoot.value!, cristal);
   }
-  // ContentTools.loadCSS(pageStatus.value.css);
-  // ContentTools.loadJS(pageStatus.value.js);
 });
 </script>
 <template>
-  <div v-if="loading">LOADING</div>
-  <div v-else-if="error">{{ error }}</div>
+  <div v-if="loading">
+    <!-- TODO: improve loading UI. -->
+    LOADING
+  </div>
+  <div v-else-if="error">
+    <!-- TODO: improve error reporting. -->
+    {{ error }}
+  </div>
   <article v-else id="content" ref="root">
     <UIX uixname="content.before" />
     <div class="pagemenu">

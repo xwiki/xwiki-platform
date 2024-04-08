@@ -68,9 +68,8 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
       // This modal should act and look like a form. We replace its content node by a form, so we can benefit from
       // native form utilities, such as implicit form validation (pressing Enter on a text field)
       const modalContent= modal.find('.modal-content');
-      const modalContentInnerHTML = modalContent.html();
       const formModalContent = $('<form class="modal-content">');
-      formModalContent.html(modalContentInnerHTML);
+      formModalContent.append(modalContent.contents());
       modalContent.replaceWith(formModalContent);
     }
     return modal;

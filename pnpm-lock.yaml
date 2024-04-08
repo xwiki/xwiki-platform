@@ -324,8 +324,8 @@ importers:
         specifier: 1.4.3
         version: 1.4.3
       prosemirror-view:
-        specifier: 1.33.3
-        version: 1.33.3
+        specifier: 1.33.4
+        version: 1.33.4
       vue:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.4)
@@ -6237,7 +6237,7 @@ packages:
     dependencies:
       prosemirror-state: 1.4.3
       prosemirror-transform: 1.8.0
-      prosemirror-view: 1.32.7
+      prosemirror-view: 1.33.4
     dev: false
 
   /prosemirror-example-setup@1.2.2:
@@ -6260,7 +6260,7 @@ packages:
       prosemirror-keymap: 1.2.2
       prosemirror-model: 1.20.0
       prosemirror-state: 1.4.3
-      prosemirror-view: 1.32.7
+      prosemirror-view: 1.33.4
     dev: false
 
   /prosemirror-history@1.3.2:
@@ -6268,7 +6268,7 @@ packages:
     dependencies:
       prosemirror-state: 1.4.3
       prosemirror-transform: 1.8.0
-      prosemirror-view: 1.32.7
+      prosemirror-view: 1.33.4
       rope-sequence: 1.3.4
     dev: false
 
@@ -6333,7 +6333,7 @@ packages:
     dependencies:
       prosemirror-model: 1.20.0
       prosemirror-transform: 1.8.0
-      prosemirror-view: 1.33.3
+      prosemirror-view: 1.33.4
     dev: false
 
   /prosemirror-tables@1.3.5:
@@ -6343,7 +6343,7 @@ packages:
       prosemirror-model: 1.20.0
       prosemirror-state: 1.4.3
       prosemirror-transform: 1.8.0
-      prosemirror-view: 1.32.7
+      prosemirror-view: 1.33.4
     dev: false
 
   /prosemirror-transform@1.8.0:
@@ -6360,8 +6360,8 @@ packages:
       prosemirror-transform: 1.8.0
     dev: false
 
-  /prosemirror-view@1.33.3:
-    resolution: {integrity: sha512-P4Ao/bc4OrU/2yLIf8dL4lJaEtjLR3QjIvQHgJYp2jUS7kYM4bSR6okbBjkqzOs/FwUon6UGjTLdKMnPL1MZqw==}
+  /prosemirror-view@1.33.4:
+    resolution: {integrity: sha512-xQqAhH8/HGleVpKDhQsrd+oqdyeKMxFtdCWDxWMmP+n0k27fBpyUqa8pA+RB5cFY8rqDDc1hll69aRZQa7UaAw==}
     dependencies:
       prosemirror-model: 1.20.0
       prosemirror-state: 1.4.3

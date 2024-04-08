@@ -53,11 +53,11 @@
       -->
       <enabled>true</enabled>
       <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
-      <storeEnabled><![CDATA[isTrue(env['CI']) and isTrue(env['GRADLE_ENTERPRISE_ACCESS_KEY'])]]></storeEnabled>
+      <storeEnabled><![CDATA[isTrue(env['CI']) and isTrue(env['DEVELOCITY_ACCESS_KEY'])]]></storeEnabled>
       <server>
-        <!-- Note: Remote cache authentication is handled in the Maven settings.xml file. The id below is the one
-       found in settings.xml -->
-        <id>gradleEnterpriseCache</id>
+        <!-- Note: Remote cache authentication is handled in the .m2/.develocity/keys.properties file and not
+             anymore in the Maven settings.xml file -->
+        <id>develocityCache</id>
         <!-- We override the default built-in node to use a EU node closer to our CI to reduce the cache lag (and thus
              to make caching more beneficial vs rebuilding) -->
         <url>https://eu-build-cache-ge.xwiki.org/cache/</url>

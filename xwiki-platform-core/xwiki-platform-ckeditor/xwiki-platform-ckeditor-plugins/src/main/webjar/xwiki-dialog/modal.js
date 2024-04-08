@@ -62,7 +62,7 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
     const submitButton = modal.find('.modal-footer .btn-primary');
     submitButton.text(definition.acceptLabel);
     modal.find('.modal-footer .btn[data-dismiss="modal"]').text(definition.dismissLabel);
-    if(definition.form) {
+    if (definition.form) {
       // We want the submit button to actually submit the form
       submitButton.removeAttr('type');
       // This modal should act and look like a form. We replace its content node by a form, so we can benefit from

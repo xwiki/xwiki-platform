@@ -37,6 +37,8 @@ import { type CristalApp, PageData } from "@cristal/api";
 import { marked } from "marked";
 import { ContentTools } from "./contentTools";
 
+const route = useRoute();
+
 const loading = ref(false);
 const error: Ref<Error | undefined> = ref(undefined);
 const currentPage: Ref<PageData | undefined> = ref(undefined);
@@ -66,12 +68,10 @@ const content: ComputedRef<string> = computed(() => {
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
-const route = useRoute();
-
-async function fetchPage() {
+async function fetchPage(page: string) {
   loading.value = true;
   try {
-    currentPage.value = await cristal.getPage(currentPageName.value);
+    currentPage.value = await cristal.getPage(page || currentPageName.value);
   } catch (e) {
     console.error(e);
     error.value = e;
@@ -85,9 +85,9 @@ watch(() => route.params.page, fetchPage, { immediate: true });
 onUpdated(() => {
   ContentTools.transformImages(cristal, "xwikicontent");
 
-  if (cristal && content.value != null) {
-    ContentTools.listenToClicks(contentRoot.value!, cristal);
-    ContentTools.transformMacros(contentRoot.value!, cristal);
+  if (cristal && contentRoot.value) {
+    ContentTools.listenToClicks(contentRoot.value, cristal);
+    ContentTools.transformMacros(contentRoot.value, cristal);
   }
 });
 </script>

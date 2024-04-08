@@ -112,20 +112,10 @@ export class DefaultCristalApp implements CristalApp {
   }
 
   setCurrentPage(newPage: string, mode: string = "view") {
-    this.mode = mode;
-    if (this.page.name != newPage) {
-      this.page.name = newPage;
-      this.logger?.debug("Pushing state in history " + newPage);
-      history.pushState(
-        { page: newPage },
-        newPage,
-        "/" + this.wikiConfig.name + "/#/" + newPage + "/" + mode,
-      );
-      // history.pushState({ page : newPage }, newPage, "#/" + newPage + "/view");
-      this.page.source = "";
-      this.page.html = "";
-      this.loadPage();
-    }
+    this.router.push({
+      name: mode,
+      params: { page: newPage },
+    });
   }
 
   handlePopState(event: PopStateEvent) {

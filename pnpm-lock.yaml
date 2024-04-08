@@ -424,8 +424,8 @@ importers:
         specifier: 5.4.4
         version: 5.4.4
       unplugin-auto-expose:
-        specifier: 0.3.0
-        version: 0.3.0(rollup@4.14.0)
+        specifier: 0.2.4
+        version: 0.2.4(rollup@4.14.0)
       vite:
         specifier: 5.2.8
         version: 5.2.8(@types/node@20.12.4)
@@ -1007,21 +1007,21 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/template': 7.24.0
-      '@babel/types': 7.23.9
+      '@babel/types': 7.24.0
     dev: true
 
   /@babel/helper-hoist-variables@7.22.5:
     resolution: {integrity: sha512-wGjk9QZVzvknA6yKIUURb8zY3grXCcOZt+/7Wcy8O2uctxhplmUPkOdlgoNhmdVee2c92JXbf1xpMtVNbfoxRw==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.23.9
+      '@babel/types': 7.24.0
     dev: true
 
   /@babel/helper-split-export-declaration@7.22.6:
     resolution: {integrity: sha512-AsUnxuLhRYsisFiaJwvp1QF+I3KjD5FOxut14q/GzovUe6orHLesW2C7d754kRm53h5gqrz6sFl6sxc4BVtE/g==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/types': 7.23.9
+      '@babel/types': 7.24.0
     dev: true
 
   /@babel/helper-string-parser@7.23.4:
@@ -1047,7 +1047,7 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
     dependencies:
-      '@babel/types': 7.23.9
+      '@babel/types': 7.24.0
     dev: true
 
   /@babel/parser@7.23.9:
@@ -1084,8 +1084,8 @@ packages:
       '@babel/helper-function-name': 7.23.0
       '@babel/helper-hoist-variables': 7.22.5
       '@babel/helper-split-export-declaration': 7.22.6
-      '@babel/parser': 7.23.9
-      '@babel/types': 7.23.9
+      '@babel/parser': 7.24.4
+      '@babel/types': 7.24.0
       debug: 4.3.4(supports-color@5.5.0)
       globals: 11.12.0
     transitivePeerDependencies:
@@ -7102,8 +7102,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
-  /unplugin-auto-expose@0.3.0(rollup@4.14.0):
-    resolution: {integrity: sha512-zg/Z7EkxXu5gOP9+MHaSPOlV9ZgunOcjPGc89kAhZA9l/+sJ98StnXZhElWADRW8ziSk54Guci4A6agg3254+Q==}
+  /unplugin-auto-expose@0.2.4(rollup@4.14.0):
+    resolution: {integrity: sha512-piVmCwoKPEAe/IskcjN52U5UmnM/RZc8Z5kmN69TX9PWE92WzKOVsu3UQt7jJll7jwHLbR3nmDGPSfBxdxPZ2g==}
     dependencies:
       '@babel/parser': 7.23.6
       '@babel/traverse': 7.23.7

@@ -36,7 +36,7 @@ import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
  * This implementation uses translations to generate localized titles.
  *
  * @version $Id$
- * @since 15.3RC1
+ * @since 16.3.0RC1
  */
 @Component(hints = {"pageAttach", "attach"})
 @Singleton

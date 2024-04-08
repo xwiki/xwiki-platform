@@ -34,7 +34,7 @@ import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
  * human-readable name instead. E.g. {@link XWikiDocumentWantedLinkTitleGenerator}
  *
  * @version $Id$
- * @since 15.3RC1
+ * @since 16.3.0RC1
  */
 @Component
 @Singleton

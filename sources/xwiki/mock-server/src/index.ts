@@ -30,6 +30,12 @@ XWiki is the best tool to organize your knowledge.
 
 [[XWiki Syntax>>Page2.WebHome]]
 `,
+    html: `<h1>Welcome to ${page}!</h1>
+
+XWiki is the best tool to organize your knowledge.
+
+<a href="Page2.WebHome">XWiki Syntax</a>
+`,
   });
 });
 

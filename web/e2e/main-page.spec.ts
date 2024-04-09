@@ -41,7 +41,7 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 // const localDefaultPage = "/Localhost/#/";
-const localDefaultPage = "/Localhost/#/";
+const localDefaultPage = "/Localhost/#/Main.WebHome/view";
 test("has title", async ({ page }) => {
   await page.goto(localDefaultPage);
 

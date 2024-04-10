@@ -41,6 +41,12 @@ public class DefaultPygmentsParserConfiguration implements PygmentsParserConfigu
     private static final String PREFIX = "rendering.macro.code.pygments.";
 
     /**
+     * Default style name to use.
+     * @since 16.3.0RC1
+     */
+    private static final String DEFAULT_STYLE = "updatedDefault";
+
+    /**
      * Defines from where to read the Pygments configuration data.
      */
     @Inject
@@ -49,6 +55,11 @@ public class DefaultPygmentsParserConfiguration implements PygmentsParserConfigu
     @Override
     public String getStyle()
     {
-        return this.configuration.getProperty(PREFIX + "style", String.class);
+        String style =  this.configuration.getProperty(PREFIX + "style", String.class);
+        if (style == null || style.isEmpty() || style.equals("default")) {
+            return DEFAULT_STYLE;
+        } else {
+            return style;
+        }
     }
 }

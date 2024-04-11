@@ -30,8 +30,9 @@
   <artifactId>xwiki-platform-wysiwyg</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Parent POM for the WYSIWYG editor modules</description>
+  <description>WYSIWYG editor modules independent of the underlying WYSIWYG implementation</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-wysiwyg-api</module>
     <module>xwiki-platform-wysiwyg-ui</module>
   </modules>

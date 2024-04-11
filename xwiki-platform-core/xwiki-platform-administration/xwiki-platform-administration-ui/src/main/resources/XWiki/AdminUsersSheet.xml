@@ -108,13 +108,15 @@
             'id': 'disable',
             'icon': 'lock',
             'allowProperty': 'doc.hasdisable',
-            'urlProperty': 'doc.disable_url'
+            'urlProperty': 'doc.disable_url',
+            'extraIconClasses': 'text-warning'
           },
           {
             'id': 'enable',
             'icon': 'unlock',
             'allowProperty': 'doc.hasenable',
-            'urlProperty': 'doc.enable_url'
+            'urlProperty': 'doc.enable_url',
+            'extraIconClasses': 'text-success'
           }
         ]
       }

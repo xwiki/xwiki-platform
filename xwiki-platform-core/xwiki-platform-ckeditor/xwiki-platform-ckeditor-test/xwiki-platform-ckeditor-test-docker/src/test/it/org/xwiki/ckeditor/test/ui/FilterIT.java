@@ -19,8 +19,6 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -28,6 +26,9 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests how CKEditor filters the content.
@@ -40,6 +41,8 @@ class FilterIT extends AbstractCKEditorIT
     @BeforeEach
     void beforeEach(TestUtils setup, TestReference testReference)
     {
+        // Ensure that raw HTML is allowed.
+        setup.loginAsSuperAdmin();
         edit(setup, testReference);
     }
 
@@ -74,8 +77,12 @@ class FilterIT extends AbstractCKEditorIT
 
         setSource(source.toString());
         String html = this.textArea.getContent();
-        assertTrue(html.contains("<style>"), "Unexpected content: " + html);
-        assertTrue(html.contains("content: '<'"), "Unexpected content: " + html);
+        // Check that the style tag is in the macro output.
+        assertThat(html, containsString("</div><style>"));
+        // Check that the escaped style content is in the macro output.
+        assertThat(html, containsString("content: '\\3C'"));
+        // Check that the comment-escaped output is in the HTML comment.
+        assertThat(html, containsString("content: '<\\'"));
 
         this.textArea.sendKeys(" end");
         // Verify that the origial style content is preserved.

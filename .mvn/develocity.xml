@@ -20,47 +20,48 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<gradleEnterprise
-  xmlns="https://www.gradle.com/gradle-enterprise-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="https://www.gradle.com/gradle-enterprise-maven https://www.gradle.com/schema/gradle-enterprise-maven.xsd">
+<develocity
+  xmlns="https://www.gradle.com/develocity-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://www.gradle.com/develocity-maven https://www.gradle.com/schema/develocity-maven.xsd">
   <server>
     <url>https://ge.xwiki.org</url>
   </server>
   <buildScan>
-    <publishIfAuthenticated>true</publishIfAuthenticated>
     <!-- Always publish build scans on CI but on demand for devs so that we don't get false positives on ge.xwiki.org
      due to local changes from users and so that it doesn't pollute the ge.xwiki.org data.
      To force publishing a build scan: -Dscan -->
-    <publish>#{env['CI'] == null ? 'ON_DEMAND' : 'ALWAYS'}</publish>
+    <publishing>
+      <onlyIf><![CDATA[env['CI'] != null && authenticated]]></onlyIf>
+    </publishing>
     <captureGoalInputFiles>true</captureGoalInputFiles>
     <!-- Use background scans only locally to avoid potential issues on CI (the ephemeral docker agent could terminate
          as soon as the build is finished and thus the upload may be terminated before it completes) -->
-    <backgroundBuildScanUpload>#{env['CI'] == null}</backgroundBuildScanUpload>
+    <backgroundBuildScanUpload><![CDATA[env['CI'] == null]]></backgroundBuildScanUpload>
   </buildScan>
   <buildCache>
     <!-- Notes:
-     * To disable the local build cache on the command line, pass: -Dgradle.cache.local.enabled=false
+     * To disable the local build cache on the command line, pass: -Ddevelocity.cache.local.enabled=false
      * We disable the local build cache on CI since our agents are transients and isolated, and thus it would cost
        more to save the goal outputs since they're not going to be re-used.
     -->
     <local>
-      <enabled>#{env['CI'] == null}</enabled>
+      <enabled><![CDATA[env['CI'] == null]]></enabled>
     </local>
     <remote>
       <!-- Notes:
-       * To disable the remote build cache on the command line, pass: -Dgradle.cache.remote.enabled=false
+       * To disable the remote build cache on the command line, pass: -Ddevelocity.cache.remote.enabled=false
       -->
       <enabled>true</enabled>
       <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
-      <storeEnabled>#{isTrue(env['CI']) and isTrue(env['GRADLE_ENTERPRISE_ACCESS_KEY'])}</storeEnabled>
+      <storeEnabled><![CDATA[isTrue(env['CI']) and isTrue(env['DEVELOCITY_ACCESS_KEY'])]]></storeEnabled>
       <server>
-        <!-- Note: Remote cache authentication is handled in the Maven settings.xml file. The id below is the one
-       found in settings.xml -->
-        <id>gradleEnterpriseCache</id>
+        <!-- Note: Remote cache authentication is handled in the .m2/.develocity/keys.properties file and not
+             anymore in the Maven settings.xml file -->
+        <id>develocityCache</id>
         <!-- We override the default built-in node to use a EU node closer to our CI to reduce the cache lag (and thus
              to make caching more beneficial vs rebuilding) -->
         <url>https://eu-build-cache-ge.xwiki.org/cache/</url>
       </server>
     </remote>
   </buildCache>
-</gradleEnterprise>
+</develocity>

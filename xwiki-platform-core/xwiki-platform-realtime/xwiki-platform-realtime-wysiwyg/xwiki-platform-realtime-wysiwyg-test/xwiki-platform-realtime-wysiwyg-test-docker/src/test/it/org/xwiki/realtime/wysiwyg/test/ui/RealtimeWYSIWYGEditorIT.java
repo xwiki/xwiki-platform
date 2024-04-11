@@ -707,7 +707,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Focus the rich text area.
         secondTextArea.click();
         // Move the caret inside the information box.
-        secondTextArea.sendKeys(Keys.ARROW_UP, Keys.TAB, "two ");
+        secondTextArea.sendKeys(Keys.ARROW_UP, "two ");
 
         MacroDialogEditModal secondMacroEditModal = secondEditor.getBalloonToolBar().editMacro();
         secondMacroEditModal.setMacroParameter("cssClass", "bar");
@@ -761,7 +761,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstMacroEditModal.clickCancel();
 
         firstEditPage.clickSaveAndView();
-        assertEquals("{{info cssClass=\"bar\" title=\"(% class=~\"box-title box-title~\" %)Some cool title\"}}\ntwo one\n{{/info}}\n\n ",
+        assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}\n\n ",
             WikiEditPage.gotoPage(testReference).getContent());
     }
     

@@ -205,7 +205,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         searchResults = new SimpleSearchPane().search("blahblah");
         assertEquals(0, searchResults.getDisplayedResultsCount());
         assertNull(searchResults.getPagination());
-        assertEquals("There were no extensions found matching '\nblahblah\n'. Try different keywords. "
+        assertEquals("There were no extensions found matching 'blahblah'. Try different keywords. "
             + "Alternatively, if you know the identifier and the version of the extension you're "
             + "looking for, you can use the Advanced Search form above.", searchResults.getNoResultsMessage());
 
@@ -244,7 +244,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals(0, searchResults.getDisplayedResultsCount());
         assertNull(searchResults.getPagination());
         assertEquals(
-            "We couldn't find any extension with id '\nfoo\n' and version '\nbar\n'. "
+            "We couldn't find any extension with id 'foo' and version 'bar'. "
                 + "Make sure you have the right extension repositories configured.",
             searchResults.getNoResultsMessage());
 

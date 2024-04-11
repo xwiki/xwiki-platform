@@ -130,6 +130,17 @@ public class AttachmentValidationScriptService implements ScriptService
         return getUploadMaxSize(null);
     }
 
+    /**
+     * @return whether or not summaries for attachments should be settable and displayed from UI
+     * @since 16.3.0RC1
+     */
+    public boolean areSummariesEnabled()
+    {
+        return getAttachmentValidationConfiguration()
+            .map(AttachmentValidationConfiguration::areSummariesEnabled)
+            .orElse(false);
+    }
+
     private Optional<AttachmentValidationConfiguration> getAttachmentValidationConfiguration()
     {
         try {

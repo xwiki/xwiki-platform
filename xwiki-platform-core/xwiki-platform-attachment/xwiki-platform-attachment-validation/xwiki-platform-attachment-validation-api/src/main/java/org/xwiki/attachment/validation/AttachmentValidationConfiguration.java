@@ -71,4 +71,10 @@ public interface AttachmentValidationConfiguration
      * @since 14.10.13
      */
     long getMaxUploadSize(EntityReference entityReference);
+
+    /**
+     * @return whether or not summaries for attachments should be settable and displayed from UI
+     * @since 16.3.0RC1
+     */
+    boolean areSummariesEnabled();
 }

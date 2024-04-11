@@ -45,7 +45,13 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     ## Temporarily disabled, until we fix attachment name handling
     ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
     ## <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
-    <div class="fileupload-field"><label class="sr-only" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" size="40" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" /></div>
+    <div class="fileupload-field">
+      #if ($services.attachmentValidation.areSummariesEnabled())
+        <label for="xwikiuploadcomment" class="sr-only">$services.localization.render('core.viewers.attachments.upload.comment')</label>
+        <input type="text" id="xwikiuploadcomment" class="uploadCommentInput" name="comment" placeholder="$services.localization.render('core.viewers.attachments.upload.comment')" title="$services.localization.render('core.comment.tooltip')" maxlength="1023" />
+      #end
+      <label class="sr-only" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" size="40" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" />
+    </div>
     <div>
       <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.viewers.attachments.upload.submit')" class="button btn btn-primary"/></span>
       <span class="buttonwrapper"><a class="cancel secondary button btn btn-primary" href="$doc.getURL()">$services.localization.render('core.viewers.attachments.upload.cancel')</a></span>

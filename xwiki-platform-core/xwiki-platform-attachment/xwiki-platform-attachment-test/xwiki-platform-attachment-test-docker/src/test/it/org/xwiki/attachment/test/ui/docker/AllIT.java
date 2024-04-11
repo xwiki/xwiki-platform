@@ -37,4 +37,10 @@ public class AllIT
     class NestedMoveAttachmentIT extends MoveAttachmentIT
     {
     }
+
+    @Nested
+    @DisplayName("Set and display attachment summaries test")
+    class NestedAttachmentSummaryIT extends AttachmentSummaryIT
+    {
+    }
 }

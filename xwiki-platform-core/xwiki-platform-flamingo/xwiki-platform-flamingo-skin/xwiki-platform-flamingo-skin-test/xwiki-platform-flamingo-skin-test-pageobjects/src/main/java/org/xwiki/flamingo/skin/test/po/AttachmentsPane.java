@@ -125,6 +125,20 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Fills the upload summary.
+     *
+     * @param summary the upload summary.
+     */
+    public void setUploadSummary(final String summary)
+    {
+        final List<WebElement> inputs = this.pane.findElements(By.className("uploadCommentInput"));
+        WebElement input = inputs.get(inputs.size() - 1);
+        // Clean the field before setting the value in case of successive uploads.
+        input.clear();
+        input.sendKeys(summary);
+    }
+
+    /**
      * Fills the URL with the specified file paths.
      *
      * @param filePaths a list of paths to the files to upload in URL form (the files *must* exist in the target

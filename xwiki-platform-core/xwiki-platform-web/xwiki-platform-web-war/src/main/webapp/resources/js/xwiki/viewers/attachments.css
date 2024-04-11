@@ -23,6 +23,9 @@
 .uploadFileInput {
   margin: 5px 10px 5px 0 !important; /* !important is needed for Toucan. */
 }
+.uploadCommentInput {
+  margin-bottom: 10px;
+}
 /* Attachment "toolbox" style */
 .skin-colibri #AddAttachment {
   border-top: 1px solid $theme.borderColor;

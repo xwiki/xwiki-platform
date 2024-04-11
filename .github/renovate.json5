@@ -22,5 +22,8 @@
   "prHourlyLimit" : 0,
   "prConcurrentLimit" : 0,
   // Prefix update commit with [Misc] by default so that only updates requiring a Jira issue need a message edit.
-  "commitMessageAction": "[Misc] Update"
-}
+  "commitMessageAction": "[Misc] Update",
+  // Distinguish separate all new major versions on separate pull requests.
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true
+ }

@@ -58,6 +58,82 @@
   ##
   #set ($registrationConfig = $NULL)
   #_loadConfig($registrationConfig)
+  #if($reg &amp;&amp; $reg &lt;= 0)
+  
+    {{error}}
+    #if($reg == -2)
+      {{translation key="core.register.passwordMismatch"/}}
+    ## -3 means username taken, -8 means username is superadmin name
+    #elseif($reg == -3 || $reg == -8)
+      {{translation key="core.register.userAlreadyExists"/}}
+    #elseif($reg == -4)
+      {{translation key="core.register.invalidUsername"/}}
+    #elseif ($reg == -9)
+      {{translation key="core.register.invalidCaptcha"/}}
+    ## Note that -10 is reserved already (see api.XWiki#createUser)
+    #elseif($reg == -11)
+      {{translation key="core.register.mailSenderWronglyConfigured"/}}
+    #else
+      {{translation key="core.register.registerFailed" parameters="$reg"/}}
+    #end
+    {{/error}}
+    
+  #elseif($reg)
+  ## Registration was successful
+    #set($registrationDone = true)
+    ##
+    ## If there is any thing to "doAfterRegistration" then do it.
+    #foreach($field in $fields)
+      #if($field.get('doAfterRegistration'))
+        #evaluate($field.get('doAfterRegistration'))
+      #end
+    #end
+    ## If there is a "global" doAfterRegistration, do that as well.
+    ## Calling toString() on a #define block will execute it and we discard the result.
+    #set($discard = $doAfterRegistration.toString())
+    ##
+    ## Define some strings which may be used by autoLogin or loginButton
+    #set($userName = $!request.get('xwikiname'))
+    #set($password = $!request.get('register_password'))
+    #set($loginURL = $xwiki.getURL($loginPage, $loginAction))
+    #if("$!request.getParameter($redirectParam)" != '')
+      #set($redirect = $request.getParameter($redirectParam))
+    #else
+      #set($redirect = $registrationConfig.defaultRedirect)
+    #end
+    ## Display a "registration successful" message
+
+    #evaluate($registrationConfig.registrationSuccessMessage)
+
+    ## Empty line prevents message from being forced into a &lt;p&gt; block.
+
+    ## Give the user a login button which posts their username and password to loginsubmit
+    #if($registrationConfig.loginButton)
+
+      {{html clean=false wiki=false}}
+        &lt;form id="loginForm" action="$loginURL" method="post"&gt;
+          &lt;div class="centered"&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.xml($!userName)" /&gt;
+          &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.xml($!password)" /&gt;
+          &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.xml($redirect)" /&gt;
+          &lt;span class="buttonwrapper"&gt;
+            &lt;input type="submit" value="$services.localization.render('login')" class="button"/&gt;
+          &lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+        ## We don't want autoLogin if we are administrators adding users...
+        #if ($registrationConfig.autoLogin &amp;&amp; $request.xpage != 'registerinline')
+          &lt;script&gt;
+            document.observe('xwiki:dom:loaded', function() {
+              document.forms['loginForm'].submit();
+            });
+          &lt;/script&gt;
+        #end
+      {{/html}}
+
+    #end
+  #end
   ##
   #*
    * You may include this document in other documents using {{include reference="XWiki.Registration"/}}
@@ -287,12 +363,6 @@
         'skipLabelFor' : true,
         'type'  : 'html',
         'html'  : "$!{services.captcha.default.display()}",
-        'validate' : {
-          'programmaticValidation' : {
-            'code' : '#if (!$services.captcha.default.isValid())failed#end',
-            'failureMessage' : $services.localization.render('core.captcha.captchaAnswerIsWrong')
-          }
-        },
         'noReturn' : true
       })
     #set($discard = $fields.add($field))
@@ -303,6 +373,14 @@
     {'name' : $redirectParam,
       'params' : {
         'type' : 'hidden'
+      }
+    })
+  #set($discard = $fields.add($field))
+  #set($field =
+    {'name' : 'register',
+      'params' : {
+        'type' : 'hidden',
+        'value': '1'
       }
     })
   #set($discard = $fields.add($field))
@@ -338,16 +416,6 @@
   ##
   ## Display the heading
   $registrationConfig.heading
-  ## If the submit button has been pressed, then we test the input and maybe create the user.
-  #if($request.getParameter('xwikiname'))
-    ## Do server side validation of input fields.
-    ## This must not be in a #set directive as it will output messages if something goes wrong.
-    #validateFields($fields, $request)
-    ## If server side validation was successfull, create the user
-    #if($allFieldsValid)
-      #createUser($fields, $request, $response, $doAfterRegistration)
-    #end
-  #end
   ## If the registration was not successful or if the user hasn't submitted the info yet
   ## Then we display the registration form.
   #if(!$registrationDone)
@@ -387,105 +455,6 @@
   #set($mainWikiRegisterPageReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', 'Register'))
   #set($temp = $response.sendRedirect($xwiki.getURL($mainWikiRegisterPageReference, 'register', $request.queryString)))
 #end
-##
-#*
- * Create the user.
- * Calls $xwiki.createUser to create a new user.
- *
- * @param $request An XWikiRequest object which made the register request.
- * @param $response The XWikiResponse object to send any redirects to.
- * @param $doAfterRegistration code block to run after registration completes successfully.
- *###
-#macro(createUser, $fields, $request, $response, $doAfterRegistration)
-  ## CSRF check
-  #if(${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-    ## See if email verification is required and register the user.
-    #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
-      #set($reg = $xwiki.createUser(true))
-    #else
-      #set($reg = $xwiki.createUser(false))
-    #end
-  #else
-    $response.sendRedirect("$!{services.csrf.getResubmissionURL()}")
-  #end
-  ##
-  ## Handle output from the registration.
-  #if($reg &amp;&amp; $reg &lt;= 0)
-    {{error}}
-    #if($reg == -2)
-      {{translation key="core.register.passwordMismatch"/}}
-    ## -3 means username taken, -8 means username is superadmin name
-    #elseif($reg == -3 || $reg == -8)
-      {{translation key="core.register.userAlreadyExists"/}}
-    #elseif($reg == -4)
-      {{translation key="core.register.invalidUsername"/}}
-    #elseif ($reg == -9)
-      {{translation key="core.register.invalidCaptcha"/}}
-    ## Note that -10 is reserved already (see api.XWiki#createUser)
-    #elseif($reg == -11)
-      {{translation key="core.register.mailSenderWronglyConfigured"/}}
-    #else
-      {{translation key="core.register.registerFailed" parameters="$reg"/}}
-    #end
-    {{/error}}
-  #elseif($reg)
-  ## Registration was successful
-    #set($registrationDone = true)
-    ##
-    ## If there is any thing to "doAfterRegistration" then do it.
-    #foreach($field in $fields)
-      #if($field.get('doAfterRegistration'))
-        #evaluate($field.get('doAfterRegistration'))
-      #end
-    #end
-    ## If there is a "global" doAfterRegistration, do that as well.
-    ## Calling toString() on a #define block will execute it and we discard the result.
-    #set($discard = $doAfterRegistration.toString())
-    ##
-    ## Define some strings which may be used by autoLogin or loginButton
-    #set($userName = $!request.get('xwikiname'))
-    #set($password = $!request.get('register_password'))
-    #set($loginURL = $xwiki.getURL($loginPage, $loginAction))
-    #if("$!request.getParameter($redirectParam)" != '')
-      #set($redirect = $request.getParameter($redirectParam))
-    #else
-      #set($redirect = $registrationConfig.defaultRedirect)
-    #end
-    ## Display a "registration successful" message
-
-    #evaluate($registrationConfig.registrationSuccessMessage)
-
-    ## Empty line prevents message from being forced into a &lt;p&gt; block.
-
-    ## Give the user a login button which posts their username and password to loginsubmit
-    #if($registrationConfig.loginButton)
-
-      {{html clean=false wiki=false}}
-        &lt;form id="loginForm" action="$loginURL" method="post"&gt;
-          &lt;div class="centered"&gt;
-          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-          &lt;input id="j_username" name="j_username" type="hidden" value="$escapetool.xml($!userName)" /&gt;
-          &lt;input id="j_password" name="j_password" type="hidden" value="$escapetool.xml($!password)" /&gt;
-          &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$escapetool.xml($redirect)" /&gt;
-          &lt;span class="buttonwrapper"&gt;
-            &lt;input type="submit" value="$services.localization.render('login')" class="button"/&gt;
-          &lt;/span&gt;
-          &lt;/div&gt;
-        &lt;/form&gt;
-        ## We don't want autoLogin if we are administrators adding users...
-        #if ($registrationConfig.autoLogin &amp;&amp; $request.xpage != 'registerinline')
-          &lt;script&gt;
-            document.observe('xwiki:dom:loaded', function() {
-              document.forms['loginForm'].submit();
-            });
-          &lt;/script&gt;
-        #end
-      {{/html}}
-
-    #end
-  #end
-  ##
-#end## createUser Macro
 {{/velocity}}</content>
   <class>
     <name>XWiki.Registration</name>

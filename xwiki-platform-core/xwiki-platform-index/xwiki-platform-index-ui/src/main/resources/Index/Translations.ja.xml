@@ -36,15 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=スペース
-index.spacesMacro.spaceIndex.title=スペースのインデックスを表示
-index.spacesMacro.spaceIndex.alt=スペースのインデックス
-index.spacesMacro.spaceAdministration.title=スペースの管理を表示
-index.spacesMacro.spaceAdministration.alt=スペースを管理
-index.spacesMacro.createSpace.link=新しいスペースを作成
-index.spacesMacro.createSpace.defaultSpaceName=スペースの名称
-index.spacesMacro.createSpace.submit=作成
-index.deletedDocuments.deleteAll=全て削除
+  <content>index.deletedDocuments.deleteAll=全て削除
 index.administration.remainingTasks.heading=残りのドキュメント分析タスク
 index.administration.remainingTasks.emptyQueue=残っているタスクはありません。
 admin.documentanalysis=ドキュメント分析

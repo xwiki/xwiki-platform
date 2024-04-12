@@ -261,7 +261,10 @@
           }
           return textNodes;
         };
-        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious');
+        // When the direction is 'getPrevious', getSiblingTextNodes returns an array of DOM Nodes in reverse order.
+        // The maybeFixNonBreakingSpace method expects both arrays to be in the actual DOM order.
+        // This is why we need to reverse the textNodesBefore array.
+        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious').reverse();
         var textNodesAfter = getSiblingTextNodes(node.getChild(offset), 'getNext');
         return this.maybeFixNonBreakingSpace(textNodesBefore, textNodesAfter);
       } else if (node.type === CKEDITOR.NODE_TEXT) {

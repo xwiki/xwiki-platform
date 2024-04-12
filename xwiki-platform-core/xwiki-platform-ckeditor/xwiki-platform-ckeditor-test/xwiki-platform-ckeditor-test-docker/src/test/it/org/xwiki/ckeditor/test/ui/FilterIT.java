@@ -23,9 +23,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.text.StringUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -87,5 +89,26 @@ class FilterIT extends AbstractCKEditorIT
         this.textArea.sendKeys(" end");
         // Verify that the origial style content is preserved.
         assertSourceContains(source.toString() + " end");
+    }
+
+    @Test
+    @Order(2)
+    void listUnbreakableSpaceMerge()
+    {
+        // See https://jira.xwiki.org/browse/XWIKI-22024.
+        this.editor.getToolBar().clickNumberedList();
+
+        // Write the triggering text: any text between round brackets, followed by more text, a space and more text
+        // again.
+        this.textArea.sendKeys("(test)s test");
+
+        // Move to inside the round brackets and change the content inside the bracket.
+        this.textArea.sendKeys(StringUtils.repeat(Keys.ARROW_LEFT.toString(), 7));
+        this.textArea.sendKeys(Keys.BACK_SPACE);
+
+        // Move back to after the round brackets and erase the text right after the closing bracket.
+        this.textArea.sendKeys(Keys.ARROW_RIGHT, Keys.ARROW_RIGHT, Keys.BACK_SPACE);
+
+        this.assertSourceEquals("1. (tes) test");
     }
 }

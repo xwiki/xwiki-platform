@@ -724,7 +724,7 @@ define(
           load.call(this, input, macroEditor);
         }
       });
-      modal.find('.modal-content')[0].addEventListener('submit', function(event) {
+      modal.find('.modal-content').on('submit', function(event) {
         // Ideally we would handle this propagation by making the modal a dialog and using method="dialog" on the form
         event.preventDefault();
         event.stopPropagation();

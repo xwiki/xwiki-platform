@@ -151,7 +151,7 @@ var XWiki = (function (XWiki) {
         'classes' : 'suggestList',
         'eventListeners' : {
           'mouseover':function(event){
-            this.suggest.setHighlight(event.currentTarget)
+            this.suggest.setHighlight(event.currentTarget);
           }
         }
       });
@@ -167,7 +167,8 @@ var XWiki = (function (XWiki) {
         sources : this.sources,
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
         displayValue: true,
-        displayValueText: "$escapetool.javascript($services.localization.render('platform.search.suggestResultLocatedIn'))",
+        displayValueText:
+          "$escapetool.javascript($services.localization.render('platform.search.suggestResultLocatedIn'))",
         resultInfoHTML: true,
         timeout: 0,
         width: 500,
@@ -199,7 +200,8 @@ var XWiki = (function (XWiki) {
             #set ($evaluatedSource = $source.evaluate())
           #end
           #if ("$!evaluateException" != '')
-            #set ($discard = $logtool.error("Error when trying to evaluate XWiki.SearchSuggestSourceClass: $evaluateException"))
+            #set ($discard = $logtool.error(
+              "Error when trying to evaluate XWiki.SearchSuggestSourceClass: $evaluateException"))
             #set ($discard = $logtool.debug($exceptiontool.getStackTrace($evaluateException)))
           #end
           #set ($name = $source.getProperty('name').value)
@@ -247,8 +249,7 @@ var XWiki = (function (XWiki) {
   };
 
   // When the document is loaded, install search suggestions
-  (XWiki.isInitialized && init())
-  || document.observe('xwiki:dom:loading', init);
+  var discard = (XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
 
   return XWiki;
 

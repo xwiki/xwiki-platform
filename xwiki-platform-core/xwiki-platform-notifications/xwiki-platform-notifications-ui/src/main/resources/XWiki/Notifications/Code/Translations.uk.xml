@@ -257,6 +257,10 @@ notifications.filters.preferences.addPreference.location.hint=На яку сто
 notifications.filters.type.inclusive=Включно
 notifications.filters.type.exclusive=Виключно
 
+## until 16.2.0RC1
+notifications.settings.filters.preferences.custom.table.description=У цій таблиці перераховано всі спеціальні фільтри, зареєстровані для поточного користувача чи поточної вікі.
+notifications.settings.filters.preferences.system.table.description=У цій таблиці перераховано всі системні фільтри, зареєстровані у вікі.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>

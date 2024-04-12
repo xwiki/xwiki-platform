@@ -28,19 +28,24 @@
 // Start JavaScript-only code.
 (function(icons) {
   "use strict";
-define('users-and-groups-translation-keys', {
-  prefix: 'platform.core.rightsManagement.',
-  keys: [
-    "allowed",
-    "denied",
-    "undefined"
-  ]
-});
-
+define('users-and-groups-translation-keys', { keys: [
+  "platform.core.rightsManagement.allowed",
+  "platform.core.rightsManagement.denied",
+  "platform.core.rightsManagement.undefined",
+  "rightsmanager.denyrightforcurrentuser",
+  "rightsmanager.clearrightforcurrentuserinstead",
+  "rightsmanager.clearrightforcurrentuser",
+  "rightsmanager.denyrightforgroup",
+  "rightsmanager.clearrightforgroupinstead",
+  "rightsmanager.clearrightforgroup",
+  "rightsmanager.denyrightforuorg",
+  "rightsmanager.clearrightforuorg",
+  "platform.core.rightsManagement.saveFailure",
+  "platform.core.rightsManagement.ajaxFailure"
+]});
 window.MSCheckbox = Class.create({
   /**
     * @todo Make confirmations generic.
-    * @todo L10N
     * @todo Send the state number, or a generic map {state => sendValue}
     * @todo Configuration: automatic save, or just change the value.
     * @todo "Busy" icon when saving.
@@ -50,34 +55,37 @@ window.MSCheckbox = Class.create({
     */
   initialize: function(domNode, right, saveUrl, defaultState, table, idx)
   {
-    this.table = table;
-    this.idx = idx;
-    if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
-      this.currentUorG = this.table.fetchedRows[this.idx].fullname;
-      this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
-    } else {
-      // guest users
-      this.currentUorG = window.unregUser;
-      this.isUserInGroup = false;
-    }
-    this.right = right;
-    this.saveUrl = saveUrl;
-    this.defaultState = defaultState;
-    this.state = defaultState;
-    this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
-    this.nrstates = this.states.length;
-    this.stateClasses = [
-      "none",
-      "yes",
-      "no"
-    ];
-    
-    this.button = document.createElement("button");
-    this.button.className = "btn btn-default btn-xs rights-edit";
-    this.button.addEventListener('click', this.createClickHandler(this));
-    
-    $(domNode).appendChild(this.button);
-    this.draw();
+    require(['xwiki-l10n!users-and-groups-translation-keys'], (l10n) => {
+      this._l10n = l10n; 
+      this.table = table;
+      this.idx = idx;
+      if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
+        this.currentUorG = this.table.fetchedRows[this.idx].fullname;
+        this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
+      } else {
+        // guest users
+        this.currentUorG = window.unregUser;
+        this.isUserInGroup = false;
+      }
+      this.right = right;
+      this.saveUrl = saveUrl;
+      this.defaultState = defaultState;
+      this.state = defaultState;
+      this.states = [0,1,2]; // 0 = undefined; 1 = allow, 2 = deny
+      this.nrstates = this.states.length;
+      this.stateClasses = [
+        "none",
+        "yes",
+        "no"
+      ];
+
+      this.button = document.createElement("button");
+      this.button.className = "btn btn-default btn-xs rights-edit";
+      this.button.addEventListener('click', this.createClickHandler(this));
+
+      $(domNode).appendChild(this.button);
+      this.draw();
+    });
   },
   
   draw: function()
@@ -98,14 +106,14 @@ window.MSCheckbox = Class.create({
     //Update the description of the button for accessibility.
     var button = this.button;
     var state = this.state;
-    require(['xwiki-l10n!users-and-groups-translation-keys'], function(l10n) {
-      var alts = [
-        l10n['undefined'],
-        l10n['allowed'],
-        l10n['denied']
-      ];
-      button.title = alts[state];
-    });
+
+    var alts = [
+      this._l10n['platform.core.rightsManagement.undefined'],
+      this._l10n['platform.core.rightsManagement.allowed'],
+      this._l10n['platform.core.rightsManagement.denied']
+    ];
+    button.title = alts[state];
+
   },
 
   nextState: function(){
@@ -134,6 +142,7 @@ window.MSCheckbox = Class.create({
    */
   createClickHandler: function(self)
   {
+    const l10n = this._l10n;
     return function(event) {
       event.preventDefault();
       if (self.req) {
@@ -146,9 +155,9 @@ window.MSCheckbox = Class.create({
       // 1. The current user is clearing / denying himself any right.
       if (self.currentUorG == window.currentUser) {
         if (nxtst == 2) {
-          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforcurrentuser'))".replace('__right__', self.right);
+          var denymessage = l10n['rightsmanager.denyrightforcurrentuser'].replace('__right__', self.right);
           if (!confirm(denymessage)) {
-            var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforcurrentuserinstead'))".replace('__right__', self.right);
+            var clearmessage = l10n['rightsmanager.clearrightforcurrentuserinstead'].replace('__right__', self.right);
             if (confirm(clearmessage)) {
               action = "clear";
               self.state = 2;
@@ -158,7 +167,7 @@ window.MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforcurrentuser'))".replace('__right__', self.right);
+          var clearmessage = l10n['rightsmanager.clearrightforcurrentuser'].replace('__right__', self.right);
           if (!confirm(clearmessage)) {
             return;
           }
@@ -167,10 +176,10 @@ window.MSCheckbox = Class.create({
       // 2. The current user is clearing / denying any rights for a group he belongs to.
       else if (self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
         if (nxtst == 2) {
-          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforgroup'))".replace(/__right__/g, self.right);
+          var denymessage = l10n['rightsmanager.denyrightforgroup'].replace(/__right__/g, self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
-            var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforgroupinstead'))".replace(/__right__/g, self.right);
+            var clearmessage = l10n['rightsmanager.clearrightforgroupinstead'].replace(/__right__/g, self.right);
             clearmessage = clearmessage.replace('__name__', self.currentUorG);
             if (confirm(clearmessage)) {
               action = "clear";
@@ -181,7 +190,7 @@ window.MSCheckbox = Class.create({
             }
           }
         } else if (nxtst == 0) {
-          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforgroup'))".replace(/__right__/g, self.right);
+          var clearmessage = l10n['rightsmanager.clearrightforgroup'].replace(/__right__/g, self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -191,13 +200,13 @@ window.MSCheckbox = Class.create({
       // 3. The current user is is clearing / denying admin right for any user / group.
       else if (self.right == "admin") {
         if (nxtst == 2) {
-          var denymessage = "$escapetool.javascript($services.localization.render('rightsmanager.denyrightforuorg'))".replace('__right__', self.right);
+          var denymessage = l10n['rightsmanager.denyrightforuorg'].replace('__right__', self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
             return;
           }
         } else if (nxtst == 0) {
-          var clearmessage = "$escapetool.javascript($services.localization.render('rightsmanager.clearrightforuorg'))".replace('__right__', self.right);
+          var clearmessage = l10n['rightsmanager.clearrightforuorg'].replace('__right__', self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
             return;
@@ -227,13 +236,13 @@ window.MSCheckbox = Class.create({
             //if an error occurred while trying to save a right rule, display an alert
             // and refresh the page, since probably the user does not have the right to perform
             // that action
-            alert("$services.localization.render('platform.core.rightsManagement.saveFailure')");
+            alert(l10n['platform.core.rightsManagement.saveFailure']);
             var rURL = unescape(window.location.pathname);
             window.location.href = rURL;
           }
         },
         onFailure: function() {
-          alert("$services.localization.render('platform.core.rightsManagement.ajaxFailure')");
+          alert(l10n['platform.core.rightsManagement.ajaxFailure']);
         },
         onComplete: function() {
           delete self.req;

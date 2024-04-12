@@ -65,8 +65,11 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      *   descendants)
      *
      * @param {boolean} propagate true when the new content should be propagated to coeditors
+     * @returns {Promise} a promise that resolves when the editor has finished handling the content update (some
+     *   changes, like for instance if you modify some macro parameters, might require a full refresh of the edited
+     *   content).
      */
-    contentUpdated(updatedNodes, propagate) {
+    async contentUpdated(updatedNodes, propagate) {
       throw new Error('Not implemented!');
     }
 
@@ -102,12 +105,17 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * Converts input data accepted by the editor to html that can be directly inserted in the editor's DOM.
+     * Simulates the loading of the given HTML in the editor without affecting the content that is currently being
+     * edited. The given HTML is parsed into a DOM representation and filtered as if it were to be edited in the editor.
+     * The returned element is similar to calling {@link #getContentWrapper()} after loading the given HTML in the
+     * editor.
      *
-     * @param {string} data the data to be converted
-     * @returns {string} html representation of the input data that can be inserted in the editor's DOM.
+     * @param {string} html the input HTML to be parsed; this should come either from {@link #getOutputHTML()} or from
+     *   rendering wiki syntax to Annotated HTML
+     * @returns {Element} the DOM representation of the given HTML, with some adjustments to match what you would get
+     *   if you were to load the given HTML directly in the editor; see also {@link #getContentWrapper()}
      */
-    convertDataToHtml(data) {
+    parseInputHTML(html) {
       throw new Error('Not implemented!');
     }
 
@@ -122,13 +130,6 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * return {Array<Object>} an array of HyperJSON filters specific to this editor implementation
-     */
-    getCustomFilters() {
-      return [];
-    }
-
-    /**
      * Adds a callback to be called before the editor is destroyed. This is useful for instance to disconnect from the
      * realtime session. It is especially important for the in-place editor where the user can enter and leave the edit
      * mode multiple times without reloading the web page, so resources and connections should be properly released when
@@ -137,6 +138,31 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      * @param {Function} callback the function to call before the editor is destroyed
      */
     onBeforeDestroy(callback) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * Adds a callback to be called before the editor is locked.
+     *
+     * @param {Function} callback the function to call before the editor is locked
+     */
+    onLock(callback) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * Adds a callback to be called after the editor is unlocked.
+     *
+     * @param {Function} callback the function to call after the editor is unlocked
+     */
+    onUnlock(callback) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * @param {boolean} readOnly {@code true} if the editor should be set to read-only mode, false otherwise
+     */
+    setReadOnly(readOnly) {
       throw new Error('Not implemented!');
     }
   }

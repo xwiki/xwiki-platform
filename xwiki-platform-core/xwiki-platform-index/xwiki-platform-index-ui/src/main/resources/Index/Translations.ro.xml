@@ -36,15 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Spații
-index.spacesMacro.spaceIndex.title=Vezi indexul spațiului
-index.spacesMacro.spaceIndex.alt=Indexul spațiului
-index.spacesMacro.spaceAdministration.title=Vezi administrarea spațiului
-index.spacesMacro.spaceAdministration.alt=Administrează spațiul
-index.spacesMacro.createSpace.link=Creează un spațiu nou
-index.spacesMacro.createSpace.defaultSpaceName=Nume spațiu
-index.spacesMacro.createSpace.submit=Creează
-index.deletedDocuments.deleteAll=Șterge tot
+  <content>index.deletedDocuments.deleteAll=Șterge tot
 index.administration.remainingTasks.heading=Sarcini rămase de analiză a documentelor
 index.administration.remainingTasks.emptyQueue=Nu există sarcini rămase.
 admin.documentanalysis=Analiza documentelor

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tour.test.po.PageWithTour;
 import org.xwiki.tour.test.po.StepEditModal;
@@ -92,7 +93,9 @@ class TourApplicationIT
     {
         TourHomePage tourHomePage = TourHomePage.gotoPage();
         ViewPage tourPage = tourHomePage.getTourPage("Test");
-        tourPage.delete().clickYes();
+        DeletingPage deletingPage = tourPage.deletePage().confirmDeletePage();
+        deletingPage.waitUntilFinished();
+        assertTrue(deletingPage.isSuccess());
     }
 
     private void tourBoundToPage()

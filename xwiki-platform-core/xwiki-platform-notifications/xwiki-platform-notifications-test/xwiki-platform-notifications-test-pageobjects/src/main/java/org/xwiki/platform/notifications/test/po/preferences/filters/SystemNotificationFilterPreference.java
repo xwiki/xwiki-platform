@@ -32,8 +32,6 @@ import org.xwiki.test.ui.XWikiWebDriver;
  */
 public class SystemNotificationFilterPreference extends AbstractNotificationFilterPreference
 {
-    private final String description;
-
     /**
      * Default constructor.
      * @param parentPage the page where the settings are displayed.
@@ -44,13 +42,14 @@ public class SystemNotificationFilterPreference extends AbstractNotificationFilt
         XWikiWebDriver webDriver)
     {
         super(parentPage, row, webDriver);
-        this.description = row.findElement(By.cssSelector("td[data-title='Description'] .view")).getText();
     }
 
-    @Override
-    protected WebElement getNameElement(WebElement row)
+    /**
+     * @return the name of the filter.
+     */
+    public String getName()
     {
-        return row.findElement(By.cssSelector("td[data-title='Name'] .view"));
+        return getRow().findElement(By.cssSelector("td[data-title='Name'] .view")).getText();
     }
 
     /**
@@ -58,6 +57,6 @@ public class SystemNotificationFilterPreference extends AbstractNotificationFilt
      */
     public String getDescription()
     {
-        return this.description;
+        return getRow().findElement(By.cssSelector("td[data-title='Description'] .view")).getText();
     }
 }

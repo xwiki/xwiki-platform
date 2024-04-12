@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.3.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.2.0-SNAPSHOT</version>
+  <version>16.3.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -54,19 +54,19 @@
     <batik.version>1.17</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.1</tika.version>
-    <pdfbox.version>2.0.30</pdfbox.version>
+    <pdfbox.version>2.0.31</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>10.0.20</jetty.server.version>
     <jetty.client.version>${jetty.server.version}</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.107.Final</netty.version>
+    <netty.version>4.1.108.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.6</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.41</jersey.version>
+    <jersey.version>2.42</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.2</zookeeper.version>
 
@@ -117,14 +117,14 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.2</pgsql.version>
+    <pgsql.version>42.7.3</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.11.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
-    <node.version>v20.11.1</node.version>
-    <npm.version>10.4.0</npm.version>
+    <node.version>v20.12.0</node.version>
+    <npm.version>10.5.1</npm.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -179,7 +179,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.26.0</version>
+        <version>4.27.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -1530,6 +1530,13 @@
                 <id>aopalliance:aopalliance</id>
                 <features>org.glassfish.hk2.external:aopalliance-repackaged</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>jakarta.ws.rs:jakarta.ws.rs-api</id>
+                <features>
+                    javax.ws.rs:jsr311-api,
+                    org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec
+                </features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>
@@ -1830,8 +1837,8 @@
       <pluginRepositories>
         <pluginRepository>
           <id>xwiki-snapshots</id>
-          <name>XWiki Nexus Plugin Snapshot Repository Proxy</name>
-          <url>https://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <name>XWiki Nexus Plugin Snapshot Repository</name>
+          <url>https://nexus-snapshots.xwiki.org/repository/snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>
@@ -1854,8 +1861,8 @@
       <repositories>
         <repository>
           <id>xwiki-snapshots</id>
-          <name>XWiki Nexus Snapshot Repository Proxy</name>
-          <url>https://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <name>XWiki Nexus Snapshot Repository</name>
+          <url>https://nexus-snapshots.xwiki.org/repository/snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>

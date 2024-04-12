@@ -30,16 +30,6 @@ define('xwiki-realtime-wysiwyg-patches', [
 ) {
   'use strict';
 
-  // HTML block-level elements.
-  const blocks = {"audio":1, "dd":1, "dt":1, "figcaption":1, "li":1, "video":1, "address":1, "article":1, "aside":1,
-    "blockquote":1, "details":1, "div":1, "dl":1, "fieldset":1, "figure":1, "footer":1, "form":1, "h1":1, "h2":1,
-    "h3":1, "h4":1, "h5":1, "h6":1, "header":1, "hgroup":1, "hr":1, "main":1, "menu":1, "nav":1, "ol":1, "p":1, "pre":1,
-    "section":1, "table":1, "ul":1, "center":1, "dir":1, "noframes":1, "body": 1};
-
-  // HTML block-level elements that can't be edited properly when empty, which is why we need to add a BR element.
-  const emptyBlocksExpectingLineEnding = 'p,div,h1,h2,h3,h4,h5,h6,li,td,th,dt,dd'.split(',')
-    .map(block => `${block}:empty`).join();
-
   class Patches {
     // We can't use private fields currently because neither JSHit nor Closure Compiler support them.
     // See https://github.com/jshint/jshint/issues/3361
@@ -50,14 +40,22 @@ define('xwiki-realtime-wysiwyg-patches', [
      */
     constructor(editor) {
       this._editor = editor;
-      this._diffDOM = Patches._createDiffDOM();
+      this._diffDOM = this._createDiffDOM();
       this._filters = new Filters();
-      this._filters.filters.push(...editor.getCustomFilters());
     }
 
-    static _createDiffDOM() {
+    _createDiffDOM() {
       const diffDOM = new DiffDOM.DiffDOM({
         preDiffApply: (change) => {
+          // Reject any change made directly to the root node (i.e. the editor content wrapper) because it may break the
+          // editor (e.g. it may remove attributes or listeners required by the editor). Only its descendants are
+          // allowed to be modified. Note that the root node shouldn't have any changes normally because we restore it
+          // in _restoreRootNode() before computing the changes, but we've seen cases where an (aria) attribute is added
+          // just after.
+          if (change.node === this._editor.getContentWrapper()) {
+            return true;
+          }
+
           if (['replaceElement', 'removeElement', 'removeTextElement'].includes(change.diff.action)) {
             diffDOM._updatedNodes.add(change.node.parentNode);
           } else if (['addAttribute', 'modifyAttribute', 'removeAttribute', 'modifyTextElement', 'modifyValue',
@@ -67,6 +65,11 @@ define('xwiki-realtime-wysiwyg-patches', [
         },
 
         postDiffApply: (change) => {
+          if (change.diff.action === 'addElement' && !change.newNode) {
+            // Unfortunately DiffDOM doesn't set the new node when an element is added so we have to find it ourselves.
+            change.newNode = this._getFromRoute(change.diff.route);
+          }
+
           if (['addTextElement', 'addElement'].includes(change.diff.action)) {
             diffDOM._updatedNodes.add(change.newNode);
           }
@@ -91,6 +94,21 @@ define('xwiki-realtime-wysiwyg-patches', [
     }
 
     /**
+     * Retrieve a node from the edited content, by its route.
+     *
+     * @param {Array[Number]} route a path in the content tree, where each step represents the index of a child of the
+     *   previous node
+     * @returns the node at the given route in the content tree
+     */
+    _getFromRoute(route) {
+      let node = this._editor.getContentWrapper();
+      for (const index of route) {
+        node = node.childNodes[index];
+      }
+      return node;
+    }
+
+    /**
      * @param {Node} node the DOM node to serialize as HyperJSON
      * @param {boolean} raw whether to filter the editor content or not before serializing it to HyperJSON;
      *   {@code true} to serialize the raw (unfiltered) content, {@code false} to serialize the filtered (normalized)
@@ -101,14 +119,16 @@ define('xwiki-realtime-wysiwyg-patches', [
       const predicate = !raw && this._filters.shouldSerializeNode.bind(this._filters);
       const filter = !raw && this._filters.filterHyperJSON.bind(this._filters);
       const hyperJSON = HyperJSON.fromDOM(node, predicate, filter);
-      if (!raw) {
-        // The root node depends on the type of editor. For the classical iframe-based editor the root node is the BODY.
-        // For the in-place editor the root node may be a DIV. We have to normalize the root node in order to be able to
-        // synchronize the content between different types of editors.
-        hyperJSON[0] = 'xwiki-content';
-        // Ignore all root attributes because they normally store user preferences that shouldn't be shared.
-        hyperJSON[1] = {};
-      }
+
+      // The root node depends on the type of editor. For the classical iframe-based editor the root node is the BODY.
+      // For the in-place editor the root node may be a DIV. We have to normalize the root node in order to be able to
+      // synchronize the content between different types of editors. Basically the root node itself is not synchronized,
+      // only its descendants are.
+      hyperJSON[0] = 'xwiki-content';
+      // Ignore all root attributes because they normally store user preferences that shouldn't be shared. Note that
+      // when we apply a remote change we make sure to not overwrite (remove all) the root node attributes.
+      hyperJSON[1] = {};
+
       return JSONSortify(hyperJSON);
     }
 
@@ -119,7 +139,15 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @returns {string} the serialization of the editor content as HyperJSON
      */
     getHyperJSON(raw) {
-      return this._stringifyNode(this._normalizeContent(this._editor.getContentWrapper()), raw);
+      if (raw) {
+        // The raw content is used to determine the local changes that need to be rebased on top of the received remote
+        // changes. Includes dynamic content, such as macro output.
+        return this._stringifyNode(this._editor.getContentWrapper(), true);
+      } else {
+        // The filtered content is synchronized with the other editors. Includes only the content that is normally sent
+        // to the server to be converted to wiki syntax.
+        return this._convertHTMLToHyperJSON(this._editor.getOutputHTML());
+      }
     }
 
     /**
@@ -130,21 +158,22 @@ define('xwiki-realtime-wysiwyg-patches', [
      *
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    setHyperJSON(remoteFilteredHyperJSON, propagate) {
+    async setHyperJSON(remoteFilteredHyperJSON, propagate) {
       let remoteHyperJSON;
       try {
         remoteHyperJSON = this._revertHyperJSONFilters(remoteFilteredHyperJSON);
       } catch (e) {
-        console.error('Failed to revert the HyperJSON filters.', {
+        console.warn('Failed to revert the HyperJSON filters.', {
           filteredHyperJSON: remoteFilteredHyperJSON,
           error: e
         });
-        return;
+        remoteHyperJSON = remoteFilteredHyperJSON;
       }
 
       let newContent;
       try {
-        newContent = HyperJSON.toDOM(JSON.parse(remoteHyperJSON));
+        remoteHyperJSON = JSON.parse(remoteHyperJSON);
+        newContent = HyperJSON.toDOM(this._restoreRootNode(remoteHyperJSON));
       } catch (e) {
         console.error('Failed to parse the HyperJSON string.', {
           filteredHyperJSON: remoteFilteredHyperJSON,
@@ -154,30 +183,34 @@ define('xwiki-realtime-wysiwyg-patches', [
         return;
       }
 
-      this._updateContent(newContent, propagate);
+      // Content update is asynchronous because it requires server-side rendering sometimes (e.g. when macro parameters
+      // have changed).
+      await this._updateContent(newContent, propagate);
     }
 
     /**
      * Update the editor content without affecting its caret / selection.
      * 
-     * @param {string} html the new HTML content
+     * @param {string} html the new HTML content; we expect this to be the result of rendering the wiki syntax to HTML
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    setHTML(html, propagate) {
-      const fixedHtml = this._editor.convertDataToHtml(html);
-
-      let doc;
-      try {
-        doc = new DOMParser().parseFromString(fixedHtml, 'text/html');
-      } catch (e) {
-        console.error('Failed to parse the given HTML string: ' + html, e);
-        return;
-      }
-
+    async setHTML(html, propagate) {
       // We convert to HyperJSON and set the HyperJSON so that we can use the same filters
       // as when receiving content from coeditors.
-      const hjson = this._stringifyNode(this._normalizeContent(doc.body), false);
-      this.setHyperJSON(hjson, propagate);
+      const hjson = this._convertHTMLToHyperJSON(html);
+      await this.setHyperJSON(hjson, propagate);
+    }
+
+    /**
+     * Converts the given HTML (obtained by rendering the wiki syntax) to HyperJSON.
+     *
+     * @param {string} html the HTML content to convert to HyperJSON; we expect this to be the result of rendering the
+     *   wiki syntax to HTML
+     * @returns {string} the HyperJSON that corresponds to the given HTML
+     */
+    _convertHTMLToHyperJSON(html) {
+      const contentWrapper = this._editor.parseInputHTML(html);
+      return this._stringifyNode(contentWrapper, false);
     }
 
     /**
@@ -186,10 +219,10 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @param {Node} newContent the new content to set, as a DOM node
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    _updateContent(newContent, propagate) {
+    async _updateContent(newContent, propagate) {
       // Remember where the selection is, to be able to restore it in case the content update affects it.
       this._editor.saveSelection();
-      const selection = this._editor.getSelection();
+      let selection = this._editor.getSelection();
       let rangeBefore = selection?.rangeCount && this._copyRangeBoundaryPoints(selection.getRangeAt(0));
 
       const oldContent = this._editor.getContentWrapper();
@@ -203,11 +236,12 @@ define('xwiki-realtime-wysiwyg-patches', [
         document: oldContent.ownerDocument
       });
 
-      this._editor.contentUpdated(this._diffDOM._updatedNodes, propagate);
+      await this._editor.contentUpdated(this._diffDOM._updatedNodes, propagate);
 
       // Restore the selection if the editor had a selection (i.e. if the selection was inside the editing area) before
       // the content update and it was affected by the content update. Note that the selection restore focuses the
-      // editor.
+      // editor. The editing area might have been reloaded so it's best to retrieve the selection again.
+      selection = this._editor.getSelection();
       const rangeAfter = selection?.rangeCount && selection.getRangeAt(0);
       if (rangeBefore && (!rangeBefore.startContainer.isConnected || !rangeBefore.endContainer.isConnected ||
           !this._isSameRange(rangeBefore, rangeAfter))) {
@@ -249,79 +283,116 @@ define('xwiki-realtime-wysiwyg-patches', [
 
     _revertHyperJSONFilters(remoteFilteredHyperJSON) {
       const localFilteredHyperJSON = this.getHyperJSON();
-      const localHyperJSON = this.getHyperJSON(true);
-      // Determine the list of operations that can be used to add the filtered content back.
-      const localOperations = ChainPad.Diff.diff(localFilteredHyperJSON, localHyperJSON);
-      const remoteOperations = ChainPad.Diff.diff(localFilteredHyperJSON, remoteFilteredHyperJSON);
-      // Transform the local operations so that we can apply them on top of the remote content.
-      const updatedLocalOperations = Transformers.RebaseNaiveJSONTransformer(localOperations, remoteOperations,
-        localFilteredHyperJSON);
-      // Apply the updated operations to the remote content in order to perform the 3-way merge (rebase). This way we
-      // integrate the local filtered content (user state, browser specific markup) into the remote content.
-      const remoteHyperJSON = ChainPad.Operation.applyMulti(updatedLocalOperations, remoteFilteredHyperJSON);
-      return remoteHyperJSON;
+      // Use the raw (unfiltered) content to determine the local changes only if the dynamic content (e.g. macro output)
+      // is not affected by the remote change. Otherwise, ignore the local filtered content (e.g. macro output) when
+      // deterining the local changes that need to be rebased on top of the received remote changes. The reason for this
+      // is because we can't merge the macro output when the macro parameters are modified. We need to re-render the
+      // macros (i.e. re-create the dynamic content).
+      const localHyperJSON = this.getHyperJSON(!this._isDynamicContentModified(localFilteredHyperJSON,
+        remoteFilteredHyperJSON));
+      return Patches.merge(localFilteredHyperJSON, remoteFilteredHyperJSON, localHyperJSON);
     }
 
     /**
-     * The real-time sychronization works best when all users work with the same content (DOM). However, the edited
-     * content (DOM) is not always the same in all browsers. For instance some browsers require a BR element to make
-     * empty blocks editable, while others don't. Some browsers remove that BR element once you start typing, others
-     * don't. The goal of this function is to remove some of these inconsistencies. Note that this functions modifies
-     * directly the edited content (DOM), unlike the HyperJSON filters, so it doesn't remove user state (which is done
-     * by the filters).
+     * Compares the local content with the remote content in order to determine if the dynamic content needs to be
+     * reloaded because some of its parameters have been modified.
      *
-     * @param {Node} content the DOM node to normalize
-     * @returns {Node} the normalized DOM node
+     * @param {string} localHyperJSON the local content
+     * @param {string} remoteHyperJSON the remote content
+     * @returns {boolean} {@code true} if the dynamic content needs to be reloaded because some of its parameters have
+     *   been modified, {@code false} otherwise
      */
-    _normalizeContent(content) {
-      // Remove empty text nodes and join adjacent text nodes.
-      content.normalize();
-
-      // Firefox needs a BR element at the end of each block otherwise space characters at the end of the block are
-      // removed once you start typing. We need to add this BR ourselves for other browsers to ensure all users are
-      // editing the same content (minus the user state).
-      this._addLineEndings(content);
-
-      return content;
-    }
-
-    /**
-     * Adds a BR element to empty blocks and after each text node that is either followed by a block or is the last leaf
-     * of the block element that contains it.
-     *
-     * @param {Node} node the node to which we want to add line endings
-     */
-    _addLineEndings(node) {
-      // Add a BR element to empty blocks in order to make them editable.
-      node.querySelectorAll(emptyBlocksExpectingLineEnding).forEach(emptyBlock => {
-        emptyBlock.appendChild(emptyBlock.ownerDocument.createElement('br'));
-      });
-
-      // Add a BR element after text nodes that are followed by a block or that are the last leaf of a block.
-      const textIterator = node.ownerDocument.createNodeIterator(node, NodeFilter.SHOW_TEXT,
-        text => (
-          // Look for text nodes that either are the last child node of their parent or are followed by a block...
-          (!text.nextSibling || blocks[text.nextSibling.nodeName.toLowerCase()]) &&
-          // ...and that are not empty (excluding whitespace, except for non-breaking space).
-          (text.nodeValue.trim().length || text.nodeValue.includes('\u00A0'))
-        ) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT);
-
-      let textNode;
-      while ((textNode = textIterator.nextNode())) {
-        let node = textNode;
-        // Go up the DOM as long as there is no next sibling and we remain inside the current block.
-        while (!node.nextSibling && node.parentNode && !blocks[node.parentNode.nodeName.toLowerCase()]) {
-          node = node.parentNode;
+    _isDynamicContentModified(localHyperJSON, remoteHyperJSON) {
+      const localMacroIterator = new MacroHyperJSONIterator(localHyperJSON);
+      const remoteMacroIterator = new MacroHyperJSONIterator(remoteHyperJSON);
+      let localMacro, remoteMacro;
+      do {
+        localMacro = localMacroIterator.next();
+        remoteMacro = remoteMacroIterator.next();
+        if (localMacro.done !== remoteMacro.done || localMacro.value !== remoteMacro.value) {
+          return true;
         }
-        // We either found the next node or we reached the block containing the text node.
-        if (node.nextSibling && blocks[node.nextSibling.nodeName.toLowerCase()]) {
-          // The text node is followed by a block, add a BR element before the block.
-          node.parentNode.insertBefore(node.ownerDocument.createElement('br'), node.nextSibling);
-        } else if (!node.nextSibling && node.parentNode) {
-          // The text node is the last leaf of a block element. Append a BR at the end of that block.
-          node.parentNode.appendChild(node.ownerDocument.createElement('br'));
+      } while (!localMacro.done && !remoteMacro.done);
+      return false;
+    }
+
+    /**
+     * Make sure the root node of the given HyperJSON matches the editor content wrapper. We have to do this, otherwise
+     * we can't apply the given HyperJSON (the root nodes must match in order to be able to compute the changes and
+     * apply the patch). Moreover, the root node itself is not synchronized, only its descendants are, so we shouldn't
+     * lose or overwrite any of its attributes.
+     *
+     * @param {Array} hyperJSON the HyperJSON for which to restore the root node
+     * @returns {Array} the modified HyperJSON, with the root node restored
+     */
+    _restoreRootNode(hyperJSON) {
+      // Create a shallow clone of the content wrapper node and compute the corresponding HyperJSON.
+      const rootClone = this._editor.getContentWrapper().cloneNode(false);
+      const rootHyperJSON = HyperJSON.fromDOM(rootClone);
+      // Preserve the descendants from the given HyperJSON.
+      rootHyperJSON[2] = hyperJSON[2];
+      return rootHyperJSON;
+    }
+
+    /**
+     * Transform the local changes (from the current version) so that they can be rebased on top of the remote changes
+     * (from the next version), producing the merged version.
+     *
+     * @param {string} previous the common ancestor between the current version and the next version of the content
+     * @param {string} next the next version of the content, usually the previous version plus the remote changes
+     * @param {string} current the current version of the content, usually the previous version plus the local changes
+     * @returns {string} the merged version of the content, where local changes have been rebased on top of the remote
+     *   changes
+     */
+    static merge(previous, next, current) {
+      // Determine the local and remote changes (operations).
+      const localOperations = ChainPad.Diff.diff(previous, current);
+      const remoteOperations = ChainPad.Diff.diff(previous, next);
+      // Transform the local operations so that we can apply them on top of the remote content (next).
+      const updatedLocalOperations = Transformers.RebaseNaiveJSONTransformer(localOperations, remoteOperations,
+        previous);
+      // Apply the updated operations to the remote content in order to perform the 3-way merge (rebase).
+      const merged = ChainPad.Operation.applyMulti(updatedLocalOperations, next);
+      return merged;
+    }
+  }
+
+  class MacroHyperJSONIterator {
+    /**
+     * @param {string} hyperJSON the HyperJSON to iterate over
+     */
+    constructor(hyperJSON) {
+      this._path = [{
+        parent: ['', {}, [JSON.parse(hyperJSON)]],
+        index: 0
+      }];
+    }
+
+    next() {
+      while (this._path.length) {
+        const currentItem = this._path[this._path.length - 1];
+        if (currentItem.index < currentItem.parent[2].length) {
+          const nextParent = currentItem.parent[2][currentItem.index++];
+          if (!Array.isArray(nextParent)) {
+            // Skip text nodes.
+            continue;
+          }
+          // Step inside the found element.
+          this._path.push({
+            parent: nextParent,
+            index: 0
+          });
+          if (nextParent[1]['data-macro']) {
+            return {
+              done: false,
+              value: nextParent[1]['data-macro']
+            };
+          }
+        } else {
+          this._path.pop();
         }
       }
+      return {done: true};
     }
   }
 

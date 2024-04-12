@@ -204,18 +204,17 @@
               macro.add(child);
             });
           } else {
-            var thisWidget = this;
             // If the widget has nested editables we need to include them, otherwise their content is not saved.
-            widgetElementClone.forEach(function(element) {
-              var nestedEditableType = getNestedEditableType(element);
+            widgetElementClone.forEach(element => {
+              const nestedEditableType = getNestedEditableType(element);
               if (nestedEditableType && element.attributes.contenteditable) {
-                var parameterType = thisWidget.getParameterType(element.attributes[nestedEditableNameAttribute]);
+                const parameterType = this.getParameterType(element.attributes[nestedEditableNameAttribute]);
                 // Skip the nested editable if it doesn't match the expected parameter type.
                 if (!parameterType || nestedEditableType === parameterType) {
                   macro.add(element);
                 }
                 return false;
-              } else if (thisWidget.upcast(element)) {
+              } else if (this.upcast(element)) {
                 // Skip nested macros that are outside of a nested editable.
                 return false;
               }
@@ -250,6 +249,8 @@
           var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
           // Preserve the macro type (in-line vs. block) as much as possible when editing a macro.
           data.inline = this.inline;
+          // Remove from the macro call the parameters that are editable in-place using nested editables.
+          this.simplifyMacroCall(data);
           // Update the macro widget data.
           this.setData(data);
           // Allow JavaScript code to update the macro output after the widget is ready. We have to do this only once
@@ -261,6 +262,16 @@
               $(editor.document.$).trigger('xwiki:dom:updated', {'elements': [this.element.$]});
             });
           }
+        },
+        simplifyMacroCall: function(macroCall) {
+          if (this.editables.$content) {
+            delete macroCall.content;
+          }
+          Object.keys(this.editables).forEach(name => {
+            const parameterName = Object.keys(macroCall.parameters)
+              .find(key => key.toLowerCase() === name.toLowerCase());
+            delete macroCall.parameters[parameterName];
+          });
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));

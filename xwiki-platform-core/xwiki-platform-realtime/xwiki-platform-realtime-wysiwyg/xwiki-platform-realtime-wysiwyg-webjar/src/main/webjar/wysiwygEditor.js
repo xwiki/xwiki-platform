@@ -596,16 +596,10 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     _easyTest() {
-      let container, offset;
-      const selection = this._editor.getSelection();
-      const range = selection?.rangeCount && selection.getRangeAt(0);
-      if (range) {
-        container = range.startContainer;
-        offset = range.startOffset;
-      }
-      const test = TypingTest.testInput(this._editor.getContentWrapper(), container, offset, this._onLocal.bind(this));
-      this._onLocal();
-      return test;
+      return TypingTest.testInput(
+        () => this._editor.getContentWrapper()?.ownerDocument.defaultView.getSelection(),
+        this._onLocal.bind(this)
+      );
     }
 
     _getXPath(element) {

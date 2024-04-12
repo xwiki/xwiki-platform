@@ -403,8 +403,8 @@ define('xwiki-realtime-wysiwyg', [
           crypto: Crypto,
           editor: EDITOR_TYPE,
           getCursor: () => {
-            const selection = this._editor.getSelection();
-            let node = selection?.rangeCount && selection.getRangeAt(0).startContainer;
+            // We take into account only the first selection range when showing the user cursor.
+            let node = this._editor.getSelection()[0]?.startContainer;
             if (!node) {
               return '';
             }
@@ -463,10 +463,6 @@ define('xwiki-realtime-wysiwyg', [
       // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they had
       // to be reloaded, e.g. rendering macros have to be rendered server-side).
       await this._patchedEditor.setHyperJSON(remoteContent);
-
-      // The remote content might have changed while we were waiting for the local content to be updated. If that was
-      // the case then the local content should have been merged when the editor was unlocked.
-      remoteContent = info.realtime.getUserDoc();
 
       const localContent = this._patchedEditor.getHyperJSON();
       if (localContent !== remoteContent) {

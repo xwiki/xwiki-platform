@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.security.requiredrights.internal.provider;
+package org.xwiki.platform.security.requiredrights.internal.display;
 
 import java.io.StringReader;
 import java.util.List;
@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.DefinitionDescriptionBlock;

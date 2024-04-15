@@ -20,6 +20,7 @@
 package org.xwiki.attachment.configuration;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * General configuration values for attachments.
@@ -27,11 +28,12 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @since 16.3.0RC1
  */
+@Unstable
 @Role
 public interface AttachmentConfiguration
 {
     /**
-     * @return whether or not summaries for attachments should be settable and displayed from UI
+     * @return whether or not comments for attachment uploads should be settable and displayed from UI
      */
-    boolean areSummariesEnabled();
+    boolean isCommentsEnabled();
 }

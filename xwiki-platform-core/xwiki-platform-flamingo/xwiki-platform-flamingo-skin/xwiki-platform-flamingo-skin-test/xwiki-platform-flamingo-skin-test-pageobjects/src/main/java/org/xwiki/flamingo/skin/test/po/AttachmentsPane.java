@@ -125,18 +125,18 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
-     * Fills the upload summary.
+     * Fills the upload comment.
      *
-     * @param summary the upload summary.
+     * @param comment the upload comment.
      * @since 16.3.0RC1
      */
-    public void setUploadSummary(final String summary)
+    public void setUploadComment(final String comment)
     {
         final List<WebElement> inputs = this.pane.findElements(By.className("uploadCommentInput"));
         WebElement input = inputs.get(inputs.size() - 1);
         // Clean the field before setting the value in case of successive uploads.
         input.clear();
-        input.sendKeys(summary);
+        input.sendKeys(comment);
     }
 
     /**

@@ -113,6 +113,6 @@ class AttachmentScriptServiceTest
     void getDefaultConfiguration()
     {
         AttachmentConfiguration configuration = this.attachmentScriptService.getConfiguration();
-        assertFalse(configuration.areSummariesEnabled());
+        assertFalse(configuration.isCommentsEnabled());
     }
 }

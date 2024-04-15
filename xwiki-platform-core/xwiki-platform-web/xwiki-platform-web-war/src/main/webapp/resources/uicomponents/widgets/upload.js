@@ -203,7 +203,7 @@ var XWiki = (function(XWiki) {
       });
 
       if (this.formData.comment) {
-        var commentValue = this.formData.comment.value;
+        const commentValue = this.formData.comment.value;
         commentValue && formData.append('comment', commentValue);
       }
 

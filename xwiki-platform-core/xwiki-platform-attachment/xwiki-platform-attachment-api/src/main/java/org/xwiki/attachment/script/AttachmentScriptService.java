@@ -40,6 +40,7 @@ import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -167,6 +168,7 @@ public class AttachmentScriptService implements ScriptService
      * @return the current configuration for attachments
      * @since 16.3.0RC1
      */
+    @Unstable
     public AttachmentConfiguration getConfiguration()
     {
         return this.attachmentConfiguration;

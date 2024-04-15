@@ -21,13 +21,14 @@ package org.xwiki.attachment.internal.configuration;
 
 import javax.inject.Named;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,16 +48,17 @@ class DefaultAttachmentConfigurationTest
     @Named("xwikiproperties")
     private ConfigurationSource xWikiPropertiesConfigurationSource;
 
-    private static final String ATTACHMENT_MIMETYPE_ENABLE_SUMMARIES_PROPERTY = "attachment.upload.enableSummaries";
+    private static final String ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY = "attachment.upload.enableComments";
 
-    @Test
-    void areSummariesEnabledInPropertiesConfigurationSource()
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void areCommentsEnabledInPropertiesConfigurationSource(boolean enabled)
     {
-        when(this.xWikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_SUMMARIES_PROPERTY, false))
-            .thenReturn(true);
+        when(this.xWikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY, false))
+            .thenReturn(enabled);
 
-        assertTrue(this.attachmentConfiguration.areSummariesEnabled());
-        verify(this.xWikiPropertiesConfigurationSource).getProperty(ATTACHMENT_MIMETYPE_ENABLE_SUMMARIES_PROPERTY,
+        assertEquals(enabled, this.attachmentConfiguration.isCommentsEnabled());
+        verify(this.xWikiPropertiesConfigurationSource).getProperty(ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY,
             false);
     }
 }

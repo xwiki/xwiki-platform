@@ -36,7 +36,7 @@ public class AttachmentHistoryPage extends ViewPage
 
     private static final int AUTHOR_COL_IDX = 4;
 
-    private static final int SUMMARY_COL_IDX = 6;
+    private static final int COMMENT_COL_IDX = 6;
 
     /**
      * @param rowIdx the index of the row of the attachment, starting at 1
@@ -83,12 +83,12 @@ public class AttachmentHistoryPage extends ViewPage
 
     /**
      * @param rowIdx the index of the row of the attachment, starting at 1
-     * @return the summary of the requested attachment version
+     * @return the comment of the requested attachment version
      * @since 16.3.0RC1
      */
-    public String getSummary(int rowIdx)
+    public String getComment(int rowIdx)
     {
-        return getCell(rowIdx, SUMMARY_COL_IDX).getText();
+        return getCell(rowIdx, COMMENT_COL_IDX).getText();
     }
 
     private WebElement getCell(long rowIdx, int columnIdx)

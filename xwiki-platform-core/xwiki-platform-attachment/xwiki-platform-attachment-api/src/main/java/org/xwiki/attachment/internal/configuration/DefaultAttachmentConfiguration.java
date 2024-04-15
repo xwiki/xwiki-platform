@@ -37,16 +37,15 @@ import org.xwiki.configuration.ConfigurationSource;
 @Singleton
 public class DefaultAttachmentConfiguration implements AttachmentConfiguration
 {
-    private static final String ATTACHMENT_MIMETYPE_ENABLE_SUMMARIES_PROPERTY = "attachment.upload.enableSummaries";
+    private static final String ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY = "attachment.upload.enableComments";
 
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource xWikiPropertiesConfigurationSource;
 
     @Override
-    public boolean areSummariesEnabled()
+    public boolean isCommentsEnabled()
     {
-        return this.xWikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_SUMMARIES_PROPERTY,
-            false);
+        return this.xWikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY, false);
     }
 }

@@ -39,8 +39,8 @@ public class AllIT
     }
 
     @Nested
-    @DisplayName("Set and display attachment summaries test")
-    class NestedAttachmentSummaryIT extends AttachmentSummaryIT
+    @DisplayName("Set and display attachment comments test")
+    class NestedAttachmentCommentIT extends AttachmentCommentIT
     {
     }
 }

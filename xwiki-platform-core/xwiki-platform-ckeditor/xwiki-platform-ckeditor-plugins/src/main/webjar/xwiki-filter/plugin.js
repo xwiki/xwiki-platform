@@ -40,6 +40,36 @@
     __namespace: true
   };
 
+  /**
+   * Remove data-widget attributes on image as they can lead to CKEditor crashing.
+   * @param event a toHtml event
+   */
+  function cleanupImages(event) {
+    const domParser = new DOMParser();
+    let html = event.data.dataValue;
+    // Depending on the editor type (inline or iframe-based) and configuration (fullPage true or false) the HTML
+    // string can be a full HTML document or just a fragment (e.g. the content of the BODY tag).
+    const isFragment = !html.trimEnd().endsWith('</html>');
+    try {
+      const doc = domParser.parseFromString(html, 'text/html');
+      // We want to modify the input HTML string only if there is a style tag that need escaping.
+      let modified = false;
+      doc.querySelectorAll('img').forEach(img => {
+        const dataWidgetAttribute = 'data-widget';
+        const hasDataWidget = img.hasAttribute(dataWidgetAttribute);
+        if(hasDataWidget) {
+          img.removeAttribute(dataWidgetAttribute);
+        }
+        modified = modified || hasDataWidget;
+      });
+      if (modified) {
+        event.data.dataValue = isFragment ? doc.body.innerHTML : doc.documentElement.outerHTML;
+      }
+    } catch (e) {
+      console.warn('Failed to cleanup the image attributes from the given HTML string: ' + html, e);
+    }
+  }
+
   CKEDITOR.plugins.add('xwiki-filter', {
     init: function(editor) {
       var replaceEmptyLinesWithEmptyParagraphs = {
@@ -167,6 +197,7 @@
       // parser is called in both cases. Priority 1 is needed to ensure our listener is called before the HTML parser
       // (which has priority 5).
       editor.on('toHtml', escapeStyleContent, null, null, 1);
+      editor.on('toHtml', cleanupImages, null, null, 1);
       editor.on('toDataFormat', escapeStyleContent, null, null, 1);
 
       // Transform <font color="..." face="..."> into <span style="color: ...; font-family: ...">.

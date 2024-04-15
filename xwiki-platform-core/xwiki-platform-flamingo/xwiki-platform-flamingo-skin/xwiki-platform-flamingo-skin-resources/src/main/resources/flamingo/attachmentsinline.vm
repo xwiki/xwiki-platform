@@ -46,7 +46,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
     ## <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
     <div class="fileupload-field">
-      #if ($services.attachmentValidation.areSummariesEnabled())
+      #if ($services.attachment.configuration.areSummariesEnabled())
         <label for="xwikiuploadcomment" class="sr-only">$services.localization.render('core.viewers.attachments.upload.comment')</label>
         <input type="text" id="xwikiuploadcomment" class="uploadCommentInput" name="comment" placeholder="$services.localization.render('core.viewers.attachments.upload.comment')" title="$services.localization.render('core.comment.tooltip')" maxlength="1023" />
       #end

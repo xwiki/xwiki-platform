@@ -65,8 +65,6 @@ public class DefaultAttachmentValidationConfiguration implements AttachmentValid
 
     private static final String ATTACHMENT_MIMETYPE_BLOCK_LIST_PROPERTY = "attachment.upload.blockList";
 
-    private static final String ATTACHMENT_MIMETYPE_ENABLE_SUMMARIES_PROPERTY = "attachment.upload.enableSummaries";
-
     @Inject
     @Named(DefaultAttachmentMimetypeRestrictionSpacesConfigurationSource.HINT)
     private ConfigurationSource attachmentConfigurationSource;
@@ -127,13 +125,6 @@ public class DefaultAttachmentValidationConfiguration implements AttachmentValid
         } finally {
             context.setDoc(previous);
         }
-    }
-
-    @Override
-    public boolean areSummariesEnabled()
-    {
-        return this.xWikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_SUMMARIES_PROPERTY,
-            false);
     }
 
     private List<String> getPropertyWithFallback(String attachmentXObjectProperty, String xWikiPropertiesProperty)

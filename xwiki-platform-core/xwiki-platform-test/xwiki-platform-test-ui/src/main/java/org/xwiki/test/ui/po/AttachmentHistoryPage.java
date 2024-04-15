@@ -84,6 +84,7 @@ public class AttachmentHistoryPage extends ViewPage
     /**
      * @param rowIdx the index of the row of the attachment, starting at 1
      * @return the summary of the requested attachment version
+     * @since 16.3.0RC1
      */
     public String getSummary(int rowIdx)
     {

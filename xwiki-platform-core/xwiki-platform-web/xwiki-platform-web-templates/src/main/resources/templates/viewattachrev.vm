@@ -31,7 +31,7 @@
     <tr>
         <th></th><th>$services.localization.render('version')</th><th>$services.localization.render('size')</th>
         <th>$services.localization.render('author')</th><th>$services.localization.render('date')</th>
-        #if ($services.attachmentValidation.areSummariesEnabled())
+        #if ($services.attachment.configuration.areSummariesEnabled())
           <th>$services.localization.render('core.viewers.attachments.livetable.comment')</th>
         #end
     </tr>
@@ -53,7 +53,7 @@
         <td>$attachrev.longSize</td>
         <td>$xwiki.getUserName($attachrev.getAuthor())</td>
         <td>$xwiki.formatDate($attachrev.getDate())</td>
-        #if ($services.attachmentValidation.areSummariesEnabled())
+        #if ($services.attachment.configuration.areSummariesEnabled())
           <td>$escapetool.xml($attachrev.comment)</td>
         #end
     </tr>

@@ -128,6 +128,7 @@ public class AttachmentsPane extends BaseElement
      * Fills the upload summary.
      *
      * @param summary the upload summary.
+     * @since 16.3.0RC1
      */
     public void setUploadSummary(final String summary)
     {

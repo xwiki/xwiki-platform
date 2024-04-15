@@ -61,17 +61,14 @@ class AttachmentSummaryIT
     @Order(1)
     void checkSummary(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
-        DocumentReference attachmentsPage = new DocumentReference("Attachments", testReference.getLastSpaceReference());
-
         setup.loginAsSuperAdmin();
-        setup.deletePage(attachmentsPage);
+        setup.deletePage(testReference);
 
-        setup.createPage(attachmentsPage, "");
+        setup.createPage(testReference, "");
 
         String attachmentPath = new File(new File(testConfiguration.getBrowser().getTestResourcesPath(), "v0"),
             ATTACHMENT_FILENAME).getAbsolutePath();
 
-        setup.gotoPage(attachmentsPage);
         AttachmentsPane sourceAttachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         sourceAttachmentsPane.setUploadSummary("Summary 1");
         sourceAttachmentsPane.setFileToUpload(attachmentPath);

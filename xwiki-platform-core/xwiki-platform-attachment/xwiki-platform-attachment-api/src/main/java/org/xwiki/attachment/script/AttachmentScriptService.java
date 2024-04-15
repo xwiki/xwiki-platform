@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.attachment.AttachmentException;
+import org.xwiki.attachment.configuration.AttachmentConfiguration;
 import org.xwiki.attachment.internal.AttachmentsManager;
 import org.xwiki.attachment.internal.refactoring.job.MoveAttachmentJob;
 import org.xwiki.attachment.refactoring.MoveAttachmentRequest;
@@ -73,6 +74,9 @@ public class AttachmentScriptService implements ScriptService
     @Inject
     @Named("readonly")
     private Provider<XWikiContext> xWikiContextProvider;
+
+    @Inject
+    private AttachmentConfiguration attachmentConfiguration;
 
     @Inject
     private Logger logger;
@@ -155,5 +159,16 @@ public class AttachmentScriptService implements ScriptService
             throw new AttachmentException(
                 String.format("Failed to get the backlinks for attachment [%s]", attachmentReference), e);
         }
+    }
+
+    /**
+     * Gets the current configuration for attachments.
+     *
+     * @return the current configuration for attachments
+     * @since 16.3.0RC1
+     */
+    public AttachmentConfiguration getConfiguration()
+    {
+        return this.attachmentConfiguration;
     }
 }

@@ -45,7 +45,9 @@ define('xwiki-realtime-wysiwyg-patches', [
           // Reject any change made directly to the root node (i.e. the editor content wrapper) because it may break the
           // editor (e.g. it may remove attributes or listeners required by the editor). Only its descendants are
           // allowed to be modified.
-          if (change.node === this._editor.getContentWrapper()) {
+          if (change.node === this._editor.getContentWrapper() &&
+              // Allow actions where change.node is actually the parent node where the chaange takes place.
+              !['addElement', 'addTextElement', 'relocateGroup'].includes(change.diff.action)) {
             return true;
           }
         },

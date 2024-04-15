@@ -33,11 +33,13 @@ public class WatchedLocationState
     public enum WatchedState
     {
         WATCHED,
+        WATCHED_BY_ANCESTOR,
         BLOCKED,
+        BLOCKED_BY_ANCESTOR,
         CUSTOM,
         NOT_SET
     }
-    private WatchedState state;
+    private final WatchedState state;
 
     private Date startingDate;
 

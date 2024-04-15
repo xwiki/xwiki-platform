@@ -855,6 +855,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function ($, xm) {
   overflow-y: scroll;
   /* 320px is the width of the smallest smartphones right now, so we don't use a larger width */
   width: 320px;
+}
+
+#watchModal {
+  text-align: left;
 }</code>
     </property>
     <property>
@@ -1163,22 +1167,108 @@ separator=true</parameters>
 #if ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
   #set ($watchIcon = 'fa-bell')
   #set ($watchText = 'Followed')
+  #set ($watchModalDescription = 'This page is followed: you will receive notifications for all event types.')
+#elseif ($watchedStatus == 'WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell')
+  #set ($watchText = 'Followed')
+  #set ($watchModalDescription = 'This page is followed through another page in the hierarchy: you will receive notifications for all event types.')
 #elseif ($watchedStatus == 'NOT_SET')
   #set ($watchIcon = 'fa-bell-o')
   #set ($watchText = 'Not set')
+  #set ($watchModalDescription = 'There is no watch settings for this page, but by default it is followed: you will receive notifications for all event types.')
 #elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
   #set ($watchIcon = 'fa-bell-slash')
-  #set ($watchText = 'Blocked')
+  #set ($watchText = 'Ignored')
+  #set ($watchModalDescription = 'This page is ignored: you won''t receive any notifications for it.')
+#elseif ($watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell-slash')
+  #set ($watchText = 'Ignored')
+  #set ($watchModalDescription = 'This page is ignored through another page in the hierarchy: you won''t receive any notifications for it.')
 #else
   #set ($watchIcon = 'fa-bullhorn')
   #set ($watchText = 'Custom')
+  #set ($watchModalDescription = 'The watch settings are custom for this page: you should review the filters applied for the page to know exactly which notifications you might receive.')
 #end
 {{html clean='false'}}
 &lt;div class="btn-group" id="watchButton"&gt;
-  &lt;a href="#" role="button" title="Watch" class="btn btn-default"&gt;
+  &lt;a href="#" role="button" title="Watch" class="btn btn-default" data-toggle="modal" data-target="#watchModal"&gt;
     &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
   &lt;/a&gt;
 &lt;/div&gt;
+&lt;div class="modal fade" tabindex="-1" role="dialog" id="watchModal"&gt;
+  &lt;div class="modal-dialog" role="document"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+        &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+        &lt;h4 class="modal-title"&gt;Watch settings&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-body"&gt;
+        &lt;p&gt;$watchModalDescription&lt;/p&gt;
+        &lt;div class="watch-options-container panel-group" role="tablist" aria-multiselectable="false"&gt;
+        #if ($watchedStatus == 'NOT_SET')
+          &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" value="watchPage" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title"&gt;
+                &lt;span class="fa fa-file"&gt;&lt;/span&gt;  Follow current page
+              &lt;/label&gt;
+               &lt;div class="xHint"&gt;
+                 You will receive notifications only for that page.
+               &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" value="watchSpace" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title"&gt;
+                &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt;  Follow current space
+              &lt;/label&gt;
+              &lt;div class="xHint"&gt;
+                 You will receive notifications for that page and for its children.
+               &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+           &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" value="watchWiki" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title"&gt;
+                &lt;span class="fa fa-globe"&gt;&lt;/span&gt;  Follow current wiki
+              &lt;/label&gt;
+              &lt;div class="xHint"&gt;
+                 You will receive notifications for all pages in the wiki.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #elseif ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
+          &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" value="watchPage" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title"&gt;
+                &lt;span class="fa fa-file"&gt;&lt;/span&gt;  Unfollow current page
+              &lt;/label&gt;
+               &lt;div class="xHint"&gt;
+                 You might still receive notifications if the wiki or a space in the hierarchy is followed.
+               &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #end
+        &lt;/div&gt;&lt;!-- end panel group --&gt;
+      &lt;/div&gt;&lt;!-- end modal body --&gt;
+      &lt;div class="modal-footer"&gt;
+        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
+        &lt;button type="button" class="btn btn-primary"&gt;Save changes&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;&lt;!-- /.modal-content --&gt;
+  &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+&lt;/div&gt;&lt;!-- /.modal --&gt;
 {{/html}}
 {{/velocity}}</content>
     </property>

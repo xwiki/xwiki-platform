@@ -122,24 +122,28 @@ public class ScopeNotificationFilterLocationStateComputer
         Iterator<ScopeNotificationFilterPreference> inclusiveFiltersIterator =
             preferencesHierarchy.getInclusiveFiltersThatHasNoParents();
 
+        boolean exactMatch = false;
         while (inclusiveFiltersIterator.hasNext()) {
             ScopeNotificationFilterPreference pref = inclusiveFiltersIterator.next();
 
+            boolean isExactMatch = isExactMatch(pref, location);
+            boolean isParentMatch = isParentMatch(pref, location);
             // If the inclusive filter match the event location...
-            if (match(pref, location)) {
+            if (isExactMatch || isParentMatch) {
                 // Then it means we watch this location
                 match = true;
-                if (startingDate == null
-                    || (pref.getStartingDate() != null && startingDate.after(pref.getStartingDate())))
-                {
-                    startingDate = pref.getStartingDate();
-                }
+                exactMatch = isExactMatch;
+                startingDate = pref.getStartingDate();
             }
         }
         if (match) {
-            WatchedLocationState.WatchedState watchedState =
-                (allEventsAllFormats) ? WatchedLocationState.WatchedState.WATCHED :
-                    WatchedLocationState.WatchedState.CUSTOM;
+            WatchedLocationState.WatchedState watchedState;
+            if (allEventsAllFormats) {
+                watchedState = (exactMatch) ? WatchedLocationState.WatchedState.WATCHED
+                    : WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR;
+            } else {
+                watchedState = WatchedLocationState.WatchedState.CUSTOM;
+            }
             result = Optional.of(new WatchedLocationState(watchedState, startingDate));
         }
         return result;
@@ -222,11 +226,14 @@ public class ScopeNotificationFilterLocationStateComputer
             ScopeNotificationFilterPreference pref = it.next();
 
             int deepLevel = pref.getScopeReference().size();
+            boolean isExactMatch = isExactMatch(pref, location);
+            boolean isParentMatch = isParentMatch(pref, location);
 
             // If the exclusive filter match the event location...
-            if (match(pref, location) && deepLevel > deepestLevel) {
+            if ((isExactMatch || isParentMatch) && deepLevel > deepestLevel) {
                 if (allTypesAndEvents) {
-                    state = WatchedLocationState.WatchedState.BLOCKED;
+                    state = (isExactMatch) ? WatchedLocationState.WatchedState.BLOCKED
+                        : WatchedLocationState.WatchedState.BLOCKED_BY_ANCESTOR;
                 } else {
                     state = WatchedLocationState.WatchedState.CUSTOM;
                 }
@@ -236,9 +243,12 @@ public class ScopeNotificationFilterLocationStateComputer
                 // then we watch the location if there is at least an inclusive filter child matching it
                 for (ScopeNotificationFilterPreference child : pref.getChildren()) {
                     int childDeepLevel = child.getScopeReference().size();
-                    if (match(child, location) && childDeepLevel > deepestLevel) {
+                    boolean isChildExactMatch = isExactMatch(child, location);
+                    boolean isChildParentMatch = isParentMatch(child, location);
+                    if ((isChildExactMatch || isChildParentMatch) && childDeepLevel > deepestLevel) {
                         if (allTypesAndEvents) {
-                            state = WatchedLocationState.WatchedState.WATCHED;
+                            state = (isChildExactMatch) ? WatchedLocationState.WatchedState.WATCHED
+                                : WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR;
                         } else {
                             state = WatchedLocationState.WatchedState.CUSTOM;
                         }
@@ -256,8 +266,13 @@ public class ScopeNotificationFilterLocationStateComputer
         }
     }
 
-    private boolean match(ScopeNotificationFilterPreference pref, EntityReference location)
+    private boolean isExactMatch(ScopeNotificationFilterPreference pref, EntityReference location)
     {
-        return location.equals(pref.getScopeReference()) || location.hasParent(pref.getScopeReference());
+        return location.equals(pref.getScopeReference());
+    }
+
+    private boolean isParentMatch(ScopeNotificationFilterPreference pref, EntityReference location)
+    {
+        return location.hasParent(pref.getScopeReference());
     }
 }

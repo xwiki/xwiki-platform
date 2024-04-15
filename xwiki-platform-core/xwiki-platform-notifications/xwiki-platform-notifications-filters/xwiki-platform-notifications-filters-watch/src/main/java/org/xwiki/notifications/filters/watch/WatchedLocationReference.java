@@ -102,7 +102,9 @@ public class WatchedLocationReference implements WatchedEntityReference
         return switch (locationWatched.getState()) {
             case CUSTOM -> WatchedStatus.CUSTOM;
             case WATCHED -> WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+            case WATCHED_BY_ANCESTOR -> WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS;
             case BLOCKED -> WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
+            case BLOCKED_BY_ANCESTOR -> WatchedStatus.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS;
             default -> WatchedStatus.NOT_SET;
         };
     }

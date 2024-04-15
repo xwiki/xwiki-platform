@@ -43,6 +43,7 @@ public interface WatchedEntityReference
          * The entity is watched for all events and all formats: the filter doesn't specify any event or format.
          */
         WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
+        WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
 
         /**
          * The entity does not have a watched status: by default it means it's not watched, but it's not blocked.
@@ -54,6 +55,7 @@ public interface WatchedEntityReference
          * The entity is blocked for all events and formats.
          */
         BLOCKED_FOR_ALL_EVENTS_AND_FORMATS,
+        BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
 
         CUSTOM
     }

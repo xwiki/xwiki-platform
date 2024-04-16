@@ -45,11 +45,13 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
     '</div>',
 
   createModal = function(definition) {
+    // form(Boolean): Whether the modal is a form. Some basic form semantics and behaviour will be added if this is true
     definition = $.extend({
       title: '',
       content: '',
       acceptLabel: translations.get('ok'),
-      dismissLabel: translations.get('cancel')
+      dismissLabel: translations.get('cancel'),
+      form: false
     }, definition);
     var modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
     modal.find('.close').attr({
@@ -58,8 +60,19 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
     });
     modal.find('.modal-title').text(definition.title);
     modal.find('.modal-body').html('').append(definition.content);
-    modal.find('.modal-footer .btn-primary').text(definition.acceptLabel);
+    const submitButton = modal.find('.modal-footer .btn-primary');
+    submitButton.text(definition.acceptLabel);
     modal.find('.modal-footer .btn[data-dismiss="modal"]').text(definition.dismissLabel);
+    if (definition.form) {
+      // We want the submit button to actually submit the form
+      submitButton.removeAttr('type');
+      // This modal should act and look like a form. We replace its content node by a form, so we can benefit from
+      // native form utilities, such as implicit form validation (pressing Enter on a text field)
+      const modalContent= modal.find('.modal-content');
+      const formModalContent = $('<form class="modal-content">');
+      formModalContent.append(modalContent.contents());
+      modalContent.replaceWith(formModalContent);
+    }
     return modal;
   },
 

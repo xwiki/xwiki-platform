@@ -704,6 +704,7 @@ define(
     title: translations.get('title'),
     content: '<div class="macro-editor xform"></div>',
     acceptLabel: translations.get('submit'),
+    form: true,
     onLoad: function() {
       var modal = this;
       var submitButton = modal.find('.modal-footer .btn-primary');
@@ -720,7 +721,10 @@ define(
           load.call(this, input, macroEditor);
         }
       });
-      submitButton.on('click', function(event) {
+      modal.find('.modal-content').on('submit', function(event) {
+        // Ideally we would handle this propagation by making the modal a dialog and using method="dialog" on the form
+        event.preventDefault();
+        event.stopPropagation();
         var macroEditor = modal.find('.macro-editor');
         var macroEditorAPI = macroEditor.xwikiMacroEditor();
         if (macroEditorAPI.validate()) {

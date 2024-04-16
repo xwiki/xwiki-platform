@@ -1,5 +1,5 @@
 <template>
-  <sl-button variant="default" size="medium">
+  <sl-button variant="default">
     <slot />
   </sl-button>
 </template>

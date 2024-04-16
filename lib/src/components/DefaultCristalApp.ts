@@ -50,18 +50,12 @@ import {
 
 import "@mdi/font/css/materialdesignicons.css";
 
-// Manuel importing to reduce build size
-// import { VApp, VContainer, VRow, VCol, VAvatar } from 'vuetify/components'
-// import {} from 'vuetify/directives'
 import Index from "../c-index.vue";
-import IndexPerf from "../indexPerf.vue";
 
 import type { ExtensionManager } from "@cristal/extension-manager";
 import type { UIXTemplateProvider, VueTemplateProvider } from "@cristal/skin";
 import type { MenuEntry } from "@cristal/extension-menubuttons";
 import type { Renderer } from "@cristal/rendering";
-
-// import i18n from './i18n'
 
 @injectable()
 export class DefaultCristalApp implements CristalApp {
@@ -399,7 +393,7 @@ export class DefaultCristalApp implements CristalApp {
 
     this.page = new DefaultPageData("_jsonld", initialPage, "initial content");
 
-    let routes = [
+    const routes = [
       {
         path: "/",
         component: this.skinManager.getTemplate("content"),
@@ -424,36 +418,6 @@ export class DefaultCristalApp implements CristalApp {
       } as RouteRecordRaw,
     ];
 
-    const perfMode = this.wikiConfig.name.startsWith("Perf");
-    if (perfMode) {
-      routes = [
-        {
-          path: "/",
-          component: this.skinManager.getTemplate("perfX"),
-        } as RouteRecordRaw,
-        {
-          path: "/X",
-          component: this.skinManager.getTemplate("perfX"),
-        } as RouteRecordRaw,
-        {
-          path: "/empty",
-          component: this.skinManager.getTemplate("perfempty"),
-        } as RouteRecordRaw,
-        {
-          path: "/vuetify",
-          component: this.skinManager.getTemplate("perfvuetify"),
-        } as RouteRecordRaw,
-        {
-          path: "/dsfr",
-          component: this.skinManager.getTemplate("perfdsfr"),
-        } as RouteRecordRaw,
-        {
-          path: "/sl",
-          component: this.skinManager.getTemplate("perfsl"),
-        } as RouteRecordRaw,
-      ];
-    }
-
     this.router = createRouter({
       /*
        4. Provide the history implementation to use. We are using the hash
@@ -467,7 +431,7 @@ export class DefaultCristalApp implements CristalApp {
       routes,
     });
 
-    this.app = createApp(perfMode ? IndexPerf : Index).use(this.router);
+    this.app = createApp(Index).use(this.router);
     this.app.provide("count", 0);
     this.app.provide("skinManager", this.skinManager);
     this.app.provide("cristal", this);

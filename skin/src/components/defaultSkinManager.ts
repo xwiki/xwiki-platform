@@ -24,7 +24,6 @@
  **/
 
 import View from "../vue/c-view.vue";
-import Header from "../vue/c-header.vue";
 import Config from "../vue/c-config.vue";
 import Sidebar from "../vue/c-sidebar.vue";
 import Footer from "../vue/c-footer.vue";
@@ -34,12 +33,6 @@ import Main from "../vue/c-main.vue";
 import Edit from "../vue/c-edit.vue";
 import Blog from "../vue/c-blog.vue";
 import Movie from "../vue/c-movie.vue";
-
-import PerfEmpty from "../vue/perf/perfEmpty.vue";
-import PerfX from "../vue/perf/perfX.vue";
-import PerfDirectVuetify from "../vue/perf/perfDirectVuetify.vue";
-import PerfDirectDSFR from "../vue/perf/perfDirectDSFR.vue";
-import PerfDirectSL from "../vue/perf/perfDirectSL.vue";
 
 import type { App, Component } from "vue";
 import type { DesignSystemLoader, SkinManager } from "@cristal/api";
@@ -60,7 +53,6 @@ export class DefaultSkinManager implements SkinManager {
   constructor() {
     this.templates = new Map<string, Component>();
     this.templates.set("view", View);
-    this.templates.set("header", Header);
     this.templates.set("config", Config);
     this.templates.set("sidebar", Sidebar);
     this.templates.set("content", Content);
@@ -70,13 +62,6 @@ export class DefaultSkinManager implements SkinManager {
     this.templates.set("edit", Edit);
     this.templates.set("blog", Blog);
     this.templates.set("movie", Movie);
-
-    // performance measurements
-    this.templates.set("perfX", PerfX);
-    this.templates.set("perfempty", PerfEmpty);
-    this.templates.set("perfvuetify", PerfDirectVuetify);
-    this.templates.set("perfdsfr", PerfDirectDSFR);
-    this.templates.set("perfsl", PerfDirectSL);
   }
 
   public setDesignSystem(designSystem: string) {
@@ -113,13 +98,17 @@ export class DefaultSkinManager implements SkinManager {
         "Exception while loading design system ",
         this.designSystem,
       );
-      if (DefaultSkinManager.DEFAULT_DESIGN_SYSTEM != "")
+      if (DefaultSkinManager.DEFAULT_DESIGN_SYSTEM != "") {
         designSystemLoader = container.getNamed<DesignSystemLoader>(
           "DesignSystemLoader",
           DefaultSkinManager.DEFAULT_DESIGN_SYSTEM,
         );
+      }
     }
-    if (designSystemLoader) designSystemLoader.loadDesignSystem(app);
-    else console.error("Cannot initialize design system");
+    if (designSystemLoader) {
+      designSystemLoader.loadDesignSystem(app);
+    } else {
+      console.error("Cannot initialize design system");
+    }
   }
 }

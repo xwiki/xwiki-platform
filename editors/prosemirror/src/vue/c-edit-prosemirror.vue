@@ -130,14 +130,18 @@ const submit = async () => {
     <!-- TODO: provide a better error reporting. -->
     {{ error }}
   </div>
-  <div v-show="!loading && !error">
-    <div ref="editor" class="editor"></div>
-    <form class="pagemenu" @submit="submit">
-      <router-link :to="viewRouterParams">
-        <x-btn>Cancel</x-btn>
-      </router-link>
-      <x-btn @click="submit">Save</x-btn>
-    </form>
+  <div v-show="!loading && !error" class="content">
+    <div class="content-scroll">
+      <div class="whole-content">
+        <div ref="editor" class="editor"></div>
+        <form class="pagemenu" @submit="submit">
+          <router-link :to="viewRouterParams">
+            <x-btn>Cancel</x-btn>
+          </router-link>
+          <x-btn @click="submit">Save</x-btn>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -155,5 +159,13 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   pointer-events: none;
   height: 0;
   content: attr(data-empty-text);
+}
+
+/*TODO: remove duplication with c-content*/
+
+.whole-content {
+  display: flex;
+  flex-flow: column;
+  gap: var(--cr-spacing-medium);
 }
 </style>

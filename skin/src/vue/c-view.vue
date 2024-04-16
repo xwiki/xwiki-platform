@@ -24,16 +24,40 @@
 -->
 <script lang="ts" setup>
 import CTemplate from "./c-template.vue";
+import CMain from "./c-main.vue";
+import "../css/main.css";
 </script>
 <template>
   <div>
+    <!-- Lazy component in charge of loading design-system specific resources.
+    For instance, CSS sheets. -->
+    <x-load></x-load>
     <div id="view" class="wrapper">
       <UIX uixname="view.before" />
-      <CTemplate name="header" />
-      <CTemplate name="main" />
+      <!-- TODO CRISTAL-165: The collapsed sidebar appears when the user click on the bars icon besides the logo. Click it again on THIS component should return the sidebar visible. 
+        This version is also shown when the layout enters in mobile mode, in this mode when the users click the button a temporary sidebar should appear over the content-->
+
       <CTemplate name="sidebar" />
-      <CTemplate name="footer" />
+      <CTemplate name="header" />
+      <c-main></c-main>
+
+      <!-- TODO CRISTAL-165: Eventually we will need a right sidebar-->
+      <!--      <c-right-sidebar></c-right-sidebar>-->
+
       <UIX uixname="view.after" />
     </div>
   </div>
 </template>
+<style scoped>
+.wrapper {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-areas: "sidebar content";
+}
+
+.wrapper:has(.right-sidebar) {
+  grid-template-columns: 250px 1fr 250px;
+  grid-template-areas: "sidebar content right-sidebar";
+}
+</style>

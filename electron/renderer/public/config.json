@@ -95,35 +95,5 @@
     "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
     "homePage": "README.md",
     "designSystem": "shoelace"
-  },
-  "Perf": {
-    "name": "Perf",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "",
-    "designSystem": "vuetify"
-  },
-  "PerfSL": {
-    "name": "PerfSL",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "",
-    "designSystem": "shoelace"
-  },
-  "PerfDSFR": {
-    "name": "PerfDSFR",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "",
-    "designSystem": "dsfr"
   }
 }

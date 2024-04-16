@@ -24,10 +24,7 @@
  **/
 
 import { MenuEntryButton1 } from "./menuEntryButton1";
-import { UIXMenuTemplateProvider } from "./uixMenuTemplateProvider";
-import { UIXMenuTemplateProvider2 } from "./uixMenuTemplateProvider2";
 import type { Container } from "inversify";
-import type { UIXTemplateProvider } from "@cristal/skin";
 import type { MenuEntry } from "../api/menuEntry";
 import type { Logger } from "@cristal/api";
 
@@ -40,14 +37,6 @@ export class ComponentInit {
 
     this.logger?.debug("Init MenuButtons components begin");
     container.bind<MenuEntry>("MenuEntry").to(MenuEntryButton1);
-    container
-      .bind<UIXTemplateProvider>("UIXTemplateProvider")
-      .to(UIXMenuTemplateProvider)
-      .whenTargetNamed(UIXMenuTemplateProvider.extensionPoint);
-    container
-      .bind<UIXTemplateProvider>("UIXTemplateProvider")
-      .to(UIXMenuTemplateProvider2)
-      .whenTargetNamed(UIXMenuTemplateProvider2.extensionPoint);
 
     this.logger?.debug("Init MenuButtons components end");
   }

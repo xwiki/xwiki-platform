@@ -25,6 +25,7 @@
 <script lang="ts">
 import { CTemplate } from "@cristal/skin";
 import { defineComponent } from "vue";
+import "./index.css";
 
 export default defineComponent({
   components: {
@@ -36,57 +37,34 @@ export default defineComponent({
 <template>
   <CTemplate name="view" />
 </template>
+<!-- TODO CRISTAL-165: these styles need to me moved to a generic CSS that loads last in the main template-->
 <style scoped>
-:global(h1) {
-  color: red;
+:global(html),
+:global(body),
+:global(#app) {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  font-family: unset;
 }
 
-:global(.template) {
-  border: 1px solid;
+:global(html) {
+  overflow: hidden;
 }
-
-:global(header) {
-  grid-area: header;
-  background-color: #30bdfe8a;
-  padding: 10px;
-}
-
-:global(article) {
-  grid-area: content;
-  background-color: white;
-  padding: 20px;
-}
-
-:global(aside) {
-  grid-area: sidebar;
-  background-color: #a3d0f0;
-  padding: 20px;
-}
-
-:global(footer) {
-  padding: 10px;
-  grid-area: footer;
-  background-color: #005ed8;
-}
-
-:global(.wrapper) {
-  display: grid;
-  grid-gap: 2px;
-  grid-template-columns: 1fr 5fr;
-  grid-template-areas:
-    "header  header"
-    "sidebar content"
-    "footer  footer";
-}
-
-@media (max-width: 500px) {
+@media (max-width: 600px) {
+  /* TODO CRISTAL-165: all of these !important declarations should be unecessary when the CSS structure is refactored */
   :global(.wrapper) {
-    grid-template-columns: 4fr;
-    grid-template-areas:
-      "header"
-      "content"
-      "sidebar"
-      "footer";
+    grid-template-columns: 24px 1fr !important;
+    grid-template-areas: "collapsed-sidebar content" !important;
+  }
+  :global(.collapsed-sidebar) {
+    display: block !important;
+  }
+  :global(#sidebar) {
+    display: none !important;
+  }
+  :global(.right-sidebar) {
+    display: none;
   }
 }
 </style>

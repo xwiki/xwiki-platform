@@ -23,7 +23,7 @@
  *
 -->
 <template>
-  <footer id="footer">
+  <footer id="footer" class="footer">
     <UIX uixname="footer.before" />
     <p>footer</p>
     <div>Click the button to increase the number</div>
@@ -49,3 +49,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.footer {
+  grid-area: footer;
+}
+</style>

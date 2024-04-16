@@ -7,8 +7,7 @@
           "build",
           "test",
           "lint",
-          "start",
-          "clean"
+          "start"
         ]
       }
     }
@@ -31,8 +30,7 @@
         "^default"
       ],
       "dependsOn": [
-        "^build",
-        "clean"
+        "^build"
       ],
       "outputs": [
         "{projectRoot}/dist"

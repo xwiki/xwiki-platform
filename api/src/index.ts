@@ -31,7 +31,10 @@ import type { PageData } from "./api/PageData.js";
 import type { Document } from "./api/document.js";
 import type { Logger } from "./api/logger.js";
 import type { LoggerConfig } from "./api/loggerConfig.js";
-import type { DesignSystemLoader } from "./api/designSystemLoader.js";
+import {
+  type DesignSystemLoader,
+  registerAsyncComponent,
+} from "./api/designSystemLoader.js";
 import { DefaultPageData } from "./components/DefaultPageData.js";
 import { DefaultWikiConfig } from "./components/defaultWikiConfig.js";
 import { JSONLDDocument } from "./components/JSONLDDocument.js";
@@ -59,4 +62,5 @@ export {
   DefaultLogger,
   DefaultLoggerConfig,
   JSONLDDocument,
+  registerAsyncComponent,
 };

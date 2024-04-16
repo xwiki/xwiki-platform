@@ -1,8 +1,6 @@
 <template>
   <DsfrPicture v-if="image" :src="image" class="avatar"></DsfrPicture>
-  <DsfrPicture v-else size="small" class="avatar">
-    <slot></slot>
-  </DsfrPicture>
+  <DsfrPicture v-else size="small" class="avatar" src=""></DsfrPicture>
 </template>
 <script lang="ts">
 import { DsfrPicture } from "@gouvminint/vue-dsfr";

@@ -52,7 +52,9 @@ export default {
           // components manager, but instead load them lazily, or only load the
           // ones allowed by the configuration (e.g., one for wysiwyg, and one
           // for plain syntax edit).
-          if (item.editorname === "editorprosemirror") {
+          if (
+            (item as { editorname: string }).editorname === "editorprosemirror"
+          ) {
             editComponent = item;
             break;
           }
@@ -76,8 +78,4 @@ export default {
     <UIX uixname="edit.after" />
   </article>
 </template>
-<style>
-.pagemenu {
-  float: right;
-}
-</style>
+<style></style>

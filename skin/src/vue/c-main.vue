@@ -22,6 +22,18 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
+<script setup lang="ts"></script>
+
 <template>
-  <router-view />
+  <main>
+    <router-view />
+  </main>
 </template>
+
+<style scoped>
+main {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+</style>

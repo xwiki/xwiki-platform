@@ -24,30 +24,22 @@
  **/
 
 import type { App } from "vue";
+import * as components from "vuetify/components";
 import {
   VAvatar,
-  VContainer,
-  VRow,
   VCol,
+  VContainer,
   VImg,
+  VRow,
   VTextField,
 } from "vuetify/components";
 import type { DesignSystemLoader } from "@cristal/api";
 
-import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import { mdi } from "vuetify/iconsets/mdi";
-// import { aliases, fa } from 'vuetify/iconsets/fa'
-import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import { injectable } from "inversify";
-import XCard from "../vue/x-card.vue";
-import XAlert from "../vue/x-alert.vue";
-import XDivider from "../vue/x-divider.vue";
-import XBtn from "../vue/x-btn.vue";
-import XDialog from "../vue/x-dialog.vue";
-import XMenu from "../vue/x-menu.vue";
-import XMenuItem from "../vue/x-menu-item.vue";
+import { registerAsyncComponent } from "@cristal/api";
 
 @injectable()
 export class VuetifyDesignSystemLoader implements DesignSystemLoader {
@@ -87,12 +79,27 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
     app.component("XTextField", VTextField);
 
     // Custom wrapped components
-    app.component("XBtn", XBtn);
-    app.component("XDivider", XDivider);
-    app.component("XCard", XCard);
-    app.component("XAlert", XAlert);
-    app.component("XDialog", XDialog);
-    app.component("XMenu", XMenu);
-    app.component("XMenuItem", XMenuItem);
+    registerAsyncComponent(app, "XLoad", () => import("../vue/x-load.vue"));
+    registerAsyncComponent(app, "XBtn", () => import("../vue/x-btn.vue"));
+    registerAsyncComponent(
+      app,
+      "XDivider",
+      () => import("../vue/x-divider.vue"),
+    );
+    registerAsyncComponent(app, "XCard", () => import("../vue/x-card.vue"));
+    registerAsyncComponent(app, "XAlert", () => import("../vue/x-alert.vue"));
+    registerAsyncComponent(app, "XDialog", () => import("../vue/x-dialog.vue"));
+    registerAsyncComponent(app, "XMenu", () => import("../vue/x-menu.vue"));
+    registerAsyncComponent(
+      app,
+      "XMenuItem",
+      () => import("../vue/x-menu-item.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XBreadcrumb",
+      () => import("../vue/x-breadcrumb.vue"),
+    );
+    registerAsyncComponent(app, "XSearch", () => import("../vue/x-search.vue"));
   }
 }

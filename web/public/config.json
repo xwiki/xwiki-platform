@@ -1,132 +1,122 @@
 {
-    "XWiki" : {
-        "name" : "XWiki",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "Main.WebHome",
-        "designSystem" : "vuetify"
-    },
-    "XWikiOffline" : {
-        "name" : "XWikiOffline",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : true,
-        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "Main.WebHome",
-        "designSystem" : "vuetify"
-    },
-    "XWikiSSR" : {
-        "name" : "XWikiSSR",
-        "configType" : "XWiki",
-        "serverRendering" : true,
-        "offline" : false,
-        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "Main.WebHome",
-        "designSystem" : "vuetify"
-    },
-    "XWikiDSFR" : {
-        "name" : "XWikiDSFR",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "Main.WebHome",
-        "designSystem" : "dsfr"
-    },
-    "XWikiSL" : {
-        "name" : "XWikiSL",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "https://cristal.demo.xwiki.com/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "Main.WebHome",
-        "designSystem" : "shoelace"
-    },
-    "Localhost" : {
-        "name" : "Localhost",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "Main.WebHome",
-        "designSystem" : "vuetify"
-    },
-    "LocalhostOffline" : {
-        "name" : "LocalhostOffline",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : true,
-        "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "Main.WebHome",
-        "designSystem" : "vuetify"
-    },
-    "GitHub" : {
-        "name" : "GitHub",
-        "configType" : "GitHub",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "https://github.com/ldubost/test/tree/master/",
-        "baseRestURL" : "https://raw.githubusercontent.com/ldubost/test/master/",
-        "homePage" : "README.md",
-        "designSystem" : "vuetify"
-    },
-    "GitHubOffline" : {
-        "name" : "GitHubOffline",
-        "configType" : "GitHub",
-        "serverRendering" : false,
-        "offline" : true,
-        "baseURL" : "https://github.com/ldubost/test/tree/master/",
-        "baseRestURL" : "https://raw.githubusercontent.com/ldubost/test/master/",
-        "homePage" : "README.md",
-        "designSystem" : "vuetify"
-    },
-    "GitHubSL" : {
-        "name" : "GitHubSL",
-        "configType" : "GitHub",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "https://github.com/ldubost/test/tree/master/",
-        "baseRestURL" : "https://raw.githubusercontent.com/ldubost/test/master/",
-        "homePage" : "README.md",
-        "designSystem" : "shoelace"
-    },
-    "Perf" : {
-        "name" : "Perf",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "",
-        "designSystem" : "vuetify"
-    },
-    "PerfSL" : {
-        "name" : "PerfSL",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "",
-        "designSystem" : "shoelace"
-    },
-    "PerfDSFR" : {
-        "name" : "PerfDSFR",
-        "configType" : "XWiki",
-        "serverRendering" : false,
-        "offline" : false,
-        "baseURL" : "http://localhost:15680/xwiki",
-        "baseRestURL" : "/rest/cristal/page?media=json",
-        "homePage" : "",
-        "designSystem" : "dsfr"
-    }
+  "XWiki": {
+    "name": "XWiki",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "vuetify"
+  },
+  "XWikiOffline": {
+    "name": "XWikiOffline",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": true,
+    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "vuetify"
+  },
+  "XWikiSSR": {
+    "name": "XWikiSSR",
+    "configType": "XWiki",
+    "serverRendering": true,
+    "offline": false,
+    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "vuetify"
+  },
+  "XWikiDSFR": {
+    "name": "XWikiDSFR",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "dsfr"
+  },
+  "XWikiSL": {
+    "name": "XWikiSL",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "shoelace"
+  },
+  "Localhost": {
+    "name": "Localhost",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "http://localhost:15680/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "vuetify"
+  },
+  "LocalhostSL": {
+    "name": "LocalhostSL",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "http://localhost:15680/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "shoelace"
+  },
+  "LocalhostDSFR": {
+    "name": "LocalhostDSFR",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "http://localhost:15680/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "dsfr"
+  },
+  "LocalhostOffline": {
+    "name": "LocalhostOffline",
+    "configType": "XWiki",
+    "serverRendering": false,
+    "offline": true,
+    "baseURL": "http://localhost:15680/xwiki",
+    "baseRestURL": "/rest/cristal/page?media=json",
+    "homePage": "Main.WebHome",
+    "designSystem": "vuetify"
+  },
+  "GitHub": {
+    "name": "GitHub",
+    "configType": "GitHub",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://github.com/ldubost/test/tree/master/",
+    "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
+    "homePage": "README.md",
+    "designSystem": "vuetify"
+  },
+  "GitHubOffline": {
+    "name": "GitHubOffline",
+    "configType": "GitHub",
+    "serverRendering": false,
+    "offline": true,
+    "baseURL": "https://github.com/ldubost/test/tree/master/",
+    "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
+    "homePage": "README.md",
+    "designSystem": "vuetify"
+  },
+  "GitHubSL": {
+    "name": "GitHubSL",
+    "configType": "GitHub",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://github.com/ldubost/test/tree/master/",
+    "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
+    "homePage": "README.md",
+    "designSystem": "shoelace"
+  }
 }

@@ -25,40 +25,48 @@
 
 import type { App } from "vue";
 import type { DesignSystemLoader } from "@cristal/api";
+import { registerAsyncComponent } from "@cristal/api";
 
 import { injectable } from "inversify";
-
-import XBtn from "../vue/x-btn.vue";
-import XAlert from "../vue/x-alert.vue";
-import XContainer from "../vue/x-container.vue";
-import XCol from "../vue/x-col.vue";
-import XRow from "../vue/x-row.vue";
-import XImg from "../vue/x-img.vue";
-import XCard from "../vue/x-card.vue";
-import XTextField from "../vue/x-textfield.vue";
-import XAvatar from "../vue/x-avatar.vue";
-import XDivider from "../vue/x-divider.vue";
-import XDialog from "../vue/x-dialog.vue";
-import XMenu from "../vue/x-menu.vue";
-import XMenuItem from "../vue/x-menuitem.vue";
-
-import "@shoelace-style/shoelace/dist/themes/light.css";
 
 @injectable()
 export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
   loadDesignSystem(app: App): void {
-    app.component("XAvatar", XAvatar);
-    app.component("XBtn", XBtn);
-    app.component("XContainer", XContainer);
-    app.component("XImg", XImg);
-    app.component("XRow", XRow);
-    app.component("XCol", XCol);
-    app.component("XTextField", XTextField);
-    app.component("XCard", XCard);
-    app.component("XAlert", XAlert);
-    app.component("XDivider", XDivider);
-    app.component("XDialog", XDialog);
-    app.component("XMenu", XMenu);
-    app.component("XMenuItem", XMenuItem);
+    registerAsyncComponent(app, "XLoad", () => import("../vue/x-load.vue"));
+    registerAsyncComponent(app, "XAvatar", () => import("../vue/x-avatar.vue"));
+    registerAsyncComponent(app, "XBtn", () => import("../vue/x-btn.vue"));
+    registerAsyncComponent(
+      app,
+      "XContainer",
+      () => import("../vue/x-container.vue"),
+    );
+    registerAsyncComponent(app, "XImg", () => import("../vue/x-img.vue"));
+    registerAsyncComponent(app, "XRow", () => import("../vue/x-row.vue"));
+    registerAsyncComponent(app, "XCol", () => import("../vue/x-col.vue"));
+    registerAsyncComponent(
+      app,
+      "XTextField",
+      () => import("../vue/x-textfield.vue"),
+    );
+    registerAsyncComponent(app, "XCard", () => import("../vue/x-card.vue"));
+    registerAsyncComponent(app, "XAlert", () => import("../vue/x-alert.vue"));
+    registerAsyncComponent(
+      app,
+      "XDivider",
+      () => import("../vue/x-divider.vue"),
+    );
+    registerAsyncComponent(app, "XDialog", () => import("../vue/x-dialog.vue"));
+    registerAsyncComponent(app, "XMenu", () => import("../vue/x-menu.vue"));
+    registerAsyncComponent(
+      app,
+      "XMenuItem",
+      () => import("../vue/x-menuitem.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XBreadcrumb",
+      () => import("../vue/x-breadcrumb.vue"),
+    );
+    registerAsyncComponent(app, "XSearch", () => import("../vue/x-search.vue"));
   }
 }

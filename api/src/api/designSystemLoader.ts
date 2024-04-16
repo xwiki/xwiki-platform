@@ -24,7 +24,37 @@
  **/
 
 import type { App } from "vue";
+import {
+  AsyncComponentLoader,
+  AsyncComponentOptions,
+  Component,
+  ComponentPublicInstance,
+  defineAsyncComponent,
+} from "vue";
 
 export interface DesignSystemLoader {
   loadDesignSystem(app: App): void;
+}
+
+/**
+ * Register a component as async to lazy-load it. Avoiding loading resources
+ * from all design systems at once (e.g., creating CSS conflicts).
+ * @param app the app to load the component to
+ * @param name the name of the Vue component
+ * @param source the source loaded (i.e., a call to import). The import must be
+ * in the package where the component is as otherwise the import is made
+ * relative to this package and the dependency is not found
+ * @since 0.7
+ */
+export function registerAsyncComponent<
+  T extends Component = {
+    new (): ComponentPublicInstance;
+  },
+>(
+  app: App,
+  name: string,
+  source: AsyncComponentLoader<T> | AsyncComponentOptions<T>,
+) {
+  // Register a component as an async component.
+  app.component(name, defineAsyncComponent(source));
 }

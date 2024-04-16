@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "@cristal/api": "workspace:^",
-    "@cristal/dsfr": "workspace:^",
-    "@cristal/dsshoelace": "workspace:^",
-    "@cristal/dsvuetify": "workspace:^",
+    "@cristal/dsfr": "workspace:*",
+    "@cristal/dsshoelace": "workspace:*",
+    "@cristal/dsvuetify": "workspace:*",
     "@cristal/editors-prosemirror": "workspace:*",
     "@cristal/extension-manager": "workspace:^",
     "@cristal/extension-menubuttons": "workspace:^",
@@ -32,13 +32,13 @@
     "@cristal/sharedworker-impl": "workspace:^",
     "@cristal/skin": "workspace:^",
     "@cristal/storage": "workspace:^",
+    "@mdi/font": "7.4.47",
     "inversify": "6.0.2",
     "reflect-metadata": "0.2.2",
     "vue": "3.4.21",
     "vue-i18n": "9.8.0",
     "vue-router": "4.3.0",
-    "vuetify": "3.5.14",
-    "@mdi/font": "7.4.47"
+    "vuetify": "3.5.14"
   },
   "devDependencies": {
     "rimraf": "5.0.5",

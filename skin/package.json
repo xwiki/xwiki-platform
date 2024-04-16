@@ -21,12 +21,13 @@
     "clean": "rimraf dist",
     "prepack": "pnpm build",
     "build": "pnpm compile",
-    "compile": "vite build",
+    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build",
     "test": "echo 'no test'",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
     "@cristal/api": "workspace:^",
+    "@cristal/icons": "workspace:^",
     "inversify": "6.0.2",
     "marked": "12.0.1",
     "reflect-metadata": "0.2.2",

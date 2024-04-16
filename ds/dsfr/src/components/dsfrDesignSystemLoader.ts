@@ -24,26 +24,10 @@
  **/
 
 import type { App } from "vue";
-import type { DesignSystemLoader } from "@cristal/api";
+import { type DesignSystemLoader, registerAsyncComponent } from "@cristal/api";
 
 import { injectable } from "inversify";
 
-import XBtn from "../vue/x-btn.vue";
-import XCard from "../vue/x-card.vue";
-import XAlert from "../vue/x-alert.vue";
-import XDivider from "../vue/x-divider.vue";
-import XDialog from "../vue/x-dialog.vue";
-import XContainer from "../vue/x-container.vue";
-import XCol from "../vue/x-col.vue";
-import XRow from "../vue/x-row.vue";
-import XImg from "../vue/x-img.vue";
-import XTextField from "../vue/x-textfield.vue";
-import XAvatar from "../vue/x-avatar.vue";
-import XMenu from "../vue/x-menu.vue";
-import XMenuItem from "../vue/x-menuitem.vue";
-
-import "@gouvfr/dsfr/dist/dsfr.min.css"; // Import des styles du DSFR
-import "@gouvminint/vue-dsfr/styles"; // Import des styles globaux propre à VueDSFR
 import VueDsfr from "@gouvminint/vue-dsfr";
 
 @injectable()
@@ -51,18 +35,35 @@ export class DSFRDesignSystemLoader implements DesignSystemLoader {
   loadDesignSystem(app: App): void {
     // Loading specific components from DSFR
     app.use(VueDsfr);
-    app.component("XBtn", XBtn);
-    app.component("XCard", XCard);
-    app.component("XAlert", XAlert);
-    app.component("XDivider", XDivider);
-    app.component("XDialog", XDialog);
-    app.component("XAvatar", XAvatar);
-    app.component("XContainer", XContainer);
-    app.component("XImg", XImg);
-    app.component("XRow", XRow);
-    app.component("XCol", XCol);
-    app.component("XTextField", XTextField);
-    app.component("XMenu", XMenu);
-    app.component("XMenuItem", XMenuItem);
+    registerAsyncComponent(app, "XLoad", () => import("../vue/x-load.vue"));
+    registerAsyncComponent(app, "XBtn", () => import("../vue/x-btn.vue"));
+    registerAsyncComponent(app, "XCard", () => import("../vue/x-card.vue"));
+    registerAsyncComponent(app, "XAlert", () => import("../vue/x-alert.vue"));
+    registerAsyncComponent(
+      app,
+      "XDivider",
+      () => import("../vue/x-divider.vue"),
+    );
+    registerAsyncComponent(app, "XDialog", () => import("../vue/x-dialog.vue"));
+    registerAsyncComponent(app, "XAvatar", () => import("../vue/x-avatar.vue"));
+    registerAsyncComponent(
+      app,
+      "XContainer",
+      () => import("../vue/x-container.vue"),
+    );
+    registerAsyncComponent(app, "XImg", () => import("../vue/x-img.vue"));
+    registerAsyncComponent(app, "XRow", () => import("../vue/x-row.vue"));
+    registerAsyncComponent(app, "XCol", () => import("../vue/x-col.vue"));
+    registerAsyncComponent(
+      app,
+      "XTextField",
+      () => import("../vue/x-textfield.vue"),
+    );
+    registerAsyncComponent(app, "XMenu", () => import("../vue/x-menu.vue"));
+    registerAsyncComponent(
+      app,
+      "XMenuItem",
+      () => import("../vue/x-menuitem.vue"),
+    );
   }
 }

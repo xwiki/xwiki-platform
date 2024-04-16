@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import "@shoelace-style/shoelace";
 
-import "@shoelace-style/shoelace/dist/themes/light.css";
-
 import { defineProps } from "vue";
 defineProps<{
   title: string;
@@ -10,6 +8,7 @@ defineProps<{
 </script>
 <template>
   <sl-dropdown>
+    <!-- The slot attribute is from shoelace, so not invalid. -->
     <sl-button slot="trigger" caret> Edit </sl-button>
     <sl-menu>
       <slot name="default" />

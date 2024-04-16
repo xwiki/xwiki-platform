@@ -5,7 +5,10 @@
   },
   "extends": "../../tsconfig.json",
   "include": [
-    "./src/index.ts",
     "./src/**/*"
+  ],
+  "exclude": [
+    "src/**/__tests__",
+    "src/vue.d.ts"
   ]
 }

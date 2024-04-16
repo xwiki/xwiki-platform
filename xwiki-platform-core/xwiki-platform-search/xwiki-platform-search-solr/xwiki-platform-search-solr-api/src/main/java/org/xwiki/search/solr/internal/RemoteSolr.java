@@ -157,15 +157,11 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         // Prefix Solr cores to avoid collision with other non-xwiki cores
         builder.append(getCorePrefix());
 
-        // In Solr 8 the name of the search core is just "<prefix>" and there is no suffix
-        if (majorVersion > 8) {
-            builder.append(getSolrCoreSuffix(majorVersion));
-        } else {
-            if (!xwikiCoreName.equals(SolrClientInstance.CORE_NAME)) {
-                builder.append('_');
+        // In Solr 8 the name of the search core was just "<prefix>"
+        if (majorVersion > 8 || !xwikiCoreName.equals(SolrClientInstance.CORE_NAME)) {
+            builder.append('_');
 
-                builder.append(super.toSolrCoreName(xwikiCoreName, majorVersion));
-            }
+            builder.append(super.toSolrCoreName(xwikiCoreName, majorVersion));
         }
 
         return builder.toString();

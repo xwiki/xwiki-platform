@@ -45,6 +45,7 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
     '</div>',
 
   createModal = function(definition) {
+    // form(Boolean): Whether the modal is a form. Some basic form semantics and behaviour will be added if this is true
     definition = $.extend({
       title: '',
       content: '',

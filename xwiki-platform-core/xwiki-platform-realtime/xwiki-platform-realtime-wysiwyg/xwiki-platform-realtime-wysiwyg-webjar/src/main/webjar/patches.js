@@ -252,7 +252,8 @@ define('xwiki-realtime-wysiwyg-patches', [
       this._editor.saveSelection();
       // Save the selection as an array of relative ranges.
       return this._editor.getSelection().map(range => {
-        const savedRange = {};
+        // Remember also the selection direction.
+        const savedRange = {reversed: range.reversed};
         if (!range.startContainer.childNodes.length) {
           savedRange.startContainer = range.startContainer;
           savedRange.startOffset = range.startOffset;
@@ -312,6 +313,7 @@ define('xwiki-realtime-wysiwyg-patches', [
         // The selected nodes are still in the DOM so we can restore the selection using the relative ranges.
         this._editor.restoreSelection(selection.map(savedRange => {
           const range = this._editor.getContentWrapper().ownerDocument.createRange();
+          range.reversed = savedRange.reversed;
           if (savedRange.startContainer?.isConnected) {
             range.setStart(savedRange.startContainer, savedRange.startOffset);
           } else if (savedRange.startBefore?.isConnected) {

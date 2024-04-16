@@ -31,12 +31,23 @@
         // selection when the Source mode is active. In that case we take the selection directly from the plain text
         // area used for editing the source. We'll have to update this code when and if we'll add support for syntax
         // highlighting to the Source area.
-        return editor.getSelection()?.getRanges().map(range => {
+        const selection = editor.getSelection();
+        const domRanges = selection?.getRanges().map(range => {
           const domRange = range.startContainer.$.ownerDocument.createRange();
           domRange.setStart(range.startContainer.$, range.startOffset);
           domRange.setEnd(range.endContainer.$, range.endOffset);
           return domRange;
         }) || [];
+        // We have to indicate the selection direction (e.g. the focus node/offset is before the anchor node/offset when
+        // you use Shift + Left Arrow to select text), otherwise we wouldn't be able to restore it properly.
+        const nativeSelection = selection?.getNative();
+        const singleRange = domRanges.length === 1 && domRanges[0];
+        if (singleRange && !singleRange.collapsed && selection.getType() === CKEDITOR.SELECTION_TEXT &&
+            nativeSelection?.anchorNode === singleRange.endContainer &&
+            nativeSelection.anchorOffset === singleRange.endOffset) {
+          singleRange.reversed = true;
+        }
+        return domRanges;
       }
     },
 
@@ -109,12 +120,21 @@
         // The editing area is focused so we can set the selection right away.
         delete editor._.cachedSelectionRanges;
         // Convert the standard DOM ranges to CKEditor selection ranges.
-        editor.getSelection()?.selectRanges(ranges.map(range => {
+        const selection = editor.getSelection();
+        selection?.selectRanges(ranges.map(range => {
           const ckRange = new CKEDITOR.dom.range(editor.editable());
           ckRange.setStart(new CKEDITOR.dom.node(range.startContainer), range.startOffset);
           ckRange.setEnd(new CKEDITOR.dom.node(range.endContainer), range.endOffset);
           return ckRange;
         }));
+        const nativeSelection = selection?.getNative();
+        const singleRange = ranges.length === 1 && ranges[0];
+        if (singleRange && !singleRange.collapsed && singleRange.reversed && nativeSelection) {
+          // CKEditor's selection API doesn't support setting the selection direction, so we have to use the native
+          // selection API to set the proper selection direction.
+          nativeSelection.setBaseAndExtent(singleRange.endContainer, singleRange.endOffset, singleRange.startContainer,
+            singleRange.startOffset);
+        }
       } else {
         // The editing area is not focused. In order to set the selection inside the editing area the CKEditor needs to
         // quickly steal the focus from the currently active element and give it back. This triggers the focus event on
@@ -258,7 +278,10 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
     return {
       text: beforeText + selectedText + afterText,
       startOffset,
-      endOffset: startOffset + selectedText.length
+      endOffset: startOffset + selectedText.length,
+      // Remember the text selection direction. This is especially important when editing in realtime because the user
+      // might be selecting text backwards (e.g. using Shift + Left Arrow) when a remove change is applied.
+      reversed: range.reversed
     };
   }
 
@@ -367,6 +390,8 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
     const range = root.ownerDocument.createRange();
     range.setStart(start.node, start.offset);
     range.setEnd(end.node, end.offset);
+    // Preserve the text selection direction.
+    range.reversed = textSelection.reversed;
     return range;
   }
 
@@ -494,8 +519,11 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
         scrollIntoView: true,
         applyDOMRange: range => {
           const selection = element.ownerDocument.defaultView.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
+          if (range.reversed) {
+            selection.setBaseAndExtent(range.endContainer, range.endOffset, range.startContainer, range.startOffset);
+          } else {
+            selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+          }
         }
       }, options);
 

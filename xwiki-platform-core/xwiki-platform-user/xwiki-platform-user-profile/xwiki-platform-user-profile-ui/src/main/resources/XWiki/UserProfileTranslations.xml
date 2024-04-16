@@ -63,7 +63,7 @@ user.profile.status.saving=Saving...
 user.profile.status.error=Error saving the user status
 
 platform.core.profile.section.shortcutPreferences=Keyboard shortcut Preferences
-platform.core.profile.section.shortcutPreferences.hint=Configure what keys to press to quickly operate common actions. The preferences defined in this section override the default shortcuts used on the wiki.When leaving the value of this preference empty, the default shortcut will be used.
+platform.core.profile.section.shortcutPreferences.hint=Configure what keys to press to quickly operate common actions. The preferences defined in this section override the default shortcuts used on the wiki. When leaving the value of this preference empty, the default shortcut will be used.
 platform.core.profile.section.shortcutPreferences.editModes=Edit modes
 platform.core.profile.section.shortcutPreferences.editModes.hint=Shortcuts to edit the current page with a specific editor. Only available as an advanced user.
 platform.core.profile.section.shortcutPreferences.viewInfos=View page informations

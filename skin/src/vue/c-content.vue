@@ -45,7 +45,7 @@ const error: Ref<Error | undefined> = ref(undefined);
 const currentPage: Ref<PageData | undefined> = ref(undefined);
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
-  return cristal?.getCurrentPage() || "XWiki.Main";
+  return (route.params.page as string) || "XWiki.Main";
 });
 
 const contentRoot = ref(undefined);

@@ -29,6 +29,7 @@ import { DOMParser, Schema } from "prosemirror-model";
 import { schema as basicSchema } from "prosemirror-schema-basic";
 import { useRoute } from "vue-router";
 
+const route = useRoute();
 const editor = ref(null);
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const loading = ref(false);
@@ -49,10 +50,8 @@ let view: EditorView;
 
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
-  return cristal?.getCurrentPage() || "XWiki.Main";
+  return (route.params.page as string) || "XWiki.Main";
 });
-
-const route = useRoute();
 
 async function fetchPage() {
   loading.value = true;

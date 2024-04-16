@@ -280,13 +280,20 @@ define('xwiki-ckeditor-realtime-adapter', [
               // We need create the editables ourselves under the widget element so that they get submitted to the
               // server when the content is refreshed (in order to be taken into account when rendering the macros).
               editable = widgetPlaceholder.ownerDocument.createElement('div');
-              editable.setAttribute('contenteditable', 'true');
               editable.classList.add('xwiki-metadata-container');
               editable.dataset.xwikiNonGeneratedContent = editablePlaceholder.dataset.contentType;
               editable.dataset.xwikiParameterName = editableName;
               widget.element.$.append(editable);
+              widget.initEditable(editableName, {
+                selector: `[data-xwiki-parameter-name="${CSS.escape(editableName)}"]`
+              });
             }
-            editable?.append(...editablePlaceholder.childNodes);
+            if (editable) {
+              // The editable should be empty, unless it was just initialized above in which case it may contain an
+              // empty paragraph that we want to get rid of (we want only the content from the editable placeholder).
+              editable.innerHTML = '';
+              editable.append(...editablePlaceholder.childNodes);
+            }
           });
         }
       });
@@ -338,9 +345,13 @@ define('xwiki-ckeditor-realtime-adapter', [
             }
           });
         }
-        // The macro parametes are kept on the macro wrapper, so if the macro wrapper was updated then it's very likely
-        // that the macro parameters were also updated.
-        shouldRefreshContent = shouldRefreshContent || updatedNode.tagName.toLowerCase() === 'xwiki-widget-xwiki-macro';
+        // Most of the macro parametes are kept on the macro wrapper, so if the macro wrapper was updated then it's very
+        // likely that the macro parameters were also updated. Some macro parameters are edited in-place using nested
+        // editables. We need to re-render the macro if a new nested editable is added.
+        shouldRefreshContent = shouldRefreshContent ||
+          updatedNode.tagName.toLowerCase() === 'xwiki-widget-xwiki-macro' ||
+          (updatedNode.tagName.toLowerCase() === 'xwiki-editable' && widget?.name === 'xwiki-macro' &&
+            !widget.editables[updatedNode.getAttribute('name')]);
       });
 
       // Delete the updated widgets so that we can reinitialize them.

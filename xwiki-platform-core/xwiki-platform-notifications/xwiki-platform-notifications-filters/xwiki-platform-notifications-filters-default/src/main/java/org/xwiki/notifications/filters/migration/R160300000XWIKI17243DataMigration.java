@@ -145,12 +145,15 @@ public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigr
         }
         if (numberOfEntries > 0) {
             WikiReference currentWiki = getXWikiContext().getWikiReference();
-            long loops = numberOfEntries / BATCH_SIZE;
+            long loops = (numberOfEntries / BATCH_SIZE);
+            if (numberOfEntries % BATCH_SIZE > 0) {
+                loops += 1;
+            }
             this.logger.info(
                 "Found a total number of [{}] users with WatchListClass objects. Migration will operate [{}]"
                     + " loops of [{}] entries.", numberOfEntries, loops, BATCH_SIZE);
 
-            int loopIndex = 0;
+            int loopIndex = 1;
             int offset = 0;
             List<String> results;
             do {

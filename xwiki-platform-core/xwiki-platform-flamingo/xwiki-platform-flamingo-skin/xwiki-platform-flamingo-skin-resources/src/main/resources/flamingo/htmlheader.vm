@@ -139,10 +139,12 @@
 #set ($preferenceUnderlining = "preference-underlining-")
 #if ($underlining == 'Yes' || $a11y == '1')
   #set ($preferenceUnderlining = $preferenceUnderlining + "yes")
-#elseif($underlining == 'OnlyInlineLinks' && $a11y != '1')
-  #set ($preferenceUnderlining = $preferenceUnderlining + "only-inline-links")
-#elseif($underlining == 'No' && $a11y != '1')
+#elseif($underlining == 'No')
+  ## The legacy a11y preference is never ON when reaching here
   #set ($preferenceUnderlining = $preferenceUnderlining + "no")
+#else
+  ## The default value `OnlyInlineLinks` has the same behavior as the fallback
+  #set ($preferenceUnderlining = $preferenceUnderlining + "only-inline-links")
 #end
 ## These elements will be closed in the htmlfooter.vm file
 ## We put a space before each class added in #if, to avoid losing them because of velocity line stripping

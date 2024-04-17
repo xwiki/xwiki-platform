@@ -36,7 +36,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 #template("attachmentslist.vm")
 </div> ## attachments
 #if($hasEdit || $hasAdmin)
-  <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
+  <form class="xform" action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
   <div>
   ## CSRF prevention
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -47,8 +47,13 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     ## <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
     <div class="fileupload-field">
       #if ($services.attachment.configuration.commentsEnabled)
-        <label for="xwikiuploadcomment" class="sr-only">$services.localization.render('core.viewers.attachments.upload.comment')</label>
-        <input type="text" id="xwikiuploadcomment" class="uploadCommentInput" name="comment" placeholder="$services.localization.render('core.viewers.attachments.upload.comment.hint')" title="$services.localization.render('core.viewers.attachments.upload.comment.tooltip')" size="40" maxlength="1023" />
+        <dl>
+          <dt>
+            <label for="xwikiuploadcomment">$services.localization.render('core.viewers.attachments.upload.comment')</label>
+            <span class="xHint">$services.localization.render('core.viewers.attachments.upload.comment.hint')</span>
+          </dt>
+          <dd><input type="text" id="xwikiuploadcomment" name="comment" maxlength="1023"></dd>
+        </dl>
       #end
       <label class="sr-only" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" size="40" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" />
     </div>

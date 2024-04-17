@@ -17,30 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.test.ui.docker;
+package org.xwiki.attachment.configuration;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * All UI tests for the Attachment feature.
+ * General configuration values for attachments.
  *
  * @version $Id$
- * @since 14.0RC1
+ * @since 16.3.0RC1
  */
-@UITest
-public class AllIT
+@Unstable
+@Role
+public interface AttachmentConfiguration
 {
-    @Nested
-    @DisplayName("Move attachments test")
-    class NestedMoveAttachmentIT extends MoveAttachmentIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Set and display attachment comments test")
-    class NestedAttachmentCommentIT extends AttachmentCommentIT
-    {
-    }
+    /**
+     * @return whether or not comments for attachment uploads should be settable and displayed from UI
+     */
+    boolean isCommentsEnabled();
 }

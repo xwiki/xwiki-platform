@@ -17,30 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.test.ui.docker;
+package org.xwiki.attachment.internal.configuration;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.attachment.configuration.AttachmentConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * All UI tests for the Attachment feature.
+ * Default implementation for attachment configuration.
  *
  * @version $Id$
- * @since 14.0RC1
+ * @since 16.3.0RC1
  */
-@UITest
-public class AllIT
+@Component
+@Singleton
+public class DefaultAttachmentConfiguration implements AttachmentConfiguration
 {
-    @Nested
-    @DisplayName("Move attachments test")
-    class NestedMoveAttachmentIT extends MoveAttachmentIT
-    {
-    }
+    private static final String ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY = "attachment.upload.enableComments";
 
-    @Nested
-    @DisplayName("Set and display attachment comments test")
-    class NestedAttachmentCommentIT extends AttachmentCommentIT
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesConfigurationSource;
+
+    @Override
+    public boolean isCommentsEnabled()
     {
+        return this.xwikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY, false);
     }
 }

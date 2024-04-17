@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
-import javax.websocket.HandshakeResponse;
+import jakarta.websocket.HandshakeResponse;
 
 import org.junit.jupiter.api.Test;
 

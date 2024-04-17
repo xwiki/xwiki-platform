@@ -21,7 +21,7 @@ package org.xwiki.netflux.internal;
 
 import java.util.List;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

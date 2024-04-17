@@ -76,7 +76,7 @@ define([
         nodes.forEach((object) => {
           // Each node will be rendered as an HTML element.
           // As such, we want to make sure we escape space characters in their ids
-          object.id = object.id.replaceAll(' ','%20');
+          object.id = object.id.replaceAll(' ', '%20');
         });
         return nodes;
       });

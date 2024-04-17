@@ -109,8 +109,6 @@ define([
     parameters = parameters || {};
     if (!childrenURL) {
       childrenURL = this.element.attr('data-url');
-      // We make sure to unescape the parent node id because we use it as content of a POST request,
-      // and not the URL of a GET.
       parameters = $.extend({
         data: 'children',
         id: node.id.replaceAll('%20', ' ').replaceAll('%25', '%')

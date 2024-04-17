@@ -76,7 +76,7 @@ define([
         nodes.forEach((object) => {
           // Each node will be rendered as an HTML element.
           // As such, we want to make sure we escape space characters in their ids
-          object.id = object.id.replaceAll(' ', '%20');
+          object.id = object.id.replaceAll('%', '%25').replaceAll(' ', '%20');
         });
         return nodes;
       });
@@ -113,7 +113,7 @@ define([
       // and not the URL of a GET.
       parameters = $.extend({
         data: 'children',
-        id: node.id.replaceAll('%20', ' ')
+        id: node.id.replaceAll('%20', ' ').replaceAll('%25', '%')
       }, parameters);
     }
     if (childrenURL) {

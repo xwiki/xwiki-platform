@@ -60,7 +60,16 @@ user.profile.network.saving=Saving...
 user.profile.network.error=Error saving the notification setting
 user.profile.status.done=Done
 user.profile.status.saving=Saving...
-user.profile.status.error=Error saving the user status</content>
+user.profile.status.error=Error saving the user status
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 16.3.0RC1
+XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>XWiki.UserProfileTranslations</name>
     <number>0</number>

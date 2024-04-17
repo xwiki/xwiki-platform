@@ -133,7 +133,7 @@ public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         String statement = "from doc.object(XWiki.WatchListClass) as watchListDoc";
-        Long numberOfEntries = -1L;
+        long numberOfEntries;
         try {
             List<Long> countResult = this.queryManager
                 .createQuery(statement, Query.XWQL)

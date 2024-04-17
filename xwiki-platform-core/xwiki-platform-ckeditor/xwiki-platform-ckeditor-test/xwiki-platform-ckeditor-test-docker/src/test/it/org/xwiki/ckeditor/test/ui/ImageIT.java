@@ -833,6 +833,35 @@ class ImageIT extends AbstractCKEditorIT
         assertEquals("a [[image:" + imageURL + "||height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(19)
+    void editListWithImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Then test the image styles on the image dialog as a standard user.
+        createAndLoginStandardUser(setup);
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("* Item 1\n"
+            + "* Item 2 [[image:image.gif]]");
+        wikiEditPage.clickSaveAndView();
+
+        WYSIWYGEditPage wysiwygEditPage = wikiEditPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        editor.getToolBar().clickNumberedList();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("* Item 1\n"
+            + "\n"
+            + "1. Item 2 [[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
     /**
      * Initialize a page with some content and an image. Then, copy its displayed content in the clipboard.
      *

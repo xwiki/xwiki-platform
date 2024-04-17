@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
-import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
+import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
 
 import com.xpn.xwiki.objects.BaseObject;
 

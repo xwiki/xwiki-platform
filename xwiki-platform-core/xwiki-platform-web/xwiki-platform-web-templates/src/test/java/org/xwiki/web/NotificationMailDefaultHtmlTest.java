@@ -49,6 +49,7 @@ import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.user.DefaultUserComponentList;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -68,6 +69,7 @@ import static org.mockito.Mockito.when;
     TemplateScriptService.class
 })
 @HTML50ComponentList
+@DefaultUserComponentList
 class NotificationMailDefaultHtmlTest extends PageTest
 {
     private static final DocumentReference TEST_DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Test", "WebHome");
@@ -276,10 +278,10 @@ class NotificationMailDefaultHtmlTest extends PageTest
             + "\n"
             + "\n"
             + "\n"
-            + "                                                \n"
-            + "                                                                          "
+            + "                                                            \n"
+            + "                                                                                            "
             + "<div style=\"border-top: 1px dashed #e8e8e8; font-size: 0.9em;\">\n"
-            + "                        <dl class=\"diff-group\">\n"
+            + "                                <dl class=\"diff-group\">\n"
             + "            <dt id=\"diff-329847360\"   data-reference=\"DOCUMENT:\"\n"
             + ">\n"
             + "          <span class=\"diff-icon diff-icon-change\" title=\"change\">\n"
@@ -317,8 +319,8 @@ class NotificationMailDefaultHtmlTest extends PageTest
             + "          </dl>\n"
             + "    </dd>\n"
             + "  </dl>\n"
-            + "        </div>\n"
-            + "    \n"
+            + "            </div>\n"
+            + "        \n"
             + "      </td>\n"
             + "    </tr>\n"
             + "  </table>";
@@ -496,10 +498,10 @@ class NotificationMailDefaultHtmlTest extends PageTest
             + "\n"
             + "\n"
             + "\n"
-            + "                                                  \n"
-            + "                                                                        "
+            + "                                                              \n"
+            + "                                                                                          "
             + "<div style=\"border-top: 1px dashed #e8e8e8; font-size: 0.9em;\">\n"
-            + "                        <dl class=\"diff-group\">\n"
+            + "                                <dl class=\"diff-group\">\n"
             + "                <dt id=\"diff-329847360\"   data-reference=\"DOCUMENT:\"\n"
             + ">\n"
             + "          <span class=\"diff-icon diff-icon-change\" title=\"change\">\n"
@@ -562,8 +564,8 @@ class NotificationMailDefaultHtmlTest extends PageTest
             + "          </dl>\n"
             + "    </dd>\n"
             + "  </dl>\n"
-            + "        </div>\n"
-            + "    \n"
+            + "            </div>\n"
+            + "        \n"
             + "      </td>\n"
             + "    </tr>\n"
             + "  </table>";

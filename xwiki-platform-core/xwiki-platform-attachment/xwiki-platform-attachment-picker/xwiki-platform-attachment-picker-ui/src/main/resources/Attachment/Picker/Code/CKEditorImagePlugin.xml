@@ -134,6 +134,33 @@
     picker.on('xwiki:attachmentGalleryPicker:unselected', function() {
       imageSelector.updateSelectedImageReferences([], $(this));
     });
+    // We extend the attachment picker to allow quick form submission
+    const results = picker.find('.attachmentPickerResults');
+    let selectButton = element.parents('.modal-content').find('.modal-footer .btn-primary');
+    function validateForm(event) {
+      event.preventDefault();
+      // Make sure we have a selected picture before going forward
+      let selected = $(event.currentTarget).parents('.attachmentGroup').data('id');
+      imageSelector.updateSelectedImageReferences([selected], picker);
+      // Validate the selection of the picture interacted with.
+      selectButton.trigger('click');
+    }
+    // Submit form on double click
+    results.on('click', 'a', (event) => {
+      // We only act on a double click.
+      // The `detail` event property for a click indicates the position of this click in a chain of click.
+      // detail === 2 means that this click is the second click of a double click.
+      if (event.detail === 2) {
+        validateForm(event);
+      }
+    });
+    // Submit form on Enter key pressed
+    results.on('keypress', 'a', function(event) {
+      // 13 is the key id of the Enter key
+      if (event.which === 13) {
+        validateForm(event);
+      }
+    });
   }
 
   init($(document).find('.image-selector'));

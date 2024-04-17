@@ -68,7 +68,7 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
 
       const formattedMessage = Messages.get(messageKey, ...args);
 
-      console.log(formattedMessage);
+      console.debug(formattedMessage);
 
       // Set the message, handle all types.
       $merges.text(formattedMessage);

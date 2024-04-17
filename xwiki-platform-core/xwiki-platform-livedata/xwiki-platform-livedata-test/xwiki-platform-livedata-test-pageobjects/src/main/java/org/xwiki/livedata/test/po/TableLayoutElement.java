@@ -566,7 +566,7 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = findColumnIndex(columnLabel);
 
         WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
-            + "(%d) .sort-icon", columnIndex)));
+            + "(%d) .handle", columnIndex)));
         element.click();
 
         waitUntilReady();

@@ -59,17 +59,16 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * Notify the editor that its content has been updated as a result of a remote change.
+     * Update the edited content as a result of a remote change.
      *
-     * @param {Node[]} updatedNodes the DOM nodes that have been updated (added, modified directly or with removed
-     *   descendants)
-     *
+     * @param {Function} updater a function that takes the current content of the editor, modifies it and returns the
+     *   updated nodes
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      * @returns {Promise} a promise that resolves when the editor has finished handling the content update (some
      *   changes, like for instance if you modify some macro parameters, might require a full refresh of the edited
      *   content).
      */
-    async contentUpdated(updatedNodes, propagate) {
+    async updateContent(updater, propagate) {
       throw new Error('Not implemented!');
     }
 
@@ -83,8 +82,12 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * @returns {Selection} the current DOM selection in the editor
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/Selection
+     * Note that the editor might not be focused so the returned selection ranges don't always match the current window
+     * selection. The returned ranges correspond to the selection (e.g. the caret position) that the editor remembers
+     * even when it loses focus (e.g. when a dialog is opened).
+     *
+     * @returns {Array[Range]} the currently selected DOM ranges in the editor, {@code []} if there is no selection
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Range
      */
     getSelection() {
       throw new Error('Not implemented!');
@@ -98,19 +101,39 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * Restore the selection saved previously.
+     * Restore the given DOM selection ranges, or the last saved text selection if no ranges are specified.
+     *
+     * @param {Range[]} ranges the DOM selection ranges to restore; if not specified, the last saved text selection is
+     *   restored
      */
-    restoreSelection() {
+    restoreSelection(ranges) {
       throw new Error('Not implemented!');
     }
 
     /**
-     * Converts input data accepted by the editor to html that can be directly inserted in the editor's DOM.
+     * Simulates the loading of the given HTML in the editor without affecting the content that is currently being
+     * edited. The given HTML is parsed into a DOM representation and filtered as if it were to be edited in the editor.
+     * The returned element is similar to calling {@link #getContentWrapper()} after loading the given HTML in the
+     * editor.
      *
-     * @param {string} data the data to be converted
-     * @returns {string} html representation of the input data that can be inserted in the editor's DOM.
+     * @param {string} html the input HTML to be parsed; this should come either from {@link #getOutputHTML()} or from
+     *   rendering wiki syntax to Annotated HTML
+     * @returns {Element} the DOM representation of the given HTML, with some adjustments to match what you would get
+     *   if you were to load the given HTML directly in the editor; see also {@link #getContentWrapper()}
      */
-    convertDataToHTML(data) {
+    parseInputHTML(html) {
+      throw new Error('Not implemented!');
+    }
+
+    /**
+     * Allows the editor to ignore some of the changes found when comparing the remote content with the local content.
+     * Each filter function taks a DOM change as input and returns a boolean indicating whether that change should be
+     * ignored or not.
+     *
+     * @returns {Array[Function]} an array of functions that must be used to filter the DOM changes before applying a
+     *   patch (due to a remote change)
+     */
+    getFilters() {
       throw new Error('Not implemented!');
     }
 
@@ -122,13 +145,6 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
      */
     showNotification(message, type) {
       throw new Error('Not implemented!');
-    }
-
-    /**
-     * return {Array<Object>} an array of HyperJSON filters specific to this editor implementation
-     */
-    getCustomFilters() {
-      return [];
     }
 
     /**

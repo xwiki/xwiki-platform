@@ -32,11 +32,11 @@ define('xwiki-realtime-saver', [
   'use strict';
 
   function warn(...args) {
-    console.log(...args);
+    console.warn(...args);
   }
 
   function debug(...args) {
-    console.log(...args);
+    console.debug(...args);
   }
 
   function verbose() {
@@ -125,8 +125,8 @@ define('xwiki-realtime-saver', [
 
     _interrupt() {
       if (this._lastSaved.receivedISAVE) {
-        warn("Another client sent an ISAVED message.");
-        warn("Aborting save action.");
+        debug("Another client sent an ISAVED message.");
+        debug("Aborting save action.");
         // Unset the flag, or else it will persist.
         this._lastSaved.receivedISAVE = false;
         // Return true such that calling functions know to abort.

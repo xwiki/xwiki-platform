@@ -36,4 +36,12 @@
     <module>xwiki-platform-security-authentication-script</module>
     <module>xwiki-platform-security-authentication-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-security-authentication-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

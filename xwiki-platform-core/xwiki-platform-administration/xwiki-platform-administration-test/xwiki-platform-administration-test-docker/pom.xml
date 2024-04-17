@@ -87,16 +87,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.icegreen</groupId>
-      <artifactId>greenmail-junit5</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>jakarta.mail</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
       <version>${project.version}</version>

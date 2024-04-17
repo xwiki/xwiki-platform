@@ -36,13 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Vietas
-index.spacesMacro.spaceIndex.title=Skatīt vietu rādītāju
-index.spacesMacro.spaceIndex.alt=Vietas saturs
-index.spacesMacro.spaceAdministration.title=Skatīt vietu pārvaldību
-index.spacesMacro.spaceAdministration.alt=Pārvaldīt vietu
-index.spacesMacro.createSpace.link=Izveidot jaunu vietu
-index.spacesMacro.createSpace.defaultSpaceName=Vietas nosaukums
-index.spacesMacro.createSpace.submit=Izveidot
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+  <content>### Missing: index.deletedDocuments.deleteAll=Delete all</content>
 </xwikidoc>

@@ -36,15 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Простори
-index.spacesMacro.spaceIndex.title=Дивитись індекс простору
-index.spacesMacro.spaceIndex.alt=Індекс простору
-index.spacesMacro.spaceAdministration.title=Дивитись управління простору
-index.spacesMacro.spaceAdministration.alt=Адміністрація простору
-index.spacesMacro.createSpace.link=Створити новий простір
-index.spacesMacro.createSpace.defaultSpaceName=Назва простору
-index.spacesMacro.createSpace.submit=Створити
-index.deletedDocuments.deleteAll=Видалити всі
+  <content>index.deletedDocuments.deleteAll=Видалити всі
 index.administration.remainingTasks.heading=Залишок завдань аналізу документів
 index.administration.remainingTasks.emptyQueue=Завдань не залишилося.
 admin.documentanalysis=Аналіз документів

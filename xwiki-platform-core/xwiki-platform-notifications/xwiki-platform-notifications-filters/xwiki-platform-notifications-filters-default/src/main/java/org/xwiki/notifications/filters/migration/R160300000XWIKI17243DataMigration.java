@@ -49,6 +49,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -70,12 +71,13 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
  * remove the xobjects but asks {@link WatchListObjectsRemovalTaskConsumer} to do it.
  *
  * @version $Id$
- * @since 16.0.0RC1
+ * @since 16.3.0RC1
  */
 @Component
-@Named("R160000000XWIKI17243")
+@Named("R160300000XWIKI17243")
 @Singleton
-public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigration
+@Unstable
+public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigration
 {
     private static final String WATCHLIST_CLASSNAME = "WatchListClass";
 
@@ -100,6 +102,10 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     private QueryFilter uniqueFilter;
 
     @Inject
+    @Named("count")
+    private QueryFilter countFilter;
+
+    @Inject
     private NotificationFilterPreferenceStore notificationFilterPreferenceStore;
 
     @Inject
@@ -120,33 +126,60 @@ public class R160000000XWIKI17243DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(160000000);
+        return new XWikiDBVersion(160300000);
     }
 
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         String statement = "from doc.object(XWiki.WatchListClass) as watchListDoc";
-        int offset = 0;
-        List<String> results;
-        do {
-            try {
-                results = this.queryManager.createQuery(statement, Query.XWQL)
-                    .addFilter(uniqueFilter)
-                    .setOffset(offset)
-                    .setLimit(BATCH_SIZE).execute();
-
-                this.logger.info("Found [{}] users with WatchListClass objects... migrating them.", results.size());
-                for (String result : results) {
-                    DocumentReference watchListDoc = this.documentReferenceResolver.resolve(result);
-                    this.migrateWatchListDoc(watchListDoc);
-                }
-                offset += BATCH_SIZE;
-            } catch (QueryException e) {
-                throw new DataMigrationException("Error while performing query to find users with WatchList objects",
-                    e);
+        long numberOfEntries;
+        try {
+            List<Long> countResult = this.queryManager
+                .createQuery(statement, Query.XWQL)
+                .addFilter(countFilter).execute();
+            numberOfEntries = countResult.get(0);
+        } catch (QueryException e) {
+            throw new DataMigrationException("Error while performing query to count users with WatchList objects",
+                e);
+        }
+        if (numberOfEntries > 0) {
+            WikiReference currentWiki = getXWikiContext().getWikiReference();
+            long loops = (numberOfEntries / BATCH_SIZE);
+            if (numberOfEntries % BATCH_SIZE > 0) {
+                loops += 1;
             }
-        } while (results.size() == BATCH_SIZE);
+            this.logger.info(
+                "Found a total number of [{}] users with WatchListClass objects. Migration will operate [{}]"
+                    + " loops of [{}] entries.", numberOfEntries, loops, BATCH_SIZE);
+
+            int loopIndex = 1;
+            int offset = 0;
+            List<String> results;
+            do {
+                try {
+                    results = this.queryManager.createQuery(statement, Query.XWQL)
+                        .addFilter(uniqueFilter)
+                        .setOffset(offset)
+                        .setLimit(BATCH_SIZE).execute();
+
+                    this.logger.info("(loop [{}] on [{}]) Migrating [{}] users with WatchListClass objects...",
+                        loopIndex, loops, results.size());
+                    for (String result : results) {
+                        DocumentReference watchListDoc = this.documentReferenceResolver.resolve(result, currentWiki);
+                        this.migrateWatchListDoc(watchListDoc);
+                    }
+                    offset += BATCH_SIZE;
+                } catch (QueryException e) {
+                    throw new DataMigrationException(
+                        "Error while performing query to find users with WatchList objects",
+                        e);
+                }
+                loopIndex++;
+            } while (results.size() == BATCH_SIZE);
+        } else {
+            this.logger.info("No users have been found with WatchListClass object. Migration skipped.");
+        }
     }
 
     private void migrateWatchListDoc(DocumentReference watchListDocReference)

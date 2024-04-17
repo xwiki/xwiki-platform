@@ -41,7 +41,6 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link XWikiIconProvider}.
  *
  * @version $Id
- *  @since 16.2.0-rc1
  */
 @ComponentTest
 class XWikiIconProviderTest

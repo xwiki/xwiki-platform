@@ -17,21 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.security.requiredrights.internal.provider;
+package org.xwiki.platform.security.requiredrights.display;
 
 import java.util.function.Supplier;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
- * Provides a block supplier for a given object and (optionally) parameters.
+ * Provides a block supplier for a given object and (optionally) parameters. This is used to get a {@link Block} for
+ * displaying a message, a code block, a macro or an XObject in a result of a required rights analysis.
+ * <p>XWiki provides the following implementations of this role:</p>
+ * <ul>
+ *     <li>{@code BlockSupplierProvider<BaseObject>}: displays all properties of an XObject</li>
+ *     <li>{@code BlockSupplierProvider<MacroBlock>}: displays a macro including all parameters and content.</li>
+ *     <li>{@code BlockSupplierProvider<String>} with name {@code stringCode}: displays a string as a code block.</li>
+ *     <li>{@code BlockSupplierProvider<String>} with name {@code translation}: displays a translation message with
+ *     the given parameters.</li>
+ * </ul>
  *
  * @param <T> the type of the object
  * @version $Id$
- * @since 15.9RC1
+ * @since 16.3.0RC1
  */
 @Role
+@Unstable
 public interface BlockSupplierProvider<T>
 {
     /**

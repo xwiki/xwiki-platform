@@ -17,28 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.test.po;
+package org.xwiki.platform.security.requiredrights.internal.display;
 
-import org.xwiki.test.ui.po.ViewPage;
+import java.util.function.Supplier;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.block.Block;
 
 /**
- * Represents the actions possible on the SpacesMacro Page.
+ * Provides a way to easily construct a supplier that just displays the given string.
  *
  * @version $Id$
- * @since 7.0RC1
  */
-public class SpacesMacroPage extends ViewPage
+@Component
+@Singleton
+@Named("stringCode")
+public class StringCodeBlockSupplierProvider extends AbstractBlockSupplierProvider<String>
 {
-    private SpacesMacroPane spacesMacroPane = new SpacesMacroPane();
-
-    public static SpacesMacroPage gotoPage()
+    @Override
+    public Supplier<Block> get(String string, Object... parameters)
     {
-        getUtil().gotoPage("Main", "Spaces");
-        return new SpacesMacroPage();
-    }
-
-    public SpacesMacroPane getSpacesMacroPane()
-    {
-        return this.spacesMacroPane;
+        return () -> getCodeBlock(string);
     }
 }

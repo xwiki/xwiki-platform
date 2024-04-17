@@ -122,7 +122,7 @@ fi
                 <artifactItems>
                   <artifactItem>
                     <groupId>org.xwiki.platform</groupId>
-                    <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
+                    <artifactId>${debian.solr.package}</artifactId>
                     <version>${platform.version}</version>
                     <type>zip</type>
                   </artifactItem>

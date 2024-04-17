@@ -17,19 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import com.gradle.maven.extension.api.scan.BuildScanApi
+import com.gradle.develocity.agent.maven.adapters.BuildScanApiAdapter
 
 /**
  * Captures the Maven active profiles and add them as tags to the Build Scan. The goal is to make it simpler to
  * filter builds on <a href="ge.xwiki.org">https://ge.xwiki.org</a> by filtering on Maven profiles.
  */
 
-BuildScanApi buildScan = session.lookup('com.gradle.maven.extension.api.scan.BuildScanApi')
-if (!buildScan) {
-    return
-}
-
-buildScan.executeOnce('tag-profiles') { BuildScanApi buildScanApi ->
+buildScan.executeOnce('tag-profiles') { BuildScanApiAdapter buildScanApi ->
 
     // Add all maven profile names as tags
     project.activeProfiles.each { buildScanApi.tag(it.id) }
@@ -55,5 +50,3 @@ buildScan.executeOnce('tag-profiles') { BuildScanApi buildScanApi ->
         buildScanApi.tag(browser.toLowerCase())
     }
 }
-
-

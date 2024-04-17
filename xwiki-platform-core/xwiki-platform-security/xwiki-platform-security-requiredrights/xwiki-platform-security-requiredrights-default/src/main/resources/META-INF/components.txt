@@ -8,10 +8,10 @@ org.xwiki.platform.security.requiredrights.internal.analyzer.PDFClassObjectRequi
 org.xwiki.platform.security.requiredrights.internal.analyzer.RequiredRightObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.ScriptMacroAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.SkinExtensionObjectRequiredRightAnalyzer
-org.xwiki.platform.security.requiredrights.internal.provider.TranslationMessageSupplierProvider
-org.xwiki.platform.security.requiredrights.internal.provider.XObjectDisplayerProvider
-org.xwiki.platform.security.requiredrights.internal.provider.MacroDisplayerProvider
-org.xwiki.platform.security.requiredrights.internal.provider.StringCodeBlockSupplierProvider
+org.xwiki.platform.security.requiredrights.internal.display.TranslationMessageSupplierProvider
+org.xwiki.platform.security.requiredrights.internal.display.XObjectDisplayerProvider
+org.xwiki.platform.security.requiredrights.internal.display.MacroDisplayerProvider
+org.xwiki.platform.security.requiredrights.internal.display.StringCodeBlockSupplierProvider
 org.xwiki.platform.security.requiredrights.internal.configuration.DefaultRequiredRightsConfiguration
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsEditConfirmationChecker
 org.xwiki.platform.security.requiredrights.internal.RequiredRightsChangedFilter

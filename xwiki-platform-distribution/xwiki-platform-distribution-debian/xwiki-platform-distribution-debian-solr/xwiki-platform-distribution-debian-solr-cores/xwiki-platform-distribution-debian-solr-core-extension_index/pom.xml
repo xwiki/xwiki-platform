@@ -31,6 +31,6 @@
   <packaging>deb</packaging>
   <name>XWiki Platform - Distribution - Debian - Solr - Core - Extension Index</name>
   <properties>
-    <debian.xwiki.coree>extension_index</debian.xwiki.coree>
+    <debian.xwiki.core>extension_index</debian.xwiki.core>
   </properties>
 </project>

@@ -51,6 +51,7 @@ import org.apache.solr.schema.IntPointField;
 import org.apache.solr.schema.LongPointField;
 import org.apache.solr.schema.StrField;
 import org.apache.solr.schema.TextField;
+import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
@@ -153,6 +154,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     @Inject
     protected SolrUtils solrUtils;
+
+    @Inject
+    protected Logger logger;
 
     protected XWikiSolrCore core;
 
@@ -351,6 +355,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     @Override
     public void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
+        this.logger.info("Starting migrating Solr core [{}] to [{}]", sourceCore.getSolrName(),
+            targetCore.getSolrName());
+
         // Set the current core
         this.core = targetCore;
 
@@ -362,12 +369,19 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
         // Copy the data
         migrateData(sourceCore, targetCore);
+
+        this.logger.info("Finished migrating Solr core [{}] to [{}]", sourceCore.getSolrName(),
+            targetCore.getSolrName());
     }
 
     private void migrateFieldTypes(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
         Map<String, FieldTypeRepresentation> sourceTypes = this.solrSchemaUtils.getFieldTypes(sourceCore, false);
         Map<String, FieldTypeRepresentation> targetTypes = this.solrSchemaUtils.getFieldTypes(targetCore, false);
+
+        this.logger.info("  Migrating [{}] field types from Solr core [{}] to [{}]", sourceTypes.size(),
+            sourceCore.getSolrName(), targetCore.getSolrName());
+
         for (Map.Entry<String, FieldTypeRepresentation> entry : sourceTypes.entrySet()) {
             if (!targetTypes.containsKey(entry.getKey())) {
                 // Add the missing type
@@ -395,6 +409,10 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         Map<String, Map<String, Object>> targetFields =
             dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
                 : this.solrSchemaUtils.getFields(targetCore, false);
+
+        this.logger.info("  Migrating [{}] {} fields from Solr core [{}] to [{}]", sourceFields.size(),
+            dynamic ? " dynamic" : "", sourceCore.getSolrName(), targetCore.getSolrName());
+
         for (Map.Entry<String, Map<String, Object>> entry : sourceFields.entrySet()) {
             if (!targetFields.containsKey(entry.getKey())) {
                 // Add the missing type
@@ -407,6 +425,10 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     {
         Map<String, Set<String>> sourceFields = this.solrSchemaUtils.getCopyFields(sourceCore, false);
         Map<String, Set<String>> targetFields = this.solrSchemaUtils.getCopyFields(targetCore, false);
+
+        this.logger.info("Migrating [{}] copy fields from Solr core [{}] to [{}]", sourceFields.size(),
+            sourceCore.getSolrName(), targetCore.getSolrName());
+
         for (Map.Entry<String, Set<String>> entry : sourceFields.entrySet()) {
             if (!targetFields.containsKey(entry.getKey())) {
                 // Add the missing type
@@ -427,8 +449,12 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     private void migrateData(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
+        this.logger.info("  Migrating data from Solr core [{}] to [{}]", sourceCore.getSolrName(),
+            targetCore.getSolrName());
+
         int batchSize = getMigrationBatchRows();
 
+        long total = -1;
         int size = 0;
         do {
             SolrQuery solrQuery = new SolrQuery();
@@ -445,6 +471,13 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             size = result.size();
 
             if (size > 0) {
+                if (total == -1) {
+                    total = result.getNumFound();
+                }
+                long remaining = result.getNumFound() - size;
+                this.logger.info("    Migrating [{}] documents, [{}] are remaining ([{}]%)", size, remaining,
+                    (remaining / total) * 100L);
+
                 migrateData(response.getResults(), sourceCore, targetCore);
             }
         } while (size == batchSize);

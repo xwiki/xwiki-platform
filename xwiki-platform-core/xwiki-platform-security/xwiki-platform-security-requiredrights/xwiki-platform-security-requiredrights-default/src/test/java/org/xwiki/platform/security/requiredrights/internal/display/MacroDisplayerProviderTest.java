@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.security.requiredrights.internal.provider;
+package org.xwiki.platform.security.requiredrights.internal.display;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

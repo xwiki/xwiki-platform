@@ -174,7 +174,7 @@
     <property>
       <parameters>id=xwiki-realtime-wysiwyg-bundle
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wysiwyg-webjar', 'webjar.bundle.min.js')
-bundles=xwiki-realtime-wysiwyg,xwiki-realtime-wysiwyg-filters,xwiki-realtime-wysiwyg-editor,xwiki-realtime-wysiwyg-patches,xwiki-realtime-wysiwyg-transformers</parameters>
+bundles=xwiki-realtime-wysiwyg,xwiki-realtime-wysiwyg-editor,xwiki-realtime-wysiwyg-patches,xwiki-realtime-wysiwyg-transformers</parameters>
     </property>
     <property>
       <scope>wiki</scope>

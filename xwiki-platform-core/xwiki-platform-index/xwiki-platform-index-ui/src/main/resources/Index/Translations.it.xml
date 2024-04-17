@@ -36,13 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Spazi
-index.spacesMacro.spaceIndex.title=Vedi indice spazio
-index.spacesMacro.spaceIndex.alt=Indice dello spazio
-index.spacesMacro.spaceAdministration.title=Vedi amministrazione spazio
-index.spacesMacro.spaceAdministration.alt=Amministrazione spazio
-index.spacesMacro.createSpace.link=Crea un nuovo spazio
-index.spacesMacro.createSpace.defaultSpaceName=Nome spazio
-index.spacesMacro.createSpace.submit=Crea
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+  <content>### Missing: index.deletedDocuments.deleteAll=Delete all</content>
 </xwikidoc>

@@ -72,6 +72,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Фильтр об
 notifications.filters.preferences.scopeNotificationFilter.page=Только страница
 notifications.filters.preferences.scopeNotificationFilter.space=Страница и дочерние
 notifications.filters.preferences.scopeNotificationFilter.wiki=Вики
+notifications.filters.preferences.scopeNotificationFilter.user=Пользователь
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Вам нужно включить уведомления в ваших настройках
@@ -94,22 +95,23 @@ notifications.settings.filters.preferences.system.title=Системные фи�
 notifications.settings.filters.preferences.system.hint=Системные фильтры, которые вы можете переключать, чтобы иметь более точный контроль над уведомлениями, которые вы хотите получать.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Название
+notifications.settings.filters.preferences.system.table.filterDescription=Описание
 notifications.settings.filters.preferences.system.table.filterType=Описание
 notifications.settings.filters.preferences.system.table.notificationFormats=Форматы
 notifications.settings.filters.preferences.system.table.isEnabled=Включено?
-notifications.settings.filters.preferences.system.table.description=В этой таблице перечислены все системные фильтры, зарегистрированные в вики.
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=Пользовательские фильтры
 notifications.settings.filters.preferences.custom.hint=Создавайте фильтры для управления уведомлениями, которые вы хотите получать.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.custom.table.name=Расположение
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Идентификатор
+notifications.settings.filters.preferences.custom.table.scope=Область видимости
+notifications.settings.filters.preferences.custom.table.location=Расположение
 notifications.settings.filters.preferences.custom.table.filterType=Действие фильтра
 notifications.settings.filters.preferences.custom.table.eventTypes=События
 notifications.settings.filters.preferences.custom.table.notificationFormats=Форматы
 notifications.settings.filters.preferences.custom.table.isEnabled=Включено?
 notifications.settings.filters.preferences.custom.table._actions=Действия
-notifications.settings.filters.preferences.custom.table.description=В этой таблице перечислены все пользовательские фильтры, зарегистрированные для данного пользователя или текущей вики.
 notifications.filters.type.custom.inclusive=Уведомить о событии
 notifications.filters.type.custom.exclusive=Игнорировать событие
 notifications.settings.addFilter=Добавить фильтр
@@ -255,6 +257,10 @@ notifications.filters.preferences.addPreference.location.hint=На какую с
 ## Filter Types
 notifications.filters.type.inclusive=Включено
 notifications.filters.type.exclusive=Исключая
+notifications.settings.filters.preferences.custom.table.description=В этой таблице перечислены все пользовательские фильтры, зарегистрированные для данного пользователя или текущей вики.
+notifications.settings.filters.preferences.system.table.description=В этой таблице перечислены все системные фильтры, зарегистрированные в вики.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Расположение
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

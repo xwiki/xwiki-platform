@@ -33,8 +33,10 @@ public class WatchedLocationState
     public enum WatchedState
     {
         WATCHED,
+        WATCHED_WITH_CHILDREN,
         WATCHED_BY_ANCESTOR,
         BLOCKED,
+        BLOCKED_WITH_CHILDREN,
         BLOCKED_BY_ANCESTOR,
         CUSTOM,
         NOT_SET

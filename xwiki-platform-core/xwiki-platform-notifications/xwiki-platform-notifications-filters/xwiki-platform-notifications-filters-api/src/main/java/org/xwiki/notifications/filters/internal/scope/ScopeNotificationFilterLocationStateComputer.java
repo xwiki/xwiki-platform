@@ -28,7 +28,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 
@@ -145,30 +148,47 @@ public class ScopeNotificationFilterLocationStateComputer
             preferencesHierarchy.getInclusiveFiltersThatHasNoParents();
 
         boolean exactMatch = false;
+        boolean spaceMatch = false;
         while (inclusiveFiltersIterator.hasNext()) {
             ScopeNotificationFilterPreference pref = inclusiveFiltersIterator.next();
 
             boolean isExactMatch = isExactMatch(pref, location);
             boolean isParentMatch = isParentMatch(pref, location);
+            boolean isSpaceMatch = isSpaceMatch(pref, location);
             // If the inclusive filter match the event location...
             if (isExactMatch || isParentMatch) {
                 // Then it means we watch this location
                 match = true;
                 exactMatch = isExactMatch;
+                spaceMatch = isSpaceMatch;
                 startingDate = pref.getStartingDate();
             }
         }
         if (match) {
-            WatchedLocationState.WatchedState watchedState;
-            if (allEventsAllFormats) {
-                watchedState = (exactMatch) ? WatchedLocationState.WatchedState.WATCHED
-                    : WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR;
-            } else {
-                watchedState = WatchedLocationState.WatchedState.CUSTOM;
-            }
+            WatchedLocationState.WatchedState watchedState =
+                getWatchedState(allEventsAllFormats, exactMatch, spaceMatch, true);
             result = Optional.of(new WatchedLocationState(watchedState, startingDate));
         }
         return result;
+    }
+
+    private static WatchedLocationState.WatchedState getWatchedState(boolean allEventsAllFormats, boolean exactMatch,
+        boolean spaceMatch, boolean isInclusive)
+    {
+        WatchedLocationState.WatchedState watchedState;
+        if (!allEventsAllFormats) {
+            watchedState = WatchedLocationState.WatchedState.CUSTOM;
+        } else if (exactMatch) {
+            watchedState = (isInclusive) ? WatchedLocationState.WatchedState.WATCHED
+                : WatchedLocationState.WatchedState.BLOCKED;
+        } else if (spaceMatch) {
+            watchedState = (isInclusive) ? WatchedLocationState.WatchedState.WATCHED_WITH_CHILDREN
+                : WatchedLocationState.WatchedState.BLOCKED_WITH_CHILDREN;
+        } else {
+            watchedState = (isInclusive) ? WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR
+                : WatchedLocationState.WatchedState.BLOCKED_BY_ANCESTOR;
+        }
+        return watchedState;
     }
 
     private Optional<WatchedLocationState> handleExclusiveFilters(EntityReference location,
@@ -185,15 +205,11 @@ public class ScopeNotificationFilterLocationStateComputer
             int deepLevel = pref.getScopeReference().size();
             boolean isExactMatch = isExactMatch(pref, location);
             boolean isParentMatch = isParentMatch(pref, location);
+            boolean isSpaceMatch = isSpaceMatch(pref, location);
 
             // If the exclusive filter match the event location...
             if ((isExactMatch || isParentMatch) && deepLevel > deepestLevel) {
-                if (allTypesAndEvents) {
-                    state = (isExactMatch) ? WatchedLocationState.WatchedState.BLOCKED
-                        : WatchedLocationState.WatchedState.BLOCKED_BY_ANCESTOR;
-                } else {
-                    state = WatchedLocationState.WatchedState.CUSTOM;
-                }
+                state = getWatchedState(allTypesAndEvents, isExactMatch, isSpaceMatch, false);
                 startingDate = pref.getStartingDate();
                 deepestLevel = deepLevel;
 
@@ -202,13 +218,9 @@ public class ScopeNotificationFilterLocationStateComputer
                     int childDeepLevel = child.getScopeReference().size();
                     boolean isChildExactMatch = isExactMatch(child, location);
                     boolean isChildParentMatch = isParentMatch(child, location);
+                    boolean isChildSpaceMatch = isSpaceMatch(child, location);
                     if ((isChildExactMatch || isChildParentMatch) && childDeepLevel > deepestLevel) {
-                        if (allTypesAndEvents) {
-                            state = (isChildExactMatch) ? WatchedLocationState.WatchedState.WATCHED
-                                : WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR;
-                        } else {
-                            state = WatchedLocationState.WatchedState.CUSTOM;
-                        }
+                        state = getWatchedState(allTypesAndEvents, isChildExactMatch, isChildSpaceMatch, true);
                         deepestLevel = childDeepLevel;
                         startingDate = child.getStartingDate();
                     }
@@ -221,6 +233,16 @@ public class ScopeNotificationFilterLocationStateComputer
         } else {
             return Optional.empty();
         }
+    }
+
+    private boolean isSpaceMatch(ScopeNotificationFilterPreference pref, EntityReference location)
+    {
+        boolean result = false;
+        EntityReference scopeReference = pref.getScopeReference();
+        if (scopeReference.getType() == EntityType.SPACE) {
+            result = new DocumentReference("WebHome", new SpaceReference(scopeReference)).equals(location);
+        }
+        return result;
     }
 
     private boolean isExactMatch(ScopeNotificationFilterPreference pref, EntityReference location)

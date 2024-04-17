@@ -103,8 +103,10 @@ public class WatchedLocationReference implements WatchedEntityReference
             case CUSTOM -> WatchedStatus.CUSTOM;
             case WATCHED -> WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
             case WATCHED_BY_ANCESTOR -> WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS;
+            case WATCHED_WITH_CHILDREN -> WatchedStatus.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS;
             case BLOCKED -> WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
             case BLOCKED_BY_ANCESTOR -> WatchedStatus.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS;
+            case BLOCKED_WITH_CHILDREN -> WatchedStatus.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS;
             default -> WatchedStatus.NOT_SET;
         };
     }

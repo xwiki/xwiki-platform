@@ -91,6 +91,7 @@ public class ScopeNotificationFilter implements NotificationFilter
             switch (state.getState()) {
                 case BLOCKED:
                 case BLOCKED_BY_ANCESTOR:
+                case BLOCKED_WITH_CHILDREN:
                     if (state.getStartingDate().before(event.getDate())) {
                         result = FilterPolicy.FILTER;
                     }
@@ -98,6 +99,7 @@ public class ScopeNotificationFilter implements NotificationFilter
 
                 case WATCHED:
                 case WATCHED_BY_ANCESTOR:
+                case WATCHED_WITH_CHILDREN:
                     if (state.getStartingDate().after(event.getDate())) {
                         result = FilterPolicy.FILTER;
                     }

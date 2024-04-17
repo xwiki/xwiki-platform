@@ -34,6 +34,7 @@ public interface WatchedEntityReference
 {
     /**
      * Define more precisely the watched status given the event types and the formats.
+     *
      * @since 15.5RC1
      */
     @Unstable
@@ -44,9 +45,11 @@ public interface WatchedEntityReference
          */
         WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
         WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
+        WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS,
 
         /**
          * The entity does not have a watched status: by default it means it's not watched, but it's not blocked.
+         *
          * @since 15.9RC1
          */
         NOT_SET,
@@ -56,7 +59,7 @@ public interface WatchedEntityReference
          */
         BLOCKED_FOR_ALL_EVENTS_AND_FORMATS,
         BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
-
+        BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS,
         CUSTOM
     }
 

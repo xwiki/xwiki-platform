@@ -23,6 +23,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 /**
  * Reference to an entity (a location, a user, etc...) to watch.
@@ -69,10 +70,9 @@ public interface WatchedEntityReference
      * @param userReference the user for whom to check if the entity is watched or not
      * @return the specific watched status of the entity by the given user
      * @throws NotificationException in case of errors
-     * @since 15.5RC1
      */
     @Unstable
-    WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException;
+    WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException;
 
     /**
      * @param userReference a user

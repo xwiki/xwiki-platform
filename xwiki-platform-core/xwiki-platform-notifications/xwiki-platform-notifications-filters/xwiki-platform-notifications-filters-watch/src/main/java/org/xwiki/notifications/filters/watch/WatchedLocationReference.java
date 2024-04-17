@@ -36,6 +36,10 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
+import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Reference of a location to watch.
@@ -47,15 +51,17 @@ public class WatchedLocationReference implements WatchedEntityReference
 {
     private static final Set<NotificationFormat> ALL_NOTIFICATION_FORMATS = Set.of(NotificationFormat.values());
 
-    private EntityReference entityReference;
+    private final EntityReference entityReference;
 
-    private String serializedReference;
+    private final String serializedReference;
 
-    private EntityReferenceResolver<String> resolver;
+    private final EntityReferenceResolver<String> resolver;
 
-    private ScopeNotificationFilterLocationStateComputer stateComputer;
+    private final ScopeNotificationFilterLocationStateComputer stateComputer;
 
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+    private final NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    private final UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     /**
      * Construct a WatchedLocationReference.
@@ -69,13 +75,15 @@ public class WatchedLocationReference implements WatchedEntityReference
     public WatchedLocationReference(EntityReference entityReference, String serializedReference,
             EntityReferenceResolver<String> resolver,
             ScopeNotificationFilterLocationStateComputer stateComputer,
-            NotificationFilterPreferenceManager notificationFilterPreferenceManager)
+            NotificationFilterPreferenceManager notificationFilterPreferenceManager,
+        UserReferenceSerializer<DocumentReference> userReferenceSerializer)
     {
         this.entityReference = entityReference;
         this.serializedReference = serializedReference;
         this.resolver = resolver;
         this.stateComputer = stateComputer;
         this.notificationFilterPreferenceManager = notificationFilterPreferenceManager;
+        this.userReferenceSerializer = userReferenceSerializer;
     }
 
     @Override
@@ -93,7 +101,13 @@ public class WatchedLocationReference implements WatchedEntityReference
     }
 
     @Override
-    public WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
+    public WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException
+    {
+        DocumentReference userDocReference = this.userReferenceSerializer.serialize(userReference);
+        return getWatchedStatus(userDocReference);
+    }
+
+    private WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
     {
         Collection<NotificationFilterPreference> filterPreferences =
             notificationFilterPreferenceManager.getFilterPreferences(userReference);

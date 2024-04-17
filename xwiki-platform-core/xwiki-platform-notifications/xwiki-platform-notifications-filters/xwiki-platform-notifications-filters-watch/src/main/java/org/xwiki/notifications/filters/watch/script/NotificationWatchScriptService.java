@@ -117,7 +117,7 @@ public class NotificationWatchScriptService implements ScriptService
             throws NotificationException
     {
         return watchedEntityFactory.createWatchedLocationReference(location)
-                .getWatchedStatus(documentAccessBridge.getCurrentUserReference());
+                .getWatchedStatus(CurrentUserReference.INSTANCE);
     }
 
     /**

@@ -41,6 +41,8 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -55,17 +57,13 @@ import static org.mockito.Mockito.when;
  */
 class WatchedLocationReferenceTest
 {
-    private EntityReference entityReference;
-
     private String serializedReference;
-
+    private EntityReference entityReference;
     private EntityReferenceResolver<String> resolver;
-
     private ScopeNotificationFilterLocationStateComputer stateComputer;
-
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
     private WatchedLocationReference watchedLocationReference;
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @BeforeEach
     void setup()
@@ -74,12 +72,15 @@ class WatchedLocationReferenceTest
         this.resolver = mock(EntityReferenceResolver.class);
         this.stateComputer = mock(ScopeNotificationFilterLocationStateComputer.class);
         this.notificationFilterPreferenceManager = mock(NotificationFilterPreferenceManager.class);
+        this.userReferenceSerializer = mock(UserReferenceSerializer.class);
         this.serializedReference = "xwiki:XWiki.Location";
+
         this.watchedLocationReference = new WatchedLocationReference(this.entityReference,
             this.serializedReference,
             this.resolver,
             this.stateComputer,
-            this.notificationFilterPreferenceManager);
+            this.notificationFilterPreferenceManager,
+            this.userReferenceSerializer);
     }
 
     @Test
@@ -243,9 +244,11 @@ class WatchedLocationReferenceTest
     @Test
     void getWatchedStatus() throws NotificationException
     {
-        DocumentReference userReference = mock(DocumentReference.class);
+        DocumentReference userDocReference = mock(DocumentReference.class);
+        UserReference userReference = mock(UserReference.class);
+        when(this.userReferenceSerializer.serialize(userReference)).thenReturn(userDocReference);
         Collection<NotificationFilterPreference> filterPreferences = mock(Collection.class);
-        when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
+        when(this.notificationFilterPreferenceManager.getFilterPreferences(userDocReference))
             .thenReturn(filterPreferences);
 
         when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))

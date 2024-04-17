@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.user.UserReference;
 
 /**
  * Manage the watched entities.
@@ -42,7 +43,12 @@ public interface WatchedEntitiesManager
      * @param user user that will watch the entity
      * @throws NotificationException if an error happens
      */
+    @Deprecated
     void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
+
+    boolean watch(WatchedEntityReference entity, UserReference user) throws NotificationException;
+    boolean removeWatchFilter(WatchedEntityReference entity, UserReference user) throws NotificationException;
+    boolean block(WatchedEntityReference entity, UserReference user) throws NotificationException;
 
     /**
      * Remove a filter to stop watching the specified entity.
@@ -51,6 +57,7 @@ public interface WatchedEntitiesManager
      * @param user user that will watch the entity
      * @throws NotificationException if an error happens
      */
+    @Deprecated
     void unwatchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 
     /**

@@ -31,6 +31,9 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
+import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Reference to a user to watch.
@@ -40,11 +43,12 @@ import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesG
  */
 public class WatchedUserReference implements WatchedEntityReference
 {
-    private String userId;
+    private final String userId;
 
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+    private final NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
-    private EventUserFilterPreferencesGetter preferencesGetter;
+    private final EventUserFilterPreferencesGetter preferencesGetter;
+    private final UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     /**
      * Construct a WatchedUserReference.
@@ -54,11 +58,13 @@ public class WatchedUserReference implements WatchedEntityReference
      * @since 10.9
      */
     public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter,
-            NotificationFilterPreferenceManager notificationFilterPreferenceManager)
+            NotificationFilterPreferenceManager notificationFilterPreferenceManager,
+        UserReferenceSerializer<DocumentReference> userReferenceSerializer)
     {
         this.userId = userId;
         this.preferencesGetter = preferencesGetter;
         this.notificationFilterPreferenceManager = notificationFilterPreferenceManager;
+        this.userReferenceSerializer = userReferenceSerializer;
     }
 
     @Override
@@ -70,13 +76,14 @@ public class WatchedUserReference implements WatchedEntityReference
     }
 
     @Override
-    public WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
+    public WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException
     {
+        DocumentReference userDocReference = this.userReferenceSerializer.serialize(userReference);
         WatchedStatus watchedStatus = WatchedStatus.NOT_SET;
-        if (isWatched(userReference)) {
+        if (isWatched(userDocReference)) {
             watchedStatus = WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
         } else if (preferencesGetter.isUserExcluded(userId,
-            notificationFilterPreferenceManager.getFilterPreferences(userReference),
+            notificationFilterPreferenceManager.getFilterPreferences(userDocReference),
             null)) {
             watchedStatus = WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
         }

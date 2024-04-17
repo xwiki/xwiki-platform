@@ -41,11 +41,11 @@ public class DefaultAttachmentConfiguration implements AttachmentConfiguration
 
     @Inject
     @Named("xwikiproperties")
-    private ConfigurationSource xWikiPropertiesConfigurationSource;
+    private ConfigurationSource xwikiPropertiesConfigurationSource;
 
     @Override
     public boolean isCommentsEnabled()
     {
-        return this.xWikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY, false);
+        return this.xwikiPropertiesConfigurationSource.getProperty(ATTACHMENT_MIMETYPE_ENABLE_COMMENTS_PROPERTY, false);
     }
 }

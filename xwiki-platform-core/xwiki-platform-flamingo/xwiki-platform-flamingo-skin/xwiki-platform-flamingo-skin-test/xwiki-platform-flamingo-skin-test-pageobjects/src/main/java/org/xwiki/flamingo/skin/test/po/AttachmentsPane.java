@@ -132,7 +132,7 @@ public class AttachmentsPane extends BaseElement
      */
     public void setUploadComment(final String comment)
     {
-        final List<WebElement> inputs = this.pane.findElements(By.className("uploadCommentInput"));
+        final List<WebElement> inputs = this.pane.findElements(By.id("xwikiuploadcomment"));
         WebElement input = inputs.get(inputs.size() - 1);
         // Clean the field before setting the value in case of successive uploads.
         input.clear();

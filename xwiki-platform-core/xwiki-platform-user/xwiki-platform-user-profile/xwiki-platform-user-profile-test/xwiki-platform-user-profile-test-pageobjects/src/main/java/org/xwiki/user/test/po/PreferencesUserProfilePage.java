@@ -33,13 +33,13 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//div[@id='preferencesPane']//div[@class='editProfileCategory']/a")
     private WebElement editPreferences;
 
-    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[2]/dd[1]")
+    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[3]/dd[1]")
     private WebElement timezone;
 
-    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[3]/dd[2]")
+    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[4]/dd[2]")
     private WebElement userType;
 
-    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[3]/dd[1]")
+    @FindBy(xpath = "//div[@id='preferencesPane']/div[1]/div/dl[4]/dd[1]")
     private WebElement defaultEditorToUse;
 
     @FindBy(xpath = "//a[@id='changePassword']")

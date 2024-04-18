@@ -132,3 +132,63 @@ img {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+// User preferences ===========================================================
+body.content {
+  /* We apply various user preference related styles to the content of the page.
+   We use classes that are added to the body itself in htmlheader.vm */
+  // Link underlining preference
+  &.preference-underlining-yes {
+    a {
+      text-decoration: underline;
+    }
+  }
+
+  &.preference-underlining-only-inline-links {
+    // Main rule for the content
+    #xwikicontent a {
+      text-decoration: underline;
+    }
+
+    // UIs where we want to underline outside of content.
+    .xdocLastModification,
+    .panel.HelpTipsPanel,
+    .commentauthor {
+      & a {
+        text-decoration: underline;
+      }
+    }
+
+    /* UIs in content where we want to not underline by default.
+      Those elements usually contain only links that are not inline (and a lot of links). */
+    #xwikicontent {
+      &.xwiki-livetable-container,
+      &.xtree,
+      &.xwikitabbar,
+      &.buttonwrapper {
+        & a {
+          text-decoration: none;
+          // Make sure we don't take over the default behaviour on hover with too much specificity.
+          &:hover, &:focus {
+            text-decoration: underline
+          }
+        }
+      }
+    }
+
+    // Helper classes for easier content customization. Note that those only work for this preference.
+    #xwikicontent .force-no-underline a {
+      text-decoration: none;
+    }
+
+    .force-underline a {
+      text-decoration: underline;
+    }
+  }
+
+  &.preference-underlining-no {
+    a {
+      text-decoration: none;
+    }
+  }
+}

@@ -33,12 +33,21 @@ const logo = xlogo;
 </script>
 <template>
   <div class="collapsed-sidebar">
+    <!-- When the user click this icon (visible only on MOBILE or with a COLLAPSED sidebar) a function should ADD the class is-visible to the element #sidebar. -->
     <c-icon name="list"></c-icon>
   </div>
   <c-navigation-drawer id="sidebar" class="left-sidebar">
     <UIX uixname="sidebar.before" />
+    <div class="sidebar-collapse-controls">
+      <!-- When the user click this icon (visible only on DESKTOP and MOBILE) a function should REMOVE the class is-visible to the element #sidebar..-->
+      <c-icon name="x-lg" class="close-sidebar"></c-icon>
+
+      <!-- When the user click this icon (visible only on DESKTOP) a function should REMOVE the class sidebar-is-collapsed of the element .wrapper in c-view.vue..-->
+      <c-icon name="pin" class="pin-sidebar"></c-icon>
+    </div>
     <div class="sidebar-header">
-      <c-icon name="list"></c-icon>
+      <!-- When the user click this icon (visible only on DESKTOP) a function should ADD the class sidebar-is-collapsed to the element .wrapper in c-view.vue.-->
+      <c-icon name="list" class="hide-sidebar"></c-icon>
       <x-img class="logo" :src="logo" />
       <c-icon name="bell"></c-icon>
       <c-config-menu></c-config-menu>
@@ -53,19 +62,12 @@ const logo = xlogo;
       <UIX uixname="sidebar.after" />
     </div>
     <c-help></c-help>
+
+    <!-- This handle should update the value of the CSS var --cr-sizes-left-sidebar-width in a <style> tag. This variable could also be saved and retrieved from local storage, if unavailable the default value on style.css from the DS will be used-->
+    <div class="resize-handle"></div>
   </c-navigation-drawer>
 </template>
 <style scoped>
-.left-sidebar {
-  grid-area: sidebar;
-  display: flex;
-  flex-flow: column;
-  gap: var(--cr-spacing-medium);
-  overflow: hidden;
-  border-right: 1px solid var(--cr-color-neutral-200);
-  box-shadow: var(--cr-shadow-large);
-}
-
 .panel-container {
   display: flex;
   flex-flow: column;
@@ -96,12 +98,18 @@ const logo = xlogo;
   margin-right: auto;
 }
 
-.collapsed-sidebar {
-  display: none;
-  background: var(--cr-color-neutral-100);
-  grid-area: collapsed-sidebar;
+.resize-handle {
+  width: 16px;
+  border-right: 2px solid transparent;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  transition: border-color var(--cr-transition-medium) ease;
 }
-#sidebar {
-  background-color: var(--cr-color-neutral-100);
+
+.resize-handle:hover {
+  cursor: col-resize;
+  border-right: 2px solid var(--cr-color-neutral-300);
 }
 </style>

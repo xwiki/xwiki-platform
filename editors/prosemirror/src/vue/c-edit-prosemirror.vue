@@ -121,35 +121,67 @@ const submit = async () => {
 </script>
 
 <template>
-  <div v-if="loading">
+  <div v-if="loading" class="content-loading">
     <!-- TODO: provide a proposer loading UI. -->
-    LOADING
+    <span class="load-spinner"></span>
+    <h3>Loading</h3>
   </div>
-  <div v-else-if="error">
+  <div class="editor-error" v-else-if="error">
     <!-- TODO: provide a better error reporting. -->
     {{ error }}
   </div>
-  <div v-show="!loading && !error" class="content">
-    <div class="content-scroll">
-      <div class="whole-content">
-        <div ref="editor" class="editor"></div>
-        <form class="pagemenu" @submit="submit">
-          <router-link :to="viewRouterParams">
-            <x-btn>Cancel</x-btn>
-          </router-link>
-          <x-btn @click="submit">Save</x-btn>
-        </form>
+  <div class="inner-content">
+    <div v-show="!loading && !error" class="content">
+      <div class="content-scroll">
+        <div class="whole-content">
+          <div ref="editor" class="document-content editor"></div>
+        </div>
       </div>
+      <form class="pagemenu" @submit="submit">
+        <x-btn size="small" variant="primary" @click="submit">Save</x-btn>
+        <router-link :to="viewRouterParams">
+          <x-btn size="small">Cancel</x-btn>
+        </router-link>
+      </form>
     </div>
   </div>
 </template>
 
 <style scoped>
-.editor {
-  max-width: 800px;
-  margin: auto;
+.content-loading {
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
-
+.content-loading svg {
+  width: 64px;
+  height: 64px;
+}
+.content-loading h3 {
+  padding: 0;
+  margin: 0;
+  color: var(--cr-color-neutral-500);
+}
+.pagemenu {
+  display: flex;
+  flex-flow: row;
+  gap: var(--cr-spacing-x-small);
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-x-small);
+  background: var(--cr-color-neutral-100);
+  width: var(--cr-spacing-max-page);
+  margin: var(--cr-spacing-x-small) auto;
+  border-radius: var(--cr-input-border-radius-medium);
+  max-width: var(--cr-sizes-max-page-width);
+  width: 100%;
+}
+:deep(.ProseMirror-menubar) {
+  border-radius: var(--cr-input-border-radius-medium);
+  border-bottom: none;
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-x-small);
+  background: var(--cr-color-neutral-100);
+}
 /*
 TODO: should be moved to a css specific to the empty line placeholder plugin.
  */
@@ -158,13 +190,5 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   pointer-events: none;
   height: 0;
   content: attr(data-empty-text);
-}
-
-/*TODO: remove duplication with c-content*/
-
-.whole-content {
-  display: flex;
-  flex-flow: column;
-  gap: var(--cr-spacing-medium);
 }
 </style>

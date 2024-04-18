@@ -36,7 +36,7 @@ import { useRoute } from "vue-router";
 import { type CristalApp, PageData } from "@cristal/api";
 import { marked } from "marked";
 import { ContentTools } from "./contentTools";
-import { CIcon } from "@cristal/icons";
+import { CIcon, Size } from "@cristal/icons";
 
 const route = useRoute();
 
@@ -99,11 +99,12 @@ onUpdated(() => {
 });
 </script>
 <template>
-  <div v-if="loading">
+  <div v-if="loading" class="content-loading">
     <!-- TODO: improve loading UI. -->
-    LOADING
+    <span class="load-spinner"></span>
+    <h3>Loading</h3>
   </div>
-  <div v-else-if="error">
+  <div v-else-if="error" class="content-error">
     <!-- TODO: improve error reporting. -->
     {{ error }}
   </div>
@@ -114,18 +115,12 @@ onUpdated(() => {
       <div class="content-header">
         <XBreadcrumb class="breadcrumb"></XBreadcrumb>
         <x-btn circle size="small" variant="primary">
-          <c-icon name="plus" label="Create a new document"></c-icon>
+          <c-icon
+            class="new-page"
+            name="plus"
+            label="Create a new document"
+          ></c-icon>
         </x-btn>
-        <div class="pagemenu">
-          <router-link
-            :to="{
-              name: 'edit',
-              params: { page: currentPageName },
-            }"
-          >
-            <c-icon name="pencil-fill"></c-icon>
-          </router-link>
-        </div>
       </div>
       <div class="content-scroll">
         <div class="whole-content">
@@ -138,17 +133,36 @@ onUpdated(() => {
               </span>
               <div class="doc-info-actions">
                 <div class="info-action like">
-                  <c-icon name="heart"></c-icon>
+                  <c-icon name="heart" :size="Size.Small"></c-icon>
                   <span class="counter">99</span>
                 </div>
                 <div class="info-action comments">
-                  <c-icon name="chat"></c-icon>
+                  <c-icon name="chat" :size="Size.Small"></c-icon>
                   <span class="counter">99</span>
                 </div>
                 <div class="info-action attachments">
-                  <c-icon name="paperclip"></c-icon>
+                  <c-icon name="paperclip" :size="Size.Small"></c-icon>
                   <span class="counter">99</span>
                 </div>
+              </div>
+              <div class="doc-page-actions">
+                <router-link
+                  :to="{
+                    name: 'edit',
+                    params: { page: currentPageName },
+                  }"
+                >
+                  <x-btn size="small" variant="default">
+                    <c-icon name="pencil" :size="Size.Small"></c-icon>
+                    Edit
+                  </x-btn>
+                </router-link>
+                <x-btn size="small" variant="default">
+                  <c-icon
+                    name="three-dots-vertical"
+                    :size="Size.Small"
+                  ></c-icon>
+                </x-btn>
               </div>
             </div>
           </div>
@@ -169,6 +183,33 @@ onUpdated(() => {
   </article>
 </template>
 <style scoped>
+.content-loading {
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-loading svg {
+  width: 64px;
+  height: 64px;
+}
+
+.content-loading h3 {
+  padding: 0;
+  margin: 0;
+  color: var(--cr-color-neutral-500);
+}
+
+.edit-icon {
+  font-size: 14px;
+}
+
+.new-page {
+  display: block;
+}
+
 .whole-content {
   display: flex;
   flex-flow: column;
@@ -179,10 +220,15 @@ onUpdated(() => {
   display: flex;
   flex-flow: column;
   gap: var(--cr-spacing-x-small);
+  position: sticky;
+  top: calc(var(--cr-spacing-small) * -1);
+  background: white;
 }
 
 .document-title {
   margin: 0;
+  font-size: var(--cr-font-size-2x-large);
+  line-height: var(--cr-font-size-2x-large);
 }
 
 .counter {
@@ -198,22 +244,32 @@ onUpdated(() => {
   padding: var(--cr-spacing-2x-small) var(--cr-spacing-x-small);
 }
 
-.doc-info-actions {
+.doc-info-actions,
+.doc-page-actions {
   display: flex;
+  flex-wrap: wrap;
   flex-flow: row;
   align-items: center;
   gap: var(--cr-spacing-2x-small);
+}
+
+.doc-info-actions {
+  margin-right: var(--cr-spacing-medium);
 }
 
 .info-action {
   display: flex;
   background-color: var(--cr-color-neutral-100);
   border-radius: 99px;
-  padding: var(--cr-spacing-2x-small) var(--cr-spacing-x-small);
+  padding: var(--cr-spacing-2x-small) var(--cr-spacing-2x-small);
   font-size: var(--cr-font-size-medium);
   flex-flow: row;
   gap: var(--cr-spacing-2x-small);
   align-items: center;
+}
+
+.info-action .cr-icon {
+  line-height: 1.3rem;
 }
 
 .doc-info-header,
@@ -233,33 +289,6 @@ onUpdated(() => {
 
 .avatar {
   --size: 24px;
-}
-
-.content,
-.content-scroll {
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-}
-
-.content {
-  display: flex;
-  flex-flow: column;
-  grid-area: content;
-}
-
-.content-scroll {
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  overflow: auto;
-  height: 100%;
-  padding: var(--cr-spacing-x-small);
-}
-
-.content-scroll > div {
-  width: 100%;
-  max-width: 960px; /*TODO: This value needs to be dynamic*/
 }
 
 .content-header {

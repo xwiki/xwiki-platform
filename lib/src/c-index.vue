@@ -38,33 +38,4 @@ export default defineComponent({
   <CTemplate name="view" />
 </template>
 <!-- TODO CRISTAL-165: these styles need to me moved to a generic CSS that loads last in the main template-->
-<style scoped>
-:global(html),
-:global(body),
-:global(#app) {
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-  font-family: unset;
-}
-
-:global(html) {
-  overflow: hidden;
-}
-@media (max-width: 600px) {
-  /* TODO CRISTAL-165: all of these !important declarations should be unecessary when the CSS structure is refactored */
-  :global(.wrapper) {
-    grid-template-columns: 24px 1fr !important;
-    grid-template-areas: "collapsed-sidebar content" !important;
-  }
-  :global(.collapsed-sidebar) {
-    display: block !important;
-  }
-  :global(#sidebar) {
-    display: none !important;
-  }
-  :global(.right-sidebar) {
-    display: none;
-  }
-}
-</style>
+<style scoped></style>

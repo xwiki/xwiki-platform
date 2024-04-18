@@ -11,7 +11,7 @@ defineProps<{
       <span class="title">{{ name }}</span>
       <c-icon name="list-nested" :size="Size.Small"></c-icon>
     </div>
-    <div class="content">
+    <div class="sidebar-content">
       <slot></slot>
     </div>
   </div>

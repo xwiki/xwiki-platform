@@ -1,0 +1,333 @@
+.load-spinner {
+   background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="40" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="100" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="160" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>') ;  
+   background-size: cover;
+   width: 64px;
+   height: 64px;
+  }
+:root {
+   --cr-sizes-max-page-width: 960px;
+   --cr-sizes-left-sidebar-width: 250px;
+   --cr-sizes-collapsed-sidebar-width: 32px;
+
+    /*
+     * Typography
+     */
+  
+    /* Fonts */
+    --cr-font-mono: var(--sl-font-mono);
+    --cr-font-sans: var(--sl-font-sans);    
+    --cr-font-serif: var(--sl-font-serif) ;
+  
+    /* Font sizes */
+    --cr-font-size-2x-small: var(--sl-font-size-2x-small);
+    --cr-font-size-x-small: var(--sl-font-size-x-small);
+    --cr-font-size-small: var(--sl-font-size-small);
+    --cr-font-size-medium: var(--sl-font-size-medium);
+    --cr-font-size-large: var(--sl-font-size-large);
+    --cr-font-size-x-large: var(--sl-font-size-x-large);
+    --cr-font-size-2x-large: var(--sl-font-size-2x-large);
+    --cr-font-size-3x-large: var(--sl-font-size-3x-large);
+    --cr-font-size-4x-large: var(--sl-font-size-4x-large);
+  
+    /* Font weights */
+    --cr-font-weight-light: var(--sl-font-weight-light);
+    --cr-font-weight-normal: var(--sl-font-weight-normal);
+    --cr-font-weight-semibold: var(--sl-font-weight-semibold);
+    --cr-font-weight-bold: var(--sl-font-weight-bold);
+  
+    /* Letter spacings */
+    --cr-letter-spacing-denser:  var(--sl-letter-spacing-denser);
+    --cr-letter-spacing-dense: var(--sl-letter-spacing-dense);
+    --cr-letter-spacing-normal: var(--sl-letter-spacing-normal);
+    --cr-letter-spacing-loose: var(--sl-letter-spacing-loose);
+    --cr-letter-spacing-looser: var(--sl-letter-spacing-looser);
+  
+    /* Line heights */
+    --cr-line-height-denser: var(--sl-line-height-denser);
+    --cr-line-height-dense: var(--sl-line-height-dense);
+    --cr-line-height-normal: var(--sl-line-height-normal);
+    --cr-line-height-loose: var(--sl-line-height-loose);
+    --cr-line-height-looser: var(--sl-line-height-looser);
+  
+    /* Focus rings */
+    --cr-focus-ring-color: var(--sl-color-primary-600);
+    --cr-focus-ring-style: solid;
+    --cr-focus-ring-width: 3px;
+    --cr-focus-ring: var(--sl-focus-ring-style) var(--sl-focus-ring-width) var(--sl-focus-ring-color);
+    --cr-focus-ring-offset: 1px;
+  
+  
+  /*Colors*/
+  
+  /*
+     * Theme Tokens
+     */
+  
+    /* Primary */
+    --cr-color-primary-50: var(--sl-color-sky-50);
+    --cr-color-primary-100: var(--sl-color-sky-100);
+    --cr-color-primary-200: var(--sl-color-sky-200);
+    --cr-color-primary-300: var(--sl-color-sky-300);
+    --cr-color-primary-400: var(--sl-color-sky-400);
+    --cr-color-primary-500: var(--sl-color-sky-500);
+    --cr-color-primary-600: var(--sl-color-sky-600);
+    --cr-color-primary-700: var(--sl-color-sky-700);
+    --cr-color-primary-800: var(--sl-color-sky-800);
+    --cr-color-primary-900: var(--sl-color-sky-900);
+    --cr-color-primary-950: var(--sl-color-sky-950);
+  
+    /* Success */
+    --cr-color-success-50: var(--sl-color-green-50);
+    --cr-color-success-100: var(--sl-color-green-100);
+    --cr-color-success-200: var(--sl-color-green-200);
+    --cr-color-success-300: var(--sl-color-green-300);
+    --cr-color-success-400: var(--sl-color-green-400);
+    --cr-color-success-500: var(--sl-color-green-500);
+    --cr-color-success-600: var(--sl-color-green-600);
+    --cr-color-success-700: var(--sl-color-green-700);
+    --cr-color-success-800: var(--sl-color-green-800);
+    --cr-color-success-900: var(--sl-color-green-900);
+    --cr-color-success-950: var(--sl-color-green-950);
+  
+    /* Warning */
+    --cr-color-warning-50: var(--sl-color-amber-50);
+    --cr-color-warning-100: var(--sl-color-amber-100);
+    --cr-color-warning-200: var(--sl-color-amber-200);
+    --cr-color-warning-300: var(--sl-color-amber-300);
+    --cr-color-warning-400: var(--sl-color-amber-400);
+    --cr-color-warning-500: var(--sl-color-amber-500);
+    --cr-color-warning-600: var(--sl-color-amber-600);
+    --cr-color-warning-700: var(--sl-color-amber-700);
+    --cr-color-warning-800: var(--sl-color-amber-800);
+    --cr-color-warning-900: var(--sl-color-amber-900);
+    --cr-color-warning-950: var(--sl-color-amber-950);
+  
+    /* Danger */
+    --cr-color-danger-50: var(--sl-color-red-50);
+    --cr-color-danger-100: var(--sl-color-red-100);
+    --cr-color-danger-200: var(--sl-color-red-200);
+    --cr-color-danger-300: var(--sl-color-red-300);
+    --cr-color-danger-400: var(--sl-color-red-400);
+    --cr-color-danger-500: var(--sl-color-red-500);
+    --cr-color-danger-600: var(--sl-color-red-600);
+    --cr-color-danger-700: var(--sl-color-red-700);
+    --cr-color-danger-800: var(--sl-color-red-800);
+    --cr-color-danger-900: var(--sl-color-red-900);
+    --cr-color-danger-950: var(--sl-color-red-950);
+  
+    /* Neutral */
+    --cr-color-neutral-50: var(--sl-color-gray-50);
+    --cr-color-neutral-100: #fafafa;
+    --cr-color-neutral-200: gray;
+    --cr-color-neutral-300: var(--sl-color-gray-300);
+    --cr-color-neutral-400: var(--sl-color-gray-400);
+    --cr-color-neutral-500: var(--sl-color-gray-500);
+    --cr-color-neutral-600: var(--sl-color-gray-600);
+    --cr-color-neutral-700: var(--sl-color-gray-700);
+    --cr-color-neutral-800: var(--sl-color-gray-800);
+    --cr-color-neutral-900: var(--sl-color-gray-900);
+    --cr-color-neutral-950: var(--sl-color-gray-950);
+  
+    /*
+     * Elevations
+     */
+  
+     --cr-shadow-x-small: var(--sl-shadow-x-small);
+     --cr-shadow-small: var(--sl-shadow-small);
+     --cr-shadow-medium: var(--sl-shadow-medium);
+     --cr-shadow-large: var(--sl-shadow-large);
+     --cr-shadow-x-large: var(--sl-shadow-x-large);
+
+  /*
+   * Spacings
+   */
+
+   --cr-spacing-max-page-width: 960px;
+   --cr-spacing-3x-small: 2px;
+   --cr-spacing-2x-small: 4px;
+   --cr-spacing-x-small:  8px;
+   --cr-spacing-small: 12px;
+   --cr-spacing-medium: 16px;
+   --cr-spacing-large: 20px;
+   --cr-spacing-x-large: 28px;
+   --cr-spacing-2x-large: 36px;
+   --cr-spacing-3x-large: 48px;
+   --cr-spacing-4x-large: 72px;
+
+/*
+   * Transitions
+   */
+
+  --cr-transition-x-slow: var(--sl-transition-x-slow);
+  --cr-transition-slow: var(--sl-transition-slow);
+  --cr-transition-medium: var(--sl-transition-medium);
+  --cr-transition-fast: var(--sl-transition-fast);
+  --cr-transition-x-fast: var(--sl-transition-x-fast);
+
+  /*
+   * Typography
+   */
+
+  /* Fonts */
+  --cr-base-font-size: 16px;
+  --cr-font-mono: var(--sl-font-mono);
+  --cr-font-sans: var(--sl-font-sans);    
+  --cr-font-serif: var(--sl-font-serif);
+
+  /* Font sizes */
+  --cr-font-size-2x-small: var(--sl-font-size-2x-small);
+  --cr-font-size-x-small: var(--sl-font-size-x-small);
+  --cr-font-size-small: var(--sl-font-size-small);
+  --cr-font-size-medium: var(--sl-font-size-medium);
+  --cr-font-size-large: var(--sl-font-size-large);
+  --cr-font-size-x-large: var(--sl-font-size-x-large);
+  --cr-font-size-2x-large: var(--sl-font-size-2x-large);
+  --cr-font-size-3x-large: var(--sl-font-size-3x-large);
+  --cr-font-size-4x-large: var(--sl-font-size-4x-large);
+
+  /* Font weights */
+  --cr-font-weight-light: var(--sl-font-weight-light);
+  --cr-font-weight-normal: var(--sl-font-weight-normal);
+  --cr-font-weight-semibold: var(--sl-font-weight-semibold);
+  --cr-font-weight-bold: var(--sl-font-weight-bold);
+
+  /* Letter spacings */
+  --cr-letter-spacing-denser: var(--sl-letter-spacing-denser);
+  --cr-letter-spacing-dense: var(--sl-letter-spacing-dense);
+  --cr-letter-spacing-normal: var(--sl-letter-spacing-normal);
+  --cr-letter-spacing-loose: var(--sl-letter-spacing-loose);
+  --cr-letter-spacing-looser: var(--sl-letter-spacing-looser);
+
+  /* Line heights */
+  --cr-line-height-denser: var(--sl-line-height-denser);
+  --cr-line-height-dense: var(--sl-line-height-dense);
+  --cr-line-height-normal: var(--sl-line-height-normal);
+  --cr-line-height-loose: var(--sl-line-height-loose);
+  --cr-line-height-looser: var(--sl-line-height-looser);
+
+  /* Focus rings */
+  --cr-focus-ring-color: var(--sl-focus-ring-color);
+  --cr-focus-ring-style: var(--sl-focus-ring-style);
+  --cr-focus-ring-width: var(--sl-focus-ring-width);
+  --cr-focus-ring: var(--sl-focus-ring);
+  --cr-focus-ring-offset: var(--sl-focus-ring-offset);
+
+  /*
+   * Forms
+   */
+
+  /* Buttons */
+  --cr-button-font-size-small: var(--sl-button-font-size-small);
+  --cr-button-font-size-medium: var(--sl-button-font-size-medium);
+  --cr-button-font-size-large: var(--sl-button-font-size-large);
+
+  /* Inputs */
+  --cr-input-height-small: var(--sl-input-height-small);
+  --cr-input-height-medium: var(--sl-input-height-medium);
+  --cr-input-height-large: var(--sl-input-height-large);
+
+  --cr-input-background-color: var(--sl-input-background-color);
+  --cr-input-background-color-hover: var(--sl-input-background-color-hover);
+  --cr-input-background-color-focus: var(--sl-input-background-color-focus);
+  --cr-input-background-color-disabled: var(--sl-input-background-color-disabled);
+  --cr-input-border-color: var(--sl-input-border-color);
+  --cr-input-border-color-hover: var(--sl-input-border-color-hover);
+  --cr-input-border-color-focus: var(--sl-input-border-color-focus);
+  --cr-input-border-color-disabled: var(--sl-input-border-color-disabled);
+  --cr-input-border-width: var(--sl-input-border-width);
+  --cr-input-required-content: var(--sl-input-required-content);
+  --cr-input-required-content-offset: var(--sl-input-required-content-offset);
+  --cr-input-required-content-color: var(--sl-input-required-content-color);
+
+  --cr-input-border-radius-small: var(--sl-input-border-radius-small);
+  --cr-input-border-radius-medium: var(--sl-input-border-radius-medium);
+  --cr-input-border-radius-large: var(--sl-input-border-radius-large);
+
+  --cr-input-font-family: var(--sl-input-font-family);
+  --cr-input-font-weight: var(--sl-input-font-weight);
+  --cr-input-font-size-small: var(--sl-input-font-size-small);
+  --cr-input-font-size-medium: var(--sl-input-font-size-medium);
+  --cr-input-font-size-large: var(--sl-input-font-size-large);
+  --cr-input-letter-spacing: var(--sl-input-letter-spacing);
+
+  --cr-input-color: var(--sl-input-color);
+  --cr-input-color-hover: var(--sl-input-color-hover);
+  --cr-input-color-focus: var(--sl-input-color-focus);
+  --cr-input-color-disabled: var(--sl-input-color-disabled);
+  --cr-input-icon-color: var(--sl-input-icon-color);
+  --cr-input-icon-color-hover: var(--sl-input-icon-color-hover);
+  --cr-input-icon-color-focus: var(--sl-input-icon-color-focus);
+  --cr-input-placeholder-color: var(--sl-input-placeholder-color);
+  --cr-input-placeholder-color-disabled: var(--sl-input-placeholder-color-disabled);
+  --cr-input-spacing-small: var(--sl-input-spacing-small);
+  --cr-input-spacing-medium: var(--sl-input-spacing-medium);
+  --cr-input-spacing-large: var(--sl-input-spacing-large);
+
+  --cr-input-focus-ring-color: var(--sl-input-focus-ring-color);
+  --cr-input-focus-ring-offset: var(--sl-input-focus-ring-offset);
+
+  --cr-input-filled-background-color: var(--sl-input-filled-background-color);
+  --cr-input-filled-background-color-hover: var(--sl-input-filled-background-color-hover);
+  --cr-input-filled-background-color-focus: var(--sl-input-filled-background-color-focus);
+  --cr-input-filled-background-color-disabled: var(--sl-input-filled-background-color-disabled);
+  --cr-input-filled-color: var(--sl-input-filled-color);
+  --cr-input-filled-color-hover: var(--sl-input-filled-color-hover);
+  --cr-input-filled-color-focus: var(--sl-input-filled-color-focus);
+  --cr-input-filled-color-disabled: var(--sl-input-filled-color-disabled);
+
+  /* Labels */
+  --cr-input-label-font-size-small: var(--sl-input-label-font-size-small);
+  --cr-input-label-font-size-medium: var(--sl-input-label-font-size-medium);
+  --cr-input-label-font-size-large: var(--sl-input-label-font-size-large);
+  --cr-input-label-color: var(--sl-input-label-color);
+
+  /* Help text */
+  --cr-input-help-text-font-size-small: var(--sl-input-help-text-font-size-small);
+  --cr-input-help-text-font-size-medium: var(--sl-input-help-text-font-size-medium);
+  --cr-input-help-text-font-size-large: var(--sl-input-help-text-font-size-large);
+  --cr-input-help-text-color: var(--sl-input-help-text-color);
+
+  /* Toggles (checkboxes, radios, switches) */
+  --cr-toggle-size-small: var(--sl-toggle-size-small);
+  --cr-toggle-size-medium: var(--sl-toggle-size-medium);
+  --cr-toggle-size-large: var(--sl-toggle-size-large);
+
+  /*
+   * Overlays
+   */
+
+  --cr-overlay-background-color: var(--sl-overlay-background-color);
+
+  /*
+   * Panels
+   */
+
+  --cr-panel-background-color: var(--sl-panel-background-color);
+  --cr-panel-border-color: var(--sl-panel-border-color);
+  --cr-panel-border-width: var(--sl-panel-border-width);
+
+  /*
+   * Tooltips
+   */
+
+  --cr-tooltip-border-radius: var(--sl-tooltip-border-radius);
+  --cr-tooltip-background-color: var(--sl-tooltip-background-color);
+  --cr-tooltip-color: var(--sl-tooltip-color);
+  --cr-tooltip-font-family: var(--sl-tooltip-font-family);
+  --cr-tooltip-font-weight: var(--sl-tooltip-font-weight);
+  --cr-tooltip-font-size: var(--sl-tooltip-font-size);
+  --cr-tooltip-line-height: var(--sl-tooltip-line-height);
+  --cr-tooltip-padding: var(--sl-tooltip-padding);
+  --cr-tooltip-arrow-size: var(--sl-tooltip-arrow-size);
+
+  /*
+   * Z-indexes
+   */
+
+  --cr-z-index-drawer: var(--sl-z-index-drawer);
+  --cr-z-index-dialog: var(--sl-z-index-dialog);
+  --cr-z-index-dropdown: var(--sl-z-index-dropdown);
+  --cr-z-index-toast: var(--sl-z-index-toast);
+  --cr-z-index-tooltip: var(--sl-z-index-tooltip);
+
+}

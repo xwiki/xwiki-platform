@@ -42,7 +42,7 @@ import "../css/main.css";
       <c-main></c-main>
 
       <!-- TODO CRISTAL-165: Eventually we will need a right sidebar-->
-      <!--      <c-right-sidebar></c-right-sidebar>-->
+      <!-- <c-right-sidebar></c-right-sidebar> -->
 
       <UIX uixname="view.after" />
     </div>
@@ -50,14 +50,6 @@ import "../css/main.css";
 </template>
 <style scoped>
 .wrapper {
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 250px 1fr;
-  grid-template-areas: "sidebar content";
-}
-
-.wrapper:has(.right-sidebar) {
-  grid-template-columns: 250px 1fr 250px;
-  grid-template-areas: "sidebar content right-sidebar";
+  height: 100dvh;
 }
 </style>

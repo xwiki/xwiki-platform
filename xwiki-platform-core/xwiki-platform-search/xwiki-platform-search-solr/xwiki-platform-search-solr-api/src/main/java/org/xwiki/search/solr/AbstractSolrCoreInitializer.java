@@ -475,8 +475,11 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
                     total = result.getNumFound();
                 }
                 long remaining = result.getNumFound() - size;
-                this.logger.info("    Migrating [{}] documents, [{}] are remaining ([{}]%)", size, remaining,
-                    (remaining / total) * 100L);
+                this.logger.info("    Migrating [{}] documents, [{}] are remaining on a total of [{}] ([{}]% done)",
+                    size,
+                    remaining,
+                    total,
+                    Math.round((double) (total - remaining) / (double) total) * 100L);
 
                 migrateData(response.getResults(), sourceCore, targetCore);
             }

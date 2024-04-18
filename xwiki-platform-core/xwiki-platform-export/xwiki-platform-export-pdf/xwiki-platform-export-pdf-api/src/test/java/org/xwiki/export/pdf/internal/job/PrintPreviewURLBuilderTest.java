@@ -22,7 +22,12 @@ package org.xwiki.export.pdf.internal.job;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -55,12 +60,13 @@ class PrintPreviewURLBuilderTest
     {
         this.request.setId("export", "pdf", "123");
         this.request.setBaseURL(new URL("http://localhost:8080/xwiki/bin/view/Some/Page?ke%7Cy=va%7Clue#fo%7Co"));
+        this.request.setContext(Collections.singletonMap("locale", Locale.FRENCH));
 
         when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
         URL printPreviewURL = new URL("http://localhost:8080/print/preview/url");
         when(this.documentAccessBridge.getDocumentURL(currentDocumentReference, "export",
             "format=html-print&xpage=get&outputSyntax=plain&async=true"
-                + "&sheet=XWiki.PDFExport.Sheet&jobId=export%2Fpdf%2F123&ke%7Cy=va%7Clue",
+                + "&sheet=XWiki.PDFExport.Sheet&jobId=export%2Fpdf%2F123&language=fr&ke%7Cy=va%7Clue",
             "fo|o", true)).thenReturn(printPreviewURL.toString());
 
         assertEquals(printPreviewURL, this.builder.getPrintPreviewURL(this.request));

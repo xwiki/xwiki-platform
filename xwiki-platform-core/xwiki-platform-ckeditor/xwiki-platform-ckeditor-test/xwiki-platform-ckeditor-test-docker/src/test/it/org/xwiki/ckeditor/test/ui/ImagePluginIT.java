@@ -237,7 +237,7 @@ class ImagePluginIT
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
 
-        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.END, Keys.ENTER, "Some text", Keys.ENTER);
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER, "Some text", Keys.ENTER);
 
         imageDialogSelectModal = editor.clickImageButton();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);

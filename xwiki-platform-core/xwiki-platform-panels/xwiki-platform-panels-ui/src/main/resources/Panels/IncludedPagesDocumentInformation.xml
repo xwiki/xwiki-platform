@@ -207,16 +207,18 @@
     <property>
       <content>{{velocity}}
 ##--------------------------------------------------------------------------
-#set ($pages = $tdoc.includedPages)
-#if($pages.size() != 0)
-  {{html clean="false"}}&lt;dt&gt;{{/html}}$services.localization.render('panels.documentInformation.includesCount', [$pages.size()]){{html clean="false"}}&lt;/dt&gt;{{/html}}
-  #foreach ($page in $pages)
-    #set ($pageLink = $services.rendering.escape($page, 'xwiki/2.1'))
-    #set ($pageName = $services.rendering.escape($services.rendering.escape($page, 'xwiki/2.1'), 'xwiki/2.1'))
-    #set ($alt = $services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1'))
-    {{html clean="false"}}&lt;dd&gt;{{/html}}[[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]{{html clean="false"}}&lt;/dd&gt;{{/html}}
-  #end
-#end
+  {{html clean="false" wiki="true"}}
+    #set ($pages = $tdoc.includedPages)
+    #if($pages.size() != 0)
+      &lt;dt&gt;$services.localization.render('panels.documentInformation.includesCount', [$pages.size()])&lt;/dt&gt;
+      #foreach ($page in $pages)
+        #set ($pageLink = $services.rendering.escape($page, 'xwiki/2.1'))
+        #set ($pageName = $services.rendering.escape($services.rendering.escape($page, 'xwiki/2.1'), 'xwiki/2.1'))
+        #set ($alt = $services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1'))
+        &lt;dd&gt;[[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]&lt;/dd&gt;
+      #end
+    #end
+  {{/html}}
 ##--------------------------------------------------------------------------
 {{/velocity}}</content>
     </property>

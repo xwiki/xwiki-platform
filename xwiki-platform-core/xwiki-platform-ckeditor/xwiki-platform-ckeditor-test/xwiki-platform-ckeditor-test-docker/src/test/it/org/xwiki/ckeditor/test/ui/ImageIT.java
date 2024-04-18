@@ -268,7 +268,7 @@ class ImageIT extends AbstractCKEditorIT
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
 
-        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.END, Keys.ENTER, "Some text", Keys.ENTER);
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER, "Some text", Keys.ENTER);
 
         imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);

@@ -53,7 +53,7 @@ Use o botão {{displayIcon name="home"/}} localizado acima do título para //nav
 
 Você pode também utilizar a  [[Sandbox&gt;&gt;Sandbox.WebHome]] para mais demostração de conteúdos e geralmente será um lugar para experimentar as funcionalidades de seu wiki. 
 
-{{box}}Aprenda mais a utilizar o XWiki com o [[Guia para iniciantes&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/WebHome]].{{/box}}
+{{box}}Aprenda mais a utilizar o XWiki com o [[Guia para iniciantes&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
 (% class="row" %)
 (((
@@ -63,7 +63,7 @@ Você pode também utilizar a  [[Sandbox&gt;&gt;Sandbox.WebHome]] para mais demo
 
 Para estender o poder e funcionalidades de seu XWiki com as características que //você// precisa, verifique o [[Gerenciador de extensões&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] onde você pode procurar e instalar complementos.
 
-Para navegar através dos + de 900 complementos contribuidos pela comunidade, verifique o [[Repositório de Complementos&gt;&gt;http://extensions.xwiki.org]].
+Para navegar através dos + de 900 complementos contribuidos pela comunidade, verifique o [[Repositório de Complementos&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (% class="col-xs-12 col-sm-6" %)

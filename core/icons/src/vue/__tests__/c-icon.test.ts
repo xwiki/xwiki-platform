@@ -10,7 +10,7 @@ describe("c-icon", () => {
         name: "test",
       },
     });
-    expect(icon.classes()).toMatchObject(["bi-test"]);
+    expect(icon.classes()).toMatchObject(["cr-icon", "bi-test"]);
   });
 
   it("is small", () => {
@@ -20,6 +20,6 @@ describe("c-icon", () => {
         size: Size.Small,
       },
     });
-    expect(icon.classes()).toMatchObject(["bi-test", "small"]);
+    expect(icon.classes()).toMatchObject(["cr-icon", "bi-test", "small"]);
   });
 });

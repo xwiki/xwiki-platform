@@ -162,6 +162,19 @@
         htmlFilter.addRules(submitOnlySignificantContent, {priority: 5, applyToAll: true});
       }
 
+      // Remove data-widget attributes on images, as otherwise they might be badly interpreted as another type of
+      // widget, leading to CKEditor crashing.
+      editor.on('toHtml', (event) => {
+        event.data.dataValue.filter(new CKEDITOR.htmlParser.filter({
+          elements: {
+            img: function (element) {
+              delete element.attributes['data-widget'];
+            }
+          }
+        }));
+        // We must use a priority below 8 to make sure our filter is executed before widgets are upcasted.
+      }, null, null, 7);
+
       // Transform <font color="..." face="..."> into <span style="color: ...; font-family: ...">.
       // See https://ckeditor.com/old//comment/125305#comment-125305
       editor.filter.addTransformations([

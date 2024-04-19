@@ -67,7 +67,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     @Override
     public void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException
     {
-        this.watch(entity, this.userReferenceResolver.resolve(user));
+        UserReference userReference = this.userReferenceResolver.resolve(user);
+        handleEntity(entity, userReference, true);
     }
 
     @Override
@@ -81,8 +82,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     {
         DocumentReference userDocRef = this.userReferenceSerializer.serialize(user);
         Set<String> filterPreferencesIds = new HashSet<>();
-        for (NotificationFilterPreference filterPreference :
-            notificationFilterPreferenceManager.getFilterPreferences(userDocRef)) {
+        for (NotificationFilterPreference filterPreference
+            : notificationFilterPreferenceManager.getFilterPreferences(userDocRef)) {
             if (entity.matchExactly(filterPreference)) {
                 filterPreferencesIds.add(filterPreference.getId());
             }
@@ -107,7 +108,8 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     public void unwatchEntity(WatchedEntityReference entity, DocumentReference user)
             throws NotificationException
     {
-        this.block(entity, this.userReferenceResolver.resolve(user));
+        UserReference userReference = this.userReferenceResolver.resolve(user);
+        handleEntity(entity, userReference, false);
     }
 
     @Override
@@ -141,20 +143,20 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         Iterator<NotificationFilterPreference> filterPreferences =
                 notificationFilterPreferenceManager.getFilterPreferences(userDocRef).iterator();
 
-        boolean thereIsAMatch = false;
-
+        boolean matchFound = false;
         // Look if an existing filter match the entity
         while (filterPreferences.hasNext()) {
             NotificationFilterPreference notificationFilterPreference = filterPreferences.next();
             if (entity.matchExactly(notificationFilterPreference)) {
-                thereIsAMatch = true;
-
+                matchFound = true;
                 if (notificationFilterPreference.getFilterType() == NotificationFilterType.INCLUSIVE
                         && notificationFilterPreference.isEnabled() != shouldBeWatched) {
-                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference, userDocRef);
+                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference,
+                        userDocRef);
                 } else if (notificationFilterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE
                         && notificationFilterPreference.isEnabled() == shouldBeWatched) {
-                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference, userDocRef);
+                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference,
+                        userDocRef);
                 }
             } else if (shouldDisableFilter(entity, notificationFilterPreference, shouldBeWatched)) {
                 // Disable custom filters that might be contradictory.
@@ -163,9 +165,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
                         false);
             }
         }
-
-        // But it might been still unwatched because of an other filter!
-        if (!thereIsAMatch) {
+        if (!matchFound || !entityIsAlreadyInDesiredState(entity, user, shouldBeWatched)) {
             notificationFilterPreferenceManager.saveFilterPreferences(userDocRef,
                 Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
             result = true;

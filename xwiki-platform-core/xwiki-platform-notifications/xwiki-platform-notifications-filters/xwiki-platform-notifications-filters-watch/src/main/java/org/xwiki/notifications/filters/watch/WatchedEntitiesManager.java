@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -46,8 +47,37 @@ public interface WatchedEntitiesManager
     @Deprecated
     void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 
+    /**
+     * Add an inclusive filter to watch the specified location if it's not watched yet.
+     * @param entity the entity to be watched
+     * @param user the user for whom to create the filter
+     * @return {@code true} if a new filter has been created
+     * @throws NotificationException in case of problem to save the changes
+     * @since 16.4.0RC1
+     */
+    @Unstable
     boolean watch(WatchedEntityReference entity, UserReference user) throws NotificationException;
+
+    /**
+     * Remove filter related to watching the specified location be it inclusive or exclusive.
+     * @param entity the entity for which to remove a filter.
+     * @param user the user for whom to remove the filter
+     * @return {@code true} if a filter has been removed
+     * @throws NotificationException in case of problem to save the changes
+     * @since 16.4.0RC1
+     */
+    @Unstable
     boolean removeWatchFilter(WatchedEntityReference entity, UserReference user) throws NotificationException;
+
+    /**
+     * Add an exclusive filter to ignore the specified location if it's not ignored yet.
+     * @param entity the entity to be watched
+     * @param user the user for whom to create the filter
+     * @return {@code true} if a new filter has been created
+     * @throws NotificationException in case of problem to save the changes
+     * @since 16.4.0RC1
+     */
+    @Unstable
     boolean block(WatchedEntityReference entity, UserReference user) throws NotificationException;
 
     /**

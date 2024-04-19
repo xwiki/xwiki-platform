@@ -48,6 +48,14 @@ public class ScopeNotificationFilterLocationStateComputer
     @Inject
     private ScopeNotificationFilterPreferencesGetter preferencesGetter;
 
+    /**
+     * Compute the watch state for the given location, based on the given preferences, for all formats and all event
+     * types.
+     *
+     * @param filterPreferences the list of filter preferences to consider for computing the watch state
+     * @param location the location for which to compute the watch state
+     * @return the watch state for all formats and all event types
+     */
     // TODO: This should be probably cached info.
     public WatchedLocationState isLocationWatchedWithAllTypesAndFormats(Collection<NotificationFilterPreference>
         filterPreferences, EntityReference location)

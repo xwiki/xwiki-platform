@@ -136,12 +136,19 @@
       "form_token": xm.form_token
     });
     var isFilterRemoval = false;
+    var method = "PUT";
     if (chosenOption === 'watchPage') {
       var url = restUrl;
     } else if (chosenOption === 'watchSpace') {
       var url = restUrl.replace(/\/pages.*/, "");
     } else if (chosenOption === 'watchWiki') {
       var url = restUrl.replace(/\/spaces.*/, "");
+    } else if (chosenOption == 'unwatchPage') {
+      var url = restUrl;
+      method = 'DELETE';
+    } else if (chosenOption == 'blockPage') {
+      var url = restUrl;
+      queryParams.append("ignore", "true");
     } else {
       console.error("Option " + chosenOption + " is not yet supported!");
     }
@@ -149,7 +156,7 @@
       var ajaxUrl = url + "?" + queryParams.toString();
       if (!isFilterRemoval) {
         $.ajax(ajaxUrl, {
-          method: "PUT"
+          method: method
         }).done(function () {
           window.location.reload();
         }).error(function (data) {
@@ -532,7 +539,20 @@
                 &lt;span class="fa fa-file"&gt;&lt;/span&gt;  Unfollow current page
               &lt;/label&gt;
                &lt;div class="xHint"&gt;
-                 You might still receive notifications if the wiki or a space in the hierarchy is followed.
+                 This will remove existing filter on this page: you might still receive notifications if the wiki or a space in the hierarchy is followed.
+               &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-block-page" value="blockPage" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title" for="option-block-page"&gt;
+                &lt;span class="fa fa-file"&gt;&lt;/span&gt;  Ignore current page
+              &lt;/label&gt;
+               &lt;div class="xHint"&gt;
+                 This will remove existing filter on this page and create a new one for ignoring all events on this page. You won't receive any notifications from this specific page. You might still receive notifications from the space or the wiki.
                &lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt;&lt;!-- end panel --&gt;

@@ -30,15 +30,51 @@ import java.util.Date;
  */
 public class WatchedLocationState
 {
+    /**
+     * The possible states of a location.
+     * @since 16.4.0RC1
+     * @version $Id$
+     */
     public enum WatchedState
     {
+        /**
+         * The location alone is explicitly watched.
+         */
         WATCHED,
+
+        /**
+         * The location and its children are explicitly watched.
+         */
         WATCHED_WITH_CHILDREN,
+
+        /**
+         * The location is watched through an ancestor.
+         */
         WATCHED_BY_ANCESTOR,
+
+        /**
+         * The location is explicitly ignored.
+         */
         BLOCKED,
+
+        /**
+         * The location and its children are explicitly ignored.
+         */
         BLOCKED_WITH_CHILDREN,
+
+        /**
+         * The location is ignored through an ancestor.
+         */
         BLOCKED_BY_ANCESTOR,
+
+        /**
+         * There's one or several filters for the location but it doesn't match all events types and/or all formats.
+         */
         CUSTOM,
+
+        /**
+         * There's no filter set for the location.
+         */
         NOT_SET
     }
     private final WatchedState state;
@@ -55,6 +91,8 @@ public class WatchedLocationState
 
     /**
      * Construct a WatchedLocationState.
+     *
+     * @param state the actual watching state
      * @param startingDate since when the location is watched (can be null)
      */
     public WatchedLocationState(WatchedState state, Date startingDate)
@@ -71,6 +109,9 @@ public class WatchedLocationState
         return new Date(dateValue * 1000);
     }
 
+    /**
+     * @return the actual watching state of the location
+     */
     public WatchedState getState()
     {
         return state;

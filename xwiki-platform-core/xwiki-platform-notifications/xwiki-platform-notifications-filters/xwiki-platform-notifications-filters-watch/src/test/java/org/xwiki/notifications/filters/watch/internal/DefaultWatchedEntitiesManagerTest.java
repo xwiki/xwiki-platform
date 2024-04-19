@@ -49,7 +49,7 @@ import static org.mockito.Mockito.*;
  * @since 9.9RC1
  */
 @ComponentTest
-public class DefaultWatchedEntitiesManagerTest
+class DefaultWatchedEntitiesManagerTest
 {
     @InjectMockComponents
     private DefaultWatchedEntitiesManager watchedEntitiesManager;
@@ -254,7 +254,7 @@ public class DefaultWatchedEntitiesManagerTest
         when(watchedEntityReference.getWatchedStatus(userRef))
             .thenReturn(
                 WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
-                WatchedEntityReference.WatchedStatus.NOT_SET);
+                WatchedEntityReference.WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
         watchedEntitiesManager.unwatchEntity(watchedEntityReference, userDocRef);
@@ -287,7 +287,7 @@ public class DefaultWatchedEntitiesManagerTest
         when(watchedEntityReference.getWatchedStatus(userRef))
             .thenReturn(
                 WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
-                WatchedEntityReference.WatchedStatus.NOT_SET);
+                WatchedEntityReference.WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
         watchedEntitiesManager.unwatchEntity(watchedEntityReference, userDocRef);
@@ -327,7 +327,7 @@ public class DefaultWatchedEntitiesManagerTest
         when(watchedEntityReference.getWatchedStatus(userRef))
             .thenReturn(
                 WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
-                WatchedEntityReference.WatchedStatus.NOT_SET);
+                WatchedEntityReference.WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
         watchedEntitiesManager.unwatchEntity(watchedEntityReference, userDocRef);

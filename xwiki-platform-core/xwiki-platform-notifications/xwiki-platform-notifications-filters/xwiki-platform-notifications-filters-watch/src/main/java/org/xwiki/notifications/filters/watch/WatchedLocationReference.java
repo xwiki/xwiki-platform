@@ -38,7 +38,6 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPre
 import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
 import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 
 /**
@@ -70,6 +69,7 @@ public class WatchedLocationReference implements WatchedEntityReference
      * @param resolver the default entity reference resolver
      * @param stateComputer the default ScopeNotificationFilterLocationStateComputer
      * @param notificationFilterPreferenceManager the notification filter preference manager
+     * @param userReferenceSerializer a serializer for user reference to document reference
      * @since 10.9
      */
     public WatchedLocationReference(EntityReference entityReference, String serializedReference,

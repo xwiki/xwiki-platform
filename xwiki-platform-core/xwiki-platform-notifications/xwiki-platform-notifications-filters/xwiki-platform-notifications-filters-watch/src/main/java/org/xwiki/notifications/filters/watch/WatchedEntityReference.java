@@ -45,7 +45,19 @@ public interface WatchedEntityReference
          * The entity is watched for all events and all formats: the filter doesn't specify any event or format.
          */
         WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
+
+        /**
+         * The entity is watched for all events and all formats through a filter placed on an ancestor.
+         * @since 16.4.0RC1
+         */
+        @Unstable
         WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
+
+        /**
+         * The entity and its children are watched for all events and all formats.
+         * @since 16.4.0RC1
+         */
+        @Unstable
         WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS,
 
         /**
@@ -59,8 +71,26 @@ public interface WatchedEntityReference
          * The entity is blocked for all events and formats.
          */
         BLOCKED_FOR_ALL_EVENTS_AND_FORMATS,
+
+        /**
+         * The entity is ignored for all events and all formats through a filter placed on an ancestor.
+         * @since 16.4.0RC1
+         */
+        @Unstable
         BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
+
+        /**
+         * The entity and its children are ignored for all events and all formats.
+         * @since 16.4.0RC1
+         */
+        @Unstable
         BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS,
+
+        /**
+         * There is a filter for the exact location of the entity but it concerns a subset of event types or formats.
+         * @since 16.4.0RC1
+         */
+        @Unstable
         CUSTOM
     }
 
@@ -70,6 +100,7 @@ public interface WatchedEntityReference
      * @param userReference the user for whom to check if the entity is watched or not
      * @return the specific watched status of the entity by the given user
      * @throws NotificationException in case of errors
+     * @since 16.4.0RC1
      */
     @Unstable
     WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException;

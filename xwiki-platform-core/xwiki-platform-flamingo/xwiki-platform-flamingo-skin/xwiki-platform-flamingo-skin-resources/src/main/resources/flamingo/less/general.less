@@ -187,9 +187,11 @@ body.content {
         .not-inline-link();
       }
 
-      // Remove the underlining from links with an icon. In the vast majority of cases, these are already spottable.
-      & a:has(img[alt=""]), // With the silk iconTheme
-      & a:has(span.fa) { // With the Font Awesome iconTheme
+      /* Remove the underlining from links with an image or an icon.
+        In the vast majority of cases, these links are already easy to find.
+       */
+      & a:has(img), // With an image or an icon from the Silk iconTheme
+      & a:has(span.fa) { // With an icon from the Font Awesome iconTheme
         .not-inline-link();
       }
     }

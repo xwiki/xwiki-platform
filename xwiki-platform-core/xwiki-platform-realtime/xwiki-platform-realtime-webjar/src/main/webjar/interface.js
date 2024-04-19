@@ -46,10 +46,9 @@ define('xwiki-realtime-interface', ['jquery', 'xwiki-l10n!xwiki-realtime-message
           '<input type="checkbox" class="realtime-allow"/>' +
         '</label>'
       ).appendTo('.buttons');
-      allowRealtimeCheckbox = wrapper.append(document.createTextNode(Messages.allowRealtime)).find('input')
-        .prop('checked', !!checked);
+      allowRealtimeCheckbox = wrapper.append(document.createTextNode(Messages.allowRealtime)).find('input');
     }
-    return allowRealtimeCheckbox;
+    return allowRealtimeCheckbox.prop('checked', !!checked);
   }
 
   function getAllowRealtimeCheckbox() {

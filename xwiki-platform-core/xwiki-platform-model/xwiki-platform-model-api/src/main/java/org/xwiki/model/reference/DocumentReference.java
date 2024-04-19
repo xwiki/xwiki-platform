@@ -72,7 +72,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
-     * Clone an DocumentReference, but replace one of the parent in the chain by a new one.
+     * Clone a DocumentReference, but replace one of the parent in the chain by a new one.
      *
      * @param reference the reference that is cloned
      * @param oldReference the old parent that will be replaced
@@ -210,7 +210,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
-     * Clone an DocumentReference, but use the specified parent for its new parent.
+     * Clone a DocumentReference, but use the specified parent for its new parent.
      *
      * @param reference the reference to clone
      * @param parent the new parent to use

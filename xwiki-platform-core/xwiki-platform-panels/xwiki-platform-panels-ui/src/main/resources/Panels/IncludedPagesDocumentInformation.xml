@@ -207,15 +207,14 @@
     <property>
       <content>{{velocity}}
 ##--------------------------------------------------------------------------
-  {{html clean="false" wiki="true"}}
+  {{html clean="false"}}
     #set ($pages = $tdoc.includedPages)
     #if($pages.size() != 0)
       &lt;dt&gt;$escapetool.html($services.localization.render('panels.documentInformation.includesCount', [$pages.size()]))&lt;/dt&gt;
       #foreach ($page in $pages)
-        #set ($pageLink = $escapetool.html($services.rendering.escape($page, 'xwiki/2.1')))
-        #set ($pageName = $services.rendering.escape($pageLink, 'xwiki/2.1'))
-        #set ($alt = $escapetool.html($services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1')))
-        &lt;dd&gt;[[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]&lt;/dd&gt;
+        #set ($pageRef = $escapetool.html($page))
+        #set ($alt = $escapetool.html($services.localization.render('panels.documentInformation.editIncluded', [$page])))
+        &lt;dd&gt;&lt;a href="$xwiki.getURL($pageRef, 'view')"&gt;$pageRef&lt;/a&gt; &lt;a href="$xwiki.getURL($pageRef, 'edit')"&gt;$services.icon.renderHTML('edit')&lt;span class="sr-only"&gt;$alt&lt;/span&gt;&lt;/a&gt;&lt;/dd&gt;
       #end
     #end
   {{/html}}

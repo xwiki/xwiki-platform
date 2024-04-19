@@ -822,7 +822,7 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
   text-decoration: none;
   /* Make sure we don't take over the default behaviour on hover with too much specificity. */
   &amp;:hover, &amp;:focus {
-    text-decoration: underline
+    text-decoration: underline;
   }
 }
 

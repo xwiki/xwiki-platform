@@ -1,4 +1,4 @@
-<script setup></script>
+<script lang="ts" setup></script>
 <template>
   <div class="right-sidebar">
     <div style="height: 9999px">

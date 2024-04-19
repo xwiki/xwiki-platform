@@ -22,102 +22,102 @@
 ## elements.
 ## -------------------------------------------------------------------------------------------------------------------
 #if($isInServletMode)
-  ## TODO this should be more specific
-  #if("$!request.noDoctype" != "true")
-  <!DOCTYPE html>
+## TODO this should be more specific
+#if("$!request.noDoctype" != "true")
+<!DOCTYPE html>
+#end
+#macro(addMetaAttribute $metaAttributes $name $value)
+  #set ($discard = $metaAttributes.add("data-xwiki-${name}=""$escapetool.xml($value)"""))
+#end
+## ---------------------------------------------------------------------------------------------------------------
+## Compute all the meta attributes to add to the HTML tag.
+## ---------------------------------------------------------------------------------------------------------------
+#set ($metaAttributes = [])
+## Target the paper paged media by default when using the print feature provided by the web browser.
+#addMetaAttribute($metaAttributes, 'paged-media', 'paper')
+#if("$!doc" != "" && "$!tdoc" != "")
+  ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
+  ## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument
+  #addMetaAttribute($metaAttributes, 'reference', $services.model.serialize($doc.documentReference, 'default'))
+  #addMetaAttribute($metaAttributes, 'document', $doc.fullName)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'wiki', $doc.wiki)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'space', $doc.space)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'page', $doc.documentReference.name)##deprecated, use 'reference' instead
+  #addMetaAttribute($metaAttributes, 'isnew', $tdoc.isNew())
+  ## If tdoc is a new document, its version when checking for conflict will be the original doc version.
+  ## This fix XWIKI-16299.
+  #if ($tdoc.isNew())
+    #set ($version = $doc.version)
+  #else
+    #set ($version = $tdoc.version)
   #end
-  #macro(addMetaAttribute $metaAttributes $name $value)
-    #set ($discard = $metaAttributes.add("data-xwiki-${name}=""$escapetool.xml($value)"""))
-  #end
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Compute all the meta attributes to add to the HTML tag.
-  ## ---------------------------------------------------------------------------------------------------------------
-  #set ($metaAttributes = [])
-  ## Target the paper paged media by default when using the print feature provided by the web browser.
-  #addMetaAttribute($metaAttributes, 'paged-media', 'paper')
-  #if("$!doc" != "" && "$!tdoc" != "")
-    ## NOTE: you should not use these attributes in javascript directly, but via the 'xwiki-meta' module instead:
-    ## http://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/FrontendResources/JavaScriptAPI/#HGetsomeinformationaboutthecurrentdocument
-    #addMetaAttribute($metaAttributes, 'reference', $services.model.serialize($doc.documentReference, 'default'))
-    #addMetaAttribute($metaAttributes, 'document', $doc.fullName)##deprecated, use 'reference' instead
-    #addMetaAttribute($metaAttributes, 'wiki', $doc.wiki)##deprecated, use 'reference' instead
-    #addMetaAttribute($metaAttributes, 'space', $doc.space)##deprecated, use 'reference' instead
-    #addMetaAttribute($metaAttributes, 'page', $doc.documentReference.name)##deprecated, use 'reference' instead
-    #addMetaAttribute($metaAttributes, 'isnew', $tdoc.isNew())
-    ## If tdoc is a new document, its version when checking for conflict will be the original doc version.
-    ## This fix XWIKI-16299.
-    #if ($tdoc.isNew())
-      #set ($version = $doc.version)
-    #else
-      #set ($version = $tdoc.version)
-    #end
-    #addMetaAttribute($metaAttributes, 'version', $version)
-    #addMetaAttribute($metaAttributes, 'rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
-    #addMetaAttribute($metaAttributes, 'locale', $tdoc.locale)
-  #end
-  #addMetaAttribute($metaAttributes, 'form-token', "$!{services.csrf.token}")
-  ## Don't put any user-reference tag when the user is not logged in
-  #if ("$!xcontext.userReference" != '')
-    #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
-  #end
+  #addMetaAttribute($metaAttributes, 'version', $version)
+  #addMetaAttribute($metaAttributes, 'rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
+  #addMetaAttribute($metaAttributes, 'locale', $tdoc.locale)
+#end
+#addMetaAttribute($metaAttributes, 'form-token', "$!{services.csrf.token}")
+## Don't put any user-reference tag when the user is not logged in
+#if ("$!xcontext.userReference" != '')
+  #addMetaAttribute($metaAttributes, 'user-reference', $!services.model.serialize($xcontext.userReference, 'default'))
+#end
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()" $stringtool.join($metaAttributes, ' ')>
-<head>
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Ensure that the Content-Type meta directive is the first one in the header.
-  ## See http://www.w3.org/International/tutorials/tutorial-char-enc/
-  ## ---------------------------------------------------------------------------------------------------------------
-  <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Compute the title.
-  ## ---------------------------------------------------------------------------------------------------------------
-  #if(!$title)
-    #set($title = $!xwiki.getSpacePreference('title'))
-    #if($title != '')
-      ## Evaluate the title since it can have velocity code.
-      #set($title = "#evaluate($title)")
-      ## Don`t forget to escape it.
-      #set($title = "$escapetool.xml($title)")
+  <head>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Ensure that the Content-Type meta directive is the first one in the header.
+    ## See http://www.w3.org/International/tutorials/tutorial-char-enc/
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Compute the title.
+    ## ---------------------------------------------------------------------------------------------------------------
+    #if(!$title)
+      #set($title = $!xwiki.getSpacePreference('title'))
+      #if($title != '')
+        ## Evaluate the title since it can have velocity code.
+        #set($title = "#evaluate($title)")
+        ## Don`t forget to escape it.
+        #set($title = "$escapetool.xml($title)")
+      #else
+        #set($title = "XWiki - $escapetool.xml($!doc.space) - $escapetool.xml($!tdoc.displayTitle)")
+      #end
     #else
-      #set($title = "XWiki - $escapetool.xml($!doc.space) - $escapetool.xml($!tdoc.displayTitle)")
+      #set($title = $escapetool.xml($title))
     #end
-  #else
-    #set($title = $escapetool.xml($title))
-  #end
-  <title>$title</title>
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Enable Responsiveness for phones
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Favicons
-  ## Present, HTML5
-  <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" />
-  ## The future, scalable icons
-  <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" />
-  ## For smart phones and tablets
-  <link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" />
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Universal edit button. See http://universaleditbutton.org
-  ## ---------------------------------------------------------------------------------------------------------------
-  #if($xcontext.action=="view")
-    <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
-  #end
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Make sure search engine spiders give the plain page instead of ?viewer=comments, ?viewer=code etc.
-  ## ---------------------------------------------------------------------------------------------------------------
-  <link rel="canonical" href="$doc.getURL('view')" />
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Add user-defined Meta directives.
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Note: Velocity code, so it needs to be evaluated.
-  #evaluate($!xwiki.getSpacePreference("meta"))
-  ## ---------------------------------------------------------------------------------------------------------------
-  ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
-  ## ---------------------------------------------------------------------------------------------------------------
-  <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
-  #template("stylesheets.vm")
-  #template("javascript.vm")
-</head>
+    <title>$title</title>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Enable Responsiveness for phones
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Favicons
+    ## Present, HTML5
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon16.png')" type="image/png" />
+    ## The future, scalable icons
+    <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" />
+    ## For smart phones and tablets
+    <link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Universal edit button. See http://universaleditbutton.org
+    ## ---------------------------------------------------------------------------------------------------------------
+    #if($xcontext.action=="view")
+      <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
+    #end
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Make sure search engine spiders give the plain page instead of ?viewer=comments, ?viewer=code etc.
+    ## ---------------------------------------------------------------------------------------------------------------    
+    <link rel="canonical" href="$doc.getURL('view')" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Add user-defined Meta directives.
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Note: Velocity code, so it needs to be evaluated.
+    #evaluate($!xwiki.getSpacePreference("meta"))
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
+    ## ---------------------------------------------------------------------------------------------------------------
+    <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
+    #template("stylesheets.vm")
+    #template("javascript.vm")
+  </head>
   #set($bodyTagName = 'body')
 #else ## Portlet Mode
   #template("stylesheets.vm")
@@ -153,10 +153,10 @@
 ## Note: when showLeftPanels and showRightPanels are both equals to 0, it is intentional of hideleft and hideright to
 ## be concatenated without space.
 <$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} ${bodyAction}body panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right ${preferenceUnderlining}
-#if("$!doc.space" != "") space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end
-#if($showLeftPanels == "0") hideleft#end
-#if($showRightPanels == "0")hideright#end
-#if($hidecolumns && ($!hidecolumns == 1)) hidelefthideright#end
-#if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1) content#end">
+  #if("$!doc.space" != "") space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end
+  #if($showLeftPanels == "0") hideleft#end
+  #if($showRightPanels == "0")hideright#end
+  #if($hidecolumns && ($!hidecolumns == 1)) hidelefthideright#end
+  #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1) content#end">
 <div id="xwikimaincontainer">
-  <div id="xwikimaincontainerinner">
+<div id="xwikimaincontainerinner">

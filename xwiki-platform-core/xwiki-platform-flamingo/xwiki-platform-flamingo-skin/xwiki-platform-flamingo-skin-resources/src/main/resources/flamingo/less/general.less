@@ -162,10 +162,11 @@ body.content {
     /* UIs in content where we want to not underline by default.
       Those elements usually contain only links that are not inline (and a lot of links). */
     #xwikicontent {
-      &.xwiki-livetable-container,
-      &.xtree,
-      &.xwikitabbar,
-      &.buttonwrapper {
+      & .xwiki-livetable-container,
+      & .xtree,
+      & .xwikitabbar,
+      & .buttonwrapper,
+      & #user-menu-col {
         & a {
           text-decoration: none;
           // Make sure we don't take over the default behaviour on hover with too much specificity.

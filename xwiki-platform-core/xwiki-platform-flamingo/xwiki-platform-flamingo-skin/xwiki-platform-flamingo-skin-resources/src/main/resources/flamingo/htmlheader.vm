@@ -148,10 +148,14 @@
 #end
 ## These elements will be closed in the htmlfooter.vm file
 ## We put a space before each class added in #if, to avoid losing them because of velocity line stripping
+## TODO: the classes should be refactored to use a array of classes where individal classes are happened on by one and
+## joined with space at the end
+## Note: when showLeftPanels and showRightPanels are both equals to 0, it is intentional of hideleft and hideright to
+## be concatenated without space.
 <$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} ${bodyAction}body panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right ${preferenceUnderlining}
   #if("$!doc.space" != "") space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end
   #if($showLeftPanels == "0") hideleft#end
-  #if($showRightPanels == "0") hideright#end
+  #if($showRightPanels == "0")hideright#end
   #if($hidecolumns && ($!hidecolumns == 1)) hidelefthideright#end
   #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1) content#end">
 <div id="xwikimaincontainer">

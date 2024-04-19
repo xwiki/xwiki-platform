@@ -210,11 +210,11 @@
   {{html clean="false" wiki="true"}}
     #set ($pages = $tdoc.includedPages)
     #if($pages.size() != 0)
-      &lt;dt&gt;$services.localization.render('panels.documentInformation.includesCount', [$pages.size()])&lt;/dt&gt;
+      &lt;dt&gt;$escapetool.html($services.localization.render('panels.documentInformation.includesCount', [$pages.size()]))&lt;/dt&gt;
       #foreach ($page in $pages)
-        #set ($pageLink = $services.rendering.escape($page, 'xwiki/2.1'))
-        #set ($pageName = $services.rendering.escape($services.rendering.escape($page, 'xwiki/2.1'), 'xwiki/2.1'))
-        #set ($alt = $services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1'))
+        #set ($pageLink = $escapetool.html($services.rendering.escape($page, 'xwiki/2.1')))
+        #set ($pageName = $services.rendering.escape($pageLink, 'xwiki/2.1'))
+        #set ($alt = $escapetool.html($services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1')))
         &lt;dd&gt;[[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]&lt;/dd&gt;
       #end
     #end

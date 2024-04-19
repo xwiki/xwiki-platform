@@ -150,7 +150,7 @@ body.content {
       text-decoration: none;
       // Make sure we don't take over the default behaviour on hover with too much specificity.
       &:hover, &:focus {
-        text-decoration: underline
+        text-decoration: underline;
       }
     }
 
@@ -177,20 +177,20 @@ body.content {
       & .buttonwrapper,
       & #user-menu-col {
         & a {
-          .not-inline-link ();
+          .not-inline-link();
         }
       }
 
       /* Remove the underlining from links with the btn class.
        Those are already styled differently from their neighboring text. */
       & a.btn {
-        .not-inline-link ();
+        .not-inline-link();
       }
 
       // Remove the underlining from links with an icon. In the vast majority of cases, these are already spottable.
       & a:has( img[alt=""]), // With the silk iconTheme
       & a:has( span.fa) { // With the Font Awesome iconTheme
-        .not-inline-link ();
+        .not-inline-link();
       }
     }
 

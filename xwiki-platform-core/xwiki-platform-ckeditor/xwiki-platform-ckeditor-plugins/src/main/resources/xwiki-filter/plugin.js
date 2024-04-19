@@ -164,7 +164,7 @@
 
       // Remove data-widget attributes on images, as otherwise they might be badly interpreted as another type of
       // widget, leading to CKEditor crashing.
-      editor.on('toHtml', (event) => {
+      editor.on('toHtml', function (event) {
         event.data.dataValue.filter(new CKEDITOR.htmlParser.filter({
           elements: {
             img: function (element) {

@@ -24,12 +24,10 @@
 }
 .selectize-control.multi.loading .selectize-input {
   background-position: center right 12px;
-  padding-right: 31px;
 }
 .selectize-control.single.loading .selectize-input,
 .selectize-control.single.loading .selectize-input.input-active {
   background-position: center right 36px;
-  padding-right: 55px;
 }
 
 /* Dropdown styles */

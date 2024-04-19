@@ -673,11 +673,11 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       marked:
-        specifier: 12.0.1
-        version: 12.0.1
+        specifier: 12.0.2
+        version: 12.0.2
       marked-base-url:
         specifier: 1.1.2
-        version: 1.1.2(marked@12.0.1)
+        version: 1.1.2(marked@12.0.2)
     devDependencies:
       '@types/dompurify':
         specifier: 3.0.5
@@ -794,8 +794,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       marked:
-        specifier: 12.0.1
-        version: 12.0.1
+        specifier: 12.0.2
+        version: 12.0.2
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3351,8 +3351,8 @@ packages:
     peerDependencies:
       marked: '>= 4 < 12'
 
-  marked@12.0.1:
-    resolution: {integrity: sha512-Y1/V2yafOcOdWQCX0XpAKXzDakPOpn6U0YLxTJs3cww6VxOzZV1BTOOYWLvH3gX38cq+iLwljHHTnMtlDfg01Q==}
+  marked@12.0.2:
+    resolution: {integrity: sha512-qXUm7e/YKFoqFPYPa3Ukg9xlI5cyAtGmyEIzMfW//m6kXwCy2Ps9DYf5ioijFKQ8qyuscrHoY04iJGctu2Kg0Q==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -7330,11 +7330,11 @@ snapshots:
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
-  marked-base-url@1.1.2(marked@12.0.1):
+  marked-base-url@1.1.2(marked@12.0.2):
     dependencies:
-      marked: 12.0.1
+      marked: 12.0.2
 
-  marked@12.0.1: {}
+  marked@12.0.2: {}
 
   matcher@3.0.0:
     dependencies:

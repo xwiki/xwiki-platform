@@ -82,9 +82,9 @@ public class ScopeNotificationFilter implements NotificationFilter
             // targets an user. We still check the exclusive one in case the user would want to avoid spam.
             boolean checkInclusiveFilters = event.getTarget() == null || event.getTarget().isEmpty();
 
-            // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long and
-            // used to generate stack overflows. So we won't make it worse by adding a date condition on each different
-            // scope preference.
+            // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long
+            // and used to generate stack overflows. So we won't make it worse by adding a date condition on each
+            // different scope preference.
             WatchedLocationState state = stateComputer.isLocationWatched(filterPreferences, eventEntity,
                 event.getType(), format, false, checkInclusiveFilters, false);
 

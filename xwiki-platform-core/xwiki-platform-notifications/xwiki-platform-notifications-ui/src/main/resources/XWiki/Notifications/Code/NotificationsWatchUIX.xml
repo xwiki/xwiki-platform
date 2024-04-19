@@ -1,0 +1,565 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsWatchUIX" locale="">
+  <web>XWiki.Notifications.Code</web>
+  <name>NotificationsWatchUIX</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>NotificationsWatchUIX</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>Technical page holding information for the watch setting of each page.</content>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsWatchUIX</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>bda1f669-a593-419e-ba7f-2ca97b79624c</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+  'use strict';
+  
+  var handleSubmit = function () {
+    var chosenOption = $('#watchModal input[type="radio"]:checked').val();
+    // This should be improved as the REST endpoint might not be the same
+    var restUrl = xm.restURL.replace("/rest/", "/rest/watch/");
+    var queryParams = new URLSearchParams({
+      "form_token": xm.form_token
+    });
+    var isFilterRemoval = false;
+    if (chosenOption === 'watchPage') {
+      var url = restUrl;
+    } else if (chosenOption === 'watchSpace') {
+      var url = restUrl.replace(/\/pages.*/, "");
+    } else if (chosenOption === 'watchWiki') {
+      var url = restUrl.replace(/\/spaces.*/, "");
+    } else {
+      console.error("Option " + chosenOption + " is not yet supported!");
+    }
+    if (url) {
+      var ajaxUrl = url + "?" + queryParams.toString();
+      if (!isFilterRemoval) {
+        $.ajax(ajaxUrl, {
+          method: "PUT"
+        }).done(function () {
+          window.location.reload();
+        }).error(function (data) {
+          console.error("Error when processing the request: " + data);
+        });
+      }
+    }
+  };
+  
+  var initWatchModal = function () {
+    $('#watchModal .btn-primary').on('click', handleSubmit);
+    $('#watchModal input[type="radio"]').on('change', function () {
+      $('#watchModal .btn-primary').prop("disabled", false);
+    });
+  };
+  
+  (XWiki.isInitialized &amp;&amp; initWatchModal()) || document.observe('xwiki:dom:loaded',initWatchModal);
+});</code>
+    </property>
+    <property>
+      <name>Handle watch settings change</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsWatchUIX</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>7ed83c53-e0a3-4c5c-90ea-6aced2cc5363</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#watchModal {
+  text-align: left;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Notifications.Code.NotificationsWatchUIX</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>b2f477cd-c38c-4d5c-8b35-8abcb3f579cc</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+#set($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
+#set($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
+## FIXME: this object should be cached / async once properly finished.
+#set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
+#if ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell')
+  #set ($watchText = 'Followed')
+  #set ($watchModalDescription = 'This page is followed: you will receive notifications for all event types.')
+#elseif ($watchedStatus == 'WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell')
+  #set ($watchText = 'Followed')
+  #set ($watchModalDescription = 'This page is followed through another page in the hierarchy: you will receive notifications for all event types.')
+#elseif ($watchedStatus == 'WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell')
+  #set ($watchText = 'Followed')
+  #set ($watchModalDescription = 'This page and its children are followed: you will receive notifications for all event types.')
+#elseif ($watchedStatus == 'NOT_SET')
+  #set ($watchIcon = 'fa-bell-o')
+  #set ($watchText = 'Not set')
+  #set ($watchModalDescription = 'There is no watch settings for this page, but by default it is followed: you will receive notifications for all event types.')
+#elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell-slash')
+  #set ($watchText = 'Ignored')
+  #set ($watchModalDescription = 'This page is ignored: you won''t receive any notifications for it.')
+#elseif ($watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell-slash')
+  #set ($watchText = 'Ignored')
+  #set ($watchModalDescription = 'This page is ignored through another page in the hierarchy: you won''t receive any notifications for it.')
+#elseif ($watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($watchIcon = 'fa-bell-slash')
+  #set ($watchText = 'Ignored')
+  #set ($watchModalDescription = 'This page and its children are ignored: you won''t receive any notifications for it.')
+#else
+  #set ($watchIcon = 'fa-bullhorn')
+  #set ($watchText = 'Custom')
+  #set ($watchModalDescription = 'The watch settings are custom for this page: you should review the filters applied for the page to know exactly which notifications you might receive.')
+#end
+{{html clean='false'}}
+&lt;div class="btn-group" id="watchButton"&gt;
+  &lt;a href="#" role="button" title="Watch" class="btn btn-default" data-toggle="modal" data-target="#watchModal"&gt;
+    &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
+  &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class="modal fade" tabindex="-1" role="dialog" id="watchModal"&gt;
+  &lt;div class="modal-dialog" role="document"&gt;
+    &lt;div class="modal-content"&gt;
+      &lt;div class="modal-header"&gt;
+        &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+        &lt;h4 class="modal-title"&gt;Watch settings&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-body"&gt;
+        &lt;p&gt;$watchModalDescription&lt;/p&gt;
+        &lt;div class="watch-options-container panel-group" role="tablist" aria-multiselectable="false"&gt;
+        #if ($watchedStatus == 'NOT_SET')
+          &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-page" value="watchPage" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title" for="option-watch-page"&gt;
+                &lt;span class="fa fa-file"&gt;&lt;/span&gt;  Follow current page
+              &lt;/label&gt;
+               &lt;div class="xHint"&gt;
+                 You will receive notifications only for that page.
+               &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-space" value="watchSpace" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title" for="option-watch-space"&gt;
+                &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt;  Follow current space
+              &lt;/label&gt;
+              &lt;div class="xHint"&gt;
+                 You will receive notifications for that page and for its children.
+               &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+           &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-wiki" value="watchWiki" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title" for="option-watch-wiki"&gt;
+                &lt;span class="fa fa-globe"&gt;&lt;/span&gt;  Follow current wiki
+              &lt;/label&gt;
+              &lt;div class="xHint"&gt;
+                 You will receive notifications for all pages in the wiki.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #elseif ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
+          &lt;div class="panel"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-unwatch-page" value="unwatchPage" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading"&gt;
+              &lt;label class="panel-title" for="option-unwatch-page"&gt;
+                &lt;span class="fa fa-file"&gt;&lt;/span&gt;  Unfollow current page
+              &lt;/label&gt;
+               &lt;div class="xHint"&gt;
+                 You might still receive notifications if the wiki or a space in the hierarchy is followed.
+               &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #end
+        &lt;/div&gt;&lt;!-- end panel group --&gt;
+      &lt;/div&gt;&lt;!-- end modal body --&gt;
+      &lt;div class="modal-footer"&gt;
+        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;Close&lt;/button&gt;
+        &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;Save changes&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;&lt;!-- /.modal-content --&gt;
+  &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+&lt;/div&gt;&lt;!-- /.modal --&gt;
+{{/html}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.menu.content</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.notification.watch</name>
+    </property>
+    <property>
+      <parameters>order=50</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

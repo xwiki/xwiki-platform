@@ -212,9 +212,8 @@
     #if($pages.size() != 0)
       &lt;dt&gt;$escapetool.html($services.localization.render('panels.documentInformation.includesCount', [$pages.size()]))&lt;/dt&gt;
       #foreach ($page in $pages)
-        #set ($pageRef = $escapetool.html($page))
-        #set ($alt = $escapetool.html($services.localization.render('panels.documentInformation.editIncluded', [$page])))
-        &lt;dd&gt;&lt;a href="$xwiki.getURL($pageRef, 'view')"&gt;$pageRef&lt;/a&gt; &lt;a href="$xwiki.getURL($pageRef, 'edit')"&gt;$services.icon.renderHTML('edit')&lt;span class="sr-only"&gt;$alt&lt;/span&gt;&lt;/a&gt;&lt;/dd&gt;
+        #set ($alt = $escapetool.xml($services.localization.render('panels.documentInformation.editIncluded', [$page])))
+        &lt;dd&gt;&lt;a href="$xwiki.getURL($page, 'view')"&gt;$escapetool.xml($page)&lt;/a&gt; &lt;a href="$xwiki.getURL($page, 'edit')"&gt;$services.icon.renderHTML('edit')&lt;span class="sr-only"&gt;$alt&lt;/span&gt;&lt;/a&gt;&lt;/dd&gt;
       #end
     #end
   {{/html}}

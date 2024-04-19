@@ -154,8 +154,8 @@
 ## be concatenated without space.
 <$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} ${bodyAction}body panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right ${preferenceUnderlining}
   #if("$!doc.space" != "") space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end
-  #if($showLeftPanels == "0") hideleft#end
-  #if($showRightPanels == "0")hideright#end
+  #if($showLeftPanels == "0") hideleft#end##Take care not to add any space between these two classes, they should combine in only one class if both are present.
+#if($showRightPanels == "0")hideright#end
   #if($hidecolumns && ($!hidecolumns == 1)) hidelefthideright#end
   #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1) content#end">
 <div id="xwikimaincontainer">

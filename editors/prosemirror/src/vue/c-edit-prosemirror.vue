@@ -126,7 +126,7 @@ const submit = async () => {
     <span class="load-spinner"></span>
     <h3>Loading</h3>
   </div>
-  <div class="editor-error" v-else-if="error">
+  <div v-else-if="error" class="editor-error">
     <!-- TODO: provide a better error reporting. -->
     {{ error }}
   </div>

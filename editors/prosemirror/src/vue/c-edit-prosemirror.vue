@@ -50,7 +50,9 @@ let view: EditorView;
 
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
-  return (route.params.page as string) || "XWiki.Main";
+  return (
+    (route.params.page as string) || cristal.getCurrentPage() || "Main.WebHome"
+  );
 });
 
 async function fetchPage() {

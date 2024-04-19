@@ -45,7 +45,9 @@ const error: Ref<Error | undefined> = ref(undefined);
 const currentPage: Ref<PageData | undefined> = ref(undefined);
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
-  return (route.params.page as string) || "XWiki.Main";
+  return (
+    (route.params.page as string) || cristal.getCurrentPage() || "Main.WebHome"
+  );
 });
 
 const contentRoot = ref(undefined);
@@ -55,12 +57,14 @@ const content: ComputedRef<string> = computed(() => {
     const cpn: PageData = currentPage.value;
     if (cpn.html && cpn.html.trim() !== "") {
       return cpn.html as string;
-    } else {
+    } else if (cpn.source) {
       // TODO: currently blindly convert the content to markdown.
       console.log("marked", marked, cpn.source);
       const parse = marked.parse(cpn.source);
       console.log("parse", parse);
       return parse as string;
+    } else {
+      return "";
     }
   } else {
     return "";

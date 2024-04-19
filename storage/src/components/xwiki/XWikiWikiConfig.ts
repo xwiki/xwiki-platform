@@ -60,6 +60,6 @@ export class XWikiWikiConfig extends DefaultWikiConfig {
   }
 
   defaultPageName(): string {
-    return "XWiki.Main";
+    return "Main.WebHome";
   }
 }

@@ -167,6 +167,18 @@
       // parser is called in both cases. Priority 1 is needed to ensure our listener is called before the HTML parser
       // (which has priority 5).
       editor.on('toHtml', escapeStyleContent, null, null, 1);
+      // Remove data-widget attributes on images, as otherwise they might be badly interpreted as another type of
+      // widget, leading to CKEditor crashing.
+      editor.on('toHtml', (event) => {
+        event.data.dataValue.filter(new CKEDITOR.htmlParser.filter({
+          elements: {
+            img: function (element) {
+              delete element.attributes['data-widget'];
+            }
+          }
+        }));
+        // We must use a priority below 8 to make sure our filter is executed before widgets are upcasted.
+      }, null, null, 7);
       editor.on('toDataFormat', escapeStyleContent, null, null, 1);
 
       // Transform <font color="..." face="..."> into <span style="color: ...; font-family: ...">.

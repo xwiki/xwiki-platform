@@ -855,6 +855,20 @@ class ImageIT extends AbstractCKEditorIT
             + "1. Item 2 [[image:image.gif]]", savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(20)
+    void editImageWithDataWidgetAttribute(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        ViewPage page = setup.createPage(testReference, "[[image:image.gif||data-widget='uploadimage']]");
+        WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+        // Make sure the image can be clicked as a proof that the editor did not crash.
+        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
     /**
      * Initialize a page with some content and an image. Then, copy its displayed content in the clipboard.
      *

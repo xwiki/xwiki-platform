@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=The wiki contains documents that are not displayed by default. These hidden documents represent technical content, like application classes, configuration pages, macros, styles, scripts, etc.
-XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
+XWiki.XWikiUsers_underline.hint=Choose if links should be underlined.
 XWiki.XWikiUsers_timezone.hint=Use a specific timezone so that the dates reflect your current location.
 XWiki.XWikiUsers_editor.hint=Choose what editor will be the default one, overriding the default editor set globally. If not defined, a default editor is chosen, depending on what is being edited.
 XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
@@ -129,7 +129,15 @@ XWiki.XWikiUsers_shortcut_edit_saveandview.hint=Key to save edits and go back to
 
 XWiki.XWikiUsers_shortcut_developer_usertype.hint=Key to switch the user type.
 XWiki.XWikiUsers_shortcut_developer_display_hidden_docs.hint=Key to toggle display of hidden pages.
-</content>
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 16.3.0RC1
+XWiki.XWikiUsers_accessibility.hint=Extra accessibility will enable various visual enhancements like: bigger fonts, underlined links, etc.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>XWiki.UserProfileTranslations</name>
     <number>0</number>

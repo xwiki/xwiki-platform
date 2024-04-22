@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -338,5 +340,30 @@ public class ScriptQuery implements SecureQuery
         }
 
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ScriptQuery that = (ScriptQuery) o;
+
+        return new EqualsBuilder().append(switchAuthor, that.switchAuthor)
+            .append(componentManager, that.componentManager).append(query, that.query)
+            .append(authorReference, that.authorReference).append(sourceReference, that.sourceReference).isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37).append(componentManager).append(query).append(switchAuthor)
+            .append(authorReference).append(sourceReference).toHashCode();
     }
 }

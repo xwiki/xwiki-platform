@@ -58,6 +58,8 @@ public class TestConfiguration
 
     private String databaseTag;
 
+    private String browserTag;
+
     private String jdbcDriverVersion;
 
     private boolean vnc;
@@ -105,6 +107,7 @@ public class TestConfiguration
         mergeDatabaseTag(testConfiguration.getDatabaseTag());
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
+        mergeBrowserTag(testConfiguration.getBrowserTag());
         mergeVNC(testConfiguration.vnc());
         mergeWCAG(testConfiguration.isWCAG());
         mergeWCAGStopOnError(testConfiguration.shouldWCAGStopOnError());
@@ -194,8 +197,6 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge database tag [%s] since it was already specified as [%s]",
                         databaseTag, getDatabaseTag()));
-            } else {
-                this.databaseTag = getDatabaseTag();
             }
         } else {
             this.databaseTag = databaseTag;
@@ -209,11 +210,22 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge Servlet engine tag [%s] since it was already specified as [%s]",
                         servletEngineTag, getServletEngineTag()));
-            } else {
-                this.servletEngineTag = getServletEngineTag();
             }
         } else {
             this.servletEngineTag = servletEngineTag;
+        }
+    }
+
+    private void mergeBrowserTag(String browserTag) throws DockerTestException
+    {
+        if (getBrowserTag() != null) {
+            if (browserTag != null && !getBrowserTag().equals(browserTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge Browser tag [%s] since it was already specified as [%s]",
+                        browserTag, getBrowserTag()));
+            }
+        } else {
+            this.browserTag = browserTag;
         }
     }
 
@@ -224,8 +236,6 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge JDBC driver version [%s] since it was already specified as [%s]",
                         jdbcDriverVersion, getJDBCDriverVersion()));
-            } else {
-                this.jdbcDriverVersion = getJDBCDriverVersion();
             }
         } else {
             this.jdbcDriverVersion = jdbcDriverVersion;
@@ -466,6 +476,23 @@ public class TestConfiguration
     public void setServletEngineTag(String servletEngineTag)
     {
         this.servletEngineTag = servletEngineTag;
+    }
+
+    /**
+     * @return the docker image tag to use for the browser container (if not specified, uses the "latest" tag)
+     * @since 16.3.0RC1
+     */
+    public String getBrowserTag()
+    {
+        return browserTag;
+    }
+
+    /**
+     * @param browserTag see {@link #getBrowserTag()}
+     */
+    public void setBrowserTag(String browserTag)
+    {
+        this.browserTag = browserTag;
     }
 
     /**

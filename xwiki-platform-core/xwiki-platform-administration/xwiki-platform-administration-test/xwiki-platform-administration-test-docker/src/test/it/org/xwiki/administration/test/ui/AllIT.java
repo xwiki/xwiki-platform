@@ -39,12 +39,6 @@ public class AllIT
     }
 
     @Nested
-    @DisplayName("Reset Password")
-    class NestedResetPasswordIT extends ResetPasswordIT
-    {
-    }
-
-    @Nested
     @DisplayName("ConfigurableClass")
     class NestedConfigurableClassIT extends ConfigurableClassIT
     {
@@ -53,12 +47,6 @@ public class AllIT
     @Nested
     @DisplayName("Users and Groups Rights Management")
     class NestedUsersGroupsRightsManagementIT extends UsersGroupsRightsManagementIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Forgot Username")
-    class NestedForgotUsernameIT extends ForgotUsernameIT
     {
     }
 

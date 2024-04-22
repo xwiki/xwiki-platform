@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.Translations" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.Translations" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>Translations</name>
   <language/>
@@ -71,6 +71,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Scope Notificatio
 notifications.filters.preferences.scopeNotificationFilter.page=Page only
 notifications.filters.preferences.scopeNotificationFilter.space=Page and children
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.user=User
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
@@ -94,6 +95,7 @@ notifications.settings.filters.preferences.system.title=System Filters
 notifications.settings.filters.preferences.system.hint=System filters that you can switches to have a more fine-grained control of the notifications you want to receive.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Name
+notifications.settings.filters.preferences.system.table.filterDescription=Description
 notifications.settings.filters.preferences.system.table.filterType=Description
 notifications.settings.filters.preferences.system.table.notificationFormats=Formats
 notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
@@ -102,7 +104,9 @@ notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
 notifications.settings.filters.preferences.custom.title=Custom Filters
 notifications.settings.filters.preferences.custom.hint=Create filters to control the notifications you want to receive.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.custom.table.name=Location
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+notifications.settings.filters.preferences.custom.table.scope=Scope
+notifications.settings.filters.preferences.custom.table.location=Location
 notifications.settings.filters.preferences.custom.table.filterType=Filter Action
 notifications.settings.filters.preferences.custom.table.eventTypes=Events
 notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
@@ -268,6 +272,7 @@ notifications.filters.type.exclusive=Exclusive
 ## until 16.2.0RC1
 notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
 notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
+notifications.settings.filters.preferences.custom.table.name=Location
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

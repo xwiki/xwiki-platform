@@ -26,7 +26,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.common.params.CommonParams;
@@ -75,7 +75,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Inject
     private SolrConfiguration configuration;
 
-    private Http2SolrClient rootClient;
+    private HttpSolrClient rootClient;
 
     private int solrMajorVersion;
 
@@ -88,7 +88,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
             this.cores.put(SolrClientInstance.CORE_NAME, new DefaultXWikiSolrCore(SolrClientInstance.CORE_NAME,
-                toSolrCoreName(SolrClientInstance.CORE_NAME), new Http2SolrClient.Builder(searchCoreURL).build()));
+                toSolrCoreName(SolrClientInstance.CORE_NAME), new HttpSolrClient.Builder(searchCoreURL).build()));
 
             // If the base URL is not provided try to guess it from the search core URL
             if (baseURL == null) {
@@ -105,7 +105,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         }
 
         // Create the root client
-        this.rootClient = new Http2SolrClient.Builder(baseURL).build();
+        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
 
         if (REQUEST_VERSION) {
             // Gather information about the server
@@ -127,7 +127,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         }
     }
 
-    Http2SolrClient getRootClient()
+    HttpSolrClient getRootClient()
     {
         return this.rootClient;
     }
@@ -141,7 +141,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Override
     protected SolrClient getInternalSolrClient(String solrCoreName)
     {
-        return new Http2SolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+        return new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
     }
 
     private String getCorePrefix()
@@ -157,15 +157,11 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         // Prefix Solr cores to avoid collision with other non-xwiki cores
         builder.append(getCorePrefix());
 
-        // In Solr 8 the name of the search core is just "<prefix>" and there is no suffix
-        if (majorVersion > 8) {
-            builder.append(getSolrCoreSuffix(majorVersion));
-        } else {
-            if (!xwikiCoreName.equals(SolrClientInstance.CORE_NAME)) {
-                builder.append('_');
+        // In Solr 8 the name of the search core was just "<prefix>"
+        if (majorVersion > 8 || !xwikiCoreName.equals(SolrClientInstance.CORE_NAME)) {
+            builder.append('_');
 
-                builder.append(super.toSolrCoreName(xwikiCoreName, majorVersion));
-            }
+            builder.append(super.toSolrCoreName(xwikiCoreName, majorVersion));
         }
 
         return builder.toString();

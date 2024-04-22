@@ -54,8 +54,13 @@ public class RealtimeCKEditor extends CKEditor
     @Override
     public RealtimeRichTextAreaElement getRichTextArea()
     {
-        // The in-line frame element is renewed while editing so we can't cache it.
-        return new RealtimeRichTextAreaElement(getContentContainer());
+        return getRichTextArea(true);
+    }
+
+    @Override
+    public RealtimeRichTextAreaElement getRichTextArea(boolean wait)
+    {
+        return new RealtimeRichTextAreaElement(getContentContainer(), wait);
     }
 
     @Override

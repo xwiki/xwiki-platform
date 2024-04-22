@@ -32,11 +32,11 @@ define('xwiki-realtime-saver', [
   'use strict';
 
   function warn(...args) {
-    console.log(...args);
+    console.warn(...args);
   }
 
   function debug(...args) {
-    console.log(...args);
+    console.debug(...args);
   }
 
   function verbose() {
@@ -61,7 +61,7 @@ define('xwiki-realtime-saver', [
    */
   class Saver {
     constructor(config) {
-      this._initializing = true;
+      this._startInitializing();
       this._revertList = [];
 
       this._config = {
@@ -97,6 +97,24 @@ define('xwiki-realtime-saver', [
       });
     }
 
+    _startInitializing() {
+      this._initializing = new Promise(resolve => {
+        this._notifyReady = () => {
+          // Mark the Saver as ready right away (rather than using a promise callback which would be called on the next
+          // tick), to be visible to the code executed right after _notifyReady is called.
+          this._initializing = false;
+          resolve();
+        };
+      });
+    }
+
+    async toBeReady() {
+      if (this._initializing) {
+        await this._initializing;
+      }
+      return this;
+    }
+
     _configure(config) {
       $.extend(this._config, config);
       $.extend(this._lastSaved, {
@@ -107,8 +125,8 @@ define('xwiki-realtime-saver', [
 
     _interrupt() {
       if (this._lastSaved.receivedISAVE) {
-        warn("Another client sent an ISAVED message.");
-        warn("Aborting save action.");
+        debug("Another client sent an ISAVED message.");
+        debug("Aborting save action.");
         // Unset the flag, or else it will persist.
         this._lastSaved.receivedISAVE = false;
         // Return true such that calling functions know to abort.
@@ -324,7 +342,7 @@ define('xwiki-realtime-saver', [
 
     _onReady(info) {
       this._chainpad = info.realtime;
-      this._initializing = false;
+      this._notifyReady();
       this._onRemote();
       this._onOpen();
     }

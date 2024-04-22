@@ -208,7 +208,7 @@ public class VersioningStoreQueryFactoryTest
         LiteralExpression<Date> dateUpperExpression = (LiteralExpression<Date>) datePredicate.getUpperBound();
         assertEquals("mocked date", datePredicate.getExpression().toString());
         assertEquals(new Date(0L), dateLowerExpression.getLiteral());
-        assertEquals(new Date(Long.MAX_VALUE), dateUpperExpression.getLiteral());
+        assertEquals(new Date(Integer.MAX_VALUE * 1000L), dateUpperExpression.getLiteral());
     }
 
     @Test
@@ -270,7 +270,7 @@ public class VersioningStoreQueryFactoryTest
         LiteralExpression<Date> dateUpperExpression = (LiteralExpression<Date>) datePredicate.getUpperBound();
         assertEquals("mocked date", datePredicate.getExpression().toString());
         assertEquals(new Date(0L), dateLowerExpression.getLiteral());
-        assertEquals(new Date(Long.MAX_VALUE), dateUpperExpression.getLiteral());
+        assertEquals(new Date(Integer.MAX_VALUE * 1000L), dateUpperExpression.getLiteral());
     }
 
     @Test

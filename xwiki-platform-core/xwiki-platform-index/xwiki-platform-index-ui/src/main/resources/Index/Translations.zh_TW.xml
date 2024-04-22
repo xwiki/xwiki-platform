@@ -36,13 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=空間
-index.spacesMacro.spaceIndex.title=空間索引
-index.spacesMacro.spaceIndex.alt=空間列表
-index.spacesMacro.spaceAdministration.title=空間管理
-index.spacesMacro.spaceAdministration.alt=管理員空間
-index.spacesMacro.createSpace.link=新增空間
-index.spacesMacro.createSpace.defaultSpaceName=空間名稱
-index.spacesMacro.createSpace.submit=新增
-index.deletedDocuments.deleteAll=刪除全部</content>
+  <content>index.deletedDocuments.deleteAll=刪除全部</content>
 </xwikidoc>

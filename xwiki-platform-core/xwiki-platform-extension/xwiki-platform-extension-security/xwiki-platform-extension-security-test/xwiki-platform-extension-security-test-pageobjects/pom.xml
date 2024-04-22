@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-security-test</artifactId>
-    <version>16.3.0-SNAPSHOT</version>
+    <version>16.3.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-extension-security-test-pageobjects</artifactId>
   <name>XWiki Platform - Extension - Security - Tests - Page Objects</name>

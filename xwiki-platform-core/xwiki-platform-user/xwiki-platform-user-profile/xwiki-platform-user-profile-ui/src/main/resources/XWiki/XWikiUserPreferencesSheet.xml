@@ -250,7 +250,8 @@
 ##   DISPLAY TEXT FIELD
 ###############################
 #macro (displayTextField $fieldName $defaultValue)
-  #set ($value = $doc.getValue($fieldName, $obj))
+  #set ($defaultValue = $escapetool.xml($defaultValue))
+  #set ($value = $escapetool.xml($doc.getValue($fieldName, $obj)))
   #set ($prop = $xclass.get($fieldName))
   #set ($defaultValueHint = "($escapetool.xml($services.localization.render('userprofile.default')))")
   #if ($isEdit)

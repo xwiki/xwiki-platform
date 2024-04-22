@@ -77,7 +77,7 @@
 #if($!xwiki.getUserPreference("shortcut_edit_${resourceIdentifier}") != '')
   #set ($shortcut = $xwiki.getUserPreference("shortcut_edit_${resourceIdentifier}"))
 #else
-  #set ($shortcut = $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"))
+  #set ($shortcut = $escapetool.xml($services.localization.render("core.shortcuts.edit.${resourceIdentifier}")))
 #end
 #submitButton("action_${action}", $shortcut, $services.localization.render($resourceIdentifier), $class)
 <input type="hidden" name="xaction" value="$escapetool.xml($action)" />

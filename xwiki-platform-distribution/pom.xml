@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.3.0-rc-1</version>
+    <version>16.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -220,12 +220,12 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-webjars-api</artifactId>
-        <version>16.3.0-rc-1</version>
+        <version>16.3.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-        <version>16.3.0-rc-1</version>
+        <version>16.3.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

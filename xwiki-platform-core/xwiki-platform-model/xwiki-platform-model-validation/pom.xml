@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model</artifactId>
-    <version>16.3.0-SNAPSHOT</version>
+    <version>16.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation</artifactId>
   <name>XWiki Platform - Model - Validation - Parent POM</name>

@@ -16,7 +16,7 @@ importers:
         version: 7.6.0(eslint@8.57.0)(typescript@5.4.5)
       '@vitejs/plugin-vue':
         specifier: 5.0.4
-        version: 5.0.4(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))
+        version: 5.0.4(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))
       '@vue/eslint-config-prettier':
         specifier: 9.0.0
         version: 9.0.0(eslint@8.57.0)(prettier@3.2.5)
@@ -48,17 +48,17 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vite-plugin-dts:
         specifier: 3.8.1
-        version: 3.8.1(@types/node@20.12.7)(rollup@4.14.3)(typescript@5.4.5)(vite@5.2.9(@types/node@20.12.7))
+        version: 3.8.1(@types/node@20.12.7)(rollup@4.14.3)(typescript@5.4.5)(vite@5.2.10(@types/node@20.12.7))
       vite-plugin-inspect:
         specifier: 0.8.3
-        version: 0.8.3(rollup@4.14.3)(vite@5.2.9(@types/node@20.12.7))
+        version: 0.8.3(rollup@4.14.3)(vite@5.2.10(@types/node@20.12.7))
       vite-plugin-vuetify:
         specifier: 2.0.3
-        version: 2.0.3(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
+        version: 2.0.3(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
 
   api:
     dependencies:
@@ -85,8 +85,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vitest:
         specifier: 1.5.0
         version: 1.5.0(@types/node@20.12.7)(happy-dom@14.7.1)
@@ -113,8 +113,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vitest:
         specifier: 1.5.0
         version: 1.5.0(@types/node@20.12.7)(happy-dom@14.7.1)
@@ -174,8 +174,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vitest:
         specifier: 1.5.0
         version: 1.5.0(@types/node@20.12.7)(happy-dom@14.7.1)
@@ -208,8 +208,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vitest:
         specifier: 1.5.0
         version: 1.5.0(@types/node@20.12.7)(happy-dom@14.7.1)
@@ -239,8 +239,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -334,8 +334,8 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -412,8 +412,8 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -436,8 +436,8 @@ importers:
         specifier: 0.2.4
         version: 0.2.4(rollup@4.14.3)
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -467,8 +467,8 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -495,11 +495,11 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vite-plugin-node:
         specifier: 3.1.0
-        version: 3.1.0(vite@5.2.9(@types/node@20.12.7))
+        version: 3.1.0(vite@5.2.10(@types/node@20.12.7))
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -526,8 +526,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
 
   extensions/menubuttons:
     dependencies:
@@ -554,8 +554,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -624,8 +624,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -652,8 +652,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -686,8 +686,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -708,8 +708,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -730,11 +730,11 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vite-plugin-comlink:
         specifier: 4.0.2
-        version: 4.0.2(comlink@4.4.1)(vite@5.2.9(@types/node@20.12.7))
+        version: 4.0.2(comlink@4.4.1)(vite@5.2.10(@types/node@20.12.7))
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -773,11 +773,11 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vite-plugin-comlink:
         specifier: 4.0.2
-        version: 4.0.2(comlink@4.4.1)(vite@5.2.9(@types/node@20.12.7))
+        version: 4.0.2(comlink@4.4.1)(vite@5.2.10(@types/node@20.12.7))
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -811,19 +811,19 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: 5.0.4
-        version: 5.0.4(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))
+        version: 5.0.4(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vite-plugin-inspect:
         specifier: 0.8.3
-        version: 0.8.3(rollup@4.14.3)(vite@5.2.9(@types/node@20.12.7))
+        version: 0.8.3(rollup@4.14.3)(vite@5.2.10(@types/node@20.12.7))
       vite-plugin-vuetify:
         specifier: 2.0.3
-        version: 2.0.3(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
+        version: 2.0.3(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
       vue:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.4.5)
@@ -887,8 +887,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -922,7 +922,7 @@ importers:
         version: 20.12.7
       '@vitejs/plugin-vue':
         specifier: 5.0.4
-        version: 5.0.4(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))
+        version: 5.0.4(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))
       npm-run-all2:
         specifier: 6.1.2
         version: 6.1.2
@@ -930,20 +930,20 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.2.9
-        version: 5.2.9(@types/node@20.12.7)
+        specifier: 5.2.10
+        version: 5.2.10(@types/node@20.12.7)
       vite-plugin-comlink:
         specifier: 4.0.2
-        version: 4.0.2(comlink@4.4.1)(vite@5.2.9(@types/node@20.12.7))
+        version: 4.0.2(comlink@4.4.1)(vite@5.2.10(@types/node@20.12.7))
       vite-plugin-dts:
         specifier: 3.8.1
-        version: 3.8.1(@types/node@20.12.7)(rollup@4.14.3)(typescript@5.4.5)(vite@5.2.9(@types/node@20.12.7))
+        version: 3.8.1(@types/node@20.12.7)(rollup@4.14.3)(typescript@5.4.5)(vite@5.2.10(@types/node@20.12.7))
       vite-plugin-inspect:
         specifier: 0.8.3
-        version: 0.8.3(rollup@4.14.3)(vite@5.2.9(@types/node@20.12.7))
+        version: 0.8.3(rollup@4.14.3)(vite@5.2.10(@types/node@20.12.7))
       vite-plugin-vuetify:
         specifier: 2.0.3
-        version: 2.0.3(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
+        version: 2.0.3(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
       vue-tsc:
         specifier: 2.0.14
         version: 2.0.14(typescript@5.4.5)
@@ -1510,19 +1510,9 @@ packages:
       rollup:
         optional: true
 
-  '@rollup/rollup-android-arm-eabi@4.14.2':
-    resolution: {integrity: sha512-ahxSgCkAEk+P/AVO0vYr7DxOD3CwAQrT0Go9BJyGQ9Ef0QxVOfjDZMiF4Y2s3mLyPrjonchIMH/tbWHucJMykQ==}
-    cpu: [arm]
-    os: [android]
-
   '@rollup/rollup-android-arm-eabi@4.14.3':
     resolution: {integrity: sha512-X9alQ3XM6I9IlSlmC8ddAvMSyG1WuHk5oUnXGw+yUBs3BFoTizmG1La/Gr8fVJvDWAq+zlYTZ9DBgrlKRVY06g==}
     cpu: [arm]
-    os: [android]
-
-  '@rollup/rollup-android-arm64@4.14.2':
-    resolution: {integrity: sha512-lAarIdxZWbFSHFSDao9+I/F5jDaKyCqAPMq5HqnfpBw8dKDiCaaqM0lq5h1pQTLeIqueeay4PieGR5jGZMWprw==}
-    cpu: [arm64]
     os: [android]
 
   '@rollup/rollup-android-arm64@4.14.3':
@@ -1530,30 +1520,15 @@ packages:
     cpu: [arm64]
     os: [android]
 
-  '@rollup/rollup-darwin-arm64@4.14.2':
-    resolution: {integrity: sha512-SWsr8zEUk82KSqquIMgZEg2GE5mCSfr9sE/thDROkX6pb3QQWPp8Vw8zOq2GyxZ2t0XoSIUlvHDkrf5Gmf7x3Q==}
-    cpu: [arm64]
-    os: [darwin]
-
   '@rollup/rollup-darwin-arm64@4.14.3':
     resolution: {integrity: sha512-Od4vE6f6CTT53yM1jgcLqNfItTsLt5zE46fdPaEmeFHvPs5SjZYlLpHrSiHEKR1+HdRfxuzXHjDOIxQyC3ptBA==}
     cpu: [arm64]
-    os: [darwin]
-
-  '@rollup/rollup-darwin-x64@4.14.2':
-    resolution: {integrity: sha512-o/HAIrQq0jIxJAhgtIvV5FWviYK4WB0WwV91SLUnsliw1lSAoLsmgEEgRWzDguAFeUEUUoIWXiJrPqU7vGiVkA==}
-    cpu: [x64]
     os: [darwin]
 
   '@rollup/rollup-darwin-x64@4.14.3':
     resolution: {integrity: sha512-0IMAO21axJeNIrvS9lSe/PGthc8ZUS+zC53O0VhF5gMxfmcKAP4ESkKOCwEi6u2asUrt4mQv2rjY8QseIEb1aw==}
     cpu: [x64]
     os: [darwin]
-
-  '@rollup/rollup-linux-arm-gnueabihf@4.14.2':
-    resolution: {integrity: sha512-nwlJ65UY9eGq91cBi6VyDfArUJSKOYt5dJQBq8xyLhvS23qO+4Nr/RreibFHjP6t+5ap2ohZrUJcHv5zk5ju/g==}
-    cpu: [arm]
-    os: [linux]
 
   '@rollup/rollup-linux-arm-gnueabihf@4.14.3':
     resolution: {integrity: sha512-ge2DC7tHRHa3caVEoSbPRJpq7azhG+xYsd6u2MEnJ6XzPSzQsTKyXvh6iWjXRf7Rt9ykIUWHtl0Uz3T6yXPpKw==}
@@ -1565,18 +1540,8 @@ packages:
     cpu: [arm]
     os: [linux]
 
-  '@rollup/rollup-linux-arm64-gnu@4.14.2':
-    resolution: {integrity: sha512-Pg5TxxO2IVlMj79+c/9G0LREC9SY3HM+pfAwX7zj5/cAuwrbfj2Wv9JbMHIdPCfQpYsI4g9mE+2Bw/3aeSs2rQ==}
-    cpu: [arm64]
-    os: [linux]
-
   '@rollup/rollup-linux-arm64-gnu@4.14.3':
     resolution: {integrity: sha512-Eci2us9VTHm1eSyn5/eEpaC7eP/mp5n46gTRB3Aar3BgSvDQGJZuicyq6TsH4HngNBgVqC5sDYxOzTExSU+NjA==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@rollup/rollup-linux-arm64-musl@4.14.2':
-    resolution: {integrity: sha512-cAOTjGNm84gc6tS02D1EXtG7tDRsVSDTBVXOLbj31DkwfZwgTPYZ6aafSU7rD/4R2a34JOwlF9fQayuTSkoclA==}
     cpu: [arm64]
     os: [linux]
 
@@ -1585,19 +1550,9 @@ packages:
     cpu: [arm64]
     os: [linux]
 
-  '@rollup/rollup-linux-powerpc64le-gnu@4.14.2':
-    resolution: {integrity: sha512-4RyT6v1kXb7C0fn6zV33rvaX05P0zHoNzaXI/5oFHklfKm602j+N4mn2YvoezQViRLPnxP8M1NaY4s/5kXO5cw==}
-    cpu: [ppc64]
-    os: [linux]
-
   '@rollup/rollup-linux-powerpc64le-gnu@4.14.3':
     resolution: {integrity: sha512-5aRjvsS8q1nWN8AoRfrq5+9IflC3P1leMoy4r2WjXyFqf3qcqsxRCfxtZIV58tCxd+Yv7WELPcO9mY9aeQyAmw==}
     cpu: [ppc64]
-    os: [linux]
-
-  '@rollup/rollup-linux-riscv64-gnu@4.14.2':
-    resolution: {integrity: sha512-KNUH6jC/vRGAKSorySTyc/yRYlCwN/5pnMjXylfBniwtJx5O7X17KG/0efj8XM3TZU7raYRXJFFReOzNmL1n1w==}
-    cpu: [riscv64]
     os: [linux]
 
   '@rollup/rollup-linux-riscv64-gnu@4.14.3':
@@ -1605,28 +1560,13 @@ packages:
     cpu: [riscv64]
     os: [linux]
 
-  '@rollup/rollup-linux-s390x-gnu@4.14.2':
-    resolution: {integrity: sha512-xPV4y73IBEXToNPa3h5lbgXOi/v0NcvKxU0xejiFw6DtIYQqOTMhZ2DN18/HrrP0PmiL3rGtRG9gz1QE8vFKXQ==}
-    cpu: [s390x]
-    os: [linux]
-
   '@rollup/rollup-linux-s390x-gnu@4.14.3':
     resolution: {integrity: sha512-jOO/PEaDitOmY9TgkxF/TQIjXySQe5KVYB57H/8LRP/ux0ZoO8cSHCX17asMSv3ruwslXW/TLBcxyaUzGRHcqg==}
     cpu: [s390x]
     os: [linux]
 
-  '@rollup/rollup-linux-x64-gnu@4.14.2':
-    resolution: {integrity: sha512-QBhtr07iFGmF9egrPOWyO5wciwgtzKkYPNLVCFZTmr4TWmY0oY2Dm/bmhHjKRwZoGiaKdNcKhFtUMBKvlchH+Q==}
-    cpu: [x64]
-    os: [linux]
-
   '@rollup/rollup-linux-x64-gnu@4.14.3':
     resolution: {integrity: sha512-8ybV4Xjy59xLMyWo3GCfEGqtKV5M5gCSrZlxkPGvEPCGDLNla7v48S662HSGwRd6/2cSneMQWiv+QzcttLrrOA==}
-    cpu: [x64]
-    os: [linux]
-
-  '@rollup/rollup-linux-x64-musl@4.14.2':
-    resolution: {integrity: sha512-8zfsQRQGH23O6qazZSFY5jP5gt4cFvRuKTpuBsC1ZnSWxV8ZKQpPqOZIUtdfMOugCcBvFGRa1pDC/tkf19EgBw==}
     cpu: [x64]
     os: [linux]
 
@@ -1635,29 +1575,14 @@ packages:
     cpu: [x64]
     os: [linux]
 
-  '@rollup/rollup-win32-arm64-msvc@4.14.2':
-    resolution: {integrity: sha512-H4s8UjgkPnlChl6JF5empNvFHp77Jx+Wfy2EtmYPe9G22XV+PMuCinZVHurNe8ggtwoaohxARJZbaH/3xjB/FA==}
-    cpu: [arm64]
-    os: [win32]
-
   '@rollup/rollup-win32-arm64-msvc@4.14.3':
     resolution: {integrity: sha512-+4h2WrGOYsOumDQ5S2sYNyhVfrue+9tc9XcLWLh+Kw3UOxAvrfOrSMFon60KspcDdytkNDh7K2Vs6eMaYImAZg==}
     cpu: [arm64]
     os: [win32]
 
-  '@rollup/rollup-win32-ia32-msvc@4.14.2':
-    resolution: {integrity: sha512-djqpAjm/i8erWYF0K6UY4kRO3X5+T4TypIqw60Q8MTqSBaQNpNXDhxdjpZ3ikgb+wn99svA7jxcXpiyg9MUsdw==}
-    cpu: [ia32]
-    os: [win32]
-
   '@rollup/rollup-win32-ia32-msvc@4.14.3':
     resolution: {integrity: sha512-T1l7y/bCeL/kUwh9OD4PQT4aM7Bq43vX05htPJJ46RTI4r5KNt6qJRzAfNfM+OYMNEVBWQzR2Gyk+FXLZfogGw==}
     cpu: [ia32]
-    os: [win32]
-
-  '@rollup/rollup-win32-x64-msvc@4.14.2':
-    resolution: {integrity: sha512-teAqzLT0yTYZa8ZP7zhFKEx4cotS8Tkk5XiqNMJhD4CpaWB1BHARE4Qy+RzwnXvSAYv+Q3jAqCVBS+PS+Yee8Q==}
-    cpu: [x64]
     os: [win32]
 
   '@rollup/rollup-win32-x64-msvc@4.14.3':
@@ -4020,11 +3945,6 @@ packages:
     resolution: {integrity: sha512-CHhPh+UNHD2GTXNYhPWLnU8ONHdI+5DI+4EYIAOaiD63rHeYlZvyh8P+in5999TTSFgUYuKUAjzRI4mdh/p+2A==}
     engines: {node: '>=8.0'}
 
-  rollup@4.14.2:
-    resolution: {integrity: sha512-WkeoTWvuBoFjFAhsEOHKRoZ3r9GfTyhh7Vff1zwebEFLEFjT1lG3784xEgKiTa7E+e70vsC81roVL2MP4tgEEQ==}
-    engines: {node: '>=18.0.0', npm: '>=8.0.0'}
-    hasBin: true
-
   rollup@4.14.3:
     resolution: {integrity: sha512-ag5tTQKYsj1bhrFC9+OEWqb5O6VYgtQDO9hPDBMmIbePwhfSr+ExlcU741t8Dhw5DkPCQf6noz0jb36D6W9/hw==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -4504,8 +4424,8 @@ packages:
       vue: ^3.0.0
       vuetify: ^3.0.0
 
-  vite@5.2.9:
-    resolution: {integrity: sha512-uOQWfuZBlc6Y3W/DTuQ1Sr+oIXWvqljLvS881SVmAj00d5RdgShLcuXWxseWPd4HXwiYBFW/vXHfKFeqj9uQnw==}
+  vite@5.2.10:
+    resolution: {integrity: sha512-PAzgUZbP7msvQvqdSD+ErD5qGnSFiGOoWmV5yAKUEI0kdhjbH6nMWVyZQC/hSc4aXwc0oJ9aEdIiF9Oje0JFCw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -5290,31 +5210,16 @@ snapshots:
     optionalDependencies:
       rollup: 4.14.3
 
-  '@rollup/rollup-android-arm-eabi@4.14.2':
-    optional: true
-
   '@rollup/rollup-android-arm-eabi@4.14.3':
-    optional: true
-
-  '@rollup/rollup-android-arm64@4.14.2':
     optional: true
 
   '@rollup/rollup-android-arm64@4.14.3':
     optional: true
 
-  '@rollup/rollup-darwin-arm64@4.14.2':
-    optional: true
-
   '@rollup/rollup-darwin-arm64@4.14.3':
     optional: true
 
-  '@rollup/rollup-darwin-x64@4.14.2':
-    optional: true
-
   '@rollup/rollup-darwin-x64@4.14.3':
-    optional: true
-
-  '@rollup/rollup-linux-arm-gnueabihf@4.14.2':
     optional: true
 
   '@rollup/rollup-linux-arm-gnueabihf@4.14.3':
@@ -5323,61 +5228,31 @@ snapshots:
   '@rollup/rollup-linux-arm-musleabihf@4.14.3':
     optional: true
 
-  '@rollup/rollup-linux-arm64-gnu@4.14.2':
-    optional: true
-
   '@rollup/rollup-linux-arm64-gnu@4.14.3':
-    optional: true
-
-  '@rollup/rollup-linux-arm64-musl@4.14.2':
     optional: true
 
   '@rollup/rollup-linux-arm64-musl@4.14.3':
     optional: true
 
-  '@rollup/rollup-linux-powerpc64le-gnu@4.14.2':
-    optional: true
-
   '@rollup/rollup-linux-powerpc64le-gnu@4.14.3':
-    optional: true
-
-  '@rollup/rollup-linux-riscv64-gnu@4.14.2':
     optional: true
 
   '@rollup/rollup-linux-riscv64-gnu@4.14.3':
     optional: true
 
-  '@rollup/rollup-linux-s390x-gnu@4.14.2':
-    optional: true
-
   '@rollup/rollup-linux-s390x-gnu@4.14.3':
-    optional: true
-
-  '@rollup/rollup-linux-x64-gnu@4.14.2':
     optional: true
 
   '@rollup/rollup-linux-x64-gnu@4.14.3':
     optional: true
 
-  '@rollup/rollup-linux-x64-musl@4.14.2':
-    optional: true
-
   '@rollup/rollup-linux-x64-musl@4.14.3':
-    optional: true
-
-  '@rollup/rollup-win32-arm64-msvc@4.14.2':
     optional: true
 
   '@rollup/rollup-win32-arm64-msvc@4.14.3':
     optional: true
 
-  '@rollup/rollup-win32-ia32-msvc@4.14.2':
-    optional: true
-
   '@rollup/rollup-win32-ia32-msvc@4.14.3':
-    optional: true
-
-  '@rollup/rollup-win32-x64-msvc@4.14.2':
     optional: true
 
   '@rollup/rollup-win32-x64-msvc@4.14.3':
@@ -5670,9 +5545,9 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-vue@5.0.4(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))':
+  '@vitejs/plugin-vue@5.0.4(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))':
     dependencies:
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
       vue: 3.4.21(typescript@5.4.5)
 
   '@vitest/expect@1.5.0':
@@ -8168,27 +8043,6 @@ snapshots:
       sprintf-js: 1.1.3
     optional: true
 
-  rollup@4.14.2:
-    dependencies:
-      '@types/estree': 1.0.5
-    optionalDependencies:
-      '@rollup/rollup-android-arm-eabi': 4.14.2
-      '@rollup/rollup-android-arm64': 4.14.2
-      '@rollup/rollup-darwin-arm64': 4.14.2
-      '@rollup/rollup-darwin-x64': 4.14.2
-      '@rollup/rollup-linux-arm-gnueabihf': 4.14.2
-      '@rollup/rollup-linux-arm64-gnu': 4.14.2
-      '@rollup/rollup-linux-arm64-musl': 4.14.2
-      '@rollup/rollup-linux-powerpc64le-gnu': 4.14.2
-      '@rollup/rollup-linux-riscv64-gnu': 4.14.2
-      '@rollup/rollup-linux-s390x-gnu': 4.14.2
-      '@rollup/rollup-linux-x64-gnu': 4.14.2
-      '@rollup/rollup-linux-x64-musl': 4.14.2
-      '@rollup/rollup-win32-arm64-msvc': 4.14.2
-      '@rollup/rollup-win32-ia32-msvc': 4.14.2
-      '@rollup/rollup-win32-x64-msvc': 4.14.2
-      fsevents: 2.3.3
-
   rollup@4.14.3:
     dependencies:
       '@types/estree': 1.0.5
@@ -8665,7 +8519,7 @@ snapshots:
       debug: 4.3.4(supports-color@5.5.0)
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -8676,15 +8530,15 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-comlink@4.0.2(comlink@4.4.1)(vite@5.2.9(@types/node@20.12.7)):
+  vite-plugin-comlink@4.0.2(comlink@4.4.1)(vite@5.2.10(@types/node@20.12.7)):
     dependencies:
       comlink: 4.4.1
       json5: 2.2.3
       magic-string: 0.30.5
       source-map: 0.7.4
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
 
-  vite-plugin-dts@3.8.1(@types/node@20.12.7)(rollup@4.14.3)(typescript@5.4.5)(vite@5.2.9(@types/node@20.12.7)):
+  vite-plugin-dts@3.8.1(@types/node@20.12.7)(rollup@4.14.3)(typescript@5.4.5)(vite@5.2.10(@types/node@20.12.7)):
     dependencies:
       '@microsoft/api-extractor': 7.43.0(@types/node@20.12.7)
       '@rollup/pluginutils': 5.1.0(rollup@4.14.3)
@@ -8695,13 +8549,13 @@ snapshots:
       typescript: 5.4.5
       vue-tsc: 1.8.27(typescript@5.4.5)
     optionalDependencies:
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
 
-  vite-plugin-inspect@0.8.3(rollup@4.14.3)(vite@5.2.9(@types/node@20.12.7)):
+  vite-plugin-inspect@0.8.3(rollup@4.14.3)(vite@5.2.10(@types/node@20.12.7)):
     dependencies:
       '@antfu/utils': 0.7.7
       '@rollup/pluginutils': 5.1.0(rollup@4.14.3)
@@ -8712,36 +8566,36 @@ snapshots:
       perfect-debounce: 1.0.0
       picocolors: 1.0.0
       sirv: 2.0.4
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
     transitivePeerDependencies:
       - rollup
       - supports-color
 
-  vite-plugin-node@3.1.0(vite@5.2.9(@types/node@20.12.7)):
+  vite-plugin-node@3.1.0(vite@5.2.10(@types/node@20.12.7)):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       chalk: 4.1.2
       debug: 4.3.4(supports-color@5.5.0)
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vuetify@2.0.3(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14):
+  vite-plugin-vuetify@2.0.3(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14):
     dependencies:
       '@vuetify/loader-shared': 2.0.3(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.21(typescript@5.4.5)))(vue@3.4.21(typescript@5.4.5)))
       debug: 4.3.4(supports-color@5.5.0)
       upath: 2.0.1
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
       vue: 3.4.21(typescript@5.4.5)
       vuetify: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.21(typescript@5.4.5)))(vue@3.4.21(typescript@5.4.5))
     transitivePeerDependencies:
       - supports-color
 
-  vite@5.2.9(@types/node@20.12.7):
+  vite@5.2.10(@types/node@20.12.7):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
-      rollup: 4.14.2
+      rollup: 4.14.3
     optionalDependencies:
       '@types/node': 20.12.7
       fsevents: 2.3.3
@@ -8765,7 +8619,7 @@ snapshots:
       strip-literal: 2.0.0
       tinybench: 2.6.0
       tinypool: 0.8.3
-      vite: 5.2.9(@types/node@20.12.7)
+      vite: 5.2.10(@types/node@20.12.7)
       vite-node: 1.5.0(@types/node@20.12.7)
       why-is-node-running: 2.2.2
     optionalDependencies:
@@ -8858,7 +8712,7 @@ snapshots:
       vue: 3.4.21(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
-      vite-plugin-vuetify: 2.0.3(vite@5.2.9(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
+      vite-plugin-vuetify: 2.0.3(vite@5.2.10(@types/node@20.12.7))(vue@3.4.21(typescript@5.4.5))(vuetify@3.5.14)
       vue-i18n: 9.8.0(vue@3.4.21(typescript@5.4.5))
 
   w3c-keyname@2.2.8: {}

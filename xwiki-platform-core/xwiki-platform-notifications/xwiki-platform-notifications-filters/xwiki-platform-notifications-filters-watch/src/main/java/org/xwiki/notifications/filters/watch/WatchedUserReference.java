@@ -20,9 +20,12 @@
 package org.xwiki.notifications.filters.watch;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.apache.commons.compress.utils.Sets;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -89,6 +92,13 @@ public class WatchedUserReference implements WatchedEntityReference
             watchedStatus = WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
         }
         return watchedStatus;
+    }
+
+    @Override
+    public Optional<Pair<EntityReference, WatchedStatus>> getFirstFilteredAncestor(UserReference userReference)
+        throws NotificationException
+    {
+        return Optional.empty();
     }
 
     @Override

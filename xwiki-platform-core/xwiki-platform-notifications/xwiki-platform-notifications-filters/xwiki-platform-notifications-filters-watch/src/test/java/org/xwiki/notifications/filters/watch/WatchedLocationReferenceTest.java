@@ -27,10 +27,14 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -66,21 +70,30 @@ class WatchedLocationReferenceTest
     private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @BeforeEach
-    void setup()
+    void setup() throws ComponentLookupException
     {
+        ComponentManager componentManager = mock(ComponentManager.class);
         this.entityReference = mock(EntityReference.class);
         this.resolver = mock(EntityReferenceResolver.class);
         this.stateComputer = mock(ScopeNotificationFilterLocationStateComputer.class);
         this.notificationFilterPreferenceManager = mock(NotificationFilterPreferenceManager.class);
         this.userReferenceSerializer = mock(UserReferenceSerializer.class);
         this.serializedReference = "xwiki:XWiki.Location";
+        EntityReferenceSerializer<String> serializer = mock(EntityReferenceSerializer.class);
 
-        this.watchedLocationReference = new WatchedLocationReference(this.entityReference,
-            this.serializedReference,
-            this.resolver,
-            this.stateComputer,
-            this.notificationFilterPreferenceManager,
-            this.userReferenceSerializer);
+        when(componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class))).thenReturn(this.resolver);
+        when(componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class))).thenReturn(serializer);
+        when(componentManager.getInstance(ScopeNotificationFilterLocationStateComputer.class))
+            .thenReturn(this.stateComputer);
+        when(componentManager.getInstance(NotificationFilterPreferenceManager.class))
+            .thenReturn(this.notificationFilterPreferenceManager);
+        when(componentManager.getInstance(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document"))
+            .thenReturn(this.userReferenceSerializer);
+        when(serializer.serialize(entityReference)).thenReturn(serializedReference);
+        this.watchedLocationReference = new WatchedLocationReference(this.entityReference, componentManager);
     }
 
     @Test

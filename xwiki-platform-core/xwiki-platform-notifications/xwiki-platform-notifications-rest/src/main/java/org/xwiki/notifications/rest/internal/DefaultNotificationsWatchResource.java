@@ -42,10 +42,18 @@ import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
+/**
+ * Default implementation of {@link NotificationsWatchResource}.
+ *
+ * @version $Id$
+ * @since 16.4.0RC1
+ */
 @Component
 @Named("org.xwiki.notifications.rest.internal.DefaultNotificationsWatchResource")
 public class DefaultNotificationsWatchResource extends XWikiResource implements NotificationsWatchResource
 {
+    private static final String GUEST_USER_ERROR_MESSAGE = "Only logged-in users can access this.";
+
     @Inject
     private WatchedEntitiesManager watchedEntitiesManager;
 
@@ -56,20 +64,41 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
+    private void checkPageArguments(String wikiName, String spaceNames, String pageName)
+    {
+        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames) || StringUtils.isEmpty(pageName)) {
+            throw new IllegalArgumentException(
+                String.format("wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)",
+                    wikiName, spaceNames, pageName));
+        }
+    }
+
+    private void checkWikiArgument(String wikiName)
+    {
+        if (StringUtils.isEmpty(wikiName)) {
+            throw new IllegalArgumentException(
+                String.format("wikiName must be not null. Current value: [%s]", wikiName));
+        }
+    }
+
+    private void checkSpaceArguments(String wikiName, String spaceNames)
+    {
+        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames)) {
+            throw new IllegalArgumentException(
+                String.format("wikiName and spaceNames must be not null. Current value: [%s:%s]",
+                    wikiName, spaceNames));
+        }
+    }
+
     @Override
     public Response getPageWatchStatus(String wikiName, String spaceNames, String pageName) throws Exception
     {
         UserReference user = getUser();
         if (user == GuestUserReference.INSTANCE) {
-            return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(),
-                "Only logged-in users can access this.").build();
+            return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(), GUEST_USER_ERROR_MESSAGE).build();
         }
         List<String> spaces = parseSpaceSegments(spaceNames);
-        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames) || StringUtils.isEmpty(pageName)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)",
-                    wikiName, spaces, pageName));
-        }
+        checkPageArguments(wikiName, spaceNames, pageName);
         DocumentReference documentReference = new DocumentReference(wikiName, spaces, pageName);
         WatchedLocationReference watchedLocationReference =
             this.watchedEntityFactory.createWatchedLocationReference(documentReference);
@@ -86,8 +115,7 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     {
         UserReference user = getUser();
         if (user == GuestUserReference.INSTANCE) {
-            return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(),
-                "Only logged-in users can access this.").build();
+            return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(), GUEST_USER_ERROR_MESSAGE).build();
         }
 
         WatchedLocationReference watchedLocationReference =
@@ -104,21 +132,14 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     @Override
     public Response watchWiki(String wikiName, boolean ignore) throws Exception
     {
-        if (StringUtils.isEmpty(wikiName)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName must be not null. Current value: [%s]", wikiName));
-        }
+        checkWikiArgument(wikiName);
         return watchLocation(new WikiReference(wikiName), ignore);
     }
 
     @Override
     public Response watchSpace(String wikiName, String spaceNames, boolean ignore) throws Exception
     {
-        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName and spaceNames must be not null. Current value: [%s:%s]",
-                    wikiName, spaceNames));
-        }
+        checkSpaceArguments(wikiName, spaceNames);
         List<String> spaces = parseSpaceSegments(spaceNames);
         SpaceReference spaceReference = new SpaceReference(wikiName, spaces);
         return watchLocation(spaceReference, ignore);
@@ -127,11 +148,7 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     @Override
     public Response watchPage(String wikiName, String spaceNames, String pageName, boolean ignore) throws Exception
     {
-        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames) || StringUtils.isEmpty(pageName)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)",
-                    wikiName, spaceNames, pageName));
-        }
+        checkPageArguments(wikiName, spaceNames, pageName);
         List<String> spaces = parseSpaceSegments(spaceNames);
         DocumentReference documentReference = new DocumentReference(wikiName, spaces, pageName);
         return watchLocation(documentReference, ignore);
@@ -141,8 +158,7 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     {
         UserReference user = getUser();
         if (user == GuestUserReference.INSTANCE) {
-            return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(),
-                "Only logged-in users can access this.").build();
+            return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(), GUEST_USER_ERROR_MESSAGE).build();
         }
 
         WatchedLocationReference watchedLocationReference =
@@ -154,22 +170,14 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     @Override
     public Response unwatchWiki(String wikiName) throws Exception
     {
-        if (StringUtils.isEmpty(wikiName)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName must be not null. Current value: [%s]", wikiName));
-        }
-
+        checkWikiArgument(wikiName);
         return unwatchLocation(new WikiReference(wikiName));
     }
 
     @Override
     public Response unwatchSpace(String wikiName, String spaceNames) throws Exception
     {
-        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName and spaceNames must be not null. Current value: [%s:%s]",
-                    wikiName, spaceNames));
-        }
+        checkSpaceArguments(wikiName, spaceNames);
         List<String> spaces = parseSpaceSegments(spaceNames);
         SpaceReference spaceReference = new SpaceReference(wikiName, spaces);
         return unwatchLocation(spaceReference);
@@ -178,11 +186,7 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     @Override
     public Response unwatchPage(String wikiName, String spaceNames, String pageName) throws Exception
     {
-        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames) || StringUtils.isEmpty(pageName)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)",
-                    wikiName, spaceNames, pageName));
-        }
+        checkPageArguments(wikiName, spaceNames, pageName);
         List<String> spaces = parseSpaceSegments(spaceNames);
         DocumentReference documentReference = new DocumentReference(wikiName, spaces, pageName);
         return unwatchLocation(documentReference);

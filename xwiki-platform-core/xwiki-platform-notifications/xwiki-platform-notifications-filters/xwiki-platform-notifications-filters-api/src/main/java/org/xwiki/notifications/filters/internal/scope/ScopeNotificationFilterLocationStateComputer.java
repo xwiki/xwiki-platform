@@ -152,6 +152,8 @@ public class ScopeNotificationFilterLocationStateComputer
         Optional<WatchedLocationState> result = Optional.empty();
         boolean match = false;
         Date startingDate = null;
+        // note that the hierarchy is not a real hierarchy: it depends on whether the filter are inclusive or
+        // exclusive so two inclusive filters are never parent of each other.
         Iterator<ScopeNotificationFilterPreference> inclusiveFiltersIterator =
             preferencesHierarchy.getInclusiveFiltersThatHasNoParents();
 
@@ -168,8 +170,13 @@ public class ScopeNotificationFilterLocationStateComputer
                 // Then it means we watch this location
                 match = true;
                 exactMatch = isExactMatch;
-                spaceMatch = isSpaceMatch;
+                // If we found an exact space match then we want to keep it true
+                spaceMatch |= isSpaceMatch;
                 startingDate = pref.getStartingDate();
+                // if it's an exact match there's no point on checking other filters
+                if (exactMatch) {
+                    break;
+                }
             }
         }
         if (match) {

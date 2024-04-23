@@ -24,12 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.notifications.filters.watch.WatchedLocationReference;
@@ -47,15 +45,6 @@ import org.xwiki.user.UserReferenceSerializer;
 public class DefaultWatchedEntityFactory implements WatchedEntityFactory
 {
     @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    @Inject
-    private EntityReferenceResolver<String> resolver;
-
-    @Inject
-    private ScopeNotificationFilterLocationStateComputer stateComputer;
-
-    @Inject
     private EventUserFilterPreferencesGetter eventUserFilterPreferencesGetter;
 
     @Inject
@@ -65,11 +54,14 @@ public class DefaultWatchedEntityFactory implements WatchedEntityFactory
     @Named("document")
     private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
     @Override
     public WatchedLocationReference createWatchedLocationReference(EntityReference location)
     {
-        return new WatchedLocationReference(location, serializer.serialize(location), resolver, stateComputer,
-                notificationFilterPreferenceManager, userReferenceSerializer);
+        return new WatchedLocationReference(location, componentManager);
     }
 
     @Override

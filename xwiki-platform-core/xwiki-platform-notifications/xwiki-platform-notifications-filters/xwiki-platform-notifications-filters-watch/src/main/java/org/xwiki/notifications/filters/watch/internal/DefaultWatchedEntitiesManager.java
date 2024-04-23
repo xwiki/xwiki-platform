@@ -22,7 +22,6 @@ package org.xwiki.notifications.filters.watch.internal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -191,18 +190,7 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     {
         // If the notifications are enabled and the entity is already in the desired state, then we have nothing to do
         WatchedEntityReference.WatchedStatus watchedStatus = entity.getWatchedStatus(user);
-        List<WatchedEntityReference.WatchedStatus> watchedStatusList = List.of(
-            WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
-            WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
-            WatchedEntityReference.WatchedStatus.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
-        );
-        List<WatchedEntityReference.WatchedStatus> blockedStatusList = List.of(
-            WatchedEntityReference.WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS,
-            WatchedEntityReference.WatchedStatus.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
-            WatchedEntityReference.WatchedStatus.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
-        );
-        return (desiredState && watchedStatusList.contains(watchedStatus))
-            || (!desiredState && blockedStatusList.contains(watchedStatus));
+        return (desiredState && watchedStatus.isWatched()) || (!desiredState && watchedStatus.isBlocked());
     }
 
     private void enableOrDeleteFilter(boolean enable, NotificationFilterPreference notificationFilterPreference,

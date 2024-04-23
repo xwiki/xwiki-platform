@@ -26,7 +26,7 @@
     "@gouvminint/vue-dsfr": "5.11.0",
     "inversify": "6.0.2",
     "oh-vue-icons": "1.0.0-rc3",
-    "vue": "3.4.21",
+    "vue": "3.4.24",
     "vue-i18n": "9.8.0",
     "vue-router": "4.3.0",
     "vuetify": "3.5.14"

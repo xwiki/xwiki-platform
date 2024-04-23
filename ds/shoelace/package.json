@@ -24,7 +24,7 @@
     "@cristal/api": "workspace:^",
     "@shoelace-style/shoelace": "2.15.0",
     "inversify": "6.0.2",
-    "vue": "3.4.21"
+    "vue": "3.4.24"
   },
   "devDependencies": {
     "@cristal/dev-config": "workspace:*",

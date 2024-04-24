@@ -1,19 +1,19 @@
 # Cristal
 
 <span>
-<img src="https://cristal.xwiki.org/xwiki/bin/download/Main/WebHome/main.png?rev=1.3" alt="Wireframe of a Cristal 
+<img src="https://cristal.xwiki.org/xwiki/bin/download/Main/WebHome/main.png" alt="Wireframe of a Cristal 
 Page" style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2)">
 </span>
 
 ## What's Cristal
 
 * A new [xwiki.org](xwiki.org) project to provide a modern knowledge base front-end
-* A wiki UI to rule them all: Provide a UI that can be plugged onto various content backends (XWiki, local file 
-  system, GitHub, etc.)
+* A wiki UI to rule them all: Provide a UI that can be plugged onto various content backends (XWiki, local file system,
+  GitHub, etc.)
 * Usable in various forms:
   * From a URL in your browser
   * Executable locally on your computer (Electron application).
-  * Embeddable in backends. For example, the intent on the long run is to have Cristal be used by [XWiki](xwiki.org) as 
+  * Embeddable in backends. For example, the intent on the long run is to have Cristal be used by [XWiki](xwiki.org) as
     its native UI
 * Ability to work offline, reconnect, and sync content.
 
@@ -25,16 +25,17 @@ Page" style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2)">
 
 ## Useful links
 
-* [Roadmap](/xwiki/bin/view/Roadmaps/)
-* [Architecture](/xwiki/bin/view/Architecture/)
-* [Technological Choices](/xwiki/bin/view/TechnologicalChoices/)
-* [Wireframes](/xwiki/bin/view/Wireframes/)
-* [UI Components](/xwiki/bin/view/UIComponents/)
-* [Backends](/xwiki/bin/view/Backends/)
+* [Roadmap](https://cristal.xwiki.org/xwiki/bin/view/Roadmaps/)
+* [Architecture](https://cristal.xwiki.org/xwiki/bin/view/Architecture/)
+* [Technological Choices](https://cristal.xwiki.org/xwiki/bin/view/TechnologicalChoices/)
+* [Wireframes](https://cristal.xwiki.org/xwiki/bin/view/Wireframes/)
+* [UI Components](https://cristal.xwiki.org/xwiki/bin/view/UIComponents/)
+* [Backends](https://cristal.xwiki.org/xwiki/bin/view/Backends/)
 * [GitHub repository](https://github.com/xwiki-contrib/cristal/)
 * [Forum](https://forum.xwiki.org/c/cristal/)
 
 ## Project details
+
 * Project Lead: [Manuel Leduc](https://www.xwiki.org/xwiki/bin/view/XWiki/mleduc)
 * Documentation & Downloads: N/A <!-- [Documentation & Download](https://extensions.xwiki.org/xwiki/bin/view/Extension/
   (extension

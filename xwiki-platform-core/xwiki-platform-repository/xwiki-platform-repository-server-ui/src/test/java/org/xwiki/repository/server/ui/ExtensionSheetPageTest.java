@@ -68,7 +68,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  * @since 15.10.9
- * @since 16.3.0RC1
+ * @since 16.3.0
  */
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList

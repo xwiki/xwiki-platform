@@ -319,7 +319,7 @@
   color: black;
 }
 .panel-radio {
-  padding: 10px 15px;
+  padding: 8px 15px;
 }</code>
     </property>
     <property>
@@ -509,16 +509,16 @@
   #set ($watchModalDescription = 'There is no watch settings for this page: you won''t receive notifications for it.')
 #elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
   #set ($watchIcon = 'fa-bell-slash')
-  #set ($watchText = 'Ignored')
-  #set ($watchModalDescription = 'This page is ignored: you won''t receive any notifications for it.')
+  #set ($watchText = 'Blocked')
+  #set ($watchModalDescription = 'This page is blocked: you won''t receive any notifications for it.')
 #elseif ($watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
   #set ($watchIcon = 'fa-bell-slash')
-  #set ($watchText = 'Ignored')
-  #set ($watchModalDescription = 'This page is ignored through another page in the hierarchy: you won''t receive any notifications for it.')
+  #set ($watchText = 'Blocked')
+  #set ($watchModalDescription = 'This page is blocked through another page in the hierarchy: you won''t receive any notifications for it.')
 #elseif ($watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
   #set ($watchIcon = 'fa-bell-slash')
-  #set ($watchText = 'Ignored')
-  #set ($watchModalDescription = 'This page and its children are ignored: you won''t receive any notifications for it.')
+  #set ($watchText = 'Blocked')
+  #set ($watchModalDescription = 'This page and its children are blocked: you won''t receive any notifications for it.')
 #else
   #set ($watchIcon = 'fa-bullhorn')
   #set ($watchText = 'Custom')
@@ -696,11 +696,11 @@
             &lt;div class="panel-heading" role="tab" id="heading-unwatch-space"&gt;
               &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-unwatch-space" aria-controls="xhint-unwatch-space"&gt;
                 &lt;h4 class="panel-title" id="title-unwatch-space"&gt;
-                  &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt;  Unfollow current space
+                  &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt;  Unfollow current page and its children
                 &lt;/h4&gt;
               &lt;/a&gt;
             &lt;/div&gt;&lt;!-- end panel heading --&gt;
-            &lt;div id="xhint-unwatch-page" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-unwatch-space"&gt;
+            &lt;div id="xhint-unwatch-space" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-unwatch-space"&gt;
               &lt;div class="panel-body xHint"&gt;
                  By selecting that option, you will remove existing filter that allows to watch that page and its children so you won't receive notifications for those. However, since you're not blocking explicitely notifications, you might again receive notifications for that page if another filter is created in the hierarchy to watch page and children or to watch the whole wiki. Similarly if one or several of the children of this page have a watch filter you might still receive notifications for them.
                &lt;/div&gt;
@@ -767,11 +767,174 @@
           If none of the above actions suits your need you can also go to #_displayReferenceInModal($ancestorRef) for modifying the watch settings there: this is the first location with a filter impacting current page.
           #end
           #elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
-          ## TODO
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-page" value="watchPage" aria-labelledby="title-watch-page" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-watch-page"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-watch-page" aria-controls="xhint-watch-page"&gt;
+                &lt;h4 class="panel-title" id="title-watch-page"&gt;
+                  &lt;span class="fa fa-file"&gt;&lt;/span&gt; Follow current page
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-watch-page" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-watch-page"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will start receiving notifications for that page only.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #if (!$isTerminal)
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-space" value="watchSpace" aria-labelledby="title-watch-space" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-watch-space"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-watch-space" aria-controls="xhint-watch-space"&gt;
+                &lt;h4 class="panel-title" id="title-watch-space"&gt;
+                  &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt; Block current page and its children
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-watch-space" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-watch-space"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will start receiving notifications for that page and all of its children.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #end
+          #if ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isWatched())
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-unblock-page" value="unblockPage" aria-labelledby="title-unblock-page" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-unblock-page"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-unblock-page" aria-controls="xhint-unblock-page"&gt;
+                &lt;h4 class="panel-title" id="title-unblock-page"&gt;
+                  &lt;span class="fa fa-file"&gt;&lt;/span&gt;  Unblock current page
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-unblock-page" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-unblock-page"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will remove existing filter that allows to block that page so you will receive notifications for that page. However, since you're not watching it explicitely, you might again have notifications blocked for that page if another filter is created in the hierarchy to block page and children.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+           #end
           #elseif ($watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
-          ## TODO
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-page" value="watchPage" aria-labelledby="title-watch-page" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-watch-page"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-watch-page" aria-controls="xhint-watch-page"&gt;
+                &lt;h4 class="panel-title" id="title-watch-page"&gt;
+                  &lt;span class="fa fa-file"&gt;&lt;/span&gt; Follow current page
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-watch-page" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-watch-page"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will start receiving notifications for that page only.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-space" value="watchSpace" aria-labelledby="title-watch-space" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-watch-space"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-watch-space" aria-controls="xhint-watch-space"&gt;
+                &lt;h4 class="panel-title" id="title-watch-space"&gt;
+                  &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt; Follow current page and its children
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-watch-space" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-watch-space"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will start receiving notifications for that page and all of its children.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #if ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isWatched())
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-unblock-space" value="unblockSpace" aria-labelledby="title-unblock-space" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-unblock-space"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-unblock-space" aria-controls="xhint-unblock-space"&gt;
+                &lt;h4 class="panel-title" id="title-unblock-space"&gt;
+                  &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt;  Unblock current page and its children
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-unblock-space" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-unblock-space"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will remove existing filter that allows to block that page and its children so you will receive notifications for those. However, since you're not following explicitely them, you might again have notifications blocked for that page if another filter is created in the hierarchy to block page and children. Similarly if one or several of the children of this page have a block filter you will have notifications blocked for them.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+           #end
           #elseif ($watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
-          ## TODO
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-page" value="watchPage" aria-labelledby="title-watch-page" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-watch-page"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-watch-page" aria-controls="xhint-watch-page"&gt;
+                &lt;h4 class="panel-title" id="title-watch-page"&gt;
+                  &lt;span class="fa fa-file"&gt;&lt;/span&gt; Follow current page
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-watch-page" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-watch-page"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will start receiving notifications for that page only.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #if (!$isTerminal)
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-watch-space" value="watchSpace" aria-labelledby="title-watch-space" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-watch-space"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-watch-space" aria-controls="xhint-watch-space"&gt;
+                &lt;h4 class="panel-title" id="title-watch-space"&gt;
+                  &lt;span class="fa fa-sitemap"&gt;&lt;/span&gt; Follow current page and its children
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-watch-space" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-watch-space"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will start receiving notifications for that page and all of its children.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #end
+          #if ($ancestorRef.type == 'WIKI')
+          &lt;div class="panel panel-default"&gt;
+            &lt;div class="panel-radio"&gt;
+              &lt;input type="radio" name="watch-option" id="option-unblock-wiki" value="unblockWiki" aria-labelledby="title-unblock-wiki" /&gt;
+            &lt;/div&gt;
+            &lt;div class="panel-heading" role="tab" id="heading-unblock-wiki"&gt;
+              &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-unblock-wiki" aria-controls="xhint-unblock-wiki"&gt;
+                &lt;h4 class="panel-title" id="title-unblock-wiki"&gt;
+                  &lt;span class="fa fa-globe"&gt;&lt;/span&gt; Unblock current wiki
+                &lt;/h4&gt;
+              &lt;/a&gt;
+            &lt;/div&gt;&lt;!-- end panel heading --&gt;
+            &lt;div id="xhint-unblock-wiki" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-unblock-wiki"&gt;
+              &lt;div class="panel-body xHint"&gt;
+                 By selecting that option, you will remove existing filter that blocks notifications for any page on the whole wiki. So it will impact this page and you will receive notifications anymore for it, but it will impact also other pages on the wiki for which you will also receive notifications after the change.
+               &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+          &lt;/div&gt;&lt;!-- end panel --&gt;
+          #end
+          #if ($ancestorRef.type == 'SPACE')
+          If none of the above actions suits your need you can also go to #_displayReferenceInModal($ancestorRef) for modifying the watch settings there: this is the first location with a filter impacting current page.
+          #end
           #end
         &lt;/div&gt;&lt;!-- end panel group --&gt;
         &lt;div class="modal-body-footer"&gt;

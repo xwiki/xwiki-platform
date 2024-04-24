@@ -599,7 +599,10 @@ require(['scriptaculous/effects'], function() {
 .panel-width-Small .applicationPanelMoreButton {
   flex-direction: column;
   padding: 0;
-  text-align: center;
+}
+
+.panel-width-Small .applicationPanelMoreButton .application-img  {
+  margin: auto;
 }
 
 .panel-width-Small .applicationPanelMoreButton .application-label {

@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
@@ -139,6 +140,11 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
         entryDescriptor.setIdProperty(ID_FIELD);
         meta.setEntryDescriptor(entryDescriptor);
+
+        LiveDataActionDescriptor deleteAction = new LiveDataActionDescriptor();
+        deleteAction.setId(DELETE);
+        deleteAction.setAllowProperty(DOC_HAS_DELETE_FIELD);
+        meta.setActions(List.of(deleteAction));
 
         meta.setPropertyDescriptors(List.of(
             getIDDescriptor(),

@@ -1,6 +1,6 @@
 {
   "name": "@cristal/editors-wikitext",
-  "version": "1.0.0",
+  "version": "0.6.0",
   "types": "dist/index.d.ts",
   "license": "AGPL-3.0",
   "repository": {

@@ -19,6 +19,10 @@
  */
 package org.xwiki.configuration.internal;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.when;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -27,9 +31,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultConfigurationSource}.
@@ -51,6 +52,10 @@ class DefaultConfigurationSourceTest
     @Named("xwikiproperties")
     private ConfigurationSource xwikiPropertiesSource;
 
+    @MockComponent
+    @Named("executionContext")
+    private ConfigurationSource executionContextSource;
+
     @Test
     void containsKey()
     {
@@ -60,10 +65,12 @@ class DefaultConfigurationSourceTest
         assertTrue(this.source.containsKey("key"));
 
         // Verify that the call order is correct
-        InOrder inOrder = inOrder(xwikiPropertiesSource, this.documentsSource);
+        InOrder inOrder = inOrder(xwikiPropertiesSource, this.documentsSource, this.executionContextSource);
         // First call
-        inOrder.verify(this.documentsSource).containsKey("key");
+        inOrder.verify(this.executionContextSource).containsKey("key");
         // Second call
+        inOrder.verify(this.documentsSource).containsKey("key");
+        // Third call
         inOrder.verify(xwikiPropertiesSource).containsKey("key");
     }
 }

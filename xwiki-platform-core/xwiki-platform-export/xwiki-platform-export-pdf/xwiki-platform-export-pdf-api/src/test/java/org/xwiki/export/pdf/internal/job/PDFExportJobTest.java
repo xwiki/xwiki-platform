@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -35,12 +36,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.TemporaryConfigurationExecutor;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
@@ -93,6 +98,9 @@ class PDFExportJobTest
     @MockComponent
     private PrintPreviewURLBuilder printPreviewURLBuilder;
 
+    @MockComponent
+    private TemporaryConfigurationExecutor temporaryConfigurationExecutor;
+
     private DocumentReference firstPageReference = new DocumentReference("test", "First", "Page");
 
     private DocumentRenderingResult firstPageRendering = new DocumentRenderingResult(this.firstPageReference,
@@ -128,6 +136,13 @@ class PDFExportJobTest
         this.request.setAuthorReference(this.bobReference);
         this.request.setDocuments(
             Arrays.asList(this.firstPageReference, this.secondPageReference, thirdPageReference, fourthPageReference));
+
+        when(this.temporaryConfigurationExecutor.call(eq("executionContext"),
+            eq(Map.of("rendering.imageDimensionsIncludedInImageURL", false)), any())).thenAnswer(invocation -> {
+                @SuppressWarnings("unchecked")
+                Callable<Void> callable = (Callable<Void>) invocation.getArgument(2);
+                return callable.call();
+            });
 
         when(this.authorization.hasAccess(Right.VIEW, this.aliceReference, this.firstPageReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.VIEW, this.aliceReference, this.secondPageReference)).thenReturn(true);

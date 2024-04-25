@@ -31,9 +31,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.icon.IconException;
-import org.xwiki.icon.IconManager;
-import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataEntryDescriptor;
 import org.xwiki.livedata.LiveDataException;
@@ -126,9 +123,6 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private NotificationFilterLiveDataTranslationHelper translationHelper;
 
     @Inject
-    private IconManager iconManager;
-
-    @Inject
     private Logger logger;
 
     @Override
@@ -145,18 +139,6 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         LiveDataEntryDescriptor entryDescriptor = new LiveDataEntryDescriptor();
         entryDescriptor.setIdProperty(ID_FIELD);
         meta.setEntryDescriptor(entryDescriptor);
-
-        LiveDataActionDescriptor deleteAction = new LiveDataActionDescriptor();
-        deleteAction.setName(this.l10n.getTranslationPlain("liveData.action.delete"));
-        deleteAction.setId(DELETE);
-        deleteAction.setAllowProperty(DOC_HAS_DELETE_FIELD);
-        try {
-            // FIXME: we should map delete action icon to the cross..
-            deleteAction.setIcon(this.iconManager.getMetaData("cross"));
-        } catch (IconException e) {
-            this.logger.error("Error while getting icon for the remove action", e);
-        }
-        meta.setActions(List.of(deleteAction));
 
         meta.setPropertyDescriptors(List.of(
             getIDDescriptor(),

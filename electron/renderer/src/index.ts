@@ -41,7 +41,7 @@ CristalAppLoader.init(
   "./config.json",
   true,
   true,
-  "FileSystem",
+  "FileSystemSL",
   (container: Container) => {
     new ComponentInit(container);
   },

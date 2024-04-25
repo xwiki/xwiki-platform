@@ -45,7 +45,14 @@ export class CristalAppLoader extends CristalLoader {
 
     if (isElectron) {
       const localConfigName = window.localStorage.getItem("currentApp");
-      if (localConfigName != null) configName = localConfigName;
+      if (
+        localConfigName != null &&
+        this.cristal.getAvailableConfigurations().has(localConfigName)
+      ) {
+        configName = localConfigName;
+      } else {
+        configName = "FileSystemSL";
+      }
     } else {
       configName = this.getConfigFromPathName(window.location.pathname);
     }

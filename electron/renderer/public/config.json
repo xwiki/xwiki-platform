@@ -6,6 +6,13 @@
     "offline": false,
     "designSystem": "vuetify"
   },
+  "FileSystemSL": {
+    "name": "FileSystemSL",
+    "configType": "FileSystem",
+    "serverRendering": false,
+    "offline": false,
+    "designSystem": "shoelace"
+  },
   "XWiki": {
     "name": "XWiki",
     "configType": "XWiki",

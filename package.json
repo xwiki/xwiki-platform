@@ -9,13 +9,13 @@
   "packageManager": "pnpm@9.0.5",
   "scripts": {
     "clean": "nx run-many -t clean",
-    "dev": "nx dev @cristal/web",
+    "dev": "nx build @cristal/web && nx dev @cristal/web",
     "build": "nx run-many -t build --nxBail=true",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
     "start": "nx run @cristal/web:start",
     "quickstart": "nx run @cristal/web:quickstart",
-    "start:electron": "nx run @cristal/electron:start"
+    "start:electron": "nx build @cristal/electron-main && nx build @cristal/electron-renderer && nx run @cristal/electron:start"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "7.6.0",

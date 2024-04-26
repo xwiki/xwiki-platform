@@ -91,6 +91,12 @@
       <artifactId>bootstrap-select</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

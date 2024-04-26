@@ -4,7 +4,7 @@
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "main": "./main/dist/index.cjs",
   "scripts": {
     "clean": "rimraf dist",

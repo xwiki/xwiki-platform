@@ -1,6 +1,6 @@
 {
   "name": "@cristal/api",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "types": "dist/index.d.ts",
   "type": "module",
   "license": "AGPL-3.0",

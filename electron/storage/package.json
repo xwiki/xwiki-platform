@@ -1,6 +1,6 @@
 {
   "name": "@cristal/electron-storage",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "types": "dist/main/index.d.ts",
   "license": "AGPL-3.0",
   "exports": {

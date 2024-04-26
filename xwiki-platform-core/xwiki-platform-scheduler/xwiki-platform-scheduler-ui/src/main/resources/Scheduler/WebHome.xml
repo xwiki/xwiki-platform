@@ -41,7 +41,8 @@
 ##
 #set ($scheduler = $xwiki.scheduler)
 ##
-## If the sheet is called with an action ($request.do), let us first process this action
+## If the sheet is called with an action ($request.do), let us first process this action after checking the user has
+## programming rights.
 ## Possible values are : "schedule", "pause", "resume", "unschedule", "delete"
 ##
 #if ("$!request.do" != '' &amp;&amp; "$!request.which" != '')
@@ -51,11 +52,17 @@
   #set ($tJobHolder = $request.which)
   #set ($jobDoc = $xwiki.getDocument($tJobHolder))
   #set ($jobObj = $jobDoc.getObject('XWiki.SchedulerJobClass'))
-  #if (!$services.csrf.isTokenValid($request.form_token))
+  #if (!$services.security.authorization.hasAccess('programming', $xcontext.userReference, $doc.documentReference))
+     ##
+     ## Check that the user has programming rights
+     ##
+     {{error}}{{translation key='xe.scheduler.missingProgrammingRights'/}}{{/error}}
+
+  #elseif (!$services.csrf.isTokenValid($request.form_token))
      ##
      ## Check that the CSRF token matches the user before any operation
      ##
-     {{error}}$services.localization.render('xe.scheduler.invalidToken'){{/error}}
+     {{error}}{{translation key='xe.scheduler.invalidToken'/}}{{/error}}
 
   #elseif ($request.do == 'schedule')
     ##
@@ -63,11 +70,11 @@
     ##
     #set ($ok = $scheduler.scheduleJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$escapetool.xml($xcontext.get('error')){{/error}}
 
     #else
       #set ($jobName = "$jobObj.get('jobName')")
-      {{info}}$services.localization.render('xe.scheduler.jobscheduled', [$jobName, $scheduler.getNextFireTime($jobObj)]){{/info}}
+      {{info}}$escapetool.xml($services.localization.render('xe.scheduler.jobscheduled', [$jobName, $scheduler.getNextFireTime($jobObj)])){{/info}}
 
     #end
   #elseif ($request.do == 'pause')
@@ -76,10 +83,10 @@
     ##
     #set ($ok = $scheduler.pauseJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$escapetool.xml($xcontext.get('error')){{/error}}
 
     #else
-      {{info}}$services.localization.render('xe.scheduler.paused', [$jobObj.get('jobName')]){{/info}}
+      {{info}}$escapetool.xml($services.localization.render('xe.scheduler.paused', [$jobObj.get('jobName')])){{/info}}
 
     #end
   #elseif ($request.do == 'resume')
@@ -88,10 +95,10 @@
     ##
     #set ($ok = $scheduler.resumeJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$escapetool.xml($xcontext.get('error')){{/error}}
 
     #else
-      {{info}}$services.localization.render('xe.scheduler.resumed', [$jobObj.get('jobName'), $scheduler.getNextFireTime($jobObj)]){{/info}}
+      {{info}}$escapetool.xml($services.localization.render('xe.scheduler.resumed', [$jobObj.get('jobName'), $scheduler.getNextFireTime($jobObj)])){{/info}}
 
     #end
   #elseif ($request.do == 'unschedule')
@@ -100,10 +107,10 @@
     ##
     #set ($ok = $scheduler.unscheduleJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$escapetool.xml($xcontext.get('error')){{/error}}
 
     #else
-      {{info}}$services.localization.render('xe.scheduler.unscheduled', [$jobObj.get('jobName')]){{/info}}
+      {{info}}$escapetool.xml($services.localization.render('xe.scheduler.unscheduled', [$jobObj.get('jobName')])){{/info}}
 
     #end
   #elseif ($request.do == 'delete')
@@ -118,7 +125,7 @@
         #set ($deleteRedirect = $xwiki.getURL($jobObj.getName(), 'delete'))
         $response.sendRedirect($deleteRedirect)
       #else
-        {{error}}$xcontext.get('error'){{/error}}
+        {{error}}$escapetool.xml($xcontext.get('error')){{/error}}
 
       #end
     #else
@@ -131,23 +138,23 @@
     ##
     #set ($ok = $scheduler.triggerJob($jobObj))
     #if (!$ok)
-      {{error}}$xcontext.get('error'){{/error}}
+      {{error}}$escapetool.xml($xcontext.get('error')){{/error}}
 
     #else
-      {{info}}$services.localization.render('xe.scheduler.triggered', [$jobObj.get('jobName')]){{/info}}
+      {{info}}$escapetool.xml($services.localization.render('xe.scheduler.triggered', [$jobObj.get('jobName')])){{/info}}
 
     #end
   #end
 #end
-$services.localization.render('xe.scheduler.welcome')
+{{translation key='xe.scheduler.welcome'/}}
 
-= $services.localization.render('xe.scheduler.jobs.list') =
+= {{translation key='xe.scheduler.jobs.list'/}} =
 
 ##
 ## Retrieve all scheduler jobs
 ## Display their name, status, possible next fire time, and available actions
 ##
-|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.name')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.status')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.next')|=(%scope="col"%)$services.localization.render('xe.scheduler.jobs.actions')
+|=(%scope="col"%){{translation key='xe.scheduler.jobs.name'/}}|=(%scope="col"%){{translation key='xe.scheduler.jobs.status'/}}|=(%scope="col"%){{translation key='xe.scheduler.jobs.next'/}}|=(%scope="col"%){{translation key='xe.scheduler.jobs.actions'/}}
 #foreach ($docName in $services.query.xwql('from doc.object(XWiki.SchedulerJobClass) as jobs where doc.fullName &lt;&gt; ''XWiki.SchedulerJobTemplate''').execute())
   #set ($jobHolder = $xwiki.getDocument($docName))
   #set ($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
@@ -159,7 +166,7 @@ $services.localization.render('xe.scheduler.welcome')
   #if ($status != 'None')
     #set ($firetime = $scheduler.getNextFireTime($job))
   #else
-    #set ($firetime = $services.localization.render('xe.scheduler.jobs.next.undefined'))
+    #set ($firetime = "{{translation key='xe.scheduler.jobs.next.undefined'/}}")
   #end
   #set ($actions = ['trigger'])
   #if ($status == 'None')
@@ -170,7 +177,7 @@ $services.localization.render('xe.scheduler.welcome')
     #set ($ok = $actions.addAll(['resume', 'unschedule']))
   #end
   #set ($ok = $actions.add('delete'))
-|$job.get('jobName')|$status|$firetime|**$services.localization.render('xe.scheduler.jobs.actions.access')** [[$services.localization.render('xe.scheduler.jobs.actions.view')&gt;&gt;$services.rendering.escape($jobHolder.fullName, 'xwiki/2.1')]]#if($jobHolder.hasAccessLevel('programming')) [[$services.localization.render('xe.scheduler.jobs.actions.edit')&gt;&gt;path:${jobHolder.getURL('edit')}]]#end **$services.localization.render('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions) [[$services.localization.render("xe.scheduler.jobs.actions.$action")&gt;&gt;path:$doc.getURL('view', $escapetool.url({'do': $action, 'which': $jobHolder.fullName, 'form_token': $services.csrf.token}))]]#end
+|$job.get('jobName')|$status|$firetime|**{{translation key='xe.scheduler.jobs.actions.access'/}}** [[{{translation key='xe.scheduler.jobs.actions.view'/}}&gt;&gt;$services.rendering.escape($jobHolder.fullName, 'xwiki/2.1')]]#if($jobHolder.hasAccessLevel('programming')) [[{{translation key='xe.scheduler.jobs.actions.edit'/}}&gt;&gt;path:${jobHolder.getURL('edit')}]]#end **{{translation key='xe.scheduler.jobs.actions.manage'/}}**#foreach($action in $actions) [[{{translation key='xe.scheduler.jobs.actions.$action'/}}&gt;&gt;path:$doc.getURL('view', $escapetool.url({'do': $action, 'which': $jobHolder.fullName, 'form_token': $services.csrf.token}))]]#end
 
 #end
 #if ($doc.hasAccessLevel('programming'))
@@ -181,12 +188,12 @@ $services.localization.render('xe.scheduler.welcome')
 ## schedule, pause, etc.
 ##
 
-= $services.localization.render('xe.scheduler.jobs.create') =
+= {{translation key='xe.scheduler.jobs.create'/}} =
 
 ##
 ## Form to create a new Job
 ##
-{{info}}$services.localization.render('xe.scheduler.jobs.explaincreate'){{/info}}
+{{info}}{{translation key='xe.scheduler.jobs.explaincreate'/}}{{/info}}
 
 {{html}}
 &lt;form action="$doc.getURL('create')" id="newdoc" class="form-inline"&gt;&lt;div&gt;
@@ -195,7 +202,7 @@ $services.localization.render('xe.scheduler.welcome')
   &lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
   &lt;input type="hidden" name="sheet" value="1" /&gt;
   &lt;input type="hidden" name="space" value="Scheduler"/&gt;
-  &lt;label class="sr-only" for="page"&gt;$services.localization.render('xe.scheduler.jobs.create.nameTip')&lt;/label&gt;
+  &lt;label class="sr-only" for="page"&gt;$escapetool.xml($services.localization.render('xe.scheduler.jobs.create.nameTip'))&lt;/label&gt;
   &lt;input id="page" name="page" size="30" type="text"
       placeholder="$escapetool.xml($services.localization.render('xe.scheduler.jobs.create.nameTip'))" /&gt;
   &lt;span class="buttonwrapper"&gt;
@@ -207,7 +214,7 @@ $services.localization.render('xe.scheduler.welcome')
 
 #else
 
-  {{warning}}$services.localization.render('xe.scheduler.jobs.warning'){{/warning}}
+  {{warning}}{{translation key='xe.scheduler.jobs.warning'/}}{{/warning}}
 
 #end
 {{/velocity}}</content>

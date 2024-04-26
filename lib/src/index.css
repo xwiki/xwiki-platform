@@ -58,19 +58,24 @@ html {
   align-items: center;
   overflow: auto;
   height: 100%;
-  padding: var(--cr-spacing-x-small);
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-large);
 }
-
+/* 
 .content-scroll > div {
   width: 100%;
-  max-width: var(--cr-sizes-max-page-width); /*TODO: This value needs to be dynamic*/
+  max-width: var(--cr-sizes-max-page-width);
+} */
+
+.center-content{
+  width: 100%;
+  max-width: var(--cr-sizes-max-page-width);
 }
 
 main {
   height: 100dvh;
   overflow: hidden;
   position: fixed;
-  left: var(--cr-sizes-left-sidebar-width);
+  left: max(var(--cr-sizes-left-sidebar-min-width) , var(--cr-sizes-left-sidebar-width));
   top: 0;
   right: 0;
   bottom: 0;
@@ -80,6 +85,7 @@ main {
 
 .left-sidebar {
   width: var(--cr-sizes-left-sidebar-width);
+  min-width: var(--cr-sizes-left-sidebar-min-width);
   background-color: var(--cr-color-neutral-100);
   position: fixed;
   left: 0;
@@ -158,6 +164,15 @@ TODO: these rules about opening and closing the sidebar should be better organiz
 .wrapper.sidebar-is-collapsed #sidebar.is-visible {
   translate: 0
 }
+
+/*
+WIKI STYLES
+TODO: Discuss and move them to a more appropriate place
+*/
+.wikiexternallink {
+  font-style: italic;
+}
+
 
 @media (max-width: 600px) {
   .collapsed-sidebar {

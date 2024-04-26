@@ -37,8 +37,11 @@ import { type CristalApp, PageData } from "@cristal/api";
 import { marked } from "marked";
 import { ContentTools } from "./contentTools";
 import { CIcon, Size } from "@cristal/icons";
+import xavatarImg from "../images/no-one.svg";
 
 const route = useRoute();
+
+const avImg = xavatarImg;
 
 const loading = ref(false);
 const error: Ref<Error | undefined> = ref(undefined);
@@ -118,7 +121,7 @@ onUpdated(() => {
       <!-- eslint-disable vue/no-v-html -->
       <div class="content-header">
         <XBreadcrumb class="breadcrumb"></XBreadcrumb>
-        <x-btn circle size="small" variant="primary">
+        <x-btn circle size="small" variant="primary" color="primary">
           <c-icon
             class="new-page"
             name="plus"
@@ -127,11 +130,11 @@ onUpdated(() => {
         </x-btn>
       </div>
       <div class="content-scroll">
-        <div class="whole-content">
-          <div class="doc-header">
+        <div class="doc-header">
+          <div class="center-content">
             <h1 class="document-title">{{ title }}</h1>
             <div class="doc-info-header">
-              <x-avatar class="avatar"></x-avatar>
+              <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
               <span class="doc-info-user-info">
                 User Name edited on 12/12/2024 at 12:00
               </span>
@@ -156,12 +159,12 @@ onUpdated(() => {
                     params: { page: currentPageName },
                   }"
                 >
-                  <x-btn size="small" variant="default">
+                  <x-btn size="small">
                     <c-icon name="pencil" :size="Size.Small"></c-icon>
                     Edit
                   </x-btn>
                 </router-link>
-                <x-btn size="small" variant="default">
+                <x-btn size="small">
                   <c-icon
                     name="three-dots-vertical"
                     :size="Size.Small"
@@ -170,15 +173,19 @@ onUpdated(() => {
               </div>
             </div>
           </div>
-          <div
-            id="xwikicontent"
-            ref="contentRoot"
-            class="document-content"
-            v-html="content"
-          ></div>
-          <div class="doc-info-footer">
-            <x-avatar class="avatar"></x-avatar>
-            <span class="doc-info-user-info">User name created...</span>
+        </div>
+        <div class="whole-content">
+          <div class="center-content">
+            <div
+              id="xwikicontent"
+              ref="contentRoot"
+              class="document-content"
+              v-html="content"
+            ></div>
+            <div class="doc-info-footer">
+              <x-avatar class="avatar"></x-avatar>
+              <span class="doc-info-user-info">User name created...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -215,18 +222,23 @@ onUpdated(() => {
 }
 
 .whole-content {
+  width: 100%;
   display: flex;
   flex-flow: column;
   gap: var(--cr-spacing-medium);
+  align-items: center;
 }
 
 .doc-header {
   display: flex;
+  width: 100%;
   flex-flow: column;
   gap: var(--cr-spacing-x-small);
   position: sticky;
   top: calc(var(--cr-spacing-small) * -1);
   background: white;
+  align-items: center;
+  z-index: 1;
 }
 
 .document-title {
@@ -296,7 +308,7 @@ onUpdated(() => {
 }
 
 .content-header {
-  padding: var(--cr-spacing-x-small) var(--cr-spacing-medium);
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-large);
   display: flex;
   flex-wrap: wrap;
   gap: var(--cr-spacing-medium);

@@ -22,29 +22,6 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<template>
-  <div>
-    <div>
-      Choose Configuration:
-      <ul>
-        <li v-for="wikiConfig in configList" :key="wikiConfig.name">
-          <span>{{ wikiConfig.name }} ({{ wikiConfig.baseURL }})</span>
-          <span v-if="wikiConfig.offline"> Offline</span>
-          <span v-if="wikiConfig.designSystem != ''">
-            Design System: {{ wikiConfig.designSystem }}</span
-          >
-          -
-          <span v-if="wikiConfig.name == currentConfig">
-            (current configuration)
-          </span>
-          <span v-else @click="cristal?.switchConfig(wikiConfig.name)">
-            (open)
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</template>
 <script lang="ts">
 import type { CristalApp, WikiConfig } from "@cristal/api";
 import { inject } from "vue";
@@ -71,3 +48,68 @@ export default {
   },
 };
 </script>
+<template>
+  <div>
+    <div class="grid-container">
+      <div v-for="wikiConfig in configList" :key="wikiConfig.name">
+        <div>
+          <div class="wiki-name">
+            {{ wikiConfig.name }}
+            <span v-if="wikiConfig.offline" class="offline">Offline</span>
+          </div>
+          <div v-if="wikiConfig.designSystem != ''" class="ds-name">
+            Design System: <strong>{{ wikiConfig.designSystem }}</strong>
+          </div>
+          <div class="url">{{ wikiConfig.baseURL }}</div>
+        </div>
+        <div v-if="wikiConfig.name == currentConfig" class="current-ds">
+          Currently in Use
+        </div>
+        <x-btn v-else @click="cristal?.switchConfig(wikiConfig.name)">
+          Open
+        </x-btn>
+      </div>
+    </div>
+  </div>
+</template>
+<style scoped>
+.wiki-name {
+  font-weight: var(--cr-font-weight-bold);
+}
+.url {
+  font-weight: var(--cr-font-weight-semi-bold);
+  color: var(--cr-color-neutral-500);
+  font-size: var(--cr-font-size-small);
+  overflow-wrap: break-word;
+  line-height: var(--cr-font-size-small);
+  width: 100%;
+}
+.ds-name {
+  font-size: var(--cr-font-size-small);
+}
+.current-ds {
+  font-size: var(--cr-font-size-small);
+  text-align: center;
+}
+p {
+  padding: 0;
+  margin: 0;
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+.grid-container > * {
+  display: grid;
+  gap: var(--cr-spacing-medium);
+  align-items: center;
+  justify-content: center;
+  grid-template-columns: 1fr 150px;
+  border-bottom: 1px solid #ddd;
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-small);
+}
+.grid-container > *:last-child {
+  border-bottom: 0;
+}
+</style>

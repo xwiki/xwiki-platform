@@ -27,9 +27,11 @@ import CConfigMenu from "./c-config-menu.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
 import CHelp from "./c-help.vue";
 import xlogo from "../images/xwiki-logo-color.svg";
+import xavatarImg from "../images/no-one.svg";
 import { CIcon } from "@cristal/icons";
 
 const logo = xlogo;
+const avImg = xavatarImg;
 </script>
 <template>
   <div class="collapsed-sidebar">
@@ -48,10 +50,10 @@ const logo = xlogo;
     <div class="sidebar-header">
       <!-- When the user click this icon (visible only on DESKTOP) a function should ADD the class sidebar-is-collapsed to the element .wrapper in c-view.vue.-->
       <c-icon name="list" class="hide-sidebar"></c-icon>
-      <x-img class="logo" :src="logo" />
+      <x-img class="logo" :src="logo" :width="72" />
       <c-icon name="bell"></c-icon>
       <c-config-menu></c-config-menu>
-      <x-avatar class="avatar"></x-avatar>
+      <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
     </div>
     <div class="search">
       <x-search></x-search>

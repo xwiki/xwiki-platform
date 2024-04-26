@@ -25,14 +25,7 @@
 
 import type { App } from "vue";
 import * as components from "vuetify/components";
-import {
-  VAvatar,
-  VCol,
-  VContainer,
-  VImg,
-  VRow,
-  VTextField,
-} from "vuetify/components";
+import { VCol, VContainer, VRow, VTextField } from "vuetify/components";
 import type { DesignSystemLoader } from "@cristal/api";
 
 import { createVuetify } from "vuetify";
@@ -71,9 +64,7 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
     });
     app.use(vuetify);
     // Native Vuetify components
-    app.component("XAvatar", VAvatar);
     app.component("XContainer", VContainer);
-    app.component("XImg", VImg);
     app.component("XRow", VRow);
     app.component("XCol", VCol);
     app.component("XTextField", VTextField);
@@ -81,6 +72,8 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
     // Custom wrapped components
     registerAsyncComponent(app, "XLoad", () => import("../vue/x-load.vue"));
     registerAsyncComponent(app, "XBtn", () => import("../vue/x-btn.vue"));
+    registerAsyncComponent(app, "XImg", () => import("../vue/x-img.vue"));
+    registerAsyncComponent(app, "XAvatar", () => import("../vue/x-avatar.vue"));
     registerAsyncComponent(
       app,
       "XDivider",

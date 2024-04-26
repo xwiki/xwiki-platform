@@ -136,7 +136,9 @@ const submit = async () => {
     <div v-show="!loading && !error" class="content">
       <div class="content-scroll">
         <div class="whole-content">
-          <div ref="editor" class="document-content editor"></div>
+          <div class="center-content">
+            <div ref="editor" class="document-content editor"></div>
+          </div>
         </div>
       </div>
       <form class="pagemenu" @submit="submit">

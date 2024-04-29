@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.groovy.internal.DefaultGroovyConfiguration;
@@ -59,6 +61,7 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -93,7 +96,7 @@ import static org.mockito.Mockito.when;
     TestNoScriptMacro.class,
     TocMacro.class,
 })
-public class ExtensionSheetPageTest extends PageTest
+class ExtensionSheetPageTest extends PageTest
 {
     private static final String WIKI_NAME = "xwiki";
 
@@ -119,6 +122,8 @@ public class ExtensionSheetPageTest extends PageTest
 
     private XWikiDocument extensionSheetDocument;
 
+    private String testString;
+
     @MockComponent
     @Named("groovy")
     private MacroPermissionPolicy groovyMacroPermissionPolicy;
@@ -133,7 +138,7 @@ public class ExtensionSheetPageTest extends PageTest
         loadPage(EXTENSION_CLASS);
         loadPage(EXTENSION_SHEET);
 
-        String testString = "]]}}}{{async}}{{velocity}}{{noscript /}}{{/velocity}}{{/async}}";
+        this.testString = "]]}}}{{async}}{{velocity}}{{noscript /}}{{/velocity}}{{/async}}";
         String groovyTestString = """
                 {{async}}
                 {{groovy}}
@@ -148,29 +153,29 @@ public class ExtensionSheetPageTest extends PageTest
         this.testPageDocument.setTitle("Extension Test");
         BaseObject extensionObject =
             this.testPageDocument.newXObject(EXTENSION_CLASS, this.context);
-        extensionObject.setStringValue("id", testString);
-        extensionObject.setStringValue("name", testString);
+        extensionObject.setStringValue("id", this.testString);
+        extensionObject.setStringValue("name", this.testString);
         extensionObject.setStringValue("description", groovyTestString);
-        extensionObject.setStringValue("summary", testString);
-        extensionObject.setStringValue("icon", testString);
-        extensionObject.setStringValue("type", testString);
-        extensionObject.setStringValue("category", testString);
-        extensionObject.setStringValue("installedCount", testString);
-        extensionObject.setStringValue("licenseName", testString);
-        extensionObject.setStringValue("issueManagementURL", testString);
+        extensionObject.setStringValue("summary", this.testString);
+        extensionObject.setStringValue("icon", this.testString);
+        extensionObject.setStringValue("type", this.testString);
+        extensionObject.setStringValue("category", this.testString);
+        extensionObject.setStringValue("installedCount", this.testString);
+        extensionObject.setStringValue("licenseName", this.testString);
+        extensionObject.setStringValue("issueManagementURL", this.testString);
         extensionObject.setStringValue("installation", groovyTestString);
-        extensionObject.setStringValue("lastVersion", testString);
-        extensionObject.setStringListValue("authors", List.of(testString));
+        extensionObject.setStringValue("lastVersion", this.testString);
+        extensionObject.setStringListValue("authors", List.of(this.testString));
 
         BaseObject extensionVersionObject = this.testPageDocument.newXObject(EXTENSION_VERSION_CLASS, this.context);
-        extensionVersionObject.setStringValue("version", testString);
+        extensionVersionObject.setStringValue("version", this.testString);
         extensionVersionObject.setStringValue("notes", groovyTestString);
 
         BaseObject extensionDependencyObject =
             this.testPageDocument.newXObject(EXTENSION_DEPENDENCY_CLASS, this.context);
-        extensionDependencyObject.setStringValue("extensionVersion", testString);
-        extensionDependencyObject.setStringValue("id", testString);
-        extensionDependencyObject.setStringValue("constraint", testString);
+        extensionDependencyObject.setStringValue("extensionVersion", this.testString);
+        extensionDependencyObject.setStringValue("id", this.testString);
+        extensionDependencyObject.setStringValue("constraint", this.testString);
 
         // Mock the database.
         Query query = mock(Query.class);
@@ -187,10 +192,11 @@ public class ExtensionSheetPageTest extends PageTest
     }
 
     @Test
-    void display() throws Exception
+    void checkPageRendersProperly() throws Exception
     {
         this.context.setDoc(this.testPageDocument);
         // The only expectation is to not get any error log due to macro executions.
-        renderHTMLPage(this.extensionSheetDocument);
+        Document document = renderHTMLPage(this.extensionSheetDocument);
+        assertEquals(12, StringUtils.countMatches(document.text(), this.testString));
     }
 }

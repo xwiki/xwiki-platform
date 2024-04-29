@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.27.1",
-    "@typescript-eslint/eslint-plugin": "7.6.0",
+    "@typescript-eslint/eslint-plugin": "7.8.0",
     "@typescript-eslint/parser": "7.6.0",
     "@vitejs/plugin-vue": "5.0.4",
     "@vue/eslint-config-prettier": "9.0.0",

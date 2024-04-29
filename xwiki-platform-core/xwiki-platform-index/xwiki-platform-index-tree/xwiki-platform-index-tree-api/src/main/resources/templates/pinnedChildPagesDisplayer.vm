@@ -1,0 +1,93 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#set ($parentReference = $doc.documentReference.lastSpaceReference)
+#if ($doc.documentReference.equals($services.model.resolveDocument('XWiki.XWikiPreferences')))
+  #set ($parentReference = $doc.documentReference.wikiReference)
+#end
+#if ($type == 'edit' || $type == 'search')
+  ## TODO: Replace this script when "XWIKI-12788: Introduce skin extension plugins for webjar resources" is closesd.
+  <script src="$escapetool.xml($services.webjars.url('org.xwiki.platform:xwiki-platform-index-tree-webjar',
+    'suggestChildPages.js', {'evaluate': true}))"></script>
+  #set ($id = "${prefix}${name}")
+  #set ($parameters = {
+    'id': $id,
+    'name': $id,
+    'value': $value,
+    'multiple': 'multiple',
+    'class': 'suggest-childPages',
+    'title': $services.localization.render('index.tree.pinnedChildPagesDisplayer.hint'),
+    'data-parent': "$parentReference.type.name().toLowerCase():$services.model.serialize($parentReference, 'default')"
+  })
+  #if ($field.getProperty('disabled').value == 1)
+    #set ($parameters.disabled = 'disabled')
+  #end
+  #suggestInput($parameters)
+#elseif ($type == 'view')
+  #set ($pinnedChildPageLinks = [])
+  #foreach ($pinnedChildPage in $value)
+    #set ($isTerminal = $parentReference.type == 'SPACE' && !$pinnedChildPage.endsWith('/'))
+    #set ($pinnedChildPage = $escapetool.unurl($stringtool.removeEnd($pinnedChildPage, '/')))
+    #if ("$!pinnedChildPage" == '')
+      // Skip empty values.
+    #elseif ($isTerminal)
+      #set ($pinnedChildPageReference = $services.model.createDocumentReference($pinnedChildPage, $parentReference))
+    #else
+      #set ($pinnedChildPageReference = $services.model.resolveDocument('', 'default',
+        $services.model.createSpaceReference($pinnedChildPage, $parentReference)))
+    #end
+    #set ($pinnedChildPageLink = "#linkToDocument($pinnedChildPageReference)")
+    #set ($discard = $pinnedChildPageLinks.add($pinnedChildPageLink.trim()))
+  #end
+  #if ($pinnedChildPageLinks.isEmpty())
+    $escapetool.xml($services.localization.render('index.tree.pinnedChildPagesDisplayer.emptyValue'))
+  #else
+    <ol>
+      <li>$stringtool.join($pinnedChildPageLinks, '</li><li>')</li>
+    </ol>
+  #end
+#elseif ($type == 'rendered')
+  $doc.displayRendered($field, $prefix, $object)
+#elseif ($type == 'hidden')
+  $doc.displayHidden($field, $prefix, $object)
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end
+
+#macro(linkToDocument $documentReference)
+  #set ($linkedDoc = $xwiki.getDocument($documentReference))
+  #if ("$!linkedDoc" == '')
+    ## Document with restricted access.
+    #set ($pageName = $document.documentReference.name)
+    #if ($pageName == $services.model.getEntityReference('DOCUMENT', 'default').name)
+      #set ($pageName = $document.documentReference.lastSpaceReference.name)
+    #end
+    ## The view displayer generates HTML so we need to escape the XML special characters from the document name.
+    $escapetool.xml($pageName)
+  #else
+    #set ($title = $escapetool.xml($linkedDoc.plainTitle))
+    #if ($linkedDoc.isNew())
+      <span class="wikicreatelink"><a href="$linkedDoc.getURL('create')">$title</a></span>
+    #else
+      <a href="$linkedDoc.URL">$title</a>
+    #end
+  #end
+#end

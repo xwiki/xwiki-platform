@@ -17,35 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.tree.AbstractTreeNode;
 
 /**
- * The attachment tree node.
+ * The translation tree node.
  * 
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
 @Component
-@Named("attachment")
+@Named("translation")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class AttachmentTreeNode extends AbstractEntityTreeNode
+public class TranslationTreeNode extends AbstractTreeNode
 {
     @Override
     public String getParent(String nodeId)
     {
-        EntityReference attachmentReference = resolve(nodeId);
-        if (attachmentReference != null && attachmentReference.getType() == EntityType.ATTACHMENT) {
-            return "attachments:" + this.defaultEntityReferenceSerializer.serialize(attachmentReference.getParent());
+        if (StringUtils.startsWith(nodeId, "translation:")) {
+            String reference = StringUtils.substringBeforeLast(nodeId.substring(12), "/");
+            return "translations:" + reference;
         }
         return null;
     }

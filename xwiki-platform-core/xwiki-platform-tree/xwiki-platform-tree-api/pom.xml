@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Provides a generic API for creating tree models that can be displayed using the tree widget.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.47</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tree API</xwiki.extension.name>
   </properties>

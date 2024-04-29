@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +31,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -51,12 +50,25 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @since 7.4.5
  */
 @Component
-@Named("object")
+@Named(ObjectTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class ObjectTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "object";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Default constructor.
+     */
+    public ObjectTreeNode()
+    {
+        super(HINT);
+    }
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
@@ -76,12 +88,12 @@ public class ObjectTreeNode extends AbstractEntityTreeNode
     private List<ObjectPropertyReference> getChildren(ObjectReference objectReference, int offset, int limit)
         throws Exception
     {
-        List<ObjectPropertyReference> children = new ArrayList<ObjectPropertyReference>();
+        List<ObjectPropertyReference> children = new ArrayList<>();
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(objectReference.getParent(), xcontext);
         BaseObject object = document.getXObject(objectReference);
         if (object != null) {
-            List<String> properties = new ArrayList<String>(object.getPropertyList());
+            List<String> properties = new ArrayList<>(object.getPropertyList());
             Collections.sort(properties);
             for (String property : subList(properties, offset, limit)) {
                 children.add(new ObjectPropertyReference(property, objectReference));

@@ -35,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public abstract class AbstractCompositeTree extends AbstractTree
 {
-    protected final Map<String, TreeNode> treeNodeByNodeType = new HashMap<String, TreeNode>();
+    protected final Map<String, TreeNode> treeNodeByNodeType = new HashMap<>();
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)

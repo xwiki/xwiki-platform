@@ -17,62 +17,73 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal.nestedpages.pinned;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.tree.TreeNode;
+import org.xwiki.tree.TreeNodeGroup;
 
 /**
- * The farm tree node.
- * 
+ * The group of pinned child pages tree nodes.
+ *
  * @version $Id$
- * @since 8.3M2
- * @since 7.4.5
+ * @since 16.4.0RC1
  */
 @Component
-@Named("farm")
+@Named(PinnedChildPagesTreeNodeGroup.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class FarmTreeNode extends AbstractEntityTreeNode
+public class PinnedChildPagesTreeNodeGroup extends AbstractEntityTreeNode implements TreeNodeGroup
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "pinnedChildPages";
+
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private PinnedChildPagesManager pinnedChildPagesManager;
+
+    /**
+     * Default constructor.
+     */
+    public PinnedChildPagesTreeNodeGroup()
+    {
+        super(HINT);
+    }
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
     {
-        return subList(getWikiDescriptors(), offset, limit).stream()
-            .map(wikiDescriptor -> "wiki:" + wikiDescriptor.getId()).collect(Collectors.toCollection(ArrayList::new));
+        List<DocumentReference> pinnedChildPages = getPinnedChildPages(nodeId);
+        return serialize(pinnedChildPages.subList(offset,
+            limit < 0 ? pinnedChildPages.size() : Math.min(offset + limit, pinnedChildPages.size())));
     }
 
     @Override
     public int getChildCount(String nodeId)
     {
-        return getWikiDescriptors().size();
+        return getPinnedChildPages(nodeId).size();
     }
 
-    private List<WikiDescriptor> getWikiDescriptors()
+    private List<DocumentReference> getPinnedChildPages(String nodeId)
     {
-        try {
-            return this.wikiDescriptorManager.getAll().stream()
-                .filter(wikiDescriptor -> !getExcludedWikis().contains(wikiDescriptor.getId()))
-                .collect(Collectors.toList());
-        } catch (WikiManagerException e) {
-            this.logger.warn("Failed to retrieve the list of wikis. Root cause [{}].",
-                ExceptionUtils.getRootCauseMessage(e));
+        @SuppressWarnings("unchecked")
+        List<String> filters =
+            (List<String>) getProperties().getOrDefault(TreeNode.PROPERTY_FILTERS, Collections.emptyList());
+        if ("reference".equals(getProperties().get("hierarchyMode")) && filters.contains(HINT)) {
+            EntityReference parentReference = resolve(nodeId);
+            return this.pinnedChildPagesManager.getPinnedChildPages(parentReference);
+        } else {
             return Collections.emptyList();
         }
     }

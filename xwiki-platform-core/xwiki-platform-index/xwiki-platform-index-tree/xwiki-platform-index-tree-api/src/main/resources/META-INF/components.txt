@@ -1,3 +1,9 @@
+org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesClassInitializer
+org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesListener
+org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesManager
+org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesTreeFilter
+org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesTreeNodeGroup
+
 org.xwiki.index.tree.internal.nestedpages.query.ChildPageFilter
 org.xwiki.index.tree.internal.nestedpages.query.DocumentReferenceResolverFilter
 org.xwiki.index.tree.internal.nestedpages.query.ExcludedDocumentFilter
@@ -6,25 +12,15 @@ org.xwiki.index.tree.internal.nestedpages.query.HiddenPageFilter
 org.xwiki.index.tree.internal.nestedpages.query.QueryRegistrationHandler
 org.xwiki.index.tree.internal.nestedpages.query.TopLevelPageFilter
 
-org.xwiki.index.tree.internal.nestedpages.AddAttachmentTreeNode
 org.xwiki.index.tree.internal.nestedpages.AddDocumentTreeNode
-org.xwiki.index.tree.internal.nestedpages.AttachmentsTreeNode
-org.xwiki.index.tree.internal.nestedpages.AttachmentTreeNode
-org.xwiki.index.tree.internal.nestedpages.ClassPropertiesTreeNode
-org.xwiki.index.tree.internal.nestedpages.ClassPropertyTreeNode
+org.xwiki.index.tree.internal.nestedpages.ChildDocumentsTreeNodeGroup
 org.xwiki.index.tree.internal.nestedpages.DocumentTreeNode
-org.xwiki.index.tree.internal.nestedpages.FarmTreeNode
 org.xwiki.index.tree.internal.nestedpages.NestedPagesTree
-org.xwiki.index.tree.internal.nestedpages.ObjectPropertyTreeNode
-org.xwiki.index.tree.internal.nestedpages.ObjectsOfTypeTreeNode
-org.xwiki.index.tree.internal.nestedpages.ObjectsTreeNode
-org.xwiki.index.tree.internal.nestedpages.ObjectTreeNode
-org.xwiki.index.tree.internal.nestedpages.TranslationsTreeNode
-org.xwiki.index.tree.internal.nestedpages.TranslationTreeNode
 org.xwiki.index.tree.internal.nestedpages.WikiTreeNode
 
 org.xwiki.index.tree.internal.nestedspaces.parentchild.query.TopLevelPageFilter
 
+org.xwiki.index.tree.internal.nestedspaces.parentchild.ChildDocumentsTreeNodeGroup
 org.xwiki.index.tree.internal.nestedspaces.parentchild.DocumentTreeNode
 org.xwiki.index.tree.internal.nestedspaces.parentchild.ParentChildOnNestedSpacesTree
 org.xwiki.index.tree.internal.nestedspaces.parentchild.SpaceTreeNode
@@ -37,7 +33,21 @@ org.xwiki.index.tree.internal.nestedspaces.NestedSpacesTree
 org.xwiki.index.tree.internal.nestedspaces.SpaceTreeNode
 org.xwiki.index.tree.internal.nestedspaces.WikiTreeNode
 
+org.xwiki.index.tree.internal.parentchild.ChildDocumentsTreeNodeGroup
 org.xwiki.index.tree.internal.parentchild.DocumentQueryHelper
 org.xwiki.index.tree.internal.parentchild.DocumentTreeNode
 org.xwiki.index.tree.internal.parentchild.ParentChildTree
 org.xwiki.index.tree.internal.parentchild.WikiTreeNode
+
+org.xwiki.index.tree.internal.AddAttachmentTreeNode
+org.xwiki.index.tree.internal.AttachmentsTreeNode
+org.xwiki.index.tree.internal.AttachmentTreeNode
+org.xwiki.index.tree.internal.ClassPropertiesTreeNode
+org.xwiki.index.tree.internal.ClassPropertyTreeNode
+org.xwiki.index.tree.internal.FarmTreeNode
+org.xwiki.index.tree.internal.ObjectPropertyTreeNode
+org.xwiki.index.tree.internal.ObjectsOfTypeTreeNode
+org.xwiki.index.tree.internal.ObjectsTreeNode
+org.xwiki.index.tree.internal.ObjectTreeNode
+org.xwiki.index.tree.internal.TranslationsTreeNode
+org.xwiki.index.tree.internal.TranslationTreeNode

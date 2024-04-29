@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,16 +36,16 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * The objects tree node.
+ * The translations tree node.
  * 
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
 @Component
-@Named("objects")
+@Named("translations")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class ObjectsTreeNode extends AbstractDocumentTreeNode
+public class TranslationsTreeNode extends AbstractDocumentRelatedTreeNode
 {
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -53,9 +53,9 @@ public class ObjectsTreeNode extends AbstractDocumentTreeNode
     /**
      * Default constructor.
      */
-    public ObjectsTreeNode()
+    public TranslationsTreeNode()
     {
-        super("objects");
+        super("translations");
     }
 
     @Override
@@ -64,14 +64,10 @@ public class ObjectsTreeNode extends AbstractDocumentTreeNode
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
         String serializedDocRef = this.defaultEntityReferenceSerializer.serialize(documentReference);
-        List<String> classNames = new ArrayList<String>();
-        for (DocumentReference classReference : document.getXObjects().keySet()) {
-            classNames.add(this.defaultEntityReferenceSerializer.serialize(classReference));
-        }
-        Collections.sort(classNames);
-        List<String> children = new ArrayList<String>();
-        for (String className : subList(classNames, offset, limit)) {
-            children.add("objectsOfType:" + serializedDocRef + "/" + className);
+        List<Locale> locales = document.getTranslationLocales(xcontext);
+        List<String> children = new ArrayList<>();
+        for (Locale locale : subList(locales, offset, limit)) {
+            children.add("translation:" + serializedDocRef + '/' + locale);
         }
         return children;
     }
@@ -81,6 +77,6 @@ public class ObjectsTreeNode extends AbstractDocumentTreeNode
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-        return document.getXObjects().size();
+        return document.getTranslationLocales(xcontext).size();
     }
 }

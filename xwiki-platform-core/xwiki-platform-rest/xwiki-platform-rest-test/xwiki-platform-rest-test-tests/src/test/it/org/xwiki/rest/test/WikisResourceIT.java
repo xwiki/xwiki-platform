@@ -455,7 +455,12 @@ public class WikisResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(this.reference);
         this.testUtils.rest().savePage(this.reference);
 
+        // Wait for the Solr queue to be empty
+        this.solrUtils.waitEmptyQueue();
+
         String query = String.format("%s?q=\"%s\"", buildURI(WikisSearchQueryResource.class, getWiki()), this.pageName);
+        // Even if the Solr queue appear to be empty we also make sure to wait for the number of results we expect, in
+        // case there is some race condition on server side
         SearchResults searchResults = this.testUtils.getDriver().waitUntilCondition(d -> search(1, query));
 
         assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());

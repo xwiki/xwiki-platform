@@ -452,7 +452,9 @@
       #set($redirect = $registrationConfig.defaultRedirect)
     #end
     ## Display a "registration successful" message
-
+    ## Define some strings which may be used by the welcome message
+    #set($firstName = $!request.get('register_first_name'))
+    #set($lastName = $!request.get('register_last_name'))
     #evaluate($registrationConfig.registrationSuccessMessage)
 
     ## Empty line prevents message from being forced into a &lt;p&gt; block.
@@ -484,6 +486,7 @@
 
     #end
   #end
+  ## Give the user a Back to Home button which redirects them to the home of the current Wiki
   ##
 #end## createUser Macro
 {{/velocity}}</content>

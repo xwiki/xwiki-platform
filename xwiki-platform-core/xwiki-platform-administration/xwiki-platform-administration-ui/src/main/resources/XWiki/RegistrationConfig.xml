@@ -522,17 +522,29 @@
       <passwordRuleOneUpperCaseEnabled>0</passwordRuleOneUpperCaseEnabled>
     </property>
     <property>
-      <registrationSuccessMessage>#set($displayName = "$!firstName$!lastName")
+      <registrationSuccessMessage>#set($displayName = "$!firstName $!lastName")
 #set($noReadableName = ($!firstName == "") && ($!lastName == ""))
 #if($noReadableName)
   #set($displayName = $userName)
 #end
-#set($headline = $services.localization.render('core.register.successful.welcome', 'xwiki/2.1', [$displayName]))
+#set($headline = $services.localization.render('core.register.successful.welcome', [$displayName]))
 #set($userLink = $xwiki.getUserName("$userSpace$userName"))
+#set($successAndLogin = $services.localization.render('core.register.successful.successandlogin'))
 [[image:undraw_done_re_oak4.svg||data-xwiki-image-style-alignment="center"]]
-(% style="text-align:center;")
-(% style="text-align:center;display:inline;" %)
-==$headline==(% style="text-align:center;display:inline;" %)#if(!$noReadableName)($displayName)#end {{translation key="core.register.successful.successandlogin"/}}(%%)</registrationSuccessMessage>
+
+{{html clean="true"}}
+<div style="display: flex;align-items: baseline;justify-content: center;">
+  <h2>$headline </h2>
+  #if(!$noReadableName)
+  <p style="display:block;">
+    ($displayName)
+  </p>
+  #end
+</div>
+<p style="text-align:center;display:block;">
+  $successAndLogin
+</p>
+{{/html}}</registrationSuccessMessage>
     </property>
     <property>
       <requireCaptcha>0</requireCaptcha>

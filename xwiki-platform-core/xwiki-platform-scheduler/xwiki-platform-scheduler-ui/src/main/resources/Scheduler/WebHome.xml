@@ -148,7 +148,6 @@
 #end
 {{translation key='xe.scheduler.welcome'/}}
 
-(% id="Hxe.scheduler.jobs.list" %)
 = {{translation key='xe.scheduler.jobs.list'/}} =
 
 ##
@@ -189,7 +188,6 @@
 ## schedule, pause, etc.
 ##
 
-(% id="Hxe.scheduler.jobs.create" %)
 = {{translation key='xe.scheduler.jobs.create'/}} =
 
 ##

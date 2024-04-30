@@ -157,30 +157,6 @@
    *###
   #set($fields = [])
   ##
-  ## The first name field, no checking.
-  #set($field =
-    {'name' : 'register_first_name',
-      'label' : $services.localization.render('core.register.firstName'),
-      'params' : {
-        'type' : 'text',
-        'size' : '60',
-        'autocomplete' : 'given-name'
-      }
-    })
-  #set($discard = $fields.add($field))
-  ##
-  ## The last name field, no checking.
-  #set($field =
-    {'name' : 'register_last_name',
-      'label' : $services.localization.render('core.register.lastName'),
-      'params' : {
-        'type' : 'text',
-        'size' : '60',
-        'autocomplete' : 'family-name'
-      }
-    })
-  #set($discard = $fields.add($field))
-  ##
   ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
   #set($field =
     {'name' : 'xwikiname',
@@ -270,6 +246,30 @@
     $userDoc.saveWithProgrammingRights("Saved favorite color from registration form.")
   #end
   *********###
+  ##
+  ## The first name field, no checking.
+  #set($field =
+    {'name' : 'register_first_name',
+      'label' : $services.localization.render('core.register.firstName'),
+      'params' : {
+        'type' : 'text',
+        'size' : '60',
+        'autocomplete' : 'given-name'
+      }
+    })
+  #set($discard = $fields.add($field))
+  ##
+  ## The last name field, no checking.
+  #set($field =
+    {'name' : 'register_last_name',
+      'label' : $services.localization.render('core.register.lastName'),
+      'params' : {
+        'type' : 'text',
+        'size' : '60',
+        'autocomplete' : 'family-name'
+      }
+    })
+  #set($discard = $fields.add($field))
   ##
   ## To disable the CAPTCHA on this page, comment out the next entry.
   ## The CAPTCHA, not really an input field but still defined the same way.
@@ -783,6 +783,102 @@
     </property>
     <property>
       <users>XWiki.XWikiGuest</users>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Registration</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>5f751597-be0d-4010-ad85-57f4b6c4bd18</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content>{{velocity}}{{html clean="false"}}
+#if ($xcontext.user == 'XWiki.XWikiGuest' &amp;&amp; !$xcontext.inactiveUserReference)
+&lt;li&gt;
+  &lt;a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)&amp;loginLink=1")" id="tmLogin" rel="nofollow"&gt;$escapetool.xml($services.localization.render('login'))&lt;/a&gt;
+&lt;/li&gt;
+#end
+#if ($xcontext.user == 'XWiki.XWikiGuest' &amp;&amp; !$xcontext.inactiveUserReference &amp;&amp; $xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
+&lt;li&gt;
+&lt;a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister" rel="nofollow"&gt;$escapetool.xml($services.localization.render('register'))&lt;/a&gt;
+&lt;/li&gt;
+#end
+{{/html}}{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.topmenu.right</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.plaform.search.quicksearch</name>
+    </property>
+    <property>
+      <parameters>order=40000</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

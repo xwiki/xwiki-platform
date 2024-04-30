@@ -155,7 +155,7 @@
    *       Removing or renaming any of these fields will result in undefined behavior.
    *
    *###
-  #set($fields = [])
+  #set($mainFields = [])
   ##
   ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
   #set($field =
@@ -177,7 +177,7 @@
         }
       }
     })
-  #set($discard = $fields.add($field))
+  #set($discard = $mainFields.add($field))
   ## Make sure the chosen user name is not already taken
   ## This macro is called by programmaticValidation for xwikiname (above)
   #macro (nameAvailable, $name)
@@ -188,7 +188,7 @@
   ##
   ##The password field, mandatory and must be at least 6 characters long.
   ##The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
-  #definePasswordFields($fields, 'register_password', 'register2_password', $registrationConfig.passwordOptions)
+  #definePasswordFields($mainFields, 'register_password', 'register2_password', $registrationConfig.passwordOptions)
   ##
   ## The email address field, regex checked with an email pattern. Mandatory if registration uses email verification
   #set($field =
@@ -209,7 +209,7 @@
   #if($registrationConfig.useEmailVerification)
     #set($field.validate.mandatory = {'failureMessage' : $services.localization.render('core.validation.required.message')})
   #end
-  #set($discard = $fields.add($field))
+  #set($discard = $mainFields.add($field))
   ##
   #*********
   ## Uncomment this code to see an example of how you can easily add a field to the registration page
@@ -235,7 +235,7 @@
       },
       'doAfterRegistration' : '#saveFavoriteColor()'
     })
-  #set($discard = $fields.add($field))
+  #set($discard = $mainFields.add($field))
   ## Save the user's favorite color on their user page.
   #macro(saveFavoriteColor)
     #set($xwikiname = $request.get('xwikiname'))
@@ -246,6 +246,7 @@
     $userDoc.saveWithProgrammingRights("Saved favorite color from registration form.")
   #end
   *********###
+  #set($aboutYouFields = [])
   ##
   ## The first name field, no checking.
   #set($field =
@@ -257,7 +258,7 @@
         'autocomplete' : 'given-name'
       }
     })
-  #set($discard = $fields.add($field))
+  #set($discard = $aboutYouFields.add($field))
   ##
   ## The last name field, no checking.
   #set($field =
@@ -269,7 +270,7 @@
         'autocomplete' : 'family-name'
       }
     })
-  #set($discard = $fields.add($field))
+  #set($discard = $aboutYouFields.add($field))
   ##
   ## To disable the CAPTCHA on this page, comment out the next entry.
   ## The CAPTCHA, not really an input field but still defined the same way.
@@ -295,7 +296,7 @@
         },
         'noReturn' : true
       })
-    #set($discard = $fields.add($field))
+    #set($discard = $aboutYouFields.add($field))
   #end
   ## Pass the redirect parameter on so that the login page may redirect to the right place.
   ## Not necessary in Firefox 3.0.10 or Opera 9.64, I don't know about IE or Safari.
@@ -305,7 +306,10 @@
         'type' : 'hidden'
       }
     })
-  #set($discard = $fields.add($field))
+  #set($discard = $aboutYouFields.add($field))
+  #set($fields = [])
+  #set($discard = $fields.addAll($mainFields))
+  #set($discard = $fields.addAll($aboutYouFields))
   ##
   #######################################################################
   ## The Code.
@@ -365,7 +369,9 @@
           #end
         &lt;/div&gt;
         ## Note that the macro inject the form_token field.
-        #generateHtml($fields, $request)
+        #generateHtml($mainFields, $request)
+        &lt;h2&gt;$services.localization.render('core.register.aboutYou')&lt;/h2&gt;
+        #generateHtml($aboutYouFields, $request)
         &lt;p class="buttons"&gt;
           &lt;span class="buttonwrapper"&gt;
             &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;

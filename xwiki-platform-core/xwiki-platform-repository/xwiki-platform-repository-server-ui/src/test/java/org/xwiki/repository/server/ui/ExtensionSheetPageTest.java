@@ -139,13 +139,11 @@ class ExtensionSheetPageTest extends PageTest
         loadPage(EXTENSION_SHEET);
 
         this.testString = "]]}}}{{async}}{{velocity}}{{noscript /}}{{/velocity}}{{/async}}";
-        String groovyTestString = """
-                {{async}}
-                {{groovy}}
-                services.logging.getLogger("Groovy").error("SHOULD NOT BE CALLED!")
-                {{/groovy}}
-                {{/async}}
-            """;
+        String groovyTestString = "{{async}}\n" +
+            "{{groovy}}\n" +
+            "services.logging.getLogger(\"Groovy\").error(\"SHOULD NOT BE CALLED!\")\n" +
+            "{{/groovy}}\n" +
+            "{{/async}}";
 
         this.extensionSheetDocument = this.xwiki.getDocument(EXTENSION_SHEET, this.context);
 

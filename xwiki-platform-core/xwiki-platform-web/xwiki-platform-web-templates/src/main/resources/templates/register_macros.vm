@@ -165,6 +165,35 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #end
           >$field.error</span>
         #end
+        ## We initialize the validation messages containers.
+        ## Since the improvements for XWIKI-22121, we want icons in there, so it's way easier to define those in the
+        ## template directly.
+        ## We want to match those to all the calls to the `add` method of the live validation object.
+        ## If there's not already a container, the livevalidation will create it itself but this fallback will not
+        ## support icons.
+        #define ($validationContainer)
+          <span class="validation-message-container $extraValidationClass" aria-live="polite">
+            <span class="validation-message-valid-icon">$services.icon.renderHTML('accept')</span>
+            <span class="validation-message-invalid-icon">$services.icon.renderHTML('error')</span>
+          </span>
+        #end
+        #set($extraValidationClass = '')
+        #if ($field.validate.mandatory)
+          #set($extraValidationClass = 'mandatory')
+          $validationContainer
+        #end
+        #if ($field.validate.mustMatch)
+          #set($extraValidationClass = 'must-match')
+          $validationContainer
+        #end
+        #if ($field.validate.regex)
+          #set($extraValidationClass = 'regex')
+          $validationContainer
+        #end
+        #foreach ($regex in $field.validate.regexes)
+          #set($extraValidationClass = 'regex-'+ $foreach.count)
+          $validationContainer
+        #end
         </dd>
       #end
     #else
@@ -190,7 +219,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set ($failMessage = $regex.failureMessage)
   #end
   #if ($pattern != '' && $failMessage != '' && !$regex.noscript)
-    ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
+    #if($!foreach.count != "")
+      ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage", identifier: 'regex-'+ $foreach.count});
+    #else
+      ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage", identifier: 'regex'});
+    #end
   #end
 #end
 #*
@@ -225,7 +258,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         #if ($validate.mandatory)
           #set ($mandatory = $validate.mandatory)
           #if ($mandatory.failureMessage && !$mandatory.noscript)
-            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage"});
+            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage", identifier: "mandatory"});
           #end
         #end
         ##
@@ -233,7 +266,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #set ($mustMatch = $validate.mustMatch)
           #if ($mustMatch.name && $mustMatch.failureMessage && !$mustMatch.noscript)
             ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.name]")[0], 
-              failureMessage: "$!mustMatch.failureMessage"});
+              failureMessage: "$!mustMatch.failureMessage", identifier: "must-match"});
           #end
         #end
         ##

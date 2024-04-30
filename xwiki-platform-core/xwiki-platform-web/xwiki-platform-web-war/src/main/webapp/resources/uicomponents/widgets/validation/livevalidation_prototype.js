@@ -109,8 +109,6 @@ LiveValidation.prototype = {
     }, optionsObj || {});
 	var node = this.options.insertAfterWhatNode || this.element;
     this.options.insertAfterWhatNode = $(node);
-    this.messageHolder = this.createMessageSpan();
-    this.options.insertAfterWhatNode.up().appendChild(this.messageHolder);
     Object.extend(this, this.options); // copy the options to the actual object
     // add to form if it has been provided
     if(this.form){
@@ -182,7 +180,14 @@ LiveValidation.prototype = {
    *    @return {Object} - the LiveValidation object itself so that calls can be chained
    */
   add: function(validationFunction, validationParamsObj){
-    this.validations.push( { type: validationFunction, params: validationParamsObj || {} } );
+    let validationMessageHolder;
+    if (validationParamsObj.identifier) {
+      validationMessageHolder = this.options.insertAfterWhatNode.up().querySelector("." + validationParamsObj.identifier);
+    } else {
+      validationMessageHolder = this.createMessageSpan();
+      this.options.insertAfterWhatNode.up().appendChild(validationMessageHolder);
+    }
+    this.validations.push( { type: validationFunction, params: validationParamsObj || {}, messageHolder: validationMessageHolder } );
     return this;
   },
   
@@ -262,11 +267,14 @@ LiveValidation.prototype = {
    *    @return {Boolean} - whether the all the validations passed or if one failed
    */
   doValidations: function(){
-    this.validationFailed = false;
+    let validationsFailed = false;
     for(var i = 0, len = this.validations.length; i < len; ++i){
-	  this.validationFailed = !this.validateElement(this.validations[i].type, this.validations[i].params);
-      if(this.validationFailed) return false;	
+      this.validationFailed = !this.validateElement(this.validations[i].type, this.validations[i].params);
+      this.insertMessage(this.validations[i].messageHolder); this.addFieldClass();
+      validationsFailed = validationsFailed || this.validationFailed;
     }
+    this.validationFailed = validationsFailed;
+    if(this.validationFailed) return false;
     this.message = this.validMessage;
     return true;
   },
@@ -370,7 +378,7 @@ LiveValidation.prototype = {
    */
    
   /**
-   *	makes a span containg the passed or failed message
+   *	makes a span containing the passed or failed message
    *
    *    @return {HTMLSpanObject} - a span element with the message in it
    */
@@ -400,13 +408,12 @@ LiveValidation.prototype = {
   /**
    *  inserts the message in its container of the message that already exists (if it does)
    */
-  insertMessage: function() {
-    this.removeMessage();
-    if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMesssage has been set to false or empty string
+  insertMessage: function(messageHolder) {
+    if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMessage has been set to false or empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
       var className = this.validationFailed ? this.invalidClass : this.validClass;
-      this.messageHolder.addClassName(this.messageClass + ' ' + className);
-      this.messageHolder.textContent = this.message;
+      messageHolder.addClassName(this.messageClass + ' ' + className);
+      messageHolder.textContent = this.message;
     }
   },
     
@@ -428,8 +435,12 @@ LiveValidation.prototype = {
    *	removes the message element if it exists
    */
   removeMessage: function(){
-    this.messageHolder.className = 'message-holder';
-    this.messageHolder.textContent = '';
+    for (let i = 0; i < this.validations.length; i++) {
+      let validation = this.validations[i];
+      let messageHolder = validation.messageHolder;
+      messageHolder.className = 'validation-message-container ' + validation.identifier;
+      messageHolder.textContent = '';
+    }
   },
     
   /**

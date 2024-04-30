@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
-    <version>16.3.0</version>
+    <version>16.3.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade-1310</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</name>

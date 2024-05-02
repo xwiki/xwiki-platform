@@ -32,7 +32,7 @@
     "prettier": "3.2.5",
     "rollup": "4.14.3",
     "typescript": "5.4.5",
-    "vite": "5.2.10",
+    "vite": "5.2.11",
     "vite-plugin-dts": "3.8.1",
     "vite-plugin-inspect": "0.8.3",
     "vite-plugin-vuetify": "2.0.3"

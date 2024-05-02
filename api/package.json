@@ -30,7 +30,7 @@
     "@cristal/dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "rimraf": "5.0.5",
-    "vite": "5.2.10",
+    "vite": "5.2.11",
     "vitest": "1.5.2",
     "vue-tsc": "2.0.14"
   }

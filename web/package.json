@@ -39,7 +39,7 @@
     "@vitejs/plugin-vue": "5.0.4",
     "npm-run-all2": "6.1.2",
     "rimraf": "5.0.5",
-    "vite": "5.2.10",
+    "vite": "5.2.11",
     "vite-plugin-comlink": "4.0.2",
     "vite-plugin-dts": "3.8.1",
     "vite-plugin-inspect": "0.8.3",

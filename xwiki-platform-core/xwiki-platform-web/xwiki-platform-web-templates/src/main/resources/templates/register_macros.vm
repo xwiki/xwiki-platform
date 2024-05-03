@@ -172,9 +172,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         ## If there's not already a container, the livevalidation will create it itself but this fallback will not
         ## support icons.
         #define ($validationContainer)
-          <span class="validation-message-container $extraValidationClass" aria-live="polite">
-            <span class="validation-message-valid-icon">$services.icon.renderHTML('accept')</span>
-            <span class="validation-message-invalid-icon">$services.icon.renderHTML('error')</span>
+          <span class="LV_validation_message $extraValidationClass" aria-live="polite">
+            <span class="LV_validation_message_valid_icon">$services.icon.renderHTML('accept')</span><span class="LV_validation_message_invalid_icon">$services.icon.renderHTML('cross')</span>
           </span>
         #end
         #set($extraValidationClass = '')
@@ -219,7 +218,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set ($failMessage = $regex.failureMessage)
   #end
   #if ($pattern != '' && $failMessage != '' && !$regex.noscript)
-    #if($!foreach.count != "")
+    #if(!$validate.regex)
       ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage", identifier: 'regex-'+ $foreach.count});
     #else
       ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage", identifier: 'regex'});

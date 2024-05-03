@@ -100,10 +100,10 @@ LiveValidation.prototype = {
 	  // hooks
 	  beforeValidation: function(){},
 	  beforeValid: function(){},
-	  onValid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
+	  onValid: function(){this.addFieldClass(); },
 	  afterValid: function(){},
 	  beforeInvalid: function(){},
-	  onInvalid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
+	  onInvalid: function(){this.addFieldClass(); },
 	  afterInvalid: function(){},
 	  afterValidation: function(){},
     }, optionsObj || {});
@@ -169,7 +169,7 @@ LiveValidation.prototype = {
       }
     }
     this.validations = [];
-	this.removeMessageAndFieldClass();
+	this.removeFieldClass();
   },
   
   /**
@@ -187,7 +187,17 @@ LiveValidation.prototype = {
       validationMessageHolder = this.createMessageSpan();
       this.options.insertAfterWhatNode.up().appendChild(validationMessageHolder);
     }
+    /* We use the failure message as a fallback for the success message for regexes. This ensures that the regex stay
+    * shown to the user at all times. */
+    if (validationParamsObj.identifier.includes("regex") && validationParamsObj.validMessage == null) {
+      validationParamsObj.validMessage = validationParamsObj.failureMessage;
+    }
     this.validations.push( { type: validationFunction, params: validationParamsObj || {}, messageHolder: validationMessageHolder } );
+    // If the validation is a regex validation, then we display it in initialization.
+    // This avoids having the user finding out what are the rules of the field validation only after filling it up once.
+    if (validationParamsObj.identifier.includes("regex")) {
+      this.insertMessage(this.validations[this.validations.length - 1], null);
+    }
     return this;
   },
   
@@ -209,7 +219,6 @@ LiveValidation.prototype = {
    * makes the validation wait the alotted time from the last keystroke 
    */
   deferValidation: function(e){
-    if(this.wait >= 300) this.removeMessageAndFieldClass();
     if(this.timeout) clearTimeout(this.timeout);
     this.timeout = setTimeout(this.validate.bind(this), this.wait);
   },
@@ -227,7 +236,7 @@ LiveValidation.prototype = {
    */
   doOnFocus: function(){
     this.focused = true;
-    this.removeMessageAndFieldClass();
+    this.removeFieldClass();
   },
 		
   /**
@@ -267,16 +276,12 @@ LiveValidation.prototype = {
    *    @return {Boolean} - whether the all the validations passed or if one failed
    */
   doValidations: function(){
-    let validationsFailed = false;
     for(var i = 0, len = this.validations.length; i < len; ++i){
-      this.validationFailed = !this.validateElement(this.validations[i].type, this.validations[i].params);
-      this.insertMessage(this.validations[i].messageHolder); this.addFieldClass();
-      validationsFailed = validationsFailed || this.validationFailed;
+      let isValid = this.validateElement(this.validations[i].type, this.validations[i].params);
+      this.insertMessage(this.validations[i], isValid);
+      this.validationFailed = this.validationFailed || isValid;
     }
-    this.validationFailed = validationsFailed;
-    if(this.validationFailed) return false;
-    this.message = this.validMessage;
-    return true;
+    return !this.validationFailed;
   },
     
   /**
@@ -372,49 +377,58 @@ LiveValidation.prototype = {
     
   /** Message insertion methods ****************************
    * 
-   * These are only used in the onValid and onInvalid callback functions and so if you overide the default callbacks,
-   * you must either impliment your own functions to do whatever you want, or call some of these from them if you 
+   * These are only used in the onValid and onInvalid callback functions and so if you override the default callbacks,
+   * you must either implement your own functions to do whatever you want, or call some of these from them if you
    * want to keep some of the functionality
    */
    
   /**
-   *	makes a span containing the passed or failed message
+   *	makes a span to contain the passed or failed message
    *
-   *    @return {HTMLSpanObject} - a span element with the message in it
+   *    @return {HTMLSpanObject} - an empty span element to contain the message.
    */
   createMessageSpan: function(){
     var span = document.createElement('span');
+    span.classList.add(this.messageClass);
     span.setAttribute('aria-live', 'polite');
     return span;
   },
-    
+
   /**
-   *  inserts the element to contain the message in place of the element that already exists (if it does)
-   *
-   *  @param elementToInsert {HTMLElementObject} - an element node to insert
+   *  inserts the message in its container.
    */
-  insertMessageHolder: function(elementToInsert){
-    var className = this.validationFailed ? this.invalidClass : this.validClass;
-    $(elementToInsert).addClassName(this.messageClass + ' ' + className);
-    var parent = this.options.insertAfterWhatNode.up();
-    var nxtSibling = this.options.insertAfterWhatNode.next();
-    if (nxtSibling) {
-      parent.insertBefore(elementToInsert, nxtSibling);
-    }else{
-      parent.appendChild(elementToInsert);
+  insertMessage: function(validation, isValid) {
+    let messageHolder = validation.messageHolder;
+    if(validation.params.validMessage=="" && !validation.params.validMessage) return; // dont insert anything if validMessage is an empty string
+    if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) ||
+      this.element.value != '' ||
+        validation.params.identifier.includes("regex")){
+      this.removeMessageClass(messageHolder);
+      /* If the isValid state is null, we assume that the validation did not occur yet. We do not add any class that
+      * would give a false hint towards a result. */
+      if(isValid != null) {
+        this.addMessageClass(messageHolder, isValid);
+      }
+      // We change just the lastChild textContent. This last child is a text node. This allows to not remove the icons.
+      let newMessageContent = isValid ? validation.params.validMessage : validation.params.failureMessage;
+      messageHolder.lastChild.textContent = newMessageContent;
     }
   },
 
   /**
-   *  inserts the message in its container of the message that already exists (if it does)
+   *  Add a class for the holder of the validation message.
    */
-  insertMessage: function(messageHolder) {
-    if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMessage has been set to false or empty string
-    if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
-      var className = this.validationFailed ? this.invalidClass : this.validClass;
-      messageHolder.addClassName(this.messageClass + ' ' + className);
-      messageHolder.textContent = this.message;
-    }
+  removeMessageClass: function(messageHolder) {
+    messageHolder.removeClassName(this.invalidClass);
+    messageHolder.removeClassName(this.validClass);
+  },
+
+  /**
+   *  Add a class for the holder of the validation message.
+   */
+  addMessageClass: function(messageHolder, isValid) {
+    let className = isValid ? this.validClass : this.invalidClass;
+    messageHolder.addClassName(className);
   },
     
   /**
@@ -432,19 +446,18 @@ LiveValidation.prototype = {
   },
     
   /**
-   *	removes the message element if it exists
+   *	Empties out the message elements if they exist
    */
   removeMessage: function(){
     for (let i = 0; i < this.validations.length; i++) {
-      let validation = this.validations[i];
-      let messageHolder = validation.messageHolder;
-      messageHolder.className = 'validation-message-container ' + validation.identifier;
-      messageHolder.textContent = '';
+      let messageHolder = this.validations[i].messageHolder;
+      this.removeMessageClass(messageHolder);
+      messageHolder.lastChild.textContent = '';
     }
   },
     
   /**
-   *  removes the class that has been applied to the field to indicte if valid or not
+   *  removes the class that has been applied to the field to indicate if valid or not
    */
   removeFieldClass: function(){
     this.element.removeClassName(this.invalidFieldClass);

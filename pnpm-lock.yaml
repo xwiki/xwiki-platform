@@ -72,8 +72,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.4.26(typescript@5.4.5))
@@ -155,14 +155,14 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.4.26(typescript@5.4.5))
       vuetify:
         specifier: 3.5.14
-        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       '@cristal/dev-config':
         specifier: workspace:^
@@ -232,11 +232,11 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vuetify:
         specifier: 3.5.14
-        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -284,11 +284,11 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vuetify:
         specifier: 3.5.14
-        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -358,11 +358,11 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vuetify:
         specifier: 3.5.14
-        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -522,8 +522,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -550,8 +550,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -614,14 +614,14 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.4.26(typescript@5.4.5))
       vuetify:
         specifier: 3.5.14
-        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -648,8 +648,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -704,8 +704,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -726,8 +726,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -766,8 +766,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.4.26(typescript@5.4.5))
@@ -803,14 +803,14 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.4.26(typescript@5.4.5))
       vuetify:
         specifier: 3.5.14
-        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: 5.0.4
@@ -880,8 +880,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       '@types/dompurify':
         specifier: 3.0.5
@@ -908,14 +908,14 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.4.26(typescript@5.4.5))
       vuetify:
         specifier: 3.5.14
-        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+        version: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       '@playwright/test':
         specifier: 1.43.1
@@ -966,8 +966,8 @@ importers:
         specifier: 3.4.26
         version: 3.4.26(typescript@5.4.5)
       vue-i18n:
-        specifier: 9.8.0
-        version: 9.8.0(vue@3.4.26(typescript@5.4.5))
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.5
@@ -1325,16 +1325,16 @@ packages:
   '@humanwhocodes/object-schema@2.0.2':
     resolution: {integrity: sha512-6EwiSjwWYP7pTckG6I5eyFANjPhmPjUX9JRLUSfNPC7FX7zK9gyZAfUEaECL6ALTpGX5AjnBq3C9XmVWPitNpw==}
 
-  '@intlify/core-base@9.8.0':
-    resolution: {integrity: sha512-UxaSZVZ1DwqC/CltUZrWZNaWNhfmKtfyV4BJSt/Zt4Or/fZs1iFj0B+OekYk1+MRHfIOe3+x00uXGQI4PbO/9g==}
+  '@intlify/core-base@9.13.1':
+    resolution: {integrity: sha512-+bcQRkJO9pcX8d0gel9ZNfrzU22sZFSA0WVhfXrf5jdJOS24a+Bp8pozuS9sBI9Hk/tGz83pgKfmqcn/Ci7/8w==}
     engines: {node: '>= 16'}
 
-  '@intlify/message-compiler@9.8.0':
-    resolution: {integrity: sha512-McnYWhcoYmDJvssVu6QGR0shqlkJuL1HHdi5lK7fNqvQqRYaQ4lSLjYmZxwc8tRNMdIe9/KUKfyPxU9M6yCtNQ==}
+  '@intlify/message-compiler@9.13.1':
+    resolution: {integrity: sha512-SKsVa4ajYGBVm7sHMXd5qX70O2XXjm55zdZB3VeMFCvQyvLew/dLvq3MqnaIsTMF1VkkOb9Ttr6tHcMlyPDL9w==}
     engines: {node: '>= 16'}
 
-  '@intlify/shared@9.8.0':
-    resolution: {integrity: sha512-TmgR0RCLjzrSo+W3wT0ALf9851iFMlVI9EYNGeWvZFUQTAJx0bvfsMlPdgVtV1tDNRiAfhkFsMKu6jtUY1ZLKQ==}
+  '@intlify/shared@9.13.1':
+    resolution: {integrity: sha512-u3b6BKGhE6j/JeRU6C/RL2FgyJfy6LakbtfeVF8fJXURpZZTzfh3e05J0bu0XPw447Q6/WUp3C4ajv4TMS4YsQ==}
     engines: {node: '>= 16'}
 
   '@isaacs/cliui@8.0.2':
@@ -2005,17 +2005,11 @@ packages:
   '@volar/typescript@2.2.1':
     resolution: {integrity: sha512-Z/tqluR7Hz5/5dCqQp7wo9C/6tSv/IYl+tTzgzUt2NjTq95bKSsuO4E+V06D0c+3aP9x5S9jggLqw451hpnc6Q==}
 
-  '@vue/compiler-core@3.4.21':
-    resolution: {integrity: sha512-MjXawxZf2SbZszLPYxaFCjxfibYrzr3eYbKxwpLR9EQN+oaziSu3qKVbwBERj1IFIB8OLUewxB5m/BFzi613og==}
-
   '@vue/compiler-core@3.4.24':
     resolution: {integrity: sha512-vbW/tgbwJYj62N/Ww99x0zhFTkZDTcGh3uwJEuadZ/nF9/xuFMC4693P9r+3sxGXISABpDKvffY5ApH9pmdd1A==}
 
   '@vue/compiler-core@3.4.26':
     resolution: {integrity: sha512-N9Vil6Hvw7NaiyFUFBPXrAyETIGlQ8KcFMkyk6hW1Cl6NvoqvP+Y8p1Eqvx+UdqsnrnI9+HMUEJegzia3mhXmQ==}
-
-  '@vue/compiler-dom@3.4.21':
-    resolution: {integrity: sha512-IZC6FKowtT1sl0CR5DpXSiEB5ayw75oT2bma1BEhV7RRR1+cfwLrxc2Z8Zq/RGFzJ8w5r9QtCOvTjQgdn0IKmA==}
 
   '@vue/compiler-dom@3.4.24':
     resolution: {integrity: sha512-4XgABML/4cNndVsQndG6BbGN7+EoisDwi3oXNovqL/4jdNhwvP8/rfRMTb6FxkxIxUUtg6AI1/qZvwfSjxJiWA==}
@@ -2078,9 +2072,6 @@ packages:
     resolution: {integrity: sha512-xoGAqSjYDPGAeRWxeoYwqJFD/gw7mpgzOvSxEmjWaFO2rE6qpbD1PC172YRpvKhrihkyHJkNDADFXTfCyVGhKw==}
     peerDependencies:
       vue: 3.4.26
-
-  '@vue/shared@3.4.21':
-    resolution: {integrity: sha512-PuJe7vDIi6VYSinuEbUIQgMIRZGgM8e4R+G+/dQTk0X1NEdvgvvgv7m+rfmDH1gZzyA1OjjoWskvHlfRNfQf3g==}
 
   '@vue/shared@3.4.24':
     resolution: {integrity: sha512-BW4tajrJBM9AGAknnyEw5tO2xTmnqgup0VTnDAMcxYmqOX0RG0b9aSUGAbEKolD91tdwpA6oCwbltoJoNzpItw==}
@@ -5200,8 +5191,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  vue-i18n@9.8.0:
-    resolution: {integrity: sha512-Izho+6PYjejsTq2mzjcRdBZ5VLRQoSuuexvR8029h5CpN03FYqiqBrShMyf2I1DKkN6kw/xmujcbvC+4QybpsQ==}
+  vue-i18n@9.13.1:
+    resolution: {integrity: sha512-mh0GIxx0wPtPlcB1q4k277y0iKgo25xmDPWioVVYanjPufDBpvu5ySTjP5wOrSvlYQ2m1xI+CFhGdauv/61uQg==}
     engines: {node: '>= 16'}
     peerDependencies:
       vue: ^3.0.0
@@ -5807,17 +5798,17 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.2': {}
 
-  '@intlify/core-base@9.8.0':
+  '@intlify/core-base@9.13.1':
     dependencies:
-      '@intlify/message-compiler': 9.8.0
-      '@intlify/shared': 9.8.0
+      '@intlify/message-compiler': 9.13.1
+      '@intlify/shared': 9.13.1
 
-  '@intlify/message-compiler@9.8.0':
+  '@intlify/message-compiler@9.13.1':
     dependencies:
-      '@intlify/shared': 9.8.0
+      '@intlify/shared': 9.13.1
       source-map-js: 1.2.0
 
-  '@intlify/shared@9.8.0': {}
+  '@intlify/shared@9.13.1': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -6550,14 +6541,6 @@ snapshots:
       '@volar/language-core': 2.2.1
       path-browserify: 1.0.1
 
-  '@vue/compiler-core@3.4.21':
-    dependencies:
-      '@babel/parser': 7.24.4
-      '@vue/shared': 3.4.21
-      entities: 4.5.0
-      estree-walker: 2.0.2
-      source-map-js: 1.2.0
-
   '@vue/compiler-core@3.4.24':
     dependencies:
       '@babel/parser': 7.24.4
@@ -6573,11 +6556,6 @@ snapshots:
       entities: 4.5.0
       estree-walker: 2.0.2
       source-map-js: 1.2.0
-
-  '@vue/compiler-dom@3.4.21':
-    dependencies:
-      '@vue/compiler-core': 3.4.21
-      '@vue/shared': 3.4.21
 
   '@vue/compiler-dom@3.4.24':
     dependencies:
@@ -6676,8 +6654,6 @@ snapshots:
       '@vue/shared': 3.4.26
       vue: 3.4.26(typescript@5.4.5)
 
-  '@vue/shared@3.4.21': {}
-
   '@vue/shared@3.4.24': {}
 
   '@vue/shared@3.4.26': {}
@@ -6687,11 +6663,11 @@ snapshots:
       js-beautify: 1.14.11
       vue-component-type-helpers: 2.0.7
 
-  '@vuetify/loader-shared@2.0.3(vue@3.4.26(typescript@5.4.5))(vuetify@3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5)))':
+  '@vuetify/loader-shared@2.0.3(vue@3.4.26(typescript@5.4.5))(vuetify@3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5)))':
     dependencies:
       upath: 2.0.1
       vue: 3.4.26(typescript@5.4.5)
-      vuetify: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+      vuetify: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
 
   '@xmldom/xmldom@0.8.10': {}
 
@@ -10229,12 +10205,12 @@ snapshots:
 
   vite-plugin-vuetify@2.0.3(vite@5.2.11(@types/node@20.12.8))(vue@3.4.26(typescript@5.4.5))(vuetify@3.5.14):
     dependencies:
-      '@vuetify/loader-shared': 2.0.3(vue@3.4.26(typescript@5.4.5))(vuetify@3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5)))
+      '@vuetify/loader-shared': 2.0.3(vue@3.4.26(typescript@5.4.5))(vuetify@3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5)))
       debug: 4.3.4(supports-color@5.5.0)
       upath: 2.0.1
       vite: 5.2.11(@types/node@20.12.8)
       vue: 3.4.26(typescript@5.4.5)
-      vuetify: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
+      vuetify: 3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     transitivePeerDependencies:
       - supports-color
 
@@ -10313,10 +10289,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)):
+  vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)):
     dependencies:
-      '@intlify/core-base': 9.8.0
-      '@intlify/shared': 9.8.0
+      '@intlify/core-base': 9.13.1
+      '@intlify/shared': 9.13.1
       '@vue/devtools-api': 6.5.1
       vue: 3.4.26(typescript@5.4.5)
 
@@ -10354,13 +10330,13 @@ snapshots:
     optionalDependencies:
       typescript: 5.4.5
 
-  vuetify@3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.8.0(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5)):
+  vuetify@3.5.14(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5)):
     dependencies:
       vue: 3.4.26(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
       vite-plugin-vuetify: 2.0.3(vite@5.2.11(@types/node@20.12.8))(vue@3.4.26(typescript@5.4.5))(vuetify@3.5.14)
-      vue-i18n: 9.8.0(vue@3.4.26(typescript@5.4.5))
+      vue-i18n: 9.13.1(vue@3.4.26(typescript@5.4.5))
 
   w3c-keyname@2.2.8: {}
 

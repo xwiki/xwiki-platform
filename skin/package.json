@@ -39,7 +39,7 @@
     "@vitejs/plugin-vue": "5.0.4",
     "rimraf": "5.0.5",
     "vite": "5.2.11",
-    "vite-plugin-inspect": "0.8.3",
+    "vite-plugin-inspect": "0.8.4",
     "vite-plugin-vuetify": "2.0.3",
     "vue": "3.4.26",
     "vue-tsc": "2.0.16"

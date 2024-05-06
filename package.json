@@ -34,7 +34,7 @@
     "typescript": "5.4.5",
     "vite": "5.2.11",
     "vite-plugin-dts": "3.9.1",
-    "vite-plugin-inspect": "0.8.3",
+    "vite-plugin-inspect": "0.8.4",
     "vite-plugin-vuetify": "2.0.3"
   }
 }

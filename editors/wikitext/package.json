@@ -25,7 +25,7 @@
     "inversify": "6.0.2",
     "vue": "3.4.26",
     "vue-i18n": "9.13.1",
-    "vuetify": "3.5.14"
+    "vuetify": "3.6.3"
   },
   "devDependencies": {
     "rimraf": "5.0.5"

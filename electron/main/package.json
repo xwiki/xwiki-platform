@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "@cristal/electron-storage": "workspace:^",
-    "electron": "29.2.0"
+    "electron": "29.3.2"
   }
 }

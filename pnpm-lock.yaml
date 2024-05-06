@@ -868,8 +868,8 @@ importers:
         specifier: workspace:^
         version: link:../sharedworker/api
       dexie:
-        specifier: 3.2.7
-        version: 3.2.7
+        specifier: 4.0.4
+        version: 4.0.4
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -2682,9 +2682,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  dexie@3.2.7:
-    resolution: {integrity: sha512-2a+BXvVhY5op+smDRLxeBAivE7YcYaneXJ1la3HOkUfX9zKkE/AJ8CNgjiXbtXepFyFmJNGSbmjOwqbT749r/w==}
-    engines: {node: '>=6.0'}
+  dexie@4.0.4:
+    resolution: {integrity: sha512-wFzwWSUdi+MC3jiFeQcCp9nInR7EaX8edzYY+4wmiITkQAiSnHpe4Wo2o5Ce5tJZe2nqt7mLW91MsW4GYx3ziQ==}
 
   diff-sequences@29.6.3:
     resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
@@ -7326,7 +7325,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dexie@3.2.7: {}
+  dexie@4.0.4: {}
 
   diff-sequences@29.6.3: {}
 

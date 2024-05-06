@@ -22,7 +22,7 @@
   "dependencies": {
     "@cristal/api": "workspace:^",
     "@cristal/sharedworker-api": "workspace:^",
-    "dexie": "3.2.7",
+    "dexie": "4.0.4",
     "inversify": "6.0.2",
     "reflect-metadata": "0.2.2",
     "vue": "3.4.26",

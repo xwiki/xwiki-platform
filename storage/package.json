@@ -32,6 +32,6 @@
     "@types/dompurify": "3.0.5",
     "rimraf": "5.0.5",
     "vite": "5.2.11",
-    "vue-tsc": "2.0.14"
+    "vue-tsc": "2.0.16"
   }
 }

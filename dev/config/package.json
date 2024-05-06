@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "vitest": "1.5.2"
+    "vitest": "1.6.0"
   }
 }

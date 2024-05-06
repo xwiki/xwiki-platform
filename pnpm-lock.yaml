@@ -436,8 +436,8 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       unplugin-auto-expose:
-        specifier: 0.3.0
-        version: 0.3.0(rollup@4.17.2)
+        specifier: 0.2.4
+        version: 0.2.4(rollup@4.17.2)
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.8)
@@ -5013,8 +5013,8 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  unplugin-auto-expose@0.3.0:
-    resolution: {integrity: sha512-zg/Z7EkxXu5gOP9+MHaSPOlV9ZgunOcjPGc89kAhZA9l/+sJ98StnXZhElWADRW8ziSk54Guci4A6agg3254+Q==}
+  unplugin-auto-expose@0.2.4:
+    resolution: {integrity: sha512-piVmCwoKPEAe/IskcjN52U5UmnM/RZc8Z5kmN69TX9PWE92WzKOVsu3UQt7jJll7jwHLbR3nmDGPSfBxdxPZ2g==}
 
   unplugin@1.6.0:
     resolution: {integrity: sha512-BfJEpWBu3aE/AyHx8VaNE/WgouoQxgH9baAiH82JjX8cqVyi3uJQstqwD5J+SZxIK326SZIhsSZlALXVBCknTQ==}
@@ -10068,7 +10068,7 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-auto-expose@0.3.0(rollup@4.17.2):
+  unplugin-auto-expose@0.2.4(rollup@4.17.2):
     dependencies:
       '@babel/parser': 7.23.6
       '@babel/traverse': 7.23.7

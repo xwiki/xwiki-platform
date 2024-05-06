@@ -22,7 +22,7 @@
     "inversify": "6.0.2"
   },
   "devDependencies": {
-    "@types/node": "20.12.7",
+    "@types/node": "20.12.8",
     "rimraf": "5.0.5",
     "vite": "5.2.11",
     "vite-plugin-node": "3.1.0",

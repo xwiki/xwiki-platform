@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.44.0",
-    "@types/node": "20.12.9",
+    "@types/node": "20.12.10",
     "@vitejs/plugin-vue": "5.0.4",
     "npm-run-all2": "6.1.2",
     "rimraf": "5.0.5",

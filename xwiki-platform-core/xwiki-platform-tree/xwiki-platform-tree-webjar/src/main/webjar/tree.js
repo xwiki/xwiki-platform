@@ -71,15 +71,7 @@ define([
         urlParams[pair[0]] = pair[1];
       }
     }
-    return $.post(new URL('?', url), $.param($.extend(urlParams, data), true))
-      .then((nodes) => {
-        nodes.forEach((object) => {
-          // Each node will be rendered as an HTML element.
-          // As such, we want to make sure we escape space characters in their ids
-          object.id = object.id.replaceAll('%', '%25').replaceAll(' ', '%20');
-        });
-        return nodes;
-      });
+    return $.post(new URL('?', url), $.param($.extend(urlParams, data), true));
   };
 
   var getChildren = function(node, callback, parameters) {
@@ -111,7 +103,7 @@ define([
       childrenURL = this.element.attr('data-url');
       parameters = $.extend({
         data: 'children',
-        id: node.id.replaceAll('%20', ' ').replaceAll('%25', '%')
+        id: node.id
       }, parameters);
     }
     if (childrenURL) {

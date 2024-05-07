@@ -34,7 +34,7 @@
     "vuetify": "3.6.3"
   },
   "devDependencies": {
-    "@playwright/test": "1.43.1",
+    "@playwright/test": "1.44.0",
     "@types/node": "20.12.9",
     "@vitejs/plugin-vue": "5.0.4",
     "npm-run-all2": "6.1.2",

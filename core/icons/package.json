@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@cristal/dev-config": "workspace:*",
-    "@vue/test-utils": "2.4.5",
+    "@vue/test-utils": "2.4.6",
     "eslint": "8.57.0",
     "rimraf": "5.0.5",
     "vite": "5.2.11",

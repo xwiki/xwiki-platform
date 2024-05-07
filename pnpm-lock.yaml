@@ -107,8 +107,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       '@vue/test-utils':
-        specifier: 2.4.5
-        version: 2.4.5
+        specifier: 2.4.6
+        version: 2.4.6
       eslint:
         specifier: 8.57.0
         version: 8.57.0
@@ -168,8 +168,8 @@ importers:
         specifier: workspace:^
         version: link:../../dev/config
       '@vue/test-utils':
-        specifier: 2.4.5
-        version: 2.4.5
+        specifier: 2.4.6
+        version: 2.4.6
       happy-dom:
         specifier: 14.7.1
         version: 14.7.1
@@ -205,8 +205,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       '@vue/test-utils':
-        specifier: 2.4.5
-        version: 2.4.5
+        specifier: 2.4.6
+        version: 2.4.6
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -2100,8 +2100,8 @@ packages:
   '@vue/shared@3.4.26':
     resolution: {integrity: sha512-Fg4zwR0GNnjzodMt3KRy2AWGMKQXByl56+4HjN87soxLNU9P5xcJkstAlIeEF3cU6UYOzmJl1tV0dVPGIljCnQ==}
 
-  '@vue/test-utils@2.4.5':
-    resolution: {integrity: sha512-oo2u7vktOyKUked36R93NB7mg2B+N7Plr8lxp2JBGwr18ch6EggFjixSCdIVVLkT6Qr0z359Xvnafc9dcKyDUg==}
+  '@vue/test-utils@2.4.6':
+    resolution: {integrity: sha512-FMxEjOpYNYiFe0GkaHsnJPXFHxQ6m4t8vI/ElPGpMWxZKpmRvQ33OIrvRXemy6yha03RxhOlQuy+gZMC3CQSow==}
 
   '@vuetify/loader-shared@2.0.3':
     resolution: {integrity: sha512-Ss3GC7eJYkp2SF6xVzsT7FAruEmdihmn4OCk2+UocREerlXKWgOKKzTN5PN3ZVN5q05jHHrsNhTuWbhN61Bpdg==}
@@ -6702,7 +6702,7 @@ snapshots:
 
   '@vue/shared@3.4.26': {}
 
-  '@vue/test-utils@2.4.5':
+  '@vue/test-utils@2.4.6':
     dependencies:
       js-beautify: 1.14.11
       vue-component-type-helpers: 2.0.7

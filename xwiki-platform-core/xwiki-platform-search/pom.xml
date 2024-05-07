@@ -35,6 +35,5 @@
     <module>xwiki-platform-search-api</module>
     <module>xwiki-platform-search-solr</module>
     <module>xwiki-platform-search-ui</module>
-    <module>xwiki-platform-search-webjar</module>
   </modules>
 </project>

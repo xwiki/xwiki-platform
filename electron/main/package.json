@@ -20,7 +20,7 @@
     "linux": "echo 'no task'"
   },
   "devDependencies": {
-    "@types/node": "20.12.10",
+    "@types/node": "20.12.11",
     "cross-env": "7.0.3",
     "rimraf": "5.0.5",
     "typescript": "5.4.5",

@@ -22,7 +22,9 @@ package org.xwiki.realtime.wiki.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.BaseElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Represents the Realtime Wiki Editor.
@@ -31,21 +33,29 @@ import org.xwiki.test.ui.po.BaseElement;
  * @since 15.5.4
  * @since 15.10
  */
-public class RealtimeWikiEditor extends BaseElement
+public class RealtimeWikiEditPage extends WikiEditPage
 {
     @FindBy(className = "realtime-allow")
     private WebElement allowRealtimeCheckbox;
 
-    @FindBy(id = "xwikimaincontainer")
-    private WebElement mainContainerDiv;
-
-    @FindBy(id = "xwikieditcontent")
-    private WebElement editContentDiv;
-
-    public void sendKeys(CharSequence... keys)
+    /**
+     * Default constructor.
+     */
+    public RealtimeWikiEditPage()
     {
-        getDriver().executeScript("arguments[0].focus()", editContentDiv);
-        mainContainerDiv.sendKeys(keys);
+        waitToLoad();
+    }
+
+    /**
+     * Opens the specified wiki page in real-time wiki edit mode.
+     *
+     * @param pageReference the wiki page to edit in real-time wiki edit mode
+     * @return the realtime wiki edit page
+     */
+    public static RealtimeWikiEditPage gotoPage(EntityReference pageReference)
+    {
+        WikiEditPage.gotoPage(pageReference);
+        return new RealtimeWikiEditPage();
     }
 
     /**
@@ -56,6 +66,16 @@ public class RealtimeWikiEditor extends BaseElement
     public void waitUntilEditingWith(String user)
     {
         getDriver().waitUntilElementHasTextContent(By.cssSelector("a.rt-user-link"), user);
+    }
+
+    /**
+     * Wait until the editor contains the given text.
+     *
+     * @param text the text to wait for
+     */
+    public void waitUntilContentContains(String text)
+    {
+        getDriver().waitUntilCondition(ExpectedConditions.textToBePresentInElementValue(this.contentText, text));
     }
 
     /**
@@ -78,12 +98,33 @@ public class RealtimeWikiEditor extends BaseElement
 
     /**
      * Join the realtime editing session.
+     *
+     * @return the realtime wiki edit page
      */
-    public void joinRealtimeEditing()
+    public RealtimeWikiEditPage joinRealtimeEditing()
     {
         if (!isRealtimeEditing()) {
+            // Joining back the realtime session reloads the page currently.
+            getDriver().addPageNotYetReloadedMarker();
             this.allowRealtimeCheckbox.click();
+            getDriver().waitUntilPageIsReloaded();
+            return new RealtimeWikiEditPage();
         }
+        return this;
     }
 
+    @Override
+    public void sendKeys(CharSequence... keys)
+    {
+        // Focus the text area before sending the keys in order to restore the previous selection.
+        getDriver().executeScript("arguments[0].focus()", this.contentText);
+        super.sendKeys(keys);
+    }
+
+    private RealtimeWikiEditPage waitToLoad()
+    {
+        getDriver().waitUntilElementIsEnabled(this.allowRealtimeCheckbox);
+        getDriver().waitUntilElementIsEnabled(this.contentText);
+        return this;
+    }
 }

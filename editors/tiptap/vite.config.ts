@@ -7,7 +7,7 @@ export default mergeConfig(
     build: {
       lib: {
         entry: "./src/index.ts",
-        name: "editors_prosemirror",
+        name: "editors_tiptap",
       },
     },
   }),

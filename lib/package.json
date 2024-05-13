@@ -24,7 +24,7 @@
     "@cristal/dsfr": "workspace:*",
     "@cristal/dsshoelace": "workspace:*",
     "@cristal/dsvuetify": "workspace:*",
-    "@cristal/editors-prosemirror": "workspace:*",
+    "@cristal/editors-tiptap": "workspace:*",
     "@cristal/extension-manager": "workspace:^",
     "@cristal/extension-menubuttons": "workspace:^",
     "@cristal/macros": "workspace:^",

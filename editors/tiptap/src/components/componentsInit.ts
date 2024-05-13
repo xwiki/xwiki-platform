@@ -1,4 +1,4 @@
-<!--
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -21,51 +21,17 @@
  * @copyright  Copyright (c) 2023 XWiki SAS
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
--->
+ **/
 
-<script lang="ts" setup>
-import { CristalApp } from "@cristal/api";
-import { inject, ref } from "vue";
+import { Container } from "inversify";
+import { UIXTemplateProvider } from "@cristal/skin";
+import { UixTiptapEditorProvider } from "./uixTiptapEditorProvider";
 
-const cristal = inject<CristalApp>("cristal");
-let link = "/" + cristal?.getCurrentPage() + "/view";
-const pageStatus = ref({
-  currentContent: "Initial content",
-  currentSource: cristal?.getCurrentSource(),
-  css: [],
-  js: [],
-  html: "",
-  document: null,
-  withSheet: false,
-  sheet: "",
-});
-if (cristal) {
-  cristal.setContentRef(pageStatus);
+export default class ComponentInit {
+  constructor(container: Container) {
+    container
+      .bind<UIXTemplateProvider>("UIXTemplateProvider")
+      .to(UixTiptapEditorProvider)
+      .whenTargetNamed(UixTiptapEditorProvider.extensionPoint);
+  }
 }
-</script>
-<template>
-  <div class="pagemenu">
-    <router-link :to="link">
-      <x-btn>Cancel</x-btn>
-    </router-link>
-    <x-btn>Save</x-btn>
-  </div>
-  <br />
-  <br />
-  <div id="xwikicontent">
-    <v-textarea
-      v-model="pageStatus.currentSource"
-      auto-grow
-      rows="25"
-      variant="outlined"
-      label="Editor"
-      width="100%"
-    />
-  </div>
-</template>
-<style>
-textarea {
-  border: 1px solid black;
-  width: 100%;
-}
-</style>

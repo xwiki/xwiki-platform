@@ -2,6 +2,7 @@
     "compilerOptions": {
         "rootDir" : "src",
         "outDir" : "dist",
+        "lib": ["dom"]
     },
     "extends": "./../../tsconfig.json",
     "include": ["./src/index.ts", "./src/**/*"]

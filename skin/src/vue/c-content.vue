@@ -117,7 +117,7 @@ onUpdated(() => {
   </div>
   <article v-else id="content" ref="root" class="content">
     <UIX uixname="content.before" />
-    <div ref="content" class="inner-content">
+    <div class="inner-content">
       <!-- eslint-disable vue/no-v-html -->
       <div class="content-header">
         <XBreadcrumb class="breadcrumb"></XBreadcrumb>

@@ -3,50 +3,37 @@ import {
   computed,
   type ComputedRef,
   inject,
-  onBeforeUnmount,
-  onBeforeUpdate,
   onUpdated,
   type Ref,
   ref,
   watch,
 } from "vue";
-import {
-  defaultMarkdownParser,
-  defaultMarkdownSerializer,
-  schema as markdownSchema,
-} from "prosemirror-markdown";
-import { EditorState, EditorStateConfig, Plugin } from "prosemirror-state";
-import { EditorView } from "prosemirror-view";
 import { CristalApp, PageData } from "@cristal/api";
-import { baseKeymap } from "prosemirror-commands";
-import { emptyLinePlaceholder } from "../plugins/empty-line-placeholder";
-import { keymap } from "prosemirror-keymap";
-import { exampleSetup } from "prosemirror-example-setup";
-import "prosemirror-example-setup/style/style.css";
-import "prosemirror-view/style/prosemirror.css";
-import "prosemirror-menu/style/menu.css";
-import { DOMParser, Schema } from "prosemirror-model";
-import { schema as basicSchema } from "prosemirror-schema-basic";
 import { useRoute } from "vue-router";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
+import { Slash } from "../components/extensions/slash";
+import { Markdown } from "tiptap-markdown";
+import Image from "@tiptap/extension-image";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableHeader from "@tiptap/extension-table-header";
+import TableCell from "@tiptap/extension-table-cell";
+import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
+import Blockquote from "@tiptap/extension-blockquote";
+import Code from "@tiptap/extension-code";
+import CodeBlock from "@tiptap/extension-code-block";
 
 const route = useRoute();
-const editor = ref(null);
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const loading = ref(false);
 const currentPage: Ref<PageData | undefined> = ref(undefined);
 const error: Ref<Error | undefined> = ref(undefined);
 
-/*
- TODO: add more plugins to make the experience more user-friendly:
- - undo / redo
- - basic styling operations
- - contextual tooltip
- - quick actions
- - ...
-*/
-const plugins: Plugin[] = [emptyLinePlaceholder, keymap(baseKeymap)];
-
-let view: EditorView;
+// TODO: load this content first, then initialize the editor.
+// Make the loading status first.
+const content = ref("");
 
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
@@ -69,62 +56,58 @@ async function fetchPage() {
 
 watch(() => route.params.page, fetchPage, { immediate: true });
 
-async function loadEditor(page: PageData) {
-  const config: EditorStateConfig = {
-    plugins,
-  };
-
-  // Push the content to the document.
-  // TODO: move to a components based implementation
-  let schema: Schema = markdownSchema;
-  if (page.syntax == "markdown/1.2") {
-    config.doc = defaultMarkdownParser.parse(page.source!)!;
-  } else {
-    const tmpparse = document.createElement("div");
-    tmpparse.innerHTML = page.html;
-    schema = basicSchema;
-    config.doc = DOMParser.fromSchema(schema).parse(tmpparse);
-  }
-
-  view = new EditorView(editor.value, {
-    state: EditorState.create({
-      ...config,
-      plugins: exampleSetup({ schema }),
-    }),
-  });
-}
-
-/**
- * Make sure to destroy the editor before creating a new one,
- * or when this component is unmounted.
- */
-function destroyEditor() {
-  if (view) {
-    view.destroy();
-  }
-}
-
-onBeforeUpdate(destroyEditor);
-onUpdated(() => loadEditor(currentPage.value!));
-onBeforeUnmount(destroyEditor);
-
 const viewRouterParams = {
   name: "view",
   params: { page: currentPageName.value },
 };
 const submit = async () => {
-  const markdown = defaultMarkdownSerializer.serialize(view.state.doc);
   // TODO: html does not make any sense here.
   await cristal
     ?.getWikiConfig()
-    .storage.save(currentPageName.value, markdown, "html");
+    .storage.save(
+      currentPageName.value,
+      editor.value?.storage.markdown.getMarkdown(),
+      "html",
+    );
   cristal?.getRouter().push(viewRouterParams);
 };
+
+let editor: Ref<Editor | undefined> = ref(undefined);
+
+async function loadEditor(page: PageData) {
+  // Push the content to the document.
+  // TODO: move to a components based implementation
+  if (!editor.value) {
+    content.value = page.syntax == "markdown/1.2" ? page.source : page.html;
+    editor.value = new Editor({
+      content: content.value,
+      extensions: [
+        StarterKit,
+        Placeholder.configure({
+          placeholder: "Type '/' to show the available actions",
+        }),
+        Image,
+        Table,
+        TableRow,
+        TableHeader,
+        TableCell,
+        Slash,
+        Markdown.configure({
+          html: true,
+        }),
+        Blockquote,
+        Code,
+        CodeBlock,
+      ],
+    });
+  }
+}
+
+onUpdated(() => loadEditor(currentPage.value!));
 </script>
 
 <template>
   <div v-if="loading" class="content-loading">
-    <!-- TODO: provide a proposer loading UI. -->
     <span class="load-spinner"></span>
     <h3>Loading</h3>
   </div>
@@ -136,9 +119,11 @@ const submit = async () => {
     <div v-show="!loading && !error" class="content">
       <div class="content-scroll">
         <div class="whole-content">
-          <div class="center-content">
-            <div ref="editor" class="document-content editor"></div>
-          </div>
+          <c-tiptap-bubble-menu
+            v-if="editor"
+            :editor="editor"
+          ></c-tiptap-bubble-menu>
+          <editor-content :editor="editor" class="document-content editor" />
         </div>
       </div>
       <form class="pagemenu" @submit="submit">
@@ -159,15 +144,18 @@ const submit = async () => {
   align-items: center;
   justify-content: center;
 }
+
 .content-loading svg {
   width: 64px;
   height: 64px;
 }
+
 .content-loading h3 {
   padding: 0;
   margin: 0;
   color: var(--cr-color-neutral-500);
 }
+
 .pagemenu {
   display: flex;
   flex-flow: row;
@@ -180,12 +168,14 @@ const submit = async () => {
   max-width: var(--cr-sizes-max-page-width);
   width: 100%;
 }
+
 :deep(.ProseMirror-menubar) {
   border-radius: var(--cr-input-border-radius-medium);
   border-bottom: none;
   padding: var(--cr-spacing-x-small) var(--cr-spacing-x-small);
   background: var(--cr-color-neutral-100);
 }
+
 /*
 TODO: should be moved to a css specific to the empty line placeholder plugin.
  */
@@ -194,5 +184,14 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   pointer-events: none;
   height: 0;
   content: attr(data-empty-text);
+}
+
+:deep(.is-empty:before) {
+  pointer-events: none;
+  float: left;
+  height: 0;
+  width: 100%;
+  color: var(--cr-color-neutral-500);
+  content: attr(data-placeholder);
 }
 </style>

@@ -26,12 +26,12 @@
 import { DefaultVueTemplateProvider } from "@cristal/skin";
 import type { Component } from "vue";
 import { injectable } from "inversify";
-import ProsemirrorEditor from "../vue/c-edit-prosemirror.vue";
+import TiptapEditor from "../vue/c-edit-tiptap.vue";
 import { CristalApp } from "@cristal/api";
 
 @injectable()
-export class UixProsemirrorEditorProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.editor.prosemirror";
+export class UixTiptapEditorProvider extends DefaultVueTemplateProvider {
+  public static cname = "cristal.editor.tiptap";
   public static hint = "";
   public static priority = 1000;
   public static singleton = true;
@@ -40,11 +40,11 @@ export class UixProsemirrorEditorProvider extends DefaultVueTemplateProvider {
   registered = false;
 
   getVueComponent(): Component {
-    ProsemirrorEditor.editorname = "prosemirror";
-    return ProsemirrorEditor;
+    TiptapEditor.editorname = "tiptap";
+    return TiptapEditor;
   }
   getVueName(): string {
-    return "ProsemirrorEditor";
+    return "TiptapEditor";
   }
   isGlobal(): boolean {
     return false;

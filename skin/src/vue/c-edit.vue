@@ -52,9 +52,7 @@ export default {
           // components manager, but instead load them lazily, or only load the
           // ones allowed by the configuration (e.g., one for wysiwyg, and one
           // for plain syntax edit).
-          if (
-            (item as { editorname: string }).editorname === "editorprosemirror"
-          ) {
+          if ((item as { editorname: string }).editorname === "editortiptap") {
             editComponent = item;
             break;
           }

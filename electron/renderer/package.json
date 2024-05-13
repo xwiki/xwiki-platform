@@ -22,7 +22,7 @@
   "dependencies": {
     "@cristal/electron-storage": "workspace:*",
     "@cristal/lib": "workspace:^",
-    "vue": "3.4.26",
+    "vue": "3.4.27",
     "inversify": "6.0.2"
   },
   "devDependencies": {

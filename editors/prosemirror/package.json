@@ -27,7 +27,7 @@
     "prosemirror-schema-basic": "1.2.2",
     "prosemirror-state": "1.4.3",
     "prosemirror-view": "1.33.4",
-    "vue": "3.4.26"
+    "vue": "3.4.27"
   },
   "devDependencies": {
     "typescript": "5.4.5",

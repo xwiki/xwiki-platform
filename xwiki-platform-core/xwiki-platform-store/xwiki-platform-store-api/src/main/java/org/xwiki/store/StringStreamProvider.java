@@ -17,17 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.test;
+package org.xwiki.store;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.ui.PageObjectSuite;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
- * Runs all functional tests found in the classpath and start/stop XWiki before/after the tests (only once).
- *
+ * A simple {@link String} implementation of {@link StreamProvider}.
+ * 
  * @version $Id$
+ * @since 16.4.0RC1
  */
-@RunWith(PageObjectSuite.class)
-public class AllIT
+public class StringStreamProvider implements StreamProvider
 {
+    private final String content;
+
+    private final Charset charset;
+
+    /**
+     * @param content the {@link String} to read
+     * @param charset the {@linkplain java.nio.charset.Charset} to be used to encode the {@code String}
+     */
+    public StringStreamProvider(String content, Charset charset)
+    {
+        this.content = content;
+        this.charset = charset;
+    }
+
+    @Override
+    public InputStream getStream() throws Exception
+    {
+        return new ByteArrayInputStream(this.content.getBytes(this.charset));
+    }
 }

@@ -184,6 +184,14 @@
               <linkTarget>/var/log/xwiki</linkTarget>
             </data>
 
+            <!-- Redirect tmp to /var/lib/xwiki/tmp -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki-jetty/tmp</linkName>
+              <linkTarget>/var/lib/xwiki/tmp</linkTarget>
+            </data>
+
             <!-- Custom Jetty context configuration -->
             <data>
               <type>link</type>

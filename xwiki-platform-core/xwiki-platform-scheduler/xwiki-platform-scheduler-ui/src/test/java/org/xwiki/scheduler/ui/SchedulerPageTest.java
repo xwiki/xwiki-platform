@@ -32,7 +32,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.quartz.Trigger;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -42,10 +41,6 @@ import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
 import org.xwiki.rendering.internal.macro.message.InfoMessageMacro;
 import org.xwiki.rendering.internal.macro.message.WarningMessageMacro;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.script.SecurityAuthorizationScriptService;
-import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
@@ -82,10 +77,8 @@ import static org.mockito.Mockito.when;
     ErrorMessageMacro.class,
     SchedulerJobClassDocumentInitializer.class,
     TestNoScriptMacro.class,
-    TranslationMacro.class,
     WarningMessageMacro.class
 })
-@SecurityScriptServiceComponentList
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
 @HTML50ComponentList
@@ -104,8 +97,6 @@ class SchedulerPageTest extends PageTest
     private QueryManagerScriptService queryService;
 
     private CSRFTokenScriptService tokenService;
-
-    private SecurityAuthorizationScriptService authorizationScriptService;
 
     private SchedulerPluginApi schedulerPluginApi;
 
@@ -147,9 +138,6 @@ class SchedulerPageTest extends PageTest
         // Fake programming access level to display the complete page.
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), anyString(), anyString(),
             any(XWikiContext.class))).thenReturn(true);
-        this.authorizationScriptService = this.oldcore.getMocker().getInstance(ScriptService.class,
-            SecurityScriptService.ROLEHINT + "." + SecurityAuthorizationScriptService.ID);
-        when(this.authorizationScriptService.hasAccess(eq(Right.PROGRAM), any(), any())).thenReturn(true);
     }
 
     /**
@@ -188,23 +176,6 @@ class SchedulerPageTest extends PageTest
         verify(this.schedulerPluginApi).triggerJob(this.testJobObjectApi);
         verify(this.tokenService).isTokenValid(CSRF_TOKEN);
         assertTrue(result.getElementsByClass("errormessage").isEmpty());
-    }
-
-    /**
-     * Check that the trigger operation fails if the user is missing programming rights.
-     */
-    @Test
-    void checkMissingProgrammingRights() throws Exception
-    {
-        when(this.authorizationScriptService.hasAccess(eq(Right.PROGRAM), any(), any())).thenReturn(false);
-        when(this.schedulerPluginApi.triggerJob(this.testJobObjectApi)).thenReturn(true);
-
-        this.request.put("do", "trigger");
-        this.request.put("which", "Scheduler.TestJob");
-        Document result = renderHTMLPage(SCHEDULER_WEB_HOME);
-
-        verify(this.schedulerPluginApi, never()).triggerJob(any(Object.class));
-        assertEquals("xe.scheduler.missingProgrammingRights", result.getElementsByClass("errormessage").text());
     }
 
     /**

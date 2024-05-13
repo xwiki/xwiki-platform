@@ -140,19 +140,6 @@
             -->
             <revapi.differences>
               <justification>
-                This should have been internal or at least marked unstable. Also, this class was only moved.
-              </justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.notifications.filters.migration.R160000000XWIKI17243DataMigration</old>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>
                 The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
                 parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
               </justification>

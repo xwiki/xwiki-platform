@@ -52,8 +52,8 @@
     ## Use the preferred content editor.
     #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   #end
+  {{html clean="false"}}
   #if ($type == 'edit')
-    {{html clean="false"}}
     ## The "content" id is expected by some JavaScript and CSS code.
     #set ($id = 'content')
     #if (!$useWysiwygEditor)
@@ -76,12 +76,10 @@
     #else
       &lt;/div&gt;
     #end
-    {{/html}}
   #elseif ($type == 'hidden')
-    {{html clean="false"}}
-      &lt;input type="hidden" id="$id" name="$name" value="$!escapetool.xml($editedDocument.content)"/>
-    {{/html}}
+    &lt;input type="hidden" id="$id" name="$name" value="$!escapetool.xml($editedDocument.content)"/>
   #end
+  {{/html}}
 #elseif ("$!type" != '')
   ## Display the content of the current document without using any sheet. We can't use the include macro here (with the
   ## author parameter) because the content may have unsaved changes (e.g. on preview action). We make sure that the HTML

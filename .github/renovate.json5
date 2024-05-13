@@ -17,13 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
- {
+{
   // We want all suggestions right away
-  "prHourlyLimit" : 0,
-  "prConcurrentLimit" : 0,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
   // Prefix update commit with [Misc] by default so that only updates requiring a Jira issue need a message edit.
   "commitMessageAction": "[Misc] Update",
   // Distinguish separate all new major versions on separate pull requests.
   "separateMajorMinor": true,
-  "separateMultipleMajor": true
- }
+  "separateMultipleMajor": true,
+  "packageRules": [
+    {
+      "groupName": "tiptap",
+      "matchDepPatterns": "@tiptap/.+"
+    }
+  ]
+}

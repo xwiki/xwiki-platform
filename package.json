@@ -6,7 +6,7 @@
   "engines": {
     "node": "20.13.1"
   },
-  "packageManager": "pnpm@9.1.0",
+  "packageManager": "pnpm@9.1.1",
   "scripts": {
     "clean": "nx run-many -t clean",
     "dev": "nx build @cristal/web && nx dev @cristal/web",

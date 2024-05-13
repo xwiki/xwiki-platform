@@ -20,7 +20,7 @@
     "cross-env": "7.0.3",
     "electron": "30.0.2",
     "electron-builder": "24.13.3",
-    "rimraf": "5.0.5"
+    "rimraf": "5.0.7"
   },
   "dependencies": {
     "@cristal/electron-storage": "workspace:^",

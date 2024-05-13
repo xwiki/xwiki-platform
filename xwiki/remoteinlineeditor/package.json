@@ -27,6 +27,6 @@
     "vue-i18n": "9.13.1"
   },
   "devDependencies": {
-    "rimraf": "5.0.5"
+    "rimraf": "5.0.7"
   }
 }

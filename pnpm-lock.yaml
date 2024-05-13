@@ -85,8 +85,8 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -113,8 +113,8 @@ importers:
         specifier: 8.57.0
         version: 8.57.0
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -174,8 +174,8 @@ importers:
         specifier: 14.10.1
         version: 14.10.1
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -208,8 +208,8 @@ importers:
         specifier: 2.4.6
         version: 2.4.6
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -239,8 +239,8 @@ importers:
         version: 3.6.3(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -291,8 +291,8 @@ importers:
         version: 3.6.3(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
 
   editors/prosemirror:
     dependencies:
@@ -365,8 +365,8 @@ importers:
         version: 3.6.3(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
 
   electron:
     dependencies:
@@ -390,8 +390,8 @@ importers:
         specifier: 24.13.3
         version: 24.13.3(electron-builder-squirrel-windows@24.13.3(dmg-builder@24.13.3))
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
 
   electron/main:
     dependencies:
@@ -409,8 +409,8 @@ importers:
         specifier: 7.0.3
         version: 7.0.3
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       typescript:
         specifier: 5.4.5
         version: 5.4.5
@@ -430,8 +430,8 @@ importers:
         specifier: 20.12.11
         version: 20.12.11
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       typescript:
         specifier: 5.4.5
         version: 5.4.5
@@ -464,8 +464,8 @@ importers:
         specifier: 20.12.11
         version: 20.12.11
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       typescript:
         specifier: 5.4.5
         version: 5.4.5
@@ -495,8 +495,8 @@ importers:
         specifier: 20.12.11
         version: 20.12.11
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -526,8 +526,8 @@ importers:
         version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -554,8 +554,8 @@ importers:
         version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -624,8 +624,8 @@ importers:
         version: 3.6.3(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.26(typescript@5.4.5)))(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -652,8 +652,8 @@ importers:
         version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -686,8 +686,8 @@ importers:
         specifier: 3.0.5
         version: 3.0.5
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -708,8 +708,8 @@ importers:
         version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -730,8 +730,8 @@ importers:
         version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -773,8 +773,8 @@ importers:
         version: 4.3.2(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -816,8 +816,8 @@ importers:
         specifier: 5.0.4
         version: 5.0.4(vite@5.2.11(@types/node@20.12.11))(vue@3.4.26(typescript@5.4.5))
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -887,8 +887,8 @@ importers:
         specifier: 3.0.5
         version: 3.0.5
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -930,8 +930,8 @@ importers:
         specifier: 6.1.2
         version: 6.1.2
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.11)
@@ -970,8 +970,8 @@ importers:
         version: 9.13.1(vue@3.4.26(typescript@5.4.5))
     devDependencies:
       rimraf:
-        specifier: 5.0.5
-        version: 5.0.5
+        specifier: 5.0.7
+        version: 5.0.7
 
 packages:
 
@@ -4499,9 +4499,9 @@ packages:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
     hasBin: true
 
-  rimraf@5.0.5:
-    resolution: {integrity: sha512-CqDakW+hMe/Bz202FPEymy68P+G50RfMQK+Qo5YUqc9SPipvbGjCGKd0RSKEelbsfQuw3g5NZDSrlZZAJurH1A==}
-    engines: {node: '>=14'}
+  rimraf@5.0.7:
+    resolution: {integrity: sha512-nV6YcJo5wbLW77m+8KjH8aB/7/rxQy9SZ0HY5shnwULfS+9nmTtVXAJET5NdZmCzA4fPI/Hm1wo/Po/4mopOdg==}
+    engines: {node: '>=14.18'}
     hasBin: true
 
   roarr@2.15.4:
@@ -7981,7 +7981,7 @@ snapshots:
     dependencies:
       foreground-child: 3.1.1
       jackspeak: 2.3.6
-      minimatch: 9.0.3
+      minimatch: 9.0.4
       minipass: 7.0.4
       path-scurry: 1.10.1
 
@@ -9463,7 +9463,7 @@ snapshots:
     dependencies:
       glob: 7.2.3
 
-  rimraf@5.0.5:
+  rimraf@5.0.7:
     dependencies:
       glob: 10.3.10
 

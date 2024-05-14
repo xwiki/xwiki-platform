@@ -33,7 +33,7 @@
     "reflect-metadata": "0.2.2",
     "vue-i18n": "9.13.1",
     "vue-router": "4.3.2",
-    "vuetify": "3.6.5"
+    "vuetify": "3.6.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "5.0.4",

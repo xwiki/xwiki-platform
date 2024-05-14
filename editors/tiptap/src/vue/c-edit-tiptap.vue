@@ -174,6 +174,12 @@ onUpdated(() => loadEditor(currentPage.value!));
   background: var(--cr-color-neutral-100);
 }
 
+:deep(.ProseMirror) {
+  outline: none;
+  max-width: var(--cr-sizes-max-page-width);
+  width: 100%;
+}
+
 /*
 TODO: should be moved to a css specific to the empty line placeholder plugin.
  */

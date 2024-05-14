@@ -226,14 +226,6 @@ onUpdated(() => {
   display: block;
 }
 
-.whole-content {
-  width: 100%;
-  display: flex;
-  flex-flow: column;
-  gap: var(--cr-spacing-medium);
-  align-items: center;
-}
-
 .doc-header {
   display: flex;
   width: 100%;

@@ -71,6 +71,21 @@ html {
   max-width: var(--cr-sizes-max-page-width);
 }
 
+.whole-content {
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  gap: var(--cr-spacing-medium);
+  align-items: center;
+}
+
+.document-content {
+  max-width: var(--cr-sizes-max-page-width);
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
 main {
   height: 100dvh;
   overflow: hidden;

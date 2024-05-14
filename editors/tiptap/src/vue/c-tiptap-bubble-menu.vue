@@ -68,6 +68,7 @@ const hideOnEsc = {
 <style scoped>
 .items {
   position: relative;
+  display: flex;
   border-radius: var(--cr-tooltip-border-radius);
   background: white; /* TODO: define a global variable for background color */
   overflow: hidden;
@@ -77,9 +78,13 @@ const hideOnEsc = {
 }
 
 .item {
-  text-align: left;
   background: transparent;
   border: none;
-  padding: 0.5rem 0.2rem;
+  padding: var(--cr-spacing-x-small);
+}
+
+.item:hover {
+  background-color: var(--cr-color-neutral-200);
+  cursor: pointer;
 }
 </style>

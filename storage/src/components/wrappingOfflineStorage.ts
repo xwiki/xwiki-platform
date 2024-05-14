@@ -86,7 +86,10 @@ export class WrappingOfflineStorage implements WrappingStorage {
     return this.storage.getImageURL(page, image);
   }
 
-  public async getPageContent(page: string, syntax: string): Promise<PageData> {
+  public async getPageContent(
+    page: string,
+    syntax: string,
+  ): Promise<PageData | undefined> {
     this.logger.debug("Trying to get data for page ", page);
     if (this.offlineStorage) {
       this.logger.debug("Asking offline storage for ", page);
@@ -119,14 +122,19 @@ export class WrappingOfflineStorage implements WrappingStorage {
     syntax: string,
   ): Promise<PageData> {
     const pageData = await this.storage.getPageContent(page, syntax);
-    pageData.id = page + "_" + syntax;
-    this.logger.debug("Saving page to offline storage", page);
-    this.offlineStorage.savePage(
-      this.getWikiConfig().name,
-      page + "_" + syntax,
-      pageData,
-    );
-    return pageData;
+    if (pageData) {
+      pageData.id = page + "_" + syntax;
+      this.logger.debug("Saving page to offline storage", page);
+      this.offlineStorage.savePage(
+        this.getWikiConfig().name,
+        page + "_" + syntax,
+        pageData,
+      );
+
+      return pageData;
+    } else {
+      throw new Error("Can't save missing page.");
+    }
   }
 
   public async updatePageContent(
@@ -138,7 +146,7 @@ export class WrappingOfflineStorage implements WrappingStorage {
       page + "_" + syntax,
     );
     const pageData = await this.storage.getPageContent(page, syntax);
-    if (currentPageData == undefined) {
+    if (currentPageData && pageData) {
       pageData.id = page + "_" + syntax;
       this.logger.debug("Saving page to offline storage", page);
       this.offlineStorage.savePage(
@@ -147,7 +155,7 @@ export class WrappingOfflineStorage implements WrappingStorage {
         pageData,
       );
       return true;
-    } else if (currentPageData.version != pageData.version) {
+    } else if (currentPageData?.version != pageData?.version && pageData) {
       pageData.id = page + "_" + syntax;
       this.logger.debug("Updating page to offline storage", page);
       this.offlineStorage.updatePage(

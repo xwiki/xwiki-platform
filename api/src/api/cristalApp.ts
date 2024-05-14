@@ -84,11 +84,12 @@ export interface CristalApp {
   /**
    * Return the requested page
    * @param page a page identifier (e.g., a document reference for the XWiki
-   * backend, or a filename for the filesystem backend)
+   *  backend, or a filename for the filesystem backend)
+   * @return the page data, or undefined if the page is not found
    *
    * @since 0.7
    */
-  getPage(page: string): Promise<PageData>;
+  getPage(page: string): Promise<PageData | undefined>;
 
   getLogger(module: string): Logger;
 

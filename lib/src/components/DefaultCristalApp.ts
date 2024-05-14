@@ -238,24 +238,32 @@ export class DefaultCristalApp implements CristalApp {
     try {
       this.logger?.debug("Loading page", this.page.name);
       if (this.getWikiConfig().isSupported("jsonld")) {
-        const pageContentData =
-          await this.getWikiConfig().storage.getPageContent(
+        const pageData = await this.getWikiConfig().storage.getPageContent(
+          this.page.name,
+          "jsonld",
+        );
+        if (!pageData) {
+          this.logger.error(
+            "Could not find page data",
             this.page.name,
+            "with syntax",
             "jsonld",
           );
-        this.page.document = pageContentData.document;
-        this.page.source = pageContentData.document.get("text");
-        if (pageContentData.html == "") {
+          return;
+        }
+        this.page.document = pageData.document;
+        this.page.source = pageData.document.get("text");
+        if (pageData.html == "") {
           this.page.html = await this.renderContent(
             this.page.source,
-            pageContentData.syntax,
+            pageData.syntax,
             "html",
             this.getWikiConfig(),
           );
           // Update JSON-LD format also
           this.page.document.set("html", this.page.html);
         } else {
-          this.page.html = pageContentData.html;
+          this.page.html = pageData.html;
         }
 
         const sheet =
@@ -266,8 +274,8 @@ export class DefaultCristalApp implements CristalApp {
           console.log("Updating vueJS content field to ", this.page.html);
           this.currentContentRef.value.currentContent = this.page.html;
           this.currentContentRef.value.currentSource = this.page.source;
-          this.currentContentRef.value.css = pageContentData.css;
-          this.currentContentRef.value.js = pageContentData.js;
+          this.currentContentRef.value.css = pageData.css;
+          this.currentContentRef.value.js = pageData.js;
           this.currentContentRef.value.document = this.page.document;
           this.currentContentRef.value.sheet = sheet;
           this.currentContentRef.value.withSheet = sheet != "";
@@ -278,30 +286,39 @@ export class DefaultCristalApp implements CristalApp {
           console.error("Could not set content on vue page view component");
         }
       } else {
-        const pageContentData =
-          await this.getWikiConfig().storage.getPageContent(
+        const pageData = await this.getWikiConfig().storage.getPageContent(
+          this.page.name,
+          "html",
+        );
+        if (!pageData) {
+          this.logger.error(
+            "Could not find page data",
             this.page.name,
+            "with syntax",
             "html",
           );
-        this.page.source = pageContentData.source;
-        this.page.html = pageContentData.html;
-        if (pageContentData.html == "") {
+          return;
+        }
+
+        this.page.source = pageData.source;
+        this.page.html = pageData.html;
+        if (pageData.html == "") {
           this.page.html = await this.renderContent(
             this.page.source,
-            pageContentData.syntax,
+            pageData.syntax,
             "html",
             this.getWikiConfig(),
           );
           // Update JSON-LD format also
           this.page.document.set("html", this.page.html);
         } else {
-          this.page.html = pageContentData.html;
+          this.page.html = pageData.html;
         }
         if (this.currentContentRef != null) {
           this.currentContentRef.value.currentContent = this.page.html;
           this.currentContentRef.value.currentSource = this.page.source;
-          this.currentContentRef.value.css = pageContentData.css;
-          this.currentContentRef.value.js = pageContentData.js;
+          this.currentContentRef.value.css = pageData.css;
+          this.currentContentRef.value.js = pageData.js;
           this.currentContentRef.value.document = null;
           this.currentContentRef.value.sheet = "";
           this.currentContentRef.value.withSheet = false;
@@ -540,14 +557,14 @@ export class DefaultCristalApp implements CristalApp {
     return uixTemplates;
   }
 
-  async getPage(page: string): Promise<PageData> {
+  async getPage(page: string): Promise<PageData | undefined> {
     const isJsonLD = this.getWikiConfig().isSupported("jsonld");
     const syntax = isJsonLD ? "jsonld" : "html";
     const pageData = await this.getWikiConfig().storage.getPageContent(
       page,
       syntax,
     );
-    if (isJsonLD) {
+    if (isJsonLD && pageData) {
       const document = pageData.document;
       pageData.html = document.get("html");
       pageData.source = document.get("text");

@@ -55,7 +55,7 @@ const currentPageName: ComputedRef<string> = computed(() => {
 
 const contentRoot = ref(undefined);
 
-const content: ComputedRef<string> = computed(() => {
+const content: ComputedRef<string | undefined> = computed(() => {
   if (currentPage.value) {
     const cpn: PageData = currentPage.value;
     if (cpn.html && cpn.html.trim() !== "") {
@@ -70,7 +70,7 @@ const content: ComputedRef<string> = computed(() => {
       return "";
     }
   } else {
-    return "";
+    return undefined;
   }
 });
 
@@ -118,7 +118,6 @@ onUpdated(() => {
   <article v-else id="content" ref="root" class="content">
     <UIX uixname="content.before" />
     <div class="inner-content">
-      <!-- eslint-disable vue/no-v-html -->
       <div class="content-header">
         <XBreadcrumb class="breadcrumb"></XBreadcrumb>
         <x-btn circle size="small" variant="primary" color="primary">
@@ -176,12 +175,18 @@ onUpdated(() => {
         </div>
         <div class="whole-content">
           <div class="center-content">
+            <!-- eslint-disable vue/no-v-html -->
             <div
+              v-if="content"
               id="xwikicontent"
               ref="contentRoot"
               class="document-content"
               v-html="content"
             ></div>
+            <div v-else class="unknown-page">
+              The requested page could not be found. You can edit the page to
+              create it.
+            </div>
             <div class="doc-info-footer">
               <x-avatar class="avatar"></x-avatar>
               <span class="doc-info-user-info">User name created...</span>

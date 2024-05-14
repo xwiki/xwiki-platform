@@ -21,9 +21,6 @@ import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
-import Blockquote from "@tiptap/extension-blockquote";
-import Code from "@tiptap/extension-code";
-import CodeBlock from "@tiptap/extension-code-block";
 import Link from "@tiptap/extension-link";
 
 const route = useRoute();
@@ -79,9 +76,9 @@ async function loadEditor(page: PageData) {
   // Push the content to the document.
   // TODO: move to a components based implementation
   if (!editor.value) {
-    content.value = page.syntax == "markdown/1.2" ? page.source : page.html;
+    content.value = page?.syntax == "markdown/1.2" ? page?.source : page?.html;
     editor.value = new Editor({
-      content: content.value,
+      content: content.value || "",
       extensions: [
         StarterKit,
         Placeholder.configure({
@@ -96,9 +93,6 @@ async function loadEditor(page: PageData) {
         Markdown.configure({
           html: true,
         }),
-        Blockquote,
-        Code,
-        CodeBlock,
         Link.configure({
           openOnClick: "whenNotEditable",
         }),

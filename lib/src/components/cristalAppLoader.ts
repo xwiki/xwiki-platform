@@ -61,15 +61,18 @@ export class CristalAppLoader extends CristalLoader {
       .getAvailableConfigurations()
       .get(configName);
     if (wikiConfig == null) {
-      if (!isElectron) window.location.href = "/XWiki/#";
+      if (!isElectron) {
+        window.location.href = "/XWiki/#";
+      }
       this.logger?.error("Could not start cristal module");
       return;
     }
 
     this.cristal.setWikiConfig(wikiConfig);
     // setting design system
-    if (wikiConfig.designSystem != "")
+    if (wikiConfig.designSystem != "") {
       this.cristal.skinManager.setDesignSystem(wikiConfig.designSystem);
+    }
 
     // Make sure we have initialized this config
     // This is necessary for offline mode
@@ -77,8 +80,11 @@ export class CristalAppLoader extends CristalLoader {
 
     this.logger.debug("Wiki Config is:", wikiConfig);
 
-    if (this.cristal != null) this.cristal.run();
-    else this.logger?.error("Could not start cristal module");
+    if (this.cristal != null) {
+      this.cristal.run();
+    } else {
+      this.logger?.error("Could not start cristal module");
+    }
   }
 
   public async launchApp(

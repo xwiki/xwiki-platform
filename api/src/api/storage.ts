@@ -37,7 +37,14 @@ export interface Storage {
 
   getImageURL(page: string, image: string): string;
 
-  getPageContent(page: string, syntax: string): Promise<PageData>;
+  /**
+   *
+   * @param page the id of the request page
+   * @param syntax the syntax of the request page
+   * @return a promise wrapping a page data, or undefined in case of page not
+   *  found
+   */
+  getPageContent(page: string, syntax: string): Promise<PageData | undefined>;
 
   getPanelContent(
     panel: string,

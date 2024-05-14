@@ -51,7 +51,10 @@ export abstract class AbstractStorage implements Storage {
 
   abstract getImageURL(page: string, image: string): string;
 
-  abstract getPageContent(page: string, syntax: string): Promise<PageData>;
+  abstract getPageContent(
+    page: string,
+    syntax: string,
+  ): Promise<PageData | undefined>;
 
   abstract getPageFromViewURL(url: string): string | null;
 

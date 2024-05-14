@@ -26,6 +26,7 @@
     "@tiptap/extension-document": "2.3.2",
     "@tiptap/extension-heading": "2.3.2",
     "@tiptap/extension-image": "2.3.2",
+    "@tiptap/extension-link": "2.3.2",
     "@tiptap/extension-list-item": "2.3.2",
     "@tiptap/extension-ordered-list": "2.3.2",
     "@tiptap/extension-placeholder": "2.3.2",

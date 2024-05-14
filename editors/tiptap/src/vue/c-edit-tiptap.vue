@@ -24,6 +24,7 @@ import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import Blockquote from "@tiptap/extension-blockquote";
 import Code from "@tiptap/extension-code";
 import CodeBlock from "@tiptap/extension-code-block";
+import Link from "@tiptap/extension-link";
 
 const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -98,6 +99,9 @@ async function loadEditor(page: PageData) {
         Blockquote,
         Code,
         CodeBlock,
+        Link.configure({
+          openOnClick: "whenNotEditable",
+        }),
       ],
     });
   }

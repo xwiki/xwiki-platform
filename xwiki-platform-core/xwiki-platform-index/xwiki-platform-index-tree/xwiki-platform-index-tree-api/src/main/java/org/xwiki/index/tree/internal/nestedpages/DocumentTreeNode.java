@@ -88,7 +88,7 @@ public class DocumentTreeNode extends AbstractDocumentTreeNode
 
     private boolean canHaveChildDocuments(EntityReference parentReference)
     {
-        return parentReference instanceof DocumentReference
+        return parentReference != null && parentReference.getType() == EntityType.DOCUMENT
             && getDefaultDocumentName().equals(parentReference.getName());
     }
 

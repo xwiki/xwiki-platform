@@ -51,7 +51,7 @@ public abstract class AbstractChildDocumentsTreeNodeGroup extends AbstractEntity
     {
         EntityReference parentReference = resolve(nodeId);
         // The parent entity must be either a wiki or a nested (non-terminal) document.
-        if (canHaveChildDocuments(parentReference)) {
+        if (parentReference != null && canHaveChildDocuments(parentReference)) {
             try {
                 return serialize(getChildDocuments(parentReference, offset, limit));
             } catch (QueryException e) {
@@ -69,7 +69,7 @@ public abstract class AbstractChildDocumentsTreeNodeGroup extends AbstractEntity
     public int getChildCount(String nodeId)
     {
         EntityReference parentReference = resolve(nodeId);
-        if (canHaveChildDocuments(parentReference)) {
+        if (parentReference != null && canHaveChildDocuments(parentReference)) {
             try {
                 return getChildDocumentsCount(parentReference);
             } catch (QueryException e) {

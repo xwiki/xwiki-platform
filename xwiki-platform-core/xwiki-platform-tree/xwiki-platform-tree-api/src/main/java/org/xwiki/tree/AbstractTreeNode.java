@@ -150,4 +150,11 @@ public abstract class AbstractTreeNode implements TreeNode
         int end = Math.max(Math.min(start + limit, list.size()), start);
         return list.subList(start, end);
     }
+
+    protected TreeNode withSameProperties(TreeNode treeNode)
+    {
+        treeNode.getProperties().clear();
+        treeNode.getProperties().putAll(getProperties());
+        return treeNode;
+    }
 }

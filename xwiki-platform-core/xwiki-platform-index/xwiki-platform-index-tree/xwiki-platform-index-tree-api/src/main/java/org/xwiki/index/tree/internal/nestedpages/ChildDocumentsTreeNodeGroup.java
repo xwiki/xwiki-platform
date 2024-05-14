@@ -37,7 +37,6 @@ import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -140,7 +139,7 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
         query.setOffset(offset);
         query.setLimit(limit);
 
-        if (parentReference instanceof WikiReference) {
+        if (parentReference.getType() == EntityType.WIKI) {
             query.addFilter(this.topLevelPageFilter);
         } else {
             query.addFilter(this.childPageFilter);
@@ -167,7 +166,7 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     {
         int count = getChildSpacesCount(parentReference);
         if (canHaveTerminalChildDocuments(parentReference)) {
-            count += getChildTerminalPagesCount((DocumentReference) parentReference);
+            count += getChildTerminalPagesCount(new DocumentReference(parentReference));
         }
         return count;
     }
@@ -175,13 +174,13 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     @Override
     protected boolean canHaveChildDocuments(EntityReference parentReference)
     {
-        return parentReference instanceof WikiReference || (parentReference instanceof DocumentReference
+        return parentReference.getType() == EntityType.WIKI || (parentReference.getType() == EntityType.DOCUMENT
             && getDefaultDocumentName().equals(parentReference.getName()));
     }
 
     private boolean canHaveTerminalChildDocuments(EntityReference parentReference)
     {
-        return parentReference instanceof DocumentReference && areTerminalDocumentsShown();
+        return parentReference.getType() == EntityType.DOCUMENT && areTerminalDocumentsShown();
     }
 
     private int getChildTerminalPagesCount(DocumentReference documentReference) throws QueryException

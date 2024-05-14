@@ -41,7 +41,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -169,16 +168,18 @@ public class PinnedChildPagesManager
 
     private Optional<DocumentReference> getPinnedChildPagesStorage(EntityReference parentReference)
     {
-        if (parentReference instanceof WikiReference) {
+        if (parentReference == null) {
+            return Optional.empty();
+        } else if (parentReference.getType() == EntityType.WIKI) {
             // Top level pinned pages are stored in the wiki preferences.
             return Optional.of(new DocumentReference(parentReference.getName(), XWiki.SYSTEM_SPACE, WIKI_PREFERENCES));
-        } else if (parentReference instanceof SpaceReference) {
+        } else if (parentReference.getType() == EntityType.SPACE) {
             // Pinned pages for a space are stored in the space preferences.
-            return Optional.of(new DocumentReference("WebPreferences", (SpaceReference) parentReference));
-        } else if (parentReference instanceof DocumentReference
+            return Optional.of(new DocumentReference("WebPreferences", new SpaceReference(parentReference)));
+        } else if (parentReference.getType() == EntityType.DOCUMENT
             && getDefaultDocumentName().equals(parentReference.getName())) {
             // Pinned pages for a nested page are stored in the parent space preferences.
-            return getPinnedChildPagesStorage(((DocumentReference) parentReference).getLastSpaceReference());
+            return getPinnedChildPagesStorage(new DocumentReference(parentReference).getLastSpaceReference());
         } else {
             // Unsupported parent type.
             return Optional.empty();

@@ -79,13 +79,13 @@ public class WikiTreeNode extends AbstractEntityTreeNode implements Initializabl
     @Override
     public int getChildCount(String nodeId)
     {
-        return this.childNodes.getChildCount(nodeId);
+        return withSameProperties(this.childNodes).getChildCount(nodeId);
     }
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
     {
-        return this.childNodes.getChildren(nodeId, offset, limit);
+        return withSameProperties(this.childNodes).getChildren(nodeId, offset, limit);
     }
 
     @Override

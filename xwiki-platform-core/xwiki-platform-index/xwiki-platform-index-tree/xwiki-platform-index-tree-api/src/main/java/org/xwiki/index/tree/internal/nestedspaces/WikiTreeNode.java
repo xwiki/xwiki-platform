@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -62,7 +63,7 @@ public class WikiTreeNode extends AbstractEntityTreeNode
     public List<String> getChildren(String nodeId, int offset, int limit)
     {
         EntityReference wikiReference = resolve(nodeId);
-        if (wikiReference instanceof WikiReference) {
+        if (wikiReference != null && wikiReference.getType() == EntityType.WIKI) {
             try {
                 return serialize(getChildren(new WikiReference(wikiReference), offset, limit));
             } catch (QueryException e) {
@@ -102,7 +103,7 @@ public class WikiTreeNode extends AbstractEntityTreeNode
     public int getChildCount(String nodeId)
     {
         EntityReference wikiReference = resolve(nodeId);
-        if (wikiReference instanceof WikiReference) {
+        if (wikiReference != null && wikiReference.getType() == EntityType.WIKI) {
             try {
                 return getChildCount(new WikiReference(wikiReference));
             } catch (QueryException e) {

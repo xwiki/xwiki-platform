@@ -43,7 +43,7 @@ public class PageChildrenResourceImpl extends XWikiResource implements PageChild
 {
     @Override
     public Pages getPageChildren(String wikiName, String spaceName, String pageName, Integer start, Integer number,
-        Boolean withPrettyNames) throws XWikiRestException
+        Boolean withPrettyNames, String hierarchy, String search) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);

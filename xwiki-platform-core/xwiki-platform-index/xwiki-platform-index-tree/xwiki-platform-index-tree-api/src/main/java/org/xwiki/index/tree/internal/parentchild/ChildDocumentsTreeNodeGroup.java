@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractChildDocumentsTreeNodeGroup;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -74,10 +75,10 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     protected List<DocumentReference> getChildDocuments(EntityReference parentReference, int offset, int limit)
         throws QueryException
     {
-        if (parentReference instanceof WikiReference) {
-            return getChildDocuments((WikiReference) parentReference, offset, limit);
+        if (parentReference.getType() == EntityType.WIKI) {
+            return getChildDocuments(new WikiReference(parentReference), offset, limit);
         } else {
-            return getChildDocuments((DocumentReference) parentReference, offset, limit);
+            return getChildDocuments(new DocumentReference(parentReference), offset, limit);
         }
     }
 
@@ -124,10 +125,10 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     @Override
     protected int getChildDocumentsCount(EntityReference parentReference) throws QueryException
     {
-        if (parentReference instanceof WikiReference) {
-            return getChildDocumentsCount((WikiReference) parentReference);
+        if (parentReference.getType() == EntityType.WIKI) {
+            return getChildDocumentsCount(new WikiReference(parentReference));
         } else {
-            return getChildDocumentsCount((DocumentReference) parentReference);
+            return getChildDocumentsCount(new DocumentReference(parentReference));
         }
     }
 
@@ -148,6 +149,6 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     @Override
     protected boolean canHaveChildDocuments(EntityReference parentReference)
     {
-        return parentReference instanceof WikiReference || parentReference instanceof DocumentReference;
+        return parentReference.getType() == EntityType.WIKI || parentReference.getType() == EntityType.DOCUMENT;
     }
 }

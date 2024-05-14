@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractChildDocumentsTreeNodeGroup;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -77,7 +78,7 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     protected List<DocumentReference> getChildDocuments(EntityReference parentReference, int offset, int limit)
         throws QueryException
     {
-        Query query = getChildDocumentsQuery((DocumentReference) parentReference);
+        Query query = getChildDocumentsQuery(new DocumentReference(parentReference));
         query.setOffset(offset);
         query.setLimit(limit);
         List<DocumentReference> documentReferences = new ArrayList<>();
@@ -90,7 +91,7 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     @Override
     protected int getChildDocumentsCount(EntityReference parentReference) throws QueryException
     {
-        Query query = getChildDocumentsQuery((DocumentReference) parentReference);
+        Query query = getChildDocumentsQuery(new DocumentReference(parentReference));
         query.addFilter(this.countQueryFilter);
         return ((Long) query.execute().get(0)).intValue();
     }
@@ -116,6 +117,6 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     @Override
     protected boolean canHaveChildDocuments(EntityReference parentReference)
     {
-        return parentReference instanceof DocumentReference;
+        return parentReference.getType() == EntityType.DOCUMENT;
     }
 }

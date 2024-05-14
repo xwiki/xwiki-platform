@@ -63,8 +63,7 @@ public class DefaultCompositeTreeNodeGroup extends AbstractTreeNode implements C
     @Override
     public void addTreeNode(TreeNode treeNode, Predicate<String> condition)
     {
-        treeNode.getProperties().putAll(getProperties());
-        this.entries.add(new Entry(treeNode, condition));
+        this.entries.add(new Entry(withSameProperties(treeNode), condition));
     }
 
     @Override
@@ -84,7 +83,7 @@ public class DefaultCompositeTreeNodeGroup extends AbstractTreeNode implements C
         if (!entry.condition.test(nodeId)) {
             return 0;
         } else if (entry.treeNode instanceof TreeNodeGroup) {
-            return entry.treeNode.getChildCount(nodeId);
+            return withSameProperties(entry.treeNode).getChildCount(nodeId);
         } else {
             return 1;
         }
@@ -109,8 +108,8 @@ public class DefaultCompositeTreeNodeGroup extends AbstractTreeNode implements C
             Entry entry = this.entries.get(index++);
             if (entry.condition.test(nodeId)) {
                 if (entry.treeNode instanceof TreeNodeGroup) {
-                    children.addAll(
-                        entry.treeNode.getChildren(nodeId, offset - count, Math.max(limit - children.size(), -1)));
+                    children.addAll(withSameProperties(entry.treeNode).getChildren(nodeId, offset - count,
+                        Math.max(limit - children.size(), -1)));
                     count = offset;
                 } else {
                     children.add(this.idGenerator.apply(nodeId, entry.treeNode.getType()));

@@ -79,13 +79,13 @@ public abstract class AbstractDocumentTreeNode extends AbstractDocumentRelatedTr
     @Override
     public int getChildCount(String nodeId)
     {
-        return this.childNodes.getChildCount(nodeId);
+        return withSameProperties(this.childNodes).getChildCount(nodeId);
     }
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
     {
-        return this.childNodes.getChildren(nodeId, offset, limit);
+        return withSameProperties(this.childNodes).getChildren(nodeId, offset, limit);
     }
 
     private boolean hasChild(TreeNode childNode, EntityReference parentReference)
@@ -98,8 +98,7 @@ public abstract class AbstractDocumentTreeNode extends AbstractDocumentRelatedTr
         String showChild = "show" + StringUtils.capitalize(childNode.getType());
         if (Boolean.TRUE.equals(getProperties().get(showChild))) {
             String nodeId = childNode.getType() + ':' + serializedDocumentReference;
-            childNode.getProperties().putAll(getProperties());
-            return childNode.getChildCount(nodeId) > 0;
+            return withSameProperties(childNode).getChildCount(nodeId) > 0;
         }
         return false;
     }

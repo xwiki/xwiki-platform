@@ -70,7 +70,7 @@ public abstract class AbstractCompositeTree extends AbstractTree
             treeNode = this.treeNodeByNodeType.get(parts[0]);
             if (treeNode != null) {
                 // Update the node properties.
-                treeNode.getProperties().putAll(getProperties());
+                treeNode = withSameProperties(treeNode);
             }
         }
         return treeNode;

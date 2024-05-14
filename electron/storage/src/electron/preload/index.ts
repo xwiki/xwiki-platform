@@ -9,8 +9,8 @@ const api: APITypes = {
   resolvePath: (page: string, syntax: string) => {
     return ipcRenderer.invoke("resolvePath", { page: page || "", syntax });
   },
-  savePage(path: string, content: string): Promise<PageData> {
-    return ipcRenderer.invoke("savePage", { path, content });
+  savePage(path: string, content: string, title: string): Promise<PageData> {
+    return ipcRenderer.invoke("savePage", { path, content, title });
   },
 };
 contextBridge.exposeInMainWorld("fileSystemStorage", api);

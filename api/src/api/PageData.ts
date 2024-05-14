@@ -31,6 +31,8 @@ export interface PageData {
   source: string;
   syntax: string;
   html: string;
+  headline: string;
+  headlineRaw: string;
   document: Document;
   css: Array<string>;
   js: Array<string>;

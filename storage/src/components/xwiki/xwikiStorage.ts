@@ -125,6 +125,9 @@ export class XWikiStorage extends AbstractStorage {
     pageContentData.css = json.css;
     pageContentData.js = json.js;
     pageContentData.version = pageContentData.document.get("version");
+    pageContentData.headlineRaw = json.headlineRaw;
+    pageContentData.headline = json.headline;
+    pageContentData.name = json.name;
     return pageContentData;
   }
 
@@ -187,7 +190,7 @@ export class XWikiStorage extends AbstractStorage {
     }
   }
 
-  async save(page: string, content: string): Promise<unknown> {
+  async save(page: string, content: string, title: string): Promise<unknown> {
     const url = this.wikiConfig.baseURL;
     const segments = ["rest", "wikis", "xwiki"];
     const referenceParts = page.split(".");
@@ -207,7 +210,7 @@ export class XWikiStorage extends AbstractStorage {
         Authorization: `Basic ${btoa("Admin:admin")}`,
       },
       // TODO: the syntax provided by the save is ignored and the content is always saved as markdown.
-      body: JSON.stringify({ content, syntax: "markdown/1.2" }),
+      body: JSON.stringify({ content, title, syntax: "markdown/1.2" }),
     });
 
     return;

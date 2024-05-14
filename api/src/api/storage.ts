@@ -61,9 +61,16 @@ export interface Storage {
    *
    * @param page the page to save
    * @param content the content of the page
+   * @param title the page title
+   * @param syntax the syntax of the page
    * @return a promise on the save is done
    *
-   * @since 0.7
+   * @since 0.8
    */
-  save(page: string, content: string, syntax: string): Promise<unknown>;
+  save(
+    page: string,
+    title: string,
+    content: string,
+    syntax: string,
+  ): Promise<unknown>;
 }

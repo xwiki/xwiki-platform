@@ -32,6 +32,8 @@ const error: Ref<Error | undefined> = ref(undefined);
 // TODO: load this content first, then initialize the editor.
 // Make the loading status first.
 const content = ref("");
+const title = ref("");
+const titlePlaceholder = ref("");
 
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
@@ -65,6 +67,7 @@ const submit = async () => {
     .storage.save(
       currentPageName.value,
       editor.value?.storage.markdown.getMarkdown(),
+      title.value,
       "html",
     );
   cristal?.getRouter().push(viewRouterParams);
@@ -77,6 +80,8 @@ async function loadEditor(page: PageData) {
   // TODO: move to a components based implementation
   if (!editor.value) {
     content.value = page?.syntax == "markdown/1.2" ? page?.source : page?.html;
+    title.value = page.headlineRaw;
+    titlePlaceholder.value = page.name;
     editor.value = new Editor({
       content: content.value || "",
       extensions: [
@@ -117,6 +122,12 @@ onUpdated(() => loadEditor(currentPage.value!));
     <div v-show="!loading && !error" class="content">
       <div class="content-scroll">
         <div class="whole-content">
+          <input
+            v-model="title"
+            type="text"
+            :placeholder="titlePlaceholder"
+            class="document-title"
+          />
           <c-tiptap-bubble-menu
             v-if="editor"
             :editor="editor"
@@ -197,5 +208,17 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   width: 100%;
   color: var(--cr-color-neutral-500);
   content: attr(data-placeholder);
+}
+
+.document-title {
+  max-width: var(--cr-sizes-max-page-width);
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  margin: 0;
+  font-size: var(--cr-font-size-2x-large);
+  line-height: var(--cr-font-size-2x-large);
+  outline: none;
+  border: none;
 }
 </style>

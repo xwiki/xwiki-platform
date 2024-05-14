@@ -72,13 +72,15 @@ export abstract class AbstractStorage implements Storage {
    * Save a page and its content to the give syntax.
    *
    * @param page the page to save
+   * @param title the raw page title
    * @param content the content of the page
    * @param syntax the syntax of the content
    *
-   * @since 0.7
+   * @since 0.8
    */
   abstract save(
     page: string,
+    title: string,
     content: string,
     syntax: string,
   ): Promise<unknown>;

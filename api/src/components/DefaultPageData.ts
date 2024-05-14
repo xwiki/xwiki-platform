@@ -38,6 +38,8 @@ export class DefaultPageData implements PageData {
   css: Array<string>;
   js: Array<string>;
   version: string;
+  headline: string;
+  headlineRaw: string;
 
   public constructor(
     id: string = "",

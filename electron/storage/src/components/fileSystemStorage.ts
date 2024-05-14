@@ -44,7 +44,10 @@ export default class FileSystemStorage extends AbstractStorage {
 
   async getPageContent(page: string, syntax: string): Promise<PageData> {
     const path = await fileSystemStorage.resolvePath(page, syntax);
-    return fileSystemStorage.readPage(path || "");
+    const pageData = await fileSystemStorage.readPage(path || "");
+    pageData.headline = pageData.name;
+    pageData.headlineRaw = pageData.name;
+    return pageData;
   }
 
   getPageFromViewURL(): string | null {
@@ -63,8 +66,8 @@ export default class FileSystemStorage extends AbstractStorage {
     return Promise.resolve(true);
   }
 
-  async save(page: string, content: string, syntax: string) {
+  async save(page: string, content: string, title: string, syntax: string) {
     const path = await fileSystemStorage.resolvePath(page, syntax);
-    fileSystemStorage.savePage(path, content);
+    fileSystemStorage.savePage(path, content, title);
   }
 }

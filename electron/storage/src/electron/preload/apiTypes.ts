@@ -5,5 +5,5 @@ export interface APITypes {
 
   readPage(path: string): Promise<PageData>;
 
-  savePage(path: string, content: string): Promise<PageData>;
+  savePage(path: string, content: string, title: string): Promise<PageData>;
 }

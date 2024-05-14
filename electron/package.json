@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "cross-env": "7.0.3",
-    "electron": "30.0.2",
+    "electron": "29.3.3",
     "electron-builder": "24.13.3",
     "rimraf": "5.0.7"
   },

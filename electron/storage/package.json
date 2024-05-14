@@ -29,6 +29,6 @@
     "vue-tsc": "2.0.16"
   },
   "peerDependencies": {
-    "electron": "30.0.2"
+    "electron": "29.3.3"
   }
 }

@@ -30,6 +30,10 @@
     {
       "groupName": "tiptap",
       "matchDepPatterns": "@tiptap/.+"
+    },
+    {
+      "groupName": "@typescript-eslint",
+      "matchDepPatterns": "@typescript-eslint/.+"
     }
   ]
 }

@@ -52,10 +52,10 @@
     ## Use the preferred content editor.
     #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   #end
+  ## The "content" id is expected by some JavaScript and CSS code.
+  #set ($id = 'content')
   {{html clean="false"}}
   #if ($type == 'edit')
-    ## The "content" id is expected by some JavaScript and CSS code.
-    #set ($id = 'content')
     #if (!$useWysiwygEditor)
       &lt;div id="xwikieditcontentinner"&gt;
         ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.

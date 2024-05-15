@@ -26,7 +26,7 @@
     "rimraf": "5.0.7",
     "vite": "5.2.11",
     "vite-plugin-node": "3.1.0",
-    "vue-tsc": "2.0.16"
+    "vue-tsc": "2.0.18"
   },
   "peerDependencies": {
     "electron": "29.3.3"

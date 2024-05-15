@@ -28,6 +28,6 @@
     "rimraf": "5.0.7",
     "vite": "5.2.11",
     "vite-plugin-comlink": "4.0.2",
-    "vue-tsc": "2.0.16"
+    "vue-tsc": "2.0.18"
   }
 }

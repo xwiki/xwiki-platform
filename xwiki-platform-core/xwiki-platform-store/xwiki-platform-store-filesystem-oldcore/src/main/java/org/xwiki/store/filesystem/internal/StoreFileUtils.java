@@ -96,6 +96,9 @@ public final class StoreFileUtils
                     // Stop at the link file if we don't follow it
                     file = linkFile;
                 }
+            } else {
+                // Stop the loop since no file or link could be found
+                break;
             }
         }
 

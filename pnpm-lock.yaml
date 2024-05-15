@@ -22,7 +22,7 @@ importers:
         version: 5.0.4(vite@5.2.11(@types/node@20.12.12))(vue@3.4.27(typescript@5.4.5))
       '@vitest/coverage-v8':
         specifier: 1.6.0
-        version: 1.6.0(vitest@1.6.0(@types/node@20.12.12)(happy-dom@14.10.1))
+        version: 1.6.0(vitest@1.6.0(@types/node@20.12.12)(happy-dom@14.11.0))
       '@vue/eslint-config-prettier':
         specifier: 9.0.0
         version: 9.0.0(eslint@8.57.0)(prettier@3.2.5)
@@ -95,7 +95,7 @@ importers:
         version: 5.2.11(@types/node@20.12.12)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.10.1)
+        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
       vue-tsc:
         specifier: 2.0.16
         version: 2.0.16(typescript@5.4.5)
@@ -123,7 +123,7 @@ importers:
         version: 5.2.11(@types/node@20.12.12)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.10.1)
+        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
@@ -135,7 +135,7 @@ importers:
     devDependencies:
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.10.1)
+        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
 
   ds/dsfr:
     dependencies:
@@ -174,8 +174,8 @@ importers:
         specifier: 2.4.6
         version: 2.4.6
       happy-dom:
-        specifier: 14.10.1
-        version: 14.10.1
+        specifier: 14.11.0
+        version: 14.11.0
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
@@ -184,7 +184,7 @@ importers:
         version: 5.2.11(@types/node@20.12.12)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.10.1)
+        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
       vue-tsc:
         specifier: 2.0.16
         version: 2.0.16(typescript@5.4.5)
@@ -218,7 +218,7 @@ importers:
         version: 5.2.11(@types/node@20.12.12)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.10.1)
+        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
       vue-tsc:
         specifier: 2.0.16
         version: 2.0.16(typescript@5.4.5)
@@ -349,7 +349,7 @@ importers:
         version: 5.2.11(@types/node@20.12.12)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.10.1)
+        version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
       vue-tsc:
         specifier: 2.0.16
         version: 2.0.16(typescript@5.4.5)
@@ -3290,8 +3290,8 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  happy-dom@14.10.1:
-    resolution: {integrity: sha512-GRbrZYIezi8+tTtffF4v2QcF8bk1h2loUTO5VYQz3GZdrL08Vk0fI+bwf/vFEBf4C/qVf/easLJ/MY1wwdhytA==}
+  happy-dom@14.11.0:
+    resolution: {integrity: sha512-vu25dY7YJqLuTG/3ADC0FZRRF0yNBp3q2K0YTN08opXdZi8V/YzIJDNJWFiCnDIuyc+RrCIE093+H5fa9Trlxg==}
     engines: {node: '>=16.0.0'}
 
   hard-rejection@2.1.0:
@@ -6587,7 +6587,7 @@ snapshots:
       vite: 5.2.11(@types/node@20.12.12)
       vue: 3.4.27(typescript@5.4.5)
 
-  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.12.12)(happy-dom@14.10.1))':
+  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.12.12)(happy-dom@14.11.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -6602,7 +6602,7 @@ snapshots:
       std-env: 3.7.0
       strip-literal: 2.0.0
       test-exclude: 6.0.0
-      vitest: 1.6.0(@types/node@20.12.12)(happy-dom@14.10.1)
+      vitest: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -8153,7 +8153,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  happy-dom@14.10.1:
+  happy-dom@14.11.0:
     dependencies:
       entities: 4.5.0
       webidl-conversions: 7.0.0
@@ -10114,7 +10114,7 @@ snapshots:
       '@types/node': 20.12.12
       fsevents: 2.3.3
 
-  vitest@1.6.0(@types/node@20.12.12)(happy-dom@14.10.1):
+  vitest@1.6.0(@types/node@20.12.12)(happy-dom@14.11.0):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -10138,7 +10138,7 @@ snapshots:
       why-is-node-running: 2.2.2
     optionalDependencies:
       '@types/node': 20.12.12
-      happy-dom: 14.10.1
+      happy-dom: 14.11.0
     transitivePeerDependencies:
       - less
       - lightningcss

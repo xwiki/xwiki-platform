@@ -181,76 +181,20 @@ var XWiki = (function (XWiki) {
 
   });
 
-  var init = function() {
-    /*!
-    ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
-    ## search suggest contructor.
-    #set ($sources = [])
-    #set ($searchSuggestConfig = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
-    #foreach ($source in $searchSuggestConfig.getObjects('XWiki.SearchSuggestSourceClass'))
-      #if ($source.getProperty('activated').value == 1)
-        #set ($engine = $source.getProperty('engine').value)
-        #if ("$!engine" == '')
-          ## For backward compatibility we consider the search engine to be Lucene when it's no specified.
-          #set ($engine = 'lucene')
-        #end
-        #set ($discard = $xwiki.getDocument('XWiki.SearchCode').getRenderedContent())
-        #if ($engine == $searchEngine)
-          #try("evaluateException")
-            #set ($evaluatedSource = $source.evaluate())
-          #end
-          #if ("$!evaluateException" != '')
-            #set ($discard = $logtool.error(
-              "Error when trying to evaluate XWiki.SearchSuggestSourceClass: $evaluateException"))
-            #set ($discard = $logtool.debug($exceptiontool.getStackTrace($evaluateException)))
-          #end
-          #set ($name = $source.getProperty('name').value)
-          #if ($services.localization.get($name))
-            #set ($name = $services.localization.render($name))
-          #elseif ("$!evaluatedSource" != '')
-            ## Evaluate the Velocity code for backward compatibility.
-            #set ($name =  $evaluatedSource.name)
-          #end
-          #set ($icon = $source.getProperty('icon').value)
-          #if ($icon.startsWith('icon:'))
-            #set ($icon = $xwiki.getSkinFile("icons/silk/${icon.substring(5)}.png"))
-          #elseif ("$!evaluatedSource" != '')
-            ## Evaluate the Velocity code for backward compatibility.
-            #set ($icon = $evaluatedSource.icon)
-          #end
-          #set ($service = $source.getProperty('url').value)
-          #set ($parameters = {
-            'query': $source.getProperty('query').value,
-            'nb': $source.getProperty('resultsNumber').value
-          })
-          #if ($xwiki.exists($service))
-            #set ($discard = $parameters.put('outputSyntax', 'plain'))
-            #set ($service = $xwiki.getURL($service, 'get', $escapetool.url($parameters)))
-          #else
-            ## Evaluate the Velocity code for backward compatibility.
-            #set ($service = "#evaluate($service)")
-            #set ($service = "$service#if ($service.contains('?'))&#else?#end$escapetool.url($parameters)")
-          #end
-          #set ($highlight = $source.getProperty('highlight').value == 1)
-          #set ($discard = $sources.add({
-            'name': $name,
-            'varname': 'input',
-            'script': $service,
-            'icon': $icon,
-            'highlight': $highlight
-          }))
-        #end
-      #end
-    #end
-    */
-    var sources = $jsontool.serialize($sources);
-    new XWiki.SearchSuggest($('headerglobalsearchinput'), sources);
-    return true;
+  var createSearchSuggest = function(sources) {
+    return new XWiki.SearchSuggest($('headerglobalsearchinput'), sources);
   };
+  const sourcesUrl = "$xwiki.getURL('XWiki.SearchSuggestCode', 'get', 'xpage=plain&outputSyntax=plain')";
 
-  // When the document is loaded, install search suggestions
-  var discard = (XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
+  require(['jquery'], function($) {
+    var init = function() {
+      $.getJSON(sourcesUrl).then(createSearchSuggest);
+      return true;
+    };
+
+    // When the document is loaded, install search suggestions
+    var discard = (XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
+  });
 
   return XWiki;
-
 })(XWiki);

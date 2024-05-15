@@ -500,7 +500,6 @@
 
     #end
   #end
-  ## Give the user a Back to Home button which redirects them to the home of the current Wiki
   ##
 #end## createUser Macro
 {{/velocity}}</content>

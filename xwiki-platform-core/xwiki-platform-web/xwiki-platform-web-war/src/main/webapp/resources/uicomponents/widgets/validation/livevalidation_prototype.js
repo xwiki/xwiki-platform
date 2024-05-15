@@ -186,6 +186,7 @@ LiveValidation.prototype = {
     } else {
       validationMessageHolder = this.createMessageSpan();
       this.options.insertAfterWhatNode.up().appendChild(validationMessageHolder);
+      return;
     }
     /* We use the failure message as a fallback for the success message for regexes. This ensures that the regex stay
     * shown to the user at all times. */

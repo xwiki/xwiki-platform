@@ -22,12 +22,6 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+import { ComponentInit } from "./componentsInit";
 
-/**
- * @module preload
- */
-
-export { sha256sum } from "./nodeCrypto";
-export { versions } from "./versions";
-import "@cristal/electron-storage/preload";
-import "@cristal/browser-electron/preload";
+export { ComponentInit };

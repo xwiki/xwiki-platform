@@ -23,11 +23,12 @@
  *
  **/
 
-/**
- * @module preload
- */
+import type { Container } from "inversify";
+import { BrowserApiElectron } from "./components/browser-api-electron";
+import { BrowserApi, name } from "@cristal/browser-api";
 
-export { sha256sum } from "./nodeCrypto";
-export { versions } from "./versions";
-import "@cristal/electron-storage/preload";
-import "@cristal/browser-electron/preload";
+export class ComponentInit {
+  constructor(container: Container) {
+    container.bind<BrowserApi>(name).to(BrowserApiElectron).inSingletonScope();
+  }
+}

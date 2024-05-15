@@ -22,12 +22,20 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+import { ipcMain, app } from "electron";
+import BrowserWindow = Electron.BrowserWindow;
+import { resolve } from "node:path";
 
 /**
- * @module preload
+ * Reload the browser by reloading the index file.
+ * @param window
  */
+function reloadBrowser(window: BrowserWindow) {
+  window.loadFile(resolve(app.getAppPath(), "./renderer/dist/index.html"));
+}
 
-export { sha256sum } from "./nodeCrypto";
-export { versions } from "./versions";
-import "@cristal/electron-storage/preload";
-import "@cristal/browser-electron/preload";
+export default function load(window: BrowserWindow) {
+  ipcMain.handle("reloadBrowser", () => {
+    return reloadBrowser(window);
+  });
+}

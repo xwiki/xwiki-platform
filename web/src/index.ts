@@ -24,6 +24,7 @@
  **/
 
 import { CristalAppLoader } from "@cristal/lib";
+import { ComponentInit } from "@cristal/browser-default";
 
 CristalAppLoader.init(
   [
@@ -40,5 +41,7 @@ CristalAppLoader.init(
   true,
   false,
   "XWiki",
-  () => {},
+  (container) => {
+    new ComponentInit(container);
+  },
 );

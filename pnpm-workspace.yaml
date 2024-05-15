@@ -1,6 +1,8 @@
 packages:
   - "api"
   - "core/icons"
+  - "core/browser/browser-api"
+  - "core/browser/browser-default"
   - "dev/config"
   - "ds/dsfr"
   - "ds/shoelace"
@@ -11,6 +13,7 @@ packages:
   - "electron/preload"
   - "electron/renderer"
   - "electron/storage"
+  - "electron/browser"
   - "extension-manager"
   - "extensions/menubuttons"
   - "lib"

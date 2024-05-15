@@ -20,10 +20,11 @@
     "linux": "echo 'no task'"
   },
   "dependencies": {
+    "@cristal/browser-electron": "workspace:*",
     "@cristal/electron-storage": "workspace:*",
     "@cristal/lib": "workspace:^",
-    "vue": "3.4.27",
-    "inversify": "6.0.2"
+    "inversify": "6.0.2",
+    "vue": "3.4.27"
   },
   "devDependencies": {
     "@types/node": "20.12.12",

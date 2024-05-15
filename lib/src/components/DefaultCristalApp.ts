@@ -48,6 +48,8 @@ import {
   RouteRecordRaw,
 } from "vue-router";
 
+import { BrowserApi } from "@cristal/browser-api";
+
 import "@mdi/font/css/materialdesignicons.css";
 
 import Index from "../c-index.vue";
@@ -64,6 +66,7 @@ export class DefaultCristalApp implements CristalApp {
   public app: App;
   public page: PageData;
   public mode: string;
+  public browserApi: BrowserApi;
   public currentContentRef: Ref;
   public container: Container;
   public vueTemplateProviders: VueTemplateProvider[];
@@ -79,6 +82,7 @@ export class DefaultCristalApp implements CristalApp {
     @multiInject("VueTemplateProvider")
     vueTemplateProviders: VueTemplateProvider[],
     @inject("Logger") logger: Logger,
+    @inject("BrowserApi") browserApi: BrowserApi,
   ) {
     // this.extensionManager = new DefaultExtensionManager();
     this.availableConfigurations = new Map<string, WikiConfig>();
@@ -87,6 +91,7 @@ export class DefaultCristalApp implements CristalApp {
     this.vueTemplateProviders = vueTemplateProviders;
     this.page = new DefaultPageData();
     this.mode = "view";
+    this.browserApi = browserApi;
     this.logger = logger;
     this.logger.setModule("app.components.DefaultWikiApp");
     this.logger?.debug("Skin manager: ", skinManager);
@@ -154,15 +159,7 @@ export class DefaultCristalApp implements CristalApp {
       if (wikiConfig.designSystem != "") {
         this.skinManager.setDesignSystem(wikiConfig.designSystem);
       }
-      if (!this.isElectron) {
-        // We want to change the URL is non Electron setup
-        window.location.href =
-          "/" + configName + "/#/" + wikiConfig.homePage + "/";
-      } else {
-        // Forcing reloading page in electron setup
-        window.localStorage.setItem("currentApp", configName);
-        // history.go(0);
-      }
+      this.browserApi.switchLocation(wikiConfig);
     }
   }
 

@@ -22,12 +22,12 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+import { contextBridge, ipcRenderer } from "electron";
+import { APITypes } from "./apiTypes";
 
-/**
- * @module preload
- */
-
-export { sha256sum } from "./nodeCrypto";
-export { versions } from "./versions";
-import "@cristal/electron-storage/preload";
-import "@cristal/browser-electron/preload";
+const api: APITypes = {
+  reloadBrowser() {
+    return ipcRenderer.invoke("reloadBrowser", {});
+  },
+};
+contextBridge.exposeInMainWorld("browserElectron", api);

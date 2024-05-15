@@ -24,7 +24,8 @@
  **/
 
 import { CristalAppLoader } from "@cristal/lib";
-import { ComponentInit } from "@cristal/electron-storage";
+import { ComponentInit as ElectronStorageComponentInit } from "@cristal/electron-storage";
+import { ComponentInit as BrowserComponentInit } from "@cristal/browser-electron";
 import { Container } from "inversify";
 
 CristalAppLoader.init(
@@ -43,6 +44,7 @@ CristalAppLoader.init(
   true,
   "FileSystemSL",
   (container: Container) => {
-    new ComponentInit(container);
+    new ElectronStorageComponentInit(container);
+    new BrowserComponentInit(container);
   },
 );

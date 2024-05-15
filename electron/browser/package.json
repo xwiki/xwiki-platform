@@ -1,0 +1,26 @@
+{
+  "name": "@cristal/browser-electron",
+  "version": "0.0.0",
+  "types": "dist/main/index.d.ts",
+  "license": "AGPL-3.0",
+  "exports": {
+    ".": "./dist/default/main.umd.cjs",
+    "./preload": "./dist/preload/main.umd.cjs",
+    "./main": "./dist/main/main.umd.cjs"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && cp \"./package.json\" ./dist/"
+  },
+  "dependencies": {
+    "@cristal/api": "workspace:*",
+    "@cristal/browser-api": "workspace:*",
+    "inversify": "6.0.2"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5",
+    "vite": "5.2.11"
+  },
+  "peerDependencies": {
+    "electron": "29.3.3"
+  }
+}

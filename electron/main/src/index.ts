@@ -29,6 +29,8 @@ import { restoreOrCreateWindow } from "./mainWindow";
 import { platform } from "node:process";
 // @ts-expect-error shouldn't happen but we need to generate the types for the whole project once.
 import load from "@cristal/electron-storage/main";
+// @ts-expect-error shouldn't happen but we need to generate the types for the whole project once.
+import loadBrowser from "@cristal/browser-electron/main";
 
 /**
  * Prevent electron from running multiple instances.
@@ -61,7 +63,7 @@ app
   .whenReady()
   .then(() => {
     load();
-    restoreOrCreateWindow();
+    restoreOrCreateWindow().then((w) => loadBrowser(w));
     /**
      * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.
      */

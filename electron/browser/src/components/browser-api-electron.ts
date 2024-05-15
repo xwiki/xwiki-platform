@@ -22,12 +22,21 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+import { BrowserApi } from "@cristal/browser-api";
+import { injectable } from "inversify";
+import { APITypes } from "../electron/preload/apiTypes";
+import { WikiConfig } from "@cristal/api";
+
+declare const browserElectron: APITypes;
 
 /**
- * @module preload
+ * Remembers the current location in the locale storage, then reload the
+ * browser.
  */
-
-export { sha256sum } from "./nodeCrypto";
-export { versions } from "./versions";
-import "@cristal/electron-storage/preload";
-import "@cristal/browser-electron/preload";
+@injectable()
+export class BrowserApiElectron implements BrowserApi {
+  switchLocation(wikiConfig: WikiConfig) {
+    window.localStorage.setItem("currentApp", wikiConfig.name);
+    browserElectron.reloadBrowser();
+  }
+}

@@ -28,7 +28,8 @@
     "vue-tsc": "2.0.16"
   },
   "dependencies": {
-    "@cristal/electron-storage": "workspace:^",
+    "@cristal/electron-storage": "workspace:*",
+    "@cristal/browser-electron": "workspace:*",
     "electron": "29.3.3"
   }
 }

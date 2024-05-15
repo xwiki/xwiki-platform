@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@cristal/electron-storage": "workspace:*",
+    "@cristal/browser-electron": "workspace:*",
     "@types/node": "20.12.12",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",

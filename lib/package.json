@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@cristal/api": "workspace:^",
+    "@cristal/browser-api": "workspace:*",
     "@cristal/dsfr": "workspace:*",
     "@cristal/dsshoelace": "workspace:*",
     "@cristal/dsvuetify": "workspace:*",

@@ -22,12 +22,18 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+import { defineConfig, mergeConfig } from "vite";
+import defaultConfig from "../../vite.vue.config.js";
 
-/**
- * @module preload
- */
-
-export { sha256sum } from "./nodeCrypto";
-export { versions } from "./versions";
-import "@cristal/electron-storage/preload";
-import "@cristal/browser-electron/preload";
+export default mergeConfig(
+  defaultConfig,
+  defineConfig({
+    build: {
+      outDir: "dist/default",
+      lib: {
+        entry: "./src/index.ts",
+        name: "browserelectron",
+      },
+    },
+  }),
+);

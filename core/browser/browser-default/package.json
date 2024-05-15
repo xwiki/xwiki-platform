@@ -1,0 +1,22 @@
+{
+  "name": "@cristal/browser-default",
+  "version": "0.0.0",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "license": "AGPL-3.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json --noEmit && vite build"
+  },
+  "dependencies": {
+    "@cristal/api": "workspace:*",
+    "@cristal/browser-api": "workspace:*",
+    "inversify": "6.0.2"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5",
+    "vite": "5.2.11"
+  }
+}

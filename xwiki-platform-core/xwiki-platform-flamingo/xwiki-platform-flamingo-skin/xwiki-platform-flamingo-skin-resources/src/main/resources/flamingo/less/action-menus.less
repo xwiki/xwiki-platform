@@ -125,12 +125,6 @@
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }
 
-  // Defines a transition for when the search results get hidden because the focus
-  // moves out of the search field.
-  & .searchSuggest {
-    transition: opacity 300ms ease-out, max-height 300ms ease-out;
-  }
-
   // When the global search is closed
   .btn[aria-expanded='false'] {
     background-color: @navbar-default-bg;

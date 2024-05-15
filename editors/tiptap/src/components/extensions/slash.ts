@@ -240,7 +240,9 @@ function renderItems() {
       }
 
       if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") {
-        return (app._instance?.refs.container as HTMLElement).dispatchEvent(
+        // Get the root element of the Vue template and forward it the events.
+        const templateRoot = (app._container as HTMLElement).children[0];
+        return templateRoot.dispatchEvent(
           new KeyboardEvent("keydown", { key: key }),
         );
       }

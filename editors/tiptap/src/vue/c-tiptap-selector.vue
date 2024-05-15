@@ -81,28 +81,32 @@ watch(index, async () => {
 </script>
 
 <template>
-  <div
-    ref="container"
-    class="items"
-    @keydown.down="down"
-    @keydown.up="up"
-    @keydown.enter="enter"
-  >
-    <template v-for="category in items" :key="category.title">
-      <span class="category-title">{{ category.title }}</span>
-      <button
-        v-for="(item, itemIndex) in category.actions"
-        :key="item.title"
-        :class="[
-          'item',
-          item.title == actions[index].title ? 'is-selected' : '',
-        ]"
-        @click="apply(itemIndex)"
-      >
-        <c-icon :name="item.icon" :size="Size.Small"></c-icon>&nbsp;
-        {{ item.hint }}
-      </button>
-    </template>
+  <!--
+  Defines a root elemement that is not part of the tippy component.
+  It's is useful as a receiver for keyboard events forwarded for the editor.
+  -->
+  <div @keydown.down="down" @keydown.up="up" @keydown.enter="enter">
+    <!--
+    This container elements is moved inside tippy and is used as the content of
+    the tippy popover.
+    -->
+    <div ref="container" class="items">
+      <template v-for="category in items" :key="category.title">
+        <span class="category-title">{{ category.title }}</span>
+        <button
+          v-for="(item, itemIndex) in category.actions"
+          :key="item.title"
+          :class="[
+            'item',
+            item.title == actions[index].title ? 'is-selected' : '',
+          ]"
+          @click="apply(itemIndex)"
+        >
+          <c-icon :name="item.icon" :size="Size.Small"></c-icon>&nbsp;
+          {{ item.hint }}
+        </button>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -110,6 +114,7 @@ watch(index, async () => {
 .category-title {
   font-style: italic;
 }
+
 .items {
   position: relative;
   border-radius: var(--cr-tooltip-border-radius);

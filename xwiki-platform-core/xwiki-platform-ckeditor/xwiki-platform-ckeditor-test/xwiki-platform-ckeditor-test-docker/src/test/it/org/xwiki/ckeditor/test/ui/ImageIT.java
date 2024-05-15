@@ -843,7 +843,7 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage wysiwygEditPage = wikiEditPage.editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().clickNumberedList();
 
@@ -864,7 +864,7 @@ class ImageIT extends AbstractCKEditorIT
         WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
         // Make sure the image can be clicked as a proof that the editor did not crash.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
         assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
     }

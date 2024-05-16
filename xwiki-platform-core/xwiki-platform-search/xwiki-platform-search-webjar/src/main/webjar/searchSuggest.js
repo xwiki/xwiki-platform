@@ -17,6 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+define('search-suggest-messages', {
+   keys: [
+     'core.widgets.suggest.noResults',
+     'core.widgets.suggest.showResults',
+     'platform.search.suggestResultLocatedIn'
+   ]
+});
 var XWiki = (function (XWiki) {
 
   /**
@@ -30,22 +37,24 @@ var XWiki = (function (XWiki) {
       * and registers event listerners.
       */
     initialize: function(searchInput, sources) {
+      require(['xwiki-l10n!search-suggest-messages'], (l10n) => {
+        this._l10n = l10n;
+        this.sources = sources;
 
-      this.sources = sources;
+        this.searchInput = $(searchInput);
+        if (!this.searchInput) {
+          return;
+        }
 
-      this.searchInput = $(searchInput);
-      if (!this.searchInput) {
-        return;
-      }
+        document.observe("xwiki:suggest:clearSuggestions", this.onClearSuggestions.bindAsEventListener(this));
+        document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this));
+        document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
+        document.observe("xwiki:suggest:updated", this.onSuggestUpdated.bindAsEventListener(this));
+        document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
+        document.observe("xwiki:suggest:collapsed", this.onSuggestCollapsed.bindAsEventListener(this));
 
-      document.observe("xwiki:suggest:clearSuggestions", this.onClearSuggestions.bindAsEventListener(this));
-      document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this));
-      document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
-      document.observe("xwiki:suggest:updated", this.onSuggestUpdated.bindAsEventListener(this));
-      document.observe("xwiki:suggest:selected", this.onSuggestionSelected.bindAsEventListener(this));
-      document.observe("xwiki:suggest:collapsed", this.onSuggestCollapsed.bindAsEventListener(this));
-
-      this.createSuggest();
+        this.createSuggest();
+      });
     },
 
     /**
@@ -131,10 +140,8 @@ var XWiki = (function (XWiki) {
             .insert(new Element('span', {'class':'suggestValue'}))
             .insert(new Element('span', {'class':'suggestInfo'}));
       this.noResultsMessage = new Element('div', {'class': 'hidden'})
-        .update("$escapetool.javascript($services.localization.render('core.widgets.suggest.noResults'))".escapeHTML());
-      var gotoSearchPageMessage = new Element('div')
-        .update("$escapetool.javascript($services.localization.render('core.widgets.suggest.showResults'))"
-        .escapeHTML());
+        .update(this._l10n['core.widgets.suggest.noResults']);
+      var gotoSearchPageMessage = new Element('div').update(this._l10n['core.widgets.suggest.showResults']);
       var content = new Element('div').insert(this.noResultsMessage).insert(gotoSearchPageMessage)
         .insert(new Element('div', {'class': 'clearfloats'}));
       var allResultsNode = new XWiki.widgets.XList([
@@ -167,8 +174,7 @@ var XWiki = (function (XWiki) {
         sources : this.sources,
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
         displayValue: true,
-        displayValueText:
-          "$escapetool.javascript($services.localization.render('platform.search.suggestResultLocatedIn'))",
+        displayValueText: this._l10n['platform.search.suggestResultLocatedIn'],
         resultInfoHTML: true,
         timeout: 0,
         width: 500,
@@ -181,20 +187,16 @@ var XWiki = (function (XWiki) {
 
   });
 
-  var createSearchSuggest = function(sources) {
-    return new XWiki.SearchSuggest($('headerglobalsearchinput'), sources);
+  const sourcesUrl = new XWiki.Document(XWiki.Model.resolve('XWiki.SearchSuggestCode', XWiki.EntityType.DOCUMENT))
+    .getURL('get');
+
+  var init = async function() {
+    var sources = await (await fetch(sourcesUrl)).json();
+    new XWiki.SearchSuggest($('headerglobalsearchinput'), sources);
+    return true;
   };
-  const sourcesUrl = "$xwiki.getURL('XWiki.SearchSuggestCode', 'get', 'xpage=plain&outputSyntax=plain')";
 
-  require(['jquery'], function($) {
-    var init = function() {
-      $.getJSON(sourcesUrl).then(createSearchSuggest);
-      return true;
-    };
-
-    // When the document is loaded, install search suggestions
-    var discard = (XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
-  });
-
+  // When the document is loaded, install search suggestions
+  var discard = (XWiki.isInitialized && init()) || document.observe('xwiki:dom:loading', init);
   return XWiki;
 })(XWiki);

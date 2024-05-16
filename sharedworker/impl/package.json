@@ -20,10 +20,10 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "@cristal/api": "workspace:^",
-    "@cristal/extension-manager": "workspace:^",
-    "@cristal/sharedworker-api": "workspace:^",
-    "@cristal/storage": "workspace:^",
+    "@cristal/api": "workspace:*",
+    "@cristal/extension-manager": "workspace:*",
+    "@cristal/sharedworker-api": "workspace:*",
+    "@cristal/storage": "workspace:*",
     "comlink": "4.4.1",
     "inversify": "6.0.2",
     "vue": "3.4.27",

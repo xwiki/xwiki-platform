@@ -20,7 +20,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "@cristal/api": "workspace:^",
+    "@cristal/api": "workspace:*",
     "inversify": "6.0.2",
     "reflect-metadata": "0.2.2",
     "vue": "3.4.27",

@@ -26,8 +26,8 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "@cristal/api": "workspace:^",
-    "@cristal/icons": "workspace:^",
+    "@cristal/api": "workspace:*",
+    "@cristal/icons": "workspace:*",
     "inversify": "6.0.2",
     "marked": "12.0.2",
     "reflect-metadata": "0.2.2",

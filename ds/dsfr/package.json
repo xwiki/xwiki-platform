@@ -21,7 +21,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "@cristal/api": "workspace:^",
+    "@cristal/api": "workspace:*",
     "@gouvfr/dsfr": "1.11.2",
     "@gouvminint/vue-dsfr": "5.11.0",
     "inversify": "6.0.2",
@@ -32,7 +32,7 @@
     "vuetify": "3.6.6"
   },
   "devDependencies": {
-    "@cristal/dev-config": "workspace:^",
+    "@cristal/dev-config": "workspace:*",
     "@vue/test-utils": "2.4.6",
     "happy-dom": "14.11.0",
     "rimraf": "5.0.7",

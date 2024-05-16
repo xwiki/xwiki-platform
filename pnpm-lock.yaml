@@ -215,7 +215,7 @@ importers:
   ds/dsfr:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
       '@gouvfr/dsfr':
         specifier: 1.11.2
@@ -243,7 +243,7 @@ importers:
         version: 3.6.6(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       '@cristal/dev-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../dev/config
       '@vue/test-utils':
         specifier: 2.4.6
@@ -444,10 +444,10 @@ importers:
   electron:
     dependencies:
       '@cristal/electron-storage':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:storage
       '@cristal/lib':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../lib
       electron-updater:
         specifier: 6.1.8
@@ -555,7 +555,7 @@ importers:
         specifier: workspace:*
         version: link:../storage
       '@cristal/lib':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../lib
       inversify:
         specifier: 6.0.2
@@ -583,10 +583,10 @@ importers:
   electron/storage:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
       '@cristal/storage':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../storage
       electron:
         specifier: 29.4.0
@@ -614,7 +614,7 @@ importers:
   extension-manager:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../api
       inversify:
         specifier: 6.0.2
@@ -639,10 +639,10 @@ importers:
   extensions/menubuttons:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
       '@cristal/skin':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../skin
       inversify:
         specifier: 6.0.2
@@ -670,7 +670,7 @@ importers:
   lib:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../api
       '@cristal/browser-api':
         specifier: workspace:*
@@ -688,25 +688,25 @@ importers:
         specifier: workspace:*
         version: link:../editors/tiptap
       '@cristal/extension-manager':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../extension-manager
       '@cristal/extension-menubuttons':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../extensions/menubuttons
       '@cristal/macros':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../macros
       '@cristal/rendering':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../rendering/rendering
       '@cristal/sharedworker-impl':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../sharedworker/impl
       '@cristal/skin':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../skin
       '@cristal/storage':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../storage
       '@mdi/font':
         specifier: 7.4.47
@@ -743,10 +743,10 @@ importers:
   macros:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../api
       '@cristal/skin':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../skin
       inversify:
         specifier: 6.0.2
@@ -771,10 +771,10 @@ importers:
   rendering/rendering:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
       '@cristal/rendering-wikimodel':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../wikimodel
       dompurify:
         specifier: 3.1.3
@@ -805,7 +805,7 @@ importers:
   rendering/wikimodel:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
       vue:
         specifier: 3.4.27
@@ -852,16 +852,16 @@ importers:
   sharedworker/impl:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
       '@cristal/extension-manager':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../extension-manager
       '@cristal/sharedworker-api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../api
       '@cristal/storage':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../storage
       comlink:
         specifier: 4.4.1
@@ -895,10 +895,10 @@ importers:
   skin:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../api
       '@cristal/icons':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../core/icons
       inversify:
         specifier: 6.0.2
@@ -969,10 +969,10 @@ importers:
   storage:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../api
       '@cristal/sharedworker-api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../sharedworker/api
       dexie:
         specifier: 4.0.4
@@ -1009,7 +1009,7 @@ importers:
         specifier: workspace:*
         version: link:../core/browser/browser-default
       '@cristal/lib':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../lib
       '@cristal/link-suggest-xwiki':
         specifier: workspace:*
@@ -1067,10 +1067,10 @@ importers:
   xwiki/remoteinlineeditor:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
       '@cristal/skin':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../skin
       inversify:
         specifier: 6.0.2

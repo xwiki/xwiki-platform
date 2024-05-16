@@ -114,8 +114,12 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  *
  * @param $fields The array of fields to use for generating HTML code.
  * @param $request The request that is made by submitting the form.
+ * @param $isOnlyBlock Whether the fields are the only block of the form
  *#
-#macro (generateHtml, $fields, $request)
+#macro (generateHtml, $fields, $request, $isOnlyBlock)
+  #if(!$isOnlyBlock)
+    #set($isOnlyBlock = 'true')
+  #end
   ## Put the same values back into the fields (if is there any problem with a field from the request that is made).
   #getParams($fields, $request)
   <dl>
@@ -200,8 +204,10 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #end
   #end
   </dl>
-  <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
-  #generateJavascript($fields)
+  #if ($isOnlyBlock == 'true')
+    <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
+    #generateJavascript($fields)
+  #end
 #end
 ##
 #macro (validateRegexJS $regex $fieldName)
@@ -257,7 +263,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         #if ($validate.mandatory)
           #set ($mandatory = $validate.mandatory)
           #if ($mandatory.failureMessage && !$mandatory.noscript)
-            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage", identifier: "mandatory"});
+            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage", identifier: 'mandatory'});
           #end
         #end
         ##
@@ -265,7 +271,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #set ($mustMatch = $validate.mustMatch)
           #if ($mustMatch.name && $mustMatch.failureMessage && !$mustMatch.noscript)
             ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.name]")[0], 
-              failureMessage: "$!mustMatch.failureMessage", identifier: "must-match"});
+              failureMessage: "$!mustMatch.failureMessage", identifier: 'must-match'});
           #end
         #end
         ##

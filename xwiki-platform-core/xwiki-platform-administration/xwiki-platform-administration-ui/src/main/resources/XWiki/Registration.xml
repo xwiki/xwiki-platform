@@ -369,9 +369,11 @@
           #end
         &lt;/div&gt;
         ## Note that the macro inject the form_token field.
-        #generateHtml($mainFields, $request)
+        #generateHtml($mainFields, $request, 'false')
         &lt;h2&gt;$services.localization.render('core.register.aboutYou')&lt;/h2&gt;
-        #generateHtml($aboutYouFields, $request)
+        #generateHtml($aboutYouFields, $request, 'false')
+        &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()" /&gt;
+        #generateJavascript($fields)
         &lt;p class="buttons"&gt;
           &lt;span class="buttonwrapper"&gt;
             &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;

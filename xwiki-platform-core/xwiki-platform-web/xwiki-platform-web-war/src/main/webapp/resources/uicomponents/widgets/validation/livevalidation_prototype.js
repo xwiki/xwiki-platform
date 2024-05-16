@@ -183,20 +183,20 @@ LiveValidation.prototype = {
     let validationMessageHolder;
     if (validationParamsObj.identifier) {
       validationMessageHolder = this.options.insertAfterWhatNode.up().querySelector("." + validationParamsObj.identifier);
+      /* We use the failure message as a fallback for the success message for regexes. This ensures that the regex stay
+        * shown to the user at all times. */
+      if (validationParamsObj.identifier.includes("regex") && validationParamsObj.validMessage == null) {
+        validationParamsObj.validMessage = validationParamsObj.failureMessage;
+      }
     } else {
       validationMessageHolder = this.createMessageSpan();
       this.options.insertAfterWhatNode.up().appendChild(validationMessageHolder);
-      return;
     }
-    /* We use the failure message as a fallback for the success message for regexes. This ensures that the regex stay
-    * shown to the user at all times. */
-    if (validationParamsObj.identifier.includes("regex") && validationParamsObj.validMessage == null) {
-      validationParamsObj.validMessage = validationParamsObj.failureMessage;
-    }
+
     this.validations.push( { type: validationFunction, params: validationParamsObj || {}, messageHolder: validationMessageHolder } );
     // If the validation is a regex validation, then we display it in initialization.
     // This avoids having the user finding out what are the rules of the field validation only after filling it up once.
-    if (validationParamsObj.identifier.includes("regex")) {
+    if (validationParamsObj.identifier && validationParamsObj.identifier.includes("regex")) {
       this.insertMessage(this.validations[this.validations.length - 1], null);
     }
     return this;

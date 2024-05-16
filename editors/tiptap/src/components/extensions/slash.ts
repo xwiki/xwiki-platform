@@ -4,6 +4,8 @@ import { App, createApp } from "vue";
 import Selector from "../../vue/c-tiptap-selector.vue";
 import { Plugin } from "prosemirror-state";
 import { CommandParams } from "./menu-helpers";
+import { createPinia } from "pinia";
+import slashStore, { Props, SlashStore } from "../../stores/slash-store";
 
 const Slash = Extension.create({
   name: "slash",
@@ -226,6 +228,7 @@ function getSuggestionItems({
 function renderItems() {
   let app: App;
   let elemDiv: HTMLDivElement;
+  let store: SlashStore;
 
   return {
     onExit() {
@@ -251,15 +254,18 @@ function renderItems() {
     onStart(props: unknown) {
       elemDiv = document.createElement("div");
       document.body.appendChild(elemDiv);
+      const pinia = createPinia();
       app = createApp(Selector, {
         props,
       });
+      app.use(pinia);
+      // The store must be initialized after pinia is created.
+      store = slashStore();
+      store.updateProps(props as Props);
       app.mount(elemDiv);
     },
     onUpdate(props: unknown) {
-      if (app._instance) {
-        app._instance.props.props = props;
-      }
+      store.updateProps(props as Props);
     },
   };
 }

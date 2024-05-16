@@ -10,22 +10,18 @@ import {
 } from "vue";
 
 import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
-import { SuggestionProps } from "@tiptap/suggestion";
-import {
-  ActionCategoryDescriptor,
-  ActionDescriptor,
-} from "../components/extensions/slash";
+import { ActionDescriptor } from "../components/extensions/slash";
 import { CIcon, Size } from "@cristal/icons";
+
+import slashStore from "../stores/slash-store";
+import { storeToRefs } from "pinia";
+import { SuggestionProps } from "@tiptap/suggestion";
 
 const container = ref();
 
-const props = defineProps<{
-  props: SuggestionProps<unknown>;
-}>();
+const props = defineProps<{ props: SuggestionProps }>();
 
-const items: ComputedRef<ActionCategoryDescriptor[]> = computed(
-  () => props.props.items as ActionCategoryDescriptor[],
-);
+const { items } = storeToRefs(slashStore());
 
 const actions: ComputedRef<ActionDescriptor[]> = computed(() => {
   return items.value.flatMap((category) => category.actions);

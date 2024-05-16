@@ -40,6 +40,7 @@
     "@tiptap/suggestion": "2.4.0",
     "@tiptap/vue-3": "2.4.0",
     "inversify": "6.0.2",
+    "pinia": "2.1.7",
     "tippy.js": "6.3.7",
     "tiptap-markdown": "0.8.10",
     "utility-types": "3.11.0",

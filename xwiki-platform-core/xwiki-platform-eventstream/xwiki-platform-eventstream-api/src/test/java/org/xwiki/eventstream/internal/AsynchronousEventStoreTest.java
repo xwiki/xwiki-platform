@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.ReentrantLock;
@@ -37,6 +38,7 @@ import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.MailEntityAddedEvent;
 import org.xwiki.eventstream.events.MailEntityDeleteEvent;
@@ -54,15 +56,16 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 /**
  * Validate {@link AbstractAsynchronousEventStore}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
-public class AsynchronousEventStoreTest
+class AsynchronousEventStoreTest
 {
     public static class TestAbstractAsynchronousEventStore extends AbstractAsynchronousEventStore
     {
@@ -115,7 +118,6 @@ public class AsynchronousEventStoreTest
 
         @Override
         public List<EventStatus> getEventStatuses(Collection<Event> events, Collection<String> entityIds)
-            throws Exception
         {
             return List.of();
         }
@@ -127,7 +129,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException
+        protected EventStatus syncSaveEventStatus(EventStatus status)
         {
             this.lock.lock();
 
@@ -141,7 +143,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
+        protected EntityEvent syncSaveMailEntityEvent(EntityEvent event)
         {
             this.lock.lock();
 
@@ -155,7 +157,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Event syncSaveEvent(Event event) throws EventStreamException
+        protected Event syncSaveEvent(Event event)
         {
             this.lock.lock();
 
@@ -169,7 +171,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Event syncPrefilterEvent(Event event) throws EventStreamException
+        protected Event syncPrefilterEvent(Event event)
         {
             this.lock.lock();
 
@@ -185,7 +187,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
+        protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status)
         {
             this.lock.lock();
 
@@ -203,7 +205,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Void syncDeleteEventStatuses(String entityId, Date date) throws EventStreamException
+        protected Void syncDeleteEventStatuses(String entityId, Date date)
         {
             this.lock.lock();
 
@@ -221,7 +223,7 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException
+        protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event)
         {
             this.lock.lock();
 
@@ -355,7 +357,7 @@ public class AsynchronousEventStoreTest
     }
 
     @Test
-    void eventstatus() throws InterruptedException, ExecutionException, EventStreamException
+    void eventstatus() throws InterruptedException, ExecutionException
     {
         DefaultEvent event1 = event("id1");
         DefaultEvent event2 = event("id2");
@@ -394,7 +396,7 @@ public class AsynchronousEventStoreTest
     }
 
     @Test
-    void mailentity() throws InterruptedException, ExecutionException, EventStreamException
+    void mailentity() throws InterruptedException, ExecutionException
     {
         DefaultEvent event1 = event("id1");
         DefaultEvent event2 = event("id2");
@@ -403,12 +405,22 @@ public class AsynchronousEventStoreTest
         DefaultEntityEvent status21 = entityEvent(event2, "entity1");
         DefaultEntityEvent status24 = entityEvent(event2, "entity4");
 
+        CompletableFuture<Object> waitForObservationOnStatus24 =
+            createCompletableFutureForStatus(status24, MailEntityAddedEvent.class);
+        CompletableFuture<Object> waitForObservationOnStatus11 =
+            createCompletableFutureForStatus(status11, MailEntityDeleteEvent.class);
+
         this.store.saveEvent(event1);
         this.store.saveEvent(event2);
         this.store.saveMailEntityEvent(status11);
         this.store.saveMailEntityEvent(status13);
         this.store.saveMailEntityEvent(status21);
         this.store.saveMailEntityEvent(status24).get();
+
+        // Wait for the observation to be called on the last store call. The observation component is intentionally 
+        // called after the completable future returned by saveMailEntityEvent and saveEvent. Therefore, we need to 
+        // mock and wait explicitly for the test. 
+        waitForObservationOnStatus24.get();
 
         assertSame(status11, this.store.events.get(event1.getId()).mailstatuses.get(status11.getEntityId()));
         assertSame(status13, this.store.events.get(event1.getId()).mailstatuses.get(status13.getEntityId()));
@@ -422,11 +434,12 @@ public class AsynchronousEventStoreTest
         verify(this.observation).notify(any(MailEntityAddedEvent.class), eq(status21));
         verify(this.observation).notify(any(MailEntityAddedEvent.class), eq(status24));
 
-
         this.store.deleteMailEntityEvent(status11).get();
-        // Delete Mail Entity event needs a bit more checks because it's Optional so it might take a bit more time than
-        // other events: we give those few more milliseconds to avoid flickers
-        Thread.sleep(5);
+
+        // Wait for the observation to be called after deleteMailEntityEvent. The observation component is intentionally 
+        // called after the completable future returned by deleteMailEntityEventt. Therefore, we need to mock and wait
+        // explicitly for the test.
+        waitForObservationOnStatus11.get();
 
         assertNull(this.store.events.get(event1.getId()).mailstatuses.get(status11.getEntityId()));
         assertSame(status13, this.store.events.get(event1.getId()).mailstatuses.get(status13.getEntityId()));
@@ -452,5 +465,25 @@ public class AsynchronousEventStoreTest
 
         assertTrue(this.store.getEvent(event1.getId()).get().isPrefiltered());
         assertFalse(this.store.getEvent(event2.getId()).get().isPrefiltered());
+    }
+
+    /**
+     * Observe for a call to notify on {@link #observation} for a given event and type. Complete the returned
+     * {@link CompletableFuture} as soon as notify is called. This allows for tests to wait for notify to be called even
+     * if not anticipated in the tested code.
+     *
+     * @param event the event to wait for
+     * @param type the type of the event
+     * @return a completable future to wait for before calling assertions
+     */
+    private CompletableFuture<Object> createCompletableFutureForStatus(DefaultEntityEvent event,
+        Class<? extends AbstractEventStreamEvent> type)
+    {
+        CompletableFuture<Object> completable = new CompletableFuture<>();
+        doAnswer(invocationOnMock -> {
+            completable.complete(true);
+            return null;
+        }).when(this.observation).notify(any(type), eq(event));
+        return completable;
     }
 }

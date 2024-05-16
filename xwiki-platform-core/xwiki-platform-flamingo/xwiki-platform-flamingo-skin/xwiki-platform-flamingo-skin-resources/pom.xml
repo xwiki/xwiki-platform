@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -89,6 +89,13 @@
       <artifactId>xwiki-platform-index-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Search -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-webjar</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

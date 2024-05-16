@@ -19,34 +19,36 @@
  */
 package org.xwiki.bridge.event;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DocumentRolledBackEvent}.
  * 
  * @version $Id$
  */
-public class DocumentRolledBackEventTest
+class DocumentRolledBackEventTest
 {
     @Test
-    public void match()
+    void match()
     {
         DocumentReference alice = new DocumentReference("wiki", "Users", "Alice");
         DocumentReference bob = new DocumentReference("wiki", "Users", "Bob");
 
-        Assert.assertFalse(new DocumentRolledBackEvent().matches(new DocumentRollingBackEvent()));
-        Assert.assertTrue(new DocumentRolledBackEvent().matches(new DocumentRolledBackEvent()));
-        Assert.assertTrue(new DocumentRolledBackEvent().matches(new DocumentRolledBackEvent(alice, "2.3")));
+        assertFalse(new DocumentRolledBackEvent().matches(new DocumentRollingBackEvent()));
+        assertTrue(new DocumentRolledBackEvent().matches(new DocumentRolledBackEvent()));
+        assertTrue(new DocumentRolledBackEvent().matches(new DocumentRolledBackEvent(alice, "2.3")));
 
-        Assert.assertFalse(new DocumentRolledBackEvent(bob).matches(new DocumentRolledBackEvent(alice, "1.5")));
-        Assert.assertTrue(new DocumentRolledBackEvent(bob).matches(new DocumentRolledBackEvent(bob, "4.2")));
+        assertFalse(new DocumentRolledBackEvent(bob).matches(new DocumentRolledBackEvent(alice, "1.5")));
+        assertTrue(new DocumentRolledBackEvent(bob).matches(new DocumentRolledBackEvent(bob, "4.2")));
 
-        Assert.assertFalse(new DocumentRolledBackEvent(bob, "3.1").matches(new DocumentRolledBackEvent(bob)));
-        Assert.assertFalse(new DocumentRolledBackEvent(bob, "7.6").matches(new DocumentRolledBackEvent(bob, "7.5")));
-        Assert.assertTrue(new DocumentRolledBackEvent(bob, "5.8").matches(new DocumentRolledBackEvent(bob, "5.8")));
+        assertFalse(new DocumentRolledBackEvent(bob, "3.1").matches(new DocumentRolledBackEvent(bob)));
+        assertFalse(new DocumentRolledBackEvent(bob, "7.6").matches(new DocumentRolledBackEvent(bob, "7.5")));
+        assertTrue(new DocumentRolledBackEvent(bob, "5.8").matches(new DocumentRolledBackEvent(bob, "5.8")));
 
-        Assert.assertFalse(new DocumentRolledBackEvent(bob, "1.0").matches(new DocumentRolledBackEvent(alice, "1.0")));
+        assertFalse(new DocumentRolledBackEvent(bob, "1.0").matches(new DocumentRolledBackEvent(alice, "1.0")));
     }
 }

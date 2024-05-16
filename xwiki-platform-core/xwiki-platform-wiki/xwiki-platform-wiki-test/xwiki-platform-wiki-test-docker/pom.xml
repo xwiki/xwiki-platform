@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-test</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-test-docker</artifactId>
   <name>XWiki Platform - Wiki - Tests - Functional Docker Tests</name>

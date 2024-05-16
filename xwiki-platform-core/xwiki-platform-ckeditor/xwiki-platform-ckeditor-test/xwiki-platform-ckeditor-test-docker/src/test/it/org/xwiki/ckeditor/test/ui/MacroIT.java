@@ -31,6 +31,11 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests how rendering macros are integrated in CKEditor.
@@ -85,5 +90,21 @@ class MacroIT extends AbstractCKEditorIT
         // Verify that the macro output is properly protected (not converted to wiki syntax).
         textArea.sendKeys(" end");
         assertSourceEquals("before\n\n{{children/}}\n\nafter end");
+    }
+
+    @Test
+    @Order(2)
+    void macroContent(TestUtils setup, TestReference testReference)
+    {
+        WYSIWYGEditPage editPage = edit(setup, testReference, true);
+
+        setSource("{{box}}\n"
+            + "Inline {{box}}<param></param>{{/box}}.\n"
+            + "{{/box}}");
+
+        this.textArea.waitUntilContentContains("Inline");
+
+        ViewPage viewPage = editPage.clickSaveAndView();
+        assertThat(viewPage.getContent(), containsString("<param></param>"));
     }
 }

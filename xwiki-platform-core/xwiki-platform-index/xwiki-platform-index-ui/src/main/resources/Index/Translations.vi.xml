@@ -36,13 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Spaces
-index.spacesMacro.spaceIndex.title=Thấy chỉ mục space
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
-index.spacesMacro.spaceAdministration.title=Thấy quản trị space
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
-index.spacesMacro.createSpace.link=Tạo trang mới
-index.spacesMacro.createSpace.defaultSpaceName=Tên Space
-index.spacesMacro.createSpace.submit=Tạo
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+  <content>### Missing: index.deletedDocuments.deleteAll=Delete all</content>
 </xwikidoc>

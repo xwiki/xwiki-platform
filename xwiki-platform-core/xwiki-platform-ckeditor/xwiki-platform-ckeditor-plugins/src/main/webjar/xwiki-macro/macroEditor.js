@@ -217,7 +217,7 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
       addParameterSeparator(parentNode.children);
     } else if (parentNode.type === 'parameter') {
       maybeSetParameterValue(parentNode.data, macroCall);
-      maybeHideParameter(parentNode.data, macroCall, hiddenMacroParameters);
+      maybeHideParameter(parentNode.data, hiddenMacroParameters);
     }
   },
 
@@ -245,10 +245,10 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
    * - deprecated parameters that don't have a value set
    * - parameters that can be edited in-place (as long as they are not mandatory and without a value set)
    */
-  maybeHideParameter = function(parameter, macroCall, hiddenMacroParameters) {
+  maybeHideParameter = function(parameter, hiddenMacroParameters) {
     // We can't hide mandatory parameters that don't have a value set.
     parameter.hidden = isHiddenParameterAndNoValue(parameter) || isDeprecatedParameterUnset(parameter) ||
-        (hiddenMacroParameters.indexOf(parameter.id) >= 0 && !isMandatoryParameterEmpty(parameter));
+        hiddenMacroParameters.indexOf(parameter.id) >= 0;
   },
 
   isHiddenParameterAndNoValue = function(macroParameter) {
@@ -259,10 +259,6 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
 
   isDeprecatedParameterUnset = function(macroParameter) {
     return macroParameter.deprecated && macroParameter.value === undefined;
-  },
-
-  isMandatoryParameterEmpty = function(macroParameter) {
-    return macroParameter.mandatory && (typeof macroParameter.value !== 'string' || macroParameter.value.length === 0);
   },
 
   compareMacroParameterTreeNodes = function(alice, bob) {
@@ -638,7 +634,8 @@ define(
       },
       validate: function() {
         var macroCall = this.getMacroCall();
-        var emptyMandatoryParams = macroEditor.find('.macro-parameter.mandatory ').filter(function() {
+        // Exclude the mandatory parameters that are editable in-place (they are hidden from the modal).
+        var emptyMandatoryParams = macroEditor.find('.macro-parameter.mandatory:not(.hidden)').filter(function() {
           var id = $(this).attr('data-id');
           var value = id === '$content' ? macroCall.content : macroCall.parameters[id];
           return value === undefined || value === '';
@@ -707,6 +704,7 @@ define(
     title: translations.get('title'),
     content: '<div class="macro-editor xform"></div>',
     acceptLabel: translations.get('submit'),
+    form: true,
     onLoad: function() {
       var modal = this;
       var submitButton = modal.find('.modal-footer .btn-primary');
@@ -723,7 +721,10 @@ define(
           load.call(this, input, macroEditor);
         }
       });
-      submitButton.on('click', function(event) {
+      modal.find('.modal-content').on('submit', function(event) {
+        // Ideally we would handle this propagation by making the modal a dialog and using method="dialog" on the form
+        event.preventDefault();
+        event.stopPropagation();
         var macroEditor = modal.find('.macro-editor');
         var macroEditorAPI = macroEditor.xwikiMacroEditor();
         if (macroEditorAPI.validate()) {

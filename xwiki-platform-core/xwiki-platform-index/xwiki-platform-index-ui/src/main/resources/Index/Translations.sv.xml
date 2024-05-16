@@ -36,13 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Rum
-index.spacesMacro.spaceIndex.title=Visa rumsindex
-index.spacesMacro.spaceIndex.alt=Rumsindex
-index.spacesMacro.spaceAdministration.title=Visa rumsadministrering
-index.spacesMacro.spaceAdministration.alt=Administrera rum
-index.spacesMacro.createSpace.link=Skapa ett nytt rum
-index.spacesMacro.createSpace.defaultSpaceName=Rumsnamn
-index.spacesMacro.createSpace.submit=Skapa
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+  <content>### Missing: index.deletedDocuments.deleteAll=Delete all</content>
 </xwikidoc>

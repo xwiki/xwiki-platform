@@ -31,9 +31,9 @@ import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.platform.notifications.test.po.preferences.AbstractNotificationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
+import org.xwiki.platform.notifications.test.po.preferences.CustomNotificationFilterPreferencesLiveDataElement;
 import org.xwiki.platform.notifications.test.po.preferences.EventTypePreferences;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterModal;
-import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.Select;
@@ -53,6 +53,8 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     private static final String ALERT_FORMAT = "alert";
 
     private static final String VALUE_ATTRIBUTE = "value";
+
+    private static final String SYSTEM_PREF_LIVE_DATA_ID = "notificationSystemFilterPreferencesLiveData";
 
     @FindBy(id = "notificationsPane")
     private WebElement notificationsPane;
@@ -106,6 +108,7 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     protected void waitUntilPreferencesAreLoaded()
     {
         getDriver().waitUntilElementIsVisible(notificationsPane, By.cssSelector(".notifPreferences .bootstrap-switch"));
+        waitForNotificationsSettingsLiveData();
     }
 
     /**
@@ -269,14 +272,19 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
         }
     }
 
+    private void waitForNotificationsSettingsLiveData()
+    {
+        new LiveDataElement(SYSTEM_PREF_LIVE_DATA_ID).waitUntilReady();
+        new CustomNotificationFilterPreferencesLiveDataElement(this).waitUntilReady();
+    }
+
     /**
      * @return the system notification filter preferences.
      * @since 13.2RC1
      */
     public List<SystemNotificationFilterPreference> getSystemNotificationFilterPreferences()
     {
-        LiveDataElement notificationSystemFilterPreferencesLiveData =
-            new LiveDataElement("notificationSystemFilterPreferencesLiveData");
+        LiveDataElement notificationSystemFilterPreferencesLiveData = new LiveDataElement(SYSTEM_PREF_LIVE_DATA_ID);
         TableLayoutElement tableLayout = notificationSystemFilterPreferencesLiveData.getTableLayout();
 
         List<SystemNotificationFilterPreference> preferences = new ArrayList<>();
@@ -287,18 +295,12 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     }
 
     /**
-     * @return the custom notification filter preferences
-     * @since 13.2RC1
+     * @return the livedata containing the custom filter preferences.
+     * @since 16.3.0RC1
      */
-    public List<CustomNotificationFilterPreference> getCustomNotificationFilterPreferences()
+    public CustomNotificationFilterPreferencesLiveDataElement getCustomNotificationFilterPreferencesLiveData()
     {
-        List<CustomNotificationFilterPreference> preferences = new ArrayList<>();
-        LiveDataElement liveDataElement =
-            new LiveDataElement("notificationCustomFilterPreferencesLiveData");
-        for (WebElement row : liveDataElement.getTableLayout().getRows()) {
-            preferences.add(new CustomNotificationFilterPreference(this, row, this.getDriver()));
-        }
-        return preferences;
+        return new CustomNotificationFilterPreferencesLiveDataElement(this);
     }
 
     /**

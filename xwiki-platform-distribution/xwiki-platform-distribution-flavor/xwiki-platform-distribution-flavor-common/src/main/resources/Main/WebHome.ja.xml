@@ -53,7 +53,7 @@ XWikiは（サポート、ドキュメンテーション、セールスなどに
 
 [[サンドボックス&gt;&gt;Sandbox.WebHome]]には、より多くのデモコンテンツがあります。また、サンドボックスはウィキの機能を試す際にも使用できます。
 
- {{box}}XWikiの使い方については、[[スタートガイド&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]]もご覧ください。{{/box}}
+ {{box}}XWikiの使い方については、[[スタートガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]]もご覧ください。{{/box}}
 
 (% class="row" %)
 (((
@@ -63,7 +63,7 @@ XWikiは（サポート、ドキュメンテーション、セールスなどに
 
 [[エクステンションマネージャー&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]]から拡張機能を検索してインストールすると、//あなた//が必要な機能を追加してウィキの性能を向上させることができます。
 
-コミュニティーが作成した900個以上の拡張機能は、[[拡張機能レポジトリ&gt;&gt;http://extensions.xwiki.org]]から確認できます。
+コミュニティーが作成した900個以上の拡張機能は、[[拡張機能レポジトリ&gt;&gt;https://extensions.xwiki.org]]から確認できます。
 )))
 
 (% class="col-xs-12 col-sm-6" %)

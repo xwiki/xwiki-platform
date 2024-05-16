@@ -167,6 +167,26 @@
       // parser is called in both cases. Priority 1 is needed to ensure our listener is called before the HTML parser
       // (which has priority 5).
       editor.on('toHtml', escapeStyleContent, null, null, 1);
+      // Remove data-widget attributes on images, as otherwise they might be badly interpreted as another type of
+      // widget, leading to CKEditor crashing.
+      editor.on('toHtml', (event) => {
+        event.data.dataValue.filter(new CKEDITOR.htmlParser.filter({
+          elements: {
+            img: function (element) {
+              const dataWidgetAttribute = element.attributes['data-widget'];
+              const dataCkeUploadIdAttribute = element.attributes['data-cke-upload-id'];
+              const isUploadImageWidget = dataWidgetAttribute === 'uploadimage';
+              // Cleanup data-widget attributes on images. Except for 'uploadimage' which is only cleaned up when
+              // the image is not currently being uploaded (i.e., has a data-cke-upload-id attribute)
+              if (!isUploadImageWidget || dataCkeUploadIdAttribute === undefined)
+              {
+                delete element.attributes['data-widget'];
+              }
+            }
+          }
+        }));
+        // We must use a priority below 8 to make sure our filter is executed before widgets are upcasted.
+      }, null, null, 7);
       editor.on('toDataFormat', escapeStyleContent, null, null, 1);
 
       // Transform <font color="..." face="..."> into <span style="color: ...; font-family: ...">.
@@ -261,7 +281,10 @@
           }
           return textNodes;
         };
-        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious');
+        // When the direction is 'getPrevious', getSiblingTextNodes returns an array of DOM Nodes in reverse order.
+        // The maybeFixNonBreakingSpace method expects both arrays to be in the actual DOM order.
+        // This is why we need to reverse the textNodesBefore array.
+        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious').reverse();
         var textNodesAfter = getSiblingTextNodes(node.getChild(offset), 'getNext');
         return this.maybeFixNonBreakingSpace(textNodesBefore, textNodesAfter);
       } else if (node.type === CKEDITOR.NODE_TEXT) {

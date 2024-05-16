@@ -154,6 +154,40 @@ class DefaultObjectRequiredRightAnalyzerTest
     }
 
     @Test
+    void analyzeDefaultTextArea()
+        throws XWikiException, RequiredRightsException, MissingParserException, ParseException
+    {
+        DocumentReference classReference = new DocumentReference("wiki", "XWiki", "StandardClass");
+        XWikiDocument classDocument = new XWikiDocument(classReference);
+        BaseClass classObject = classDocument.getXClass();
+        String wikiFieldName = "wiki";
+        classObject.addTextAreaField(wikiFieldName, "Wiki", 80, 5, "---", "---", false);
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, this.oldcore.getXWikiContext());
+
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        Syntax testSyntax = mock();
+        testDocument.setSyntax(testSyntax);
+        BaseObject testObject = testDocument.newXObject(classReference, this.oldcore.getXWikiContext());
+        String wikiContent = "{{groovy}}{{/groovy}}";
+        testObject.setLargeStringValue(wikiFieldName, wikiContent);
+
+        XDOM wikiXDOM = new XDOM(List.of());
+        when(this.contentParser.parse(wikiContent, testSyntax, testObject.getDocumentReference())).thenReturn(wikiXDOM);
+
+        RequiredRightAnalysisResult wikiResult = mock();
+        when(this.xdomRequiredRightAnalyzer.analyze(wikiXDOM)).thenReturn(List.of(wikiResult));
+
+        List<RequiredRightAnalysisResult> results = this.analyzer.analyze(testObject);
+        verify(this.xdomRequiredRightAnalyzer).analyze(wikiXDOM);
+        verifyNoMoreInteractions(this.xdomRequiredRightAnalyzer);
+        assertEquals(testObject.getField(wikiFieldName).getReference(),
+            wikiXDOM.getMetaData().getMetaData().get(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA));
+
+        assertEquals(wikiResult, results.get(0));
+    }
+
+
+    @Test
     void analyzeWithCustomAnalyzerThrowsException() throws XWikiException, RequiredRightsException
     {
         XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -75,6 +76,9 @@ public class TableLayoutElement extends BaseElement
     private static final String CLASS_HTML_ATTRIBUTE = "class";
 
     private final LiveDataElement liveData;
+
+    private static final Pattern PAGINATION_SENTENCE_PATTERN =
+        Pattern.compile("^Entries (?<firstEntry>\\d+) - (?<lastEntry>\\d+) out of (?<totalEntries>\\d+)$");
 
     /**
      * @return the list of rows {@link WebElement}s
@@ -562,7 +566,7 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = findColumnIndex(columnLabel);
 
         WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
-            + "(%d) .sort-icon", columnIndex)));
+            + "(%d) .handle", columnIndex)));
         element.click();
 
         waitUntilReady();
@@ -688,6 +692,24 @@ public class TableLayoutElement extends BaseElement
             .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
     }
 
+    private String getPaginationEntriesString()
+    {
+        return getRoot().findElement(By.className("pagination-current-entries")).getText().trim();
+    }
+
+    private java.util.regex.Matcher getPaginationMatcher()
+    {
+        return PAGINATION_SENTENCE_PATTERN.matcher(getPaginationEntriesString());
+    }
+
+    public long getTotalEntries()
+    {
+        java.util.regex.Matcher paginationMatcher = getPaginationMatcher();
+        if (!paginationMatcher.matches()) {
+            throw new IllegalStateException("Matcher does not match: " + getPaginationEntriesString());
+        }
+        return Long.parseLong(paginationMatcher.group("totalEntries"));
+    }
 
     /**
      * Clicks on an action button identified by its name, on a given row.
@@ -697,7 +719,18 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        clickAction(rowNumber, By.cssSelector(String.format(".actions-container .action.action_%s", actionName)));
+        clickAction(rowNumber, getActionSelector(actionName));
+    }
+
+    /**
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 16.2.0RC1
+     */
+    public boolean hasAction(int rowNumber, String actionName)
+    {
+        return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
     }
 
     /**
@@ -708,9 +741,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, By selector)
     {
-        getRowElement(rowNumber)
-            .findElement(selector)
-            .click();
+        findElementInRow(rowNumber, selector).click();
     }
 
     /**
@@ -752,8 +783,20 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement findElementInRow(int rowNumber, By by)
     {
-        return getRowElement(rowNumber)
-            .findElement(by);
+        return getRowElement(rowNumber).findElement(by);
+    }
+
+    /**
+     * Return a list of elements matching a given selector in a row.
+     *
+     * @param rowNumber the number of the row to search on (starting at index 1)
+     * @param by the selector of the elements to search for
+     * @return the list of matched elements
+     * @since 16.2.0RC1
+     */
+    public List<WebElement> findElementsInRow(int rowNumber, By by)
+    {
+        return getRowElement(rowNumber).findElements(by);
     }
 
     private WebElement getRowElement(int rowNumber)
@@ -1005,5 +1048,10 @@ public class TableLayoutElement extends BaseElement
             uri = initialUri;
         }
         return uri.toASCIIString();
+    }
+
+    private static By getActionSelector(String actionName)
+    {
+        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
     }
 }

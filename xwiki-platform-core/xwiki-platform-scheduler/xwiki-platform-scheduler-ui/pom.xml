@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-scheduler</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.4.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-scheduler-ui</artifactId>
   <name>XWiki Platform - Scheduler - UI</name>

@@ -435,7 +435,9 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
             }
         }
 
-        // Notify Future listeners
+        // Notify Future listeners.
+        // We do so before the call to event listeners because callers do not need to wait for them before continuing,
+        // and instead should continue as soon as the output value is available.
         task.future.complete(output);
 
         // Notify event listeners

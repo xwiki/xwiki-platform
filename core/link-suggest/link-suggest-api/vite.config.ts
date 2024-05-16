@@ -22,28 +22,17 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+import { defineConfig, mergeConfig } from "vite";
+import defaultConfig from "../../../vite.default.config";
 
-import { CristalAppLoader } from "@cristal/lib";
-import { ComponentInit as BrowserComponentInit } from "@cristal/browser-default";
-import { ComponentInit as LinkSuggestComponentInit } from "@cristal/link-suggest-xwiki";
-
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  "/config.json",
-  true,
-  false,
-  "XWiki",
-  (container) => {
-    new BrowserComponentInit(container);
-    new LinkSuggestComponentInit(container);
-  },
+export default mergeConfig(
+  defaultConfig,
+  defineConfig({
+    build: {
+      lib: {
+        entry: "./src/index.ts",
+        name: "linksuggestapi",
+      },
+    },
+  }),
 );

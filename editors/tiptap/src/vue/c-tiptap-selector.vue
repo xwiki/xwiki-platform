@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  ComputedRef,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from "vue";
+import { computed, ComputedRef, onMounted, onUnmounted, ref } from "vue";
 
 import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
 import { ActionDescriptor } from "../components/extensions/slash";
@@ -16,12 +8,13 @@ import { CIcon, Size } from "@cristal/icons";
 import slashStore from "../stores/slash-store";
 import { storeToRefs } from "pinia";
 import { SuggestionProps } from "@tiptap/suggestion";
+import { listNavigation } from "./list-navigation-helper";
 
 const container = ref();
 
-const props = defineProps<{ props: SuggestionProps }>();
+const { items, props } = storeToRefs(slashStore());
 
-const { items } = storeToRefs(slashStore());
+const piniaProps = computed(() => props.value as SuggestionProps<unknown>);
 
 const actions: ComputedRef<ActionDescriptor[]> = computed(() => {
   return items.value.flatMap((category) => category.actions);
@@ -31,7 +24,8 @@ let popup: Instance<Props>[];
 
 onMounted(() => {
   popup = tippy("body", {
-    getReferenceClientRect: props.props.clientRect as GetReferenceClientRect,
+    getReferenceClientRect: piniaProps.value
+      .clientRect as GetReferenceClientRect,
     appendTo: () => document.body,
     content: container.value,
     showOnCreate: true,
@@ -45,40 +39,25 @@ onUnmounted(() => {
   popup[0].destroy();
 });
 
-const index = ref(0);
-
-function down() {
-  index.value = (index.value + 1) % actions.value.length;
-}
-
-function up() {
-  const actionsLength = actions.value.length;
-  index.value = (index.value + actionsLength - 1) % actionsLength;
-}
-
-function enter() {
-  apply(index.value);
-}
-
 function apply(index: number) {
   const item = actions.value[index];
   if (item) {
-    props.props.command(item);
+    piniaProps.value.command(item);
   }
 }
 
-// Make sure the newly selected item is visible on element focus change.
-watch(index, async () => {
-  // Wait for the container to be re-pained to run the selector on the newly
-  // selected element.
-  await nextTick();
-  container.value.querySelector(".is-selected").scrollIntoView();
-});
+const { down, up, enter, index } = listNavigation(
+  apply,
+  computed(() => {
+    return actions.value.length;
+  }),
+  container,
+);
 </script>
 
 <template>
   <!--
-  Defines a root elemement that is not part of the tippy component.
+  Defines a root element that is not part of the tippy component.
   It's is useful as a receiver for keyboard events forwarded for the editor.
   -->
   <div @keydown.down="down" @keydown.up="up" @keydown.enter="enter">

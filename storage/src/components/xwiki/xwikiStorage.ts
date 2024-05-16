@@ -52,7 +52,7 @@ export class XWikiStorage extends AbstractStorage {
   }
 
   getPageFromViewURL(url: string): string | null {
-    let page = null;
+    let page: string | null;
     if (url.startsWith(this.wikiConfig.baseURL)) {
       const uri = url.replace(this.wikiConfig.baseURL, "");
       page = uri.replace("/bin", "").replace("/view/", "").replaceAll("/", ".");
@@ -60,7 +60,7 @@ export class XWikiStorage extends AbstractStorage {
         page += "WebHome";
       }
     } else {
-      page = url;
+      page = null;
     }
     return page;
   }

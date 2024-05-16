@@ -163,11 +163,54 @@ importers:
         specifier: 2.0.18
         version: 2.0.18(typescript@5.4.5)
 
+  core/link-suggest/link-suggest-api:
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.11
+        version: 5.2.11(@types/node@20.12.12)
+
+  core/link-suggest/link-suggest-xwiki:
+    dependencies:
+      '@cristal/api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@cristal/link-suggest-api':
+        specifier: workspace:*
+        version: link:../link-suggest-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.11
+        version: 5.2.11(@types/node@20.12.12)
+
   dev/config:
     devDependencies:
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
+
+  ds/api:
+    devDependencies:
+      '@cristal/dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
+      happy-dom:
+        specifier: 14.11.0
+        version: 14.11.0
+      rimraf:
+        specifier: 5.0.7
+        version: 5.0.7
+      vite:
+        specifier: 5.2.11
+        version: 5.2.11(@types/node@20.12.12)
 
   ds/dsfr:
     dependencies:
@@ -224,8 +267,11 @@ importers:
   ds/shoelace:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
+      '@cristal/dsapi':
+        specifier: workspace:*
+        version: link:../api
       '@shoelace-style/shoelace':
         specifier: 2.15.0
         version: 2.15.0(@types/react@18.2.52)
@@ -258,8 +304,11 @@ importers:
   ds/vuetify:
     dependencies:
       '@cristal/api':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../api
+      '@cristal/dsapi':
+        specifier: workspace:*
+        version: link:../api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -291,6 +340,9 @@ importers:
       '@cristal/icons':
         specifier: workspace:*
         version: link:../../core/icons
+      '@cristal/link-suggest-api':
+        specifier: workspace:*
+        version: link:../../core/link-suggest/link-suggest-api
       '@cristal/skin':
         specifier: workspace:*
         version: link:../../skin
@@ -959,6 +1011,9 @@ importers:
       '@cristal/lib':
         specifier: workspace:^
         version: link:../lib
+      '@cristal/link-suggest-xwiki':
+        specifier: workspace:*
+        version: link:../core/link-suggest/link-suggest-xwiki
       express:
         specifier: 4.19.2
         version: 4.19.2

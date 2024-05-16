@@ -23,27 +23,12 @@
  *
  **/
 
-import { CristalAppLoader } from "@cristal/lib";
-import { ComponentInit as BrowserComponentInit } from "@cristal/browser-default";
-import { ComponentInit as LinkSuggestComponentInit } from "@cristal/link-suggest-xwiki";
+/**
+ * Shared types for the x-brreadcrumb component implementations.
+ * @since 0.8
+ */
+type BreadcrumbProps = {
+  items: string[];
+};
 
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  "/config.json",
-  true,
-  false,
-  "XWiki",
-  (container) => {
-    new BrowserComponentInit(container);
-    new LinkSuggestComponentInit(container);
-  },
-);
+export { BreadcrumbProps };

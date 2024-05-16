@@ -23,27 +23,21 @@
  *
  **/
 
-import { CristalAppLoader } from "@cristal/lib";
-import { ComponentInit as BrowserComponentInit } from "@cristal/browser-default";
-import { ComponentInit as LinkSuggestComponentInit } from "@cristal/link-suggest-xwiki";
+/**
+ * Produces an equality operator based on the current query.
+ * The equality operation currently returns true of the query is a sub-string
+ * of the provided value, without taking into account the case.
+ *
+ * @param query the query to apply on the provided value
+ * @return a lamba taking a string and returning a true when the value matches
+ * the query filter, and false otherwise
+ * @since 0.8
+ */
+function queryEqualityOperator(query: string) {
+  const queryNoCase = query.toLowerCase();
+  return (value: string) => {
+    return value.toLowerCase().includes(queryNoCase);
+  };
+}
 
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  "/config.json",
-  true,
-  false,
-  "XWiki",
-  (container) => {
-    new BrowserComponentInit(container);
-    new LinkSuggestComponentInit(container);
-  },
-);
+export { queryEqualityOperator };

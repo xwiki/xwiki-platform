@@ -6,6 +6,7 @@ import { Plugin } from "prosemirror-state";
 import { CommandParams } from "./menu-helpers";
 import { createPinia } from "pinia";
 import slashStore, { Props, SlashStore } from "../../stores/slash-store";
+import { queryEqualityOperator } from "./filter-helper";
 
 const Slash = Extension.create({
   name: "slash",
@@ -158,21 +159,6 @@ function getAllActions(): ActionCategoryDescriptor[] {
   ];
 }
 
-/**
- * Produces an equality operator based on the current query.
- * The equality operation currently returns true of the query is a sub-string
- * of the provided value, without taking into account the case.
- *
- * @param query the query to apply on the provided value
- * @return a lamba taking a string and returning a true when the value matches
- * the query filter, and false otherwise
- */
-function queryEqualityOperator(query: string) {
-  return (value: string) => {
-    return value.toLowerCase().includes(query.toLowerCase());
-  };
-}
-
 export function filterActionsByQuery(
   query: string,
   actions: ActionCategoryDescriptor[],
@@ -244,7 +230,7 @@ function renderItems() {
 
       if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") {
         // Get the root element of the Vue template and forward it the events.
-        const templateRoot = (app._container as HTMLElement).children[0];
+        const templateRoot = app._container.children[0];
         return templateRoot.dispatchEvent(
           new KeyboardEvent("keydown", { key: key }),
         );

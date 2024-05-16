@@ -28,6 +28,7 @@
   "dependencies": {
     "@cristal/browser-default": "workspace:*",
     "@cristal/lib": "workspace:^",
+    "@cristal/link-suggest-xwiki": "workspace:*",
     "express": "4.19.2",
     "vue": "3.4.27",
     "vue-i18n": "9.13.1",

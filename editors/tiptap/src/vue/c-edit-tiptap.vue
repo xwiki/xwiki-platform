@@ -14,6 +14,7 @@ import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Slash } from "../components/extensions/slash";
+import { loadLinkSuggest } from "../components/extensions/link-suggest";
 import { Markdown } from "tiptap-markdown";
 import Image from "@tiptap/extension-image";
 import Table from "@tiptap/extension-table";
@@ -22,6 +23,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import Link from "@tiptap/extension-link";
+import { LinkSuggestService, name } from "@cristal/link-suggest-api";
 
 const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -75,13 +77,20 @@ const submit = async () => {
 
 let editor: Ref<Editor | undefined> = ref(undefined);
 
-async function loadEditor(page: PageData) {
+async function loadEditor(page: PageData | undefined) {
   // Push the content to the document.
   // TODO: move to a components based implementation
   if (!editor.value) {
-    content.value = page?.syntax == "markdown/1.2" ? page?.source : page?.html;
-    title.value = page.headlineRaw;
-    titlePlaceholder.value = page.name;
+    content.value =
+      page?.syntax == "markdown/1.2" ? page?.source : page?.html || "";
+    title.value = page?.headlineRaw || "";
+    titlePlaceholder.value = page?.name || "";
+    let linkSuggest: LinkSuggestService | undefined = undefined;
+    try {
+      linkSuggest = cristal.getContainer().get<LinkSuggestService>(name);
+    } catch (e) {
+      console.debug(`[${name}] service not found`);
+    }
     editor.value = new Editor({
       content: content.value || "",
       extensions: [
@@ -95,6 +104,14 @@ async function loadEditor(page: PageData) {
         TableHeader,
         TableCell,
         Slash,
+        // TODO: I did it that way for simplicity but this should really be
+        // moved to an actual inversify component.
+        loadLinkSuggest(
+          cristal.getSkinManager(),
+          cristal.getContainer(),
+          cristal.getWikiConfig(),
+          linkSuggest,
+        ),
         Markdown.configure({
           html: true,
         }),

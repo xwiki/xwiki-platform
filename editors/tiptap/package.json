@@ -18,6 +18,7 @@
   "dependencies": {
     "@cristal/api": "workspace:*",
     "@cristal/icons": "workspace:*",
+    "@cristal/link-suggest-api": "workspace:*",
     "@cristal/skin": "workspace:*",
     "@tiptap/extension-blockquote": "2.4.0",
     "@tiptap/extension-bullet-list": "2.4.0",

@@ -22,28 +22,34 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+/**
+ * Minimal data required to describe a link.
+ * @since 0.8
+ */
+type Link = {
+  id: string;
+  url: string;
+  reference: string;
+  label: string;
+  hint: string;
+};
 
-import { CristalAppLoader } from "@cristal/lib";
-import { ComponentInit as BrowserComponentInit } from "@cristal/browser-default";
-import { ComponentInit as LinkSuggestComponentInit } from "@cristal/link-suggest-xwiki";
+/**
+ * Provide the operation to get links suggestions.
+ * @since 0.8
+ */
+interface LinkSuggestService {
+  /**
+   * Returns a list of page links from a text query.
+   * @param query a textual search value (e.g., PageName)
+   */
+  getLinks(query: string): Promise<Link[]>;
+}
 
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  "/config.json",
-  true,
-  false,
-  "XWiki",
-  (container) => {
-    new BrowserComponentInit(container);
-    new LinkSuggestComponentInit(container);
-  },
-);
+/**
+ * The component id of LinkSuggestService.
+ * @since 0.8
+ */
+const name = "LinkSuggestService";
+
+export { LinkSuggestService, name, Link };

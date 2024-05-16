@@ -119,7 +119,10 @@ onUpdated(() => {
     <UIX uixname="content.before" />
     <div class="inner-content">
       <div class="content-header">
-        <XBreadcrumb class="breadcrumb"></XBreadcrumb>
+        <XBreadcrumb
+          class="breadcrumb"
+          :items="['Home', 'First', 'Second', 'Third']"
+        ></XBreadcrumb>
         <x-btn circle size="small" variant="primary" color="primary">
           <c-icon
             class="new-page"

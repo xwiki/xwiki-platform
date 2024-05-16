@@ -26,6 +26,7 @@ import { inject, injectable } from "inversify";
 import { DefaultPageData, Logger, PageData } from "@cristal/api";
 import { AbstractStorage } from "@cristal/storage";
 import { APITypes } from "../electron/preload/apiTypes";
+
 declare const fileSystemStorage: APITypes;
 
 @injectable()
@@ -45,8 +46,10 @@ export default class FileSystemStorage extends AbstractStorage {
   async getPageContent(page: string, syntax: string): Promise<PageData> {
     const path = await fileSystemStorage.resolvePath(page, syntax);
     const pageData = await fileSystemStorage.readPage(path || "");
-    pageData.headline = pageData.name;
-    pageData.headlineRaw = pageData.name;
+    if (pageData) {
+      pageData.headline = pageData.name;
+      pageData.headlineRaw = pageData.name;
+    }
     return pageData;
   }
 
@@ -68,6 +71,6 @@ export default class FileSystemStorage extends AbstractStorage {
 
   async save(page: string, content: string, title: string, syntax: string) {
     const path = await fileSystemStorage.resolvePath(page, syntax);
-    fileSystemStorage.savePage(path, content, title);
+    await fileSystemStorage.savePage(path, content, title);
   }
 }

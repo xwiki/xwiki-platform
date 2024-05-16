@@ -565,6 +565,7 @@ export class DefaultCristalApp implements CristalApp {
       const document = pageData.document;
       pageData.html = document.get("html");
       pageData.source = document.get("text");
+      pageData.syntax = document.get("encodingFormat");
     }
     return pageData;
   }

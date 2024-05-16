@@ -829,6 +829,28 @@ class NotificationsSettingsIT
         assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
         assertTrue(filterPreference.getEventTypes().isEmpty());
         assertEquals(pageSpaceName + ".Page_12", filterPreference.getLocation());
+
+        customPrefLiveData.clearAllSort();
+        customPrefLiveData.clearAllFilters();
+        customPrefLiveData.filterEventType(DELETE);
+        assertEquals(2, customPrefLiveData.getTableLayout().getTotalEntries());
+        customNotificationFilterPreferences = customPrefLiveData.getCustomNotificationFilterPreferences();
+        filterPreference = customNotificationFilterPreferences.get(1);
+        assertEquals("Page only", filterPreference.getScope());
+        assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".Page2", filterPreference.getLocation());
+        assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
+        assertEquals(List.of("Alert"), filterPreference.getFormats());
+        // core.events.delete before core.events.update
+        assertEquals(List.of("A page is deleted","A page is modified"), filterPreference.getEventTypes());
+
+        filterPreference = customNotificationFilterPreferences.get(0);
+
+        assertEquals("Page only", filterPreference.getScope());
+        assertEquals(NotificationsSettingsIT.class.getSimpleName() + ".Page1", filterPreference.getLocation());
+        assertEquals(CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT, filterPreference.getFilterAction());
+        assertEquals(List.of("Alert"), filterPreference.getFormats());
+        // core.events.delete before core.events.update
+        assertEquals(List.of("A page is deleted", "A page is modified"), filterPreference.getEventTypes());
     }
 
     @Test

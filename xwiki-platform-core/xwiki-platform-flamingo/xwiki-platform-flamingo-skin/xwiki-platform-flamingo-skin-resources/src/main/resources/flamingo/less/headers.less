@@ -38,9 +38,13 @@
   // Leave some space on the left so that we distinguish the section edit link from the heading text.
   margin-left: 1em;
   // We can have many section edit links on a page so they should have a low profile.
-  opacity: .3;
+  // We don't reduce the opacity too much in order to keep a correct contrast at least on the Iceberg colortheme.
+  opacity: .65;
+  // Add some padding so that the focus border is displayed nicely and doesn't cramp down aroundthe icon.
+  padding-right: 4px;
+  padding-left: 4px;
 }
 
-.edit_section:not(.disabled):hover {
+.edit_section:not(.disabled):hover, .edit_section:not(.disabled):focus {
   opacity: 1;
 }

@@ -30,6 +30,6 @@
   "dependencies": {
     "@cristal/electron-storage": "workspace:*",
     "@cristal/browser-electron": "workspace:*",
-    "electron": "29.3.3"
+    "electron": "29.4.0"
   }
 }

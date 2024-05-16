@@ -402,8 +402,8 @@ importers:
         specifier: 7.0.3
         version: 7.0.3
       electron:
-        specifier: 29.3.3
-        version: 29.3.3
+        specifier: 29.4.0
+        version: 29.4.0
       electron-builder:
         specifier: 24.13.3
         version: 24.13.3(electron-builder-squirrel-windows@24.13.3(dmg-builder@24.13.3))
@@ -420,8 +420,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/browser/browser-api
       electron:
-        specifier: 29.3.3
-        version: 29.3.3
+        specifier: 29.4.0
+        version: 29.4.0
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -442,8 +442,8 @@ importers:
         specifier: workspace:*
         version: link:../storage
       electron:
-        specifier: 29.3.3
-        version: 29.3.3
+        specifier: 29.4.0
+        version: 29.4.0
     devDependencies:
       '@types/node':
         specifier: 20.12.12
@@ -534,8 +534,8 @@ importers:
         specifier: workspace:^
         version: link:../../storage
       electron:
-        specifier: 29.3.3
-        version: 29.3.3
+        specifier: 29.4.0
+        version: 29.4.0
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -2852,8 +2852,8 @@ packages:
   electron-updater@6.1.8:
     resolution: {integrity: sha512-hhOTfaFAd6wRHAfUaBhnAOYc+ymSGCWJLtFkw4xJqOvtpHmIdNHnXDV9m1MHC+A6q08Abx4Ykgyz/R5DGKNAMQ==}
 
-  electron@29.3.3:
-    resolution: {integrity: sha512-I/USTe9UsQUKb/iuiYnmt074vHxNHCJZWYiU4Xg6lNPKVBsPadAhZcc+g2gYLqC1rA7KT4AvKTmNsY8n7oEUCw==}
+  electron@29.4.0:
+    resolution: {integrity: sha512-4DTO8U66oiI8rShrDSu2zDPW6GWRiCebyb1MHSfQkLWCNI/PnLyGKeqYPUoVgc0FWaNN2sCBn8NKJHb++hE2LQ==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -7485,7 +7485,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@29.3.3:
+  electron@29.4.0:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.12.12

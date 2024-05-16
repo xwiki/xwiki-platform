@@ -138,11 +138,19 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
-            
+            <revapi.differences>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.web.XWikiServletResponse</old>
+                  <new>class com.xpn.xwiki.web.XWikiServletResponse</new>
+                  <superClass>javax.servlet.ServletResponseWrapper</superClass>
+                  <justification>Not a breakage since the ServletResponseWrapper class doesn't contain any final method</justification>
+                  <criticality>allowed</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

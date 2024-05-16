@@ -140,8 +140,9 @@ var XWiki = (function (XWiki) {
             .insert(new Element('span', {'class':'suggestValue'}))
             .insert(new Element('span', {'class':'suggestInfo'}));
       this.noResultsMessage = new Element('div', {'class': 'hidden'})
-        .update(this._l10n['core.widgets.suggest.noResults']);
-      var gotoSearchPageMessage = new Element('div').update(this._l10n['core.widgets.suggest.showResults']);
+        .update(this._l10n['core.widgets.suggest.noResults']).escapeHTML();
+      var gotoSearchPageMessage = new Element('div').update(this._l10n['core.widgets.suggest.showResults'])
+        .escapeHTML();
       var content = new Element('div').insert(this.noResultsMessage).insert(gotoSearchPageMessage)
         .insert(new Element('div', {'class': 'clearfloats'}));
       var allResultsNode = new XWiki.widgets.XList([

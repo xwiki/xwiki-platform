@@ -23,10 +23,17 @@
         color: @breadcrumb-color;
         cursor: pointer;
         /* Match the separator padding */
+        margin: 2px;
         margin-left: 5px;
+        /* Remove default styles for buttons */
+        background: transparent;
+        border-color: transparent;
+        padding: 0;
 
-        :hover {
+        &:hover, &:focus {
           color: @breadcrumb-active-color;
+          /* We want to revert the default from bootstrap where the outline is removed... */
+          outline: revert;
         }
       }
 

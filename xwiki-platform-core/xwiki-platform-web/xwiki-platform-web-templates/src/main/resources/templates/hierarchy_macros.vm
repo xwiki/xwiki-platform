@@ -220,8 +220,8 @@
       'showTranslations': $xwiki.isMultiLingual(),
       'showWikis': $showWikis
     })
-    #set ($treeToggle = "<span class='dropdown-toggle' data-toggle='dropdown'>" +
-      "$services.icon.renderHTML('caret-down')</span>")
+    #set ($treeToggle = "<button class='dropdown-toggle' data-toggle='dropdown'>" +
+      "$services.icon.renderHTML('caret-down')</button>")
     #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>#documentTree($treeParams)</div>")
   #end
 #end

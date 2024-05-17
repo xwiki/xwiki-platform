@@ -89,32 +89,27 @@ public class ScopeNotificationFilter implements NotificationFilter
                 event.getType(), format, false, checkInclusiveFilters, false);
 
             switch (state.getState()) {
-                case BLOCKED:
-                case BLOCKED_BY_ANCESTOR:
-                case BLOCKED_WITH_CHILDREN:
+                case BLOCKED, BLOCKED_BY_ANCESTOR, BLOCKED_WITH_CHILDREN -> {
                     if (state.getStartingDate() != null && state.getStartingDate().before(event.getDate())) {
                         result = FilterPolicy.FILTER;
                     }
-                    break;
+                }
 
-                case WATCHED:
-                case WATCHED_BY_ANCESTOR:
-                case WATCHED_WITH_CHILDREN:
+                case WATCHED, WATCHED_BY_ANCESTOR, WATCHED_WITH_CHILDREN -> {
                     if (state.getStartingDate() != null && state.getStartingDate().after(event.getDate())) {
                         result = FilterPolicy.FILTER;
                     }
-                    break;
+                }
 
-                case CUSTOM:
+                case CUSTOM ->
                     this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}] ",
                         event, user);
-                    break;
 
-                case NOT_SET:
-                default:
+                default -> {
                     if (checkInclusiveFilters) {
                         result = FilterPolicy.FILTER;
                     }
+                }
             }
         }
         return result;

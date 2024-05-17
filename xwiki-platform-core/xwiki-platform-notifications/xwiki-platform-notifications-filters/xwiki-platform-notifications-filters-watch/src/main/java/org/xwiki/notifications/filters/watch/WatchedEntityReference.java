@@ -97,8 +97,8 @@ public interface WatchedEntityReference
         @Unstable
         CUSTOM(false, false);
 
-        private boolean blocked;
-        private boolean watched;
+        private final boolean blocked;
+        private final boolean watched;
 
         /**
          * Default constructor.

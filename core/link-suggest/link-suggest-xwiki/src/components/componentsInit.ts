@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 import { Container, injectable, inject } from "inversify";
 import { Link, LinkSuggestService, name } from "@cristal/link-suggest-api";
 import { CristalApp } from "@cristal/api";

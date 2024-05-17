@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 /**
  * Minimal data required to describe a link.
  * @since 0.8

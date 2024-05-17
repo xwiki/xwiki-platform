@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 import "reflect-metadata";
 import { describe, expect, it, vi } from "vitest";
 import { DefaultLogger } from "../defaultLogger";

@@ -1,0 +1,4 @@
+node_modules/
+dist/
+rendering/wikimodel/src/wikimodel-teavm.js
+/resources/

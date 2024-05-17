@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 import { BrowserApi } from "@cristal/browser-api";
 import { injectable } from "inversify";
 import { WikiConfig } from "@cristal/api";

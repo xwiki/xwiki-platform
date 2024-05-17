@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * This file is part of the Cristal Wiki software prototypenx
+ * This file is part of the Cristal Wiki software prototype
  * @copyright  Copyright (c) 2023 XWiki SAS
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *

@@ -26,8 +26,7 @@
 import { Container } from "inversify";
 
 export default class ComponentInit {
-    constructor(container : Container) {
-        // container.bind<Interface>("Interface").to(DefaultClass);
-    }
+  constructor(container: Container) {
+    // container.bind<Interface>("Interface").to(DefaultClass);
+  }
 }
-

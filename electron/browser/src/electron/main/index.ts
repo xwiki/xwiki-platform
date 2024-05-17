@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 import { ipcMain, app } from "electron";
 import BrowserWindow = Electron.BrowserWindow;
 import { resolve } from "node:path";

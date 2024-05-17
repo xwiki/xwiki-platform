@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 import { Extension } from "@tiptap/vue-3";
 import Suggestion from "@tiptap/suggestion";
 

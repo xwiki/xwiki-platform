@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 import { defineStore, Store, StoreDefinition } from "pinia";
 import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggest";
 

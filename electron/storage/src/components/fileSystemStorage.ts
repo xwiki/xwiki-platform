@@ -22,6 +22,7 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
+
 import { inject, injectable } from "inversify";
 import { DefaultPageData, Logger, PageData } from "@cristal/api";
 import { AbstractStorage } from "@cristal/storage";

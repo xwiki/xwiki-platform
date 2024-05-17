@@ -36,15 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Spaces
-index.spacesMacro.spaceIndex.title=See Space Index
-index.spacesMacro.spaceIndex.alt=Space Index
-index.spacesMacro.spaceAdministration.title=See Space Administration
-index.spacesMacro.spaceAdministration.alt=Administer Space
-index.spacesMacro.createSpace.link=Create a new space
-index.spacesMacro.createSpace.defaultSpaceName=Space name
-index.spacesMacro.createSpace.submit=Create
-index.deletedDocuments.deleteAll=Delete all
+  <content>index.deletedDocuments.deleteAll=Delete all
 index.administration.remainingTasks.heading=Remaining Document Analysis tasks
 index.administration.remainingTasks.emptyQueue=No remaining tasks.
 admin.documentanalysis=Document Analysis</content>

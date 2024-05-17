@@ -23,7 +23,7 @@
  *
 -->
 <script lang="ts">
-import { inject, Component, markRaw } from "vue";
+import { inject, type Component, markRaw } from "vue";
 import { Logger, CristalApp } from "@xwiki/cristal-api";
 
 let comps: Array<Component>;

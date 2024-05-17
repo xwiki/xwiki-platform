@@ -37,7 +37,7 @@ export class ContentTools {
     this.logger = cristal?.getLogger("skin.vue.contenttools");
   }
 
-  /* 
+  /*
         Method to intercept clicks in the HTML content and load the page using Cristal Wiki
     */
   public static listenToClicks(
@@ -302,7 +302,7 @@ export class ContentTools {
     return destroy;
   }
 
-  /* 
+  /*
         Method to look for Macros in client side rendering
         Macros are inserted by the WikiModel parser using the following syntax
           <pre class="wikimodel-macro" macroname="MACRONAME" param1="PARAMVALUE1" param2="PARAMVALUE2">
@@ -321,7 +321,7 @@ export class ContentTools {
       if (macroTag.className == "wikimodel-macro") {
         const macroName = macroTag.getAttribute("macroname");
         if (macroName != null && macroName != "") {
-          ContentTools.logger.debug("Found macro", macroName);
+          ContentTools.logger?.debug("Found macro", macroName);
           try {
             const macroProvider = cristal
               ?.getContainer()
@@ -339,7 +339,7 @@ export class ContentTools {
               );
             }
           } catch (e) {
-            ContentTools.logger.debug(
+            ContentTools.logger?.debug(
               "Could not find macro implementation for",
               macroName,
               e,

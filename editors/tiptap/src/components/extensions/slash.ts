@@ -96,7 +96,7 @@ function getHeadingAction(level: number): ActionDescriptor {
     title: `Heading ${level}`,
     aliases: [`h${level}`],
     icon: `type-h${level}`,
-    hint: `Toggle Heading level ${level}`,
+    hint: `Heading level ${level}`,
     command({ editor, range }) {
       editor
         .chain()
@@ -113,7 +113,7 @@ function getListActions(): ActionDescriptor[] {
     {
       title: "Bulleted list",
       icon: "list-ul",
-      hint: "Toggle bulleted list",
+      hint: "Bulleted list",
       sortField: "list-bulleted",
       command({ editor, range }) {
         editor.chain().focus().deleteRange(range).toggleBulletList().run();
@@ -122,7 +122,7 @@ function getListActions(): ActionDescriptor[] {
     {
       title: "Ordered list",
       icon: "list-ol",
-      hint: "Toggle ordered list",
+      hint: "Ordered list",
       sortField: "list-ordered",
       command({ editor, range }) {
         editor.chain().focus().deleteRange(range).toggleOrderedList().run();
@@ -146,7 +146,7 @@ function getBlockquoteAction(): ActionDescriptor {
   return {
     title: "Blockquote",
     icon: "quote",
-    hint: "Toggle blockquote",
+    hint: "Blockquote",
     command({ editor, range }) {
       editor.chain().focus().deleteRange(range).toggleBlockquote().run();
     },
@@ -157,7 +157,7 @@ function getCodeBlockAction(): ActionDescriptor {
   return {
     title: "Code",
     icon: "code",
-    hint: "Toggle code block",
+    hint: "Code block",
     command({ editor, range }) {
       editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
     },

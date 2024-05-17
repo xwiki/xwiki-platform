@@ -23,11 +23,12 @@
  *
  **/
 
-import { isMarkActive, isNodeActive } from "../../tiptap/helpers";
-import { Editor } from "@tiptap/vue-3";
+import { Editor, Primitive } from "@tiptap/vue-3";
 import { EditorState } from "@tiptap/pm/state";
 import { Range } from "@tiptap/core";
 import { Level } from "@tiptap/extension-heading";
+import { type Component } from "vue";
+import CTiptapLinkEdit from "../../vue/c-tiptap-link-edit.vue";
 
 // TODO: also add condition, for instance some actions shouldn't be proposed on
 // code.
@@ -38,7 +39,11 @@ import { Level } from "@tiptap/extension-heading";
  */
 export interface BubbleMenuAction {
   title: string;
-  command: (params: { editor: Editor; range: Range }) => void;
+  additionalComponent?: Component;
+  command: (
+    params: { editor: Editor; range: Range },
+    props?: Record<string, Primitive>,
+  ) => void;
   isActive: (state: EditorState) => boolean;
   icon: string;
 }
@@ -50,7 +55,7 @@ function getBoldAction(editor: Editor): BubbleMenuAction {
     command({ editor }) {
       editor.commands.toggleBold();
     },
-    isActive: isMarkActive(editor.schema.marks.strong),
+    isActive: () => editor.schema.marks.bold !== undefined,
   };
 }
 
@@ -61,7 +66,7 @@ function getItalic(editor: Editor): BubbleMenuAction {
     command({ editor }) {
       editor.commands.toggleItalic();
     },
-    isActive: isMarkActive(editor.schema.marks.strong),
+    isActive: () => editor.schema.marks.italic != undefined,
   };
 }
 
@@ -72,7 +77,7 @@ function getCode(editor: Editor): BubbleMenuAction {
     command({ editor }) {
       editor.commands.toggleCode();
     },
-    isActive: isMarkActive(editor.schema.marks.code),
+    isActive: () => editor.schema.marks.code != undefined,
   };
 }
 
@@ -83,7 +88,30 @@ function getHeadingAction(level: Level, editor: Editor): BubbleMenuAction {
     command({ editor }) {
       editor.chain().toggleHeading({ level }).run();
     },
-    isActive: isNodeActive(editor.schema.nodes.heading, { level: level }),
+    isActive: () => editor.schema.nodes.heading != undefined,
+  };
+}
+
+export function getLinkAction(editor: Editor): BubbleMenuAction {
+  return {
+    title: "Link",
+    icon: "link-45deg",
+    additionalComponent: CTiptapLinkEdit,
+    command(
+      { editor, range },
+      { linkValue, removeLink }: { linkValue?: string; removeLink?: boolean },
+    ) {
+      if (linkValue) {
+        // find a way to load a sub-element instead and use it as part of the
+        // bubble UI.isMarkActive()
+        editor.chain().setLink({ href: linkValue }).focus(range.to).run();
+      }
+
+      if (removeLink) {
+        editor.commands.unsetLink();
+      }
+    },
+    isActive: () => editor.schema.marks.link != undefined,
   };
 }
 
@@ -92,10 +120,18 @@ export default function getMenuActions(editor: Editor): BubbleMenuAction[] {
   const headings: BubbleMenuAction[] = numbers.map((level) =>
     getHeadingAction(level, editor),
   );
-  return [
+  const action = [
     ...headings,
     getBoldAction(editor),
     getItalic(editor),
     getCode(editor),
+    getLinkAction(editor),
   ];
+  // Keep only actions at can be activated in the current context:
+  // Actions with marks and nodes that are not available should not be available
+  // Some actions can also be deactivated when the current selection does not
+  // allow it (e.g., not possible to define bold text inside a code block).
+  return action.filter((action) => {
+    return action.isActive(editor.state);
+  });
 }

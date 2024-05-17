@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search</artifactId>
-    <version>15.10.9-SNAPSHOT</version>
+    <version>15.10.9</version>
   </parent>
   <artifactId>xwiki-platform-search-api</artifactId>
   <name>XWiki Platform - Search - API</name>

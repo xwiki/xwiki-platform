@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-dashboard-test</artifactId>
-    <version>15.10.9-SNAPSHOT</version>
+    <version>15.10.9</version>
   </parent>
   <artifactId>xwiki-platform-dashboard-test-docker</artifactId>
   <name>XWiki Platform - Dashboard - Test - Functional Docker Tests</name>

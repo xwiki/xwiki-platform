@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>15.10.9-SNAPSHOT</version>
+    <version>15.10.9</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-security</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Security</name>

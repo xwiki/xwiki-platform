@@ -131,7 +131,7 @@
   var handleSubmit = function () {
     var chosenOption = $('#watchModal input[type="radio"]:checked').val();
     // This should be improved as the REST endpoint might not be the same
-    var restUrl = xm.restURL.replace("/rest/", "/rest/notificationsWatchFilters/");
+    var restUrl = xm.restURL;
     var queryParams = new URLSearchParams({
       "form_token": xm.form_token
     });
@@ -165,7 +165,7 @@
       console.error("Option " + chosenOption + " is not yet supported!");
     }
     if (url) {
-      var ajaxUrl = url + "?" + queryParams.toString();
+      var ajaxUrl = url + "/notificationsWatches?" + queryParams.toString();
       if (!isFilterRemoval) {
         $.ajax(ajaxUrl, {
           method: method

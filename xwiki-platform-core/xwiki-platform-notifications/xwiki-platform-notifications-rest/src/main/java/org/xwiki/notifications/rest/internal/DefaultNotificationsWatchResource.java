@@ -38,6 +38,7 @@ import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.notifications.filters.watch.WatchedLocationReference;
 import org.xwiki.notifications.rest.NotificationsWatchResource;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.XWikiRestException;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -64,30 +65,25 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
-    private void checkPageArguments(String wikiName, String spaceNames, String pageName)
-    {
-        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames) || StringUtils.isEmpty(pageName)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)",
-                    wikiName, spaceNames, pageName));
-        }
-    }
-
-    private void checkWikiArgument(String wikiName)
+    private EntityReference getEntityReference(String wikiName, String spaceNames, String pageName)
+        throws XWikiRestException
     {
         if (StringUtils.isEmpty(wikiName)) {
             throw new IllegalArgumentException(
                 String.format("wikiName must be not null. Current value: [%s]", wikiName));
         }
-    }
-
-    private void checkSpaceArguments(String wikiName, String spaceNames)
-    {
-        if (StringUtils.isEmpty(wikiName) || StringUtils.isEmpty(spaceNames)) {
-            throw new IllegalArgumentException(
-                String.format("wikiName and spaceNames must be not null. Current value: [%s:%s]",
-                    wikiName, spaceNames));
+        EntityReference entityReference;
+        if (!StringUtils.isEmpty(spaceNames)) {
+            List<String> spaces = parseSpaceSegments(spaceNames.substring("/spaces/".length()));
+            if (!StringUtils.isEmpty(pageName)) {
+                entityReference = new DocumentReference(wikiName, spaces, pageName.substring("/pages/".length()));
+            } else {
+                entityReference = new SpaceReference(wikiName, spaces);
+            }
+        } else {
+            entityReference = new WikiReference(wikiName);
         }
+        return entityReference;
     }
 
     @Override
@@ -97,11 +93,10 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
         if (user == GuestUserReference.INSTANCE) {
             return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(), GUEST_USER_ERROR_MESSAGE).build();
         }
-        List<String> spaces = parseSpaceSegments(spaceNames);
-        checkPageArguments(wikiName, spaceNames, pageName);
-        DocumentReference documentReference = new DocumentReference(wikiName, spaces, pageName);
+
+        EntityReference entityReference = getEntityReference(wikiName, spaceNames, pageName);
         WatchedLocationReference watchedLocationReference =
-            this.watchedEntityFactory.createWatchedLocationReference(documentReference);
+            this.watchedEntityFactory.createWatchedLocationReference(entityReference);
         WatchedEntityReference.WatchedStatus watchedStatus = watchedLocationReference.getWatchedStatus(user);
         return Response.ok(watchedStatus).build();
     }
@@ -130,28 +125,10 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     }
 
     @Override
-    public Response watchWiki(String wikiName, boolean ignore) throws Exception
-    {
-        checkWikiArgument(wikiName);
-        return watchLocation(new WikiReference(wikiName), ignore);
-    }
-
-    @Override
-    public Response watchSpace(String wikiName, String spaceNames, boolean ignore) throws Exception
-    {
-        checkSpaceArguments(wikiName, spaceNames);
-        List<String> spaces = parseSpaceSegments(spaceNames);
-        SpaceReference spaceReference = new SpaceReference(wikiName, spaces);
-        return watchLocation(spaceReference, ignore);
-    }
-
-    @Override
     public Response watchPage(String wikiName, String spaceNames, String pageName, boolean ignore) throws Exception
     {
-        checkPageArguments(wikiName, spaceNames, pageName);
-        List<String> spaces = parseSpaceSegments(spaceNames);
-        DocumentReference documentReference = new DocumentReference(wikiName, spaces, pageName);
-        return watchLocation(documentReference, ignore);
+        EntityReference entityReference = getEntityReference(wikiName, spaceNames, pageName);
+        return watchLocation(entityReference, ignore);
     }
 
     private Response unwatchLocation(EntityReference location) throws Exception
@@ -168,27 +145,9 @@ public class DefaultNotificationsWatchResource extends XWikiResource implements 
     }
 
     @Override
-    public Response unwatchWiki(String wikiName) throws Exception
-    {
-        checkWikiArgument(wikiName);
-        return unwatchLocation(new WikiReference(wikiName));
-    }
-
-    @Override
-    public Response unwatchSpace(String wikiName, String spaceNames) throws Exception
-    {
-        checkSpaceArguments(wikiName, spaceNames);
-        List<String> spaces = parseSpaceSegments(spaceNames);
-        SpaceReference spaceReference = new SpaceReference(wikiName, spaces);
-        return unwatchLocation(spaceReference);
-    }
-
-    @Override
     public Response unwatchPage(String wikiName, String spaceNames, String pageName) throws Exception
     {
-        checkPageArguments(wikiName, spaceNames, pageName);
-        List<String> spaces = parseSpaceSegments(spaceNames);
-        DocumentReference documentReference = new DocumentReference(wikiName, spaces, pageName);
-        return unwatchLocation(documentReference);
+        EntityReference entityReference = getEntityReference(wikiName, spaceNames, pageName);
+        return unwatchLocation(entityReference);
     }
 }

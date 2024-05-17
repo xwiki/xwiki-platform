@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>15.10.9</version>
+    <version>15.10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>

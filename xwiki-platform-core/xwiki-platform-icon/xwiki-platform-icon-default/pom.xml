@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-icon</artifactId>
-    <version>15.10.9</version>
+    <version>15.10.10-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-default</artifactId>
   <name>XWiki Platform - Icon - Default implementation</name>

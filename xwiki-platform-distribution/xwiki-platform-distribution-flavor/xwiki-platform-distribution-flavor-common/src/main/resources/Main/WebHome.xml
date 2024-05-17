@@ -45,11 +45,13 @@ XWiki can be used as a knowledge base (support, documentation, sales, etc.), for
 
 To make the most out of your wiki, log-in and:
 
-Use the {{displayIcon name="pencil"/}} button above to //edit// this page and start customizing your wiki to your needs.
+Use the {{displayIcon name="pencil"/}}{{html}}&lt;span class="sr-only"&gt;Edit&lt;/span&gt;{{/html}} button above to //edit// this page and start customizing your wiki to your needs.
 
-Use the {{displayIcon name="add"/}} button above to //add// more pages to your wiki and create the //hierarchy// that best organizes your content.
+Use the {{displayIcon name="add"/}}{{html}}&lt;span class="sr-only"&gt;Create&lt;/span&gt;{{/html}} button above to //add// more pages to your wiki and create the //hierarchy// that best organizes your content.
 
-Use the {{displayIcon name="home"/}} breadcrumbs located above the title to //navigate// inside your pages. It's easy to get lost in a big wiki without them.
+Use the {{displayIcon name="home"/}}{{html}}&lt;span class="sr-only"&gt;Home&lt;/span&gt;{{/html}} breadcrumbs located above the title to //navigate// inside your pages. It's easy to get lost in a big wiki without them.
+
+{{html}}&lt;p class="sr-only"&gt;Those three buttons are accessible using a keyboard between the global navbar elements and the main page content.&lt;/p&gt;{{/html}}
 
 You can also use the [[Sandbox&gt;&gt;Sandbox.WebHome]] for more demo content and generally a place to experiment with your wiki's features. 
 

@@ -32,7 +32,8 @@
     'value': $value,
     'multiple': 'multiple',
     'class': 'suggest-childPages',
-    'title': $services.localization.render('index.tree.pinnedChildPagesDisplayer.hint'),
+    'title': $services.localization.render('index.tree.pinnedChildPagesDisplayer.placeholder'),
+    'placeholder': $services.localization.render('index.tree.pinnedChildPagesDisplayer.placeholder'),
     'data-parent': "$parentReference.type.name().toLowerCase():$services.model.serialize($parentReference, 'default')"
   })
   #if ($field.getProperty('disabled').value == 1)

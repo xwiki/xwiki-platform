@@ -799,7 +799,7 @@ require([
   }
 
   function getPinnedTopLevelPages() {
-    return navigationTree.get_json()
+    const pinnedTopLevelPages = navigationTree.get_json()
       .filter(node =&gt; node.data?.type === 'document' &amp;&amp; node.a_attr['data-pinned'])
       .map(node =&gt; {
         const documentReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
@@ -809,6 +809,8 @@ require([
         // here because top level pages are always nested.
         return topLevelSpaceName.replaceAll('%', '%25').replaceAll('/', '%2F');
       });
+    // We need to have at least one value in order to be able to overwrite the value stored on the server.
+    return pinnedTopLevelPages.length ? pinnedTopLevelPages : [''];
   }
 
   const $saveButton = $('.admin-buttons input[type=submit]');

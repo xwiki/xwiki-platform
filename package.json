@@ -18,7 +18,7 @@
     "start:electron": "nx build @cristal/electron-main && nx build @cristal/electron-renderer && nx build @cristal/electron-storage && nx run @cristal/electron:start"
   },
   "devDependencies": {
-    "@changesets/cli": "2.27.1",
+    "@changesets/cli": "2.27.3",
     "@typescript-eslint/eslint-plugin": "7.9.0",
     "@typescript-eslint/parser": "7.9.0",
     "@vitejs/plugin-vue": "5.0.4",

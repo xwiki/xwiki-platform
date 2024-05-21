@@ -17,34 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.tree.AbstractTreeNode;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 /**
- * The translation tree node.
+ * The object property tree node.
  * 
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
 @Component
-@Named("translation")
+@Named(ObjectPropertyTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class TranslationTreeNode extends AbstractTreeNode
+public class ObjectPropertyTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "objectProperty";
+
+    /**
+     * Default constructor.
+     */
+    public ObjectPropertyTreeNode()
+    {
+        super(HINT);
+    }
+
     @Override
     public String getParent(String nodeId)
     {
-        if (StringUtils.startsWith(nodeId, "translation:")) {
-            String reference = StringUtils.substringBeforeLast(nodeId.substring(12), "/");
-            return "translations:" + reference;
+        EntityReference objectPropertyReference = resolve(nodeId);
+        if (objectPropertyReference != null && objectPropertyReference.getType() == EntityType.OBJECT_PROPERTY) {
+            return serialize(objectPropertyReference.getParent());
         }
         return null;
     }

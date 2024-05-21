@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,22 +30,23 @@ import javax.inject.Provider;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * The translations tree node.
+ * The class properties tree node.
  * 
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
 @Component
-@Named("translations")
+@Named("classProperties")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class TranslationsTreeNode extends AbstractDocumentTreeNode
+public class ClassPropertiesTreeNode extends AbstractDocumentRelatedTreeNode
 {
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -53,9 +54,9 @@ public class TranslationsTreeNode extends AbstractDocumentTreeNode
     /**
      * Default constructor.
      */
-    public TranslationsTreeNode()
+    public ClassPropertiesTreeNode()
     {
-        super("translations");
+        super("classProperties");
     }
 
     @Override
@@ -63,11 +64,11 @@ public class TranslationsTreeNode extends AbstractDocumentTreeNode
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-        String serializedDocRef = this.defaultEntityReferenceSerializer.serialize(documentReference);
-        List<Locale> locales = document.getTranslationLocales(xcontext);
-        List<String> children = new ArrayList<String>();
-        for (Locale locale : subList(locales, offset, limit)) {
-            children.add("translation:" + serializedDocRef + '/' + locale);
+        List<String> properties = new ArrayList<>(document.getXClass().getPropertyList());
+        Collections.sort(properties);
+        List<String> children = new ArrayList<>();
+        for (String property : subList(properties, offset, limit)) {
+            children.add(serialize(new ClassPropertyReference(property, documentReference)));
         }
         return children;
     }
@@ -77,6 +78,6 @@ public class TranslationsTreeNode extends AbstractDocumentTreeNode
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-        return document.getTranslationLocales(xcontext).size();
+        return document.getXClass().getPropertyList().size();
     }
 }

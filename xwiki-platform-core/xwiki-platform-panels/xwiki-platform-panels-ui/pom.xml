@@ -91,14 +91,10 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery-ui</artifactId>
-      <version>1.13.2</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jquery-ui-touch-punch</artifactId>
-      <version>0.2.3-2</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>

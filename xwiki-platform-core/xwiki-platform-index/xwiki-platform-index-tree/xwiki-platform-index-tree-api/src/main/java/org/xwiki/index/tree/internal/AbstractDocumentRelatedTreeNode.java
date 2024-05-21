@@ -17,37 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Base class for document tree nodes.
+ * Base class for tree nodes that are linked to an XWiki document (e.g. attachments, translations, objects).
  * 
  * @version $Id$
- * @since 8.3M2
- * @since 7.4.5
+ * @since 16.4.0RC1
  */
-public abstract class AbstractDocumentTreeNode extends AbstractEntityTreeNode
+public abstract class AbstractDocumentRelatedTreeNode extends AbstractEntityTreeNode
 {
-    private final String nodeType;
-
     /**
      * Creates a new node with the specified type.
      * 
-     * @param nodeType the type of document node
+     * @param nodeType the type of document related node
      */
-    public AbstractDocumentTreeNode(String nodeType)
+    protected AbstractDocumentRelatedTreeNode(String nodeType)
     {
-        this.nodeType = nodeType;
+        super(nodeType);
     }
 
     @Override
@@ -114,7 +110,7 @@ public abstract class AbstractDocumentTreeNode extends AbstractEntityTreeNode
     @Override
     protected EntityReference resolve(String nodeId)
     {
-        String prefix = this.nodeType + ':';
+        String prefix = getType() + ':';
         if (StringUtils.startsWith(nodeId, prefix)) {
             return super.resolve("document:" + nodeId.substring(prefix.length()));
         }

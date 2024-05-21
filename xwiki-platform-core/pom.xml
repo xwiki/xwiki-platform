@@ -151,6 +151,21 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
+                parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

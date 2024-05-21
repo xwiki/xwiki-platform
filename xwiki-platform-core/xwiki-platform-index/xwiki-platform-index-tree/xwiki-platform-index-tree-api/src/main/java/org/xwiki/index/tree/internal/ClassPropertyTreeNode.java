@@ -17,35 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * The object property tree node.
+ * The class property tree node.
  * 
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
 @Component
-@Named("objectProperty")
+@Named(ClassPropertyTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class ObjectPropertyTreeNode extends AbstractEntityTreeNode
+public class ClassPropertyTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "classProperty";
+
+    /**
+     * Default constructor.
+     */
+    public ClassPropertyTreeNode()
+    {
+        super(HINT);
+    }
+
     @Override
     public String getParent(String nodeId)
     {
-        EntityReference objectPropertyReference = resolve(nodeId);
-        if (objectPropertyReference != null && objectPropertyReference.getType() == EntityType.OBJECT_PROPERTY) {
-            return serialize(objectPropertyReference.getParent());
+        EntityReference classPropertyReference = resolve(nodeId);
+        if (classPropertyReference != null && classPropertyReference.getType() == EntityType.CLASS_PROPERTY) {
+            return "classProperties:"
+                + this.defaultEntityReferenceSerializer.serialize(classPropertyReference.getParent());
         }
         return null;
     }

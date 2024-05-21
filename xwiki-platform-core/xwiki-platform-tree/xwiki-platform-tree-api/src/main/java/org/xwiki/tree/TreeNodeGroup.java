@@ -17,36 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.tree;
 
-import javax.inject.Named;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
- * The "Add attachment" tree node.
+ * A group of related tree nodes, similar to a document fragment in a DOM tree.
  * 
  * @version $Id$
- * @since 8.3M2
- * @since 7.4.5
+ * @since 16.4.0RC1
  */
-@Component
-@Named("addAttachment")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class AddAttachmentTreeNode extends AbstractEntityTreeNode
+@Unstable
+public interface TreeNodeGroup extends TreeNode
 {
     @Override
-    public String getParent(String nodeId)
+    default String getParent(String nodeId)
     {
-        EntityReference documentReference = resolve(nodeId);
-        if (documentReference != null && documentReference.getType() == EntityType.DOCUMENT) {
-            return "attachments:" + this.defaultEntityReferenceSerializer.serialize(documentReference);
-        }
+        // Tree node groups are never attached to the tree.
         return null;
     }
 }

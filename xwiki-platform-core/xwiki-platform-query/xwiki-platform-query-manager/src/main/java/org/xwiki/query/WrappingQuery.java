@@ -81,9 +81,9 @@ public class WrappingQuery implements Query
     }
 
     @Override
-    public Query bindValue(String var, Object val)
+    public Query bindValue(String variable, Object val)
     {
-        return getWrappedQuery().bindValue(var, val);
+        return getWrappedQuery().bindValue(variable, val);
     }
 
     @Override
@@ -111,9 +111,9 @@ public class WrappingQuery implements Query
     }
 
     @Override
-    public QueryParameter bindValue(String var)
+    public QueryParameter bindValue(String variable)
     {
-        return getWrappedQuery().bindValue(var);
+        return getWrappedQuery().bindValue(variable);
     }
 
     @Override

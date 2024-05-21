@@ -29,7 +29,7 @@
     "vue": "3.4.27",
     "vue-i18n": "9.13.1",
     "vue-router": "4.3.2",
-    "vuetify": "3.6.6"
+    "vuetify": "3.6.7"
   },
   "devDependencies": {
     "@cristal/dev-config": "workspace:*",

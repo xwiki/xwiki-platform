@@ -30,7 +30,7 @@ define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'jquery-ui-touch-punch
 
   function getSelectizeOptions(select) {
     return {
-      // TODO: Remove this once we add the remote source (REST API call).
+      // Allow free text just in case the user can't find the desired page in the suggestions.
       create: true,
       plugins: ['drag_drop'],
       // Where to look for child pages. The following is supported:
@@ -53,9 +53,31 @@ define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'jquery-ui-touch-punch
     return options;
   }
 
-  function loadChildPages(text, options) {
-    // TODO: Use the REST API to get the child pages.
-    return Promise.resolve([]).then(processChildPages.bind(null, options));
+  async function loadChildPages(text, options) {
+    try {
+      const childPages = await (await fetch(getChildPagesURL(text, options), {
+        headers: {
+          'Accept': 'application/json'
+        }
+      })).json();
+      return processChildPages(childPages);
+    } catch (error) {
+      console.warn('Failed to load child pages.', error);
+      return [];
+    }
+  }
+
+  function getChildPagesURL(text, options) {
+    const encodedText = encodeURIComponent(text);
+    if (options.parentReference.type === XWiki.EntityType.WIKI) {
+      const wikiName = options.parentReference.name;
+      return `${XWiki.contextPath}/rest/wikis/${wikiName}/children?limit=10&search=${encodedText}`;
+    } else {
+      const parentDocumentReference = new XWiki.EntityReference(webHome, XWiki.EntityType.DOCUMENT,
+        options.parentReference);
+      return new XWiki.Document(parentDocumentReference).getRestURL('children',
+        'number=10&prettyNames=true&hierarchy=nestedpages&search=' + encodedText);
+    }
   }
 
   function loadChildPage(value, options) {
@@ -71,7 +93,7 @@ define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'jquery-ui-touch-punch
     const childPageURL = new XWiki.Document(childPageReference).getRestURL();
     return $.getJSON(childPageURL, $.param({
       prettyNames: true
-    })).then(processChildPage.bind(null, options)).then(function(childPage) {
+    })).then(processChildPage).then(function(childPage) {
       // Preserve the value (i.e. don't normalize the value).
       childPage.value = value;
       // An array is expected in xwiki.selectize.js
@@ -82,15 +104,15 @@ define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'jquery-ui-touch-punch
   /**
    * Adapt the JSON returned by the REST call to the format expected by the Selectize widget.
    */
-  function processChildPages(options, response) {
-    if (Array.isArray(response.searchResults)) {
-      return response.searchResults.map(processPage.bind(null, options));
+  function processChildPages(response) {
+    if (Array.isArray(response.pageSummaries)) {
+      return response.pageSummaries.map(processChildPage);
     } else {
       return [];
     }
   }
 
-  function processChildPage(options, childPage) {
+  function processChildPage(childPage) {
     // Value
     const childPageReference = XWiki.Model.resolve(childPage.id, XWiki.EntityType.DOCUMENT);
     // We're going to add a slash at the end of the page name for nested child pages in order to distinguish them from
@@ -101,15 +123,9 @@ define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'jquery-ui-touch-punch
     if (childPageReference.name === webHome) {
       childPageName += '/';
     }
-    // Label
-    const hierarchy = childPage.hierarchy.items;
-    let childPageTitle = hierarchy.pop().label;
-    if (childPageReference.name === webHome) {
-      childPageTitle = hierarchy.pop().label;
-    }
     return {
       value: childPageName,
-      label: childPageTitle,
+      label: childPage.title,
       icon: pageIcon,
       url: new XWiki.Document(childPageReference).getURL()
     };

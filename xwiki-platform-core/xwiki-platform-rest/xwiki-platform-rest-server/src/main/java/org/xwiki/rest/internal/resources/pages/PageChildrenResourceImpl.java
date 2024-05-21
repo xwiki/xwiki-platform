@@ -50,6 +50,7 @@ public class PageChildrenResourceImpl extends AbstractPagesResource implements P
     private PageHierarchy nestedPageHierarchy;
 
     @Inject
+    @Named("document")
     private QueryFilter documentFilter;
 
     @Override

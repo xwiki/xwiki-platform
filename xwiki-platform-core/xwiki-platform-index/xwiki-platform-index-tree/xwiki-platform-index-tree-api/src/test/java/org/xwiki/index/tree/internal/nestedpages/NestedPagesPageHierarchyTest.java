@@ -67,6 +67,14 @@ class NestedPagesPageHierarchyTest
     private QueryFilter documenFilter;
 
     @MockComponent
+    @Named("hidden/document")
+    private QueryFilter hiddenDocumentFilter;
+
+    @MockComponent
+    @Named("hidden/space")
+    private QueryFilter hiddenSpaceFilter;
+
+    @MockComponent
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
@@ -80,6 +88,8 @@ class NestedPagesPageHierarchyTest
     void configure()
     {
         when(this.queryParameter.query()).thenReturn(this.query);
+        when(this.query.addFilter(this.hiddenDocumentFilter)).thenReturn(this.query);
+        when(this.query.addFilter(this.hiddenSpaceFilter)).thenReturn(this.query);
     }
 
     @Test
@@ -90,9 +100,9 @@ class NestedPagesPageHierarchyTest
         DocumentReference bob = new DocumentReference("test", "Alice", "WebHome");
 
         when(this.queryManager
-            .createQuery(", XWikiSpace AS space WHERE doc.space = space.reference AND doc.name = 'WebHome'"
-                + " AND space.parent IS NULL AND space.name LIKE :text ORDER BY doc.fullName", Query.HQL))
-                    .thenReturn(this.query);
+            .createQuery(", XWikiSpace AS space WHERE doc.space = space.reference AND doc.translation = 0"
+                + " AND doc.name = 'WebHome' AND space.parent IS NULL"
+                + " AND LOWER(space.name) LIKE :text ORDER BY doc.fullName", Query.HQL)).thenReturn(this.query);
         when(this.query.bindValue("text")).thenReturn(this.queryParameter);
         when(this.queryParameter.anyChars()).thenReturn(this.queryParameter);
         when(this.queryParameter.literal("foo")).thenReturn(this.queryParameter);
@@ -102,7 +112,7 @@ class NestedPagesPageHierarchyTest
         when(this.query.execute()).thenReturn(List.of(alice, bob));
 
         ChildrenQuery childrenQuery =
-            this.nestedPagesPageHierarchy.getChildren(wikiReference).withOffset(10).matching("foo");
+            this.nestedPagesPageHierarchy.getChildren(wikiReference).withOffset(10).matching("fOO");
 
         assertEquals(List.of(alice, bob), childrenQuery.getDocumentReferences());
     }
@@ -113,8 +123,8 @@ class NestedPagesPageHierarchyTest
         WikiReference wikiReference = new WikiReference("test");
 
         when(this.queryManager
-            .createQuery(", XWikiSpace AS space WHERE doc.space = space.reference AND doc.name = 'WebHome'"
-                + " AND space.parent IS NULL", Query.HQL)).thenReturn(this.query);
+            .createQuery(", XWikiSpace AS space WHERE doc.space = space.reference AND doc.translation = 0"
+                + " AND doc.name = 'WebHome' AND space.parent IS NULL", Query.HQL)).thenReturn(this.query);
         when(this.query.setWiki("test")).thenReturn(query);
         when(this.query.addFilter(this.countFilter)).thenReturn(query);
         when(this.query.execute()).thenReturn(List.of(7L));
@@ -131,12 +141,15 @@ class NestedPagesPageHierarchyTest
         DocumentReference alice = new DocumentReference("test", "Parent", "Alice");
         DocumentReference bob = new DocumentReference("test", List.of("Parent", "Bob"), "WebHome");
 
-        when(this.queryManager.createQuery(", XWikiSpace AS space WHERE doc.space = space.reference"
-            + " AND ((doc.name <> 'WebHome' AND doc.space = :parent)"
-            + " OR (doc.name = 'WebHome' AND space.parent = :parent))"
-            + " AND ((doc.name <> 'WebHome' AND doc.name like :text)"
-            + " OR (doc.name = 'WebHome' AND space.name LIKE :text)) ORDER BY doc.fullName", Query.HQL))
-                .thenReturn(this.query);
+        when(
+            this.queryManager
+                .createQuery(
+                    ", XWikiSpace AS space WHERE doc.space = space.reference AND doc.translation = 0"
+                        + " AND ((doc.name <> 'WebHome' AND doc.space = :parent)"
+                        + " OR (doc.name = 'WebHome' AND space.parent = :parent))"
+                        + " AND ((doc.name <> 'WebHome' AND LOWER(doc.name) LIKE :text)"
+                        + " OR (doc.name = 'WebHome' AND LOWER(space.name) LIKE :text)) ORDER BY doc.fullName",
+                    Query.HQL)).thenReturn(this.query);
         when(this.localEntityReferenceSerializer.serialize(parentReference.getLastSpaceReference()))
             .thenReturn("Parent");
         when(this.query.bindValue("parent", "Parent")).thenReturn(this.query);
@@ -149,7 +162,7 @@ class NestedPagesPageHierarchyTest
         when(this.query.execute()).thenReturn(List.of(alice, bob));
 
         ChildrenQuery childrenQuery =
-            this.nestedPagesPageHierarchy.getChildren(parentReference).withLimit(5).matching("bar");
+            this.nestedPagesPageHierarchy.getChildren(parentReference).withLimit(5).matching("Bar");
 
         assertEquals(List.of(alice, bob), childrenQuery.getDocumentReferences());
     }
@@ -160,7 +173,7 @@ class NestedPagesPageHierarchyTest
         DocumentReference parentReference = new DocumentReference("test", "Parent", "WebHome");
 
         when(this.queryManager.createQuery(", XWikiSpace AS space WHERE doc.space = space.reference"
-            + " AND ((doc.name <> 'WebHome' AND doc.space = :parent)"
+            + " AND doc.translation = 0 AND ((doc.name <> 'WebHome' AND doc.space = :parent)"
             + " OR (doc.name = 'WebHome' AND space.parent = :parent))", Query.HQL)).thenReturn(this.query);
         when(this.localEntityReferenceSerializer.serialize(parentReference.getLastSpaceReference()))
             .thenReturn("Parent");

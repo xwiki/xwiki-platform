@@ -60,6 +60,14 @@ public class NestedPagesPageHierarchy implements PageHierarchy
     private QueryFilter documenFilter;
 
     @Inject
+    @Named("hidden/document")
+    private QueryFilter hiddenDocumentFilter;
+
+    @Inject
+    @Named("hidden/space")
+    private QueryFilter hiddenSpaceFilter;
+
+    @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
@@ -100,7 +108,7 @@ public class NestedPagesPageHierarchy implements PageHierarchy
 
         private Query buildQuery(boolean ordered) throws QueryException
         {
-            String statement = ", XWikiSpace AS space WHERE doc.space = space.reference";
+            String statement = ", XWikiSpace AS space WHERE doc.space = space.reference AND doc.translation = 0";
             if (this.parentReference.getType() == EntityType.WIKI) {
                 statement += " AND doc.name = 'WebHome' AND space.parent IS NULL";
             } else {
@@ -109,10 +117,10 @@ public class NestedPagesPageHierarchy implements PageHierarchy
             }
             if (StringUtils.isNotEmpty(this.text)) {
                 if (this.parentReference.getType() == EntityType.WIKI) {
-                    statement += " AND space.name LIKE :text";
+                    statement += " AND LOWER(space.name) LIKE :text";
                 } else {
-                    statement += " AND ((doc.name <> 'WebHome' AND doc.name like :text) OR"
-                        + " (doc.name = 'WebHome' AND space.name LIKE :text))";
+                    statement += " AND ((doc.name <> 'WebHome' AND LOWER(doc.name) LIKE :text) OR"
+                        + " (doc.name = 'WebHome' AND LOWER(space.name) LIKE :text))";
                 }
             }
             if (ordered) {
@@ -127,7 +135,7 @@ public class NestedPagesPageHierarchy implements PageHierarchy
             }
 
             if (StringUtils.isNotEmpty(this.text)) {
-                query = query.bindValue("text").anyChars().literal(this.text).anyChars().query();
+                query = query.bindValue("text").anyChars().literal(this.text.toLowerCase()).anyChars().query();
             }
 
             if (this.offset > 0) {
@@ -141,7 +149,7 @@ public class NestedPagesPageHierarchy implements PageHierarchy
             String wiki = this.parentReference.extractReference(EntityType.WIKI).getName();
             query = query.setWiki(wiki);
 
-            return query;
+            return query.addFilter(hiddenDocumentFilter).addFilter(hiddenSpaceFilter);
         }
     }
 

@@ -59,12 +59,12 @@ public class ScriptQuery implements SecureQuery
     /**
      * Used to retrieve {@link org.xwiki.query.QueryFilter} implementations.
      */
-    private ComponentManager componentManager;
+    private final ComponentManager componentManager;
 
     /**
      * The wrapped {@link Query}.
      */
-    private Query query;
+    private final Query query;
 
     private boolean switchAuthor;
 

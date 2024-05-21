@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class WrappingQuery implements Query
 {
-    private Query wrappedQuery;
+    private final Query wrappedQuery;
 
     /**
      * @param wrappedQuery the query being wrapped

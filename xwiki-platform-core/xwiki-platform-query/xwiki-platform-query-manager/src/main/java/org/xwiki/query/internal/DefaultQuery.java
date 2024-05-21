@@ -57,7 +57,7 @@ public class DefaultQuery implements SecureQuery
     /**
      * field for {@link Query#getStatement()}.
      */
-    private String statement;
+    private final String statement;
 
     /**
      * field for {@link Query#getLanguage()}.
@@ -72,12 +72,12 @@ public class DefaultQuery implements SecureQuery
     /**
      * map from query parameters to values.
      */
-    private Map<String, Object> namedParameters = new HashMap<String, Object>();
+    private final Map<String, Object> namedParameters = new HashMap<String, Object>();
 
     /**
      * map from index to positional parameter value.
      */
-    private Map<Integer, Object> positionalParameters = new HashMap<Integer, Object>();
+    private final Map<Integer, Object> positionalParameters = new HashMap<Integer, Object>();
 
     /**
      * field for {@link Query#setLimit(int)}.
@@ -102,12 +102,12 @@ public class DefaultQuery implements SecureQuery
     /**
      * field for {@link #getFilters()}.
      */
-    private List<QueryFilter> filters = new ArrayList<QueryFilter>();
+    private final List<QueryFilter> filters = new ArrayList<QueryFilter>();
 
     /**
      * field for {@link #getExecuter()}.
      */
-    private transient QueryExecutor executer;
+    private final transient QueryExecutor executer;
 
     /**
      * Create a Query.

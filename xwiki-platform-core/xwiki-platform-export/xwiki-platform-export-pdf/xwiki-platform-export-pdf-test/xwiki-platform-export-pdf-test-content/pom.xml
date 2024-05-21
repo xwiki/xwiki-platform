@@ -68,6 +68,20 @@
       <artifactId>application-numbered-content-headings-ui</artifactId>
       <version>1.10.1</version>
       <type>xar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-localization-macro</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-localization-webjar</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- Used to test the PDF export of the code macro. -->
     <dependency>

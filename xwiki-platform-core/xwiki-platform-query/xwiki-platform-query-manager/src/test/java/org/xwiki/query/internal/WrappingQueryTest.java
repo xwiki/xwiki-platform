@@ -34,8 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * Unit tests for {@link WrappingQuery}.
  *
  * @version $Id$
- * @since 8.4.5
- * @since 9.3RC1
  */
 @ComponentTest
 class WrappingQueryTest

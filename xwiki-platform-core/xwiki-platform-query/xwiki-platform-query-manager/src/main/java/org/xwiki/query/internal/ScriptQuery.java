@@ -177,9 +177,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public Query bindValue(String var, Object val)
+    public Query bindValue(String variable, Object val)
     {
-        this.query.bindValue(var, val);
+        this.query.bindValue(variable, val);
         return this;
     }
 
@@ -205,9 +205,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public QueryParameter bindValue(String var)
+    public QueryParameter bindValue(String variable)
     {
-        QueryParameter parameter = this.query.bindValue(var);
+        QueryParameter parameter = this.query.bindValue(variable);
         return new ScriptQueryParameter(this, parameter);
     }
 

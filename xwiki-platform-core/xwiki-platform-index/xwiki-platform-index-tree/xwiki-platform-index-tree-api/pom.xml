@@ -32,7 +32,7 @@
   <description>Defines multiple document hierarchies (nested pages, nested spaces, parent-child, etc.) that can be displayed using the document tree macro.</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Document Tree API</xwiki.extension.name>
   </properties>

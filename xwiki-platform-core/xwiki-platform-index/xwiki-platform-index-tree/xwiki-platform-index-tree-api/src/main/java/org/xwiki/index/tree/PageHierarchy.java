@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.hierarchy;
+package org.xwiki.index.tree;
 
 import java.util.List;
 
@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.QueryException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -63,12 +64,12 @@ public interface PageHierarchy
         /**
          * @return the list of child document references
          */
-        List<DocumentReference> getDocumentReferences();
+        List<DocumentReference> getDocumentReferences() throws QueryException;
 
         /**
          * @return the number of child pages
          */
-        int count();
+        int count() throws QueryException;
     }
 
     /**
@@ -89,7 +90,7 @@ public interface PageHierarchy
          *
          * @param parentReference the reference of the parent entity for which to retrieve the children
          */
-        public AbstractChildrenQuery(EntityReference parentReference)
+        protected AbstractChildrenQuery(EntityReference parentReference)
         {
             this.parentReference = parentReference;
         }

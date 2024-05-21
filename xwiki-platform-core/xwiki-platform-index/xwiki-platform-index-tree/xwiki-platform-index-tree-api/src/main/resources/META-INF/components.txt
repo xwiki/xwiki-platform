@@ -15,6 +15,7 @@ org.xwiki.index.tree.internal.nestedpages.query.TopLevelPageFilter
 org.xwiki.index.tree.internal.nestedpages.AddDocumentTreeNode
 org.xwiki.index.tree.internal.nestedpages.ChildDocumentsTreeNodeGroup
 org.xwiki.index.tree.internal.nestedpages.DocumentTreeNode
+org.xwiki.index.tree.internal.nestedpages.NestedPagesPageHierarchy
 org.xwiki.index.tree.internal.nestedpages.NestedPagesTree
 org.xwiki.index.tree.internal.nestedpages.WikiTreeNode
 

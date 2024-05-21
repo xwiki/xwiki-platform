@@ -77,9 +77,9 @@ public interface Query
     String getWiki();
 
     /**
-     * Bind named parameter var with value val in query statement.
+     * Bind named parameter variable with value val in query statement.
      *
-     * @param variable variable in query statement (:var).
+     * @param variable variable in query statement (:variable).
      * @param val value of the variable.
      * @return this query
      */

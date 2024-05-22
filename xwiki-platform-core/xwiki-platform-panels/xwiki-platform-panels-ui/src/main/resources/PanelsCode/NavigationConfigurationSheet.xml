@@ -532,7 +532,7 @@ require([
 
   var excludeNode = function(tree, nodeId) {
     var node = tree.get_node(nodeId);
-    if (node &amp;&amp; node.data &amp;&amp; node.data.type === 'document') {
+    if (node?.data?.type === 'document') {
       excludePageFromDynamicFilter(tree, node) || excludeOtherPage(tree, node);
       tree.hide_node(nodeId);
     }
@@ -591,12 +591,13 @@ require([
   // Tree Node Actions
   //
 
-  const navigationTree = $navigationTree.jstree();
-  const nodeTemplate = navigationTree._data?.core?.node;
+  let navigationTree = $navigationTree.jstree?.(true);
+  const nodeTemplate = navigationTree?._data?.core?.node;
   if (!nodeTemplate) {
     // The tree node template hasn't been initialized yet.
     $navigationTree.on('loading', function(event, data) {
-      modifyNodeTemplate(data.instance._data.core.node);
+      navigationTree = data.instance;
+      modifyNodeTemplate(navigationTree._data.core.node);
     });
   } else {
     modifyNodeTemplate(nodeTemplate);
@@ -617,7 +618,7 @@ require([
 
   $navigationTree.on('focusin mouseenter', '.jstree-actions', function(event) {
     const $node = $(event.target).closest('.jstree-node');
-    $navigationTree.jstree().hover_node($node);
+    $navigationTree.jstree(true).hover_node($node);
     if (event.type === 'focusin') {
       // Make sure we can get back from the actions to the node anchor (e.g. using Shift + Tab) and continue navigating
       // the tree using the arrow keys.
@@ -627,7 +628,7 @@ require([
 
   $navigationTree.on('mouseleave', '.jstree-actions', function(event) {
     const $node = $(event.target).closest('.jstree-node');
-    $navigationTree.jstree().dehover_node($node);
+    $navigationTree.jstree(true).dehover_node($node);
   });
 
   $navigationTree.on('hover_node.jstree', function(event, data) {
@@ -655,7 +656,7 @@ require([
   $navigationTree.on('keydown', function(event) {
     if (event.altKey &amp;&amp; event.shiftKey) {
       const $node = $(event.target).closest('.jstree-node');
-      const node = navigationTree.get_node($node);
+      const node = navigationTree?.get_node($node);
       if (node?.data?.draggable) {
         node.a_attr['data-moving'] = true;
         $node.children('.jstree-anchor').attr('data-moving', true);
@@ -667,7 +668,7 @@ require([
     if (!event.altKey || !event.shiftKey) {
       const $node = $(event.target).closest('.jstree-node');
       $node.children('.jstree-anchor').removeAttr('data-moving');
-      const node = navigationTree.get_node($node);
+      const node = navigationTree?.get_node($node);
       if (node?.a_attr) {
         delete node.a_attr['data-moving'];
       }
@@ -680,7 +681,7 @@ require([
 
   function maybeMoveNode(event, position) {
     const $node = $(event.target).closest('.jstree-node');
-    const node = navigationTree.get_node($node);
+    const node = navigationTree?.get_node($node);
     if (node?.data?.draggable) {
       let $referenceNode;
       if (position === 'before') {
@@ -724,9 +725,11 @@ require([
     if (data.parent === $.jstree.root) {
       data.nodes.forEach(nodeId =&gt; {
         const node = tree.get_node(nodeId);
-        const documentReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
-        if (pinnedTopLevelPages.includes(documentReference.parent.name)) {
-          node.a_attr['data-pinned'] = true;
+        if (node?.data?.type === 'document') {
+          const documentReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+          if (pinnedTopLevelPages.includes(documentReference.parent.name)) {
+            node.a_attr['data-pinned'] = true;
+          }
         }
       });
     }
@@ -756,13 +759,12 @@ require([
   });
 
   $navigationTree.on('click', '.jstree-action-pin', function(event) {
-    const tree = $navigationTree.jstree();
     const $node = $(event.target).closest('.jstree-node');
-    const node = tree.get_node($node);
+    const node = navigationTree.get_node($node);
     if (node.a_attr['data-pinned']) {
-      unpinTopLevelPages(tree, node);
+      unpinTopLevelPages(navigationTree, node);
     } else {
-      pinTopLevelPages(tree, node);
+      pinTopLevelPages(navigationTree, node);
     }
   });
 
@@ -1045,6 +1047,10 @@ ul.exclusion-filter-pages a {
     display: flex;
     // We want the children to be displayed on a new flex row, taking the full width.
     flex-wrap: wrap;
+
+    &amp;.jstree-hidden {
+      display: none;
+    }
   }
 
   .jstree-anchor,

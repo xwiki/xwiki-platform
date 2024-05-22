@@ -18,5 +18,5 @@
         "forceConsistentCasingInFileNames": true,
         "skipLibCheck": true,
         "declaration": true
-    }
+    },
 }

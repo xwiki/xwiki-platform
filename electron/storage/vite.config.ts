@@ -23,18 +23,15 @@
  *
  **/
 
-import { defineConfig, mergeConfig } from "vite";
-import defaultConfig from "../../vite.vue.config.js";
+import { generateConfig } from "../../vite.config";
+import { mergeConfig } from "vitest/config";
+import { defineConfig } from "vite";
 
 export default mergeConfig(
-  defaultConfig,
+  generateConfig(import.meta.url),
   defineConfig({
     build: {
       outDir: "dist/default",
-      lib: {
-        entry: "./src/index.ts",
-        name: "electronstorage",
-      },
     },
   }),
 );

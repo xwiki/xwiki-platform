@@ -23,22 +23,6 @@
  *
  **/
 
-import { defineConfig, mergeConfig } from "vite";
-import defaultConfig from "./../../vite.vue.config.js";
-import { comlink } from "vite-plugin-comlink";
+import { generateConfig } from "../../vite.config";
 
-export default mergeConfig(
-  defaultConfig,
-  defineConfig({
-    plugins: [comlink()],
-    build: {
-      lib: {
-        entry: "./src/index.ts",
-        name: "sharedworkerapi",
-      },
-    },
-    worker: {
-      plugins: () => [comlink()],
-    },
-  }),
-);
+export default generateConfig(import.meta.url);

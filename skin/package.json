@@ -1,6 +1,7 @@
 {
   "name": "@cristal/skin",
   "version": "0.7.0",
+  "type": "module",
   "types": "dist/index.d.ts",
   "license": "AGPL-3.0",
   "repository": {
@@ -8,14 +9,20 @@
     "directory": "skin",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
-  "files": [
-    "dist/*"
-  ],
-  "main": "dist/main.bundle.js",
-  "module": "dist/main.umd.cjs",
-  "type": "module",
+  "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    }
   },
   "scripts": {
     "clean": "rimraf dist",
@@ -31,6 +38,7 @@
     "inversify": "6.0.2",
     "marked": "12.0.2",
     "reflect-metadata": "0.2.2",
+    "vue": "3.4.27",
     "vue-i18n": "9.13.1",
     "vue-router": "4.3.2",
     "vuetify": "3.6.7"
@@ -41,7 +49,6 @@
     "vite": "5.2.11",
     "vite-plugin-inspect": "0.8.4",
     "vite-plugin-vuetify": "2.0.3",
-    "vue": "3.4.27",
     "vue-tsc": "2.0.19"
   }
 }

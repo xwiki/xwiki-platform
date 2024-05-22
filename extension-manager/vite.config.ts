@@ -23,17 +23,6 @@
  *
  **/
 
-import { defineConfig, mergeConfig } from "vite";
-import defaultConfig from "./../vite.default.config.js";
+import { generateConfigVue } from "../vite.config";
 
-export default mergeConfig(
-  defaultConfig,
-  defineConfig({
-    build: {
-      lib: {
-        entry: "./src/index.ts",
-        name: "extensionManager",
-      },
-    },
-  }),
-);
+export default generateConfigVue(import.meta.url);

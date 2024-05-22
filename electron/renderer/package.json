@@ -7,12 +7,11 @@
     "directory": "electron/renderer",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
-  "exports": {},
   "scripts": {
     "clean": "rimraf dist",
     "prepack": "pnpm build",
     "build": "pnpm compile",
-    "compile": "tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
+    "compile": "vite build",
     "test": "echo 'no test'",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "electron": "echo 'no task'",
@@ -30,7 +29,6 @@
     "@types/node": "20.12.12",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",
-    "vite": "5.2.11",
-    "vue-tsc": "2.0.19"
+    "vite": "5.2.11"
   }
 }

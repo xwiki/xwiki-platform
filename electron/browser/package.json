@@ -1,15 +1,37 @@
 {
   "name": "@cristal/browser-electron",
   "version": "0.0.0",
-  "types": "dist/main/index.d.ts",
+  "type": "module",
   "license": "AGPL-3.0",
+  "main": "./src/index.ts",
   "exports": {
-    ".": "./dist/default/main.umd.cjs",
-    "./preload": "./dist/preload/main.umd.cjs",
-    "./main": "./dist/main/main.umd.cjs"
+    ".": "./src/index.ts",
+    "./preload": "./src/electron/preload/index.ts",
+    "./main": "./src/electron/main/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/main/index.es.js",
+    "types": "./dist/main/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/main/index.es.js",
+        "require": "./dist/main/index.umd.js",
+        "types": "./dist/main/index.d.ts"
+      },
+      "./preload": {
+        "import": "./dist/preload/index.es.js",
+        "require": "./dist/preload/index.umd.js",
+        "types": "./dist/preload/index.d.ts"
+      },
+      "./main": {
+        "import": "./dist/main/index.es.js",
+        "require": "./dist/main/index.umd.js",
+        "types": "./dist/main/index.d.ts"
+      }
+    }
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && cp \"./package.json\" ./dist/"
+    "build": "tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts"
   },
   "dependencies": {
     "@cristal/api": "workspace:*",

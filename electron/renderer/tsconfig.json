@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "module": "esnext",
     "target": "esnext",
     "sourceMap": false,
@@ -11,17 +12,10 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "#preload": ["../preload/src/index"],
-      "/@/*": ["./src/*"]
+      "#preload": ["../preload/src/index"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
   },
-  "include": [
-    "src/**/*.vue",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "types/**/*.d.ts",
-    "../../types/**/*.d.ts"
-  ],
+  "include": ["./src"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

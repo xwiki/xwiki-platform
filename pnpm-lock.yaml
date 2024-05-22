@@ -137,6 +137,9 @@ importers:
       bootstrap-icons:
         specifier: 1.11.3
         version: 1.11.3
+      vue:
+        specifier: 3.4.27
+        version: 3.4.27(typescript@5.4.5)
     devDependencies:
       '@cristal/dev-config':
         specifier: workspace:*
@@ -156,9 +159,6 @@ importers:
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.12.12)(happy-dom@14.11.0)
-      vue:
-        specifier: 3.4.27
-        version: 3.4.27(typescript@5.4.5)
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -515,9 +515,6 @@ importers:
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.12)
-      vue-tsc:
-        specifier: 2.0.19
-        version: 2.0.19(typescript@5.4.5)
 
   electron/preload:
     devDependencies:
@@ -542,9 +539,6 @@ importers:
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.12)
-      vue-tsc:
-        specifier: 2.0.19
-        version: 2.0.19(typescript@5.4.5)
 
   electron/renderer:
     dependencies:
@@ -576,9 +570,6 @@ importers:
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.12)
-      vue-tsc:
-        specifier: 2.0.19
-        version: 2.0.19(typescript@5.4.5)
 
   electron/storage:
     dependencies:
@@ -909,6 +900,9 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
+      vue:
+        specifier: 3.4.27
+        version: 3.4.27(typescript@5.4.5)
       vue-i18n:
         specifier: 9.13.1
         version: 9.13.1(vue@3.4.27(typescript@5.4.5))
@@ -934,9 +928,6 @@ importers:
       vite-plugin-vuetify:
         specifier: 2.0.3
         version: 2.0.3(vite@5.2.11(@types/node@20.12.12))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.7)
-      vue:
-        specifier: 3.4.27
-        version: 3.4.27(typescript@5.4.5)
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -999,9 +990,6 @@ importers:
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.12)
-      vue-tsc:
-        specifier: 2.0.19
-        version: 2.0.19(typescript@5.4.5)
 
   web:
     dependencies:
@@ -1082,6 +1070,9 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
+      vue-tsc:
+        specifier: 2.0.19
+        version: 2.0.19(typescript@5.4.5)
 
 packages:
 

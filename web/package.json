@@ -15,7 +15,7 @@
     "clean": "rimraf dist",
     "prepack": "pnpm build",
     "build": "pnpm compile",
-    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
+    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build",
     "test": "echo 'no test'",
     "test:e2e": "playwright test",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",

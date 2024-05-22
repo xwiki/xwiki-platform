@@ -1,15 +1,27 @@
 {
   "name": "@cristal/editors-tiptap",
   "version": "1.0.0",
+  "type": "module",
   "types": "dist/index.d.ts",
   "license": "AGPL-3.0",
-  "main": "index.js",
+  "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts"
   },
+  "publishConfig": {
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    }
+  },
   "scripts": {
     "clean": "rimraf dist",
-    "prepack": "vue-tsc --project tsconfig.json --noEmit && pnpm build",
+    "prepack": "pnpm build",
     "build": "pnpm compile",
     "compile": "vue-tsc --project tsconfig.json --noEmit && vite build",
     "test": "vitest --run",

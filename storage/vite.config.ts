@@ -23,17 +23,6 @@
  *
  **/
 
-import { defineConfig, mergeConfig } from "vite";
-import defaultConfig from "./../vite.vue.config.js";
+import { generateConfig } from "../vite.config";
 
-export default mergeConfig(
-  defaultConfig,
-  defineConfig({
-    build: {
-      lib: {
-        entry: "./src/index.ts",
-        name: "storage",
-      },
-    },
-  }),
-);
+export default generateConfig(import.meta.url);

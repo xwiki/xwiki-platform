@@ -12,24 +12,23 @@
     "clean": "rimraf dist",
     "prepack": "pnpm build",
     "build": "pnpm compile",
-    "compile": "tsc --project tsconfig.json --noEmit && vite build && cp \"./package.json\" ./dist/",
+    "compile": "tsc --project tsconfig.json --noEmit && vite build",
     "test": "echo 'no test'",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "electron": "echo 'no task'",
     "package": "echo 'no task'",
     "linux": "echo 'no task'"
   },
+  "dependencies": {
+    "@cristal/electron-storage": "workspace:*",
+    "@cristal/browser-electron": "workspace:*",
+    "electron": "29.4.0"
+  },
   "devDependencies": {
     "@types/node": "20.12.12",
     "cross-env": "7.0.3",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",
-    "vite": "5.2.11",
-    "vue-tsc": "2.0.19"
-  },
-  "dependencies": {
-    "@cristal/electron-storage": "workspace:*",
-    "@cristal/browser-electron": "workspace:*",
-    "electron": "29.4.0"
+    "vite": "5.2.11"
   }
 }

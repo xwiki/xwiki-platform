@@ -1,11 +1,22 @@
 {
   "name": "@cristal/link-suggest-api",
   "version": "0.0.0",
-  "types": "dist/index.d.ts",
   "type": "module",
   "license": "AGPL-3.0",
+  "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    }
   },
   "scripts": {
     "build": "tsc --project tsconfig.json --noEmit && vite build"

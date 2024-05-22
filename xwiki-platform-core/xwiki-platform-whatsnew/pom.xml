@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.4.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-whatsnew</artifactId>
   <name>XWiki Platform - What's New - Parent POM</name>

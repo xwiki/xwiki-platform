@@ -77,7 +77,6 @@ public class ScopeNotificationFilter implements NotificationFilter
         final EntityReference eventEntity = getEventEntity(event);
         FilterPolicy result = FilterPolicy.NO_EFFECT;
         if (eventEntity != null) {
-
             // We don't check the inclusive filters if the target is specified since it means the notification already
             // targets an user. We still check the exclusive one in case the user would want to avoid spam.
             boolean checkInclusiveFilters = event.getTarget() == null || event.getTarget().isEmpty();
@@ -88,27 +87,35 @@ public class ScopeNotificationFilter implements NotificationFilter
             WatchedLocationState state = stateComputer.isLocationWatched(filterPreferences, eventEntity,
                 event.getType(), format, false, checkInclusiveFilters, false);
 
-            switch (state.getState()) {
-                case BLOCKED, BLOCKED_BY_ANCESTOR, BLOCKED_WITH_CHILDREN -> {
-                    if (state.getStartingDate() != null && state.getStartingDate().before(event.getDate())) {
-                        result = FilterPolicy.FILTER;
-                    }
+            result = getFilterPolicy(event, user, state, checkInclusiveFilters);
+        }
+        return result;
+    }
+
+    private FilterPolicy getFilterPolicy(Event event, DocumentReference user, WatchedLocationState state,
+        boolean checkInclusiveFilters)
+    {
+        FilterPolicy result = FilterPolicy.NO_EFFECT;
+        switch (state.getState()) {
+            case BLOCKED, BLOCKED_BY_ANCESTOR, BLOCKED_WITH_CHILDREN -> {
+                if (state.getStartingDate() != null && state.getStartingDate().before(event.getDate())) {
+                    result = FilterPolicy.FILTER;
                 }
+            }
 
-                case WATCHED, WATCHED_BY_ANCESTOR, WATCHED_WITH_CHILDREN -> {
-                    if (state.getStartingDate() != null && state.getStartingDate().after(event.getDate())) {
-                        result = FilterPolicy.FILTER;
-                    }
+            case WATCHED, WATCHED_BY_ANCESTOR, WATCHED_WITH_CHILDREN -> {
+                if (state.getStartingDate() != null && state.getStartingDate().after(event.getDate())) {
+                    result = FilterPolicy.FILTER;
                 }
+            }
 
-                case CUSTOM ->
-                    this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}] ",
-                        event, user);
+            case CUSTOM ->
+                this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}] ",
+                    event, user);
 
-                default -> {
-                    if (checkInclusiveFilters) {
-                        result = FilterPolicy.FILTER;
-                    }
+            default -> {
+                if (checkInclusiveFilters) {
+                    result = FilterPolicy.FILTER;
                 }
             }
         }

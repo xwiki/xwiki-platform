@@ -27,7 +27,4 @@
 <suppressions>
   <suppress checks="CyclomaticComplexity" files="ScopeNotificationFilterPreferencesGetter.java"/>
   <suppress checks="CyclomaticComplexity" files="DefaultNotificationFilterManager.java"/>
-
-  <!-- FIXME -->
-  <suppress checks="CyclomaticComplexity" files="ScopeNotificationFilter.java"/>
 </suppressions>

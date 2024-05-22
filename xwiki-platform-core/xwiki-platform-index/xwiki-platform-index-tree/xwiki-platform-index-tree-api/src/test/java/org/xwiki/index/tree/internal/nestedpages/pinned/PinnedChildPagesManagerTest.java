@@ -127,10 +127,4 @@ class PinnedChildPagesManagerTest
         assertEquals(List.of(),
             this.pinnedChildPagesManager.getPinnedChildPages(new DocumentReference("wiki", "space", "page")));
     }
-
-    @Test
-    void setPinnedChildPages()
-    {
-        // TODO
-    }
 }

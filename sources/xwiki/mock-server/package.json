@@ -13,7 +13,6 @@
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
-  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },

@@ -27,7 +27,9 @@ import type { Storage } from "./storage";
 
 export interface WikiConfig {
   name: string;
+  // The base url of the backend endpoint
   baseURL: string;
+  // The rest base url of the backend endpoint
   baseRestURL: string;
   homePage: string;
   storage: Storage;

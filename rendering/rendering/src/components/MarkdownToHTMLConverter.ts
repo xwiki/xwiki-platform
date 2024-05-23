@@ -23,8 +23,8 @@
  *
  **/
 
-import type { WikiConfig } from "@cristal/api";
-import type { Logger } from "@cristal/api";
+import type { WikiConfig } from "@xwiki/cristal-api";
+import type { Logger } from "@xwiki/cristal-api";
 import type { Converter } from "../api/converter";
 import { marked } from "marked";
 import { baseUrl } from "marked-base-url";

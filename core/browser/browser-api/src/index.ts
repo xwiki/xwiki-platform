@@ -23,7 +23,7 @@
  *
  **/
 
-import { WikiConfig } from "@cristal/api";
+import { WikiConfig } from "@xwiki/cristal-api";
 
 /**
  * Provide the operations to interact with the browser. We need this abstraction

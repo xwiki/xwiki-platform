@@ -24,8 +24,8 @@
  **/
 
 import type { App } from "vue";
-import type { DesignSystemLoader } from "@cristal/api";
-import { registerAsyncComponent } from "@cristal/api";
+import type { DesignSystemLoader } from "@xwiki/cristal-api";
+import { registerAsyncComponent } from "@xwiki/cristal-api";
 
 import { injectable } from "inversify";
 

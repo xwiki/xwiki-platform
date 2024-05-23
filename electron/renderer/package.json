@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/electron-renderer",
+  "name": "@xwiki/cristal-electron-renderer",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -24,9 +24,9 @@
     "test": "echo 'no test'"
   },
   "dependencies": {
-    "@cristal/browser-electron": "workspace:*",
-    "@cristal/electron-storage": "workspace:*",
-    "@cristal/lib": "workspace:*",
+    "@xwiki/cristal-browser-electron": "workspace:*",
+    "@xwiki/cristal-electron-storage": "workspace:*",
+    "@xwiki/cristal-lib": "workspace:*",
     "inversify": "6.0.2",
     "vue": "3.4.27"
   },

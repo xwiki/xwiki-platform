@@ -28,7 +28,7 @@ import {
   DefaultWikiConfig,
   type Logger,
   type Storage,
-} from "@cristal/api";
+} from "@xwiki/cristal-api";
 import { inject, injectable, named } from "inversify";
 import "reflect-metadata";
 

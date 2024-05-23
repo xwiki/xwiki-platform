@@ -23,7 +23,7 @@
  *
 -->
 <script lang="ts">
-import { CTemplate } from "@cristal/skin";
+import { CTemplate } from "@xwiki/cristal-skin";
 import { defineComponent } from "vue";
 import "./index.css";
 

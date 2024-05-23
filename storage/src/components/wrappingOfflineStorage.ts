@@ -32,9 +32,9 @@ import type {
   Storage,
   WikiConfig,
   WrappingStorage,
-} from "@cristal/api";
+} from "@xwiki/cristal-api";
 import type OfflineStorage from "../api/offlineStorage";
-import type { QueueWorker } from "@cristal/sharedworker-api";
+import type { QueueWorker } from "@xwiki/cristal-sharedworker-api";
 
 @injectable()
 export class WrappingOfflineStorage implements WrappingStorage {

@@ -23,7 +23,7 @@
  *
  **/
 
-import type { CristalApp, Logger } from "@cristal/api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { MacroProvider } from "../api/macroProvider";
 import type { App, Component, VNode } from "vue";
 import { createVNode, render } from "vue";

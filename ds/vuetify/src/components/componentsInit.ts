@@ -23,7 +23,7 @@
  *
  **/
 
-import type { DesignSystemLoader } from "@cristal/api";
+import type { DesignSystemLoader } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 import { VuetifyDesignSystemLoader } from "./vuetifyDesignSystemLoader";
 

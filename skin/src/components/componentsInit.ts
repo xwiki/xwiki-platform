@@ -26,7 +26,7 @@
 import { TemplateComponent } from "./templateTemplateProvider";
 import { DefaultSkinManager } from "./defaultSkinManager";
 import type { Container } from "inversify";
-import type { Logger, SkinManager } from "@cristal/api";
+import type { Logger, SkinManager } from "@xwiki/cristal-api";
 import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import { UIXVueTemplateProvider } from "./uixVueTemplateProvider";
 import { UIXLoginTemplateProvider } from "./uixLoginTemplateProvider";

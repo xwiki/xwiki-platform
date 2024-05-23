@@ -1,4 +1,4 @@
-# @cristal/sharedworker-api
+# @xwiki/cristal-sharedworker-api
 
 ## 0.7.0
 

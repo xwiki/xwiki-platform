@@ -27,7 +27,7 @@ import { UIXEditorProvider } from "../api/uixEditorProvider";
 import { injectable } from "inversify";
 import "reflect-metadata";
 import DefaultUIXTemplateProvider from "./defaultUIXTemplateProvider";
-import { CristalApp } from "@cristal/api";
+import { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 export default class DefaultUIXEditorProvider

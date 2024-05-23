@@ -33,7 +33,7 @@ import {
   ref,
   watch,
 } from "vue";
-import { CristalApp, PageData } from "@cristal/api";
+import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { useRoute } from "vue-router";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
@@ -48,7 +48,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import Link from "@tiptap/extension-link";
-import { LinkSuggestService, name } from "@cristal/link-suggest-api";
+import { LinkSuggestService, name } from "@xwiki/cristal-link-suggest-api";
 
 const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;

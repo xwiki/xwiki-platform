@@ -23,9 +23,9 @@
  *
  **/
 
-import { CristalLoader } from "@cristal/extension-manager";
+import { CristalLoader } from "@xwiki/cristal-extension-manager";
 import { DefaultCristalApp } from "./DefaultCristalApp";
-import { type CristalApp } from "@cristal/api";
+import { type CristalApp } from "@xwiki/cristal-api";
 import { Container } from "inversify";
 import { Primitive } from "utility-types";
 

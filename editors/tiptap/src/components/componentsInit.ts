@@ -24,7 +24,7 @@
  **/
 
 import { Container } from "inversify";
-import { UIXTemplateProvider } from "@cristal/skin";
+import { UIXTemplateProvider } from "@xwiki/cristal-skin";
 import { UixTiptapEditorProvider } from "./uixTiptapEditorProvider";
 
 export default class ComponentInit {

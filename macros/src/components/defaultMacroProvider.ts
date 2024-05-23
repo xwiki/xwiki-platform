@@ -23,8 +23,11 @@
  *
  **/
 
-import type { MacroData, MacroProvider } from "@cristal/skin";
-import { DefaultVueTemplateProvider, DefaultMacroData } from "@cristal/skin";
+import type { MacroData, MacroProvider } from "@xwiki/cristal-skin";
+import {
+  DefaultVueTemplateProvider,
+  DefaultMacroData,
+} from "@xwiki/cristal-skin";
 
 export abstract class DefaultMacroProvider
   extends DefaultVueTemplateProvider

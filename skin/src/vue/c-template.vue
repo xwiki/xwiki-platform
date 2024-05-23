@@ -25,8 +25,8 @@
 <script lang="ts" setup>
 import type { Component } from "vue";
 import { inject } from "vue";
-import type { CristalApp, Logger } from "@cristal/api";
-import { type SkinManager } from "@cristal/api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import { type SkinManager } from "@xwiki/cristal-api";
 
 let component: Component | undefined;
 let logger: Logger | undefined;

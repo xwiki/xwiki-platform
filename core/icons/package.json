@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/icons",
+  "name": "@xwiki/cristal-icons",
   "version": "0.7.0",
   "description": "Provide UI components to display icons.",
   "license": "AGPL-3.0",
@@ -29,8 +29,8 @@
     "vue": "3.4.27"
   },
   "devDependencies": {
-    "@cristal/dev-config": "workspace:*",
     "@vue/test-utils": "2.4.6",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "eslint": "8.57.0",
     "rimraf": "5.0.7",
     "vite": "5.2.11",

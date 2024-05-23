@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/sharedworker-api",
+  "name": "@xwiki/cristal-sharedworker-api",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",

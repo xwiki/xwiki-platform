@@ -29,5 +29,5 @@
 
 export { sha256sum } from "./nodeCrypto";
 export { versions } from "./versions";
-import "@cristal/electron-storage/preload";
-import "@cristal/browser-electron/preload";
+import "@xwiki/cristal-electron-storage/preload";
+import "@xwiki/cristal-browser-electron/preload";

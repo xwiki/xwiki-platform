@@ -23,11 +23,11 @@
  *
  **/
 
-import { DefaultVueTemplateProvider } from "@cristal/skin";
+import { DefaultVueTemplateProvider } from "@xwiki/cristal-skin";
 import { Component } from "vue";
 import { injectable } from "inversify";
 import TextEditor from "../vue/edittext.vue";
-import { CristalApp } from "@cristal/api";
+import { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 export class UIXRemoteXWikiEditorProvider extends DefaultVueTemplateProvider {

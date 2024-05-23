@@ -1,4 +1,4 @@
-# @cristal/sharedworker-impl
+# @xwiki/cristal-sharedworker-impl
 
 ## 0.7.0
 
@@ -9,7 +9,7 @@
 ### Patch Changes
 
 - Updated dependencies [aa0a7ca]
-  - @cristal/api@0.7.0
-  - @cristal/extension-manager@0.7.0
-  - @cristal/sharedworker-api@0.7.0
-  - @cristal/storage@0.7.0
+  - @xwiki/cristal-api@0.7.0
+  - @xwiki/cristal-extension-manager@0.7.0
+  - @xwiki/cristal-sharedworker-api@0.7.0
+  - @xwiki/cristal-storage@0.7.0

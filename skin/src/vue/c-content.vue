@@ -33,10 +33,10 @@ import {
   watch,
 } from "vue";
 import { useRoute } from "vue-router";
-import { type CristalApp, PageData } from "@cristal/api";
+import { type CristalApp, PageData } from "@xwiki/cristal-api";
 import { marked } from "marked";
 import { ContentTools } from "./contentTools";
-import { CIcon, Size } from "@cristal/icons";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 import xavatarImg from "../images/no-one.svg";
 
 const route = useRoute();

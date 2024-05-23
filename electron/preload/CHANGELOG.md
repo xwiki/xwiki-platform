@@ -1,4 +1,4 @@
-# @cristal/electron-preload
+# @xwiki/cristal-electron-preload
 
 ## 0.7.0
 

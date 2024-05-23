@@ -1,7 +1,7 @@
 {
   "private": true,
-  "name": "@cristal/root",
-  "version": "0.2.0",
+  "name": "@xwiki/cristal-root",
+  "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
@@ -15,11 +15,11 @@
   "scripts": {
     "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",
-    "dev": "nx build @cristal/web && nx dev @cristal/web",
+    "dev": "nx build @xwiki/cristal-web && nx dev @xwiki/cristal-web",
     "lint": "nx run-many -t lint",
-    "quickstart": "nx run @cristal/web:quickstart",
-    "start": "nx run @cristal/web:start",
-    "start:electron": "nx build @cristal/electron-main && nx build @cristal/electron-renderer && nx build @cristal/electron-storage && nx run @cristal/electron:start",
+    "quickstart": "nx run @xwiki/cristal-web:quickstart",
+    "start": "nx run @xwiki/cristal-web:start",
+    "start:electron": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
     "test": "nx run-many -t test"
   },
   "devDependencies": {

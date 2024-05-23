@@ -26,7 +26,7 @@
 import { dirname, join, relative } from "node:path";
 import { app, ipcMain } from "electron";
 import fs from "node:fs";
-import { PageData } from "@cristal/api";
+import { PageData } from "@xwiki/cristal-api";
 
 const HOME_PATH = ".cristal";
 const HOME_PATH_FULL = join(app.getPath("home"), HOME_PATH);

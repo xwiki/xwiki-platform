@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/electron-preload",
+  "name": "@xwiki/cristal-electron-preload",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -24,9 +24,9 @@
     "test": "echo 'no test'"
   },
   "devDependencies": {
-    "@cristal/browser-electron": "workspace:*",
-    "@cristal/electron-storage": "workspace:*",
     "@types/node": "20.12.12",
+    "@xwiki/cristal-browser-electron": "workspace:*",
+    "@xwiki/cristal-electron-storage": "workspace:*",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",
     "unplugin-auto-expose": "0.2.4",

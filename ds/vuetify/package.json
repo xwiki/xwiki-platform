@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/dsvuetify",
+  "name": "@xwiki/cristal-dsvuetify",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -26,8 +26,8 @@
     "test": "echo 'no test'"
   },
   "dependencies": {
-    "@cristal/api": "workspace:*",
-    "@cristal/dsapi": "workspace:*",
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "inversify": "6.0.2",
     "vue": "3.4.27",
     "vue-i18n": "9.13.1",

@@ -1,4 +1,4 @@
-# @cristal/dev-config
+# @xwiki/cristal-dev-config
 
 ## 0.7.0
 

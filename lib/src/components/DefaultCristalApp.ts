@@ -32,13 +32,13 @@ import type {
   LoggerConfig,
   PageData,
   WikiConfig,
-} from "@cristal/api";
+} from "@xwiki/cristal-api";
 import {
   DefaultLogger,
   DefaultPageData,
   type Logger,
   type SkinManager,
-} from "@cristal/api";
+} from "@xwiki/cristal-api";
 import type { App, Component, Ref } from "vue";
 import { createApp } from "vue";
 import {
@@ -48,16 +48,19 @@ import {
   RouteRecordRaw,
 } from "vue-router";
 
-import { BrowserApi } from "@cristal/browser-api";
+import { BrowserApi } from "@xwiki/cristal-browser-api";
 
 import "@mdi/font/css/materialdesignicons.css";
 
 import Index from "../c-index.vue";
 
-import type { ExtensionManager } from "@cristal/extension-manager";
-import type { UIXTemplateProvider, VueTemplateProvider } from "@cristal/skin";
-import type { MenuEntry } from "@cristal/extension-menubuttons";
-import type { Renderer } from "@cristal/rendering";
+import type { ExtensionManager } from "@xwiki/cristal-extension-manager";
+import type {
+  UIXTemplateProvider,
+  VueTemplateProvider,
+} from "@xwiki/cristal-skin";
+import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";
+import type { Renderer } from "@xwiki/cristal-rendering";
 
 @injectable()
 export class DefaultCristalApp implements CristalApp {

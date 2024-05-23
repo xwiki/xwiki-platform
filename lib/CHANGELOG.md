@@ -1,4 +1,4 @@
-# @cristal/lib
+# @xwiki/cristal-lib
 
 ## 0.7.0
 
@@ -9,15 +9,15 @@
 ### Patch Changes
 
 - Updated dependencies [aa0a7ca]
-  - @cristal/api@0.7.0
-  - @cristal/dsfr@0.7.0
-  - @cristal/dsshoelace@0.7.0
-  - @cristal/dsvuetify@0.7.0
-  - @cristal/editors-prosemirror@0.7.0
-  - @cristal/extension-manager@0.7.0
-  - @cristal/extension-menubuttons@0.7.0
-  - @cristal/macros@0.7.0
-  - @cristal/rendering@0.7.0
-  - @cristal/sharedworker-impl@0.7.0
-  - @cristal/skin@0.7.0
-  - @cristal/storage@0.7.0
+  - @xwiki/cristal-api@0.7.0
+  - @xwiki/cristal-dsfr@0.7.0
+  - @xwiki/cristal-dsshoelace@0.7.0
+  - @xwiki/cristal-dsvuetify@0.7.0
+  - @xwiki/cristal-editors-prosemirror@0.7.0
+  - @xwiki/cristal-extension-manager@0.7.0
+  - @xwiki/cristal-extension-menubuttons@0.7.0
+  - @xwiki/cristal-macros@0.7.0
+  - @xwiki/cristal-rendering@0.7.0
+  - @xwiki/cristal-sharedworker-impl@0.7.0
+  - @xwiki/cristal-skin@0.7.0
+  - @xwiki/cristal-storage@0.7.0

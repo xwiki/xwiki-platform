@@ -29,7 +29,7 @@ import getMenuActions, {
   BubbleMenuAction,
 } from "../components/extensions/bubble-menu";
 import { computed, ComputedRef } from "vue";
-import { CIcon, Size } from "@cristal/icons";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 
 const props = defineProps<{
   editor: Editor;

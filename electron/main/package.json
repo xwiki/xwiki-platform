@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/electron-main",
+  "name": "@xwiki/cristal-electron-main",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -24,8 +24,8 @@
     "test": "echo 'no test'"
   },
   "dependencies": {
-    "@cristal/browser-electron": "workspace:*",
-    "@cristal/electron-storage": "workspace:*",
+    "@xwiki/cristal-browser-electron": "workspace:*",
+    "@xwiki/cristal-electron-storage": "workspace:*",
     "electron": "29.4.1"
   },
   "devDependencies": {

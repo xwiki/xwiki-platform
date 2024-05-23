@@ -23,7 +23,7 @@
  *
  **/
 
-import { DefaultUIXTemplateProvider } from "@cristal/skin";
+import { DefaultUIXTemplateProvider } from "@xwiki/cristal-skin";
 import Menu from "./c-menu.vue";
 import { injectable } from "inversify";
 import "reflect-metadata";

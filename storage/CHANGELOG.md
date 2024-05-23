@@ -1,4 +1,4 @@
-# @cristal/storage
+# @xwiki/cristal-storage
 
 ## 0.7.0
 
@@ -9,5 +9,5 @@
 ### Patch Changes
 
 - Updated dependencies [aa0a7ca]
-  - @cristal/api@0.7.0
-  - @cristal/sharedworker-api@0.7.0
+  - @xwiki/cristal-api@0.7.0
+  - @xwiki/cristal-sharedworker-api@0.7.0

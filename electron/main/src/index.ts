@@ -28,9 +28,9 @@ import "./security-restrictions";
 import { restoreOrCreateWindow } from "./mainWindow";
 import { platform } from "node:process";
 // @ts-expect-error shouldn't happen but we need to generate the types for the whole project once.
-import load from "@cristal/electron-storage/main";
+import load from "@xwiki/cristal-electron-storage/main";
 // @ts-expect-error shouldn't happen but we need to generate the types for the whole project once.
-import loadBrowser from "@cristal/browser-electron/main";
+import loadBrowser from "@xwiki/cristal-browser-electron/main";
 
 /**
  * Prevent electron from running multiple instances.

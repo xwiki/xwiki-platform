@@ -23,16 +23,16 @@
  *
  **/
 
-import { ComponentInit as SkinComponentInit } from "@cristal/skin";
-import { ComponentInit as VueDSComponentInit } from "@cristal/dsvuetify";
-import { ComponentInit as DSFRComponentInit } from "@cristal/dsfr";
-import { ComponentInit as ShoelaceComponentInit } from "@cristal/dsshoelace";
-import { ComponentInit as StorageComponentInit } from "@cristal/storage";
-import { ComponentInit as MacrosComponentInit } from "@cristal/macros";
-import { ComponentInit as MenuButtonsComponentInit } from "@cristal/extension-menubuttons";
-import { ComponentInit as QueueWorkerComponentInit } from "@cristal/sharedworker-impl";
-import { ComponentInit as RenderingComponentInit } from "@cristal/rendering";
-import { ComponentInit as EditorTiptapComponentInit } from "@cristal/editors-tiptap";
+import { ComponentInit as SkinComponentInit } from "@xwiki/cristal-skin";
+import { ComponentInit as VueDSComponentInit } from "@xwiki/cristal-dsvuetify";
+import { ComponentInit as DSFRComponentInit } from "@xwiki/cristal-dsfr";
+import { ComponentInit as ShoelaceComponentInit } from "@xwiki/cristal-dsshoelace";
+import { ComponentInit as StorageComponentInit } from "@xwiki/cristal-storage";
+import { ComponentInit as MacrosComponentInit } from "@xwiki/cristal-macros";
+import { ComponentInit as MenuButtonsComponentInit } from "@xwiki/cristal-extension-menubuttons";
+import { ComponentInit as QueueWorkerComponentInit } from "@xwiki/cristal-sharedworker-impl";
+import { ComponentInit as RenderingComponentInit } from "@xwiki/cristal-rendering";
+import { ComponentInit as EditorTiptapComponentInit } from "@xwiki/cristal-editors-tiptap";
 import type { Container } from "inversify";
 
 export class StaticBuild {

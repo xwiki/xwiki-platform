@@ -1,4 +1,4 @@
-# @cristal/rendering
+# @xwiki/cristal-rendering
 
 ## 0.7.0
 
@@ -9,5 +9,5 @@
 ### Patch Changes
 
 - Updated dependencies [aa0a7ca]
-  - @cristal/api@0.7.0
-  - @cristal/rendering-wikimodel@0.7.0
+  - @xwiki/cristal-api@0.7.0
+  - @xwiki/cristal-rendering-wikimodel@0.7.0

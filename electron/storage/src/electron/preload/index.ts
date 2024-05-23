@@ -25,7 +25,7 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { APITypes } from "./apiTypes";
-import { PageData } from "@cristal/api";
+import { PageData } from "@xwiki/cristal-api";
 
 const api: APITypes = {
   readPage: (path: string) => {

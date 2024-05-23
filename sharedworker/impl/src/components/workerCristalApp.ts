@@ -30,7 +30,7 @@ import type {
   PageData,
   SkinManager,
   WikiConfig,
-} from "@cristal/api";
+} from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 import { injectable } from "inversify";
 import type { App, Component } from "vue";

@@ -1,4 +1,4 @@
-# @cristal/electron-main
+# @xwiki/cristal-electron-main
 
 ## 0.7.0
 
@@ -9,4 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies [aa0a7ca]
-  - @cristal/electron-storage@0.7.0
+  - @xwiki/cristal-electron-storage@0.7.0

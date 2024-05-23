@@ -24,11 +24,11 @@
  **/
 
 import * as Comlink from "comlink";
-import type { MyWorker, QueueWorker } from "@cristal/sharedworker-api";
-import type { CristalApp, WrappingStorage } from "@cristal/api";
-import { type WikiConfig } from "@cristal/api";
-import { CristalLoader } from "@cristal/extension-manager";
-import { ComponentInit as StorageComponentInit } from "@cristal/storage";
+import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
+import type { CristalApp, WrappingStorage } from "@xwiki/cristal-api";
+import { type WikiConfig } from "@xwiki/cristal-api";
+import { CristalLoader } from "@xwiki/cristal-extension-manager";
+import { ComponentInit as StorageComponentInit } from "@xwiki/cristal-storage";
 import type { Container } from "inversify";
 import { WorkerCristalApp } from "./workerCristalApp";
 import WorkerQueueWorker from "./workerQueueWorker";

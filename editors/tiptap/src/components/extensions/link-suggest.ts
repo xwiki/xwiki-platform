@@ -30,13 +30,13 @@ import { App, createApp } from "vue";
 import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
 import { PluginKey } from "@tiptap/pm/state";
 import { Container } from "inversify";
-import { SkinManager, WikiConfig } from "@cristal/api";
+import { SkinManager, WikiConfig } from "@xwiki/cristal-api";
 import { createPinia } from "pinia";
 import linkSuggestStore, {
   LinkSuggestStore,
 } from "../../stores/link-suggest-store";
 import { queryEqualityOperator } from "./filter-helper";
-import { Link, LinkSuggestService } from "@cristal/link-suggest-api";
+import { Link, LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 
 /**
  * Describe a link suggestion action (i.e., a search result entry).

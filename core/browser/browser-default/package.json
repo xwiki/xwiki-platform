@@ -1,6 +1,6 @@
 {
-  "name": "@cristal/browser-default",
-  "version": "0.0.0",
+  "name": "@xwiki/cristal-browser-default",
+  "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
@@ -21,8 +21,8 @@
     "build": "tsc --project tsconfig.json --noEmit && vite build"
   },
   "dependencies": {
-    "@cristal/api": "workspace:*",
-    "@cristal/browser-api": "workspace:*",
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-browser-api": "workspace:*",
     "inversify": "6.0.2"
   },
   "devDependencies": {

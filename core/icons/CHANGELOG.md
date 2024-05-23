@@ -1,4 +1,4 @@
-# @cristal/icons
+# @xwiki/cristal-icons
 
 ## 0.7.0
 

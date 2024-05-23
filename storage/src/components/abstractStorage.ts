@@ -23,7 +23,7 @@
  *
  **/
 
-import { Logger, PageData, Storage, WikiConfig } from "@cristal/api";
+import { Logger, PageData, Storage, WikiConfig } from "@xwiki/cristal-api";
 import { injectable, unmanaged } from "inversify";
 
 @injectable()

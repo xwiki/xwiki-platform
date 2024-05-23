@@ -23,11 +23,11 @@
  *
  **/
 
-import { DefaultVueTemplateProvider } from "@cristal/skin";
+import { DefaultVueTemplateProvider } from "@xwiki/cristal-skin";
 import type { Component } from "vue";
 import { injectable } from "inversify";
 import TiptapEditor from "../vue/c-edit-tiptap.vue";
-import { CristalApp } from "@cristal/api";
+import { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 export class UixTiptapEditorProvider extends DefaultVueTemplateProvider {

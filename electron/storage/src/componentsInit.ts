@@ -24,7 +24,7 @@
  **/
 
 import type { Container } from "inversify";
-import type { Logger, Storage, WikiConfig } from "@cristal/api";
+import type { Logger, Storage, WikiConfig } from "@xwiki/cristal-api";
 import { FileSystemConfig } from "./components/FileSystemConfig";
 import FileSystemStorage from "./components/fileSystemStorage";
 

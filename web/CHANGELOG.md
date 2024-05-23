@@ -1,4 +1,4 @@
-# @cristal/web
+# @xwiki/cristal-web
 
 ## 0.7.0
 
@@ -9,4 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies [aa0a7ca]
-  - @cristal/lib@0.7.0
+  - @xwiki/cristal-lib@0.7.0

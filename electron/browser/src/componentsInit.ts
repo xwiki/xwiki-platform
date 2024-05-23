@@ -25,7 +25,7 @@
 
 import type { Container } from "inversify";
 import { BrowserApiElectron } from "./components/browser-api-electron";
-import { BrowserApi, name } from "@cristal/browser-api";
+import { BrowserApi, name } from "@xwiki/cristal-browser-api";
 
 export class ComponentInit {
   constructor(container: Container) {

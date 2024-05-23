@@ -38,7 +38,7 @@
   </template>
 </template>
 <script lang="ts">
-import type { CristalApp, Document, Logger, Storage } from "@cristal/api";
+import type { CristalApp, Document, Logger, Storage } from "@xwiki/cristal-api";
 import type { Ref } from "vue";
 import { defineComponent, inject, type PropType, ref } from "vue";
 import { ContentTools } from "./contentTools";

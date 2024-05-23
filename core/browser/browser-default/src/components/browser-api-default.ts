@@ -23,9 +23,9 @@
  *
  **/
 
-import { BrowserApi } from "@cristal/browser-api";
+import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { injectable } from "inversify";
-import { WikiConfig } from "@cristal/api";
+import { WikiConfig } from "@xwiki/cristal-api";
 
 /**
  * Default implementation for the browser. Set the window location, and the

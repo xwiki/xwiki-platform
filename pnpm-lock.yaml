@@ -81,7 +81,7 @@ importers:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.27(typescript@5.4.5))
     devDependencies:
-      '@cristal/dev-config':
+      '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../dev/config
       reflect-metadata:
@@ -102,7 +102,7 @@ importers:
 
   core/browser/browser-api:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
     devDependencies:
@@ -115,10 +115,10 @@ importers:
 
   core/browser/browser-default:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-      '@cristal/browser-api':
+      '@xwiki/cristal-browser-api':
         specifier: workspace:*
         version: link:../browser-api
       inversify:
@@ -141,12 +141,12 @@ importers:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
     devDependencies:
-      '@cristal/dev-config':
-        specifier: workspace:*
-        version: link:../../dev/config
       '@vue/test-utils':
         specifier: 2.4.6
         version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
       eslint:
         specifier: 8.57.0
         version: 8.57.0
@@ -174,10 +174,10 @@ importers:
 
   core/link-suggest/link-suggest-xwiki:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-      '@cristal/link-suggest-api':
+      '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../link-suggest-api
       inversify:
@@ -199,7 +199,7 @@ importers:
 
   ds/api:
     devDependencies:
-      '@cristal/dev-config':
+      '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
       happy-dom:
@@ -214,15 +214,15 @@ importers:
 
   ds/dsfr:
     dependencies:
-      '@cristal/api':
-        specifier: workspace:*
-        version: link:../../api
       '@gouvfr/dsfr':
         specifier: 1.11.2
         version: 1.11.2
       '@gouvminint/vue-dsfr':
         specifier: 5.11.0
         version: 5.11.0(oh-vue-icons@1.0.0-rc3(vue@3.4.27(typescript@5.4.5)))(vue-router@4.3.2(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5))
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -242,12 +242,12 @@ importers:
         specifier: 3.6.7
         version: 3.6.7(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5))
     devDependencies:
-      '@cristal/dev-config':
-        specifier: workspace:*
-        version: link:../../dev/config
       '@vue/test-utils':
         specifier: 2.4.6
         version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
       happy-dom:
         specifier: 14.11.0
         version: 14.11.0
@@ -266,15 +266,15 @@ importers:
 
   ds/shoelace:
     dependencies:
-      '@cristal/api':
-        specifier: workspace:*
-        version: link:../../api
-      '@cristal/dsapi':
-        specifier: workspace:*
-        version: link:../api
       '@shoelace-style/shoelace':
         specifier: 2.15.1
         version: 2.15.1(@types/react@18.2.52)
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../api
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -282,12 +282,12 @@ importers:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
     devDependencies:
-      '@cristal/dev-config':
-        specifier: workspace:*
-        version: link:../../dev/config
       '@vue/test-utils':
         specifier: 2.4.6
         version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
@@ -303,10 +303,10 @@ importers:
 
   ds/vuetify:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@cristal/dsapi':
+      '@xwiki/cristal-dsapi':
         specifier: workspace:*
         version: link:../api
       inversify:
@@ -334,18 +334,6 @@ importers:
 
   editors/tiptap:
     dependencies:
-      '@cristal/api':
-        specifier: workspace:*
-        version: link:../../api
-      '@cristal/icons':
-        specifier: workspace:*
-        version: link:../../core/icons
-      '@cristal/link-suggest-api':
-        specifier: workspace:*
-        version: link:../../core/link-suggest/link-suggest-api
-      '@cristal/skin':
-        specifier: workspace:*
-        version: link:../../skin
       '@tiptap/extension-blockquote':
         specifier: 2.4.0
         version: 2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))
@@ -406,6 +394,18 @@ importers:
       '@tiptap/vue-3':
         specifier: 2.4.0
         version: 2.4.0(@tiptap/core@2.4.0(@tiptap/pm@2.4.0))(@tiptap/pm@2.4.0)(vue@3.4.27(typescript@5.4.5))
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../api
+      '@xwiki/cristal-icons':
+        specifier: workspace:*
+        version: link:../../core/icons
+      '@xwiki/cristal-link-suggest-api':
+        specifier: workspace:*
+        version: link:../../core/link-suggest/link-suggest-api
+      '@xwiki/cristal-skin':
+        specifier: workspace:*
+        version: link:../../skin
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -443,10 +443,10 @@ importers:
 
   electron:
     dependencies:
-      '@cristal/electron-storage':
+      '@xwiki/cristal-electron-storage':
         specifier: workspace:*
         version: link:storage
-      '@cristal/lib':
+      '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../lib
       electron-updater:
@@ -468,10 +468,10 @@ importers:
 
   electron/browser:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@cristal/browser-api':
+      '@xwiki/cristal-browser-api':
         specifier: workspace:*
         version: link:../../core/browser/browser-api
       electron:
@@ -490,10 +490,10 @@ importers:
 
   electron/main:
     dependencies:
-      '@cristal/browser-electron':
+      '@xwiki/cristal-browser-electron':
         specifier: workspace:*
         version: link:../browser
-      '@cristal/electron-storage':
+      '@xwiki/cristal-electron-storage':
         specifier: workspace:*
         version: link:../storage
       electron:
@@ -518,15 +518,15 @@ importers:
 
   electron/preload:
     devDependencies:
-      '@cristal/browser-electron':
-        specifier: workspace:*
-        version: link:../browser
-      '@cristal/electron-storage':
-        specifier: workspace:*
-        version: link:../storage
       '@types/node':
         specifier: 20.12.12
         version: 20.12.12
+      '@xwiki/cristal-browser-electron':
+        specifier: workspace:*
+        version: link:../browser
+      '@xwiki/cristal-electron-storage':
+        specifier: workspace:*
+        version: link:../storage
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
@@ -542,13 +542,13 @@ importers:
 
   electron/renderer:
     dependencies:
-      '@cristal/browser-electron':
+      '@xwiki/cristal-browser-electron':
         specifier: workspace:*
         version: link:../browser
-      '@cristal/electron-storage':
+      '@xwiki/cristal-electron-storage':
         specifier: workspace:*
         version: link:../storage
-      '@cristal/lib':
+      '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../../lib
       inversify:
@@ -573,10 +573,10 @@ importers:
 
   electron/storage:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@cristal/storage':
+      '@xwiki/cristal-storage':
         specifier: workspace:*
         version: link:../../storage
       electron:
@@ -604,7 +604,7 @@ importers:
 
   extension-manager:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
       inversify:
@@ -629,10 +629,10 @@ importers:
 
   extensions/menubuttons:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@cristal/skin':
+      '@xwiki/cristal-skin':
         specifier: workspace:*
         version: link:../../skin
       inversify:
@@ -660,48 +660,48 @@ importers:
 
   lib:
     dependencies:
-      '@cristal/api':
-        specifier: workspace:*
-        version: link:../api
-      '@cristal/browser-api':
-        specifier: workspace:*
-        version: link:../core/browser/browser-api
-      '@cristal/dsfr':
-        specifier: workspace:*
-        version: link:../ds/dsfr
-      '@cristal/dsshoelace':
-        specifier: workspace:*
-        version: link:../ds/shoelace
-      '@cristal/dsvuetify':
-        specifier: workspace:*
-        version: link:../ds/vuetify
-      '@cristal/editors-tiptap':
-        specifier: workspace:*
-        version: link:../editors/tiptap
-      '@cristal/extension-manager':
-        specifier: workspace:*
-        version: link:../extension-manager
-      '@cristal/extension-menubuttons':
-        specifier: workspace:*
-        version: link:../extensions/menubuttons
-      '@cristal/macros':
-        specifier: workspace:*
-        version: link:../macros
-      '@cristal/rendering':
-        specifier: workspace:*
-        version: link:../rendering/rendering
-      '@cristal/sharedworker-impl':
-        specifier: workspace:*
-        version: link:../sharedworker/impl
-      '@cristal/skin':
-        specifier: workspace:*
-        version: link:../skin
-      '@cristal/storage':
-        specifier: workspace:*
-        version: link:../storage
       '@mdi/font':
         specifier: 7.4.47
         version: 7.4.47
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../api
+      '@xwiki/cristal-browser-api':
+        specifier: workspace:*
+        version: link:../core/browser/browser-api
+      '@xwiki/cristal-dsfr':
+        specifier: workspace:*
+        version: link:../ds/dsfr
+      '@xwiki/cristal-dsshoelace':
+        specifier: workspace:*
+        version: link:../ds/shoelace
+      '@xwiki/cristal-dsvuetify':
+        specifier: workspace:*
+        version: link:../ds/vuetify
+      '@xwiki/cristal-editors-tiptap':
+        specifier: workspace:*
+        version: link:../editors/tiptap
+      '@xwiki/cristal-extension-manager':
+        specifier: workspace:*
+        version: link:../extension-manager
+      '@xwiki/cristal-extension-menubuttons':
+        specifier: workspace:*
+        version: link:../extensions/menubuttons
+      '@xwiki/cristal-macros':
+        specifier: workspace:*
+        version: link:../macros
+      '@xwiki/cristal-rendering':
+        specifier: workspace:*
+        version: link:../rendering/rendering
+      '@xwiki/cristal-sharedworker-impl':
+        specifier: workspace:*
+        version: link:../sharedworker/impl
+      '@xwiki/cristal-skin':
+        specifier: workspace:*
+        version: link:../skin
+      '@xwiki/cristal-storage':
+        specifier: workspace:*
+        version: link:../storage
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -736,10 +736,10 @@ importers:
 
   macros:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
-      '@cristal/skin':
+      '@xwiki/cristal-skin':
         specifier: workspace:*
         version: link:../skin
       inversify:
@@ -764,10 +764,10 @@ importers:
 
   rendering/rendering:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@cristal/rendering-wikimodel':
+      '@xwiki/cristal-rendering-wikimodel':
         specifier: workspace:*
         version: link:../wikimodel
       dompurify:
@@ -798,7 +798,7 @@ importers:
 
   rendering/wikimodel:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
       vue:
@@ -845,16 +845,16 @@ importers:
 
   sharedworker/impl:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@cristal/extension-manager':
+      '@xwiki/cristal-extension-manager':
         specifier: workspace:*
         version: link:../../extension-manager
-      '@cristal/sharedworker-api':
+      '@xwiki/cristal-sharedworker-api':
         specifier: workspace:*
         version: link:../api
-      '@cristal/storage':
+      '@xwiki/cristal-storage':
         specifier: workspace:*
         version: link:../../storage
       comlink:
@@ -888,10 +888,10 @@ importers:
 
   skin:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
-      '@cristal/icons':
+      '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../core/icons
       inversify:
@@ -962,10 +962,10 @@ importers:
 
   storage:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
-      '@cristal/sharedworker-api':
+      '@xwiki/cristal-sharedworker-api':
         specifier: workspace:*
         version: link:../sharedworker/api
       dexie:
@@ -996,13 +996,13 @@ importers:
 
   web:
     dependencies:
-      '@cristal/browser-default':
+      '@xwiki/cristal-browser-default':
         specifier: workspace:*
         version: link:../core/browser/browser-default
-      '@cristal/lib':
+      '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../lib
-      '@cristal/link-suggest-xwiki':
+      '@xwiki/cristal-link-suggest-xwiki':
         specifier: workspace:*
         version: link:../core/link-suggest/link-suggest-xwiki
       express:
@@ -1054,10 +1054,10 @@ importers:
 
   xwiki/remoteinlineeditor:
     dependencies:
-      '@cristal/api':
+      '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@cristal/skin':
+      '@xwiki/cristal-skin':
         specifier: workspace:*
         version: link:../../skin
       inversify:

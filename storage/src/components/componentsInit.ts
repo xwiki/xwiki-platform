@@ -29,7 +29,7 @@ import type {
   Storage,
   WikiConfig,
   WrappingStorage,
-} from "@cristal/api";
+} from "@xwiki/cristal-api";
 import { XWikiStorage } from "./xwiki/xwikiStorage";
 import { XWikiWikiConfig } from "./xwiki/XWikiWikiConfig";
 import { GitHubStorage } from "./github/githubStorage";

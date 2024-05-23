@@ -1,4 +1,4 @@
-# @cristal/sources-xwiki-mock-server
+# @xwiki/cristal-sources-xwiki-mock-server
 
 ## 0.7.0
 

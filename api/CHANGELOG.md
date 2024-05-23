@@ -1,4 +1,4 @@
-# @cristal/api
+# @xwiki/cristal-api
 
 ## 0.7.0
 

@@ -23,7 +23,7 @@
  *
  **/
 
-import { CristalApp } from "@cristal/api";
+import { CristalApp } from "@xwiki/cristal-api";
 import { UIXTemplateProvider } from "./uixTemplateProvider";
 
 export interface UIXEditorProvider extends UIXTemplateProvider {

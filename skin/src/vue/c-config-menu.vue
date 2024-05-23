@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import CTemplate from "./c-template.vue";
 import logo from "../images/xwiki-logo-color.svg";
-import { CIcon } from "@cristal/icons";
+import { CIcon } from "@xwiki/cristal-icons";
 </script>
 
 <template>

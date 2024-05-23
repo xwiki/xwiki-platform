@@ -1,5 +1,6 @@
 {
-  "name": "@cristal/sources-xwiki-mock-server",
+  "private": true,
+  "name": "@xwiki/cristal-sources-xwiki-mock-server",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",

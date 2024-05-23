@@ -25,8 +25,12 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import type { Document, PageData } from "@cristal/api";
-import { DefaultPageData, JSONLDDocument, type Logger } from "@cristal/api";
+import type { Document, PageData } from "@xwiki/cristal-api";
+import {
+  DefaultPageData,
+  JSONLDDocument,
+  type Logger,
+} from "@xwiki/cristal-api";
 import { AbstractStorage } from "../abstractStorage";
 
 @injectable()

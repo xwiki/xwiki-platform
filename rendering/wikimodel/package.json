@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/rendering-wikimodel",
+  "name": "@xwiki/cristal-rendering-wikimodel",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -27,7 +27,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@cristal/api": "workspace:*",
+    "@xwiki/cristal-api": "workspace:*",
     "vue": "3.4.27",
     "vue-i18n": "9.13.1"
   },

@@ -25,8 +25,8 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import type { Logger, PageData, WikiConfig } from "@cristal/api";
-import { DefaultPageData } from "@cristal/api";
+import type { Logger, PageData, WikiConfig } from "@xwiki/cristal-api";
+import { DefaultPageData } from "@xwiki/cristal-api";
 import { AbstractStorage } from "../abstractStorage";
 
 @injectable()

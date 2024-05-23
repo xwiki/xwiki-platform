@@ -24,10 +24,10 @@
  **/
 
 import { inject, injectable } from "inversify";
-import type { MyWorker, QueueWorker } from "@cristal/sharedworker-api";
+import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 import * as Comlink from "comlink";
 import Worker from "./worker?sharedworker";
-import { type CristalApp, type Logger } from "@cristal/api";
+import { type CristalApp, type Logger } from "@xwiki/cristal-api";
 
 @injectable()
 export default class DefaultQueueWorker implements QueueWorker {

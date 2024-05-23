@@ -28,7 +28,7 @@
 </template>
 <script lang="ts">
 import { inject, ref } from "vue";
-import type { CristalApp, Logger, PageData } from "@cristal/api";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import { ContentTools } from "./contentTools";
 
 let currentContent = "Panel content";

@@ -42,10 +42,10 @@
   </template>
 </template>
 <script lang="ts">
-import { Logger, CristalApp } from "@cristal/api";
+import { Logger, CristalApp } from "@xwiki/cristal-api";
 import { inject } from "vue";
 import { ref } from "vue";
-import { CTemplate } from "@cristal/skin";
+import { CTemplate } from "@xwiki/cristal-skin";
 
 const pageStatus = ref({
   currentContent: "Initial content",

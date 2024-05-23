@@ -26,13 +26,13 @@
 import type { App } from "vue";
 import * as components from "vuetify/components";
 import { VCol, VContainer, VRow, VTextField } from "vuetify/components";
-import type { DesignSystemLoader } from "@cristal/api";
+import type { DesignSystemLoader } from "@xwiki/cristal-api";
 
 import { createVuetify } from "vuetify";
 import { mdi } from "vuetify/iconsets/mdi";
 import * as directives from "vuetify/directives";
 import { injectable } from "inversify";
-import { registerAsyncComponent } from "@cristal/api";
+import { registerAsyncComponent } from "@xwiki/cristal-api";
 
 @injectable()
 export class VuetifyDesignSystemLoader implements DesignSystemLoader {

@@ -28,7 +28,7 @@ import CSidebarPanel from "./c-sidebar-panel.vue";
 import CHelp from "./c-help.vue";
 import xlogo from "../images/xwiki-logo-color.svg";
 import xavatarImg from "../images/no-one.svg";
-import { CIcon } from "@cristal/icons";
+import { CIcon } from "@xwiki/cristal-icons";
 
 const logo = xlogo;
 const avImg = xavatarImg;

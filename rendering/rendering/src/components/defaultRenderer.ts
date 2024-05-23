@@ -23,8 +23,8 @@
  *
  **/
 
-import type { WikiConfig } from "@cristal/api";
-import { type CristalApp, type Logger } from "@cristal/api";
+import type { WikiConfig } from "@xwiki/cristal-api";
+import { type CristalApp, type Logger } from "@xwiki/cristal-api";
 import { inject, injectable } from "inversify";
 import type { Renderer } from "../api/renderer";
 import type { Converter } from "../api/converter";

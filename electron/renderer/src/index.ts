@@ -23,9 +23,9 @@
  *
  **/
 
-import { CristalAppLoader, loadConfig } from "@cristal/lib";
-import { ComponentInit as ElectronStorageComponentInit } from "@cristal/electron-storage";
-import { ComponentInit as BrowserComponentInit } from "@cristal/browser-electron";
+import { CristalAppLoader, loadConfig } from "@xwiki/cristal-lib";
+import { ComponentInit as ElectronStorageComponentInit } from "@xwiki/cristal-electron-storage";
+import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-electron";
 import { Container } from "inversify";
 
 CristalAppLoader.init(

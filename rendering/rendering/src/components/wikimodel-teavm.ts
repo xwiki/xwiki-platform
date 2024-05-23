@@ -23,7 +23,7 @@
  *
  **/
 
-import { WikiModelTeaVM } from "@cristal/rendering-wikimodel";
+import { WikiModelTeaVM } from "@xwiki/cristal-rendering-wikimodel";
 
 export class WikiModel {
   public constructor() {

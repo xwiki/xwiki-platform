@@ -1,5 +1,5 @@
 {
-  "name": "@cristal/dsshoelace",
+  "name": "@xwiki/cristal-dsshoelace",
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
@@ -26,15 +26,15 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@cristal/api": "workspace:*",
-    "@cristal/dsapi": "workspace:*",
     "@shoelace-style/shoelace": "2.15.1",
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "inversify": "6.0.2",
     "vue": "3.4.27"
   },
   "devDependencies": {
-    "@cristal/dev-config": "workspace:*",
     "@vue/test-utils": "2.4.6",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "rimraf": "5.0.7",
     "vite": "5.2.11",
     "vitest": "1.6.0",

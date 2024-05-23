@@ -24,7 +24,12 @@
  **/
 
 import { inject, injectable, named } from "inversify";
-import { CristalApp, DefaultWikiConfig, Logger, Storage } from "@cristal/api";
+import {
+  CristalApp,
+  DefaultWikiConfig,
+  Logger,
+  Storage,
+} from "@xwiki/cristal-api";
 
 @injectable()
 export class FileSystemConfig extends DefaultWikiConfig {

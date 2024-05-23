@@ -23,7 +23,7 @@
  *
  **/
 
-import { PageData } from "@cristal/api";
+import { PageData } from "@xwiki/cristal-api";
 
 export interface APITypes {
   resolvePath(page: string, syntax: string): Promise<string>;

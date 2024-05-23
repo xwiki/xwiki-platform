@@ -24,7 +24,7 @@
  **/
 
 import { injectable } from "inversify";
-import type { QueueWorker } from "@cristal/sharedworker-api";
+import type { QueueWorker } from "@xwiki/cristal-sharedworker-api";
 
 @injectable()
 export default class WorkerQueueWorker implements QueueWorker {

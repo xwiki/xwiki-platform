@@ -23,9 +23,9 @@
  *
  **/
 
-import type { Logger } from "@cristal/api";
-import type { LoggerConfig } from "@cristal/api";
-import { DefaultLogger, DefaultLoggerConfig } from "@cristal/api";
+import type { Logger } from "@xwiki/cristal-api";
+import type { LoggerConfig } from "@xwiki/cristal-api";
+import { DefaultLogger, DefaultLoggerConfig } from "@xwiki/cristal-api";
 import type { ExtensionManager } from "../api/extensionManager";
 import ComponentInit from "./componentsInit";
 import { Container } from "inversify";

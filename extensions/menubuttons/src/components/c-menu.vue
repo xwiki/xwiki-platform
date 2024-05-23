@@ -31,7 +31,7 @@
   </ul>
 </template>
 <script lang="ts">
-import type { CristalApp } from "@cristal/api";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 import { inject } from "vue";
 

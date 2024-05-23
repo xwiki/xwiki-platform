@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import type { Component } from "vue";
 import { inject, shallowRef } from "vue";
-import type { CristalApp, Logger } from "@cristal/api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 
 let components: Array<Component> = [];
 let logger: Logger | undefined = undefined;

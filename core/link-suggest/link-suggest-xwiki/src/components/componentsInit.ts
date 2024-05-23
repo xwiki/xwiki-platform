@@ -24,8 +24,12 @@
  **/
 
 import { Container, injectable, inject } from "inversify";
-import { Link, LinkSuggestService, name } from "@cristal/link-suggest-api";
-import { CristalApp } from "@cristal/api";
+import {
+  Link,
+  LinkSuggestService,
+  name,
+} from "@xwiki/cristal-link-suggest-api";
+import { CristalApp } from "@xwiki/cristal-api";
 
 /**
  * Default implementation of the link suggestion service, for XWiki.

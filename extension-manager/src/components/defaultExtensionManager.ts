@@ -30,7 +30,7 @@ import { DefaultExtensionConfig } from "./defaultExtensionConfig";
 import type { Container } from "inversify";
 import { injectable, inject } from "inversify";
 import "reflect-metadata";
-import type { Logger } from "@cristal/api";
+import type { Logger } from "@xwiki/cristal-api";
 
 @injectable()
 export class DefaultExtensionManager

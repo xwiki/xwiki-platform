@@ -28,7 +28,7 @@ import { computed, ComputedRef, onMounted, onUnmounted, ref } from "vue";
 
 import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
 import { ActionDescriptor } from "../components/extensions/slash";
-import { CIcon, Size } from "@cristal/icons";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 
 import slashStore from "../stores/slash-store";
 import { storeToRefs } from "pinia";

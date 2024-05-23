@@ -35,7 +35,7 @@ import Blog from "../vue/c-blog.vue";
 import Movie from "../vue/c-movie.vue";
 
 import type { App, Component } from "vue";
-import type { DesignSystemLoader, SkinManager } from "@cristal/api";
+import type { DesignSystemLoader, SkinManager } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
 import { injectable } from "inversify";
 import "reflect-metadata";

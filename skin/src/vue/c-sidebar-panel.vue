@@ -24,7 +24,7 @@
  **/
 -->
 <script setup lang="ts">
-import { CIcon, Size } from "@cristal/icons";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 
 defineProps<{
   name: string;

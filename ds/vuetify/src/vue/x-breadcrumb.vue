@@ -24,7 +24,7 @@
  **/
 -->
 <script setup lang="ts">
-import { BreadcrumbProps } from "@cristal/dsapi";
+import { BreadcrumbProps } from "@xwiki/cristal-dsapi";
 
 defineProps<BreadcrumbProps>();
 </script>

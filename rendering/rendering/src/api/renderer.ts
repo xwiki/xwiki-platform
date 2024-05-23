@@ -23,7 +23,7 @@
  *
  **/
 
-import type { WikiConfig } from "@cristal/api";
+import type { WikiConfig } from "@xwiki/cristal-api";
 
 export interface Renderer {
   preloadConverters(): Promise<void>;

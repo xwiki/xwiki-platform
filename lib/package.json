@@ -49,6 +49,7 @@
     "@mdi/font": "7.4.47",
     "inversify": "6.0.2",
     "reflect-metadata": "0.2.2",
+    "utility-types": "3.11.0",
     "vue": "3.4.27",
     "vue-i18n": "9.13.1",
     "vue-router": "4.3.2",

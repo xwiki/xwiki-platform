@@ -23,7 +23,7 @@
  *
  **/
 
-import { CristalAppLoader } from "@cristal/lib";
+import { CristalAppLoader, loadConfig } from "@cristal/lib";
 import { ComponentInit as BrowserComponentInit } from "@cristal/browser-default";
 import { ComponentInit as LinkSuggestComponentInit } from "@cristal/link-suggest-xwiki";
 
@@ -38,7 +38,7 @@ CristalAppLoader.init(
     "extension-menubuttons",
     "sharedworker",
   ],
-  "/config.json",
+  loadConfig("/config.json"),
   true,
   false,
   "XWiki",

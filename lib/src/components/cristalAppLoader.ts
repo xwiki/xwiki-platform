@@ -27,6 +27,19 @@ import { CristalLoader } from "@cristal/extension-manager";
 import { DefaultCristalApp } from "./DefaultCristalApp";
 import { type CristalApp } from "@cristal/api";
 import { Container } from "inversify";
+import { Primitive } from "utility-types";
+
+/**
+ *
+ * @param input
+ * @since 0.8
+ */
+export function loadConfig(input: string) {
+  return async () => {
+    const response = await fetch(input);
+    return await response.json();
+  };
+}
 
 export class CristalAppLoader extends CristalLoader {
   public cristal: DefaultCristalApp;
@@ -40,6 +53,7 @@ export class CristalAppLoader extends CristalLoader {
     isElectron: boolean,
     configName: string,
   ) {
+    const defaultConfig = configName;
     const configMap = new Map<string, T>(Object.entries(config));
     this.cristal.setAvailableConfigurations(configMap);
 
@@ -57,9 +71,10 @@ export class CristalAppLoader extends CristalLoader {
       configName = this.getConfigFromPathName(window.location.pathname);
     }
 
-    const wikiConfig = this.cristal
-      .getAvailableConfigurations()
-      .get(configName);
+    let wikiConfig = this.cristal.getAvailableConfigurations().get(configName);
+    if (wikiConfig == null) {
+      wikiConfig = this.cristal.getAvailableConfigurations().get(defaultConfig);
+    }
     if (wikiConfig == null) {
       if (!isElectron) {
         window.location.href = "/XWiki/#";
@@ -89,7 +104,7 @@ export class CristalAppLoader extends CristalLoader {
 
   public async launchApp(
     forceStaticMode: boolean,
-    configPath: string,
+    loadConfig: () => Promise<Record<string, Primitive>>,
     isElectron: boolean,
     configName: string,
     additionalComponents?: (container: Container) => void,
@@ -116,14 +131,13 @@ export class CristalAppLoader extends CristalLoader {
     this.cristal.isElectron = isElectron;
     this.cristal.setContainer(this.container);
 
-    const response = await fetch(configPath);
-    const config = await response.json();
+    const config = await loadConfig();
     this.loadApp(config, isElectron, configName);
   }
 
   public static init(
     extensionList: Array<string>,
-    configPage: string,
+    loadConfig: () => Promise<Record<string, Primitive>>,
     staticBuild: boolean,
     isElectron: boolean,
     configName: string,
@@ -133,7 +147,7 @@ export class CristalAppLoader extends CristalLoader {
     cristalLoader.initializeContainer();
     cristalLoader.launchApp(
       staticBuild,
-      configPage,
+      loadConfig,
       isElectron,
       configName,
       additionalComponents,

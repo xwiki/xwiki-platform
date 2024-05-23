@@ -663,9 +663,6 @@ importers:
       '@cristal/api':
         specifier: workspace:*
         version: link:../api
-      '@cristal/browser-api':
-        specifier: workspace:*
-        version: link:../core/browser/browser-api
       '@cristal/dsfr':
         specifier: workspace:*
         version: link:../ds/dsfr
@@ -708,6 +705,9 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
+      utility-types:
+        specifier: 3.11.0
+        version: 3.11.0
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
@@ -7465,6 +7465,10 @@ snapshots:
     dependencies:
       ms: 2.0.0
 
+  debug@4.3.4:
+    dependencies:
+      ms: 2.1.2
+
   debug@4.3.4(supports-color@5.5.0):
     dependencies:
       ms: 2.1.2
@@ -10183,7 +10187,7 @@ snapshots:
   vite-plugin-vuetify@2.0.3(vite@5.2.11(@types/node@20.12.12))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.7):
     dependencies:
       '@vuetify/loader-shared': 2.0.3(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.7(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5)))
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
       upath: 2.0.1
       vite: 5.2.11(@types/node@20.12.12)
       vue: 3.4.27(typescript@5.4.5)

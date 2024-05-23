@@ -24,6 +24,6 @@
  **/
 
 import { DefaultCristalApp } from "./components/DefaultCristalApp";
-import { CristalAppLoader } from "./components/cristalAppLoader";
+import { CristalAppLoader, loadConfig } from "./components/cristalAppLoader";
 
-export { DefaultCristalApp as DefaultCristalApp, CristalAppLoader };
+export { DefaultCristalApp, CristalAppLoader, loadConfig as loadConfig };

@@ -23,7 +23,7 @@
  *
  **/
 
-import { CristalAppLoader } from "@cristal/lib";
+import { CristalAppLoader, loadConfig } from "@cristal/lib";
 import { ComponentInit as ElectronStorageComponentInit } from "@cristal/electron-storage";
 import { ComponentInit as BrowserComponentInit } from "@cristal/browser-electron";
 import { Container } from "inversify";
@@ -39,7 +39,7 @@ CristalAppLoader.init(
     "extension-menubuttons",
     "sharedworker",
   ],
-  "./config.json",
+  loadConfig("./config.json"),
   true,
   true,
   "FileSystemSL",

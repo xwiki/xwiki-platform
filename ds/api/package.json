@@ -28,8 +28,6 @@
     "build": "tsc --project tsconfig.json --noEmit && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
-  "dependencies": {
-  },
   "devDependencies": {
     "@cristal/dev-config": "workspace:*",
     "happy-dom": "14.11.0",

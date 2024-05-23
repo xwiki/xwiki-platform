@@ -32,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
@@ -52,7 +53,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"})
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+    // The script needs PR right.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
+        + ".*:((Nested)?VersionIT\\.getRevisionsWithCriteria\\.Script)"
+})
 class VersionIT
 {
     private static final String TITLE = "Page Title";
@@ -644,5 +649,60 @@ class VersionIT
             historyPane = historyPane.showMinorEdits();
             historyPane.rollbackToVersion(latestVersionBeforeChanges);
         }
+    }
+
+    @Test
+    @Order(10)
+    void getRevisionsWithCriteria(TestUtils testUtils, TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.rest().delete(testReference);
+        testUtils.rest().savePage(testReference, "Some content", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1 2", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1 2 3", "Title");
+        testUtils.rest().savePage(testReference, "Some content 1 2 3 4", "Title");
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals("5.1", historyPane.getCurrentVersion());
+        assertEquals(5, historyPane.getNumberOfVersions());
+
+        String currentTestReference = testUtils.serializeReference(testReference);
+        String targetTestReference = "xwiki:Test.getRevisionsWithCriteriaFoo.WebHome";
+        String script = String.format("""
+        {{velocity}}
+        #set ($myTest = "%s")
+        #set ($startAt = 0)
+        #set ($endAt = -1)
+        #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
+        #set ($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
+        #set ($discard = $criteria.setRange($range))
+        #set ($myDoc = $xwiki.getDocument($myTest))
+        #set ($xwikiDoc = $myDoc.document)
+        #set ($discard = $myDoc.document.loadArchive($xcontext.context))
+        XWiki Doc: $xwikiDoc
+        #set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))
+        Revision: $revisions
+        #set ($newRef = $services.model.resolveDocument("%s"))
+        #set ($discard = $xwikiDoc.setDocumentReference($newRef))
+        XWiki Doc: $xwikiDoc
+        #set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))
+        Revision: $revisions
+        {{/velocity}}
+        """, currentTestReference, targetTestReference);
+
+        DocumentReference scriptReference = new DocumentReference("Script", testReference.getLastSpaceReference());
+        ViewPage page = testUtils.createPage(scriptReference, script);
+        String expectedResult = String.format("""
+        XWiki Doc: %s
+        Revision: [5.1]
+        XWiki Doc: %s
+        Revision: [5.1]""", currentTestReference.substring("xwiki:".length()), targetTestReference.substring("xwiki:".length()));
+        assertEquals(expectedResult, page.getContent());
+        logCaptureConfiguration.registerExpectedRegexes("^.*\\QDeprecated usage of method "
+            + "[com.xpn.xwiki.doc.XWikiDocument.setDocumentReference] in "
+            + "xwiki:\\E(Nested)?\\QVersionIT.getRevisionsWithCriteria.Script\\E.*$");
     }
 }

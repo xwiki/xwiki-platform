@@ -19,10 +19,14 @@
  */
 package com.xpn.xwiki.store;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -147,11 +151,69 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiContext inputxcontext) throws XWikiException
     {
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
-        // We only retrieve a cached archive if we want a complete one.
-        if (archiveDoc != null && criteria.isAllInclusive()) {
-            return archiveDoc;
+        if (archiveDoc == null) {
+            archiveDoc = getXWikiDocumentArchiveFromDatabase(doc, criteria, inputxcontext);
+        } else if (!criteria.isAllInclusive()) {
+            archiveDoc = filterArchiveFromCriteria(doc, archiveDoc, criteria);
+        }
+        return archiveDoc;
+    }
+
+    private XWikiDocumentArchive filterArchiveFromCriteria(XWikiDocument doc, XWikiDocumentArchive archiveDoc,
+        RevisionCriteria criteria)
+    {
+        XWikiDocumentArchive result =
+            new XWikiDocumentArchive(doc.getDocumentReference().getWikiReference(), doc.getId());
+        Collection<XWikiRCSNodeInfo> nodes = archiveDoc.getNodes();
+        XWikiRCSNodeInfo nodeinfo = null;
+        List<XWikiRCSNodeInfo> results = new ArrayList<>();
+
+        for (XWikiRCSNodeInfo nextNodeinfo : nodes) {
+            if (nodeinfo != null && (criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit())) {
+                if (isAuthorMatching(criteria, nodeinfo) && isDateMatching(criteria, nodeinfo)) {
+                    results.add(nodeinfo);
+                }
+            }
+            nodeinfo = nextNodeinfo;
+        }
+        if (nodeinfo != null && isAuthorMatching(criteria, nodeinfo) && isDateMatching(criteria, nodeinfo)) {
+            results.add(nodeinfo);
         }
 
+        List<String> versionList = criteria.getRange().subList(
+            results
+                .stream()
+                .map(XWikiRCSNodeInfo::getVersion)
+                .map(Version::toString)
+                .collect(
+                    Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        l -> {
+                            Collections.reverse(l); return l;
+                        }
+                    )
+                )
+        );
+        result.setNodes(results.stream()
+            .filter(node -> versionList.contains(node.getVersion().toString())).toList());
+        return result;
+    }
+
+    private static boolean isAuthorMatching(RevisionCriteria criteria, XWikiRCSNodeInfo nodeinfo)
+    {
+        return criteria.getAuthor().isEmpty() || criteria.getAuthor().equals(nodeinfo.getAuthor());
+    }
+
+    private static boolean isDateMatching(RevisionCriteria criteria, XWikiRCSNodeInfo nodeinfo)
+    {
+        Date versionDate = nodeinfo.getDate();
+        return (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate()));
+    }
+
+    private XWikiDocumentArchive getXWikiDocumentArchiveFromDatabase(XWikiDocument doc, RevisionCriteria criteria,
+        XWikiContext inputxcontext) throws XWikiException
+    {
+        XWikiDocumentArchive archiveDoc = null;
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         String db = context.getWikiId();

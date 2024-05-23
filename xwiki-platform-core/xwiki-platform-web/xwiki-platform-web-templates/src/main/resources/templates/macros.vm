@@ -1230,6 +1230,9 @@ $html
 ## Only do this if the variable name is really a valid variable name
 #if ($variableName.matches('[a-zA-Z_][a-zA-Z0-9_-]*'))
 #evaluate("${escapetool.h}set(${escapetool.d}${variableName}=${escapetool.d}value)")
+#elseif ($variableName.matches('\$macro\.[a-zA-Z_][a-zA-Z0-9_-]*'))
+#set($macro.varName = $variableName.substring(7))
+#evaluate("${escapetool.h}set(${escapetool.d}macro.parent.parent.$macro.varName=${escapetool.d}value)")
 #elseif ($variableName.matches('\$[a-zA-Z_][a-zA-Z0-9_-]*'))
 #evaluate("${escapetool.h}set(${variableName}=${escapetool.d}value)")
 #end

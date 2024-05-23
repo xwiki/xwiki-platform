@@ -96,6 +96,9 @@ public final class StoreFileUtils
                     // Stop at the link file if we don't follow it
                     file = linkFile;
                 }
+            } else {
+                // Stop the loop since no file or link could be found
+                break;
             }
         }
 
@@ -109,8 +112,7 @@ public final class StoreFileUtils
      */
     public static File getLinkFile(File originalfile)
     {
-        return new File(originalfile.getParent(),
-            StoreFileUtils.getStoredFilename(originalfile.getName() + ".lnk", null));
+        return new File(originalfile.getParent(), originalfile.getName() + ".lnk");
     }
 
     /**

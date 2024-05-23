@@ -479,7 +479,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
                     size,
                     remaining,
                     total,
-                    Math.round((double) (total - remaining) / (double) total) * 100L);
+                    Math.round(((double) (total - remaining) / (double) total) * 100L));
 
                 migrateData(response.getResults(), sourceCore, targetCore);
             }

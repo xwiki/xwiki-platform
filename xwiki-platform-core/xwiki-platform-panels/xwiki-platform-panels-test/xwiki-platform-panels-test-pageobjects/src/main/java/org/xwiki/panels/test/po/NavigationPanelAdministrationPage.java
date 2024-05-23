@@ -101,7 +101,7 @@ public class NavigationPanelAdministrationPage extends ViewPage
         WebElement source = null;
         for (String page : pages) {
             source = getDriver().findElementWithoutWaiting(this.treeElement,
-                By.xpath(".//*[@class = 'jstree-anchor' and . = '" + page + "']"));
+                By.xpath(".//*[contains(@class, 'jstree-anchor') and . = '" + page + "']"));
             // If there is more than one page to include we need to select all of them first.
             if (pages.length > 1) {
                 getDriver().createActions().keyDown(Keys.SHIFT).click(source).keyUp(Keys.SHIFT).build().perform();

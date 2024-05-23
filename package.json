@@ -1,8 +1,17 @@
 {
   "private": true,
+  "name": "@cristal/root",
   "version": "0.2.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
   "scripts": {
     "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",

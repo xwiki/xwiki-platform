@@ -4,7 +4,15 @@
   "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
-  "homepage": "https://cristal.xwiki.org",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "electron",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
   "main": "./main/dist/index.cjs",
   "scripts": {
     "clean": "rimraf dist",

@@ -2,6 +2,16 @@
   "name": "@cristal/browser-api",
   "version": "0.0.0",
   "license": "AGPL-3.0",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "/core/browser/browser-api",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "require-author": "error",
+    "require-license": "error",
+    "require-name": "error",
+    "require-repository": "error",
+    "require-version": "error",
+    "require-bugs": "error",
+    "require-homepage": "error",
+    "valid-values-author": ["error", [
+      "XWiki Org Community <contact@xwiki.org>"
+    ]]
+  }
+}

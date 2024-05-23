@@ -52,14 +52,14 @@ public interface WatchedEntityReference
 
         /**
          * The entity is watched for all events and all formats through a filter placed on an ancestor.
-         * @since 16.4.0RC1
+         * @since 16.5.0RC1
          */
         @Unstable
         WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS(true, false),
 
         /**
          * The entity and its children are watched for all events and all formats.
-         * @since 16.4.0RC1
+         * @since 16.5.0RC1
          */
         @Unstable
         WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS(true, false),
@@ -78,21 +78,21 @@ public interface WatchedEntityReference
 
         /**
          * The entity is ignored for all events and all formats through a filter placed on an ancestor.
-         * @since 16.4.0RC1
+         * @since 16.5.0RC1
          */
         @Unstable
         BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS(false, true),
 
         /**
          * The entity and its children are ignored for all events and all formats.
-         * @since 16.4.0RC1
+         * @since 16.5.0RC1
          */
         @Unstable
         BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS(false, true),
 
         /**
          * There is a filter for the exact location of the entity but it concerns a subset of event types or formats.
-         * @since 16.4.0RC1
+         * @since 16.5.0RC1
          */
         @Unstable
         CUSTOM(false, false);
@@ -135,10 +135,13 @@ public interface WatchedEntityReference
      * @param userReference the user for whom to check if the entity is watched or not
      * @return the specific watched status of the entity by the given user
      * @throws NotificationException in case of errors
-     * @since 16.4.0RC1
+     * @since 16.5.0RC1
      */
     @Unstable
-    WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException;
+    default WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException
+    {
+        return WatchedStatus.CUSTOM;
+    }
 
     /**
      * Try to retrieve the first ancestor of the location which have a status whose status is watched or blocked.
@@ -151,19 +154,23 @@ public interface WatchedEntityReference
      * @see WatchedStatus#isWatched()
      * @see WatchedStatus#isBlocked()
      * @throws NotificationException in case of problem for computing the status
-     * @since 16.4.0RC1
+     * @since 16.5.0RC1
      */
     @Unstable
-    Optional<Pair<EntityReference, WatchedStatus>> getFirstFilteredAncestor(UserReference userReference)
-        throws NotificationException;
+    default Optional<Pair<EntityReference, WatchedStatus>> getFirstFilteredAncestor(UserReference userReference)
+        throws NotificationException
+    {
+        return Optional.empty();
+    }
 
     /**
      * @param userReference a user
      * @return {@code true} if the given user watch the current entity reference for any event type or format.
      * @throws NotificationException if an error happens
      * @since 9.9RC1
+     * @deprecated use {@link #getWatchedStatus(UserReference)}.
      */
-    @Deprecated
+    @Deprecated(since = "16.5.0RC1")
     boolean isWatched(DocumentReference userReference) throws NotificationException;
 
     /**
@@ -171,8 +178,9 @@ public interface WatchedEntityReference
      * @return {@code true} if the given user watch the current entity reference for all events.
      * @throws NotificationException if an error happens
      * @since 12.8RC1
+     * @deprecated use {@link #getWatchedStatus(UserReference)}.
      */
-    @Deprecated
+    @Deprecated(since = "16.5.0RC1")
     default boolean isWatchedWithAllEventTypes(DocumentReference userReference) throws NotificationException
     {
         return isWatched(userReference);

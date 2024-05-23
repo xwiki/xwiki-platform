@@ -43,8 +43,9 @@ public interface WatchedEntitiesManager
      * @param entity the entity to watch
      * @param user user that will watch the entity
      * @throws NotificationException if an error happens
+     * @deprecated use {@link #watch(WatchedEntityReference, UserReference)}.
      */
-    @Deprecated
+    @Deprecated(since = "16.5.0RC1")
     void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 
     /**
@@ -53,10 +54,13 @@ public interface WatchedEntitiesManager
      * @param user the user for whom to create the filter
      * @return {@code true} if a new filter has been created
      * @throws NotificationException in case of problem to save the changes
-     * @since 16.4.0RC1
+     * @since 16.5.0RC1
      */
     @Unstable
-    boolean watch(WatchedEntityReference entity, UserReference user) throws NotificationException;
+    default boolean watch(WatchedEntityReference entity, UserReference user) throws NotificationException
+    {
+        return false;
+    }
 
     /**
      * Remove filter related to watching the specified location be it inclusive or exclusive.
@@ -64,10 +68,13 @@ public interface WatchedEntitiesManager
      * @param user the user for whom to remove the filter
      * @return {@code true} if a filter has been removed
      * @throws NotificationException in case of problem to save the changes
-     * @since 16.4.0RC1
+     * @since 16.5.0RC1
      */
     @Unstable
-    boolean removeWatchFilter(WatchedEntityReference entity, UserReference user) throws NotificationException;
+    default boolean removeWatchFilter(WatchedEntityReference entity, UserReference user) throws NotificationException
+    {
+        return false;
+    }
 
     /**
      * Add an exclusive filter to ignore the specified location if it's not ignored yet.
@@ -75,10 +82,13 @@ public interface WatchedEntitiesManager
      * @param user the user for whom to create the filter
      * @return {@code true} if a new filter has been created
      * @throws NotificationException in case of problem to save the changes
-     * @since 16.4.0RC1
+     * @since 16.5.0RC1
      */
     @Unstable
-    boolean block(WatchedEntityReference entity, UserReference user) throws NotificationException;
+    default boolean block(WatchedEntityReference entity, UserReference user) throws NotificationException
+    {
+        return false;
+    }
 
     /**
      * Remove a filter to stop watching the specified entity.
@@ -86,8 +96,9 @@ public interface WatchedEntitiesManager
      * @param entity the entity to watch
      * @param user user that will watch the entity
      * @throws NotificationException if an error happens
+     * @deprecated use {@link #block(WatchedEntityReference, UserReference)}.
      */
-    @Deprecated
+    @Deprecated(since = "16.5.0RC1")
     void unwatchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException;
 
     /**

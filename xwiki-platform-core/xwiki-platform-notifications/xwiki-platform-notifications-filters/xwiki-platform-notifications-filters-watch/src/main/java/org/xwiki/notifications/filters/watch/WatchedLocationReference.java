@@ -117,7 +117,15 @@ public class WatchedLocationReference implements WatchedEntityReference
         return getWatchedStatus(userDocReference);
     }
 
-    private WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
+    /**
+     * Retrieve the specific watched status of an entity for the given user.
+     *
+     * @param userReference the user for whom to check if the entity is watched or not
+     * @return the specific watched status of the entity by the given user
+     * @throws NotificationException in case of errors
+     * @since 15.5RC1
+     */
+    public WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
     {
         Collection<NotificationFilterPreference> filterPreferences =
             notificationFilterPreferenceManager.getFilterPreferences(userReference);

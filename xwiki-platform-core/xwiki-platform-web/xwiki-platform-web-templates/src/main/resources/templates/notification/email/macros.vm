@@ -18,6 +18,10 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #template('notification/macros.vm')
+
+#set($breadcrumbBackground = '#f5f5f5')
+#set($breadcrumbColor = '#707070')
+#set($mutedColor = '#656565')
 #**
  * Display a styled link
  * @param $url URL of the link
@@ -95,7 +99,7 @@
 
 #macro(displayNotificationPage $event)
   <div>
-    <div style="background-color: #f5f5f5; color: #707070; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
+    <div style="background-color: $breadcrumbBackground; color: $breadcrumbColor; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
       #template('hierarchy_macros.vm')
       #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
     </div>
@@ -205,10 +209,10 @@
         ##set($result = $result.replaceAll('<dt', '<dt style="font-size: 1.2em; fontw-weight: bold;"'))
         #set($result = $result.replaceAll('<ins>', '<ins style="background-color: #99ff99; text-decoration: none;">'))
         #set($result = $result.replaceAll('<del>', '<del style="background-color: #ff9999; text-decoration: none;">'))
-        #set($result = $result.replaceAll('class="diff-header"', 'style="border: 1px solid #E8E8E8; border-left: 5px solid #E8E8E8; color: #656565; padding: .5em .2em;"'))
-        #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid #E8E8E8; font-family: Monospace; overflow: auto;"'))
-        #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid #E8E8E8; color: rgb(101, 101, 101); font-family: Monospace; text-align: right; vertical-align: top;"'))
-        #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: rgb(101, 101, 101); font-family: Monospace; padding: .4em .5em;"'))
+        #set($result = $result.replaceAll('class="diff-header"', 'style="border: 1px solid $mutedColor; border-left: 5px solid $mutedColor; color: $mutedColor; padding: .5em .2em;"'))
+        #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid $mutedColor; font-family: Monospace; overflow: auto;"'))
+        #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid $mutedColor; color: $mutedColor; font-family: Monospace; text-align: right; vertical-align: top;"'))
+        #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: $mutedColor; font-family: Monospace; padding: .4em .5em;"'))
         #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
         $result
       #end

@@ -1,30 +1,30 @@
 {
-  "name": "@cristal/electron",
   "private": true,
+  "name": "@cristal/electron",
+  "version": "0.7.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org",
-  "version": "0.7.0",
   "main": "./main/dist/index.cjs",
   "scripts": {
     "clean": "rimraf dist",
     "electron": "cross-env MODE=production electron-builder build --config .electron-builder.config.js --dir --config.asar=false",
-    "package": "pnpm prepackage && mkdir -p dist/@cristal && pnpm linux",
-    "prepackage": "cross-env MODE=production electron-builder -mwl --config .electron-builder.config.js --dir --config.asar=false",
     "linux": "electron-builder --linux deb tar.gz --config .electron-builder.config.js --dir --config.asar=true",
-    "win": "electron-builder --win nsis --config .electron-builder.config.js --dir --config.asar=false",
     "mac": "electron-builder --mac dmg --config .electron-builder.config.js --dir --config.asar=false",
-    "start": "electron ."
+    "prepackage": "cross-env MODE=production electron-builder -mwl --config .electron-builder.config.js --dir --config.asar=false",
+    "package": "pnpm prepackage && mkdir -p dist/@cristal && pnpm linux",
+    "start": "electron .",
+    "win": "electron-builder --win nsis --config .electron-builder.config.js --dir --config.asar=false"
+  },
+  "dependencies": {
+    "@cristal/electron-storage": "workspace:*",
+    "@cristal/lib": "workspace:*",
+    "electron-updater": "6.1.8"
   },
   "devDependencies": {
     "cross-env": "7.0.3",
     "electron": "29.4.1",
     "electron-builder": "24.13.3",
     "rimraf": "5.0.7"
-  },
-  "dependencies": {
-    "@cristal/electron-storage": "workspace:*",
-    "@cristal/lib": "workspace:*",
-    "electron-updater": "6.1.8"
   }
 }

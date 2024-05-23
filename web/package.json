@@ -1,7 +1,6 @@
 {
   "name": "@cristal/web",
   "version": "0.7.0",
-  "types": "dist/index.d.ts",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -12,19 +11,20 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "prepack": "pnpm build",
     "build": "pnpm compile",
+    "clean": "rimraf dist",
     "compile": "vue-tsc --project tsconfig.json --noEmit && vite build",
-    "test": "echo 'no test'",
-    "test:e2e": "playwright test",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "dev": "vite dev",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "prepack": "pnpm build",
     "prepare": "mkdir -p ./dist/apps && ln -fs ../../../extension-manager/dist/ dist/apps/extension-manager && ln -fs ../../../extension-menubuttons/dist/ dist/apps/extension-menubuttons && ln -fs ../../../skin/dist/ dist/apps/skin && ln -fs ../../../dsvuetify/dist/ dist/apps/dsvuetify && ln -fs ../../../storage/dist/ dist/apps/storage && ln -fs ../../../wikimodel/dist dist/apps/wikimodel && ln -fs ../../../dsfr/dist dist/apps/dsfr && ln -fs ../../../dsshoelace/dist dist/apps/dsshoelace",
+    "quickstart": "pnpm run build --scope @cristal/app && pnpm prepare && NODE_ENV=production node src/server.js",
     "start": "pnpm run build && pnpm prepare && NODE_ENV=production node src/server.js",
     "start:e2e:xwiki": "pnpm run -C ../sources/xwiki/mock-server dev",
-    "quickstart": "pnpm run build --scope @cristal/app && pnpm prepare && NODE_ENV=production node src/server.js"
+    "test": "echo 'no test'",
+    "test:e2e": "playwright test"
   },
+  "types": "dist/index.d.ts",
   "dependencies": {
     "@cristal/browser-default": "workspace:*",
     "@cristal/lib": "workspace:*",

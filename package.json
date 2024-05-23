@@ -1,21 +1,17 @@
 {
-  "version": "0.2.0",
   "private": true,
+  "version": "0.2.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
-  "engines": {
-    "node": "20.13.1"
-  },
-  "packageManager": "pnpm@9.1.2",
   "scripts": {
+    "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",
     "dev": "nx build @cristal/web && nx dev @cristal/web",
-    "build": "nx run-many -t build --nxBail=true",
-    "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
-    "start": "nx run @cristal/web:start",
     "quickstart": "nx run @cristal/web:quickstart",
-    "start:electron": "nx build @cristal/electron-main && nx build @cristal/electron-renderer && nx build @cristal/electron-storage && nx run @cristal/electron:start"
+    "start": "nx run @cristal/web:start",
+    "start:electron": "nx build @cristal/electron-main && nx build @cristal/electron-renderer && nx build @cristal/electron-storage && nx run @cristal/electron:start",
+    "test": "nx run-many -t test"
   },
   "devDependencies": {
     "@changesets/cli": "2.27.3",
@@ -37,5 +33,9 @@
     "vite-plugin-dts": "3.9.1",
     "vite-plugin-inspect": "0.8.4",
     "vite-plugin-vuetify": "2.0.3"
-  }
+  },
+  "engines": {
+    "node": "20.13.1"
+  },
+  "packageManager": "pnpm@9.1.2"
 }

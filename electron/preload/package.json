@@ -8,19 +8,19 @@
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "prepack": "pnpm build",
     "build": "pnpm compile",
+    "clean": "rimraf dist",
     "compile": "tsc --project tsconfig.json --noEmit && vite build",
-    "test": "echo 'no test'",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "electron": "echo 'no task'",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "linux": "echo 'no task'",
+    "prepack": "pnpm build",
     "package": "echo 'no task'",
-    "linux": "echo 'no task'"
+    "test": "echo 'no test'"
   },
   "devDependencies": {
-    "@cristal/electron-storage": "workspace:*",
     "@cristal/browser-electron": "workspace:*",
+    "@cristal/electron-storage": "workspace:*",
     "@types/node": "20.12.12",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",

@@ -1,7 +1,7 @@
 {
+  "private": true,
   "name": "@cristal/dev-config",
   "version": "0.7.0",
-  "private": true,
   "type": "module",
   "devDependencies": {
     "vitest": "1.6.0"

@@ -1,7 +1,6 @@
 {
   "name": "@cristal/sources-xwiki-mock-server",
   "version": "0.7.0",
-  "types": "dist/index.d.ts",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -14,6 +13,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts"
   },
+  "types": "dist/index.d.ts",
   "dependencies": {
     "dotenv": "16.4.5",
     "express": "4.19.2"

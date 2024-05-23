@@ -1,38 +1,24 @@
 {
   "name": "@cristal/icons",
   "version": "0.7.0",
-  "type": "module",
+  "description": "Provide UI components to display icons.",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
     "directory": "skin",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
-  "main": "./src/index.ts",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
-  "publishConfig": {
-    "main": "./dist/index.es.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "import": "./dist/index.es.js",
-        "require": "./dist/index.umd.js",
-        "types": "./dist/index.d.ts"
-      }
-    }
-  },
-  "description": "Provide UI components to display icons.",
+  "main": "./src/index.ts",
   "scripts": {
-    "clean": "rimraf dist",
     "build": "vue-tsc --project tsconfig.json --noEmit && vite build",
-    "test": "vitest --run",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
   },
-  "keywords": [
-    "icons"
-  ],
   "dependencies": {
     "bootstrap-icons": "1.11.3",
     "vue": "3.4.27"
@@ -45,5 +31,19 @@
     "vite": "5.2.11",
     "vitest": "1.6.0",
     "vue-tsc": "2.0.19"
+  },
+  "keywords": [
+    "icons"
+  ],
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
   }
 }

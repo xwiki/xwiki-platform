@@ -1,35 +1,24 @@
 {
   "name": "@cristal/api",
   "version": "0.7.0",
-  "type": "module",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
     "directory": "api",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
-  "main": "./src/index.ts",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
-  "publishConfig": {
-    "main": "./dist/index.es.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "import": "./dist/index.es.js",
-        "require": "./dist/index.umd.js",
-        "types": "./dist/index.d.ts"
-      }
-    }
-  },
+  "main": "./src/index.ts",
   "scripts": {
-    "clean": "rimraf dist",
-    "prepack": "pnpm build",
     "build": "pnpm compile",
+    "clean": "rimraf dist",
     "compile": "vue-tsc --project tsconfig.json --noEmit && vite build",
-    "test": "vitest --run",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "prepack": "pnpm build",
+    "test": "vitest --run"
   },
   "dependencies": {
     "inversify": "6.0.2",
@@ -44,5 +33,16 @@
     "vite": "5.2.11",
     "vitest": "1.6.0",
     "vue-tsc": "2.0.19"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
   }
 }

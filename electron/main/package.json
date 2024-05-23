@@ -9,19 +9,19 @@
   },
   "exports": {},
   "scripts": {
-    "clean": "rimraf dist",
-    "prepack": "pnpm build",
     "build": "pnpm compile",
+    "clean": "rimraf dist",
     "compile": "tsc --project tsconfig.json --noEmit && vite build",
-    "test": "echo 'no test'",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "electron": "echo 'no task'",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "linux": "echo 'no task'",
+    "prepack": "pnpm build",
     "package": "echo 'no task'",
-    "linux": "echo 'no task'"
+    "test": "echo 'no test'"
   },
   "dependencies": {
-    "@cristal/electron-storage": "workspace:*",
     "@cristal/browser-electron": "workspace:*",
+    "@cristal/electron-storage": "workspace:*",
     "electron": "29.4.1"
   },
   "devDependencies": {

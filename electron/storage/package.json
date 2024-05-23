@@ -1,17 +1,38 @@
 {
   "name": "@cristal/electron-storage",
   "version": "0.7.0",
-  "type": "module",
   "license": "AGPL-3.0",
-  "main": "./src/index.ts",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./preload": "./src/electron/preload/index.ts",
     "./main": "./src/electron/main/index.ts"
   },
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "pnpm compile",
+    "clean": "rimraf dist",
+    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "prepack": "pnpm build",
+    "test": "echo 'no test'"
+  },
+  "dependencies": {
+    "@cristal/api": "workspace:*",
+    "@cristal/storage": "workspace:*",
+    "inversify": "6.0.2"
+  },
+  "peerDependencies": {
+    "electron": "29.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.12",
+    "rimraf": "5.0.7",
+    "vite": "5.2.11",
+    "vite-plugin-node": "3.1.0",
+    "vue-tsc": "2.0.19"
+  },
   "publishConfig": {
-    "main": "./dist/main/index.es.js",
-    "types": "./dist/main/index.d.ts",
     "exports": {
       ".": {
         "import": "./dist/main/index.es.js",
@@ -28,29 +49,8 @@
         "require": "./dist/main/index.umd.js",
         "types": "./dist/main/index.d.ts"
       }
-    }
-  },
-  "scripts": {
-    "clean": "rimraf dist",
-    "prepack": "pnpm build",
-    "build": "pnpm compile",
-    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
-    "test": "echo 'no test'",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
-  },
-  "dependencies": {
-    "@cristal/api": "workspace:*",
-    "@cristal/storage": "workspace:*",
-    "inversify": "6.0.2"
-  },
-  "devDependencies": {
-    "@types/node": "20.12.12",
-    "rimraf": "5.0.7",
-    "vite": "5.2.11",
-    "vite-plugin-node": "3.1.0",
-    "vue-tsc": "2.0.19"
-  },
-  "peerDependencies": {
-    "electron": "29.4.1"
+    },
+    "main": "./dist/main/index.es.js",
+    "types": "./dist/main/index.d.ts"
   }
 }

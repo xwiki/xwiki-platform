@@ -26,7 +26,6 @@
 <script lang="ts" setup>
 import "@shoelace-style/shoelace";
 
-import { defineProps } from "vue";
 defineProps<{
   title: string;
 }>();

@@ -101,6 +101,7 @@ main {
 .left-sidebar {
   width: var(--cr-sizes-left-sidebar-width);
   min-width: var(--cr-sizes-left-sidebar-min-width);
+  max-width: 100%;
   background-color: var(--cr-color-neutral-100);
   position: fixed;
   left: 0;
@@ -130,6 +131,13 @@ TODO: these rules about opening and closing the sidebar should be better organiz
   display: none
 }
 
+.open-sidebar:hover,
+.close-sidebar:hover,
+.pin-sidebar:hover,
+.hide-sidebar:hover {
+  cursor: pointer;
+}
+
 .wrapper .sidebar-collapse-controls {
   display: none
 }
@@ -146,7 +154,8 @@ TODO: these rules about opening and closing the sidebar should be better organiz
   display: flex;
   flex-flow: row;
   justify-content: space-between;
-  padding: var(--cr-spacing-2x-small);
+  padding: var(--cr-spacing-small) var(--cr-spacing-x-small) 0;
+  z-index: 2;
 }
 
 .wrapper.sidebar-is-collapsed .hide-sidebar {
@@ -154,16 +163,18 @@ TODO: these rules about opening and closing the sidebar should be better organiz
 }
 
 .wrapper.sidebar-is-collapsed .pin-sidebar {
-  display: block
+  display: block;
 }
 
 .wrapper.sidebar-is-collapsed .close-sidebar {
-  display: block
+  display: block;
 }
 
 .collapsed-sidebar {
   background: var(--cr-color-neutral-100);
   width: var(--cr-sizes-collapsed-sidebar-width);
+  padding-top: var(--cr-spacing-x-small);
+  text-align: center;
   position: fixed;
   translate: -100%;
   top: 0;
@@ -188,14 +199,25 @@ TODO: Discuss and move them to a more appropriate place
   font-style: italic;
 }
 
-
 @media (max-width: 600px) {
-  .collapsed-sidebar {
-    translate: 0;
+  .wrapper.sidebar-is-collapsed {
+    &:has(.left-sidebar.is-visible) {
+      &:before {
+        content: ' ';
+        background-color: var(--cr-overlay-background-color);        
+        position: fixed;
+        width: unset;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+      }
+    }
   }
-
+  
   .left-sidebar {
-    translate: -100%;
+    width: 80%;
   }
 
   .is-visible {
@@ -206,19 +228,11 @@ TODO: Discuss and move them to a more appropriate place
     left: var(--cr-sizes-collapsed-sidebar-width);
   }
 
-  .hide-sidebar {
-    display: none
-  }
-
-  .close-sidebar {
-    display: block
-  }
-
-  .wrapper .sidebar-collapse-controls {
-    display: block
-  }
-
   .wrapper .sidebar-collapse-controls .pin-sidebar {
-    display: none
+    display: none;
+  }
+
+  .resize-handle {
+    display: none;
   }
 }

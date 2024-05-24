@@ -23,21 +23,60 @@
  *
 -->
 <script lang="ts" setup>
+import { Ref, onMounted, ref, watch } from "vue";
 import CTemplate from "./c-template.vue";
 import CMain from "./c-main.vue";
+import { ViewportType, useViewportType } from "../composables/viewport";
 import "../css/main.css";
+
+const viewportType: Ref<ViewportType> = useViewportType();
+// By default, left sidebar is collapsed on mobile only.
+const isLeftSidebarCollapsed: Ref<boolean> = ref(
+  viewportType.value == ViewportType.Mobile,
+);
+
+onMounted(() => {
+  // Attempt to load collapsed state from local storage.
+  if (viewportType.value == ViewportType.Desktop) {
+    isLeftSidebarCollapsed.value =
+      localStorage.isLeftSidebarCollapsed === "true";
+  }
+});
+
+watch(viewportType, (newViewportType: ViewportType) => {
+  // Collapse left sidebar on smaller viewport,
+  // load previous state from local storage on larger viewport.
+  if (newViewportType == ViewportType.Mobile) {
+    isLeftSidebarCollapsed.value = true;
+  } else {
+    isLeftSidebarCollapsed.value =
+      localStorage.isLeftSidebarCollapsed === "true";
+  }
+});
+
+function onCollapseLeftSidebar() {
+  // Left sidebar should always be collapsed on mobile.
+  if (viewportType.value == ViewportType.Desktop) {
+    isLeftSidebarCollapsed.value = !isLeftSidebarCollapsed.value;
+    localStorage.isLeftSidebarCollapsed = isLeftSidebarCollapsed.value;
+  }
+}
 </script>
 <template>
   <div>
     <!-- Lazy component in charge of loading design-system specific resources.
     For instance, CSS sheets. -->
     <x-load></x-load>
-    <div id="view" class="wrapper">
+    <div
+      id="view"
+      class="wrapper"
+      :class="{ 'sidebar-is-collapsed': isLeftSidebarCollapsed }"
+    >
       <UIX uixname="view.before" />
-      <!-- TODO CRISTAL-165: The collapsed sidebar appears when the user click on the bars icon besides the logo. Click it again on THIS component should return the sidebar visible. 
-        This version is also shown when the layout enters in mobile mode, in this mode when the users click the button a temporary sidebar should appear over the content-->
-
-      <CTemplate name="sidebar" />
+      <CTemplate
+        name="sidebar"
+        @collapse-left-sidebar="onCollapseLeftSidebar"
+      />
       <CTemplate name="header" />
       <c-main></c-main>
 

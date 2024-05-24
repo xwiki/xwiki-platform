@@ -23,33 +23,129 @@
  *
 -->
 <script lang="ts" setup>
+import { Ref, onMounted, ref, watch } from "vue";
 import CConfigMenu from "./c-config-menu.vue";
+import CNavigationDrawer from "./c-navigation-drawer.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
 import CHelp from "./c-help.vue";
 import xlogo from "../images/xwiki-logo-color.svg";
 import xavatarImg from "../images/no-one.svg";
 import { CIcon } from "@xwiki/cristal-icons";
+import { useMouseCoordinates } from "../composables/mouse";
+import { ViewportType, useViewportType } from "../composables/viewport";
 
 const logo = xlogo;
 const avImg = xavatarImg;
+const viewportType: Ref<ViewportType> = useViewportType();
+const { x } = useMouseCoordinates();
+// By default, left sidebar is closed on mobile only.
+const isSidebarClosed: Ref<boolean> = ref(
+  viewportType.value == ViewportType.Mobile,
+);
+
+defineEmits(["collapseLeftSidebar"]);
+
+onMounted(() => {
+  // Load and apply left sidebar size from local storage, if available.
+  if (localStorage.leftSidebarWidth) {
+    updateLeftSidebarWidth(localStorage.leftSidebarWidth);
+  }
+  // If left sidebar is collapsed on desktop, it should also be closed.
+  if (viewportType.value == ViewportType.Desktop) {
+    isSidebarClosed.value = localStorage.isLeftSidebarCollapsed === "true";
+  }
+});
+
+watch(viewportType, (newViewportType: ViewportType) => {
+  // Always close left sidebar when switching to a smaller viewport
+  if (newViewportType == ViewportType.Mobile) {
+    isSidebarClosed.value = true;
+  }
+});
+
+// Store the interval for left sidebar resize operation.
+let sidebarResizeInterval: number = 0;
+
+function updateLeftSidebarWidth(newSidebarWidth: number) {
+  document.documentElement.style.setProperty(
+    "--cr-sizes-left-sidebar-width",
+    `${newSidebarWidth}px`,
+  );
+}
+
+function startLeftSidebarResize() {
+  // Check that no other interval exists before scheduling one.
+  if (sidebarResizeInterval == 0) {
+    sidebarResizeInterval = setInterval(() => {
+      let newSidebarWidth = x.value + 8;
+      updateLeftSidebarWidth(newSidebarWidth);
+      localStorage.leftSidebarWidth = newSidebarWidth;
+    }, 10);
+  }
+  window.addEventListener("mouseup", endLeftSidebarResize);
+  window.addEventListener("touchend", endLeftSidebarResize);
+}
+
+function endLeftSidebarResize() {
+  clearInterval(sidebarResizeInterval);
+  sidebarResizeInterval = 0;
+  window.removeEventListener("mouseup", endLeftSidebarResize);
+  window.removeEventListener("touchend", endLeftSidebarResize);
+}
+
+function onOpenLeftSidebar() {
+  isSidebarClosed.value = false;
+  window.addEventListener("click", onClickOutsideLeftSidebar);
+}
+
+function onCloseLeftSidebar() {
+  isSidebarClosed.value = true;
+  window.removeEventListener("click", onClickOutsideLeftSidebar);
+}
+
+function onClickOutsideLeftSidebar() {
+  // We need to get the actual size of the left sidebar at any time
+  // since it may be a relative value in some cases.
+  let currentSidebarWidth: number = parseInt(
+    window.getComputedStyle(document.getElementById("sidebar")!).width,
+  );
+  if (x.value > currentSidebarWidth) {
+    onCloseLeftSidebar();
+  }
+}
 </script>
 <template>
-  <div class="collapsed-sidebar">
-    <!-- When the user click this icon (visible only on MOBILE or with a COLLAPSED sidebar) a function should ADD the class is-visible to the element #sidebar. -->
-    <c-icon name="list"></c-icon>
+  <div class="collapsed-sidebar" @click="onOpenLeftSidebar">
+    <c-icon name="list" class="open-sidebar"></c-icon>
   </div>
-  <c-navigation-drawer id="sidebar" class="left-sidebar">
+  <c-navigation-drawer
+    id="sidebar"
+    class="left-sidebar"
+    :class="{ 'is-visible': !isSidebarClosed }"
+  >
     <UIX uixname="sidebar.before" />
     <div class="sidebar-collapse-controls">
-      <!-- When the user click this icon (visible only on DESKTOP and MOBILE) a function should REMOVE the class is-visible to the element #sidebar..-->
-      <c-icon name="x-lg" class="close-sidebar"></c-icon>
+      <c-icon
+        name="x-lg"
+        class="close-sidebar"
+        @click="onCloseLeftSidebar()"
+      ></c-icon>
 
-      <!-- When the user click this icon (visible only on DESKTOP) a function should REMOVE the class sidebar-is-collapsed of the element .wrapper in c-view.vue..-->
-      <c-icon name="pin" class="pin-sidebar"></c-icon>
+      <c-icon
+        name="pin"
+        class="pin-sidebar"
+        @click="$emit('collapseLeftSidebar')"
+      ></c-icon>
     </div>
     <div class="sidebar-header">
-      <!-- When the user click this icon (visible only on DESKTOP) a function should ADD the class sidebar-is-collapsed to the element .wrapper in c-view.vue.-->
-      <c-icon name="list" class="hide-sidebar"></c-icon>
+      <c-icon
+        name="list"
+        class="hide-sidebar"
+        @click="
+          $emit('collapseLeftSidebar');
+          onCloseLeftSidebar();
+        "
+      ></c-icon>
       <x-img class="logo" :src="logo" :width="72" />
       <c-icon name="bell"></c-icon>
       <c-config-menu></c-config-menu>
@@ -65,8 +161,11 @@ const avImg = xavatarImg;
     </div>
     <c-help></c-help>
 
-    <!-- This handle should update the value of the CSS var --cr-sizes-left-sidebar-width in a <style> tag. This variable could also be saved and retrieved from local storage, if unavailable the default value on style.css from the DS will be used-->
-    <div class="resize-handle"></div>
+    <div
+      class="resize-handle"
+      @mousedown="startLeftSidebarResize"
+      @touchstart="startLeftSidebarResize"
+    ></div>
   </c-navigation-drawer>
 </template>
 <style scoped>

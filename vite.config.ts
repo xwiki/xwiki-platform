@@ -21,6 +21,7 @@ export function generateConfig(path: string) {
 
   return defineConfig({
     build: {
+      sourcemap: true,
       lib: {
         entry: "./src/index.ts",
         name: `cristal_${packageDirName}`,

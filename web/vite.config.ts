@@ -9,6 +9,7 @@ import { resolve } from "path";
 
 export default defineConfig({
   build: {
+    sourcemap: true,
     input: {
       main: resolve(__dirname, "index.html"),
     },

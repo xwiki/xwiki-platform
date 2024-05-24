@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,30 +18,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-search-test</artifactId>
     <version>16.5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search</artifactId>
-  <name>XWiki Platform - Search - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Search - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-search-api</module>
-    <module>xwiki-platform-search-solr</module>
-    <module>xwiki-platform-search-ui</module>
-    <module>xwiki-platform-search-webjar</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-search-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-search-test-pageobjects</artifactId>
+  <name>XWiki Platform - Search - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Search - Tests - Page Objects</description>
+  <properties>
+    <!-- None of the classes is valid -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

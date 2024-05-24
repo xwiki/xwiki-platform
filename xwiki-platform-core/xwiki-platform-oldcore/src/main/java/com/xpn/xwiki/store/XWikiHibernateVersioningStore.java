@@ -153,6 +153,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
         if (archiveDoc == null) {
             archiveDoc = getXWikiDocumentArchiveFromDatabase(doc, criteria, inputxcontext);
+        // if there's an archive doc and the criteria is to not return everything then we filter, else we just return
         } else if (!criteria.isAllInclusive()) {
             archiveDoc = filterArchiveFromCriteria(doc, archiveDoc, criteria);
         }
@@ -168,6 +169,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiRCSNodeInfo nodeinfo = null;
         List<XWikiRCSNodeInfo> results = new ArrayList<>();
 
+        // Iterate over all versions and get the ones matching the criteria
         for (XWikiRCSNodeInfo nextNodeinfo : nodes) {
             if (nodeinfo != null && (criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit())) {
                 if (isAuthorMatching(criteria, nodeinfo) && isDateMatching(criteria, nodeinfo)) {
@@ -180,6 +182,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             results.add(nodeinfo);
         }
 
+        // getRange().subList only applies on String: so we apply it on the Version (e.g.: 1.1,2.1,etc) and
+        // we ensure to return them in the ascending order: nodes are returned from the archive in descending order
         List<String> versionList = criteria.getRange().subList(
             results
                 .stream()
@@ -194,6 +198,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                     )
                 )
         );
+        // We retrieve the actual nodes from the versions we kept just before
         result.setNodes(results.stream()
             .filter(node -> versionList.contains(node.getVersion().toString())).toList());
         return result;

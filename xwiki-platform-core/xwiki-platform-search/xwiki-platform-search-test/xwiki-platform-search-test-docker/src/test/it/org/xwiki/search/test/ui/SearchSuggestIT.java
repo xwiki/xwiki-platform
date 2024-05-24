@@ -22,7 +22,7 @@ package org.xwiki.search.test.ui;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.repository.test.SolrTestUtils;
-import org.xwiki.search.test.po.MainPage;
+import org.xwiki.search.test.po.QuickSearchElement;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -48,9 +48,9 @@ class SearchSuggestIT
 
         new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
 
-        MainPage mainPage = new MainPage();
-        mainPage.search(testDocumentLocation);
-        WebElement firstSuggestElement = mainPage.getSuggestItemTitles(0);
+        QuickSearchElement quickSearchElement = new QuickSearchElement();
+        quickSearchElement.search(testDocumentLocation);
+        WebElement firstSuggestElement = quickSearchElement.getSuggestItemTitles(0);
         assertEquals(testDocumentLocation, firstSuggestElement.getText());
     }
 

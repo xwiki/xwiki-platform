@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
-public class MainPage extends ViewPage
+public class QuickSearchElement extends ViewPage
 {
     @FindBy(id = "headerglobalsearchinput")
     private WebElement searchInput;
@@ -35,12 +35,21 @@ public class MainPage extends ViewPage
     @FindBy(xpath= "//div[@class = 'results results0']//ul[@class = 'xlist suggestList']")
     private WebElement suggestItemsListTitles;
 
+    /**
+     * Enter text in the quick search box.
+     * @param terms text to search
+     */
     public void search(String terms) {
         this.searchButton.click();
         this.searchInput.clear();
         this.searchInput.sendKeys(terms);
     }
 
+    /**
+     * Get a suggest item from the "Page Titles" category.
+     * @param index the index of the item to get
+     * @return the title of the item
+     */
     public WebElement getSuggestItemTitles(int index) {
         return this.suggestItemsListTitles.findElements(By.xpath("//div[@class = 'value']")).get(index);
     }

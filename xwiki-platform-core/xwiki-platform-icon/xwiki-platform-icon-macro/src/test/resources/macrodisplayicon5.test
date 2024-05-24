@@ -1,0 +1,23 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# Verify the text alternative functionality
+.#-----------------------------------------------------
+{{displayIcon name="home" textAlternative="Home" /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [displayIcon] [name=home|textAlternative=Home]
+beginMetaData [[syntax]=[XWiki 2.1]]
+beginParagraph
+beginFormat [NONE] [[class]=[icon][data-xwiki-icon]=[homeIcon]]
+onWord [i]
+endFormat [NONE] [[class]=[icon][data-xwiki-icon]=[homeIcon]]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.1]]
+beginFormat [NONE] [[class]=[sr-only]]
+onWord [Home]
+endFormat [NONE] [[class]=[sr-only]]
+endMacroMarkerStandalone [displayIcon] [name=home|textAlternative=Home]
+endDocument

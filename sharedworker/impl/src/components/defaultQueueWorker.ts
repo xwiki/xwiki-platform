@@ -52,7 +52,11 @@ export default class DefaultQueueWorker implements QueueWorker {
         "Received callback that new document has been loaded",
         page,
       );
-      this.cristalApp.loadPage();
+      // When reloading the page for the worker, prevents a requeue to avoid
+      // an endless re-fetch of the current page.
+      this.cristalApp.loadPage({
+        requeue: false,
+      });
       this.logger.debug(
         "Done callback that new document has been loaded",
         page,

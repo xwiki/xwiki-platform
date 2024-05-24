@@ -41,10 +41,17 @@ export interface Storage {
    *
    * @param page the id of the request page
    * @param syntax the syntax of the request page
+   * @param requeue optional param informing whether an asynchronous update of
+   *  the page content is allowed (default is true)
    * @return a promise wrapping a page data, or undefined in case of page not
    *  found
+   *  @since 0.8
    */
-  getPageContent(page: string, syntax: string): Promise<PageData | undefined>;
+  getPageContent(
+    page: string,
+    syntax: string,
+    requeue?: boolean,
+  ): Promise<PageData | undefined>;
 
   getPanelContent(
     panel: string,

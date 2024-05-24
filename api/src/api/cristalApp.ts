@@ -79,7 +79,7 @@ export interface CristalApp {
 
   loadPageFromURL(url: string): Promise<void>;
 
-  loadPage(): Promise<void>;
+  loadPage(options?: { requeue: boolean }): Promise<void>;
 
   /**
    * Return the requested page

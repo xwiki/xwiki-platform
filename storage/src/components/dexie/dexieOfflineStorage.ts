@@ -69,7 +69,9 @@ export default class DexieOfflineStorage implements OfflineStorage {
   async savePage(wikiName: string, id: string, page: PageData): Promise<void> {
     try {
       const pageStorage = this.getPageStorage(wikiName);
-      await pageStorage.pages.add(page.toObject(), id);
+      // Put must be used instead of get since the later does not allow for
+      // content update.
+      await pageStorage.pages.put(page.toObject(), id);
     } catch (e) {
       this.logger.debug(
         "Exception while trying to store in local storage",

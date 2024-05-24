@@ -85,6 +85,9 @@ const cristal: CristalApp = inject<CristalApp>("cristal")!;
 async function fetchPage(page: string) {
   loading.value = true;
   try {
+    // Provides a reactive variable to be updated if the page content is updated
+    // in the background.
+    cristal.setContentRef(currentPage);
     currentPage.value = await cristal.getPage(page || currentPageName.value);
   } catch (e) {
     console.error(e);

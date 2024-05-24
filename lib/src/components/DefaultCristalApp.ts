@@ -234,13 +234,21 @@ export class DefaultCristalApp implements CristalApp {
     }
   }
 
-  async loadPage() {
+  /**
+   * Load the current page content.
+   * @param options an optional set of parameters. When a requeue key is
+   * provided, it is used to determine if an asynchronous update of the page
+   * content is allowed. When undefinied, default to true.
+   * @since 0.8
+   */
+  async loadPage(options?: { requeue: boolean }) {
     try {
       this.logger?.debug("Loading page", this.page.name);
       if (this.getWikiConfig().isSupported("jsonld")) {
         const pageData = await this.getWikiConfig().storage.getPageContent(
           this.page.name,
           "jsonld",
+          options?.requeue,
         );
         if (!pageData) {
           this.logger.error(
@@ -266,19 +274,8 @@ export class DefaultCristalApp implements CristalApp {
           this.page.html = pageData.html;
         }
 
-        const sheet =
-          this.page.document && this.page.document.get("sheet") != null
-            ? this.page.document.get("sheet")
-            : "";
         if (this.currentContentRef != null) {
-          console.log("Updating vueJS content field to ", this.page.html);
-          this.currentContentRef.value.currentContent = this.page.html;
-          this.currentContentRef.value.currentSource = this.page.source;
-          this.currentContentRef.value.css = pageData.css;
-          this.currentContentRef.value.js = pageData.js;
-          this.currentContentRef.value.document = this.page.document;
-          this.currentContentRef.value.sheet = sheet;
-          this.currentContentRef.value.withSheet = sheet != "";
+          this.currentContentRef.value = this.page;
 
           this.logger?.debug("Page content ", this.page.source);
           this.logger?.debug("Page loaded ", this.page.name);
@@ -315,13 +312,7 @@ export class DefaultCristalApp implements CristalApp {
           this.page.html = pageData.html;
         }
         if (this.currentContentRef != null) {
-          this.currentContentRef.value.currentContent = this.page.html;
-          this.currentContentRef.value.currentSource = this.page.source;
-          this.currentContentRef.value.css = pageData.css;
-          this.currentContentRef.value.js = pageData.js;
-          this.currentContentRef.value.document = null;
-          this.currentContentRef.value.sheet = "";
-          this.currentContentRef.value.withSheet = false;
+          this.currentContentRef.value = this.page;
           this.logger?.debug("Page content ", this.page.html);
           this.logger?.debug("Page loaded ", this.page.name);
         } else {

@@ -24,5 +24,15 @@
  **/
 
 import { generateConfig } from "../../vite.config";
+import { mergeConfig, defineConfig } from "vite";
+import comlink from "vite-plugin-comlink";
 
-export default generateConfig(import.meta.url);
+export default mergeConfig(
+  generateConfig(import.meta.url),
+  defineConfig({
+    plugins: [comlink()],
+    worker: {
+      plugins: () => [comlink()],
+    },
+  }),
+);

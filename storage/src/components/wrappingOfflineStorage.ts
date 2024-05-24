@@ -89,6 +89,7 @@ export class WrappingOfflineStorage implements WrappingStorage {
   public async getPageContent(
     page: string,
     syntax: string,
+    requeue?: boolean,
   ): Promise<PageData | undefined> {
     this.logger.debug("Trying to get data for page ", page);
     if (this.offlineStorage) {
@@ -100,9 +101,11 @@ export class WrappingOfflineStorage implements WrappingStorage {
       if (pageData != null && pageData != undefined) {
         this.logger.debug("Loading data from local storage for page", page);
         // Adding page to refresh queue in shared worker
-        this.queueWorker.addToQueue(
-          this.getWikiConfig().name + ":" + page + "_" + syntax,
-        );
+        if (requeue == undefined || requeue) {
+          this.queueWorker.addToQueue(
+            this.getWikiConfig().name + ":" + page + "_" + syntax,
+          );
+        }
         return pageData;
       } else {
         this.logger.debug(

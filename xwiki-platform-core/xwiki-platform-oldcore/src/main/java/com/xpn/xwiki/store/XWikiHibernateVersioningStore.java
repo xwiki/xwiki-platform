@@ -165,54 +165,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     {
         XWikiDocumentArchive result =
             new XWikiDocumentArchive(doc.getDocumentReference().getWikiReference(), doc.getId());
-        Collection<XWikiRCSNodeInfo> nodes = archiveDoc.getNodes();
-        XWikiRCSNodeInfo nodeinfo = null;
-        List<XWikiRCSNodeInfo> results = new ArrayList<>();
-
-        // Iterate over all versions and get the ones matching the criteria
-        for (XWikiRCSNodeInfo nextNodeinfo : nodes) {
-            if (nodeinfo != null && (criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit())) {
-                if (isAuthorMatching(criteria, nodeinfo) && isDateMatching(criteria, nodeinfo)) {
-                    results.add(nodeinfo);
-                }
-            }
-            nodeinfo = nextNodeinfo;
-        }
-        if (nodeinfo != null && isAuthorMatching(criteria, nodeinfo) && isDateMatching(criteria, nodeinfo)) {
-            results.add(nodeinfo);
-        }
-
-        // getRange().subList only applies on String: so we apply it on the Version (e.g.: 1.1,2.1,etc) and
-        // we ensure to return them in the ascending order: nodes are returned from the archive in descending order
-        List<String> versionList = criteria.getRange().subList(
-            results
-                .stream()
-                .map(XWikiRCSNodeInfo::getVersion)
-                .map(Version::toString)
-                .collect(
-                    Collectors.collectingAndThen(
-                        Collectors.toList(),
-                        l -> {
-                            Collections.reverse(l); return l;
-                        }
-                    )
-                )
-        );
-        // We retrieve the actual nodes from the versions we kept just before
-        result.setNodes(results.stream()
-            .filter(node -> versionList.contains(node.getVersion().toString())).toList());
+        Collection<String> versionsToKeep = filterVersions(archiveDoc, criteria);
+        // We retrieve the actual nodes from the versions we obtained
+        result.setNodes(archiveDoc.getNodes().stream()
+            .filter(node -> versionsToKeep.contains(node.getVersion().toString())).toList());
         return result;
-    }
-
-    private static boolean isAuthorMatching(RevisionCriteria criteria, XWikiRCSNodeInfo nodeinfo)
-    {
-        return criteria.getAuthor().isEmpty() || criteria.getAuthor().equals(nodeinfo.getAuthor());
-    }
-
-    private static boolean isDateMatching(RevisionCriteria criteria, XWikiRCSNodeInfo nodeinfo)
-    {
-        Date versionDate = nodeinfo.getDate();
-        return (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate()));
     }
 
     private XWikiDocumentArchive getXWikiDocumentArchiveFromDatabase(XWikiDocument doc, RevisionCriteria criteria,

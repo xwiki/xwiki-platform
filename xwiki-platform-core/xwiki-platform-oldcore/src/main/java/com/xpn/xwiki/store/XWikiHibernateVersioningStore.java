@@ -38,7 +38,6 @@ import org.xwiki.user.UserReferenceSerializer;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.criteria.impl.RangeFactory;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -289,11 +288,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            RevisionCriteria criteria = new RevisionCriteria();
-            criteria.setIncludeMinorVersions(true);
-            criteria.setRange(RangeFactory.getLAST());
-
-            XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, criteria, context);
+            XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
             UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
                 new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
             String author = userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());

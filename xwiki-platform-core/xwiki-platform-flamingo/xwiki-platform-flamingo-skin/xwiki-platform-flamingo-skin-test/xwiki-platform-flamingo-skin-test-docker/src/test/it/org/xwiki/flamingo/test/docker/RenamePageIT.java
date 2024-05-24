@@ -32,11 +32,13 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -46,6 +48,7 @@ import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -518,6 +521,39 @@ class RenamePageIT
 
         newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
         assertEquals("fr [[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+    }
 
+    @Order(6)
+    @Test
+    void renamePageWithObjectAndAttachmentsPreserveHistory(TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        testUtils.rest().savePage(testReference, "Content 0", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2 3", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2 3 4", "Title");
+        // add attachment
+        AttachmentReference attachmentReference = new AttachmentReference("file.txt", testReference);
+        testUtils.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        //add object
+        Object styleSheetObject = testUtils.rest().object(testReference, "XWiki.StyleSheetExtension");
+        styleSheetObject.getProperties().add(testUtils.rest().property("title", "a ssx"));
+        testUtils.rest().add(styleSheetObject);
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(7, historyPane.getNumberOfVersions());
+        assertEquals("7.1", historyPane.getCurrentVersion());
+
+        RenamePage rename = viewPage.rename();
+        rename.getDocumentPicker().setTitle("Another Title");
+        CopyOrRenameOrDeleteStatusPage statusPage = rename.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+        viewPage = statusPage.gotoNewPage();
+        historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(7, historyPane.getNumberOfVersions());
+        assertEquals("7.2", historyPane.getCurrentVersion());
+        assertEquals("Update document after refactoring.", historyPane.getCurrentVersionComment());
     }
 }

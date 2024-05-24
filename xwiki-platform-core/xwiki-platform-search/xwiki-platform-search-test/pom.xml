@@ -37,6 +37,7 @@
   </properties>
   <modules>
     <module>xwiki-platform-search-test-pageobjects</module>
+    <module>xwiki-platform-search-test-utils</module>
   </modules>
   <profiles>
     <profile>

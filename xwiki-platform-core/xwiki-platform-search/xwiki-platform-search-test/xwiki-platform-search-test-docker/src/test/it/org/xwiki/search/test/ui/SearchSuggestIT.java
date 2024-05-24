@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.search.test.po.QuickSearchElement;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -40,11 +41,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SearchSuggestIT
 {
     @Test
-    void verifySearchSuggestTitles(TestUtils setup, TestConfiguration testConfiguration) throws Exception {
+    void verifySearchSuggestTitles(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
         setup.loginAsSuperAdmin();
 
         String testDocumentLocation = "Main";
-        setup.createPage(testDocumentLocation, "WebHome", "Test Document", testDocumentLocation);
+        setup.rest().savePage(testReference, "Hello World!", testDocumentLocation);
+        setup.gotoPage(testReference);
 
         new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
 

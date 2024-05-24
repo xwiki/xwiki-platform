@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.test.ui;
+package org.xwiki.search.test.ui;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.repository.test.SolrTestUtils;
-import org.xwiki.search.solr.test.po.SolrSearchPage;
+import org.xwiki.search.test.po.SolrSearchPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;

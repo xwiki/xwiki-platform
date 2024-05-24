@@ -31,6 +31,11 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
+    class NestedSolrSearchIT extends SolrSearchIT
+    {
+    }
+
+    @Nested
     class NestedSearchSuggestIT extends SearchSuggestIT
     {
     }

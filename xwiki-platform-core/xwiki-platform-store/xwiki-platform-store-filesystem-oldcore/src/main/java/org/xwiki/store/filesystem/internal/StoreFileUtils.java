@@ -112,8 +112,7 @@ public final class StoreFileUtils
      */
     public static File getLinkFile(File originalfile)
     {
-        return new File(originalfile.getParent(),
-            StoreFileUtils.getStoredFilename(originalfile.getName() + ".lnk", null));
+        return new File(originalfile.getParent(), originalfile.getName() + ".lnk");
     }
 
     /**

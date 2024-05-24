@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,77 +31,56 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * The attachments tree node.
+ * The objects tree node.
  * 
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
 @Component
-@Named("attachments")
+@Named("objects")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class AttachmentsTreeNode extends AbstractDocumentTreeNode
+public class ObjectsTreeNode extends AbstractDocumentRelatedTreeNode
 {
-    @Inject
-    private ContextualAuthorizationManager authorization;
-
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Default constructor.
      */
-    public AttachmentsTreeNode()
+    public ObjectsTreeNode()
     {
-        super("attachments");
+        super("objects");
     }
 
     @Override
     protected List<String> getChildren(DocumentReference documentReference, int offset, int limit) throws Exception
     {
-        List<String> children = new ArrayList<String>();
-
-        if (offset == 0 && showAddAttachment(documentReference)) {
-            children.add("addAttachment:" + this.defaultEntityReferenceSerializer.serialize(documentReference));
-        }
-
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-        List<XWikiAttachment> attachments = document.getAttachmentList();
-        for (XWikiAttachment attachment : subList(attachments, offset, limit)) {
-            children.add(serialize(attachment.getReference()));
+        String serializedDocRef = this.defaultEntityReferenceSerializer.serialize(documentReference);
+        List<String> classNames = new ArrayList<>();
+        for (DocumentReference classReference : document.getXObjects().keySet()) {
+            classNames.add(this.defaultEntityReferenceSerializer.serialize(classReference));
         }
-
+        Collections.sort(classNames);
+        List<String> children = new ArrayList<>();
+        for (String className : subList(classNames, offset, limit)) {
+            children.add("objectsOfType:" + serializedDocRef + "/" + className);
+        }
         return children;
     }
 
     @Override
     protected int getChildCount(DocumentReference documentReference) throws Exception
     {
-        int count = 0;
-
-        if (showAddAttachment(documentReference)) {
-            count++;
-        }
-
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-        count += document.getAttachmentList().size();
-
-        return count;
-    }
-
-    private boolean showAddAttachment(DocumentReference documentReference)
-    {
-        return Boolean.TRUE.equals(getProperties().get("showAddAttachment"))
-            && this.authorization.hasAccess(Right.EDIT, documentReference);
+        return document.getXObjects().size();
     }
 }

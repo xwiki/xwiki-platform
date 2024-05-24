@@ -17,35 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.query.internal;
 
-import javax.inject.Named;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.tree.AbstractTreeNode;
+import org.junit.jupiter.api.Test;
+import org.xwiki.query.Query;
+import org.xwiki.query.WrappingQuery;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * The translation tree node.
- * 
+ * Unit tests for {@link WrappingQuery}.
+ *
  * @version $Id$
- * @since 8.3M2
- * @since 7.4.5
  */
-@Component
-@Named("translation")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class TranslationTreeNode extends AbstractTreeNode
+@ComponentTest
+class WrappingQueryTest
 {
-    @Override
-    public String getParent(String nodeId)
+    @Test
+    void bindValueReturnsThisTest()
     {
-        if (StringUtils.startsWith(nodeId, "translation:")) {
-            String reference = StringUtils.substringBeforeLast(nodeId.substring(12), "/");
-            return "translations:" + reference;
-        }
-        return null;
+        Query wrappedQuery =  mock(Query.class);
+        Query wrappingQuery = new WrappingQuery(wrappedQuery);
+        assertSame(wrappingQuery, wrappingQuery.bindValue("hello", "world"));
+        assertSame(wrappingQuery, wrappingQuery.bindValue(0, "hello"));
+        assertSame(wrappingQuery, wrappingQuery.bindValues(List.of("hello", "world")));
+        assertSame(wrappingQuery, wrappingQuery.bindValues(Map.of("hello", "world")));
     }
 }

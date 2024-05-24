@@ -36,10 +36,23 @@ import org.xwiki.model.reference.EntityReference;
  * @since 7.4.5
  */
 @Component
-@Named("addDocument")
+@Named(AddDocumentTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class AddDocumentTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "addDocument";
+
+    /**
+     * Default constructor.
+     */
+    public AddDocumentTreeNode()
+    {
+        super(HINT);
+    }
+
     @Override
     public String getParent(String nodeId)
     {

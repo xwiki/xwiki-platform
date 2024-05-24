@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -44,5 +45,15 @@ class StoreFileUtilsTest
         File foundFile = StoreFileUtils.resolve(file, true);
 
         assertSame(file, foundFile);
+    }
+
+    @Test
+    void getLinkFile() throws IOException
+    {
+        File file = new File("folder/file.ext");
+
+        File linkFile = StoreFileUtils.getLinkFile(file);
+
+        assertEquals("folder/file.ext.lnk", linkFile.getPath());
     }
 }

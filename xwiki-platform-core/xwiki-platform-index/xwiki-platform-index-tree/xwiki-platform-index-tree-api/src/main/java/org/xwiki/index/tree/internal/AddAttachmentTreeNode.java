@@ -17,36 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * The class property tree node.
+ * The "Add attachment" tree node.
  * 
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
 @Component
-@Named("classProperty")
+@Named(AddAttachmentTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class ClassPropertyTreeNode extends AbstractEntityTreeNode
+public class AddAttachmentTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "addAttachment";
+
+    /**
+     * Default constructor.
+     */
+    public AddAttachmentTreeNode()
+    {
+        super(HINT);
+    }
+
     @Override
     public String getParent(String nodeId)
     {
-        EntityReference classPropertyReference = resolve(nodeId);
-        if (classPropertyReference != null && classPropertyReference.getType() == EntityType.CLASS_PROPERTY) {
-            return "classProperties:"
-                + this.defaultEntityReferenceSerializer.serialize(classPropertyReference.getParent());
+        EntityReference documentReference = resolve(nodeId);
+        if (documentReference != null && documentReference.getType() == EntityType.DOCUMENT) {
+            return "attachments:" + this.defaultEntityReferenceSerializer.serialize(documentReference);
         }
         return null;
     }

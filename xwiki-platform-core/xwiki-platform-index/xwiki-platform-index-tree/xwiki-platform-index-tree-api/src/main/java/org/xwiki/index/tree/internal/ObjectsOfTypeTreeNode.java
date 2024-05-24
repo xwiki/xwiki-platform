@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +70,7 @@ public class ObjectsOfTypeTreeNode extends AbstractTreeNode
         DocumentReference[] parts = resolve(nodeId);
         if (parts != null) {
             try {
-                List<String> children = new ArrayList<String>();
+                List<String> children = new ArrayList<>();
                 for (ObjectReference objectReference : subList(getXObjectReferences(parts[0], parts[1]), offset,
                     limit)) {
                     children.add("object:" + this.defaultEntityReferenceSerializer.serialize(objectReference));
@@ -124,7 +124,7 @@ public class ObjectsOfTypeTreeNode extends AbstractTreeNode
         String serializedDocRef = parts[1].substring(0, separatorIndex);
         String serializedClassRef = parts[1].substring(separatorIndex + 1);
         return new DocumentReference[] {this.currentDocumentReferenceResolver.resolve(serializedDocRef),
-        this.currentDocumentReferenceResolver.resolve(serializedClassRef)};
+            this.currentDocumentReferenceResolver.resolve(serializedClassRef)};
     }
 
     private List<ObjectReference> getXObjectReferences(DocumentReference documentReference,
@@ -132,7 +132,7 @@ public class ObjectsOfTypeTreeNode extends AbstractTreeNode
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-        List<ObjectReference> objectReferences = new ArrayList<ObjectReference>();
+        List<ObjectReference> objectReferences = new ArrayList<>();
         List<BaseObject> objects = document.getXObjects(classReference);
         if (objects != null) {
             for (BaseObject object : objects) {

@@ -17,7 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal.nestedpages;
+package org.xwiki.index.tree.internal;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,10 +46,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /**
  * Unit tests for {@link ObjectsOfTypeTreeNode}.
  * 
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 10.7
  */
 @ComponentTest
-public class ObjectsOfTypeTreeNodeTest
+class ObjectsOfTypeTreeNodeTest
 {
     private static String NODE_ID = "objectsOfType:wiki:Path.To.Page/Path.To.Class";
 
@@ -83,7 +83,7 @@ public class ObjectsOfTypeTreeNodeTest
     private XWikiDocument document;
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
         when(this.currentDocumentReferenceResolver.resolve("wiki:Path.To.Page")).thenReturn(DOCUMENT_REFERENCE);
         when(this.defaultEntityReferenceSerializer.serialize(DOCUMENT_REFERENCE)).thenReturn("wiki:Path.To.Page");
@@ -97,7 +97,7 @@ public class ObjectsOfTypeTreeNodeTest
     }
 
     @Test
-    public void getChildCount()
+    void getChildCount()
     {
         int count = 3;
         List<BaseObject> objects = new ArrayList<>();
@@ -114,7 +114,7 @@ public class ObjectsOfTypeTreeNodeTest
     }
 
     @Test
-    public void getChildren()
+    void getChildren()
     {
         List<BaseObject> objects = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -130,7 +130,7 @@ public class ObjectsOfTypeTreeNodeTest
     }
 
     @Test
-    public void getParent()
+    void getParent()
     {
         assertEquals("objects:wiki:Path.To.Page", this.objectsOfTypeTreeNode.getParent(NODE_ID));
     }

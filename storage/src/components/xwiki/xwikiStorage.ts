@@ -211,7 +211,7 @@ export class XWikiStorage extends AbstractStorage {
       headers: {
         "Content-Type": "application/json",
         // TODO: externalize credentials
-        Authorization: `Basic ${btoa("Admin:admin")}`,
+        Authorization: `Basic ${btoa("Test:xwiki")}`,
       },
       // TODO: the syntax provided by the save is ignored and the content is always saved as markdown.
       body: JSON.stringify({ content, title, syntax: "markdown/1.2" }),

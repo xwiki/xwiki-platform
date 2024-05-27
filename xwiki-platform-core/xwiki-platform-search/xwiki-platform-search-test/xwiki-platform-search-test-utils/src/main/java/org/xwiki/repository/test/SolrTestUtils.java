@@ -22,6 +22,8 @@ package org.xwiki.repository.test;
 import java.util.Map;
 
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -43,7 +45,13 @@ public class SolrTestUtils
 
     public SolrTestUtils(TestUtils testUtils) throws Exception
     {
-        this(testUtils, null);
+        this(testUtils, (String) null);
+    }
+
+    public SolrTestUtils(TestUtils testUtils, ServletEngine servletEngine) throws Exception
+    {
+        this(testUtils, String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
+            XWikiExecutor.DEFAULT_CONTEXT));
     }
 
     public SolrTestUtils(TestUtils testUtils, String url) throws Exception

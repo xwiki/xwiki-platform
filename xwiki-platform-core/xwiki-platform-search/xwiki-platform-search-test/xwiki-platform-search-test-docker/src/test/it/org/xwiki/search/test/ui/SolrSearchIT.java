@@ -24,8 +24,6 @@ import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.search.test.po.SolrSearchPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,18 +43,11 @@ class SolrSearchIT
         String testDocumentLocation = "{{/html}}";
         setup.createPage(testDocumentLocation, "WebHome", "Test Document", testDocumentLocation);
 
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         SolrSearchPage searchPage = SolrSearchPage.gotoPage();
         searchPage.search("\"Test Document\"");
         searchPage.toggleSpaceFaucet();
         assertEquals(testDocumentLocation + "\n1", searchPage.getSpaceFaucetContent());
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

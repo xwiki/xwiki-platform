@@ -92,7 +92,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
+      <artifactId>xwiki-platform-search-test-utils</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

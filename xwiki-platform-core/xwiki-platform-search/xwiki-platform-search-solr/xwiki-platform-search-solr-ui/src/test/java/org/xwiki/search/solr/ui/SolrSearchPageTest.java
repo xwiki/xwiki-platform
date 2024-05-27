@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.ui;
+package org.xwiki.search.solr.ui;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -28,12 +28,15 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.text.StringUtils;
+import org.xwiki.user.DefaultUserComponentList;
+import org.xwiki.user.internal.AllUserPropertiesResolver;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.feed.FeedPlugin;
@@ -42,32 +45,40 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Page test for {@code Main.DatabaseSearch}.
+ * Page test for {@code Main.SolrSearch}.
  *
  * @version $Id$
  */
 @ComponentList({
-    TestNoScriptMacro.class
+    TemplateMacro.class,
+    TestNoScriptMacro.class,
+    AllUserPropertiesResolver.class
 })
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
-class DatabaseSearchPageTest extends PageTest
+@DefaultUserComponentList
+class SolrSearchPageTest extends PageTest
 {
     private static final String WIKI_NAME = "xwiki";
 
     private static final String MAIN_SPACE = "Main";
 
-    private static final DocumentReference DATABASE_SEARCH_REFERENCE =
-        new DocumentReference(WIKI_NAME, MAIN_SPACE, "DatabaseSearch");
+    private static final DocumentReference SOLR_SEARCH_REFERENCE =
+        new DocumentReference(WIKI_NAME, MAIN_SPACE, "SolrSearch");
+
+    private static final DocumentReference SOLR_SEARCH_MACROS_REFERENCE =
+        new DocumentReference(WIKI_NAME, MAIN_SPACE, "SolrSearchMacros");
 
     @BeforeEach
-    void setUp()
+    void setUp() throws Exception
     {
         this.xwiki.initializeMandatoryDocuments(this.context);
 
         this.xwiki.getPluginManager().addPlugin("feed", FeedPlugin.class.getName(), this.context);
+
+        loadPage(SOLR_SEARCH_MACROS_REFERENCE);
     }
 
     @Test
@@ -76,11 +87,12 @@ class DatabaseSearchPageTest extends PageTest
         String unescapedText = "<b>}}}{{noscript}}</b>";
         String escapedText = "&lt;b&gt;}}}{{noscript}}&lt;/b&gt;";
 
+        this.request.put("media", "rss");
         this.request.put("text", unescapedText);
         this.context.setAction("get");
 
-        XWikiDocument databaseSearchDocument = loadPage(DATABASE_SEARCH_REFERENCE);
-        this.context.setDoc(databaseSearchDocument);
+        XWikiDocument solrSearchDocument = loadPage(SOLR_SEARCH_REFERENCE);
+        this.context.setDoc(solrSearchDocument);
 
         // Get directly the writer to check the RSS feed.
         StringWriter out = new StringWriter();
@@ -94,11 +106,11 @@ class DatabaseSearchPageTest extends PageTest
         };
         this.context.setResponse(this.response);
 
-        String rssFeed = databaseSearchDocument.displayDocument(Syntax.PLAIN_1_0, this.context);
+        String rssFeed = solrSearchDocument.displayDocument(Syntax.PLAIN_1_0, this.context);
         assertTrue(StringUtils.isAllBlank(rssFeed));
 
         rssFeed = out.toString();
-        assertTrue(rssFeed.contains("<title>search.rss [" + escapedText + "]</title>"));
-        assertTrue(rssFeed.contains("<description>search.rss [" + escapedText + "]</description>"));
+        assertTrue(rssFeed.contains("<title>search.rss [[" + escapedText + "]]</title>"));
+        assertTrue(rssFeed.contains("<description>search.rss [[" + escapedText + "]]</description>"));
     }
 }

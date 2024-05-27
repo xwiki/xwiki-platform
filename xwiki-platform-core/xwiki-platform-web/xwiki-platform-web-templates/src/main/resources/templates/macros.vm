@@ -2806,19 +2806,32 @@ Recursive title display detected!##
  * @param $data the data to be written as JSON on the HTTP response
  *#
 #macro (jsonResponse $data)
-  #set ($json = $jsontool.serialize($data))
-  ## We write the output directly to the HTTP response in order to avoid going through the Rendering which executes
-  ## transformations that could break the JSON (e.g. the icon transformation). Another option would be to specify which
-  ## Rendering Transformations to execute in the query string (XWIKI-13167).
-  #set ($discard = $response.setContentType('application/json'))
+  #rawResponse($jsontool.serialize($data), 'application/json')
+#end
+
+#**
+ * Writes content of any type on the HTTP response, setting the proper content type and length.
+ *
+ * @param $data the data to be written on the HTTP response
+ * @param $contentType the content type to use in the HTTP response (default: 'text/plain')
+ * @since 15.10.11
+ * @since 16.4.1
+ * @since 16.5.0RC1
+ *#
+#macro (rawResponse $data $contentType)
+  #if (!$contentType)
+    #set ($contentType = 'text/plain')
+  #end
+  #set ($characterEncoding = 'utf-8')
+  #set ($discard = $response.setContentType($contentType))
   ## Make sure the Character Encoding response header matches the character encoding used to write the response and
   ## compute its length.
-  #set ($characterEncoding = 'utf-8')
   #set ($discard = $response.setCharacterEncoding($characterEncoding))
-  #set ($discard = $response.writer.write($json))
+  ## We write the output directly to the response to avoid the execution of the Rendering Transformations.
+  #set ($discard = $response.writer.print($data))
   ## The content length is measured in bytes and one character can use more than one byte.
-  #set ($discard = $response.setContentLength($json.getBytes($characterEncoding).size()))
-  ## Make sure the entire content is send back to the client.
+  #set ($discard = $response.setContentLength($data.getBytes($characterEncoding).size()))
+  ## Make sure the entire content is sent back to the client.
   #set ($discard = $response.flushBuffer())
   ## Make sure XWiki doesn't write any more content to the response.
   #set ($discard = $xcontext.setFinished(true))

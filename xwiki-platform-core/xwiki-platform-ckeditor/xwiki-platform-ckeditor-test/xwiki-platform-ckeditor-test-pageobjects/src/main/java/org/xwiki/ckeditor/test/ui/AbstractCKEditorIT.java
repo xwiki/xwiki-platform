@@ -28,8 +28,6 @@ import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
@@ -131,13 +129,6 @@ public abstract class AbstractCKEditorIT
 
     protected void waitForSolrIndexing(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
-    }
-
-    protected String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
     }
 }

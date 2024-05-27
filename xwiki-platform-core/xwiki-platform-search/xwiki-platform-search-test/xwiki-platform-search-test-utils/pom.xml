@@ -24,62 +24,32 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-repository-test</artifactId>
+    <artifactId>xwiki-platform-search-test</artifactId>
     <version>16.4.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-repository-test-utils</artifactId>
-  <name>XWiki Platform - Repository - Tests - Utils</name>
+  <artifactId>xwiki-platform-search-test-utils</artifactId>
+  <name>XWiki Platform - Search - Tests - Utils</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Repository - Tests - Utils</description>
+  <description>XWiki Platform - Search - Tests - Utils</description>
   <properties>
     <!-- None of the classes is valid -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-api</artifactId>
-      <version>${commons.version}</version>
-      <type>test-jar</type>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-integration</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-test-utils</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-repository-server-api</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>xwiki-platform-oldcore</artifactId>
-          <groupId>org.xwiki.platform</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
-
-  <!-- Make this project a test jar because it's manipulating test classes in dependencies.
-       Eclipse for example does not accept main class using a test class. -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

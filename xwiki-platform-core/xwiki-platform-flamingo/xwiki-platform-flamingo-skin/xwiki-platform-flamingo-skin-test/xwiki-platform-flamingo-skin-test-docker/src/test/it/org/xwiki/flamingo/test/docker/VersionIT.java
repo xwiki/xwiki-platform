@@ -29,6 +29,7 @@ import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -56,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
     // The script needs PR right.
     "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
-        + ".*:((Nested)?VersionIT\\.getRevisionsWithCriteria\\.Script)"
+        + ".*:Test\\.Execute\\..+"
 })
 class VersionIT
 {
@@ -656,7 +657,6 @@ class VersionIT
     void getRevisionsWithCriteria(TestUtils testUtils, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
-        testUtils.loginAsSuperAdmin();
         testUtils.rest().delete(testReference);
         testUtils.rest().savePage(testReference, "Some content", "Title");
         testUtils.rest().savePage(testReference, "Some content 1", "Title");
@@ -693,16 +693,16 @@ class VersionIT
         {{/velocity}}
         """, currentTestReference, targetTestReference);
 
-        DocumentReference scriptReference = new DocumentReference("Script", testReference.getLastSpaceReference());
-        ViewPage page = testUtils.createPage(scriptReference, script);
+        String obtainedResult = testUtils.executeWikiPlain(script, Syntax.XWIKI_2_1);
         String expectedResult = String.format("""
         XWiki Doc: %s
         Revision: [5.1]
         XWiki Doc: %s
-        Revision: [5.1]""", currentTestReference.substring("xwiki:".length()), targetTestReference.substring("xwiki:".length()));
-        assertEquals(expectedResult, page.getContent());
+        Revision: [5.1]""",
+            currentTestReference.substring("xwiki:".length()),
+            targetTestReference.substring("xwiki:".length()));
+        assertEquals(expectedResult, obtainedResult);
         logCaptureConfiguration.registerExpectedRegexes("^.*\\QDeprecated usage of method "
-            + "[com.xpn.xwiki.doc.XWikiDocument.setDocumentReference] in "
-            + "xwiki:\\E(Nested)?\\QVersionIT.getRevisionsWithCriteria.Script\\E.*$");
+            + "[com.xpn.xwiki.doc.XWikiDocument.setDocumentReference] in xwiki:Test.Execute\\E.*$");
     }
 }

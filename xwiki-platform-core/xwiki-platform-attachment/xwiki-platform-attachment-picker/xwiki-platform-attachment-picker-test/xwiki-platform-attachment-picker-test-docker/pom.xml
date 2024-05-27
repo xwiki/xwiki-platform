@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-picker-test</artifactId>
-    <version>15.10.10</version>
+    <version>15.10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-attachment-picker-test-docker</artifactId>
   <name>XWiki Platform - Attachment - Picker - Tests - Functional Tests in Docker</name>

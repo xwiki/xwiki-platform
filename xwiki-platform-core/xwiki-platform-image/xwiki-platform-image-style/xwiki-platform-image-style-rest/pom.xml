@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-image-style</artifactId>
-    <version>15.10.10</version>
+    <version>15.10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-image-style-rest</artifactId>
   <name>XWiki Platform - Image - Style - Rest</name>

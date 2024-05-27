@@ -22,6 +22,7 @@ package com.xpn.xwiki.store;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -69,24 +70,23 @@ public interface XWikiVersioningStoreInterface
         return false;
     }
 
-    private Collection<String> getXWikiDocStringVersions(XWikiDocument doc, RevisionCriteria criteria,
-        XWikiContext context) throws XWikiException
+    default Collection<String> filterVersions(XWikiDocumentArchive archive, RevisionCriteria criteria)
     {
         List<String> results = new ArrayList<>();
 
-        Version[] revisions = getXWikiDocVersions(doc, context);
-        XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+        List<XWikiRCSNodeInfo> nodes = new ArrayList<>(archive.getNodes());
+        Collections.reverse(nodes);
 
-        Iterator<Version> revisionsIterator = Arrays.stream(revisions).iterator();
-        if (!revisionsIterator.hasNext()) {
+        Iterator<XWikiRCSNodeInfo> nodesIterator = nodes.iterator();
+        if (!nodesIterator.hasNext()) {
             return List.of();
         }
 
-        XWikiRCSNodeInfo nodeinfo = archive.getNode(revisionsIterator.next());
+        XWikiRCSNodeInfo nodeinfo = nodesIterator.next();
         XWikiRCSNodeInfo nextNodeinfo;
 
-        while (revisionsIterator.hasNext()) {
-            nextNodeinfo = archive.getNode(revisionsIterator.next());
+        while (nodesIterator.hasNext()) {
+            nextNodeinfo =nodesIterator.next();
 
             // Minor/Major version matching
             if ((criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit())
@@ -118,7 +118,7 @@ public interface XWikiVersioningStoreInterface
     default Collection<Version> getXWikiDocVersions(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
         throws XWikiException
     {
-        return getXWikiDocStringVersions(doc, criteria, context).stream()
+        return filterVersions(getXWikiDocumentArchive(doc, context), criteria).stream()
             .map(Version::new)
             .collect(Collectors.toList());
     }
@@ -137,7 +137,7 @@ public interface XWikiVersioningStoreInterface
     default long getXWikiDocVersionsCount(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
         throws XWikiException
     {
-        return getXWikiDocStringVersions(doc, criteria, context).size();
+        return filterVersions(getXWikiDocumentArchive(doc, context), criteria).size();
     }
 
     XWikiDocument loadXWikiDoc(XWikiDocument doc, String version, XWikiContext context) throws XWikiException;

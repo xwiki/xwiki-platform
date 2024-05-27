@@ -19,14 +19,10 @@
  */
 package com.xpn.xwiki.store;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

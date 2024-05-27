@@ -39,7 +39,20 @@
   <content>index.deletedDocuments.deleteAll=Delete all
 index.administration.remainingTasks.heading=Remaining Document Analysis tasks
 index.administration.remainingTasks.emptyQueue=No remaining tasks.
-admin.documentanalysis=Document Analysis</content>
+admin.documentanalysis=Document Analysis
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Spaces
+index.spacesMacro.spaceIndex.title=See Space Index
+index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceAdministration.title=See Space Administration
+index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.createSpace.link=Create a new space
+index.spacesMacro.createSpace.defaultSpaceName=Space name
+index.spacesMacro.createSpace.submit=Create</content>
   <object>
     <name>Index.Translations</name>
     <number>0</number>

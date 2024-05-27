@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr-test</artifactId>
-    <version>15.10.10-SNAPSHOT</version>
+    <version>15.10.10</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-test-pageobjects</artifactId>
   <name>XWiki Platform - Search - Solr - Tests - Page Objects</name>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,20 +18,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wiki-test</artifactId>
+    <artifactId>xwiki-platform-search-test</artifactId>
     <version>16.5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-test-docker</artifactId>
-  <name>XWiki Platform - Wiki - Tests - Functional Docker Tests</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
+  <artifactId>xwiki-platform-search-test-docker</artifactId>
+  <name>XWiki Platform - Search - Tests - Functional Docker Tests</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Wiki - Functional Tests in Docker</description>
+  <description>XWiki Platform - Search - Tests - Functional Tests in Docker</description>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
@@ -40,53 +36,25 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-rest-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
+      <artifactId>xwiki-platform-search-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Needed by wiki creation job to resolve extensions -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-repository-maven</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- For snapshots too -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- Needed to provision wiki
-         TODO: maybe but this dependency in xwiki-platform-wiki-creationjob instead -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-handler-jar</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Needed to provision wiki -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Needed to display debug logs to debug strange issues on CI. Can be removed once the
-         WikiTemplateIT#createWikiFromTemplate() flicker is fixed -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-logging-script</artifactId>
+      <artifactId>xwiki-platform-search-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-
-    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -96,23 +64,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- We need some search suggest sources, so we use Solr -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>
+      <artifactId>xwiki-platform-search-solr-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-test-pageobjects</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity output="false"}}
 ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
 ## search suggest contructor.
 #set ($sources = [])
@@ -96,6 +96,6 @@
     #end
   #end
 #end
-$jsontool.serialize($sources)
+#jsonResponse($sources)
 {{/velocity}}</content>
 </xwikidoc>

@@ -43,8 +43,6 @@ import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
@@ -68,13 +66,6 @@ class RenamePageIT
         setup.loginAsSuperAdmin();
     }
 
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
-    }
-
     @Order(1)
     @Test
     void convertNestedPageToTerminalPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
@@ -91,7 +82,7 @@ class RenamePageIT
         ViewPage vp = setup.createPage(reference, "", "");
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.3.WebHome and check the Terminal checkbox. We also need to uncheck the
         // Auto Redirect checkbox so the page 1.2.3.WebHome will not appear as existing after the Rename operation.
@@ -129,7 +120,7 @@ class RenamePageIT
         ViewPage vp = new ViewPage();
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.WebHome.
         RenamePage renamePage = vp.rename();
@@ -400,7 +391,7 @@ class RenamePageIT
             String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 1
         ViewPage viewPage = setup.gotoPage(sourcePageReference1);
@@ -417,7 +408,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 2
         viewPage = setup.gotoPage(sourcePageReference2);
@@ -434,7 +425,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 3
         viewPage = setup.gotoPage(sourcePageReference3);
@@ -451,7 +442,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 4
         viewPage = setup.gotoPage(sourcePageReference4);
@@ -468,7 +459,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 5
         viewPage = setup.gotoPage(sourcePageReference5);
@@ -504,7 +495,7 @@ class RenamePageIT
         assertEquals("[[OtherPage]]", setup.rest().<Page>get(reference).getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Rename the page
         ViewPage vp = setup.gotoPage(reference);

@@ -24,25 +24,32 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-search-test</artifactId>
     <version>16.5.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search</artifactId>
-  <name>XWiki Platform - Search - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Search - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-search-api</module>
-    <module>xwiki-platform-search-solr</module>
-    <module>xwiki-platform-search-ui</module>
-    <module>xwiki-platform-search-webjar</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-search-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-search-test-utils</artifactId>
+  <name>XWiki Platform - Search - Tests - Utils</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Search - Tests - Utils</description>
+  <properties>
+    <!-- None of the classes is valid -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-integration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

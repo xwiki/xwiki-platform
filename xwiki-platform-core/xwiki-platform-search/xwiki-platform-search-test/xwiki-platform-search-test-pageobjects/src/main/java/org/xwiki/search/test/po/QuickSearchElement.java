@@ -43,6 +43,7 @@ public class QuickSearchElement extends BaseElement
         this.searchButton.click();
         this.searchInput.clear();
         this.searchInput.sendKeys(terms);
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".searchSuggest li.showAllResults.loading"));
     }
 
     /**
@@ -50,17 +51,20 @@ public class QuickSearchElement extends BaseElement
      * @param index the index of the item to get
      * @return the title of the item, or null if it could not be found
      */
-    public WebElement getSuggestItemTitles(int index) throws InterruptedException
+    public WebElement getSuggestItemTitles(int index)
     {
-        WebElement suggestItemsListTitles = this.getDriver().findElement(By.cssSelector(".results0 .suggestList"));
-        int nRetries = 5;
-        while (nRetries-- > 0) {
-            List<WebElement> titles = suggestItemsListTitles.findElements(By.xpath("//div[@class = 'value']"));
-            if (index < titles.size()) {
-                return titles.get(index);
-            }
-            Thread.sleep(500);
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".searchSuggest .results0:not(.loading)"));
+
+        WebElement suggestItemsListTitles = getDriver().findElement(By.cssSelector(".results0 .suggestList"));
+        if (suggestItemsListTitles == null) {
+            return null;
         }
-        return null;
+
+        List<WebElement> titles = suggestItemsListTitles.findElements(By.xpath("//div[@class = 'value']"));
+        if (index < titles.size()) {
+            return titles.get(index);
+        } else {
+            return null;
+        }
     }
 }

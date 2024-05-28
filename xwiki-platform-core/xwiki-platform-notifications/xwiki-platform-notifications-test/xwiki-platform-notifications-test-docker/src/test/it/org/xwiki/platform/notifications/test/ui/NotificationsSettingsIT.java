@@ -31,9 +31,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
+import org.xwiki.platform.notifications.test.po.NotificationWatchButtonElement;
 import org.xwiki.platform.notifications.test.po.NotificationsAdministrationPage;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
+import org.xwiki.platform.notifications.test.po.NotificationsWatchModal;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
 import org.xwiki.platform.notifications.test.po.preferences.CustomNotificationFilterPreferencesLiveDataElement;
 import org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterModal;
@@ -256,13 +258,10 @@ class NotificationsSettingsIT
 
             // Create a page
             testUtils.createPage(testReference, "", "");
-            NotificationsTrayPage trayPage = new NotificationsTrayPage();
-            trayPage.showNotificationTray();
+            NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
 
             // Check if the page is watched
-            assertTrue(trayPage.isPageOnlyWatched());
-            assertFalse(trayPage.arePageAndChildrenWatched());
-            assertFalse(trayPage.isWikiWatched());
+            assertTrue(watchButtonElement.isWatched());
 
             // Go back to the preferences to ensure the filter has been created
             NotificationsUserProfilePage notificationsUserProfilePage =
@@ -287,13 +286,16 @@ class NotificationsSettingsIT
 
             // back to the page
             testUtils.gotoPage(testReference);
-            trayPage = new NotificationsTrayPage();
-            // Unwatch the page
-            trayPage.setPageOnlyWatchedState(false);
-            // Verify all other buttons are updated
-            assertFalse(trayPage.isPageOnlyWatched());
-            assertFalse(trayPage.arePageAndChildrenWatched());
-            assertFalse(trayPage.isWikiWatched());
+            watchButtonElement = new NotificationWatchButtonElement();
+            NotificationsWatchModal notificationsWatchModal = watchButtonElement.openModal();
+            assertEquals(List.of(
+                NotificationsWatchModal.WatchOptions.BLOCK_PAGE,
+                NotificationsWatchModal.WatchOptions.BLOCK_SPACE,
+                NotificationsWatchModal.WatchOptions.UNWATCH_PAGE
+            ), notificationsWatchModal.getAvailableOptions());
+            notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.UNWATCH_PAGE);
+
+            watchButtonElement = new NotificationWatchButtonElement();
 
             // Go back to the preferences to ensure the filter has been deleted
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
@@ -304,13 +306,17 @@ class NotificationsSettingsIT
 
             // back to the page
             testUtils.gotoPage(testReference);
-            trayPage = new NotificationsTrayPage();
-            trayPage.showNotificationTray();
+            watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isNotSet());
+            notificationsWatchModal = watchButtonElement.openModal();
+            assertEquals(List.of(
+                NotificationsWatchModal.WatchOptions.WATCH_PAGE,
+                NotificationsWatchModal.WatchOptions.WATCH_SPACE,
+                NotificationsWatchModal.WatchOptions.WATCH_WIKI
+            ), notificationsWatchModal.getAvailableOptions());
 
             // Watch the space
-            trayPage.setPageAndChildrenWatchedState(true);
-            // Verify the other button is updated
-            assertTrue(trayPage.isPageOnlyWatched());
+            notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_SPACE);
 
             // Go back to the preferences to ensure the filter has been created
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
@@ -330,15 +336,21 @@ class NotificationsSettingsIT
 
             // back to the page
             testUtils.gotoPage(testReference);
-            trayPage = new NotificationsTrayPage();
-            trayPage.showNotificationTray();
+            watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isWatched());
 
-            // Unwatch the page
-            trayPage.setPageOnlyWatchedState(false);
-            // Verify the whole status
-            assertFalse(trayPage.isPageOnlyWatched());
-            assertTrue(trayPage.arePageAndChildrenWatched());
-            assertFalse(trayPage.isWikiWatched());
+            notificationsWatchModal = watchButtonElement.openModal();
+            assertEquals(List.of(
+                NotificationsWatchModal.WatchOptions.BLOCK_PAGE,
+                NotificationsWatchModal.WatchOptions.BLOCK_SPACE,
+                NotificationsWatchModal.WatchOptions.UNWATCH_SPACE
+            ), notificationsWatchModal.getAvailableOptions());
+
+            // Block the page
+            notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.BLOCK_PAGE);
+
+            watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isBlocked());
 
             // Go back to the preferences
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
@@ -368,12 +380,9 @@ class NotificationsSettingsIT
 
             // Go back to the page to check how it impacts the watch
             testUtils.gotoPage(testReference);
-            trayPage = new NotificationsTrayPage();
-            trayPage.showNotificationTray();
-            // Verify the whole status
-            assertTrue(trayPage.isPageOnlyWatched());
-            assertTrue(trayPage.arePageAndChildrenWatched());
-            assertFalse(trayPage.isWikiWatched());
+
+            watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isWatched());
 
             // Delete the filters
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
@@ -386,11 +395,8 @@ class NotificationsSettingsIT
 
             // Verify it's all like the beginning
             testUtils.gotoPage(testReference);
-            trayPage = new NotificationsTrayPage();
-            trayPage.showNotificationTray();
-            assertFalse(trayPage.isPageOnlyWatched());
-            assertFalse(trayPage.arePageAndChildrenWatched());
-            assertFalse(trayPage.isWikiWatched());
+            watchButtonElement = new NotificationWatchButtonElement();
+            assertTrue(watchButtonElement.isNotSet());
 
             // Go back to the preferences
             notificationsUserProfilePage = NotificationsUserProfilePage.gotoPage(FIRST_USER_NAME);
@@ -837,21 +843,19 @@ class NotificationsSettingsIT
     {
         testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
         ViewPage viewPage = testUtils.createPage(testReference, "Content", "Title");
-        NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
-        notificationsTrayPage.showNotificationTray();
+
         // Autowatch is enabled for created page
-        assertTrue(notificationsTrayPage.isPageOnlyWatched());
+        NotificationWatchButtonElement watchButtonElement = new NotificationWatchButtonElement();
+        assertTrue(watchButtonElement.isWatched());
         RenamePage renamePage = viewPage.rename();
         renamePage.getDocumentPicker().setTitle(testReference.getName() + "Renamed");
         CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton().waitUntilFinished();
         statusPage.gotoNewPage();
-        notificationsTrayPage = new NotificationsTrayPage();
-        notificationsTrayPage.showNotificationTray();
-        assertTrue(notificationsTrayPage.isPageOnlyWatched());
+        watchButtonElement = new NotificationWatchButtonElement();
+        assertTrue(watchButtonElement.isWatched());
 
         testUtils.gotoPage(testReference);
-        notificationsTrayPage = new NotificationsTrayPage();
-        notificationsTrayPage.showNotificationTray();
-        assertFalse(notificationsTrayPage.isPageOnlyWatched());
+        watchButtonElement = new NotificationWatchButtonElement();
+        assertTrue(watchButtonElement.isNotSet());
     }
 }

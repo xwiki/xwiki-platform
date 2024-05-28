@@ -38,12 +38,4 @@
     <module>xwiki-platform-search-solr-rest</module>
     <module>xwiki-platform-search-solr-ui</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-search-solr-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

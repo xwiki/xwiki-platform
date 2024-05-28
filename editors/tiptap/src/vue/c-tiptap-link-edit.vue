@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CIcon } from "@cristal/icons";
+import { CIcon } from "@xwiki/cristal-icons";
 import { BubbleMenuAction } from "../components/extensions/bubble-menu";
 import { Editor, Range } from "@tiptap/vue-3";
 import { inject, onMounted, onUpdated, Ref, ref } from "vue";

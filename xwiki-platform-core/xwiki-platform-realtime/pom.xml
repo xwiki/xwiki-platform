@@ -32,6 +32,7 @@
   <packaging>pom</packaging>
   <description>Adds support for real-time editing in XWiki.</description>
   <modules>
+    <module>xwiki-platform-realtime-api</module>
     <module>xwiki-platform-realtime-ui</module>
     <module>xwiki-platform-realtime-webjar</module>
     <module>xwiki-platform-realtime-wiki</module>

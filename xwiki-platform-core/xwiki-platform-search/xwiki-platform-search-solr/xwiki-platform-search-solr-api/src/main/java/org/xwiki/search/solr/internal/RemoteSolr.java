@@ -19,6 +19,10 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,10 +30,13 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.GenericSolrRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.CoreAdminParams.CoreAdminAction;
 import org.apache.solr.common.util.NamedList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -127,6 +134,20 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         }
     }
 
+    private Set<String> getCores() throws SolrServerException, IOException
+    {
+        CoreAdminRequest request = new CoreAdminRequest();
+        request.setAction(CoreAdminAction.STATUS);
+        CoreAdminResponse response = request.process(this.rootClient);
+
+        Set<String> cores = new HashSet<>();
+        for (int i = 0; i < response.getCoreStatus().size(); i++) {
+            cores.add(response.getCoreStatus().getName(i));
+        }
+
+        return cores;
+    }
+
     HttpSolrClient getRootClient()
     {
         return this.rootClient;
@@ -139,9 +160,19 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     }
 
     @Override
-    protected SolrClient getInternalSolrClient(String solrCoreName)
+    protected SolrClient getInternalSolrClient(String solrCoreName) throws SolrException
     {
-        return new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+        // Check if the core exists
+        try {
+            if (getCores().contains(solrCoreName)) {
+                return new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+            }
+        } catch (Exception e) {
+            throw new SolrException("Failed to get the list of cores", e);
+        }
+
+        // If not, return null
+        return null;
     }
 
     private String getCorePrefix()

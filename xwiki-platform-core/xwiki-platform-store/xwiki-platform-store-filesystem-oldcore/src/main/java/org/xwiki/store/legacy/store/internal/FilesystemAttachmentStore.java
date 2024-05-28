@@ -38,7 +38,6 @@ import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StreamProvider;
 import org.xwiki.store.StringStreamProvider;
 import org.xwiki.store.TransactionRunnable;
-import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
@@ -340,7 +339,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                         archive.getRevision(attachment, attachment.getVersion(), context);
                     // Really comparing the content could be very expensive so we assume comparing the size and date are
                     // enough
-                    if (archiveAttachment.getDate() == attachment.getDate()
+                    if (archiveAttachment != null && archiveAttachment.getDate() == attachment.getDate()
                         && archiveAttachment.getLongSize() == attachment.getLongSize()) {
                         link = true;
                     }
@@ -369,7 +368,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             if (link) {
                 // Create a link to the current version
                 finalAttachFile = linkAttachFile;
-                streamProvider = new StringStreamProvider(getLinkContent(attachment), StandardCharsets.UTF_8);
+                streamProvider = new StringStreamProvider(fileTools.getLinkContent(attachment), StandardCharsets.UTF_8);
                 otherAttachFile = attachFile;
             } else {
                 // Save the content as is
@@ -403,15 +402,6 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                     }
                 }.runIn(this);
             }
-        }
-
-        private String getLinkContent(XWikiAttachment attachment)
-        {
-            AttachmentFileProvider provider = fileTools.getAttachmentFileProvider(attachment.getReference());
-            File defaultFile = provider.getAttachmentContentFile();
-            File versionFile = provider.getAttachmentVersionContentFile(attachment.getVersion());
-
-            return StoreFileUtils.getLinkContent(defaultFile.getParentFile(), versionFile);
         }
     }
 

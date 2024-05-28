@@ -36,7 +36,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.deletedDocuments.deleteAll=Alle löschen
+  <content>index.spacesMacro.title=Bereiche
+index.spacesMacro.spaceIndex.title=Siehe Dokumentenverzeichnis
+index.spacesMacro.spaceIndex.alt=Dokumentenverzeichnis des Bereichs
+index.spacesMacro.spaceAdministration.title=Siehe Bereichs-Administration
+index.spacesMacro.spaceAdministration.alt=Bereich administrieren
+index.spacesMacro.createSpace.link=Neuen Bereich erstellen
+index.spacesMacro.createSpace.defaultSpaceName=Bereichsname
+index.spacesMacro.createSpace.submit=Erstellen
+index.deletedDocuments.deleteAll=Alle löschen
 index.administration.remainingTasks.heading=Verbleibende Aufgaben zur Dokumentenanalyse
 index.administration.remainingTasks.emptyQueue=Keine verbleibenden Aufgaben.
 admin.documentanalysis=Dokumentenanalyse

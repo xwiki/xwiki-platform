@@ -36,5 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+  <content>index.spacesMacro.title=Prostory
+index.spacesMacro.spaceIndex.title=Viz obsah prostoru
+index.spacesMacro.spaceIndex.alt=Index prostoru
+index.spacesMacro.spaceAdministration.title=Viz administrace prostoru
+index.spacesMacro.spaceAdministration.alt=Administrovat prostor
+index.spacesMacro.createSpace.link=Vytvořit nový prostor
+index.spacesMacro.createSpace.defaultSpaceName=Jméno prostoru
+index.spacesMacro.createSpace.submit=Vytvořit
+### Missing: index.deletedDocuments.deleteAll=Delete all</content>
 </xwikidoc>

@@ -37,6 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#if ($xcontext.action == 'get')
 ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
 ## search suggest contructor.
 #set ($sources = [])
@@ -97,5 +98,6 @@
   #end
 #end
 #jsonResponse($sources)
+#end
 {{/velocity}}</content>
 </xwikidoc>

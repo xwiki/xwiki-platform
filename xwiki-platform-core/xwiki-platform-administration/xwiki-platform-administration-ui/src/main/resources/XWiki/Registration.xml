@@ -879,7 +879,7 @@
       <extensionPointId>org.xwiki.platform.topmenu.right</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.plaform.search.quicksearch</name>
+      <name>org.xwiki.plaform.registration</name>
     </property>
     <property>
       <parameters>order=40000</parameters>

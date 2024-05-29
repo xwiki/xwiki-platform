@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -164,7 +165,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         Collection<String> versionsToKeep = filterVersions(archiveDoc, criteria);
         // We retrieve the actual nodes from the versions we obtained
         result.setNodes(archiveDoc.getNodes().stream()
-            .filter(node -> versionsToKeep.contains(node.getVersion().toString())).toList());
+            .filter(node -> versionsToKeep.contains(node.getVersion().toString())).collect(Collectors.toList()));
         return result;
     }
 

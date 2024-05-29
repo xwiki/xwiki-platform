@@ -19,6 +19,7 @@
  */
 package org.xwiki.icon.macro.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -40,6 +41,7 @@ import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroContentParser;
@@ -134,7 +136,29 @@ class DisplayIconMacroTest
         when(this.iconRenderer.render(anyString(), any(IconSet.class)))
             .then(invocation -> invocation.getArgument(0, String.class));
         when(this.macroContentParser.parse(anyString(), eq(Syntax.XWIKI_2_1), any(), eq(false), any(), anyBoolean()))
-            .then(invocation -> new XDOM(List.of(new WordBlock(invocation.getArgument(0)))));
+            .then(invocation -> {
+                // Split the input into words and transform it into a series of space and word blocks.
+                List<Block> parsedInput = new ArrayList<>();
+                String input = invocation.getArgument(0);
+                StringBuilder currentWord = new StringBuilder();
+                for (int i = 0; i < input.length(); i++) {
+                    char c = input.charAt(i);
+                    if (c == ' ') {
+                        if (!currentWord.isEmpty()) {
+                            parsedInput.add(new WordBlock(currentWord.toString()));
+                            currentWord.setLength(0);
+                        }
+                        parsedInput.add(new SpaceBlock());
+                    } else {
+                        currentWord.append(c);
+                    }
+                }
+                if (!currentWord.isEmpty()) {
+                    parsedInput.add(new WordBlock(currentWord.toString()));
+                }
+
+                return new XDOM(parsedInput);
+            });
         when(this.documentContextExecutor.call(any(), any()))
             .then(invocation -> invocation.getArgument(0, Callable.class).call());
         when(this.blockAsyncRendererExecutor.execute(any())).then(invocation -> invocation.getArgument(0,

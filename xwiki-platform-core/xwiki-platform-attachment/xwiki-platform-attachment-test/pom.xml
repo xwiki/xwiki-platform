@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.4.0</version>
   </parent>
   <artifactId>xwiki-platform-attachment-test</artifactId>
   <name>XWiki Platform - Attachment - Tests - Parent POM</name>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-image</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.4.0</version>
   </parent>
   <artifactId>xwiki-platform-image-lightbox</artifactId>
   <name>XWiki Platform - Image - Lightbox - Parent POM</name>

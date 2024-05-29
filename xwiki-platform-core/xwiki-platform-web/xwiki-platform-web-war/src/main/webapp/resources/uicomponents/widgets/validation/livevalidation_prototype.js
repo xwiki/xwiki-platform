@@ -282,7 +282,7 @@ LiveValidation.prototype = {
       this.insertMessage(this.validations[i], isValid);
       this.validationFailed = this.validationFailed || isValid;
     }
-    return !this.validationFailed;
+    return this.validationFailed;
   },
     
   /**

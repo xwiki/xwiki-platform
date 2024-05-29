@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-captcha</artifactId>
-    <version>16.4.0</version>
+    <version>16.4.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha-api</artifactId>
   <name>XWiki Platform - CAPTCHA - API</name>

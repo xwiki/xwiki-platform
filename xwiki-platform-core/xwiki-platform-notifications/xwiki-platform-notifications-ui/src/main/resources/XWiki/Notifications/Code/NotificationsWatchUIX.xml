@@ -462,7 +462,7 @@
     </property>
     <property>
       <content>{{velocity}}
-## FIXME: this object should be cached / async once properly finished.
+#if (!$isGuest)
 #set($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #set($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #macro (_displayReferenceInModal $entityReference)
@@ -637,6 +637,7 @@
   &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
 &lt;/div&gt;&lt;!-- /.modal --&gt;
 {{/html}}
+#end
 {{/velocity}}</content>
     </property>
     <property>

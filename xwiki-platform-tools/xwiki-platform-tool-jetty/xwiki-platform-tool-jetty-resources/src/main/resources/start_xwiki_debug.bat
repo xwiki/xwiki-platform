@@ -90,7 +90,7 @@ set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir="%XWIKI_DATA_DIR%"
 
 REM Make sure the standard Java tmpdir is isolated per instance (by default Jetty provides applications work dir in the Java tmpdir)
 set JAVA_TMP=tmp
-XWIKI_OPTS=%XWIKI_OPTS% -Djava.io.tmpdir="%JAVA_TMP%"
+set XWIKI_OPTS=%XWIKI_OPTS% -Djava.io.tmpdir="%JAVA_TMP%"
 REM Make sure the Java tmpdir exist since Jenkins does not create it
 if not exist "%JAVA_TMP%" mkdir "%JAVA_TMP%"
 

@@ -671,34 +671,32 @@ class VersionIT
 
         String currentTestReference = testUtils.serializeReference(testReference);
         String targetTestReference = "xwiki:Test.getRevisionsWithCriteriaFoo.WebHome";
-        String script = String.format("""
-        {{velocity}}
-        #set ($myTest = "%s")
-        #set ($startAt = 0)
-        #set ($endAt = -1)
-        #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-        #set ($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
-        #set ($discard = $criteria.setRange($range))
-        #set ($myDoc = $xwiki.getDocument($myTest))
-        #set ($xwikiDoc = $myDoc.document)
-        #set ($discard = $myDoc.document.loadArchive($xcontext.context))
-        XWiki Doc: $xwikiDoc
-        #set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))
-        Revision: $revisions
-        #set ($newRef = $services.model.resolveDocument("%s"))
-        #set ($discard = $xwikiDoc.setDocumentReference($newRef))
-        XWiki Doc: $xwikiDoc
-        #set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))
-        Revision: $revisions
-        {{/velocity}}
-        """, currentTestReference, targetTestReference);
+        String script = String.format("{{velocity}}\n"
+            + "#set ($myTest = \"%s\")\n"
+            + "#set ($startAt = 0)\n"
+            + "#set ($endAt = -1)\n"
+            + "#set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', "
+            + "$minorVersions))\n"
+            + "#set ($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))\n"
+            + "#set ($discard = $criteria.setRange($range))\n"
+            + "#set ($myDoc = $xwiki.getDocument($myTest))\n"
+            + "#set ($xwikiDoc = $myDoc.document)\n"
+            + "#set ($discard = $myDoc.document.loadArchive($xcontext.context))\n"
+            + "XWiki Doc: $xwikiDoc\n"
+            + "#set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))\n"
+            + "Revision: $revisions\n"
+            + "#set ($newRef = $services.model.resolveDocument(\"%s\"))\n"
+            + "#set ($discard = $xwikiDoc.setDocumentReference($newRef))\n"
+            + "XWiki Doc: $xwikiDoc\n"
+            + "#set ($revisions = $xwikiDoc.getRevisions($criteria, $xcontext.context))\n"
+            + "Revision: $revisions\n"
+        + "{{/velocity}}", currentTestReference, targetTestReference);
 
         String obtainedResult = testUtils.executeWikiPlain(script, Syntax.XWIKI_2_1);
-        String expectedResult = String.format("""
-        XWiki Doc: %s
-        Revision: [5.1]
-        XWiki Doc: %s
-        Revision: [5.1]""",
+        String expectedResult = String.format("XWiki Doc: %s\n"
+            + "Revision: [5.1]\n"
+            + "XWiki Doc: %s\n"
+            + "Revision: [5.1]",
             currentTestReference.substring("xwiki:".length()),
             targetTestReference.substring("xwiki:".length()));
         assertEquals(expectedResult, obtainedResult);

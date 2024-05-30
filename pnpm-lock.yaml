@@ -56,6 +56,9 @@ importers:
       vite:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.12)
+      vite-plugin-css-injected-by-js:
+        specifier: 3.5.1
+        version: 3.5.1(vite@5.2.11(@types/node@20.12.12))
       vite-plugin-dts:
         specifier: 3.9.1
         version: 3.9.1(@types/node@20.12.12)(rollup@4.18.0)(typescript@5.4.5)(vite@5.2.11(@types/node@20.12.12))
@@ -3369,6 +3372,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   global-agent@3.0.0:
     resolution: {integrity: sha512-PT6XReJ+D07JvGoxQMkT6qji/jVNfX/h364XHZOWeRzy64sSFr+xJ5OX7LI3b4MPQzdL4H8Y8M0xzPpsVMwA8Q==}
@@ -5189,6 +5193,11 @@ packages:
     peerDependencies:
       comlink: ^4.3.1
       vite: '>=2.9.6'
+
+  vite-plugin-css-injected-by-js@3.5.1:
+    resolution: {integrity: sha512-9ioqwDuEBxW55gNoWFEDhfLTrVKXEEZgl5adhWmmqa88EQGKfTmexy4v1Rh0pAS6RhKQs2bUYQArprB32JpUZQ==}
+    peerDependencies:
+      vite: '>2.0.0-0'
 
   vite-plugin-dts@3.9.1:
     resolution: {integrity: sha512-rVp2KM9Ue22NGWB8dNtWEr+KekN3rIgz1tWD050QnRGlriUCmaDwa7qA5zDEjbXg5lAXhYMSBJtx3q3hQIJZSg==}
@@ -10140,6 +10149,10 @@ snapshots:
       json5: 2.2.3
       magic-string: 0.30.5
       source-map: 0.7.4
+      vite: 5.2.11(@types/node@20.12.12)
+
+  vite-plugin-css-injected-by-js@3.5.1(vite@5.2.11(@types/node@20.12.12)):
+    dependencies:
       vite: 5.2.11(@types/node@20.12.12)
 
   vite-plugin-dts@3.9.1(@types/node@20.12.12)(rollup@4.18.0)(typescript@5.4.5)(vite@5.2.11(@types/node@20.12.12)):

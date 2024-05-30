@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import vue from "@vitejs/plugin-vue";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 function pathsComputation(path: string) {
   const dir = dirname(fileURLToPath(path));
@@ -44,6 +45,7 @@ export function generateConfigVue(path: string) {
     generateConfig(path),
     defineConfig({
       build: {
+        cssCodeSplit: true,
         rollupOptions: {
           // external: Object.keys(pkg.dependencies || {}),
           output: {
@@ -62,6 +64,10 @@ export function generateConfigVue(path: string) {
             },
           },
         }),
+        // This plugin is useful to make the CSS of a given module loaded by the
+        // module itself, allowing CSS to be loaded even when Cristal is
+        // imported in an external project.
+        cssInjectedByJsPlugin(),
       ],
     }),
   );

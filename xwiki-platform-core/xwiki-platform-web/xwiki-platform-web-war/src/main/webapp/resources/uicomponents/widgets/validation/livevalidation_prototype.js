@@ -403,7 +403,7 @@ LiveValidation.prototype = {
     if(validation.params.validMessage=="" && !validation.params.validMessage) return; // dont insert anything if validMessage is an empty string
     if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) ||
       this.element.value != '' ||
-        validation.params.identifier.includes("regex")){
+      validation.params.identifier.includes("regex")){
       this.removeMessageClass(messageHolder);
       /* If the isValid state is null, we assume that the validation did not occur yet. We do not add any class that
       * would give a false hint towards a result. */

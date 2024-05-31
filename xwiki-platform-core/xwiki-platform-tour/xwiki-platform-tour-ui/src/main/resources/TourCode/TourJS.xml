@@ -172,10 +172,8 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     // Create the popover
     var popover = $('&lt;div class="popover-content"&gt;#tr("tour.popover.show.hint")&lt;/div&gt;').appendTo(buttonContainer);
     // Create the button that will start the tour again
-    var button = $($jsontool.serialize("&lt;button id='tourResume' class='btn btn-default btn-xs'&gt;$services.icon.renderHTML('info')")
-      + "#tr('tour.popover.show')"
-      + $jsontool.serialize("&lt;/button&gt;"))
-      .appendTo(buttonContainer);
+    const button = $('&lt;button id=\'tourResume\' class=\'btn btn-default btn-xs\'&gt;&lt;/button&gt;')
+      .html("$escapetool.javascript($services.icon.renderHTML('info')) #tr('tour.popover.show')")
 
     if (showPopover) {
       buttonContainer.addClass('opened');

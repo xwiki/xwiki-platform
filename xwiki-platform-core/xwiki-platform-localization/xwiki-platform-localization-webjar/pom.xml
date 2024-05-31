@@ -31,6 +31,10 @@
   <artifactId>xwiki-platform-localization-webjar</artifactId>
   <name>XWiki Platform - Localization - WebJar</name>
   <description>A JavaScript API to load localization messages.</description>
+  <properties>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.webjars</groupId>

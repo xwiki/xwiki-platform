@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- This module has been moved from XWiki Contrib to platform. -->
     <xwiki.extension.previousIds>org.xwiki.contrib:application-ckeditor-webjar</xwiki.extension.previousIds>
     <!-- The list of extensions that this module either replaces or bundles:

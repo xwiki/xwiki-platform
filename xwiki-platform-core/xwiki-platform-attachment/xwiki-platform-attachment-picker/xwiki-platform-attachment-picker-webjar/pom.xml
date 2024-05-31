@@ -34,8 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Attachment Picker WebJar</xwiki.extension.name>
-    <!-- Category to display in the Extension Manager. -->
-    <xwiki.extension.category>api</xwiki.extension.category>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

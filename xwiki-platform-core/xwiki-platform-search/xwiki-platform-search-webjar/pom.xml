@@ -32,6 +32,10 @@
   <artifactId>xwiki-platform-search-webjar</artifactId>
   <name>XWiki Platform - Search - WebJar</name>
   <description>A JavaScript component to manage and display search suggestions.</description>
+  <properties>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
+  </properties>
   <dependencies>
     <!-- Search suggestions require SearchSuggestSourceObjectEvaluator. -->
     <dependency>

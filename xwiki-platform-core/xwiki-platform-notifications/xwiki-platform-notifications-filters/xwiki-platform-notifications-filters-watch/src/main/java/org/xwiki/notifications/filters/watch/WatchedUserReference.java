@@ -27,6 +27,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
@@ -96,7 +97,8 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setStartingDate(new Date());
-        filterPreference.setUser(userId);
+        filterPreference.setEntity(userId);
+        filterPreference.setScope(NotificationFilterScope.USER);
 
         return filterPreference;
     }
@@ -111,7 +113,8 @@ public class WatchedUserReference implements WatchedEntityReference
         filterPreference.setFilterName(EventUserFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Sets.newHashSet(NotificationFormat.values()));
         filterPreference.setStartingDate(new Date());
-        filterPreference.setUser(userId);
+        filterPreference.setEntity(userId);
+        filterPreference.setScope(NotificationFilterScope.USER);
 
         return filterPreference;
     }

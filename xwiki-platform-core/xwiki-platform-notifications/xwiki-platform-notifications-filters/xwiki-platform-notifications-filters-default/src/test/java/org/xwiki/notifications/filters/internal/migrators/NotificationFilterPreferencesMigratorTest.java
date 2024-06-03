@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
@@ -199,16 +200,20 @@ public class NotificationFilterPreferencesMigratorTest
         preference.setEnabled(isEnabled);
         preference.setStartingDate(date);
         if (StringUtils.isNotBlank(wiki)) {
-            preference.setWiki(wiki);
+            preference.setEntity(wiki);
+            preference.setScope(NotificationFilterScope.WIKI);
         }
         if (StringUtils.isNotBlank(page)) {
-            preference.setPage(page);
+            preference.setEntity(page);
+            preference.setScope(NotificationFilterScope.SPACE);
         }
         if (StringUtils.isNotBlank(pageOnly)) {
-            preference.setPageOnly(pageOnly);
+            preference.setEntity(pageOnly);
+            preference.setScope(NotificationFilterScope.PAGE);
         }
         if (StringUtils.isNotBlank(user)) {
-            preference.setUser(user);
+            preference.setEntity(user);
+            preference.setScope(NotificationFilterScope.USER);
         }
         return preference;
     }

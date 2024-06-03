@@ -43,6 +43,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
@@ -228,22 +229,26 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
         for (String page : filterPreferenceProperties.get(NotificationFilterProperty.PAGE)) {
             DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
-            pref.setPageOnly(page);
+            pref.setEntity(page);
+            pref.setScope(NotificationFilterScope.PAGE);
             preferencesToConvert.add(pref);
         }
         for (String space : filterPreferenceProperties.get(NotificationFilterProperty.SPACE)) {
             DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
-            pref.setPage(space);
+            pref.setEntity(space);
+            pref.setScope(NotificationFilterScope.SPACE);
             preferencesToConvert.add(pref);
         }
         for (String wiki : filterPreferenceProperties.get(NotificationFilterProperty.WIKI)) {
             DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
-            pref.setWiki(wiki);
+            pref.setEntity(wiki);
+            pref.setScope(NotificationFilterScope.WIKI);
             preferencesToConvert.add(pref);
         }
         for (String user : filterPreferenceProperties.get(NotificationFilterProperty.USER)) {
             DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference(preference);
-            pref.setUser(user);
+            pref.setEntity(user);
+            pref.setScope(NotificationFilterScope.USER);
             preferencesToConvert.add(pref);
         }
         // We don't handle the property APPLICATIONS that is not here anymore

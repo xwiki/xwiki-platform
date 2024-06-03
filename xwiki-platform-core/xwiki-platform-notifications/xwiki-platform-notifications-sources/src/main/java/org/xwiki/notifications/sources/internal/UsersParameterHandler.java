@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -104,7 +105,8 @@ public class UsersParameterHandler
             pref.setFilterType(NotificationFilterType.INCLUSIVE);
             pref.setEnabled(true);
             pref.setNotificationFormats(formats);
-            pref.setUser(userId);
+            pref.setEntity(userId);
+            pref.setScope(NotificationFilterScope.USER);
             parameters.filterPreferences.add(pref);
         }
     }

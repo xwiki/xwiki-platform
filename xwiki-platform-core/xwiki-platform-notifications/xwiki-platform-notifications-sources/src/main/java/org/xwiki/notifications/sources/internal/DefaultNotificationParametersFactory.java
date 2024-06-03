@@ -52,6 +52,7 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.SystemUserNotificationFilter;
@@ -540,13 +541,16 @@ public class DefaultNotificationParametersFactory
                 pref.setNotificationFormats(formats);
                 switch (property) {
                     case WIKI:
-                        pref.setWiki(locationArray[i]);
+                        pref.setEntity(locationArray[i]);
+                        pref.setScope(NotificationFilterScope.WIKI);
                         break;
                     case SPACE:
-                        pref.setPage(makeReferenceAbsolute(locationArray[i], EntityType.SPACE, currentWiki));
+                        pref.setEntity(makeReferenceAbsolute(locationArray[i], EntityType.SPACE, currentWiki));
+                        pref.setScope(NotificationFilterScope.SPACE);
                         break;
                     case PAGE:
-                        pref.setPageOnly(makeReferenceAbsolute(locationArray[i], EntityType.PAGE, currentWiki));
+                        pref.setEntity(makeReferenceAbsolute(locationArray[i], EntityType.PAGE, currentWiki));
+                        pref.setScope(NotificationFilterScope.PAGE);
                         break;
                     default:
                         break;

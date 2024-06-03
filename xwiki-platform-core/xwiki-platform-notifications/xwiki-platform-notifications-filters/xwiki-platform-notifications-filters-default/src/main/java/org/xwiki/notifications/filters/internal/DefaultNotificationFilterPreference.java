@@ -23,12 +23,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.text.StringUtils;
 
 /**
  * Default implementation of {@link NotificationFilterPreference}.
@@ -39,8 +40,6 @@ import org.xwiki.text.StringUtils;
  */
 public class DefaultNotificationFilterPreference implements NotificationFilterPreference
 {
-    private static final String LIST_SEPARATOR = ",";
-
     private String id;
 
     private long internalId;
@@ -53,19 +52,12 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private NotificationFilterType filterType;
 
-    private Set<NotificationFormat> notificationFormats = new HashSet<>();
-
+    private Set<NotificationFormat> formats = new HashSet<>();
+    private NotificationFilterScope scope;
+    private String entity;
     private Date startingDate;
 
     private Set<String> eventTypes = new HashSet<>();
-
-    private String user;
-
-    private String pageOnly;
-
-    private String page;
-
-    private String wiki;
 
     /**
      * Construct an empty DefaultNotificationFilterPreference.
@@ -103,15 +95,11 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.filterName = notificationFilterPreference.getFilterName();
         this.enabled = notificationFilterPreference.isEnabled();
         this.filterType = notificationFilterPreference.getFilterType();
-        this.notificationFormats = notificationFilterPreference.getNotificationFormats();
         this.startingDate = notificationFilterPreference.getStartingDate();
         this.eventTypes = new HashSet<>(notificationFilterPreference.getEventTypes());
-        this.user = notificationFilterPreference.getUser();
-        this.pageOnly = notificationFilterPreference.getPageOnly();
-        this.page = notificationFilterPreference.getPage();
-        this.wiki = notificationFilterPreference.getWiki();
-
-        this.setNotificationFormats(notificationFilterPreference.getNotificationFormats());
+        this.scope = notificationFilterPreference.getScope();
+        this.entity = notificationFilterPreference.getEntity();
+        this.formats = new HashSet<>(notificationFilterPreference.getNotificationFormats());
     }
 
     /**
@@ -173,28 +161,11 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     /**
-     * @param active if the preference is active or not
-     * @deprecated this method is kept only for avoiding issues with hibernate
-     */
-    @Deprecated(since = "16.5.0RC1")
-    public void setActive(boolean active)
-    {
-    }
-
-    /**
      * @param filterType the type of the filter described by this preference.
      */
     public void setFilterType(NotificationFilterType filterType)
     {
         this.filterType = filterType;
-    }
-
-    /**
-     * @param filterFormats a set of {@link NotificationFormat} for which the filter should be applied.
-     */
-    public void setNotificationFormats(Set<NotificationFormat> filterFormats)
-    {
-        this.notificationFormats = filterFormats;
     }
 
     /**
@@ -213,46 +184,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setEventTypes(Set<String> eventTypes)
     {
         this.eventTypes = eventTypes;
-    }
-
-    /**
-     * @param user the user concerned by the preference
-     * @since 10.8RC1
-     * @since 9.11.8
-     */
-    public void setUser(String user)
-    {
-        this.user = user;
-    }
-
-    /**
-     * @param pageOnly the page concerned by the preference
-     * @since 10.8RC1
-     * @since 9.11.8
-     */
-    public void setPageOnly(String pageOnly)
-    {
-        this.pageOnly = pageOnly;
-    }
-
-    /**
-     * @param page the page (and its children) concerned by the preference
-     * @since 10.8RC1
-     * @since 9.11.8
-     */
-    public void setPage(String page)
-    {
-        this.page = page;
-    }
-
-    /**
-     * @param wiki the wiki concerned by the preference
-     * @since 10.8RC1
-     * @since 9.11.8
-     */
-    public void setWiki(String wiki)
-    {
-        this.wiki = wiki;
     }
 
     @Override
@@ -280,12 +211,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     @Override
-    public Set<NotificationFormat> getNotificationFormats()
-    {
-        return notificationFormats;
-    }
-
-    @Override
     public Date getStartingDate()
     {
         return startingDate;
@@ -297,123 +222,56 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         return eventTypes;
     }
 
-    @Override
-    public String getUser()
-    {
-        return user;
-    }
 
     @Override
-    public String getPageOnly()
+    public Set<NotificationFormat> getNotificationFormats()
     {
-        return pageOnly;
+        return formats;
     }
 
-    @Override
-    public String getPage()
+    /**
+     * @param formats the formats that the filter will target
+     * @since 16.5.0RC1
+     */
+    public void setNotificationFormats(Set<NotificationFormat> formats)
     {
-        return page;
+        this.formats = formats;
     }
 
     @Override
-    public String getWiki()
+    public NotificationFilterScope getScope()
     {
-        return wiki;
+        return scope;
     }
 
     /**
-     * @return if the alert format is enabled (for storage use)
+     * @param scope the scope of the entity this filter is about
+     * @since 16.5.0RC1
      */
-    public boolean isAlertEnabled()
+    public void setScope(NotificationFilterScope scope)
     {
-        return this.notificationFormats.contains(NotificationFormat.ALERT);
-    }
-
-    /**
-     * @param alertEnabled if the alert format is enabled (for storage use)
-     */
-    public void setAlertEnabled(boolean alertEnabled)
-    {
-        if (alertEnabled) {
-            this.notificationFormats.add(NotificationFormat.ALERT);
-        } else {
-            this.notificationFormats.remove(NotificationFormat.ALERT);
-        }
-    }
-
-    /**
-     * @return if the email format is enabled (for storage used)
-     */
-    public boolean isEmailEnabled()
-    {
-        return this.notificationFormats.contains(NotificationFormat.EMAIL);
-    }
-
-    /**
-     * @param emailEnabled if the email format is enabled (for storage used)
-     */
-    public void setEmailEnabled(boolean emailEnabled)
-    {
-        if (emailEnabled) {
-            this.notificationFormats.add(NotificationFormat.EMAIL);
-        } else {
-            this.notificationFormats.remove(NotificationFormat.EMAIL);
-        }
-    }
-
-    /**
-     * To store a list in hibernate without the need to create a new table, we create this accessor that simply
-     * join the values together, separated by commas.
-     *
-     * @return a unique string containing all event types, separated by commas
-     */
-    public String getAllEventTypes()
-    {
-        if (eventTypes.isEmpty()) {
-            return "";
-        }
-        // We add a separator (",") at the beginning and at the end so we can make query like
-        // "event.eventTypes LIKE '%,someEventType,%'" without of matching an other event type
-        return LIST_SEPARATOR + StringUtils.join(eventTypes, LIST_SEPARATOR) + LIST_SEPARATOR;
-    }
-
-    /**
-     * Allow to load a list stored in hibernate as a commas-separated list of values.
-     *
-     * @param eventTypes unique string containing all event types, separated by commas
-     */
-    public void setAllEventTypes(String eventTypes)
-    {
-        this.eventTypes.clear();
-
-        if (eventTypes != null) {
-            String[] types = eventTypes.split(LIST_SEPARATOR);
-            for (int i = 0; i < types.length; ++i) {
-                if (StringUtils.isNotBlank(types[i])) {
-                    this.eventTypes.add(types[i]);
-                }
-            }
-        }
+        this.scope = scope;
     }
 
     @Override
-    public String toString()
+    public String getEntity()
     {
-        return "DefaultNotificationFilterPreference{"
-                + "id='" + id + '\''
-                + ", internalId=" + internalId
-                + ", owner='" + owner + '\''
-                + ", filterName='" + filterName + '\''
-                + ", enabled=" + enabled
-                + ", filterType=" + filterType
-                + ", notificationFormats=" + notificationFormats
-                + ", startingDate=" + startingDate
-                + ", eventTypes=" + eventTypes
-                + ", user='" + user + '\''
-                + ", pageOnly='" + pageOnly + '\''
-                + ", page='" + page + '\''
-                + ", wiki='" + wiki + '\''
-                + '}';
+        return entity;
+    }
+
+    /**
+     * @param entity the entity the filter is about
+     * @since 16.5.0RC1
+     */
+    public void setEntity(String entity)
+    {
+        this.entity = entity;
+    }
+
+    @Override
+    public boolean isFromWiki(String wikiId)
+    {
+        return this.entity.startsWith(wikiId);
     }
 
     @Override
@@ -427,41 +285,56 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
             return false;
         }
 
-        DefaultNotificationFilterPreference other = (DefaultNotificationFilterPreference) o;
-        EqualsBuilder equalsBuilder = new EqualsBuilder();
-        equalsBuilder.append(internalId, other.internalId)
-            .append(enabled, other.enabled)
-            .append(id, other.id)
-            .append(owner, other.owner)
-            .append(filterName, other.filterName)
-            .append(filterType, other.filterType)
-            .append(notificationFormats, other.notificationFormats)
-            .append(startingDate, other.startingDate)
-            .append(eventTypes, other.eventTypes)
-            .append(user, other.user)
-            .append(pageOnly, other.pageOnly)
-            .append(page, other.page)
-            .append(wiki, other.wiki);
-        return equalsBuilder.isEquals();
+        DefaultNotificationFilterPreference that = (DefaultNotificationFilterPreference) o;
+
+        return new EqualsBuilder()
+            .append(internalId, that.internalId)
+            .append(enabled, that.enabled)
+            .append(id, that.id)
+            .append(owner, that.owner)
+            .append(filterName, that.filterName)
+            .append(filterType, that.filterType)
+            .append(formats, that.formats)
+            .append(scope, that.scope)
+            .append(entity, that.entity)
+            .append(startingDate, that.startingDate)
+            .append(eventTypes, that.eventTypes)
+            .isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
-        hashCodeBuilder.append(internalId)
-            .append(enabled)
+        return new HashCodeBuilder(17, 63)
             .append(id)
+            .append(internalId)
             .append(owner)
             .append(filterName)
+            .append(enabled)
             .append(filterType)
-            .append(notificationFormats)
+            .append(formats)
+            .append(scope)
+            .append(entity)
             .append(startingDate)
             .append(eventTypes)
-            .append(user)
-            .append(pageOnly)
-            .append(page)
-            .append(wiki);
-        return hashCodeBuilder.toHashCode();
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("id", id)
+            .append("internalId", internalId)
+            .append("owner", owner)
+            .append("filterName", filterName)
+            .append("enabled", enabled)
+            .append("filterType", filterType)
+            .append("formats", formats)
+            .append("scope", scope)
+            .append("entity", entity)
+            .append("startingDate", startingDate)
+            .append("eventTypes", eventTypes)
+            .toString();
     }
 }

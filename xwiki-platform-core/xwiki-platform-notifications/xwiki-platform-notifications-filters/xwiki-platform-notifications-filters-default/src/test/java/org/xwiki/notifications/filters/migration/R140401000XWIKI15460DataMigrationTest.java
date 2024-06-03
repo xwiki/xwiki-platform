@@ -38,6 +38,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.query.Query;
@@ -168,23 +169,28 @@ class R140401000XWIKI15460DataMigrationTest
         // nfp1 is from a removed wiki
         // nfp2 is from a not-removed wikiA
         DefaultNotificationFilterPreference nfp0 = new DefaultNotificationFilterPreference();
-        nfp0.setWiki("mainwikiid");
+        nfp0.setEntity("mainwikiid");
+        nfp0.setScope(NotificationFilterScope.WIKI);
         nfp0.setOwner("xwiki:XWiki.ExistingUser");
 
         DefaultNotificationFilterPreference nfp1 = new DefaultNotificationFilterPreference();
-        nfp1.setPageOnly("unknownikiid:XWiki.Test");
+        nfp1.setEntity("unknownikiid:XWiki.Test");
+        nfp1.setScope(NotificationFilterScope.PAGE);
         nfp1.setOwner("mainwikiid:XWiki.ExistingUser");
 
         DefaultNotificationFilterPreference nfp2 = new DefaultNotificationFilterPreference();
-        nfp2.setPage("wikiA:XWiki.test");
+        nfp2.setEntity("wikiA:XWiki.test");
+        nfp2.setScope(NotificationFilterScope.SPACE);
         nfp2.setOwner("xwiki:XWiki.DeletedUser");
 
         DefaultNotificationFilterPreference nfp3 = new DefaultNotificationFilterPreference();
-        nfp3.setPage("wikiA:XWiki.test");
+        nfp3.setEntity("wikiA:XWiki.test");
+        nfp3.setScope(NotificationFilterScope.SPACE);
         nfp3.setOwner("otherwiki:XWiki.DeletedUser");
 
         DefaultNotificationFilterPreference nfp4 = new DefaultNotificationFilterPreference();
-        nfp4.setPage("wikiA:XWiki.test");
+        nfp4.setEntity("wikiA:XWiki.test");
+        nfp4.setScope(NotificationFilterScope.SPACE);
         nfp4.setOwner("deletedwiki:XWiki.DeletedUser");
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn(currentWikiId);

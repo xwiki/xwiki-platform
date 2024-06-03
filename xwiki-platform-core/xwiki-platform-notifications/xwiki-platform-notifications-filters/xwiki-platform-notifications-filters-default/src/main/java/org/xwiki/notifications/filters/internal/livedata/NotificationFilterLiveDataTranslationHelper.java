@@ -34,8 +34,8 @@ import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.livedata.custom.NotificationCustomFiltersLiveDataConfigurationProvider;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -93,7 +93,7 @@ public class NotificationFilterLiveDataTranslationHelper
      * @param scope the scope for which to get a translation
      * @return the plain text translation of the scope
      */
-    public String getScopeTranslation(NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
+    public String getScopeTranslation(NotificationFilterScope scope)
     {
         return getTranslationWithPrefix("notifications.filters.preferences.scopeNotificationFilter.",
             scope.name().toLowerCase());

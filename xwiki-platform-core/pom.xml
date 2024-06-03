@@ -138,10 +138,30 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>Deprecated method available through legacy but breakage triggered by a
+                dependant module.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getProviderHint()</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Deprecated method available through legacy but breakage triggered by a
+                dependant module.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.notifications.filters.NotificationFilterPreference::isActive()</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

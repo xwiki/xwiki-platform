@@ -23,7 +23,11 @@
 <!DOCTYPE hibernate-mapping PUBLIC
 "-//Hibernate/Hibernate Mapping DTD//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
 <hibernate-mapping>
+  <typedef name="NotificationFormat" class="org.hibernate.type.EnumType">
+    <param name="enumClass">org.xwiki.notifications.NotificationFormat</param>
+  </typedef>
   <class name="org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference"
          table="notification_filter_prefs">
 
@@ -38,8 +42,6 @@
 
     <property name="enabled" type="boolean" column="nfp_enabled" />
 
-    <property name="active" type="boolean" column="nfp_active" />
-
     <property name="filterType" column="nfp_filter_type">
       <type name="org.hibernate.type.EnumType">
         <param name="enumClass">org.xwiki.notifications.filters.NotificationFilterType</param>
@@ -48,19 +50,23 @@
 
     <property name="startingDate" type="timestamp" column="nfp_date" />
 
-    <property name="allEventTypes" type="text" column="nfp_event_types" />
+    <set name="eventTypes"  table="notification_filter_prefs_eventTypes" lazy="false">
+      <key column="nfp_id" />
+      <element column="value" type="string" length="768" />
+    </set>
 
-    <property name="user" type="string" column="nfp_user" length="768"/>
+    <property name="scope" column="nfp_scope" not-null="true">
+      <type name="org.hibernate.type.EnumType">
+        <param name="enumClass">org.xwiki.notifications.filters.NotificationFilterScope</param>
+      </type>
+    </property>
 
-    <property name="pageOnly" type="string" column="nfp_page_only" length="768" />
+    <property name="entity" type="string" column="nfp_entity" length="768" index="NFP_ENTITY" />
 
-    <property name="page" type="string" column="nfp_page" length="768" />
-
-    <property name="wiki" type="string" column="nfp_wiki" length="255" />
-
-    <property name="alertEnabled" type="boolean" column="nfp_alert" />
-
-    <property name="emailEnabled" type="boolean" column="nfp_email" />
+    <set name="notificationFormats" table="notification_filter_prefs_formats" lazy="false">
+      <key column="nfp_id" />
+      <element column="value" type="NotificationFormat" />
+    </set>
 
   </class>
 </hibernate-mapping>

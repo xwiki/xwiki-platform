@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -125,7 +126,8 @@ class UsersParameterHandlerTest
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
         pref.setEnabled(true);
         pref.setNotificationFormats(Collections.singleton(NotificationFormat.EMAIL));
-        pref.setUser(userId);
+        pref.setEntity(userId);
+        pref.setScope(NotificationFilterScope.USER);
         return pref;
     }
 }

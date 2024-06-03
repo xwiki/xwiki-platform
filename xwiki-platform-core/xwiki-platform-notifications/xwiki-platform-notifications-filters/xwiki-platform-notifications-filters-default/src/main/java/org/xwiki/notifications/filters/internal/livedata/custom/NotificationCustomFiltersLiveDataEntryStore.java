@@ -30,7 +30,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.LiveData;
@@ -44,6 +43,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.notifications.filters.internal.livedata.AbstractNotificationFilterLiveDataEntryStore;
@@ -119,8 +119,6 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
     private Map<String, Object> getPreferenceInformation(NotificationFilterPreference filterPreference)
         throws LiveDataException
     {
-        NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope = getScope(filterPreference);
-
         Map<String, Object> result = new LinkedHashMap<>();
         // Map.of only accept 10 args
         result.put(NotificationCustomFiltersLiveDataConfigurationProvider.ID_FIELD, filterPreference.getId());
@@ -128,9 +126,9 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
             this.displayEventTypes(filterPreference));
         result.put(NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD,
             displayNotificationFormats(filterPreference.getNotificationFormats()));
-        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(scope));
+        result.put(NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD, getScopeInfo(filterPreference));
         result.put(NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
-            this.displayLocation(filterPreference, scope));
+            this.displayLocation(filterPreference));
         result.put(NotificationCustomFiltersLiveDataConfigurationProvider.DISPLAY_FIELD,
             this.renderDisplay(filterPreference));
         result.put(NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD,
@@ -145,15 +143,14 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
         return result;
     }
 
-    private String displayLocation(NotificationFilterPreference filterPreference,
-        NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
+    private String displayLocation(NotificationFilterPreference filterPreference)
     {
-        EntityReference location = switch (scope) {
-            case USER -> this.entityReferenceResolver.resolve(filterPreference.getUser(), EntityType.DOCUMENT);
-            case WIKI -> this.entityReferenceResolver.resolve(filterPreference.getWiki(), EntityType.WIKI);
-            case SPACE -> this.entityReferenceResolver.resolve(filterPreference.getPage(), EntityType.SPACE);
+        EntityReference location = switch (filterPreference.getScope()) {
+            case USER -> this.entityReferenceResolver.resolve(filterPreference.getEntity(), EntityType.DOCUMENT);
+            case WIKI -> this.entityReferenceResolver.resolve(filterPreference.getEntity(), EntityType.WIKI);
+            case SPACE -> this.entityReferenceResolver.resolve(filterPreference.getEntity(), EntityType.SPACE);
             case PAGE ->
-                this.entityReferenceResolver.resolve(filterPreference.getPageOnly(), EntityType.DOCUMENT);
+                this.entityReferenceResolver.resolve(filterPreference.getEntity(), EntityType.DOCUMENT);
         };
         // TODO: Create an improvment ticket for having a displayer
         ScriptContext currentScriptContext = this.scriptContextManager.getCurrentScriptContext();
@@ -177,8 +174,9 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
         return getStaticListInfo(items);
     }
 
-    private Map<String, String> getScopeInfo(NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope)
+    private Map<String, String> getScopeInfo(NotificationFilterPreference notificationFilterPreference)
     {
+        NotificationFilterScope scope = notificationFilterPreference.getScope();
         String icon = switch (scope) {
             case USER -> "user";
             case WIKI -> WIKI;
@@ -209,20 +207,6 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
         }
 
         return result;
-    }
-
-    private NotificationCustomFiltersLiveDataConfigurationProvider.Scope getScope(NotificationFilterPreference
-        filterPreference)
-    {
-        if (!StringUtils.isBlank(filterPreference.getUser())) {
-            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.USER;
-        } else if (!StringUtils.isBlank(filterPreference.getPageOnly())) {
-            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.PAGE;
-        } else if (!StringUtils.isBlank(filterPreference.getPage())) {
-            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.SPACE;
-        } else {
-            return NotificationCustomFiltersLiveDataConfigurationProvider.Scope.WIKI;
-        }
     }
 
     @Override

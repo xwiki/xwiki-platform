@@ -57,7 +57,10 @@ export default {
 
   watch: {
     filterValue(newValue, oldValue) {
-      if (newValue !== oldValue) {
+      if (this.$refs.input.selectize.items.length === 0) {
+        // When no values are selected, simply remove the filter.
+        this.removeFilter();
+      } else if (newValue !== oldValue) {
         $(this.$refs.input).val(newValue).trigger('change');
         this.applyFilter(newValue);
       }

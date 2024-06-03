@@ -173,7 +173,7 @@ LiveValidation.prototype = {
   },
   
   /**
-   *	adds a validation to perform to a LiveValidation object
+   *	adds a validation to perform on a LiveValidation object
    *
    *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
    *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
@@ -181,24 +181,24 @@ LiveValidation.prototype = {
    */
   add: function(validationFunction, validationParamsObj){
     let validationMessageHolder;
+    /* The identifier helps us give specific behaviour to different kinds of validations. The user expectations change
+     * depending on the validation type, and this identifier makes sure we can retrieve the right message from the set
+     * of messages in the template. */
     if (validationParamsObj.identifier) {
       validationMessageHolder = this.options.insertAfterWhatNode.up().querySelector("." + validationParamsObj.identifier);
-      /* We use the failure message as a fallback for the success message for regexes. This ensures that the regex stay
-        * shown to the user at all times. */
+      /* We use the failure message as a fallback for the success message for regexes. This ensures that the regex stays
+       * shown to the user at all times. */
       if (validationParamsObj.identifier.includes("regex") && validationParamsObj.validMessage == null) {
         validationParamsObj.validMessage = validationParamsObj.failureMessage;
       }
     } else {
+      /* If we don't have an identifier for the validation, this is a legacy use of the livevalidation.
+        We create a message holder from scratch to make it compatible with the way the new implementation works. */
       validationMessageHolder = this.createMessageSpan();
       this.options.insertAfterWhatNode.up().appendChild(validationMessageHolder);
     }
-
+    /* We add one validation object to the list of validations for the current field. */
     this.validations.push( { type: validationFunction, params: validationParamsObj || {}, messageHolder: validationMessageHolder } );
-    // If the validation is a regex validation, then we display it in initialization.
-    // This avoids having the user finding out what are the rules of the field validation only after filling it up once.
-    if (validationParamsObj.identifier && validationParamsObj.identifier.includes("regex")) {
-      this.insertMessage(this.validations[this.validations.length - 1], null);
-    }
     return this;
   },
   

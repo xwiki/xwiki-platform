@@ -32,20 +32,21 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -65,13 +66,6 @@ class RenamePageIT
         setup.loginAsSuperAdmin();
     }
 
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
-    }
-
     @Order(1)
     @Test
     void convertNestedPageToTerminalPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
@@ -88,7 +82,7 @@ class RenamePageIT
         ViewPage vp = setup.createPage(reference, "", "");
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.3.WebHome and check the Terminal checkbox. We also need to uncheck the
         // Auto Redirect checkbox so the page 1.2.3.WebHome will not appear as existing after the Rename operation.
@@ -126,7 +120,7 @@ class RenamePageIT
         ViewPage vp = new ViewPage();
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.WebHome.
         RenamePage renamePage = vp.rename();
@@ -397,7 +391,7 @@ class RenamePageIT
             String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 1
         ViewPage viewPage = setup.gotoPage(sourcePageReference1);
@@ -414,7 +408,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 2
         viewPage = setup.gotoPage(sourcePageReference2);
@@ -431,7 +425,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 3
         viewPage = setup.gotoPage(sourcePageReference3);
@@ -448,7 +442,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 4
         viewPage = setup.gotoPage(sourcePageReference4);
@@ -465,7 +459,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 5
         viewPage = setup.gotoPage(sourcePageReference5);
@@ -501,7 +495,7 @@ class RenamePageIT
         assertEquals("[[OtherPage]]", setup.rest().<Page>get(reference).getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Rename the page
         ViewPage vp = setup.gotoPage(reference);
@@ -518,6 +512,39 @@ class RenamePageIT
 
         newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
         assertEquals("fr [[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+    }
 
+    @Order(6)
+    @Test
+    void renamePageWithObjectAndAttachmentsPreserveHistory(TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        testUtils.rest().savePage(testReference, "Content 0", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2 3", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2 3 4", "Title");
+        // add attachment
+        AttachmentReference attachmentReference = new AttachmentReference("file.txt", testReference);
+        testUtils.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        //add object
+        Object styleSheetObject = testUtils.rest().object(testReference, "XWiki.StyleSheetExtension");
+        styleSheetObject.getProperties().add(testUtils.rest().property("title", "a ssx"));
+        testUtils.rest().add(styleSheetObject);
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(7, historyPane.getNumberOfVersions());
+        assertEquals("7.1", historyPane.getCurrentVersion());
+
+        RenamePage rename = viewPage.rename();
+        rename.getDocumentPicker().setTitle("Another Title");
+        CopyOrRenameOrDeleteStatusPage statusPage = rename.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+        viewPage = statusPage.gotoNewPage();
+        historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(7, historyPane.getNumberOfVersions());
+        assertEquals("7.2", historyPane.getCurrentVersion());
+        assertEquals("Update document after refactoring.", historyPane.getCurrentVersionComment());
     }
 }

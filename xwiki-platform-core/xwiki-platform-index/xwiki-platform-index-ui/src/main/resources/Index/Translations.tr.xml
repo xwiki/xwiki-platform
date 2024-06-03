@@ -36,5 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+  <content>index.spacesMacro.title=Spaces
+index.spacesMacro.spaceIndex.title=See alan indeksi
+index.spacesMacro.spaceIndex.alt=Uzay indeksi
+index.spacesMacro.spaceAdministration.title=See alan yönetim
+index.spacesMacro.spaceAdministration.alt=Yönet alanı
+index.spacesMacro.createSpace.link=yeni bir alan oluşturma
+index.spacesMacro.createSpace.defaultSpaceName=Uzay isim
+index.spacesMacro.createSpace.submit=Oluştur
+### Missing: index.deletedDocuments.deleteAll=Delete all</content>
 </xwikidoc>

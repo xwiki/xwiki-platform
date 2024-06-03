@@ -44,8 +44,6 @@ import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -759,7 +757,7 @@ class DeletePageIT
         testUtils.createPage(newTargetReference, "", "New target");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -798,7 +796,7 @@ class DeletePageIT
         testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete page without specifying a new target.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -841,7 +839,7 @@ class DeletePageIT
             String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
         ViewPage parentPage = testUtils.gotoPage(parentReference);
@@ -863,12 +861,5 @@ class DeletePageIT
         assertEquals("New target", parentPage.getDocumentTitle());
         ViewPage childPage = testUtils.gotoPage(childReference);
         assertEquals("Child", childPage.getDocumentTitle());
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

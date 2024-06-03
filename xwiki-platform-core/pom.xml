@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -138,19 +138,8 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class com.xpn.xwiki.web.XWikiServletResponse</old>
-                  <new>class com.xpn.xwiki.web.XWikiServletResponse</new>
-                  <superClass>javax.servlet.ServletResponseWrapper</superClass>
-                  <justification>Not a breakage since the ServletResponseWrapper class doesn't contain any final method</justification>
-                  <criticality>allowed</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -134,7 +134,7 @@ img {
 }
 
 // User preferences ===========================================================
-body.content {
+body {
   /* We apply various user preference related styles to the content of the page.
    We use classes that are added to the body itself in htmlheader.vm */
   // Link underlining preference
@@ -164,7 +164,7 @@ body.content {
 
     // UIs where we want to underline outside of content.
     .xdocLastModification,
-    .panel.HelpTipsPanel,
+    .panel[class*="HelpTipsPanel "],
     .commentauthor {
       & a {
         .inline-link();

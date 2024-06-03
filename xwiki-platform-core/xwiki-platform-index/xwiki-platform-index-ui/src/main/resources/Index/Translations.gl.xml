@@ -36,7 +36,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.deletedDocuments.deleteAll=Eliminar todo
+  <content>index.spacesMacro.title=Espazos
+index.spacesMacro.spaceIndex.title=Ver o índice do espazo
+### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceAdministration.title=Ver a administración do espazo
+### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.createSpace.link=Crear un novo espazo
+index.spacesMacro.createSpace.defaultSpaceName=Nome do espazo
+index.spacesMacro.createSpace.submit=Crear
+### Missing: index.deletedDocuments.deleteAll=Delete all
 index.administration.remainingTasks.heading=Tarefas restantes de análisis de documentos
 index.administration.remainingTasks.emptyQueue=Non quedan tarefas
 admin.documentanalysis=Análisis de documentos

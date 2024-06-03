@@ -412,7 +412,12 @@ LiveValidation.prototype = {
       }
       // We change just the lastChild textContent. This last child is a text node. This allows to not remove the icons.
       let newMessageContent = isValid ? validation.params.validMessage : validation.params.failureMessage;
-      messageHolder.lastChild.textContent = newMessageContent;
+      if (messageHolder.lastChild != null) {
+        messageHolder.lastChild.textContent = newMessageContent;
+      } else {
+        messageHolder.textContent = newMessageContent;
+      }
+
     }
   },
 

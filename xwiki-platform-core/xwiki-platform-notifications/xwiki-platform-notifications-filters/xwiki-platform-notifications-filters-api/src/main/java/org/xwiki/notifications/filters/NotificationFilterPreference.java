@@ -73,23 +73,6 @@ public interface NotificationFilterPreference
     boolean isEnabled();
 
     /**
-     * A filter preference can either be active or passive. It the preference is active, then it should force the
-     * retrieval of notifications when used in conjunction with a {@link NotificationFilter}.
-     *
-     * On the other hand, a passive (non-active) notification filter should not automatically trigger the retrieval of
-     * notifications.
-     *
-     * @return true if the filter preference is active.
-     * @deprecated this behaviour doesn't make sense anymore with usage of prefiltering as there's no trigger for
-     * retrieving the notifications nowadays.
-     */
-    @Deprecated(since = "16.5.0RC1")
-    default boolean isActive()
-    {
-        return true;
-    }
-
-    /**
      * @return the type of the filter described by this preference.
      */
     NotificationFilterType getFilterType();

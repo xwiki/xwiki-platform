@@ -80,7 +80,10 @@ public interface NotificationFilterPreference
      * notifications.
      *
      * @return true if the filter preference is active.
+     * @deprecated this behaviour doesn't make sense anymore with usage of prefiltering as there's no trigger for
+     * retrieving the notifications nowadays.
      */
+    @Deprecated(since = "16.5.0RC1")
     boolean isActive();
 
     /**

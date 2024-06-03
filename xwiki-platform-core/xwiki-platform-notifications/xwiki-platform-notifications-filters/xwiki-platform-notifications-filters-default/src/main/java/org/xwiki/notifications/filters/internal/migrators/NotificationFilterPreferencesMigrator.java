@@ -208,7 +208,6 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
         preference.setFilterName(obj.getStringValue(FIELD_FILTER_NAME));
         preference.setEnabled(obj.getIntValue(FIELD_IS_ENABLED, 1) == 1);
-        preference.setActive(obj.getIntValue(FIELD_IS_ACTIVE, 1) == 1);
         preference.setFilterType(filterType);
         preference.setNotificationFormats(filterFormats);
         preference.setStartingDate(obj.getDateValue(FIELD_STARTING_DATE));

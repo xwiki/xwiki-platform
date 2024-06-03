@@ -155,7 +155,7 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     @Override
     public boolean isActive()
     {
-        return filterPreference.isActive();
+        return true;
     }
 
     @Override

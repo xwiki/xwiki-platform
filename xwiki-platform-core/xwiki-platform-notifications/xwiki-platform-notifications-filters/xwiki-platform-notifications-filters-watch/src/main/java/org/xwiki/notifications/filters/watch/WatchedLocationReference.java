@@ -141,7 +141,6 @@ public class WatchedLocationReference implements WatchedEntityReference
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
-        filterPreference.setActive(false);
         filterPreference.setStartingDate(new Date());
 
         // Properties

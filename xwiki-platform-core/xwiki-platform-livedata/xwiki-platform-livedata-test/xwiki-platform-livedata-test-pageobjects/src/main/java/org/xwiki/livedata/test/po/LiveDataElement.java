@@ -139,7 +139,7 @@ public class LiveDataElement extends BaseElement
         return this;
     }
 
-    private void waitUntilReady()
+    public void waitUntilReady()
     {
         getDriver().waitUntilCondition(input -> isVueLoaded());
 

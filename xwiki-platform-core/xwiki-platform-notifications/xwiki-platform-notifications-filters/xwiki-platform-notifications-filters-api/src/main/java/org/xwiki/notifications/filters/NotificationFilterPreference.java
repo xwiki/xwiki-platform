@@ -53,7 +53,7 @@ public interface NotificationFilterPreference
      * @since 16.5.0RC1
      */
     @Unstable
-    String DB_STORED_FILTER_PREFIX = "NFP_";
+    String DB_ID_FILTER_PREFIX = "NFP_";
     
     /**
      * @return the unique identifier of the filter preference.

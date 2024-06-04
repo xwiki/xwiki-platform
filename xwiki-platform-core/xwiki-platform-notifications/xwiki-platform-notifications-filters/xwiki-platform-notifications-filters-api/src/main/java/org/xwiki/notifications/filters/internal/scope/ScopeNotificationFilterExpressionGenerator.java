@@ -295,9 +295,7 @@ public class ScopeNotificationFilterExpressionGenerator
     {
         // This optimization can only works on preferences stored by the user, that's why we add the final condition
         return nfp.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(nfp.getFilterName())
-            && (StringUtils.startsWith(nfp.getId(), NotificationFilterPreference.DB_STORED_FILTER_PREFIX)
-            // we also check for watchlist prefix in case of old migrated filters.
-            || StringUtils.startsWith(nfp.getId(), "watchlist_"));
+            && StringUtils.startsWith(nfp.getId(), NotificationFilterPreference.DB_ID_FILTER_PREFIX);
     }
 
     private boolean doesFilterTypeAndFormatMatch(NotificationFilterPreference nfp, NotificationFormat format,

@@ -62,7 +62,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Singleton
 public class NotificationFilterPreferenceStore
 {
-    private static final String FILTER_PREFIX = "NFP_";
     private static final String ID = "id";
 
     @Inject
@@ -327,8 +326,9 @@ public class NotificationFilterPreferenceStore
 
     private long getInternalIdFromId(String filterPreferenceId) throws NotificationException
     {
-        if (StringUtils.startsWith(filterPreferenceId, FILTER_PREFIX)) {
-            return Long.parseLong(filterPreferenceId.substring(FILTER_PREFIX.length()));
+        if (StringUtils.startsWith(filterPreferenceId, NotificationFilterPreference.DB_ID_FILTER_PREFIX)) {
+            return Long.parseLong(
+                filterPreferenceId.substring(NotificationFilterPreference.DB_ID_FILTER_PREFIX.length()));
         } else {
             throw new NotificationException(String.format("Cannot guess internal id of preference with id [%s].",
                 filterPreferenceId));

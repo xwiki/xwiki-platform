@@ -84,7 +84,10 @@ public interface NotificationFilterPreference
      * retrieving the notifications nowadays.
      */
     @Deprecated(since = "16.5.0RC1")
-    boolean isActive();
+    default boolean isActive()
+    {
+        return true;
+    }
 
     /**
      * @return the type of the filter described by this preference.

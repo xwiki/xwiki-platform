@@ -86,12 +86,6 @@ public class TagNotificationFilterPreference implements NotificationFilterPrefer
     }
 
     @Override
-    public boolean isActive()
-    {
-        return false;
-    }
-
-    @Override
     public NotificationFilterType getFilterType()
     {
         return NotificationFilterType.INCLUSIVE;

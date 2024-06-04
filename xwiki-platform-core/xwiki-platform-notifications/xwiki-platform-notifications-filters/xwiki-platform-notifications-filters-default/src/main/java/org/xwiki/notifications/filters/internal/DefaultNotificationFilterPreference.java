@@ -274,12 +274,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     @Override
-    public boolean isActive()
-    {
-        return true;
-    }
-
-    @Override
     public NotificationFilterType getFilterType()
     {
         return filterType;

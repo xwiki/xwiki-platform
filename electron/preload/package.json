@@ -24,7 +24,7 @@
     "test": "echo 'no test'"
   },
   "devDependencies": {
-    "@types/node": "20.12.12",
+    "@types/node": "20.14.1",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "rimraf": "5.0.7",

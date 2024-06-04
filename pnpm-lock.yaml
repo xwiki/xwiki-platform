@@ -840,8 +840,8 @@ importers:
         specifier: 5.2.12
         version: 5.2.12(@types/node@20.14.1)
       vite-plugin-comlink:
-        specifier: 4.0.2
-        version: 4.0.2(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1))
+        specifier: 4.1.0
+        version: 4.1.0(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1))
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -883,8 +883,8 @@ importers:
         specifier: 5.2.12
         version: 5.2.12(@types/node@20.14.1)
       vite-plugin-comlink:
-        specifier: 4.0.2
-        version: 4.0.2(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1))
+        specifier: 4.1.0
+        version: 4.1.0(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1))
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -1040,8 +1040,8 @@ importers:
         specifier: 5.2.12
         version: 5.2.12(@types/node@20.14.1)
       vite-plugin-comlink:
-        specifier: 4.0.2
-        version: 4.0.2(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1))
+        specifier: 4.1.0
+        version: 4.1.0(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1))
       vite-plugin-dts:
         specifier: 3.9.1
         version: 3.9.1(@types/node@20.14.1)(rollup@4.18.0)(typescript@5.4.5)(vite@5.2.12(@types/node@20.14.1))
@@ -3855,10 +3855,6 @@ packages:
   magic-string@0.30.10:
     resolution: {integrity: sha512-iIRwTIf0QKV3UAnYK4PU8uiEc4SRh5jX0mwpIwETPpHdhVM4f53RSwS/vXvN1JhGX+Cs7B8qIq3d6AH49O5fAQ==}
 
-  magic-string@0.30.5:
-    resolution: {integrity: sha512-7xlpfBaQaP/T6Vh8MO/EqXSW5En6INHEvEXQiuff7Gku0PWjU3uf6w/j9o7O+SpB5fOAkrI5HeoNgwjEO0pFsA==}
-    engines: {node: '>=12'}
-
   magicast@0.3.4:
     resolution: {integrity: sha512-TyDF/Pn36bBji9rWKHlZe+PZb6Mx5V8IHCSxk7X4aljM4e/vyDvZZYwHewdVaqiA0nb3ghfHU/6AUpDxWoER2Q==}
 
@@ -5107,8 +5103,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-comlink@4.0.2:
-    resolution: {integrity: sha512-3XZmJ7hqLj4ZdDCfbUSyjnCZVrXpah2wDhHaoJw3gUIfh6bDYzli7ptpPnjnLWG4SptLCxSneGC7ARTP5+u1Wg==}
+  vite-plugin-comlink@4.1.0:
+    resolution: {integrity: sha512-wsCLCobd7k8X7oB803XzPAvcypcoQj6cTaw6n1qb11jhegssZSwDhI52vLtitVUjYi/1/IqtKpQZeyUsLvuLdg==}
     peerDependencies:
       comlink: ^4.3.1
       vite: '>=2.9.6'
@@ -8615,10 +8611,6 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  magic-string@0.30.5:
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.4.15
-
   magicast@0.3.4:
     dependencies:
       '@babel/parser': 7.24.4
@@ -9996,11 +9988,11 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-comlink@4.0.2(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1)):
+  vite-plugin-comlink@4.1.0(comlink@4.4.1)(vite@5.2.12(@types/node@20.14.1)):
     dependencies:
       comlink: 4.4.1
       json5: 2.2.3
-      magic-string: 0.30.5
+      magic-string: 0.30.10
       source-map: 0.7.4
       vite: 5.2.12(@types/node@20.14.1)
 

@@ -277,12 +277,13 @@ LiveValidation.prototype = {
    *    @return {Boolean} - whether the all the validations passed or if one failed
    */
   doValidations: function(){
+    this.validationFailed = false;
     for(var i = 0, len = this.validations.length; i < len; ++i){
       let isValid = this.validateElement(this.validations[i].type, this.validations[i].params);
       this.insertMessage(this.validations[i], isValid);
-      this.validationFailed = this.validationFailed || isValid;
+      this.validationFailed = this.validationFailed || !isValid;
     }
-    return this.validationFailed;
+    return !this.validationFailed;
   },
     
   /**
@@ -411,7 +412,8 @@ LiveValidation.prototype = {
         this.addMessageClass(messageHolder, isValid);
       }
       // We change just the lastChild textContent. This last child is a text node. This allows to not remove the icons.
-      let newMessageContent = isValid ? validation.params.validMessage : validation.params.failureMessage;
+      let validMessage = validation.params.validMessage ? validation.params.validMessage : this.options.validMessage;
+      let newMessageContent = isValid ? validMessage : validation.params.failureMessage;
       if (messageHolder.lastChild != null) {
         messageHolder.lastChild.textContent = newMessageContent;
       } else {

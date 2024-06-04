@@ -25,7 +25,7 @@
 }
 
 /* We don't want to display anything when some kind of validations are successful.*/
-.LV_valid.mandatory .LV_validation_message_valid_icon,
-.LV_valid.must-match .LV_validation_message_valid_icon {
+.LV_valid.mandatory,
+.LV_valid.must-match {
   display: none;
 }

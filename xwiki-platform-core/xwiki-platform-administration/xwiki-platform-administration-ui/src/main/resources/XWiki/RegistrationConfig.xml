@@ -524,7 +524,7 @@
     <property>
       <registrationSuccessMessage>#set($discard = $xwiki.ssx.use("XWiki.RegistrationConfig"))
 #set($displayName = "$!firstName $!lastName")
-#set($noReadableName = ($!firstName == "") &amp;&amp; ($!lastName == ""))
+#set($noReadableName = ($!firstName == "") || ($!lastName == ""))
 #if($noReadableName)
   #set($displayName = $userName)
 #end

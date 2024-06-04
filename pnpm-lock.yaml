@@ -22,7 +22,7 @@ importers:
         version: 5.0.4(vite@5.2.12(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))
       '@vitest/coverage-v8':
         specifier: 1.6.0
-        version: 1.6.0(vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.11.0))
+        version: 1.6.0(vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.12.0))
       '@vue/eslint-config-prettier':
         specifier: 9.0.0
         version: 9.0.0(eslint@8.57.0)(prettier@3.3.0)
@@ -98,7 +98,7 @@ importers:
         version: 5.2.12(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.11.0)
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -161,7 +161,7 @@ importers:
         version: 5.2.12(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.11.0)
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -198,7 +198,7 @@ importers:
     devDependencies:
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.11.0)
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
 
   ds/api:
     devDependencies:
@@ -206,8 +206,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       happy-dom:
-        specifier: 14.11.0
-        version: 14.11.0
+        specifier: 14.12.0
+        version: 14.12.0
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
@@ -252,8 +252,8 @@ importers:
         specifier: workspace:*
         version: link:../../dev/config
       happy-dom:
-        specifier: 14.11.0
-        version: 14.11.0
+        specifier: 14.12.0
+        version: 14.12.0
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
@@ -262,7 +262,7 @@ importers:
         version: 5.2.12(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.11.0)
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -299,7 +299,7 @@ importers:
         version: 5.2.12(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.11.0)
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -439,7 +439,7 @@ importers:
         version: 5.2.12(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
-        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.11.0)
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
       vue-tsc:
         specifier: 2.0.19
         version: 2.0.19(typescript@5.4.5)
@@ -3333,8 +3333,8 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  happy-dom@14.11.0:
-    resolution: {integrity: sha512-vu25dY7YJqLuTG/3ADC0FZRRF0yNBp3q2K0YTN08opXdZi8V/YzIJDNJWFiCnDIuyc+RrCIE093+H5fa9Trlxg==}
+  happy-dom@14.12.0:
+    resolution: {integrity: sha512-dHcnlGFY2o2CdxfuYpqwSrBrpj/Kuzv4u4f3TU5yHW1GL24dKij4pv1BRjXnXc3uWo8qsCbToF9weaDsm/He8A==}
     engines: {node: '>=16.0.0'}
 
   hard-rejection@2.1.0:
@@ -6575,7 +6575,7 @@ snapshots:
       vite: 5.2.12(@types/node@20.14.1)
       vue: 3.4.27(typescript@5.4.5)
 
-  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.11.0))':
+  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.12.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -6590,7 +6590,7 @@ snapshots:
       std-env: 3.7.0
       strip-literal: 2.0.0
       test-exclude: 6.0.0
-      vitest: 1.6.0(@types/node@20.14.1)(happy-dom@14.11.0)
+      vitest: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -8141,7 +8141,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  happy-dom@14.11.0:
+  happy-dom@14.12.0:
     dependencies:
       entities: 4.5.0
       webidl-conversions: 7.0.0
@@ -10062,7 +10062,7 @@ snapshots:
       '@types/node': 20.14.1
       fsevents: 2.3.3
 
-  vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.11.0):
+  vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.12.0):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -10086,7 +10086,7 @@ snapshots:
       why-is-node-running: 2.2.2
     optionalDependencies:
       '@types/node': 20.14.1
-      happy-dom: 14.11.0
+      happy-dom: 14.12.0
     transitivePeerDependencies:
       - less
       - lightningcss

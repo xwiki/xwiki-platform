@@ -33,6 +33,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data WebJar</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

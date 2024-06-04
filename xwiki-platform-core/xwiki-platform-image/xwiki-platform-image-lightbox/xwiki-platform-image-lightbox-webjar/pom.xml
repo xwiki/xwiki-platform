@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display in the Extension Manager -->
     <xwiki.extension.name>Image Lightbox WebJar</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
     <gallery.version>3.4.0</gallery.version>
   </properties>
   <dependencies>

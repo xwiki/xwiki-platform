@@ -32,7 +32,7 @@ public class WatchedLocationState
 {
     /**
      * The possible states of a location.
-     * @since 16.4.0RC1
+     * @since 16.5.0RC1
      * @version $Id$
      */
     public enum WatchedState

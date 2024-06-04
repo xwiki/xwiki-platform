@@ -38,7 +38,7 @@ import org.xwiki.user.UserReference;
  * REST resources for handling watch filters.
  *
  * @version $Id$
- * @since 16.4.0RC1
+ * @since 16.5.0RC1
  */
 @Unstable
 @Path("/wikis/{wikiName}{spaceName : (/spaces/[^/]+)*}{pageName : (/pages/[^/]+)?}/notificationsWatches")

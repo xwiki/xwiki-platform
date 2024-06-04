@@ -193,7 +193,7 @@
     });
   };
   
-  (XWiki.isInitialized &amp;&amp; initWatchModal()) || document.observe('xwiki:dom:loaded',initWatchModal);
+  (XWiki.isInitialized &amp;&amp; initWatchModal()) || document.on('xwiki:dom:loaded',initWatchModal);
 });</code>
     </property>
     <property>
@@ -495,16 +495,16 @@
 #set ($iconWhenCustom = 'fa-bullhorn')
 #if ($watchedStatus == 'NOT_SET')
   #set ($watchIcon = $iconWhenNotSet)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.notset'))
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.notset', [], 'html/5.0'))
 #elseif ($watchedStatus.isWatched())
   #set ($watchIcon = $iconWhenWatched)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.followed'))
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.followed', [], 'html/5.0'))
 #elseif ($watchedStatus.isBlocked())
   #set ($watchIcon = $iconWhenBlocked)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.blocked'))
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.blocked', [], 'html/5.0'))
 #else
   #set ($watchIcon = $iconWhenCustom)
-  #set ($watchText = $services.localization.render('notifications.watch.button.status.custom'))
+  #set ($watchText = $services.localization.render('notifications.watch.button.status.custom', [], 'html/5.0'))
 #end
 ## TODO: better way for that?
 #set ($isTerminal = ($doc.getDocumentReference().name != 'WebHome'))
@@ -516,13 +516,13 @@
     &lt;div class="panel-heading" role="tab" id="heading-$attributeName"&gt;
       &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-$attributeName" aria-controls="xhint-$attributeName"&gt;
         &lt;h4 class="panel-title" id="title-$attributeName"&gt;
-          $services.icon.renderHTML("$iconName") $services.localization.render("notifications.watch.modal.option.${translationSuffix}.title")
+          $services.icon.renderHTML("$iconName") $services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", [], 'html/5.0')
         &lt;/h4&gt;
       &lt;/a&gt;
     &lt;/div&gt;&lt;!-- end panel heading --&gt;
     &lt;div id="xhint-$attributeName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-$attributeName"&gt;
       &lt;div class="panel-body xHint"&gt;
-        $services.localization.render("notifications.watch.modal.option.${translationSuffix}.hint")
+        $services.localization.render("notifications.watch.modal.option.${translationSuffix}.hint", [], 'html/5.0')
       &lt;/div&gt;
     &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
   &lt;/div&gt;&lt;!-- end panel --&gt;
@@ -548,17 +548,20 @@
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
-        &lt;button type="button" class="close" data-dismiss="modal" aria-label="$escapetool.xml($services.localization.render('notifications.watch.modal.close'))"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+        &lt;button type="button" class="close" data-dismiss="modal" aria-label="$escapetool.xml($services.localization.render('notifications.watch.modal.close'))"&gt;
+          &lt;span aria-hidden="true"&gt;
+            $services.icon.renderHTML('cross')
+          &lt;/span&gt;&lt;/button&gt;
         &lt;h4 class="modal-title"&gt;
-          $services.localization.render('notifications.watch.modal.title')
+          $services.localization.render('notifications.watch.modal.title', [], 'html/5.0')
         &lt;/h4&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;
         &lt;p&gt;
-          $services.localization.render("notifications.watch.modal.description.$watchedStatus")
+          $services.localization.render("notifications.watch.modal.description.$watchedStatus", [], 'html/5.0')
         &lt;/p&gt;
         #if ($isTerminal)
-          &lt;p class="terminal-page-info"&gt;$services.localization.render('notifications.watch.modal.terminalpage.info')&lt;/p&gt;
+          &lt;p class="terminal-page-info"&gt;$services.localization.render('notifications.watch.modal.terminalpage.info', [], 'html/5.0')&lt;/p&gt;
         #end
         &lt;div class="watch-options-container panel-group" id="watch-options-accordion" role="tablist" aria-multiselectable="false"&gt;
         #if ($watchedStatus == 'NOT_SET')
@@ -590,7 +593,7 @@
           $unwatchWikiOption
           #end
           #if ($ancestorRef.type == 'SPACE')
-          $services.localization.render('notifications.watch.modal.option.ancestorlink', ["#_displayReferenceInModal($ancestorRef)"])
+          $services.localization.render('notifications.watch.modal.option.ancestorlink', ["#_displayReferenceInModal($ancestorRef)"], 'html/5.0')
           #end
         #elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
           $watchPageOption
@@ -615,22 +618,22 @@
           $unblockWikiOption
           #end
           #if ($ancestorRef.type == 'SPACE')
-          $services.localization.render('notifications.watch.modal.option.ancestorlink', ["#_displayReferenceInModal($ancestorRef)"])
+          $services.localization.render('notifications.watch.modal.option.ancestorlink', ["#_displayReferenceInModal($ancestorRef)"], 'html/5.0')
           #end
         #end
         &lt;/div&gt;&lt;!-- end panel group --&gt;
         &lt;div class="modal-body-footer"&gt;
           #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
           #set ($notifUrl = "$userDoc.getURL('view','category=notifications')#Hnotifications.settings.filters.preferences.custom.title")
-          $services.localization.render('notifications.watch.modal.option.settingslink',["&lt;a href='$notifUrl'&gt;", '&lt;/a&gt;'])
+          $services.localization.render('notifications.watch.modal.option.settingslink',["&lt;a href='$notifUrl'&gt;", '&lt;/a&gt;'], 'html/5.0')
         &lt;/div&gt;
       &lt;/div&gt;&lt;!-- end modal body --&gt;
       &lt;div class="modal-footer"&gt;
         &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
-          $services.localization.render('notifications.watch.modal.close')
+          $services.localization.render('notifications.watch.modal.close', [], 'html/5.0')
         &lt;/button&gt;
         &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
-          $services.localization.render('notifications.watch.modal.savechanges')
+          $services.localization.render('notifications.watch.modal.savechanges', [], 'html/5.0')
         &lt;/button&gt;
       &lt;/div&gt;
     &lt;/div&gt;&lt;!-- /.modal-content --&gt;

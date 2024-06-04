@@ -132,7 +132,7 @@ public class NotificationWatchScriptService implements ScriptService
      * @see WatchedEntityReference.WatchedStatus#isWatched()
      * @see WatchedEntityReference.WatchedStatus#isBlocked()
      * @throws NotificationException in case of problem for computing the status
-     * @since 16.4.0RC1
+     * @since 16.5.0RC1
      */
     @Unstable
     public Pair<EntityReference, WatchedEntityReference.WatchedStatus> getFirstFilteredAncestor(EntityReference

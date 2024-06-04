@@ -47,7 +47,7 @@ import org.xwiki.user.UserReferenceResolver;
  * Default implementation of {@link NotificationsWatchResource}.
  *
  * @version $Id$
- * @since 16.4.0RC1
+ * @since 16.5.0RC1
  */
 @Component
 @Named("org.xwiki.notifications.rest.internal.DefaultNotificationsWatchResource")

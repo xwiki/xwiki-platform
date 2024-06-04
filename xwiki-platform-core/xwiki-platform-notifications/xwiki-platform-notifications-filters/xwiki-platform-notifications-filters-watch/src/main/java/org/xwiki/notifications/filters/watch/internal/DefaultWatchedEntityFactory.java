@@ -25,14 +25,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
-import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.notifications.filters.watch.WatchedLocationReference;
 import org.xwiki.notifications.filters.watch.WatchedUserReference;
-import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Default implementation of {@link WatchedEntityFactory}.
@@ -44,16 +40,6 @@ import org.xwiki.user.UserReferenceSerializer;
 @Singleton
 public class DefaultWatchedEntityFactory implements WatchedEntityFactory
 {
-    @Inject
-    private EventUserFilterPreferencesGetter eventUserFilterPreferencesGetter;
-
-    @Inject
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
-    @Inject
-    @Named("document")
-    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
-
     @Inject
     @Named("context")
     private ComponentManager componentManager;
@@ -67,7 +53,6 @@ public class DefaultWatchedEntityFactory implements WatchedEntityFactory
     @Override
     public WatchedUserReference createWatchedUserReference(String userId)
     {
-        return new WatchedUserReference(userId, eventUserFilterPreferencesGetter, notificationFilterPreferenceManager,
-            userReferenceSerializer);
+        return new WatchedUserReference(userId, componentManager);
     }
 }

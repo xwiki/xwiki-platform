@@ -210,7 +210,7 @@
                   <ignore>true</ignore>
                   <code>java.method.numberOfParametersChanged</code>
                   <old>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter, org.xwiki.notifications.filters.NotificationFilterPreferenceManager)</old>
-                  <new>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter, org.xwiki.notifications.filters.NotificationFilterPreferenceManager, org.xwiki.user.UserReferenceSerializer&lt;org.xwiki.model.reference.DocumentReference&gt;)</new>
+                  <new>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.component.manager.ComponentManager)</new>
                   <justification>Simplify future extensions of this API.</justification>
                 </item>
               </differences>

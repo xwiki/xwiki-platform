@@ -24,6 +24,9 @@ import java.util.Optional;
 
 import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.lang3.tuple.Pair;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
@@ -48,6 +51,8 @@ public class WatchedUserReference implements WatchedEntityReference
 {
     private final String userId;
 
+    private final ComponentManager componentManager;
+
     private final NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     private final EventUserFilterPreferencesGetter preferencesGetter;
@@ -56,19 +61,21 @@ public class WatchedUserReference implements WatchedEntityReference
     /**
      * Construct a WatchedUserReference.
      * @param userId id of the user to watch.
-     * @param preferencesGetter the instance of EventUserFilterPreferencesGetter
-     * @param notificationFilterPreferenceManager the notification filter manager
-     * @param userReferenceSerializer a serializer for user reference to document reference
-     * @since 10.9
+     * @param componentManager the component manager for loading needed components
      */
-    public WatchedUserReference(String userId, EventUserFilterPreferencesGetter preferencesGetter,
-            NotificationFilterPreferenceManager notificationFilterPreferenceManager,
-        UserReferenceSerializer<DocumentReference> userReferenceSerializer)
+    public WatchedUserReference(String userId, ComponentManager componentManager)
     {
         this.userId = userId;
-        this.preferencesGetter = preferencesGetter;
-        this.notificationFilterPreferenceManager = notificationFilterPreferenceManager;
-        this.userReferenceSerializer = userReferenceSerializer;
+        this.componentManager = componentManager;
+        try {
+            this.preferencesGetter = this.componentManager.getInstance(EventUserFilterPreferencesGetter.class);
+            this.notificationFilterPreferenceManager =
+                this.componentManager.getInstance(NotificationFilterPreferenceManager.class);
+            this.userReferenceSerializer = componentManager.getInstance(
+                new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

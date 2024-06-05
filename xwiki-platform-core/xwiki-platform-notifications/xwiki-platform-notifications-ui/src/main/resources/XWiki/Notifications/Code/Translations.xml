@@ -248,6 +248,7 @@ notifications.watch.button.status.custom=Custom
 
 notifications.watch.modal.title=Notification settings for this page
 notifications.watch.modal.description.options=You can change the current notification settings with the following options: 
+notifications.watch.modal.description.ancestoroption=You can either go to {0} and modify the notification settings there or directly apply settings on the current page with the following options: 
 notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=You are following this page: you will receive notifications for it.
 notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are following this page through a parent in the hierarchy: you will receive notifications for it.
 notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are following this page and its children: you will receive notifications for it.
@@ -258,7 +259,6 @@ notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_F
 notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you should review them to know exactly which notifications you might receive.
 
 notifications.watch.modal.terminalpage.info=This is a terminal page: some options for following or ignoring page and children are not displayed.
-notifications.watch.modal.option.ancestorlink=You can modify the notification settings of this page by going to {0} and modify the notification settings there: this is the first parent location with a filter impacting current page.
 notifications.watch.modal.option.settingslink=You can find and manipulate all page notification settings in {0}your user profile{1}.
 
 notifications.watch.modal.option.watchpage.title=Follow current page

@@ -170,12 +170,21 @@
         $.ajax(ajaxUrl, {
           method: method
         }).done(function () {
+          removeAnySelection();
           window.location.reload();
         }).error(function (data) {
+          removeAnySelection();
           console.error("Error when processing the request: " + data);
         });
       }
     }
+  };
+  
+  var removeAnySelection = function() {
+      $('#watchModal input[type="radio"]').each(function () {
+        $(this).prop('checked', '');
+        $('#watchModal .btn-primary').prop('disabled', true);
+      });
   };
   
   var initWatchModal = function () {
@@ -191,12 +200,7 @@
         $('#watchModal .btn-primary').prop('disabled', false);
       });
     });
-    $('#watchModal .close-modal').on('click', function() {
-      $('#watchModal input[type="radio"]').each(function () {
-        $(this).prop('checked', '');
-        $('#watchModal .btn-primary').prop('disabled', true);
-      });
-    });
+    $('#watchModal .close-modal').on('click', removeAnySelection);
   };
   
   (XWiki.isInitialized &amp;&amp; initWatchModal()) || document.on('xwiki:dom:loaded',initWatchModal);
@@ -571,7 +575,15 @@
         &lt;p&gt;
           $services.localization.render("notifications.watch.modal.description.$watchedStatus", 'html/5.0', [])
           &lt;hr /&gt;
-          $services.localization.render('notifications.watch.modal.description.options', 'html/5.0', [])
+          #if (($watchedStatus == 'WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS' || $watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS') &amp;&amp; $ancestorRef.type == 'SPACE' &amp;&amp; $services.security.authorization.hasAccess('view', $ancestorRef))
+            #set ($ancestorDoc = $xwiki.getDocument($ancestorRef))
+            #set ($ancestorDocUrl = $ancestorDoc.getURL())
+            #set ($ancestorDocTitle = $ancestorDoc.displayTitle)
+            #set ($ancestorLink = "&lt;a href=""$ancestorDocUrl""&gt;$ancestorDocTitle&lt;/a&gt;")
+            $services.localization.render('notifications.watch.modal.description.ancestoroption', [$ancestorLink])
+          #else
+            $services.localization.render('notifications.watch.modal.description.options', 'html/5.0', [])
+          #end
         &lt;/p&gt;
         #if ($isTerminal)
           &lt;p class="terminal-page-info"&gt;$services.localization.render('notifications.watch.modal.terminalpage.info', 'html/5.0', [])&lt;/p&gt;
@@ -605,9 +617,6 @@
           #if ($ancestorRef.type == 'WIKI')
           $unwatchWikiOption
           #end
-          #if ($ancestorRef.type == 'SPACE')
-          $services.localization.render('notifications.watch.modal.option.ancestorlink', 'html/5.0', ["#_displayReferenceInModal($ancestorRef)"])
-          #end
         #elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
           $watchPageOption
           #if (!$isTerminal)
@@ -629,9 +638,6 @@
           #end
           #if ($ancestorRef.type == 'WIKI')
           $unblockWikiOption
-          #end
-          #if ($ancestorRef.type == 'SPACE')
-          $services.localization.render('notifications.watch.modal.option.ancestorlink', 'html/5.0', ["#_displayReferenceInModal($ancestorRef)"])
           #end
         #end
         &lt;/div&gt;&lt;!-- end panel group --&gt;

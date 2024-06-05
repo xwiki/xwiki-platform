@@ -599,7 +599,7 @@
         #end
         &lt;div class="watch-options-container panel-group" id="watch-options-accordion" role="tablist" aria-multiselectable="false"&gt;
         #set ($blockedByAncestor = ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isBlocked()))
-        #set ($watchedByAncestor = ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isWatched()))
+        #set ($watchedByAncestor = ($ancestorWatchStatus.isWatched()))
         #if ($watchedStatus == 'NOT_SET')
           $watchPageOption
           #if (!$isTerminal)

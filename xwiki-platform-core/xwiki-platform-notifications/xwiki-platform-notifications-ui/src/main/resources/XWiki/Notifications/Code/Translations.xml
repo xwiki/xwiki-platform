@@ -283,9 +283,9 @@ notifications.watch.modal.option.unwatchwiki.title=Unfollow current wiki
 notifications.watch.modal.option.unwatchwiki.hint=You will stop receiving notifications for any page in the wiki.
 
 notifications.watch.modal.option.unblockpage.title=Unignore current page
-notifications.watch.modal.option.unblockpage.hint=You will stop ignoring notifications for that page only.
+notifications.watch.modal.option.unblockpage.hint=You will receive notifications for that page only.
 notifications.watch.modal.option.unblockspace.title=Unignore current page and its children
-notifications.watch.modal.option.unblockspace.hint=You will stop ignoring notifications for that page and its children.
+notifications.watch.modal.option.unblockspace.hint=You will receive notifications for that page and its children.
 notifications.watch.modal.option.unblockwiki.title=Unignore current wiki
 notifications.watch.modal.option.unblockwiki.hint=You will stop ignoring notifications for any page in the wiki.
 

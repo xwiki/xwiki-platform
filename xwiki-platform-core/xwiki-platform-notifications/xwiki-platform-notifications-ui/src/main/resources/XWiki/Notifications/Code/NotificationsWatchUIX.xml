@@ -494,17 +494,6 @@
 #if (!$isGuest)
 #set($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
 #set($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsWatchUIX'))
-#macro (_displayReferenceInModal $entityReference)
-  #if ($entityReference.type == 'WIKI')
-    &lt;span class="entity-reference"&gt;&lt;span class="fa fa-globe"&gt;&lt;/span&gt; wiki $entityReference.name&lt;/span&gt;
-  #elseif ($entityReference.type == 'SPACE')
-    &lt;span class="entity-reference"&gt;&lt;span class="fa fa-sitemap"&gt;&lt;/span&gt; space $entityReference&lt;/span&gt;
-  #elseif ($entityReference.type == 'PAGE')
-    &lt;span class="entity-reference"&gt;&lt;span class="fa fa-file"&gt;&lt;/span&gt; page $entityReference&lt;/span&gt;
-  #else
-    &lt;span class="entity-reference"&gt;$entityReference&lt;/span&gt;
-  #end
-#end
 #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($doc))
 ## If the watched status informs that the filter is about children it means it's a filter for the space,
 ## so we should look for ancestor of the space.

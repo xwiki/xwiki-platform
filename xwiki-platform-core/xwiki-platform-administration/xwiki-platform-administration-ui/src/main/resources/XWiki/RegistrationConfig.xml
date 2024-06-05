@@ -538,7 +538,7 @@
   &lt;h2&gt;$headline &lt;/h2&gt;
   #if(!$noReadableName)
   &lt;p class="registration-success-subtitle"&gt;
-    ($displayName)
+    ($userName)
   &lt;/p&gt;
   #end
 &lt;/div&gt;

@@ -243,7 +243,8 @@ class RegisterIT
     {
         AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         registrationPage.fillInJohnSmithValues();
-        assertTrue(validateAndRegister(testUtils, isModal, registrationPage));
+        assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
+                + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
         tryToLoginAsJohnSmith(testUtils, AbstractRegistrationPage.JOHN_SMITH_PASSWORD, registrationPage);
     }
 
@@ -345,10 +346,12 @@ class RegisterIT
                 AbstractRegistrationPage.JOHN_SMITH_USERNAME, password, password, "wiki@example.com");
             assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
-
-            assertEquals(String.format("%s %s (%s): Registration successful.", firstName, lastName,
-                    AbstractRegistrationPage.JOHN_SMITH_USERNAME),
-                ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
+            String registrationSuccessMessage = ((RegistrationPage) registrationPage)
+                .getRegistrationSuccessMessage().orElseThrow().replace("\n"," ");
+            assertTrue(registrationSuccessMessage.contains(String.format("%s %s (%s)", firstName, lastName,
+                AbstractRegistrationPage.JOHN_SMITH_USERNAME)),
+                String.format("<%s> should contain <%s>", registrationSuccessMessage,
+                    String.format("%s %s (%s)", firstName, lastName, AbstractRegistrationPage.JOHN_SMITH_USERNAME)));
         }
     }
 

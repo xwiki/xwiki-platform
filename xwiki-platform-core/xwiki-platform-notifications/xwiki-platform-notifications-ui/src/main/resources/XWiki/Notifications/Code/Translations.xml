@@ -241,6 +241,8 @@ notifications.switches.tooltip.wiki=Watch this wiki
 notifications.switches.changeStatusError=Failed to change the status of the notifications.
 
 ## Watch button and modal
+
+notifications.watch.button.title=Current notification setting for this page: {0} - Click to change it
 notifications.watch.button.status.notset=Not set
 notifications.watch.button.status.followed=Followed
 notifications.watch.button.status.blocked=Ignored
@@ -282,9 +284,9 @@ notifications.watch.modal.option.unwatchwiki.hint=You will stop receiving notifi
 
 notifications.watch.modal.option.unblockpage.title=Unignore current page
 notifications.watch.modal.option.unblockpage.hint=You will stop ignoring notifications for that page only.
-notifications.watch.modal.option.unblockspace.title=Unblock current page and its children
+notifications.watch.modal.option.unblockspace.title=Unignore current page and its children
 notifications.watch.modal.option.unblockspace.hint=You will stop ignoring notifications for that page and its children.
-notifications.watch.modal.option.unblockwiki.title=Unblock current wiki
+notifications.watch.modal.option.unblockwiki.title=Unignore current wiki
 notifications.watch.modal.option.unblockwiki.hint=You will stop ignoring notifications for any page in the wiki.
 
 notifications.watch.modal.close=Close without saving

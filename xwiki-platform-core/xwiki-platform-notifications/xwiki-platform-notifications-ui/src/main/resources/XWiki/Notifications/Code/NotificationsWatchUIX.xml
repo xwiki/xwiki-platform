@@ -128,14 +128,11 @@
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
   
-  var handleSubmit = function () {
-    var chosenOption = $('#watchModal input[type="radio"]:checked').val();
-    // This should be improved as the REST endpoint might not be the same
+  var performChange = function (chosenOption) {
     var restUrl = xm.restURL;
     var queryParams = new URLSearchParams({
       "form_token": xm.form_token
     });
-    var isFilterRemoval = false;
     var method = "PUT";
     if (chosenOption === 'watchPage') {
       var url = restUrl;
@@ -166,17 +163,36 @@
     }
     if (url) {
       var ajaxUrl = url + "/notificationsWatches?" + queryParams.toString();
-      if (!isFilterRemoval) {
-        $.ajax(ajaxUrl, {
+      return $.ajax(ajaxUrl, {
           method: method
-        }).done(function () {
-          removeAnySelection();
-          window.location.reload();
-        }).error(function (data) {
-          removeAnySelection();
-          console.error("Error when processing the request: " + data);
-        });
+      });
+    }
+  };
+  
+  var handleSubmit = function () {
+    var chosenOption = $('#watchModal input[type="radio"]:checked').val();
+    var promise;
+    if (chosenOption == 'unwatchPageWatchSpace') {
+      var firstPromise = performChange('unwatchPage');
+      if (firstPromise !== 'undefined') {
+        promise = firstPromise.pipe(performChange('watchSpace'))
       }
+    } else if (chosenOption == 'unblockPageBlockSpace') {
+      var firstPromise = performChange('unblockPage');
+      if (firstPromise !== 'undefined') {
+        promise = firstPromise.pipe(performChange('blockSpace'))
+      }
+    } else {
+      promise = performChange(chosenOption);
+    }
+    if (promise !== 'undefined') {
+      promise.done(function () {
+        removeAnySelection();
+        window.location.reload();
+      }).error(function (data) {
+        removeAnySelection();
+        console.error("Error when processing the request: " + data);
+      });
     }
   };
   
@@ -544,8 +560,10 @@
 #end
 #set ($watchPageOption = "#_displayOption('watch-page','watchPage','watchpage','page')")
 #set ($watchSpaceOption = "#_displayOption('watch-space','watchSpace','watchspace','chart-organisation')")
+#set ($unwatchPageAndWatchSpaceOption = "#_displayOption('unwatch-page-watch-space','unwatchPageWatchSpace','watchspace','chart-organisation')")
 #set ($watchWikiOption = "#_displayOption('watch-wiki','watchWiki','watchwiki','world')")
 #set ($blockPageOption = "#_displayOption('block-page','blockPage','blockpage','page')")
+#set ($unblockPageAndBlockSpaceOption = "#_displayOption('unblock-page-block-space','unblockPageBlockSpace','blockspace','chart-organisation')")
 #set ($blockSpaceOption = "#_displayOption('block-space','blockSpace','blockspace','chart-organisation')")
 #set ($unwatchPageOption = "#_displayOption('unwatch-page','unwatchPage','unwatchpage','page')")
 #set ($unwatchSpaceOption = "#_displayOption('unwatch-space','unwatchSpace','unwatchspace','chart-organisation')")
@@ -553,9 +571,11 @@
 #set ($unblockPageOption = "#_displayOption('unblock-page','unblockPage','unblockpage','page')")
 #set ($unblockSpaceOption = "#_displayOption('unblock-space','unblockSpace','unblockspace','chart-organisation')")
 #set ($unblockWikiOption = "#_displayOption('unblock-wiki','unblockWiki','unblockwiki','world')")
+
+#set ($buttonTitle = $services.localization.render('notifications.watch.button.title', [$watchText]))
 {{html clean='false'}}
 &lt;div class="btn-group" id="watchButton"&gt;
-  &lt;a href="#" role="button" title="$escapetool.xml($watchText)" class="btn btn-default" data-toggle="modal" data-target="#watchModal"&gt;
+  &lt;a href="#" role="button" title="$escapetool.xml($buttonTitle)" class="btn btn-default" data-toggle="modal" data-target="#watchModal"&gt;
     &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
   &lt;/a&gt;
 &lt;/div&gt;
@@ -589,6 +609,8 @@
           &lt;p class="terminal-page-info"&gt;$services.localization.render('notifications.watch.modal.terminalpage.info', 'html/5.0', [])&lt;/p&gt;
         #end
         &lt;div class="watch-options-container panel-group" id="watch-options-accordion" role="tablist" aria-multiselectable="false"&gt;
+        #set ($blockedByAncestor = ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isBlocked()))
+        #set ($watchedByAncestor = ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isWatched()))
         #if ($watchedStatus == 'NOT_SET')
           $watchPageOption
           #if (!$isTerminal)
@@ -596,18 +618,22 @@
           #end
           $watchWikiOption
         #elseif ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
-          $blockPageOption
-          #if (!$isTerminal)
-          $blockSpaceOption
-          #end
-          #if ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isBlocked())
+          #if ($blockedByAncestor)
           $unwatchPageOption
+          #else
+          $blockPageOption
+          #end
+          #if (!$isTerminal &amp;&amp; $blockedByAncestor)
+          $unwatchPageAndWatchSpaceOption
+          #elseif (!$isTerminal &amp;&amp; !$blockedByAncestor)
+          $blockSpaceOption
           #end
         #elseif ($watchedStatus == 'WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+          #if ($blockedByAncestor)
+          $unwatchSpaceOption
+          #else
           $blockPageOption
           $blockSpaceOption
-          #if ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isBlocked())
-          $unwatchSpaceOption
           #end
         #elseif ($watchedStatus == 'WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
           $blockPageOption
@@ -618,18 +644,22 @@
           $unwatchWikiOption
           #end
         #elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
-          $watchPageOption
-          #if (!$isTerminal)
-          $watchSpaceOption
-          #end
-          #if ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isWatched())
+          #if ($watchedByAncestor)
           $unblockPageOption
+          #else
+          $watchPageOption
+          #end
+          #if (!$isTerminal &amp;&amp; $watchedByAncestor)
+          $unblockPageAndBlockSpaceOption
+          #elseif (!$isTerminal &amp;&amp; !$watchedByAncestor)
+          $watchSpaceOption
           #end
         #elseif ($watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+          #if ($watchedByAncestor)
+          $unblockSpaceOption
+          #else
           $watchPageOption
           $watchSpaceOption
-          #if ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isWatched())
-          $unblockSpaceOption
           #end
         #elseif ($watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
           $watchPageOption

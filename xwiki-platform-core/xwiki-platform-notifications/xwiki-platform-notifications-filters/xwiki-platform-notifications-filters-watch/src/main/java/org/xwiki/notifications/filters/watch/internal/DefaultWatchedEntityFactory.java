@@ -24,8 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.notifications.filters.watch.WatchedLocationReference;
 import org.xwiki.notifications.filters.watch.WatchedUserReference;
@@ -45,14 +47,23 @@ public class DefaultWatchedEntityFactory implements WatchedEntityFactory
     private ComponentManager componentManager;
 
     @Override
-    public WatchedLocationReference createWatchedLocationReference(EntityReference location)
+    public WatchedLocationReference createWatchedLocationReference(EntityReference location) throws
+        NotificationException
     {
-        return new WatchedLocationReference(location, componentManager);
+        try {
+            return new WatchedLocationReference(location, componentManager);
+        } catch (ComponentLookupException e) {
+            throw new NotificationException("Error when instantiating a new WatchedLocationReference", e);
+        }
     }
 
     @Override
-    public WatchedUserReference createWatchedUserReference(String userId)
+    public WatchedUserReference createWatchedUserReference(String userId) throws NotificationException
     {
-        return new WatchedUserReference(userId, componentManager);
+        try {
+            return new WatchedUserReference(userId, componentManager);
+        } catch (ComponentLookupException e) {
+            throw new NotificationException("Error when instantiating a new WatchedUserReference", e);
+        }
     }
 }

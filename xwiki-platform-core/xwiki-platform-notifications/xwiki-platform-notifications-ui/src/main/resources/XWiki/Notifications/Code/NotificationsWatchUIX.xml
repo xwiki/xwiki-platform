@@ -191,6 +191,12 @@
         $('#watchModal .btn-primary').prop('disabled', false);
       });
     });
+    $('#watchModal .close-modal').on('click', function() {
+      $('#watchModal input[type="radio"]').each(function () {
+        $(this).prop('checked', '');
+        $('#watchModal .btn-primary').prop('disabled', true);
+      });
+    });
   };
   
   (XWiki.isInitialized &amp;&amp; initWatchModal()) || document.on('xwiki:dom:loaded',initWatchModal);
@@ -320,6 +326,9 @@
 }
 .panel-radio {
   padding: 8px 15px;
+}
+.help-icon {
+  float: right;
 }</code>
     </property>
     <property>
@@ -516,7 +525,9 @@
     &lt;div class="panel-heading" role="tab" id="heading-$attributeName"&gt;
       &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-$attributeName" aria-controls="xhint-$attributeName"&gt;
         &lt;h4 class="panel-title" id="title-$attributeName"&gt;
-          $services.icon.renderHTML("$iconName") $services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", 'html/5.0', [])
+          $services.icon.renderHTML("$iconName") 
+          $services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", 'html/5.0', [])
+          &lt;span class="help-icon"&gt;$services.icon.renderHTML('question')&lt;/span&gt;
         &lt;/h4&gt;
       &lt;/a&gt;
     &lt;/div&gt;&lt;!-- end panel heading --&gt;
@@ -548,7 +559,7 @@
   &lt;div class="modal-dialog" role="document"&gt;
     &lt;div class="modal-content"&gt;
       &lt;div class="modal-header"&gt;
-        &lt;button type="button" class="close" data-dismiss="modal" aria-label="$escapetool.xml($services.localization.render('notifications.watch.modal.close'))"&gt;
+        &lt;button type="button" class="close close-modal" data-dismiss="modal" aria-label="$escapetool.xml($services.localization.render('notifications.watch.modal.close'))"&gt;
           &lt;span aria-hidden="true"&gt;
             $services.icon.renderHTML('cross')
           &lt;/span&gt;&lt;/button&gt;
@@ -559,6 +570,8 @@
       &lt;div class="modal-body"&gt;
         &lt;p&gt;
           $services.localization.render("notifications.watch.modal.description.$watchedStatus", 'html/5.0', [])
+          &lt;hr /&gt;
+          $services.localization.render('notifications.watch.modal.description.options', 'html/5.0', [])
         &lt;/p&gt;
         #if ($isTerminal)
           &lt;p class="terminal-page-info"&gt;$services.localization.render('notifications.watch.modal.terminalpage.info', 'html/5.0', [])&lt;/p&gt;
@@ -625,11 +638,11 @@
         &lt;div class="modal-body-footer"&gt;
           #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
           #set ($notifUrl = "$userDoc.getURL('view','category=notifications')#Hnotifications.settings.filters.preferences.custom.title")
-          $services.localization.render('notifications.watch.modal.option.settingslink', 'html/5.0',["&lt;a href='$notifUrl'&gt;", '&lt;/a&gt;'])
+          $services.localization.render('notifications.watch.modal.option.settingslink', ["&lt;a href='$notifUrl'&gt;", '&lt;/a&gt;'])
         &lt;/div&gt;
       &lt;/div&gt;&lt;!-- end modal body --&gt;
       &lt;div class="modal-footer"&gt;
-        &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+        &lt;button type="button" class="btn btn-default close-modal" data-dismiss="modal"&gt;
           $services.localization.render('notifications.watch.modal.close', 'html/5.0', [])
         &lt;/button&gt;
         &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;

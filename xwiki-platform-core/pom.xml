@@ -203,14 +203,14 @@
                   <ignore>true</ignore>
                   <code>java.method.numberOfParametersChanged</code>
                   <old>method void org.xwiki.notifications.filters.watch.WatchedLocationReference::&lt;init&gt;(org.xwiki.model.reference.EntityReference, java.lang.String, org.xwiki.model.reference.EntityReferenceResolver&lt;java.lang.String&gt;, org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer, org.xwiki.notifications.filters.NotificationFilterPreferenceManager)</old>
-                  <new>method void org.xwiki.notifications.filters.watch.WatchedLocationReference::&lt;init&gt;(org.xwiki.model.reference.EntityReference, org.xwiki.component.manager.ComponentManager)</new>
+                  <new>method void org.xwiki.notifications.filters.watch.WatchedLocationReference::&lt;init&gt;(org.xwiki.model.reference.EntityReference, org.xwiki.component.manager.ComponentManager) throws org.xwiki.component.manager.ComponentLookupException</new>
                   <justification>Simplify future extensions of this API.</justification>
                 </item>
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.numberOfParametersChanged</code>
                   <old>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter, org.xwiki.notifications.filters.NotificationFilterPreferenceManager)</old>
-                  <new>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.component.manager.ComponentManager)</new>
+                  <new>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.component.manager.ComponentManager) throws org.xwiki.component.manager.ComponentLookupException</new>
                   <justification>Simplify future extensions of this API.</justification>
                 </item>
               </differences>

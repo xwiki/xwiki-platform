@@ -63,19 +63,15 @@ public class WatchedUserReference implements WatchedEntityReference
      * @param userId id of the user to watch.
      * @param componentManager the component manager for loading needed components
      */
-    public WatchedUserReference(String userId, ComponentManager componentManager)
+    public WatchedUserReference(String userId, ComponentManager componentManager) throws ComponentLookupException
     {
         this.userId = userId;
         this.componentManager = componentManager;
-        try {
-            this.preferencesGetter = this.componentManager.getInstance(EventUserFilterPreferencesGetter.class);
-            this.notificationFilterPreferenceManager =
-                this.componentManager.getInstance(NotificationFilterPreferenceManager.class);
-            this.userReferenceSerializer = componentManager.getInstance(
-                new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException(e);
-        }
+        this.preferencesGetter = this.componentManager.getInstance(EventUserFilterPreferencesGetter.class);
+        this.notificationFilterPreferenceManager =
+            this.componentManager.getInstance(NotificationFilterPreferenceManager.class);
+        this.userReferenceSerializer = componentManager.getInstance(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
     }
 
     @Override

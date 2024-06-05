@@ -243,50 +243,51 @@ notifications.switches.changeStatusError=Failed to change the status of the noti
 ## Watch button and modal
 notifications.watch.button.status.notset=Not set
 notifications.watch.button.status.followed=Followed
-notifications.watch.button.status.blocked=Blocked
+notifications.watch.button.status.blocked=Ignored
 notifications.watch.button.status.custom=Custom
 
-notifications.watch.modal.title=Watch settings
-notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=This page is followed: you will receive notifications for all event types.
-notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=This page is followed through another page in the hierarchy: you will receive notifications for all event types.
-notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=This page and its children are followed: you will receive notifications for all event types.
-notifications.watch.modal.description.NOT_SET=There is no watch settings for this page: you won't receive notifications for it.
-notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=This page is blocked: you won't receive any notifications for it.
-notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=This page is blocked through another page in the hierarchy: you won't receive any notifications for it.
-notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=This page and its children are blocked: you won't receive any notifications for it.
-notifications.watch.modal.description.CUSTOM=The watch settings are custom for this page: you should review the filters applied for the page to know exactly which notifications you might receive.
+notifications.watch.modal.title=Notification settings for this page
+notifications.watch.modal.description.options=You can change the current notification settings with the following options: 
+notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=You are following this page: you will receive notifications for it.
+notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are following this page through a parent in the hierarchy: you will receive notifications for it.
+notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are following this page and its children: you will receive notifications for it.
+notifications.watch.modal.description.NOT_SET=You are not following this page: you won't receive notifications for it.
+notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page: you won't receive any notifications for it.
+notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page through a parent in the hierarchy: you won't receive any notifications for it.
+notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page and its children: you won't receive any notifications for it.
+notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you should review them to know exactly which notifications you might receive.
 
-notifications.watch.modal.terminalpage.info=Note that this is a terminal page: some options you usually see for watching page and children are not displayed.
-notifications.watch.modal.option.ancestorlink=If none of the above actions suits your need you can also go to {0} for modifying the watch settings there: this is the first location with a filter impacting current page.
-notifications.watch.modal.option.settingslink=You can find and manipulate all your custom filters for watch settings in {0}your notifications settings{1}.
+notifications.watch.modal.terminalpage.info=This is a terminal page: some options for following or ignoring page and children are not displayed.
+notifications.watch.modal.option.ancestorlink=You can modify the notification settings of this page by going to {0} and modify the notification settings there: this is the first parent location with a filter impacting current page.
+notifications.watch.modal.option.settingslink=You can find and manipulate all page notification settings in {0}your user profile{1}.
 
 notifications.watch.modal.option.watchpage.title=Follow current page
-notifications.watch.modal.option.watchpage.hint=By selecting that option, you will receive notifications for that page only.
+notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
 notifications.watch.modal.option.watchspace.title=Follow current page and its children
-notifications.watch.modal.option.watchspace.hint=By selecting that option, you will receive notifications for that page and its children.
+notifications.watch.modal.option.watchspace.hint=You will receive notifications for that page and its children.
 notifications.watch.modal.option.watchwiki.title=Follow current wiki
-notifications.watch.modal.option.watchwiki.hint=By selecting that option, you will receive notifications for any page in the wiki, provided that no other filter exists.
+notifications.watch.modal.option.watchwiki.hint=You will receive notifications for any page in the wiki.
 
-notifications.watch.modal.option.blockpage.title=Block current page
-notifications.watch.modal.option.blockpage.hint=By selecting that option, you will stop receiving notifications for that page only.
-notifications.watch.modal.option.blockspace.title=Block current page and its children
-notifications.watch.modal.option.blockspace.hint=By selecting that option, you will stop receiving notifications for that page and all of its children.
+notifications.watch.modal.option.blockpage.title=Ignore current page
+notifications.watch.modal.option.blockpage.hint=You will ignore any notifications for that page only.
+notifications.watch.modal.option.blockspace.title=Ignore current page and its children
+notifications.watch.modal.option.blockspace.hint=You will ignore any notifications for that page and all of its children.
 
 notifications.watch.modal.option.unwatchpage.title=Unfollow current page
-notifications.watch.modal.option.unwatchpage.hint=By selecting that option, you will remove existing filter that allows to watch that page so you won't receive notifications for that page. However, since you're not blocking explicitely notifications, you might again receive notifications for that page if another filter is created in the hierarchy to watch page and children or to watch the whole wiki.
+notifications.watch.modal.option.unwatchpage.hint=You will stop receiving notifications for that page only.
 notifications.watch.modal.option.unwatchspace.title=Unfollow current page and its children
-notifications.watch.modal.option.unwatchspace.hint=By selecting that option, you will remove existing filter that allows to watch that page and its children so you won't receive notifications for those. However, since you're not blocking explicitely notifications, you might again receive notifications for that page if another filter is created in the hierarchy to watch page and children or to watch the whole wiki. Similarly if one or several of the children of this page have a watch filter you might still receive notifications for them.
+notifications.watch.modal.option.unwatchspace.hint=You will stop receiving notifications for that page and its children.
 notifications.watch.modal.option.unwatchwiki.title=Unfollow current wiki
-notifications.watch.modal.option.unwatchwiki.hint=By selecting that option, you will remove existing filter allowing to receive notifications for any page on the whole wiki. So it will impact this page and you won't receive notifications anymore for it, but it will impact also notifications received for other pages on the wiki.
+notifications.watch.modal.option.unwatchwiki.hint=You will stop receiving notifications for any page in the wiki.
 
-notifications.watch.modal.option.unblockpage.title=Unblock current page
-notifications.watch.modal.option.unblockpage.hint=By selecting that option, you will remove existing filter that allows to block that page so you will receive notifications for that page. However, since you're not watching it explicitely, you might again have notifications blocked for that page if another filter is created in the hierarchy to block page and children.
+notifications.watch.modal.option.unblockpage.title=Unignore current page
+notifications.watch.modal.option.unblockpage.hint=You will stop ignoring notifications for that page only.
 notifications.watch.modal.option.unblockspace.title=Unblock current page and its children
-notifications.watch.modal.option.unblockspace.hint=By selecting that option, you will remove existing filter that allows to block that page and its children so you will receive notifications for those. However, since you're not following explicitely them, you might again have notifications blocked for that page if another filter is created in the hierarchy to block page and children. Similarly if one or several of the children of this page have a block filter you will have notifications blocked for them.
+notifications.watch.modal.option.unblockspace.hint=You will stop ignoring notifications for that page and its children.
 notifications.watch.modal.option.unblockwiki.title=Unblock current wiki
-notifications.watch.modal.option.unblockwiki.hint=By selecting that option, you will remove existing filter that blocks notifications for any page on the whole wiki. So it will impact this page and you will receive notifications anymore for it, but it will impact also other pages on the wiki for which you will also receive notifications after the change.
+notifications.watch.modal.option.unblockwiki.hint=You will stop ignoring notifications for any page in the wiki.
 
-notifications.watch.modal.close=Close
+notifications.watch.modal.close=Close without saving
 notifications.watch.modal.savechanges=Save changes
 
 ## Used to indicate where deprecated keys start

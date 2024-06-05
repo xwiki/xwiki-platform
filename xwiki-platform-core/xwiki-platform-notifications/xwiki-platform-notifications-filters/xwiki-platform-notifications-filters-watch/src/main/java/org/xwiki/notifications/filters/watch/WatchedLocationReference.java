@@ -76,23 +76,21 @@ public class WatchedLocationReference implements WatchedEntityReference
      * @param componentManager the component manager for loading needed components
      */
     public WatchedLocationReference(EntityReference entityReference, ComponentManager componentManager)
+        throws ComponentLookupException
     {
         this.entityReference = entityReference;
         this.componentManager = componentManager;
         EntityReferenceSerializer<String> serializer;
-        try {
-            this.resolver = componentManager.getInstance(
-                new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class));
-            serializer = componentManager.getInstance(
-                new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
-            this.stateComputer = componentManager.getInstance(ScopeNotificationFilterLocationStateComputer.class);
-            this.notificationFilterPreferenceManager =
-                componentManager.getInstance(NotificationFilterPreferenceManager.class);
-            this.userReferenceSerializer = componentManager.getInstance(
-                new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException(e);
-        }
+        this.resolver = componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class));
+        serializer = componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
+        this.stateComputer = componentManager.getInstance(ScopeNotificationFilterLocationStateComputer.class);
+        this.notificationFilterPreferenceManager =
+            componentManager.getInstance(NotificationFilterPreferenceManager.class);
+        this.userReferenceSerializer = componentManager.getInstance(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
+
         this.serializedReference = serializer.serialize(entityReference);
     }
 
@@ -157,7 +155,12 @@ public class WatchedLocationReference implements WatchedEntityReference
                 EntityReference parent = currentReference.getParent();
                 if (parent != null) {
                     WatchedLocationReference parentWatchedLocationReference =
-                        new WatchedLocationReference(parent, componentManager);
+                        null;
+                    try {
+                        parentWatchedLocationReference = new WatchedLocationReference(parent, componentManager);
+                    } catch (ComponentLookupException e) {
+                        throw new NotificationException("Error when creating a new reference", e);
+                    }
                     parentWatchedStatus = parentWatchedLocationReference.getWatchedStatus(userReference);
                 }
                 currentReference = parent;

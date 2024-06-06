@@ -40,7 +40,7 @@
     <xwiki.jacoco.instructionRatio>0.08</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
-    <!-- Trigger xwiki-platform-notifications-fomters-api dependencies (but without
+    <!-- Trigger xwiki-platform-notifications-filters-api dependencies (but without
     xwiki-platform-notifications-filters-api jar itself) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -42,7 +42,7 @@ import org.xwiki.notifications.filters.NotificationFilterType;
  * Default implementation of the role {@link NotificationFilterPreferenceManager}.
  *
  * @version $Id$
- * @since 9.8RC1
+ * @since 10.9
  */
 @Component
 @Singleton

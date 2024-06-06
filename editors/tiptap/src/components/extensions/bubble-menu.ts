@@ -102,9 +102,12 @@ export function getLinkAction(editor: Editor): BubbleMenuAction {
       { linkValue, removeLink }: { linkValue?: string; removeLink?: boolean },
     ) {
       if (linkValue) {
-        // find a way to load a sub-element instead and use it as part of the
-        // bubble UI.isMarkActive()
-        editor.chain().setLink({ href: linkValue }).focus(range.to).run();
+        editor
+          .chain()
+          .focus()
+          .extendMarkRange("link")
+          .setLink({ href: linkValue })
+          .run();
       }
 
       if (removeLink) {

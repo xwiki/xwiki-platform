@@ -19,7 +19,7 @@
     "eslint-plugin-vue": "9.24.1",
     "jsdom": "24.1.0",
     "prettier": "3.3.2",
-    "terser": "5.31.0",
+    "terser": "5.31.1",
     "vite": "5.2.12",
     "vue-template-compiler": "2.7.16",
     "jquery": "3.7.1"

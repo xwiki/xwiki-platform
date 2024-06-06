@@ -214,7 +214,7 @@
         #set($result = $result.replaceAll('class="diff-header"', "style='border: 1px solid ${borderColor}; border-left: 5px solid ${borderColor}; color: ${mutedColor}; padding: .5em .2em;'"))
         #set($result = $result.replaceAll('class="diff-container"', "style='border: 1px solid ${borderColor}; font-family: Monospace; overflow: auto;'"))
         #set($result = $result.replaceAll('class="diff-line-number"', "style='border-right: 1px solid ${borderColor}; color: ${mutedColor}; font-family: Monospace; text-align: right; vertical-align: top;'"))
-        #set($result = $result.replaceAll('diff-line-meta"', "' style='background-color: #eee; color: ${mutedColor}; font-family: Monospace; padding: .4em .5em;'"))
+        #set($result = $result.replaceAll('diff-line-meta"', """ style='background-color: #eee; color: ${mutedColor}; font-family: Monospace; padding: .4em .5em;'"))
         #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
         $result
       #end

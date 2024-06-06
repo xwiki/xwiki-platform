@@ -42,7 +42,6 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceSerializer;
 

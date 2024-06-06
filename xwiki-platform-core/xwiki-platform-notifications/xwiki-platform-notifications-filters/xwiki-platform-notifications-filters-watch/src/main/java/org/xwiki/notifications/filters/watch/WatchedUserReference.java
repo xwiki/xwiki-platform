@@ -37,7 +37,6 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceSerializer;
 

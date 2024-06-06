@@ -40,15 +40,15 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Slash } from "../components/extensions/slash";
 import { loadLinkSuggest } from "../components/extensions/link-suggest";
-import { Markdown } from "tiptap-markdown";
 import Image from "@tiptap/extension-image";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
-import Link from "@tiptap/extension-link";
 import { LinkSuggestService, name } from "@xwiki/cristal-link-suggest-api";
+import Link from "../extensions/link";
+import Markdown from "../extensions/markdown";
 
 const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;

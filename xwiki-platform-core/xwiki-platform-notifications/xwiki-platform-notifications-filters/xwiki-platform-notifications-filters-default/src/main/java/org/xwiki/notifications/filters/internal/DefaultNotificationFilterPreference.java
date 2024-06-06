@@ -49,8 +49,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private String filterName;
 
-    private String providerHint;
-
     private boolean enabled;
 
     private boolean active;
@@ -105,7 +103,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
         this.id = notificationFilterPreference.getId();
         this.filterName = notificationFilterPreference.getFilterName();
-        this.providerHint = notificationFilterPreference.getProviderHint();
         this.enabled = notificationFilterPreference.isEnabled();
         this.active = notificationFilterPreference.isActive();
         this.filterType = notificationFilterPreference.getFilterType();
@@ -142,7 +139,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setInternalId(long internalId)
     {
         this.internalId = internalId;
-        this.id = String.format("NFP_%d", internalId);
+        this.id = String.format("%s%d", DB_ID_FILTER_PREFIX, internalId);
     }
 
     /**
@@ -167,14 +164,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setFilterName(String filterName)
     {
         this.filterName = filterName;
-    }
-
-    /**
-     * @param providerHint the name of the provider that have built this preference
-     */
-    public void setProviderHint(String providerHint)
-    {
-        this.providerHint = providerHint;
     }
 
     /**
@@ -278,12 +267,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public String getFilterName()
     {
         return filterName;
-    }
-
-    @Override
-    public String getProviderHint()
-    {
-        return providerHint;
     }
 
     @Override
@@ -429,7 +412,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
                 + ", internalId=" + internalId
                 + ", owner='" + owner + '\''
                 + ", filterName='" + filterName + '\''
-                + ", providerHint='" + providerHint + '\''
                 + ", enabled=" + enabled
                 + ", active=" + active
                 + ", filterType=" + filterType
@@ -462,7 +444,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
             .append(id, other.id)
             .append(owner, other.owner)
             .append(filterName, other.filterName)
-            .append(providerHint, other.providerHint)
             .append(filterType, other.filterType)
             .append(notificationFormats, other.notificationFormats)
             .append(startingDate, other.startingDate)
@@ -484,7 +465,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
             .append(id)
             .append(owner)
             .append(filterName)
-            .append(providerHint)
             .append(filterType)
             .append(notificationFormats)
             .append(startingDate)

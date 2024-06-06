@@ -95,8 +95,7 @@ public interface NotificationFilterPreferenceManager
             NotificationFilterType filterType, NotificationFormat format);
 
     /**
-     * Save the given set of {@link NotificationFilterPreference} against their respective
-     * {@link NotificationFilterPreferenceProvider}.
+     * Save the given set of {@link NotificationFilterPreference}.
      *
      * @param user the user to use
      * @param notificationFilterPreferences a set of {@link NotificationFilterPreference} to save

@@ -262,9 +262,9 @@
       ## tools to display the title.
       #set ($title = $document.displayTitle)
     #end
-    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: #767676;">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $title)
+    <li style="vertical-align: middle; padding-left: 0; margin: 5px 0;"><span style="color: ${borderColor};">---</span> <img src="cid:NEPage.png" width="8" height="10" style="width: 8px; height: 10px; margin-right: 2px;"/> #link("#${escapetool.xml($ev.event.events.get(0).id)}", $title)
       #if ($ev.hasChildren())
-        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 20px;">
+        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed ${borderColor}; margin-left: 20px;">
         #foreach ($child in $ev.children)
           #displaySortedEventTOC($child)
         #end
@@ -281,7 +281,7 @@
     #if ($wiki != '')
       #set ($wikiDescriptor = $services.wiki.getById($wiki))
       <li style="margin: 10px 0;"><img src="cid:NEWiki.png" alt="" style="width: 10px;"/> $escapetool.xml($wikiDescriptor.prettyName)
-        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed #ccc; margin-left: 5px;">
+        <ul style="list-style-type: none; padding: 0; border-left: 1px dashed ${borderColor}; margin-left: 5px;">
           #foreach ($ev in $sortedEventList)
             #displaySortedEventTOC($ev)
           #end

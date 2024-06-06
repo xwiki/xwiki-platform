@@ -666,8 +666,8 @@ public class TableLayoutElement extends BaseElement
     {
         int columnIndex = findColumnIndex(columnLabel);
         By cssSelector = By.cssSelector(String.format(
-            ".column-filters > th:nth-child(%1$d) input.livedata-filter, "
-            + ".column-filters > th:nth-child(%1$d) select.livedata-filter", columnIndex));
+            ".column-filters > th:nth-child(%1$d) input, "
+            + ".column-filters > th:nth-child(%1$d) select", columnIndex));
         return getRoot().findElement(cssSelector);
     }
 

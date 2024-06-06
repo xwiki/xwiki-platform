@@ -19,10 +19,18 @@ fi
 if [ ! -d /var/log/xwiki ]; then
   mkdir /var/log/xwiki
 fi
-
 # Make sure XWiki is able to write in the log directory
 if [ ! 'xwiki' = `stat -c '%U' /var/log/xwiki` ]; then
   chown -R xwiki:xwiki /var/log/xwiki
+fi
+
+# Make sure the tmp directory exist
+if [ ! -d /var/lib/xwiki/tmp ]; then
+  mkdir /var/lib/xwiki/tmp
+fi
+# Make sure XWiki is able to write in the tmp directory
+if [ ! 'xwiki' = `stat -c '%U' /var/lib/xwiki/tmp` ]; then
+  chown -R xwiki:xwiki /var/lib/xwiki/tmp
 fi
 
 #########################

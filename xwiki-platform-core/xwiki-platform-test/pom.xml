@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test</artifactId>
   <name>XWiki Platform - Test - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Test - Parent POM</description>
   <properties>
-    <selenium.version>4.19.1</selenium.version>
+    <selenium.version>4.20.0</selenium.version>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>

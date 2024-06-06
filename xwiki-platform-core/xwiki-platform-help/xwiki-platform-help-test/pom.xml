@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-help</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-help-test</artifactId>
   <name>XWiki Platform - Panels - Help - Parent POM</name>

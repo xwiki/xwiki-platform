@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -139,20 +139,17 @@
                  Single justification example:
             -->
             <revapi.differences>
-              <justification>
-                This should have been internal or at least marked unstable. Also, this class was only moved.
-              </justification>
+              <justification>Deprecated method available through legacy but breakage triggered by a
+                dependant module.</justification>
               <criticality>allowed</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.notifications.filters.migration.R160000000XWIKI17243DataMigration</old>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getProviderHint()</old>
                 </item>
               </differences>
             </revapi.differences>
-            
-            
             
             
           </analysisConfiguration>

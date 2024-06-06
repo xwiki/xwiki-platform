@@ -51,8 +51,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private boolean enabled;
 
-    private boolean active;
-
     private NotificationFilterType filterType;
 
     private Set<NotificationFormat> notificationFormats = new HashSet<>();
@@ -104,7 +102,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         this.id = notificationFilterPreference.getId();
         this.filterName = notificationFilterPreference.getFilterName();
         this.enabled = notificationFilterPreference.isEnabled();
-        this.active = notificationFilterPreference.isActive();
         this.filterType = notificationFilterPreference.getFilterType();
         this.notificationFormats = notificationFilterPreference.getNotificationFormats();
         this.startingDate = notificationFilterPreference.getStartingDate();
@@ -177,10 +174,11 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     /**
      * @param active if the preference is active or not
+     * @deprecated this method is kept only for avoiding issues with hibernate
      */
+    @Deprecated(since = "16.5.0RC1")
     public void setActive(boolean active)
     {
-        this.active = active;
     }
 
     /**
@@ -273,12 +271,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public boolean isEnabled()
     {
         return enabled;
-    }
-
-    @Override
-    public boolean isActive()
-    {
-        return active;
     }
 
     @Override
@@ -413,7 +405,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
                 + ", owner='" + owner + '\''
                 + ", filterName='" + filterName + '\''
                 + ", enabled=" + enabled
-                + ", active=" + active
                 + ", filterType=" + filterType
                 + ", notificationFormats=" + notificationFormats
                 + ", startingDate=" + startingDate
@@ -440,7 +431,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         EqualsBuilder equalsBuilder = new EqualsBuilder();
         equalsBuilder.append(internalId, other.internalId)
             .append(enabled, other.enabled)
-            .append(active, other.active)
             .append(id, other.id)
             .append(owner, other.owner)
             .append(filterName, other.filterName)
@@ -461,7 +451,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
         hashCodeBuilder.append(internalId)
             .append(enabled)
-            .append(active)
             .append(id)
             .append(owner)
             .append(filterName)

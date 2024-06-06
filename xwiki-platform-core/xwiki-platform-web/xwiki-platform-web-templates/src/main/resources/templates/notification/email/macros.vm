@@ -19,16 +19,18 @@
 ## ---------------------------------------------------------------------------
 #template('notification/macros.vm')
 
+#set($linkColor = '#2f6faf')
 #set($breadcrumbBackground = '#f5f5f5')
 #set($breadcrumbColor = '#707070')
 #set($mutedColor = '#656565')
+#set($borderColor = '#e8e8e8')
 #**
  * Display a styled link
  * @param $url URL of the link
  * @param $linkText text of the link
  *#
 #macro(link $url $linkText)
-  <a style="color: $theme.linkColor; text-decoration: none;" href="$escapetool.xml($url)">$linkText</a>
+  <a style="color: ${linkColor}; text-decoration: none;" href="$escapetool.xml($url)">$linkText</a>
 #end
 #**
  * Display a little avatar of the user
@@ -99,7 +101,7 @@
 
 #macro(displayNotificationPage $event)
   <div>
-    <div style="background-color: $breadcrumbBackground; color: $breadcrumbColor; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
+    <div style="background-color: ${breadcrumbBackground}; color: ${breadcrumbColor}; padding: 4px 8px; border-radius: 7px; font-size: 8px;">
       #template('hierarchy_macros.vm')
       #hierarchy($event.document, {'id': 'hierarchy', 'limit': 5, 'treeNavigation': false, 'plain': true})
     </div>
@@ -209,10 +211,10 @@
         ##set($result = $result.replaceAll('<dt', '<dt style="font-size: 1.2em; fontw-weight: bold;"'))
         #set($result = $result.replaceAll('<ins>', '<ins style="background-color: #99ff99; text-decoration: none;">'))
         #set($result = $result.replaceAll('<del>', '<del style="background-color: #ff9999; text-decoration: none;">'))
-        #set($result = $result.replaceAll('class="diff-header"', 'style="border: 1px solid $mutedColor; border-left: 5px solid $mutedColor; color: $mutedColor; padding: .5em .2em;"'))
-        #set($result = $result.replaceAll('class="diff-container"', 'style="border: 1px solid $mutedColor; font-family: Monospace; overflow: auto;"'))
-        #set($result = $result.replaceAll('class="diff-line-number"', 'style="border-right: 1px solid $mutedColor; color: $mutedColor; font-family: Monospace; text-align: right; vertical-align: top;"'))
-        #set($result = $result.replaceAll('diff-line-meta"', '" style="background-color: #eee; color: $mutedColor; font-family: Monospace; padding: .4em .5em;"'))
+        #set($result = $result.replaceAll('class="diff-header"', "style='border: 1px solid ${borderColor}; border-left: 5px solid ${borderColor}; color: ${mutedColor}; padding: .5em .2em;'"))
+        #set($result = $result.replaceAll('class="diff-container"', "style='border: 1px solid ${borderColor}; font-family: Monospace; overflow: auto;'"))
+        #set($result = $result.replaceAll('class="diff-line-number"', "style='border-right: 1px solid ${borderColor}; color: ${mutedColor}; font-family: Monospace; text-align: right; vertical-align: top;'"))
+        #set($result = $result.replaceAll('diff-line-meta"', "' style='background-color: #eee; color: ${mutedColor}; font-family: Monospace; padding: .4em .5em;'"))
         #set($result = $result.replaceAll('<dd>', '<dd style="margin-left: 0">'))
         $result
       #end

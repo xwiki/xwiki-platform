@@ -43,6 +43,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 
@@ -258,13 +259,16 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
 
         switch (reference.getType()) {
             case WIKI:
-                preference.setWiki(reference.getName());
+                preference.setEntity(reference.getName());
+                preference.setScope(NotificationFilterScope.WIKI);
                 break;
             case SPACE:
-                preference.setPage(entityReferenceSerializer.serialize(reference));
+                preference.setEntity(entityReferenceSerializer.serialize(reference));
+                preference.setScope(NotificationFilterScope.SPACE);
                 break;
             case DOCUMENT:
-                preference.setPageOnly(entityReferenceSerializer.serialize(reference));
+                preference.setEntity(entityReferenceSerializer.serialize(reference));
+                preference.setScope(NotificationFilterScope.PAGE);
                 break;
             default:
                 break;

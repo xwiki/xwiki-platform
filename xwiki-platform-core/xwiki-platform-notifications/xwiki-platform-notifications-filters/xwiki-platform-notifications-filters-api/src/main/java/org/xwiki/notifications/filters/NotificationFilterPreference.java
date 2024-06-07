@@ -73,23 +73,6 @@ public interface NotificationFilterPreference
     boolean isEnabled();
 
     /**
-     * A filter preference can either be active or passive. It the preference is active, then it should force the
-     * retrieval of notifications when used in conjunction with a {@link NotificationFilter}.
-     *
-     * On the other hand, a passive (non-active) notification filter should not automatically trigger the retrieval of
-     * notifications.
-     *
-     * @return true if the filter preference is active.
-     * @deprecated this behaviour doesn't make sense anymore with usage of prefiltering as there's no trigger for
-     * retrieving the notifications nowadays.
-     */
-    @Deprecated(since = "16.5.0RC1")
-    default boolean isActive()
-    {
-        return true;
-    }
-
-    /**
      * @return the type of the filter described by this preference.
      */
     NotificationFilterType getFilterType();
@@ -123,28 +106,79 @@ public interface NotificationFilterPreference
      * @since 10.8RC1
      * @since 9.11.8
      */
-    String getUser();
+    @Deprecated(since = "16.5.0RC1")
+    default String getUser()
+    {
+        return null;
+    }
 
     /**
      * @return the page concerned by the preference (can be null)
      * @since 10.8RC1
      * @since 9.11.8
      */
-    String getPageOnly();
+    @Deprecated(since = "16.5.0RC1")
+    default String getPageOnly()
+    {
+        return null;
+    }
 
     /**
      * @return the page (and its children) concerned by the preference (can be null)
      * @since 10.8RC1
      * @since 9.11.8
      */
-    String getPage();
+    @Deprecated(since = "16.5.0RC1")
+    default String getPage()
+    {
+        return null;
+    }
+
+    /**
+     * @return the scope of the filter.
+     * @since 16.5.0RC1
+     */
+    @Unstable
+    default NotificationFilterScope getScope()
+    {
+        if (!StringUtils.isEmpty(getUser())) {
+            return NotificationFilterScope.USER;
+        } else if (!StringUtils.isEmpty(getPageOnly())) {
+            return NotificationFilterScope.PAGE;
+        } else if (!StringUtils.isEmpty(getPage())) {
+            return NotificationFilterScope.SPACE;
+        } else {
+            return NotificationFilterScope.WIKI;
+        }
+    }
+
+    /**
+     * @return the serialized entity of the filter target.
+     * @since 16.5.0RC1
+     */
+    @Unstable
+    default String getEntity()
+    {
+        if (!StringUtils.isEmpty(getUser())) {
+            return getUser();
+        } else if (!StringUtils.isEmpty(getPageOnly())) {
+            return getPageOnly();
+        } else if (!StringUtils.isEmpty(getPage())) {
+            return getPage();
+        } else {
+            return getWiki();
+        }
+    }
 
     /**
      * @return the wiki concerned by the preference (can be null)
      * @since 10.8RC1
      * @since 9.11.8
      */
-    String getWiki();
+    default String getWiki()
+    {
+        return null;
+    }
 
     /**
      * @param enabled if the preference is enabled or not
@@ -167,10 +201,7 @@ public interface NotificationFilterPreference
     default boolean isFromWiki(String wikiId)
     {
         String wikiIdWithPrefix = wikiId + DB_SPACE_SEP;
-        return Objects.equals(getWiki(), wikiId)
-            || StringUtils.startsWith(getPage(), wikiIdWithPrefix)
-            || StringUtils.startsWith(getPageOnly(), wikiIdWithPrefix)
-            || StringUtils.startsWith(getUser(), wikiIdWithPrefix);
+        return Objects.equals(getEntity(), wikiId) || StringUtils.startsWith(getEntity(), wikiIdWithPrefix);
     }
 
     /**
@@ -185,16 +216,10 @@ public interface NotificationFilterPreference
      */
     default Optional<String> getWikiId()
     {
-        String wikiId = null;
-        if (getWiki() != null) {
-            wikiId = getWiki();
-        } else if (getPage() != null) {
-            wikiId = StringUtils.substringBefore(getPage(), DB_SPACE_SEP);
-        } else if (getPageOnly() != null) {
-            wikiId = StringUtils.substringBefore(getPageOnly(), DB_SPACE_SEP);
-        } else if (getUser() != null) {
-            wikiId = StringUtils.substringBefore(getUser(), DB_SPACE_SEP);
-        }
+        String wikiId = switch (getScope()) {
+            case USER, PAGE, SPACE -> StringUtils.substringBefore(getEntity(), DB_SPACE_SEP);
+            case WIKI -> getEntity();
+        };
         return Optional.ofNullable(wikiId);
     }
 }

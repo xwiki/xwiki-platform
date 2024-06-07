@@ -134,10 +134,8 @@ class NotificationFilterPreferenceStoreTest
 
         verify(this.context).setWikiReference(wikiReference);
         verify(this.session).createQuery("delete from DefaultNotificationFilterPreference "
-            + "where page like :wikiPrefix "
-            + "or pageOnly like :wikiPrefix "
-            + "or user like :wikiPrefix "
-            + "or wiki = :wikiId");
+            + "where entity like :wikiPrefix "
+            + "or entity = :wikiId");
         verify(this.query).setParameter("wikiPrefix", "wikiid:%");
         verify(this.query).setParameter("wikiId", "wikiid");
         verify(this.query).executeUpdate();

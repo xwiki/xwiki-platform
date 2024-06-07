@@ -349,6 +349,9 @@
 }
 .help-icon {
   float: right;
+}
+.panel-group .panel.wiki-option {
+  margin-top: 2em;
 }</code>
     </property>
     <property>
@@ -526,8 +529,8 @@
 #end
 ## TODO: better way for that?
 #set ($isTerminal = ($doc.getDocumentReference().name != 'WebHome'))
-#macro (_displayOption $attributeName $optionValue $translationSuffix $iconName)
-  &lt;div class="panel panel-default"&gt;
+#macro (_displayOption $attributeName $optionValue $translationSuffix $iconName $panelClass)
+  &lt;div class="panel panel-default $panelClass"&gt;
     &lt;div class="panel-radio"&gt;
       &lt;input type="radio" name="watch-option" id="option-$attributeName" value="$optionValue" aria-labelledby="title-$attributeName" /&gt;
     &lt;/div&gt;
@@ -547,19 +550,19 @@
     &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
   &lt;/div&gt;&lt;!-- end panel --&gt;
 #end
-#set ($watchPageOption = "#_displayOption('watch-page','watchPage','watchpage','page')")
-#set ($watchSpaceOption = "#_displayOption('watch-space','watchSpace','watchspace','chart-organisation')")
-#set ($unwatchPageAndWatchSpaceOption = "#_displayOption('unwatch-page-watch-space','unwatchPageWatchSpace','watchspace','chart-organisation')")
-#set ($watchWikiOption = "#_displayOption('watch-wiki','watchWiki','watchwiki','world')")
-#set ($blockPageOption = "#_displayOption('block-page','blockPage','blockpage','page')")
-#set ($unblockPageAndBlockSpaceOption = "#_displayOption('unblock-page-block-space','unblockPageBlockSpace','blockspace','chart-organisation')")
-#set ($blockSpaceOption = "#_displayOption('block-space','blockSpace','blockspace','chart-organisation')")
-#set ($unwatchPageOption = "#_displayOption('unwatch-page','unwatchPage','unwatchpage','page')")
-#set ($unwatchSpaceOption = "#_displayOption('unwatch-space','unwatchSpace','unwatchspace','chart-organisation')")
-#set ($unwatchWikiOption = "#_displayOption('unwatch-wiki','unwatchWiki','unwatchwiki','world')")
-#set ($unblockPageOption = "#_displayOption('unblock-page','unblockPage','unblockpage','page')")
-#set ($unblockSpaceOption = "#_displayOption('unblock-space','unblockSpace','unblockspace','chart-organisation')")
-#set ($unblockWikiOption = "#_displayOption('unblock-wiki','unblockWiki','unblockwiki','world')")
+#set ($watchPageOption = "#_displayOption('watch-page','watchPage','watchpage','page','')")
+#set ($watchSpaceOption = "#_displayOption('watch-space','watchSpace','watchspace','chart-organisation','')")
+#set ($unwatchPageAndWatchSpaceOption = "#_displayOption('unwatch-page-watch-space','unwatchPageWatchSpace','watchspace','chart-organisation','')")
+#set ($watchWikiOption = "#_displayOption('watch-wiki','watchWiki','watchwiki','world','wiki-option')")
+#set ($blockPageOption = "#_displayOption('block-page','blockPage','blockpage','page','')")
+#set ($unblockPageAndBlockSpaceOption = "#_displayOption('unblock-page-block-space','unblockPageBlockSpace','blockspace','chart-organisation','')")
+#set ($blockSpaceOption = "#_displayOption('block-space','blockSpace','blockspace','chart-organisation','')")
+#set ($unwatchPageOption = "#_displayOption('unwatch-page','unwatchPage','unwatchpage','page','')")
+#set ($unwatchSpaceOption = "#_displayOption('unwatch-space','unwatchSpace','unwatchspace','chart-organisation','')")
+#set ($unwatchWikiOption = "#_displayOption('unwatch-wiki','unwatchWiki','unwatchwiki','world','wiki-option')")
+#set ($unblockPageOption = "#_displayOption('unblock-page','unblockPage','unblockpage','page','')")
+#set ($unblockSpaceOption = "#_displayOption('unblock-space','unblockSpace','unblockspace','chart-organisation','')")
+#set ($unblockWikiOption = "#_displayOption('unblock-wiki','unblockWiki','unblockwiki','world','wiki-option')")
 
 #set ($buttonTitle = $services.localization.render('notifications.watch.button.title', [$watchText]))
 {{html clean='false'}}
@@ -577,7 +580,7 @@
             $services.icon.renderHTML('cross')
           &lt;/span&gt;&lt;/button&gt;
         &lt;h4 class="modal-title"&gt;
-          $services.localization.render('notifications.watch.modal.title', 'html/5.0', [])
+          &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $services.localization.render("notifications.watch.modal.title.$watchedStatus", 'html/5.0', [])
         &lt;/h4&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;
@@ -590,13 +593,8 @@
             #set ($ancestorDocTitle = $ancestorDoc.displayTitle)
             #set ($ancestorLink = "&lt;a href=""$ancestorDocUrl""&gt;$ancestorDocTitle&lt;/a&gt;")
             $services.localization.render('notifications.watch.modal.description.ancestoroption', [$ancestorLink])
-          #else
-            $services.localization.render('notifications.watch.modal.description.options', 'html/5.0', [])
           #end
         &lt;/p&gt;
-        #if ($isTerminal)
-          &lt;p class="terminal-page-info"&gt;$services.localization.render('notifications.watch.modal.terminalpage.info', 'html/5.0', [])&lt;/p&gt;
-        #end
         &lt;div class="watch-options-container panel-group" id="watch-options-accordion" role="tablist" aria-multiselectable="false"&gt;
         #set ($blockedByAncestor = ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isBlocked()))
         #set ($watchedByAncestor = ($ancestorWatchStatus.isWatched()))
@@ -662,17 +660,21 @@
         &lt;/div&gt;&lt;!-- end panel group --&gt;
         &lt;div class="modal-body-footer"&gt;
           #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
-          #set ($notifUrl = "$userDoc.getURL('view','category=notifications')#Hnotifications.settings.filters.preferences.custom.title")
-          $services.localization.render('notifications.watch.modal.option.settingslink', ["&lt;a href='$notifUrl'&gt;", '&lt;/a&gt;'])
+          #set ($settingsLink = "$userDoc.getURL('view','category=notifications')#Hnotifications.settings.filters.preferences.custom.title")
+          &lt;a href="$settingsLink" class="goto-settings"&gt;
+            $services.localization.render('notifications.watch.modal.gotosettings', 'html/5.0', []) $services.icon.renderHTML('move')
+          &lt;/a&gt;
         &lt;/div&gt;
       &lt;/div&gt;&lt;!-- end modal body --&gt;
       &lt;div class="modal-footer"&gt;
         &lt;button type="button" class="btn btn-default close-modal" data-dismiss="modal"&gt;
           $services.localization.render('notifications.watch.modal.close', 'html/5.0', [])
         &lt;/button&gt;
+        #if ($watchedStatus != 'CUSTOM')
         &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
           $services.localization.render('notifications.watch.modal.savechanges', 'html/5.0', [])
         &lt;/button&gt;
+        #end
       &lt;/div&gt;
     &lt;/div&gt;&lt;!-- /.modal-content --&gt;
   &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;

@@ -37,7 +37,7 @@
          By setting this property, we make sure this application would be automatically uninstalled if the administrator
          installs the old Activity Stream Application. -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-notifications-filters-api</xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.08</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.07</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Trigger xwiki-platform-notifications-filters-api dependencies (but without

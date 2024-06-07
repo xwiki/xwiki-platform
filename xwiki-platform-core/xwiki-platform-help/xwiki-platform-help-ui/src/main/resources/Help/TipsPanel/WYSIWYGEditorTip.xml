@@ -164,7 +164,7 @@
     </property>
     <property>
       <content>{{velocity}}
-$services.localization.render('help.tipsPanel.WYSIWYGEditorTip')
+$services.localization.render('help.tipsPanel.WYSIWYGEditorTip', ['##', '##'])
 {{/velocity}}</content>
     </property>
     <property>

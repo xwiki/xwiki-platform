@@ -98,7 +98,7 @@ export function getLinkAction(editor: Editor): BubbleMenuAction {
     icon: "link-45deg",
     additionalComponent: CTiptapLinkEdit,
     command(
-      { editor, range },
+      { editor },
       { linkValue, removeLink }: { linkValue?: string; removeLink?: boolean },
     ) {
       if (linkValue) {

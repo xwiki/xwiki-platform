@@ -8995,6 +8995,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Parse the content if not already done
         if (xdom == null) {
             xdom = parseContentNoException();
+        } else {
+            // Clone the XDOM to avoid concurrent modifications during the preparation
+            xdom = xdom.clone();
         }
 
         // Prepare the content
@@ -9005,7 +9008,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         this.xdomCache = xdom;
         this.xdomCachePrepareDate = xdomPrepareDate;
 
-        return xdom.clone();
+        return this.xdomCache.clone();
     }
 
     private void resetXDOM()

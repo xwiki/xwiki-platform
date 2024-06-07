@@ -39,7 +39,7 @@
   <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 ## MENU
-core.menu.type.wiki=일주일
+core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=위키 보기
 core.menu.watchlist.remove.wiki=위키 보기 해제
 core.menu.admin.wiki=이 위키 관리

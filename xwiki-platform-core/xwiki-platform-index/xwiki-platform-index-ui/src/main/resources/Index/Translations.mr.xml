@@ -36,5 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.deletedDocuments.deleteAll=सर्व हटवा</content>
+  <content>index.spacesMacro.title=मोकळी जागा
+index.spacesMacro.spaceIndex.title=स्पेस इंडेक्स पहा
+index.spacesMacro.spaceIndex.alt=स्पेस इंडेक्स
+index.spacesMacro.spaceAdministration.title=स्पेस प्रशासन पहा
+index.spacesMacro.spaceAdministration.alt=स्पेस प्रशासित करा
+index.spacesMacro.createSpace.link=एक नवीन स्पेस तयार करा
+index.spacesMacro.createSpace.defaultSpaceName=स्पेस नाव
+index.spacesMacro.createSpace.submit=बनवा
+index.deletedDocuments.deleteAll=सर्व हटवा</content>
 </xwikidoc>

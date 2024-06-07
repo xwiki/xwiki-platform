@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-notifications-filters</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-notifications-filters-api</artifactId>
   <name>XWiki Platform - Legacy - Notifications - Filters - API</name>
@@ -37,14 +37,18 @@
          By setting this property, we make sure this application would be automatically uninstalled if the administrator
          installs the old Activity Stream Application. -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-notifications-filters-api</xwiki.extension.features>
-    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.08</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
+    <!-- Trigger xwiki-platform-notifications-filters-api dependencies (but without
+    xwiki-platform-notifications-filters-api jar itself) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-filters-api</artifactId>
       <version>${project.version}</version>
+      <type>pom</type>
       <exclusions>
+        <!-- We want the legacy dependency of notification-api -->
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-notifications-api</artifactId>
@@ -56,6 +60,27 @@
       <artifactId>xwiki-platform-legacy-notifications-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Aspectified dependency -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+      <version>${project.version}</version>
+      <!-- We don't want to draw this dependency since we're wrapping it -->
+      <scope>provided</scope>
+      <exclusions>
+        <!-- We want the legacy dependency of notification-api -->
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Build tools -->
+    <!-- Needed for backward compatibility Aspects -->
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -64,4 +89,111 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- Apply Backward compatibility Aspects using the strategy described at
+        http://blogs.sonatype.com/john/2007/11/09/1194630418546.html -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>backward-compatibility-aspects</id>
+            <configuration>
+              <weaveDependencies>
+                <weaveDependency>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+                </weaveDependency>
+              </weaveDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/builddef.lst</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Merge components.txt files -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <configuration>
+              <target>
+                <!-- Add a line separator before appending the legacy components.
+                     NOTE: The following solutions didn't work:
+                     * the fixlastline parameter of the concat task affects only the appended files, NOT the destination
+                       file; we need the new line at the end of the destination file!
+                     * the text content of the header element inside the concat task is trimmed when the POM is parsed.
+                       See http://jira.codehaus.org/browse/PLX-461 -->
+                <echo message="${line.separator}" file="${project.build.directory}/classes/META-INF/components.txt" append="true" />
+                <concat destfile="${project.build.directory}/classes/META-INF/components.txt" append="true">
+                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt" />
+                </concat>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Make sure we run the tests only with the aspectified JARs since otherwise components will be registered
+           twice for example. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-notifications-filters-api:jar</classpathDependencyExcludes>
+          </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.ComponentAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Skip foreign declaration checks since we merge the components.txt -->
+                      <name>skipForeignDeclarations</name>
+                      <value>true</value>
+                    </property>
+                    <!-- TODO: Ideally inherit this from the top level pom but I couldn't find how to do it, or remove
+                         it when spoon is fixed, see https://github.com/INRIA/spoon/issues/3339 -->
+                    <property>
+                      <name>componentsTxtPath</name>
+                      <value>target/classes/META-INF/components.txt</value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+          <execution>
+            <id>spoon-test</id>
+            <configuration>
+              <!-- TODO: Remove once https://github.com/INRIA/spoon/issues/3583 is fixed -->
+              <skip>true</skip>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

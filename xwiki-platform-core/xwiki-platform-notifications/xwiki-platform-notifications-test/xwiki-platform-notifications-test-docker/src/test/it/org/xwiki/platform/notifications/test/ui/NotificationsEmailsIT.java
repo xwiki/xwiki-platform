@@ -261,6 +261,8 @@ class NotificationsEmailsIT
     {
         testUtils.deletePage("XWiki", FIRST_USER_NAME);
         testUtils.deletePage("XWiki", SECOND_USER_NAME);
-        this.mail.stop();
+        if (this.mail != null) {
+            this.mail.stop();
+        }
     }
 }

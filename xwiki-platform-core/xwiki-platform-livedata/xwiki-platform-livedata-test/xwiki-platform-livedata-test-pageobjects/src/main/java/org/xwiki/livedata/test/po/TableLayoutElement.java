@@ -678,8 +678,10 @@ public class TableLayoutElement extends BaseElement
     public WebElement getFilter(String columnLabel)
     {
         int columnIndex = findColumnIndex(columnLabel);
-        return getRoot()
-            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        By cssSelector = By.cssSelector(String.format(
+            ".column-filters > th:nth-child(%1$d) input, "
+            + ".column-filters > th:nth-child(%1$d) select", columnIndex));
+        return getRoot().findElement(cssSelector);
     }
 
     /**

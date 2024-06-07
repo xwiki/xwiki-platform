@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
@@ -41,9 +40,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.async.internal.AbstractExecutedContentMacro;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.syntax.Syntax;
@@ -151,12 +149,6 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
         throws IconException, MacroExecutionException
     {
         String iconContent = this.iconRenderer.render(parameters.getName(), iconSet);
-        // Force the icon to be more than, e.g., just a raw HTML macro to ensure that we get a wrapping paragraph
-        // around it when the icon isn't inline.
-        // This also forces the icon itself to be inline.
-        if (StringUtils.isNotBlank(iconContent)) {
-            iconContent = " " + iconContent;
-        }
         MetaData metaData = null;
 
         if (iconSet.getSourceDocumentReference() != null) {
@@ -165,15 +157,14 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
             metaData = new MetaData(Map.of(MetaData.SOURCE, stringReference));
         }
 
-        XDOM result = this.parser.parse(iconContent, Syntax.XWIKI_2_1, context, false, metaData,
-            context.isInline());
-
-        // Remove the space we inserted again.
-        Block firstSpace = result.getFirstBlock(new ClassBlockMatcher(SpaceBlock.class), Block.Axes.DESCENDANT);
-        if (firstSpace != null) {
-            firstSpace.getParent().removeBlock(firstSpace);
+        XDOM iconXDOM = this.parser.parse(iconContent, Syntax.XWIKI_2_1, context, false, metaData, true);
+        if (!context.isInline()) {
+            // Wrap the children of the XDOM in a paragraph. We don't ask the parser to produce block content as
+            // icons should always be inline, and some icons are defined as raw inline HTML.
+            Block wrapper = new ParagraphBlock(iconXDOM.getChildren());
+            iconXDOM.setChildren(List.of(wrapper));
         }
-        return result;
+        return iconXDOM;
     }
 
     private IconSet getIconSet(DisplayIconMacroParameters parameters) throws IconException, MacroExecutionException

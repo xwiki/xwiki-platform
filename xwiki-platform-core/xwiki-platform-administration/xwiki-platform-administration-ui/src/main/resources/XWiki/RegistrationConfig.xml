@@ -531,7 +531,7 @@
 #set($headline = $services.localization.render('core.register.successful.welcome', [$displayName]))
 #set($userLink = $xwiki.getUserName("$userSpace$userName"))
 #set($successAndLogin = $services.localization.render('core.register.successful.successandlogin'))
-[[image:undraw_done_re_oak4.svg||data-xwiki-image-style-alignment="center"]]
+[[image:undraw_done_re_oak4.svg||data-xwiki-image-style-alignment="center" height="50vh"]]
 
 {{html clean="true"}}
 &lt;div class="registration-success-headline"&gt;
@@ -673,6 +673,12 @@
 .registration-success-hint {
   display: block;
   text-align: center;
+}
+
+/* Resize the hero image displayed when the registration is successful so that the buttons are always on screen without
+ needing to scroll. */
+img.wikigeneratedid {
+  height: 50vh;
 }</code>
   </property>
   <property>

@@ -209,6 +209,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #set($validation = $field.validate.mustMatch)
           $validationContainer
         #end
+        #if ($field.validate.programmaticValidation)
+          #set($extraValidationClass = 'programmatic-validation')
+          #set($validation = $field.validate.programmaticValidation)
+          $validationContainer
+        #end
         #if ($field.validate.regex)
           #set($extraValidationClass = 'regex')
           #set($validation = $field.validate.regex)

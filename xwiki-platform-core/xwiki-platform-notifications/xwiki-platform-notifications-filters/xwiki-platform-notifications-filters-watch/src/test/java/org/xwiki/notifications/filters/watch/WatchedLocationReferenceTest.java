@@ -40,7 +40,6 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;

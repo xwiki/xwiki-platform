@@ -28,7 +28,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
+import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -135,6 +140,53 @@ class InplaceEditIT
 
     @Test
     @Order(2)
+    void saveFromSourceMode(TestUtils setup, TestReference testReference)
+    {
+        // Enter in-place edit mode.
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.clear();
+
+        // Insert a macro that is editable in-line.
+        richTextArea.sendKeys("/inf");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/inf", "Info Box");
+        richTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // The content is reloaded after the macro is inserted.
+        ckeditor.getRichTextArea();
+
+        // Switch to Source mode and save without making any change.
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("", ckeditor.getSourceTextArea().getText());
+        viewPage.saveAndView();
+
+        // Edit again and check the source.
+        viewPage.editInplace();
+        ckeditor = new CKEditor("content");
+        // Focus the rich text area to get the floating toolbar.
+        ckeditor.getRichTextArea().click();
+        ckeditor.getToolBar().toggleSourceMode();
+        WebElement sourceTextArea = ckeditor.getSourceTextArea();
+        assertEquals("{{info}}\nType your information message here.\n{{/info}}", sourceTextArea.getAttribute("value"));
+
+        // Modify the soure and save twice, without any change in between.
+        sourceTextArea.clear();
+        sourceTextArea.sendKeys("{{success}}test{{/success}}");
+        viewPage.save().saveAndView();
+
+        // Edit again and check the source.
+        viewPage.editInplace();
+        ckeditor = new CKEditor("content");
+        ckeditor.getRichTextArea().click();
+        ckeditor.getToolBar().toggleSourceMode();
+        assertEquals("{{success}}\ntest\n{{/success}}", ckeditor.getSourceTextArea().getAttribute("value"));
+    }
+
+    @Test
+    @Order(3)
     void editInPlaceWithMandatoryTitle(TestUtils setup, TestReference testReference) throws Exception
     {
         // First of all, test that we can save with an empty title.
@@ -172,7 +224,7 @@ class InplaceEditIT
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void editInPlaceWithMandatoryVersionSummary(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -222,7 +274,7 @@ class InplaceEditIT
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void saveWithMergeReloadsEditor(TestUtils setup, TestReference testReference) throws Exception
     {
         // Enter in-place edit mode.

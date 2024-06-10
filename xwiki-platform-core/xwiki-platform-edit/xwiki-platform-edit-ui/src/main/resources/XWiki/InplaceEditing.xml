@@ -873,7 +873,7 @@ define('editInPlace', [
 
     // Submit either the raw (source) content (no syntax conversion needed in this case) or the rendered content (HTML)
     // in which case we have to force the conversion to the document syntax on the server.
-    const submitRawContent = xwikiDocument.content !== xwikiDocument.originalDocument.content;
+    const submitRawContent = typeof xwikiDocument.renderedContent !== 'string';
     form.find('input[name="content"]').val(submitRawContent ? xwikiDocument.content : xwikiDocument.renderedContent);
     form.find('input[name="RequiresHTMLConversion"]').prop('disabled', submitRawContent);
     form.find('input[name="content_syntax"]').val(xwikiDocument.syntax).prop('disabled', submitRawContent);

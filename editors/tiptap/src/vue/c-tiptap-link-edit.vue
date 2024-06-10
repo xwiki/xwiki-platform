@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CIcon } from "@xwiki/cristal-icons";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 import { BubbleMenuAction } from "../components/extensions/bubble-menu";
 import { Editor, Range } from "@tiptap/vue-3";
 import { inject, onMounted, onUpdated, Ref, ref } from "vue";
@@ -66,6 +66,7 @@ onUpdated(listenToLinks);
   <div class="container">
     <form
       ref="formRoot"
+      class="edit-link"
       title="Press enter to validate"
       @submit.prevent="submitLink"
     >
@@ -79,29 +80,30 @@ onUpdated(listenToLinks);
       />
       <!-- TODO: distinguish between following internal and external links? -->
       <x-btn
+        color="primary"
         title="Follow link"
-        variant="secondary"
+        variant="default"
         size="small"
         :disabled="!url || isAmbiguous"
       >
         <a v-if="url" :href="url">
-          <c-icon name="box-arrow-up-right"></c-icon>
+          <c-icon name="box-arrow-up-right" :size="Size.Small"></c-icon>
         </a>
-        <c-icon v-else name="box-arrow-up-right"></c-icon>
+        <c-icon v-else name="box-arrow-up-right" :size="Size.Small"></c-icon>
       </x-btn>
       <x-btn
         title="Remove link"
-        variant="secondary"
+        variant="default"
         size="small"
         @click="removeLink"
         @keydown.enter="removeLink"
       >
-        <c-icon name="x-circle-fill"></c-icon>
+        <c-icon name="x-circle-fill" :size="Size.Small"></c-icon>
       </x-btn>
       <x-btn
         v-if="hasWrapper"
         title="Go back"
-        variant="secondary"
+        variant="default"
         size="small"
         @click="close"
         @keydown.enter="close"
@@ -113,7 +115,24 @@ onUpdated(listenToLinks);
 </template>
 
 <style scoped>
+.edit-link {
+  display: flex;
+  gap: 8px;
+}
 .container {
-  padding: 0.2rem 0.5rem;
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-small);
+}
+input {
+  width: 250px;
+  border-radius: 4px;
+}
+:deep(.button) {
+  padding: 0 var(--cr-spacing-x-small);
+  min-width: unset;
+  background-color: transparent !important;
+  border: 0;
+}
+:deep(.cr-icon) {
+  color: var(--cr-color-neutral-700);
 }
 </style>

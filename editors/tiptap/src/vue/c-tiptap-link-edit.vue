@@ -5,6 +5,7 @@ import { Editor, Range } from "@tiptap/vue-3";
 import { inject, onMounted, onUpdated, Ref, ref } from "vue";
 import { ContentTools } from "@xwiki/cristal-skin";
 import type { CristalApp } from "@xwiki/cristal-api";
+import type { XBtn } from "@xwiki/cristal-dsapi";
 
 const emits = defineEmits(["close"]);
 

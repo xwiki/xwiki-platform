@@ -25,6 +25,7 @@
 -->
 <script setup lang="ts">
 import { CIcon } from "@xwiki/cristal-icons";
+import { XBtn } from "@xwiki/cristal-dsapi";
 </script>
 <template>
   <div class="help-button">

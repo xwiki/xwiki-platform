@@ -18,7 +18,7 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc --project tsconfig.json --noEmit && vite build",
+    "build": "tsc --project tsconfig.json --declaration --emitDeclarationOnly",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
@@ -31,12 +31,9 @@
   "publishConfig": {
     "exports": {
       ".": {
-        "import": "./dist/index.es.js",
-        "require": "./dist/index.umd.js",
         "types": "./dist/index.d.ts"
       }
     },
-    "main": "./dist/index.es.js",
     "types": "./dist/index.d.ts"
   }
 }

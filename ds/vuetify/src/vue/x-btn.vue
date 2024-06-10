@@ -23,6 +23,11 @@
  *
  **/
 -->
+<script setup lang="ts">
+import { XBtnProps } from "@xwiki/cristal-dsapi";
+
+defineProps<XBtnProps>();
+</script>
 <template>
   <v-btn>
     <slot />

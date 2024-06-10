@@ -48,6 +48,7 @@
     "@tiptap/suggestion": "2.4.0",
     "@tiptap/vue-3": "2.4.0",
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",

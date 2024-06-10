@@ -26,9 +26,9 @@
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/breadcrumb/breadcrumb";
 import "@shoelace-style/shoelace/dist/components/breadcrumb-item/breadcrumb-item";
-import { BreadcrumbProps } from "@xwiki/cristal-dsapi";
+import { XBreadcrumbProps } from "@xwiki/cristal-dsapi";
 
-defineProps<BreadcrumbProps>();
+defineProps<XBreadcrumbProps>();
 </script>
 
 <template>

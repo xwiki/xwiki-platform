@@ -1,4 +1,4 @@
-<!--
+/**
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -22,31 +22,26 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
--->
-<script lang="ts" setup>
-import "@shoelace-style/shoelace/dist/components/button/button";
+import { defineComponent } from "vue";
 
-import { XBtnProps } from "@xwiki/cristal-dsapi";
+/**
+ * Props of the x-btn abstract component.
+ *
+ * @since 0.9
+ */
+export type XBtnProps = {
+  color?: string;
+  size?: "small";
+  variant?: "primary" | "default";
+  disabled?: boolean;
+  circle?: boolean;
+  title?: string;
+  pill?: boolean;
+};
 
-defineProps<XBtnProps>();
-</script>
-
-<template>
-  <sl-button variant="default">
-    <!-- TODO: We should try to use each the default icon slots to avoid weird alignment issues
-      https://shoelace.style/components/button#slots
-      -->
-    <span class="align">
-      <slot />
-    </span>
-  </sl-button>
-</template>
-<style scoped>
-.align {
-  display: flex;
-  flex-flow: row;
-  flex-wrap: nowrap;
-  gap: var(--cr-spacing-2x-small);
-  align-items: center;
-}
-</style>
+/**
+ * Signature of the x-btn component.
+ *
+ * @since 0.9
+ */
+export const XBtn = defineComponent<XBtnProps>({});

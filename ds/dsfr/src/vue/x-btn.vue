@@ -25,9 +25,21 @@
 -->
 <script lang="ts" setup>
 import { DsfrButton } from "@gouvminint/vue-dsfr";
+import { XBtnProps } from "@xwiki/cristal-dsapi";
+import { computed } from "vue";
+
+const props = defineProps<XBtnProps>();
+const dsfrSize = computed(() => {
+  switch (props.size) {
+    case "small":
+      return "small";
+    default:
+      return undefined;
+  }
+});
 </script>
 <template>
-  <DsfrButton size="large">
+  <DsfrButton :size="dsfrSize">
     <slot />
   </DsfrButton>
 </template>

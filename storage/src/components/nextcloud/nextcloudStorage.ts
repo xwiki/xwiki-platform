@@ -23,8 +23,8 @@
  *
  **/
 
-import { injectable } from "inversify";
-import { DefaultPageData, PageData } from "@xwiki/cristal-api";
+import { injectable, inject } from "inversify";
+import { DefaultPageData, Logger, PageData } from "@xwiki/cristal-api";
 import { AbstractStorage } from "../abstractStorage";
 
 /**
@@ -36,6 +36,10 @@ import { AbstractStorage } from "../abstractStorage";
  */
 @injectable()
 export class NextcloudStorage extends AbstractStorage {
+  constructor(@inject<Logger>("Logger") logger: Logger) {
+    super(logger, "storage.components.nextcloudStorage");
+  }
+
   async getEditField(): Promise<string> {
     // TODO: unsupported
     return "";

@@ -64,7 +64,7 @@ class DefaultEntityChannelStoreTest
         assertFalse(this.entityChannelStore.getChannel(entityReference, path).isPresent());
 
         // Create the channel.
-        Channel channel = new Channel();
+        Channel channel = new Channel("test");
         when(this.channelStore.create()).thenReturn(channel);
         EntityChannel entityChannel = this.entityChannelStore.createChannel(entityReference, path);
 
@@ -97,18 +97,18 @@ class DefaultEntityChannelStoreTest
     @Test
     void getChannels()
     {
-        Channel channelOne = new Channel();
+        Channel channelOne = new Channel("one");
         when(this.channelStore.create()).thenReturn(channelOne);
         EntityChannel entityChannelOne =
             this.entityChannelStore.createChannel(entityReference, Arrays.asList("a", "b"));
         when(this.channelStore.get(channelOne.getKey())).thenReturn(channelOne);
 
-        Channel channelTwo = new Channel();
+        Channel channelTwo = new Channel("two");
         when(this.channelStore.create()).thenReturn(channelTwo);
         EntityChannel entityChannelTwo = this.entityChannelStore.createChannel(entityReference, Arrays.asList("x"));
         when(this.channelStore.get(channelTwo.getKey())).thenReturn(channelTwo);
 
-        Channel channelThree = new Channel();
+        Channel channelThree = new Channel("three");
         when(this.channelStore.create()).thenReturn(channelThree);
         EntityChannel entityChannelThree =
             this.entityChannelStore.createChannel(entityReference, Arrays.asList("a", "b", "c"));

@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * The component used to create and associate channels to XWiki entities.
@@ -68,6 +69,21 @@ public interface EntityChannelStore
     {
         return getChannels(entityReference).stream().filter(Objects::nonNull)
             .filter(channel -> Objects.equals(channel.getPath(), path)).findFirst();
+    }
+
+    /**
+     * Retrieve an entity channel by its key.
+     *
+     * @param key the channel key
+     * @return the channel associated with the specified key, if any
+     * @since 15.10.11
+     * @since 16.4.1
+     * @since 16.5.0RC1
+     */
+    @Unstable
+    default Optional<EntityChannel> getChannel(String key)
+    {
+        return Optional.empty();
     }
 
     /**

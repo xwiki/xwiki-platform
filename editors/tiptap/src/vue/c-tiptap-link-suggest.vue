@@ -164,7 +164,7 @@ onUnmounted(() => {
   border: none;
   padding: var(--cr-spacing-x-small);
   width: 100%;
-  text-align: left;
+  text-align: start;
 }
 
 .information {

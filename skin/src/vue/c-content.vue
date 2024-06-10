@@ -214,6 +214,45 @@ onUpdated(() => {
   justify-content: center;
 }
 
+/*TABLE STYLES*/
+/*TODO: Check a better way to write these styles without the global tag. Currently impossible to use :deep because the html inside the document content is not assigned an ID */
+
+:global(.document-content table) {
+  max-width: 100%;
+  width: 100%;
+  border: none;
+  border-collapse: collapse;
+  color: inherit;
+  margin-bottom: var(--cr-spacing-small);
+}
+
+:global(.document-content table tr) {
+  border-bottom: solid 1px var(--cr-input-border-color);
+}
+
+:global(.document-content table th) {
+  font-weight: var(--cr-font-weight-bold);
+  text-align: start;
+}
+
+:global(.document-content table td),
+:global(.document-content table th) {
+  line-height: var(--cr-line-height-normal);
+  padding: 1rem 1rem;
+}
+
+:global(.document-content table th p:first-child),
+:global(.document-content table td p:first-child) {
+  margin-top: 0;
+}
+
+:global(.document-content table th p:last-child),
+:global(.document-content table td p:last-child) {
+  margin-bottom: 0;
+}
+
+/*---*/
+
 .content-loading svg {
   width: 64px;
   height: 64px;

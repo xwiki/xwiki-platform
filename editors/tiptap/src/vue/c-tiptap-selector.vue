@@ -129,7 +129,7 @@ const { down, up, enter, index } = listNavigation(
 .item {
   display: block;
   width: 100%;
-  text-align: left;
+  text-align: start;
   background: transparent;
   border: none;
   padding: 0.2rem 0.5rem;

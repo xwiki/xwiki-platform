@@ -158,21 +158,29 @@
   }
 
   function maybeMoveToFirstNestedEditable(editor, range, shouldMove) {
-    // Check if a single element is selected by the given range.
-    if (shouldMove && !range.collapsed && range.startContainer === range.endContainer &&
-        range.startContainer.nodeType === Node.ELEMENT_NODE && range.endOffset - range.startOffset === 1) {
-      const selectedNode = range.startContainer.childNodes[range.startOffset];
-      if (selectedNode.nodeType === Node.ELEMENT_NODE) {
-        // Check if the selected element is a widget wrapper.
-        const widget = editor.widgets.getByElement(new CKEDITOR.dom.element(selectedNode), true);
-        const firstNestedEditable = Object.values(widget?.editables)[0];
-        if (firstNestedEditable) {
-          // Move the selection to the first nested editable of the selected widget.
-          const ckRange = new CKEDITOR.dom.range(editor.editable());
-          ckRange.moveToElementEditablePosition(firstNestedEditable);
-          range.setStart(ckRange.startContainer.$, ckRange.startOffset);
-          range.collapse(true);
-        }
+    const selectedWidget = shouldMove && getSelectedWidget(editor, range);
+    const firstNestedEditable = Object.values(selectedWidget?.editables)[0];
+    if (firstNestedEditable) {
+      // Move the selection to the first nested editable of the selected widget.
+      const ckRange = new CKEDITOR.dom.range(editor.editable());
+      ckRange.moveToElementEditablePosition(firstNestedEditable);
+      range.setStart(ckRange.startContainer.$, ckRange.startOffset);
+      range.collapse(true);
+    }
+  }
+
+  function getSelectedWidget(editor, range) {
+    // Check if the range start is followed by a widget wrapper.
+    const nodeAfterRangeStart = range.startContainer.childNodes?.[range.startOffset];
+    if (nodeAfterRangeStart?.nodeType === Node.ELEMENT_NODE) {
+      const widget = editor.widgets.getByElement(new CKEDITOR.dom.element(nodeAfterRangeStart), true);
+      // Either the range is collapsed before the widget,
+      if (widget && (range.collapsed ||
+          // or the range ends after the widget (we already know it starts before the widget)
+          (range.startContainer === range.endContainer && range.endOffset - range.startOffset === 1) ||
+          //  or inside the widget.
+          nodeAfterRangeStart.contains(range.endContainer))) {
+        return widget;
       }
     }
   }

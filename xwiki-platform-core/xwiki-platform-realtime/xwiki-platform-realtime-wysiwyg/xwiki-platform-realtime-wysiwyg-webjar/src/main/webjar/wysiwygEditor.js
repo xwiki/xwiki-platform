@@ -142,10 +142,36 @@ define('xwiki-realtime-wysiwyg', [
         this._onAbort();
       });
 
+      this._addNetfluxChannelToSubmittedData();
+
       // Export the typing tests to the window.
       // Call like `test = easyTest()`
       // Terminate the test like `test.cancel()`
       window.easyTest = this._easyTest.bind(this);
+    }
+
+    _addNetfluxChannelToSubmittedData() {
+      // Indicate the Netflux channel used to synchronize the edited content when performing the HTML conversion (e.g.
+      // when refreshing the content after a macro is inserted) in order to render the content using the effective
+      // author associated with this channel (and thus prevent privilege escalation through script injection in the
+      // realtime session).
+      $(document).off('xwiki:wysiwyg:convertHTML.realtime')
+        .on('xwiki:wysiwyg:convertHTML.realtime', (event, conversionParams) => {
+          conversionParams.netfluxChannel = this._channel;
+        });
+      
+        const fieldSet = this._editor.getToolBar().closest('form, .form, body')
+          .querySelector('input[name=form_token]').parentNode;
+        let netfluxChannelInput = fieldSet.querySelector(
+          `input[name=netfluxChannel][data-for="${CSS.escape(this._editor.getFormFieldName())}"]`);
+        if (!netfluxChannelInput) {
+          netfluxChannelInput = document.createElement('input');
+          netfluxChannelInput.setAttribute('type', 'hidden');
+          netfluxChannelInput.setAttribute('name', 'netfluxChannel');
+          netfluxChannelInput.setAttribute('data-for', this._editor.getFormFieldName());
+          fieldSet.prepend(netfluxChannelInput);
+        }
+        netfluxChannelInput.value = this._channel;
     }
 
     /**
@@ -222,14 +248,6 @@ define('xwiki-realtime-wysiwyg', [
             this._editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
             return null;
           }
-        },
-        getSaveValue: () => {
-          const fieldName = this._editor.getFormFieldName();
-          return {
-            [fieldName]: this._editor.getOutputHTML(),
-            RequiresHTMLConversion: fieldName,
-            [`${fieldName}_syntax`]: 'xwiki/2.1'
-          };
         },
         getTextAtCurrentRevision: (revision) => {
           return $.get(XWiki.currentDocument.getURL('get', $.param({

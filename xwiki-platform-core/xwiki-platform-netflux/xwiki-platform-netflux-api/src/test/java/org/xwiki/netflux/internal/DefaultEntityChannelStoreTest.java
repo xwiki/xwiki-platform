@@ -96,18 +96,18 @@ class DefaultEntityChannelStoreTest
     @Test
     void getChannels()
     {
-        Channel channelOne = new Channel("test");
+        Channel channelOne = new Channel("one");
         when(this.channelStore.create()).thenReturn(channelOne);
         EntityChannel entityChannelOne =
             this.entityChannelStore.createChannel(this.entityReference, List.of("a", "b"));
         when(this.channelStore.get(channelOne.getKey())).thenReturn(channelOne);
 
-        Channel channelTwo = new Channel("test");
+        Channel channelTwo = new Channel("two");
         when(this.channelStore.create()).thenReturn(channelTwo);
         EntityChannel entityChannelTwo = this.entityChannelStore.createChannel(this.entityReference, List.of("x"));
         when(this.channelStore.get(channelTwo.getKey())).thenReturn(channelTwo);
 
-        Channel channelThree = new Channel("test");
+        Channel channelThree = new Channel("three");
         when(this.channelStore.create()).thenReturn(channelThree);
         EntityChannel entityChannelThree =
             this.entityChannelStore.createChannel(this.entityReference, List.of("a", "b", "c"));

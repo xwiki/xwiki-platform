@@ -43,6 +43,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
+import org.xwiki.user.UserReference;
+
 /**
  * A wrapper around {@link XWikiRequest}.
  * 
@@ -493,5 +495,11 @@ public class WrappingXWikiRequest implements XWikiRequest
     public Cookie getCookie(String cookieName)
     {
         return this.request.getCookie(cookieName);
+    }
+
+    @Override
+    public UserReference getEffectiveAuthor()
+    {
+        return this.request.getEffectiveAuthor();
     }
 }

@@ -25,6 +25,9 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -62,6 +65,9 @@ public class PreviewAction extends EditAction
     @Inject
     @Named("saveandcontinue")
     private LegacyAction saveandcontinueAction;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
 
     /**
      * Default constructor.
@@ -125,15 +131,19 @@ public class PreviewAction extends EditAction
 
         // The current user editing the document should be displayed as author and creator (if the edited document is
         // new) when the edited document is previewed.
-        editedDocument.setAuthorReference(context.getUserReference());
+        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+        editedDocument.getAuthors().setOriginalMetadataAuthor(currentUserReference);
         if (editedDocument.isNew()) {
-            editedDocument.setCreatorReference(context.getUserReference());
+            editedDocument.getAuthors().setCreator(currentUserReference);
         }
 
         // Make sure the current user doesn't use the programming rights of the previous content author (by editing a
         // document saved with programming rights, changing it and then previewing it). Also make sure the code
         // requiring programming rights is executed in preview mode if the current user has programming rights.
-        editedDocument.setContentAuthorReference(context.getUserReference());
+        editedDocument.getAuthors().setEffectiveMetadataAuthor(context.getRequest().getEffectiveAuthor());
+        if (editedDocument.isContentDirty()) {
+            editedDocument.getAuthors().setContentAuthor(editedDocument.getAuthors().getEffectiveMetadataAuthor());
+        }
 
         if ("1".equals(context.getRequest().getParameter("diff"))
             && StringUtils.isNotEmpty(context.getRequest().getParameter("version"))) {

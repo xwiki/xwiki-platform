@@ -55,6 +55,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.xwiki.user.UserReference;
 
 /**
  * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
@@ -914,5 +915,11 @@ public class XWikiServletRequestStub implements XWikiRequest
     public void setDaemon(boolean daemon)
     {
         this.daemon = daemon;
+    }
+
+    @Override
+    public UserReference getEffectiveAuthor()
+    {
+        return (UserReference) getAttribute(XWikiServletRequest.ATTRIBUTE_EFFECTIVE_AUTHOR);
     }
 }

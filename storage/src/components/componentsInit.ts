@@ -32,6 +32,8 @@ import type {
 } from "@xwiki/cristal-api";
 import { XWikiStorage } from "./xwiki/xwikiStorage";
 import { XWikiWikiConfig } from "./xwiki/XWikiWikiConfig";
+import { NextcloudStorage } from "./nextcloud/nextcloudStorage";
+import { NextcloudWikiConfig } from "./nextcloud/NextcloudWikiConfig";
 import { GitHubStorage } from "./github/githubStorage";
 import { GitHubWikiConfig } from "./github/GitHubWikiConfig";
 import { WrappingOfflineStorage } from "./wrappingOfflineStorage";
@@ -45,7 +47,7 @@ export default class ComponentInit {
     this.logger = container.get<Logger>("Logger");
     this.logger.setModule("storage.components.componentsInit");
 
-    this.logger?.debug("Init Sample Module components begin");
+    this.logger?.debug("Init Storage Module components begin");
     container
       .bind<OfflineStorage>("OfflineStorage")
       .to(DexieOfflineStorage)
@@ -60,6 +62,10 @@ export default class ComponentInit {
       .whenTargetNamed("XWiki");
     container
       .bind<WikiConfig>("WikiConfig")
+      .to(NextcloudWikiConfig)
+      .whenTargetNamed("Nextcloud");
+    container
+      .bind<WikiConfig>("WikiConfig")
       .to(GitHubWikiConfig)
       .whenTargetNamed("GitHub");
     container
@@ -68,8 +74,12 @@ export default class ComponentInit {
       .whenTargetNamed("XWiki");
     container
       .bind<Storage>("Storage")
+      .to(NextcloudStorage)
+      .whenTargetNamed("Nextcloud");
+    container
+      .bind<Storage>("Storage")
       .to(GitHubStorage)
       .whenTargetNamed("GitHub");
-    this.logger?.debug("Init Sample Module components end");
+    this.logger?.debug("Init Storage Module components end");
   }
 }

@@ -105,7 +105,7 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <hsqldb.version>2.7.2</hsqldb.version>
+    <hsqldb.version>2.7.3</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
     <mysql.version>8.3.0</mysql.version>

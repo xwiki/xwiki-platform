@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.repository.test.po.editor;
+package org.xwiki.repository.test.po.edit;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -108,6 +109,17 @@ public class ExtensionInlinePage extends InlinePage
         this.iconInput.sendKeys(icon);
     }
 
+    public void selectSupportPlan(String supporterPageName, String supportPlanPageName, boolean selected)
+    {
+        WebElement supportPlanElement =
+            getUtil().getDriver().findElementWithoutWaiting(By.xpath("//input[@value='Extension.Support.Supporter."
+                + supporterPageName + '.' + supportPlanPageName + ".WebHome']"));
+
+        if (supportPlanElement.isSelected() != selected) {
+            supportPlanElement.click();
+        }
+    }
+
     public void setDescription(String description)
     {
         this.descriptionInput.clear();
@@ -127,8 +139,10 @@ public class ExtensionInlinePage extends InlinePage
     }
 
     @Override
-    protected ExtensionPage createViewPage()
+    public ExtensionPage clickSaveAndView()
     {
+        super.clickSaveAndView();
+
         return new ExtensionPage();
     }
 }

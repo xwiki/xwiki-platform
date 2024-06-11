@@ -1076,6 +1076,14 @@ public class TestUtils
     }
 
     /**
+     * @since 16.8.0RC1
+     */
+    public String serializeLocalReference(EntityReference reference)
+    {
+        return localReferenceSerializer.serialize(reference);
+    }
+
+    /**
      * Accesses the URL to delete the specified space.
      *
      * @param space the name of the space to delete

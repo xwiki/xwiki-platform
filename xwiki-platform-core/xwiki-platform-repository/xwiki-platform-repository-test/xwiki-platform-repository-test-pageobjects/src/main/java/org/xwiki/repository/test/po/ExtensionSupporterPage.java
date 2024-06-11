@@ -19,52 +19,47 @@
  */
 package org.xwiki.repository.test.po;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.repository.test.po.edit.ExtensionInlinePage;
+import org.xwiki.repository.test.po.edit.ExtensionSupportPlanInlinePage;
+import org.xwiki.repository.test.po.edit.ExtensionSupporterInlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * @version $Id$
- * @since 4.2M1
+ * @since 16.8.0RC1
  */
-public class ExtensionPage extends ViewPage
+public class ExtensionSupporterPage extends ViewPage
 {
-    @FindBy(xpath = "//a[@title='Update extension']")
-    private WebElement update;
+    @FindBy(name = "ExtensionCode.ExtensionSupportPlanClass_0_name")
+    private WebElement supportPlanNameInput;
 
-    public static ExtensionPage gotoPage(String pageName)
+    @FindBy(name = "add_plan")
+    private WebElement addButton;
+
+    public static ExtensionSupporterPage gotoPage(String url)
     {
-        getUtil().gotoPage(new LocalDocumentReference(Arrays.asList("Extension", pageName), "WebHome"));
+        getUtil().gotoPage(url);
 
-        return new ExtensionPage();
+        return new ExtensionSupporterPage();
     }
 
-    /**
-     * @since 4.2M1
-     */
-    public boolean isValidExtension()
+    public void setSupportPlanName(String supportPlanName)
     {
-        List<WebElement> elements = getDriver().findElements(By.xpath(
-            "//div[@class = 'box successmessage' and ./p[contains(., 'Installable with the Extension Manager')]]"));
-        return !elements.isEmpty();
+        this.supportPlanNameInput.clear();
+        this.supportPlanNameInput.sendKeys(supportPlanName);
     }
 
-    public ExtensionPage updateExtension()
+    public ExtensionSupportPlanInlinePage clickAdd()
     {
-        this.update.click();
+        this.addButton.click();
 
-        return new ExtensionPage();
+        return new ExtensionSupportPlanInlinePage();
     }
 
     @Override
-    protected ExtensionInlinePage createInlinePage()
+    protected ExtensionSupporterInlinePage createInlinePage()
     {
-        return new ExtensionInlinePage();
+        return new ExtensionSupporterInlinePage();
     }
 }

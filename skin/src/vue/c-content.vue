@@ -38,7 +38,6 @@ import { marked } from "marked";
 import { ContentTools } from "./contentTools";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import xavatarImg from "../images/no-one.svg";
-import { XBtn } from "@xwiki/cristal-dsapi";
 
 const route = useRoute();
 

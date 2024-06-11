@@ -22,14 +22,13 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
  **/
-import { XBtn, XBtnProps } from "./x-btn";
 
 /**
  * Shared types for the x-brreadcrumb component implementations.
  * @since 0.8
  */
-type XBreadcrumbProps = {
+type BreadcrumbProps = {
   items: string[];
 };
 
-export { XBtn, XBtnProps, XBreadcrumbProps };
+export { BreadcrumbProps };

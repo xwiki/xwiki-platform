@@ -23,14 +23,6 @@
  *
  **/
 -->
-<script lang="ts" setup>
-import "@shoelace-style/shoelace/dist/components/button/button";
-
-import { XBtnProps } from "@xwiki/cristal-dsapi";
-
-defineProps<XBtnProps>();
-</script>
-
 <template>
   <sl-button variant="default">
     <!-- TODO: We should try to use each the default icon slots to avoid weird alignment issues
@@ -41,6 +33,10 @@ defineProps<XBtnProps>();
     </span>
   </sl-button>
 </template>
+<script lang="ts">
+import "@shoelace-style/shoelace/dist/components/button/button";
+export default {};
+</script>
 <style scoped>
 .align {
   display: flex;

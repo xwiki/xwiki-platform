@@ -28,7 +28,6 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "inversify": "6.0.2",
     "marked": "12.0.2",

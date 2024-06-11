@@ -49,7 +49,6 @@ import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import { LinkSuggestService, name } from "@xwiki/cristal-link-suggest-api";
 import Link from "../extensions/link";
 import Markdown from "../extensions/markdown";
-import { XBtn } from "@xwiki/cristal-dsapi";
 
 const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;

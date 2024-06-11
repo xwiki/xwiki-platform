@@ -25,12 +25,10 @@
 <script lang="ts">
 import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
 import { inject } from "vue";
-import { XBtn } from "@xwiki/cristal-dsapi";
 
 let cristal: CristalApp | undefined;
 
 export default {
-  components: { XBtn },
   setup() {
     let configList: Array<WikiConfig> = [];
     let currentConfig = "";

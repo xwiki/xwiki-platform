@@ -226,9 +226,6 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -403,9 +400,6 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../../ds/api
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../../core/icons
@@ -900,9 +894,6 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../ds/api
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../core/icons

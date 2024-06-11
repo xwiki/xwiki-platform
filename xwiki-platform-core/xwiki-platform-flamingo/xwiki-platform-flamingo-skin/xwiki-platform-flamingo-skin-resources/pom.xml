@@ -141,7 +141,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>moment-timezone</artifactId>
-      <version>0.5.43</version>
+      <version>0.5.45</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>

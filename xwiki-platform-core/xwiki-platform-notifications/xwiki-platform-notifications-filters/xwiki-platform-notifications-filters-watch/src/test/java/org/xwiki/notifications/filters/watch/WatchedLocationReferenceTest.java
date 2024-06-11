@@ -103,9 +103,9 @@ class WatchedLocationReferenceTest
         Collection<NotificationFilterPreference> filterPreferences = mock(Collection.class);
         when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
             .thenReturn(filterPreferences);
+        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference, null, null, false, true,
+            false)).thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
 
-        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
-            .thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
         assertTrue(this.watchedLocationReference.isWatched(userReference));
 
         verify(this.notificationFilterPreferenceManager).getFilterPreferences(userReference);

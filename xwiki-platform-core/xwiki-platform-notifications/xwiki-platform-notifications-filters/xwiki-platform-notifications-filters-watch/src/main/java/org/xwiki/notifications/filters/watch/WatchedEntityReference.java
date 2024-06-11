@@ -67,13 +67,16 @@ public interface WatchedEntityReference
         /**
          * The entity does not have a watched status: by default it means it's not watched, but it's not blocked.
          *
-         * @since 15.9RC1
+         * @since 16.5.0RC1
          */
+        @Unstable
         NOT_SET(false, false),
 
         /**
          * The entity is blocked for all events and formats.
+         * @since 16.5.0RC1
          */
+        @Unstable
         BLOCKED_FOR_ALL_EVENTS_AND_FORMATS(false, true),
 
         /**
@@ -105,7 +108,9 @@ public interface WatchedEntityReference
          *
          * @param watched {@code true} if the status means the page is watched.
          * @param blocked {@code true} if the status means the page is ignored.
+         * @since 16.5.0RC1
          */
+        @Unstable
         WatchedStatus(boolean watched, boolean blocked)
         {
             this.blocked = blocked;
@@ -114,7 +119,9 @@ public interface WatchedEntityReference
 
         /**
          * @return {@code true} if the status means the page is watched.
+         * @since 16.5.0RC1
          */
+        @Unstable
         public boolean isWatched()
         {
             return watched;
@@ -122,7 +129,9 @@ public interface WatchedEntityReference
 
         /**
          * @return {@code true} if the status means the page is ignored.
+         * @since 16.5.0RC1
          */
+        @Unstable
         public boolean isBlocked()
         {
             return blocked;

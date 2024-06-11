@@ -96,9 +96,12 @@ public class WatchedLocationReference implements WatchedEntityReference
     @Override
     public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        // FIXME: it doesn't feel correct...
-        // Fix is with introducing a deprecated stateComputer.isWatched
-        return isWatchedWithAllEventTypes(userReference);
+        WatchedLocationState locationWatched =
+            stateComputer.isLocationWatched(notificationFilterPreferenceManager.getFilterPreferences(userReference),
+                this.entityReference, null, null, false, true, false);
+        return locationWatched.getState() == WatchedLocationState.WatchedState.WATCHED
+            || locationWatched.getState() == WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR
+            || locationWatched.getState() == WatchedLocationState.WatchedState.WATCHED_WITH_CHILDREN;
     }
 
     @Override

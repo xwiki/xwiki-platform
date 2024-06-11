@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ExtensionCode.Translations" locale="">
+<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language/>
@@ -49,7 +49,38 @@ extension.repository.rating=Rating
 extension.repository.installedCount=Installs
 
 ## Administration UI
-admin.repository=Extension Repository</content>
+admin.repository=Extension Repository
+
+## Support
+repository.support.createsupporter=Register
+
+## Supporters
+repository.supporter.sheet.description=This page controls how ExtensionSupporter pages are displayed in both view and edit modes.
+repository.supporter.sheet.noObject=The current page doesn't have the expected ExtensionSupporter object.
+repository.supporter.sheet.createplan=Add
+
+repository.supporter.sheet.plans=Plans
+
+ExtensionCode.ExtensionSupporterClass_emptyvalue=
+ExtensionCode.ExtensionSupporterClass_doc.title=Name
+ExtensionCode.ExtensionSupporterClass_summary=Summary
+ExtensionCode.ExtensionSupporterClass_url=URL
+ExtensionCode.ExtensionSupporterClass_email=Email
+ExtensionCode.ExtensionSupporterClass_content=Details
+ExtensionCode.ExtensionSupporterClass_active=Active
+
+## Support plans
+repository.supportplan.sheet.description=This page controls how ExtensionSupportPlan pages are displayed in both view and edit modes.
+repository.supportplan.sheet.noObject=The current page doesn't have the expected ExtensionSupportPlan object.
+
+ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
+ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
+ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
+ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+ExtensionCode.ExtensionSupportPlanClass_url=URL
+ExtensionCode.ExtensionSupportPlanClass_content=Details
+ExtensionCode.ExtensionSupportPlanClass_active=Active
+ExtensionCode.ExtensionSupportPlanClass_paying=Paying</content>
   <object>
     <name>ExtensionCode.Translations</name>
     <number>0</number>
@@ -68,13 +99,15 @@ admin.repository=Extension Repository</content>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>
         <prettyName>Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>GLOBAL|WIKI|USER|ON_DEMAND</values>

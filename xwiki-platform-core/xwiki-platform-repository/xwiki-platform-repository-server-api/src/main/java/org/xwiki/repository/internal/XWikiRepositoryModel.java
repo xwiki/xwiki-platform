@@ -322,6 +322,8 @@ public class XWikiRepositoryModel
             new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
         SOLR_FIELDS.put("vote", SOLR_FIELDS.get(PROP_RATING_AVERAGEVOTE));
 
+        // TODO: Support plans
+
         // Recommended
         SOLR_FIELDS.put(RemoteExtension.FIELD_RECOMMENDED,
             new ExtensionSolrField(PROP_EXTENSION_RECOMMENDED, SOLR_BOOLEAN, null));

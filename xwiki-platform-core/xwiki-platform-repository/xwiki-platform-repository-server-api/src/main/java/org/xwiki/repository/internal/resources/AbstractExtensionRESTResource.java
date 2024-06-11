@@ -652,6 +652,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME, false));
         extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY, false));
 
+        // TODO: Support plans
+
         // Recommended
         Boolean recommended = this.<Boolean>getSolrValue(document, RemoteExtension.FIELD_RECOMMENDED, false, false);
         if (recommended == Boolean.TRUE) {

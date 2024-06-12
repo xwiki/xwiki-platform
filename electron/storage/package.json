@@ -33,7 +33,7 @@
     "inversify": "6.0.2"
   },
   "peerDependencies": {
-    "electron": "29.4.1"
+    "electron": "31.0.1"
   },
   "devDependencies": {
     "@types/node": "20.14.1",

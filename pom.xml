@@ -63,7 +63,7 @@
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.1.101.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.4</dockerJava.version>
+    <dockerJava.version>3.3.6</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>
     <solr.version>8.11.2</solr.version>
     <zookeeper.version>3.9.1</zookeeper.version>

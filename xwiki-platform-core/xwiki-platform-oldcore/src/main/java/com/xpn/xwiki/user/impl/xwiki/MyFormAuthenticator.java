@@ -34,6 +34,8 @@ import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
+import org.xwiki.csrf.CSRFToken;
+import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -128,6 +130,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
         throws Exception
     {
+
         try {
             Principal principal = MyBasicAuthenticator.checkLogin(request, response, context);
             if (principal != null) {
@@ -183,6 +186,15 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
         // process login form submittal
         if ((this.loginSubmitPattern != null) && request.getMatchableURL().endsWith(this.loginSubmitPattern)) {
+
+            CSRFToken csrfTokenVerifier = Utils.getComponent(CSRFToken.class);
+            String token = request.getParameter("form_token");
+            if (!csrfTokenVerifier.isTokenValid(token)) {
+                String redirect = csrfTokenVerifier.getResubmissionURL();
+                response.sendRedirect(redirect);
+                return false;
+            }
+
             String username = convertUsername(request.getParameter(FORM_USERNAME), context);
             String password = request.getParameter(FORM_PASSWORD);
             String rememberme = request.getParameter(FORM_REMEMBERME);
@@ -205,6 +217,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
     public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
         HttpServletResponse response, XWikiContext context) throws Exception
     {
+
         Principal principal = authenticate(username, password, context);
         AuthenticationFailureManager authenticationFailureManager =
             Utils.getComponent(AuthenticationFailureManager.class);

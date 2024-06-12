@@ -162,7 +162,9 @@ body {
     // UIs where we want to underline outside of content.
     .xdocLastModification,
     .panel[class*="HelpTipsPanel "],
-    .commentauthor {
+    .commentauthor,
+    .xHint // Form input hints, covered even outside of regular page content.
+    {
       & a {
         text-decoration: underline;
       }

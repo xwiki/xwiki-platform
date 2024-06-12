@@ -108,7 +108,7 @@
     <hsqldb.version>2.7.3</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>8.3.0</mysql.version>
+    <mysql.version>8.4.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.3.3</mariadb.version>

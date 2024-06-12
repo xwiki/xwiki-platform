@@ -183,6 +183,7 @@ class InplaceEditIT
         ckeditor.getRichTextArea().click();
         ckeditor.getToolBar().toggleSourceMode();
         assertEquals("{{success}}\ntest\n{{/success}}", ckeditor.getSourceTextArea().getAttribute("value"));
+        viewPage.cancel();
     }
 
     @Test

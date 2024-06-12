@@ -71,6 +71,11 @@ public class NotificationsWatchModal extends BaseModal
          * For removing the watch filter on the page.
          */
         UNWATCH_PAGE("unwatchPage"),
+
+        /**
+         * For removing the watch filter on a page and instead watch the entire space
+         */
+        UNWATCH_PAGE_WATCH_SPACE("unwatchPageWatchSpace"),
         /**
          * For removing the watch filter on the space.
          */
@@ -83,6 +88,11 @@ public class NotificationsWatchModal extends BaseModal
          * For removing the block filter on the page.
          */
         UNBLOCK_PAGE("unblockPage"),
+
+        /**
+         * For removing the block filter on a page and instead block the entire space
+         */
+        UNBLOCK_PAGE_BLOCK_SPACE("unblockPageBlockSpace"),
         /**
          * For removing the block filter on the space.
          */
@@ -114,7 +124,7 @@ public class NotificationsWatchModal extends BaseModal
             Arrays.stream(WatchOptions.values())
             .filter(option -> element.getAttribute("value").equals(option.getOptionValue()))
             .findFirst()
-            .orElseThrow()
+            .orElseThrow(() -> new IllegalArgumentException("Option " + element.getAttribute("value") + " not found"))
         ).toList();
     }
 

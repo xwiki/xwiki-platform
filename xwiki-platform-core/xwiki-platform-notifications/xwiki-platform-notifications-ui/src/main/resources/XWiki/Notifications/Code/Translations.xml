@@ -245,7 +245,7 @@ notifications.switches.changeStatusError=Failed to change the status of the noti
 notifications.watch.button.title=Current notification setting for this page: {0} - Click to change it
 notifications.watch.button.status.notset=Not set
 notifications.watch.button.status.followed=Followed
-notifications.watch.button.status.blocked=Ignored
+notifications.watch.button.status.blocked=Blocked
 notifications.watch.button.status.custom=Custom
 
 notifications.watch.modal.title=Notification settings for this page

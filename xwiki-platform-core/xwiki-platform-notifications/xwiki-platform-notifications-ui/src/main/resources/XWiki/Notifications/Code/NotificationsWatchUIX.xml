@@ -352,6 +352,10 @@
 }
 .panel-group .panel.wiki-option {
   margin-top: 2em;
+}
+h4 &gt; label {
+  font-weight: unset;
+  display: inline;
 }</code>
     </property>
     <property>
@@ -532,16 +536,16 @@
 #macro (_displayOption $attributeName $optionValue $translationSuffix $iconName $panelClass)
   &lt;div class="panel panel-default $panelClass"&gt;
     &lt;div class="panel-radio"&gt;
-      &lt;input type="radio" name="watch-option" id="option-$attributeName" value="$optionValue" aria-labelledby="title-$attributeName" /&gt;
+      &lt;input type="radio" name="watch-option" id="option-$attributeName" value="$optionValue" /&gt;
     &lt;/div&gt;
     &lt;div class="panel-heading" role="tab" id="heading-$attributeName"&gt;
-      &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-$attributeName" aria-controls="xhint-$attributeName"&gt;
         &lt;h4 class="panel-title" id="title-$attributeName"&gt;
           $services.icon.renderHTML("$iconName") 
-          $services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", 'html/5.0', [])
-          &lt;span class="help-icon"&gt;$services.icon.renderHTML('question')&lt;/span&gt;
+          &lt;label for="option-$attributeName"&gt;$services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", 'html/5.0', [])&lt;/label&gt;
+          &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-$attributeName" aria-controls="xhint-$attributeName"&gt;
+            &lt;span class="help-icon"&gt;$services.icon.renderHTML('question')&lt;/span&gt;
+          &lt;/a&gt;
         &lt;/h4&gt;
-      &lt;/a&gt;
     &lt;/div&gt;&lt;!-- end panel heading --&gt;
     &lt;div id="xhint-$attributeName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-$attributeName"&gt;
       &lt;div class="panel-body xHint"&gt;
@@ -584,7 +588,7 @@
         &lt;/h4&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;
-        &lt;p&gt;
+        &lt;div class="watch-status-container"&gt;
           $services.localization.render("notifications.watch.modal.description.$watchedStatus", 'html/5.0', [])
           &lt;hr /&gt;
           #if (($watchedStatus == 'WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS' || $watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS') &amp;&amp; $ancestorRef.type == 'SPACE' &amp;&amp; $services.security.authorization.hasAccess('view', $ancestorRef))
@@ -594,7 +598,7 @@
             #set ($ancestorLink = "&lt;a href=""$ancestorDocUrl""&gt;$ancestorDocTitle&lt;/a&gt;")
             $services.localization.render('notifications.watch.modal.description.ancestoroption', [$ancestorLink])
           #end
-        &lt;/p&gt;
+        &lt;/div&gt;
         &lt;div class="watch-options-container panel-group" id="watch-options-accordion" role="tablist" aria-multiselectable="false"&gt;
         #set ($blockedByAncestor = ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isBlocked()))
         #set ($watchedByAncestor = ($ancestorWatchStatus.isWatched()))

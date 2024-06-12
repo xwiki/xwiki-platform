@@ -33,7 +33,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
 import org.xwiki.platform.notifications.test.po.NotificationWatchButtonElement;
 import org.xwiki.platform.notifications.test.po.NotificationsAdministrationPage;
-import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.NotificationsWatchModal;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;

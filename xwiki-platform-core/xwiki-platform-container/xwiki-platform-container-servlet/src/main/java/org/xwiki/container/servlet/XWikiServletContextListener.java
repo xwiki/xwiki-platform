@@ -45,7 +45,7 @@ import jakarta.servlet.ServletContextListener;
  * from Java point of view.
  * 
  * @version $Id$
- * @since 17-jakarta
+ * @since -1.jakarta
  */
 public class XWikiServletContextListener implements ServletContextListener
 {

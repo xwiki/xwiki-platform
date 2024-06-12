@@ -64,7 +64,7 @@ public interface RequestParameterConverter
      * @param response the response used to redirect or do changes in case of conversion error
      * @return a mutable request with the converted parameters, or an empty optional in case of error
      * @throws IOException in case of problem to write an answer in the response
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException;
 
@@ -92,7 +92,7 @@ public interface RequestParameterConverter
      * @param request the request that might contain parameter needing conversion
      * @return an instance of {@link RequestParameterConversionResult} containing the modified request and the output
      *         and errors that might have occurred
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     JakartaRequestParameterConversionResult convert(ServletRequest request);
 }

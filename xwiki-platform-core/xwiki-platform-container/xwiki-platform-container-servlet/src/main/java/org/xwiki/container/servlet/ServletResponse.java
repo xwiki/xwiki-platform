@@ -43,7 +43,7 @@ public class ServletResponse implements Response, RedirectResponse
 
     /**
      * @param jakartaHttpServletRequest the standard Jakarta {@link HttpServletRequest} instance
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     public ServletResponse(HttpServletResponse httpServletResponse)
     {
@@ -63,7 +63,7 @@ public class ServletResponse implements Response, RedirectResponse
 
     /**
      * @return the standard Jakarta {@link HttpServletResponse} instance
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     public HttpServletResponse getJakartaHttpServletResponse()
     {

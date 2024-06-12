@@ -57,7 +57,7 @@ import jakarta.servlet.ServletResponse;
  * 
  * @author Craig McClanahan
  * @version $Id$
- * @since 17-jakarta
+ * @since -1.jakarta
  */
 public class SetCharacterEncodingFilter implements Filter
 {

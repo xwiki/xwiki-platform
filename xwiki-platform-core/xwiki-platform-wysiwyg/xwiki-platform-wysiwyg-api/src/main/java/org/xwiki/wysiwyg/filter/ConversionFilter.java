@@ -43,7 +43,7 @@ import com.xpn.xwiki.web.Utils;
  * from Java point of view.
  * 
  * @version $Id$
- * @since 17-jakarta
+ * @since -1.jakarta
  */
 public class ConversionFilter implements Filter
 {

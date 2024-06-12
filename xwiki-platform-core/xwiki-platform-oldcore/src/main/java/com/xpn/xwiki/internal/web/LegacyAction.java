@@ -55,7 +55,7 @@ public interface LegacyAction
      * @param servletRequest the request passed to the servlet
      * @param servletResponse the response passed to the servlet
      * @throws Exception when the action produces an unexptected error
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     default void execute(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws Exception
     {

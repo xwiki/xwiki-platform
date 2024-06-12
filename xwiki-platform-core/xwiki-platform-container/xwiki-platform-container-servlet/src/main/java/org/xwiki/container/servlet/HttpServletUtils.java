@@ -81,7 +81,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      * @throws MalformedURLException when an invalid URL was received
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     @Unstable
     public static URL getSourceURL(HttpServletRequest servletRequest) throws MalformedURLException
@@ -110,7 +110,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      * @throws MalformedURLException when an invalid URL was received
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     @Unstable
     public static URL getSourceBaseURL(HttpServletRequest servletRequest) throws MalformedURLException
@@ -215,7 +215,7 @@ public final class HttpServletUtils
     /**
      * @param request the servlet request input
      * @return true if the request explicitly disable getting resources from the cache
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     @Unstable
     public static boolean isCacheReadAllowed(HttpServletRequest request)

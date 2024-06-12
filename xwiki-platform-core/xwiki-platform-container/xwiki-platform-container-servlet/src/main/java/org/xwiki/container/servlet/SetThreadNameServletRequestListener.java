@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * from Java point of view.
  * 
  * @version $Id$
- * @since 17-jakarta
+ * @since -1.jakarta
  */
 public class SetThreadNameServletRequestListener implements ServletRequestListener
 {

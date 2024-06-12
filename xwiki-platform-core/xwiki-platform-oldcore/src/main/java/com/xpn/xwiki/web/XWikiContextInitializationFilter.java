@@ -52,7 +52,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * from Java point of view.
  * 
  * @version $Id$
- * @since 17-jakarta
+ * @since -1.jakarta
  */
 public class XWikiContextInitializationFilter implements Filter
 {
@@ -122,7 +122,7 @@ public class XWikiContextInitializationFilter implements Filter
      * @param request the request being processed
      * @param response the response
      * @throws ServletException if the initialization fails
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     protected void initializeXWikiContext(ServletRequest request, ServletResponse response) throws ServletException
     {

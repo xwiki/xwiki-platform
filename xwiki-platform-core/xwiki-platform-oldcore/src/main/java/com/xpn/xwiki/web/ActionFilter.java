@@ -62,7 +62,7 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  *
  * @version $Id$
  * @since 1.8M1
- * @since 17-jakarta
+ * @since -1.jakarta
  */
 public class ActionFilter implements Filter
 {

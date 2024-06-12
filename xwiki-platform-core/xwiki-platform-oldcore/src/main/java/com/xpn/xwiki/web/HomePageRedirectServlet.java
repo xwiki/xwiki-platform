@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
  * from Java point of view.
  * 
- * @since 17-jakarta
+ * @since -1.jakarta
  */
 public class HomePageRedirectServlet extends HttpServlet
 {

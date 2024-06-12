@@ -43,7 +43,7 @@ public class ServletRequest implements Request
 
     /**
      * @param jakartaHttpServletRequest the standard Jakarta {@link HttpServletRequest} instance
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     public ServletRequest(HttpServletRequest jakartaHttpServletRequest)
     {
@@ -63,7 +63,7 @@ public class ServletRequest implements Request
 
     /**
      * @return the standard Jakarta {@link HttpServletRequest} instance
-     * @since 17-jakarta
+     * @since -1.jakarta
      */
     public HttpServletRequest getJakartaHttpServletRequest()
     {

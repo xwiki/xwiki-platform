@@ -331,10 +331,15 @@ XWiki.Selection = Class.create({
     return descendant;
   },
 
+  // Removes the highligh on selected text (e.g., after pressing when annotating a new piece of text).
   removeSelectionHighlight : function() {
-    // unwrap
+    // We used previously replace from prototype earlier, but it behaves badly when the parent of the wrapper is a td
+    // (moving the selected text at the end of the td).
+    // Also, wrapper is always an element containing only text. If &lt;strong&gt;a&lt;em&gt;b&lt;/em&gt;c&lt;/strong&gt; is
+    // selected for annotation, a, b, and c will each be wrapped in a &lt;span class='selection-highligh' ...&gt;.
+    // Therefore, when unwrapping we know that the spans of this.highlightWrappers contain only text.
     this.highlightWrappers.each(function(wrapper) {
-      wrapper.replace(wrapper.innerHTML);
+      wrapper.replaceWith(wrapper.innerHTML);
     });
   },
 
@@ -623,7 +628,7 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
-    // List for clicks on annotated texts on the comments. 
+    // List for clicks on annotated texts on the comments.
     // Takes care to load the annotations and to make them visible before moving
     // the user to the anchor corresponding to the requested annotation.
     require(['jquery'], ($) =&gt; {
@@ -634,7 +639,7 @@ XWiki.Annotation = Class.create({
           this.setAnnotationVisibility(true);
           this.toggleAnnotations(this.displayingAnnotations);
         } else {
-          // In this case we need to fetch the annotations fist. As this is asynchronous we need to wait for 
+          // In this case we need to fetch the annotations fist. As this is asynchronous we need to wait for
           // the annotations to be fetched before moving the user to the anchor.
           this.fetchAnnotations(true);
           event.preventDefault();

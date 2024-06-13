@@ -353,7 +353,7 @@
 .panel-group .panel.wiki-option {
   margin-top: 2em;
 }
-h4 &gt; label {
+.panel-title &gt; label {
   font-weight: unset;
   display: inline;
 }</code>
@@ -539,13 +539,13 @@ h4 &gt; label {
       &lt;input type="radio" name="watch-option" id="option-$attributeName" value="$optionValue" /&gt;
     &lt;/div&gt;
     &lt;div class="panel-heading" role="tab" id="heading-$attributeName"&gt;
-        &lt;h4 class="panel-title" id="title-$attributeName"&gt;
+        &lt;div class="panel-title" id="title-$attributeName"&gt;
           $services.icon.renderHTML("$iconName") 
           &lt;label for="option-$attributeName"&gt;$services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", 'html/5.0', [])&lt;/label&gt;
           &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" href="#xhint-$attributeName" aria-controls="xhint-$attributeName"&gt;
             &lt;span class="help-icon"&gt;$services.icon.renderHTML('question')&lt;/span&gt;
           &lt;/a&gt;
-        &lt;/h4&gt;
+        &lt;/div&gt;
     &lt;/div&gt;&lt;!-- end panel heading --&gt;
     &lt;div id="xhint-$attributeName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-$attributeName"&gt;
       &lt;div class="panel-body xHint"&gt;
@@ -583,9 +583,9 @@ h4 &gt; label {
           &lt;span aria-hidden="true"&gt;
             $services.icon.renderHTML('cross')
           &lt;/span&gt;&lt;/button&gt;
-        &lt;h4 class="modal-title"&gt;
+        &lt;div class="modal-title"&gt;
           &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $services.localization.render("notifications.watch.modal.title.$watchedStatus", 'html/5.0', [])
-        &lt;/h4&gt;
+        &lt;/div&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;
         &lt;div class="watch-status-container"&gt;

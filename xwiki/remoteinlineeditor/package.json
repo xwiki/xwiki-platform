@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "rimraf": "5.0.7",
-    "vue-tsc": "2.0.19"
+    "vue-tsc": "2.0.21"
   },
   "publishConfig": {
     "exports": {

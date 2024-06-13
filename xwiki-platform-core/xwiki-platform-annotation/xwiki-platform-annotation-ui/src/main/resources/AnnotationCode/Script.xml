@@ -333,13 +333,12 @@ XWiki.Selection = Class.create({
 
   // Removes the highligh on selected text (e.g., after pressing when annotating a new piece of text).
   removeSelectionHighlight : function() {
-    // We used previously replace from prototype earlier, but it behaves badly when the parent of the wrapper is a td
-    // (moving the selected text at the end of the td).
-    // Also, wrapper is always an element containing only text. If &lt;strong&gt;a&lt;em&gt;b&lt;/em&gt;c&lt;/strong&gt; is
+    // We used previously replace for prototype, but it behaves badly when the parent of the wrapper is a td.
+    // Also, wrapper is always an element containing only text. In otherword, if &lt;strong&gt;a&lt;em&gt;b&lt;/em&gt;c&lt;/strong&gt; is
     // selected for annotation, a, b, and c will each be wrapped in a &lt;span class='selection-highligh' ...&gt;.
     // Therefore, when unwrapping we know that the spans of this.highlightWrappers contain only text.
     this.highlightWrappers.each(function(wrapper) {
-      wrapper.replaceWith(wrapper.innerHTML);
+      wrapper.replaceWith(...wrapper.childNodes)
     });
   },
 

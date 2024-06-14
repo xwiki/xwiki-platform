@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Optional;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -107,8 +109,8 @@ public class XWikiServletRequest extends HttpServletRequestWrapper implements XW
     }
 
     @Override
-    public UserReference getEffectiveAuthor()
+    public Optional<UserReference> getEffectiveAuthor()
     {
-        return (UserReference) getAttribute(ATTRIBUTE_EFFECTIVE_AUTHOR);
+        return Optional.ofNullable((UserReference) getAttribute(ATTRIBUTE_EFFECTIVE_AUTHOR));
     }
 }

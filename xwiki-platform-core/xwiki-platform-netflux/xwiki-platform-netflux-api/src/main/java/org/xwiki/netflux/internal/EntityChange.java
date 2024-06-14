@@ -23,9 +23,8 @@ import java.util.Date;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.user.UserReference;
 
 /**
@@ -148,8 +147,7 @@ public class EntityChange implements Comparable<EntityChange>
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this, ToStringStyle.JSON_STYLE).append("entity", this.entityReference)
-            .append("author", this.author).append("scriptLevel", this.scriptLevel).append("timestamp", this.timestamp)
-            .toString();
+        return new XWikiToStringBuilder(this).append("entity", this.entityReference).append("author", this.author)
+            .append("scriptLevel", this.scriptLevel).append("timestamp", this.timestamp).toString();
     }
 }

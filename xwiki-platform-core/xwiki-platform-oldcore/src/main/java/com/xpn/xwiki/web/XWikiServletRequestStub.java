@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -918,8 +919,8 @@ public class XWikiServletRequestStub implements XWikiRequest
     }
 
     @Override
-    public UserReference getEffectiveAuthor()
+    public Optional<UserReference> getEffectiveAuthor()
     {
-        return (UserReference) getAttribute(XWikiServletRequest.ATTRIBUTE_EFFECTIVE_AUTHOR);
+        return Optional.ofNullable((UserReference) getAttribute(XWikiServletRequest.ATTRIBUTE_EFFECTIVE_AUTHOR));
     }
 }

@@ -397,7 +397,7 @@ public class WysiwygEditorScriptService implements ScriptService
         XWikiContext xwikiContext = this.xcontextProvider.get();
         // We clone the document in order to not impact the environment (the document cache for example).
         XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
-        clonedDocument.getAuthors().setContentAuthor(xwikiContext.getRequest().getEffectiveAuthor());
+        xwikiContext.getRequest().getEffectiveAuthor().ifPresent(clonedDocument.getAuthors()::setContentAuthor);
         this.injectTemoraryAttachments(clonedDocument);
         return clonedDocument;
     }

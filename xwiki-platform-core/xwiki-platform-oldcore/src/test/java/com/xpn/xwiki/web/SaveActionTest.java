@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -148,7 +149,7 @@ class SaveActionTest
         this.context.setWiki(this.xWiki);
 
         this.mockRequest = mock(XWikiRequest.class);
-        when(this.mockRequest.getEffectiveAuthor()).thenReturn(this.effectiveAuthor);
+        when(this.mockRequest.getEffectiveAuthor()).thenReturn(Optional.of(this.effectiveAuthor));
         this.context.setRequest(this.mockRequest);
 
         this.mockResponse = mock(XWikiResponse.class);

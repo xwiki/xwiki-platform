@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -498,7 +499,7 @@ public class WrappingXWikiRequest implements XWikiRequest
     }
 
     @Override
-    public UserReference getEffectiveAuthor()
+    public Optional<UserReference> getEffectiveAuthor()
     {
         return this.request.getEffectiveAuthor();
     }

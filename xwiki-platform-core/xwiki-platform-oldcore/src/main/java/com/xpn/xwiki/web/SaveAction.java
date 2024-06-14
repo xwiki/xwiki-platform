@@ -241,7 +241,7 @@ public class SaveAction extends EditAction
 
         UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
         tdoc.getAuthors().setOriginalMetadataAuthor(currentUserReference);
-        tdoc.getAuthors().setEffectiveMetadataAuthor(request.getEffectiveAuthor());
+        request.getEffectiveAuthor().ifPresent(tdoc.getAuthors()::setEffectiveMetadataAuthor);
 
         if (tdoc.isNew()) {
             tdoc.getAuthors().setCreator(currentUserReference);

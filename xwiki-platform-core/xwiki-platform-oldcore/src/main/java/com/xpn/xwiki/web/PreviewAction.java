@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -128,21 +129,27 @@ public class PreviewAction extends EditAction
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiDocument editedDocument = prepareEditedDocument(context);
+        DocumentAuthors editedDocumentAuthors = editedDocument.getAuthors();
 
         // The current user editing the document should be displayed as author and creator (if the edited document is
         // new) when the edited document is previewed.
         UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
-        editedDocument.getAuthors().setOriginalMetadataAuthor(currentUserReference);
+        editedDocumentAuthors.setOriginalMetadataAuthor(currentUserReference);
         if (editedDocument.isNew()) {
-            editedDocument.getAuthors().setCreator(currentUserReference);
+            editedDocumentAuthors.setCreator(currentUserReference);
         }
 
-        // Make sure the current user doesn't use the programming rights of the previous content author (by editing a
-        // document saved with programming rights, changing it and then previewing it). Also make sure the code
-        // requiring programming rights is executed in preview mode if the current user has programming rights.
-        context.getRequest().getEffectiveAuthor().ifPresent(editedDocument.getAuthors()::setEffectiveMetadataAuthor);
+        // Make sure the meta data of the edited document (e.g. a text area property) is executed with the rights of the
+        // effective author specified by the preview request. This also means that the request effective author (e.g.
+        // the currently authenticated user) can't execute code on behalf of the previous metadata author of the edited
+        // document (e.g. by modifying a text area property and previewing the changes without saving, i.e. without
+        // updating the medata author).
+        context.getRequest().getEffectiveAuthor().ifPresent(editedDocumentAuthors::setEffectiveMetadataAuthor);
         if (editedDocument.isContentDirty()) {
-            editedDocument.getAuthors().setContentAuthor(editedDocument.getAuthors().getEffectiveMetadataAuthor());
+            // The request effective author has modified the content of the edited document (without saving) so we must
+            // execute this content using the rights of the request effective author. This is needed to prevent
+            // privilege escalation from the previous content author to the request effective author.
+            editedDocumentAuthors.setContentAuthor(editedDocumentAuthors.getEffectiveMetadataAuthor());
         }
 
         if ("1".equals(context.getRequest().getParameter("diff"))

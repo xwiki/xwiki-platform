@@ -150,8 +150,71 @@
                 </item>
               </differences>
             </revapi.differences>
-            
-            
+            <revapi.differences>
+              <justification>
+                The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
+                parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                <ignore>true</ignore>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                <new>method org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Changes in unstable API of notification for watching pages.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus.NOT_WATCHED</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus.WATCHED_FOR_SOME_EVENTS_OR_FORMATS</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedEntityReference::getWatchedStatus(===org.xwiki.model.reference.DocumentReference===) throws org.xwiki.notifications.NotificationException</old>
+                  <new>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedEntityReference::getWatchedStatus(===org.xwiki.user.UserReference===) throws org.xwiki.notifications.NotificationException</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedEntityReference::getWatchedStatus(===org.xwiki.model.reference.DocumentReference===) throws org.xwiki.notifications.NotificationException @ org.xwiki.notifications.filters.watch.WatchedUserReference</old>
+                  <new>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedUserReference::getWatchedStatus(===org.xwiki.user.UserReference===) throws org.xwiki.notifications.NotificationException</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Watch page API changes to be able to compute it more exactly</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.notifications.filters.watch.WatchedLocationReference::&lt;init&gt;(org.xwiki.model.reference.EntityReference, java.lang.String, org.xwiki.model.reference.EntityReferenceResolver&lt;java.lang.String&gt;, org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer, org.xwiki.notifications.filters.NotificationFilterPreferenceManager)</old>
+                  <new>method void org.xwiki.notifications.filters.watch.WatchedLocationReference::&lt;init&gt;(org.xwiki.model.reference.EntityReference, org.xwiki.component.manager.ComponentManager) throws org.xwiki.component.manager.ComponentLookupException</new>
+                  <justification>Simplify future extensions of this API.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter, org.xwiki.notifications.filters.NotificationFilterPreferenceManager)</old>
+                  <new>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.component.manager.ComponentManager) throws org.xwiki.component.manager.ComponentLookupException</new>
+                  <justification>Simplify future extensions of this API.</justification>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

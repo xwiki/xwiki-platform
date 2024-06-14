@@ -25,7 +25,7 @@ xsi:schemaLocation="http://maven.apache.org/EXTENSIONS/1.1.0 https://maven.apach
   <extension>
     <groupId>com.gradle</groupId>
     <artifactId>develocity-maven-extension</artifactId>
-    <version>1.21.1</version>
+    <version>1.21.4</version>
   </extension>
   <extension>
     <groupId>com.gradle</groupId>

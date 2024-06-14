@@ -24,18 +24,23 @@
  **/
 -->
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from "vue";
 
 import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
 import { storeToRefs } from "pinia";
 import linkSuggestStore from "../stores/link-suggest-store";
 import { listNavigation } from "./list-navigation-helper";
 import { SuggestionProps } from "@tiptap/suggestion";
+import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggest";
 
 const container = ref();
 
-defineProps<{
+const componentProps = defineProps<{
   hasSuggestService: boolean;
+  existingLinkAction: (link: LinkSuggestionActionDescriptor) => void;
+  newLinkAction?: (href: string) => void;
+  upAction?: () => void;
+  downAction?: () => void;
 }>();
 
 const { links, text, props } = storeToRefs(linkSuggestStore());
@@ -44,7 +49,7 @@ const piniaProps = computed(() => props.value as SuggestionProps<unknown>);
 
 let popup: Instance<Props>[];
 
-onMounted(() => {
+function createPopup() {
   popup = tippy("body", {
     getReferenceClientRect: piniaProps.value
       .clientRect as GetReferenceClientRect,
@@ -55,6 +60,26 @@ onMounted(() => {
     trigger: "manual",
     placement: "bottom-start",
   });
+}
+
+function removePopup() {
+  if (popup) {
+    popup[0].destroy();
+  }
+}
+
+onMounted(createPopup);
+onUpdated(createPopup);
+watch(
+  piniaProps.value,
+  () => {
+    createPopup();
+  },
+  { immediate: true },
+);
+
+onUnmounted(() => {
+  removePopup();
 });
 
 const isLinkValid = computed(() => {
@@ -64,42 +89,31 @@ const isLinkValid = computed(() => {
 });
 
 const apply = (index: number) => {
-    // We only submit the text as a link if it's a valid link
-    if (index == 0 && isLinkValid.value) {
-      piniaProps.value.editor
-        .chain()
-        .focus()
-        .deleteRange(piniaProps.value.range)
-        .setLink({ href: text.value })
-        .command(({ tr }) => {
-          tr.insertText(text.value);
-          return true;
-        })
-        .run();
-    } else {
-      const link = links.value[index - 1];
-      piniaProps.value.editor
-        .chain()
-        .focus()
-        .deleteRange(piniaProps.value.range)
-        .setLink({ href: link.url })
-        .command(({ tr }) => {
-          tr.insertText(link.title);
-          return true;
-        })
-        .run();
-    }
-  },
-  { down, up, enter, index } = listNavigation(
-    apply,
-    computed(() => {
-      return links.value.length;
-    }),
-    container,
-  );
+  // We only submit the text as a link if it's a valid link
+  if (index == 0 && isLinkValid.value) {
+    componentProps.newLinkAction?.(text.value);
+  } else {
+    componentProps.existingLinkAction(links.value[index - 1]);
+  }
+};
+const { down, up, enter, index } = listNavigation(
+  apply,
+  computed(() => {
+    return links.value.length;
+  }),
+  container,
+);
 
-onUnmounted(() => {
-  popup[0].destroy();
+defineExpose({
+  upAction() {
+    up();
+  },
+  downAction() {
+    down();
+  },
+  enterAction() {
+    enter();
+  },
 });
 </script>
 
@@ -115,7 +129,7 @@ onUnmounted(() => {
     -->
     <div ref="container" class="form">
       <button
-        class="item"
+        v-show="newLinkAction"
         :class="[
           index == 0 ? 'is-selected' : '',
           isLinkValid ? '' : 'disabled',
@@ -125,6 +139,7 @@ onUnmounted(() => {
             ? 'Insert the typed link'
             : 'Invalid link, can\'t be submitted'
         "
+        class="item"
         @click="apply(0)"
       >
         Create link from text

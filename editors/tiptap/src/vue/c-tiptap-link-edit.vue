@@ -2,15 +2,25 @@
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { BubbleMenuAction } from "../components/extensions/bubble-menu";
 import { Editor, Range } from "@tiptap/vue-3";
-import { inject, onMounted, onUpdated, Ref, ref } from "vue";
+import { inject, onMounted, onUpdated, Ref, ref, toRefs, watch } from "vue";
 import { ContentTools } from "@xwiki/cristal-skin";
 import type { CristalApp } from "@xwiki/cristal-api";
+import CTiptapLinkSuggest from "./c-tiptap-link-suggest.vue";
+import { LinkSuggestService, name } from "@xwiki/cristal-link-suggest-api";
+import linkSuggestStore, {
+  LinkSuggestStore,
+} from "../stores/link-suggest-store";
+import {
+  initSuggestionsService,
+  LinkSuggestionActionDescriptor,
+} from "../components/extensions/link-suggest";
+import { debounce } from "lodash";
 
 const emits = defineEmits(["close"]);
 
 const props = withDefaults(
   defineProps<{
-    // Define wheter the component is wrapped in a parent component.
+    // Define whether the component is wrapped in a parent component.
     // When it's the case, a "back" button is displayed, sending a cancel event
     // in click
     hasWrapper?: boolean;
@@ -34,6 +44,13 @@ const props = withDefaults(
 );
 // We don't propose the link when the selection is ambiguous.
 const linkValue = ref(props.isAmbiguous ? "" : props.url);
+
+const { url } = toRefs(props);
+
+watch(url, (value) => {
+  linkValue.value = value;
+});
+
 function submitLink() {
   const { action, editor, range } = props;
   action.command({ editor, range }, { linkValue: linkValue.value });
@@ -50,16 +67,71 @@ function close() {
 }
 
 const formRoot: Ref<HTMLElement | undefined> = ref(undefined);
+const tippyContainer: Ref<HTMLElement | undefined> = ref(undefined);
+const linkSuggestComp: Ref<typeof CTiptapLinkSuggest | undefined> =
+  ref(undefined);
 
-// Campture internal link navigation for the follow link button.
+// Capture internal link navigation for the follow link button.
 function listenToLinks() {
   const cristal: CristalApp = inject<CristalApp>("cristal")!;
   if (formRoot.value) {
     ContentTools.listenToClicks(formRoot.value, cristal);
   }
 }
+
 onMounted(listenToLinks);
 onUpdated(listenToLinks);
+
+const cristal: CristalApp = inject<CristalApp>("cristal")!;
+let linkSuggest: LinkSuggestService | undefined = undefined;
+try {
+  linkSuggest = cristal.getContainer().get<LinkSuggestService>(name);
+} catch (e) {
+  console.debug(`[${name}] service not found`);
+}
+
+const store: LinkSuggestStore = linkSuggestStore();
+
+store.updateProps({
+  clientRect: () => {
+    return tippyContainer.value?.getBoundingClientRect();
+  },
+  editor: props.editor,
+});
+
+const debouncedWatch = debounce(async (query: string) => {
+  const links = await initSuggestionsService(
+    linkSuggest,
+    cristal.getWikiConfig(),
+  )({ query });
+  store.updateText(query);
+  store.updateLinks(links);
+}, 400);
+watch(
+  linkValue,
+  async (query) => {
+    await debouncedWatch(query || "");
+  },
+  { immediate: true },
+);
+
+function existingLinkAction(link: LinkSuggestionActionDescriptor) {
+  linkValue.value = link.url;
+}
+
+// Bind the keyboard event of the input field to the actions of the link suggest
+// component (which is providing dedicated operations).
+const { up, down, enter } = {
+  up() {
+    linkSuggestComp.value?.upAction();
+  },
+  down() {
+    linkSuggestComp.value?.downAction();
+  },
+  enter() {
+    linkSuggestComp.value?.enterAction();
+  },
+};
 </script>
 
 <template>
@@ -73,11 +145,20 @@ onUpdated(listenToLinks);
       <!-- TODO: integrate the link suggestion there too -->
       <!-- TODO: introduce a x-input component in the abstract DS. -->
       <input
+        ref="tippyContainer"
         v-model="linkValue"
         type="text"
         placeholder="Link..."
         :disabled="isAmbiguous"
+        @keydown.up.prevent="up"
+        @keydown.down.prevent="down"
+        @keydown.enter="enter"
       />
+      <CTiptapLinkSuggest
+        ref="linkSuggestComp"
+        :has-suggest-service="linkSuggest != null"
+        :existing-link-action="existingLinkAction"
+      ></CTiptapLinkSuggest>
       <!-- TODO: distinguish between following internal and external links? -->
       <x-btn
         color="primary"

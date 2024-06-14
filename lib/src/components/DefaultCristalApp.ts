@@ -61,6 +61,7 @@ import type {
 } from "@xwiki/cristal-skin";
 import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";
 import type { Renderer } from "@xwiki/cristal-rendering";
+import { createPinia } from "pinia";
 
 @injectable()
 export class DefaultCristalApp implements CristalApp {
@@ -439,7 +440,7 @@ export class DefaultCristalApp implements CristalApp {
       routes,
     });
 
-    this.app = createApp(Index).use(this.router);
+    this.app = createApp(Index).use(this.router).use(createPinia());
     this.app.provide("count", 0);
     this.app.provide("skinManager", this.skinManager);
     this.app.provide("cristal", this);

@@ -23,7 +23,7 @@
  *
  **/
 
-import { Extension } from "@tiptap/vue-3";
+import { Editor, Extension, Range } from "@tiptap/vue-3";
 import Suggestion from "@tiptap/suggestion";
 
 import { App, createApp } from "vue";
@@ -91,10 +91,16 @@ function loadLinkSuggest(
   });
 }
 
-function getSuggestionItems(
+/**
+ * Build a function returning an array of link suggestions from a string.
+ * @param linkSuggest the link suggestion service to use
+ * @param wikiConfig the wiki configuration to use
+ */
+function initSuggestionsService(
+  linkSuggest: LinkSuggestService | undefined,
   wikiConfig: WikiConfig,
-  linkSuggest?: LinkSuggestService,
 ) {
+  // Return an array of suggestions from a query
   return async function ({
     query,
   }: {
@@ -136,11 +142,29 @@ function getSuggestionItems(
   };
 }
 
+/**
+ * Initialize a link suggestion function based on the values provided during the
+ * extension initialization of the link-suggest extension
+ * @param wikiConfig the wiki configuration to use
+ * @param linkSuggest the link suggestion service to use
+ */
+function getSuggestionItems(
+  wikiConfig: WikiConfig,
+  linkSuggest?: LinkSuggestService,
+) {
+  return initSuggestionsService(linkSuggest, wikiConfig);
+}
+
 function renderItems(
   skinManager: SkinManager,
   container: Container,
   linkSuggest?: LinkSuggestService,
 ) {
+  // The editor and range to be used for the link creation action.
+  // They need to be updated during "onUpdate" to avoid using outdated
+  // information.
+  let editor: Editor;
+  let range: Range;
   return () => {
     let app: App;
     let elemDiv: HTMLDivElement;
@@ -168,14 +192,50 @@ function renderItems(
 
         return false;
       },
-      onStart(props: { items: LinkSuggestionActionDescriptor[] }) {
+      onStart(props: {
+        items: LinkSuggestionActionDescriptor[];
+        editor: Editor;
+        range: Range;
+      }) {
         elemDiv = document.createElement("div");
         document.body.appendChild(elemDiv);
         const pinia = createPinia();
         this.container = new Container();
+
+        editor = props.editor;
+        range = props.range;
+
+        function existingLinkAction(link: LinkSuggestionActionDescriptor) {
+          editor
+            .chain()
+            .focus()
+            .deleteRange(range)
+            .setLink({ href: link.url })
+            .command(({ tr }) => {
+              tr.insertText(link.title);
+              return true;
+            })
+            .run();
+        }
+
+        function newLinkAction(href: string) {
+          editor
+            .chain()
+            .focus()
+            .deleteRange(range)
+            .setLink({ href: href })
+            .command(({ tr }) => {
+              tr.insertText(href);
+              return true;
+            })
+            .run();
+        }
+
         app = createApp(LinkSuggestVue, {
           props,
           hasSuggestService: linkSuggest != undefined,
+          existingLinkAction,
+          newLinkAction,
         });
         app.use(pinia);
         // Allow the abstract design components to be available in the sub-app
@@ -190,13 +250,16 @@ function renderItems(
       onUpdate(props: {
         items: LinkSuggestionActionDescriptor[];
         text: string;
+        editor: Editor;
+        range: Range;
       }) {
+        editor = props.editor;
+        range = props.range;
         store.updateLinks(props.items);
         store.updateText(props.text);
-        store.updateProps(props);
       },
     };
   };
 }
 
-export { loadLinkSuggest };
+export { loadLinkSuggest, initSuggestionsService };

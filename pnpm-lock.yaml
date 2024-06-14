@@ -412,6 +412,9 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
       pinia:
         specifier: 2.1.7
         version: 2.1.7(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))
@@ -428,6 +431,9 @@ importers:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
     devDependencies:
+      '@types/lodash':
+        specifier: 4.17.5
+        version: 4.17.5
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
@@ -708,6 +714,9 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
+      pinia:
+        specifier: 2.1.7
+        version: 2.1.7(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1993,6 +2002,9 @@ packages:
 
   '@types/linkify-it@3.0.5':
     resolution: {integrity: sha512-yg6E+u0/+Zjva+buc3EIb+29XEg4wltq7cSmd4Uc2EE/1nUVmxyzpX6gUXD0V8jIrG0r7YeOGVIbYRkxeooCtw==}
+
+  '@types/lodash@4.17.5':
+    resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
 
   '@types/markdown-it@13.0.8':
     resolution: {integrity: sha512-V+KmpgiipS+zoypeUSS9ojesWtY/0k4XfqcK2fnVrX/qInJhX7rsCxZ/rygiPH2zxlPPrhfuW0I6ddMcWTKLsg==}
@@ -6432,6 +6444,8 @@ snapshots:
       '@types/node': 20.14.1
 
   '@types/linkify-it@3.0.5': {}
+
+  '@types/lodash@4.17.5': {}
 
   '@types/markdown-it@13.0.8':
     dependencies:

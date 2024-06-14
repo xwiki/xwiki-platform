@@ -52,6 +52,7 @@
     "@xwiki/cristal-link-suggest-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
     "inversify": "6.0.2",
+    "lodash": "4.17.21",
     "pinia": "2.1.7",
     "tippy.js": "6.3.7",
     "tiptap-markdown": "0.8.10",
@@ -59,6 +60,7 @@
     "vue": "3.4.27"
   },
   "devDependencies": {
+    "@types/lodash": "4.17.5",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",
     "vite": "5.2.13",

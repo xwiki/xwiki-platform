@@ -42,6 +42,7 @@
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-storage": "workspace:*",
     "inversify": "6.0.2",
+    "pinia": "2.1.7",
     "reflect-metadata": "0.2.2",
     "utility-types": "3.11.0",
     "vue": "3.4.27",

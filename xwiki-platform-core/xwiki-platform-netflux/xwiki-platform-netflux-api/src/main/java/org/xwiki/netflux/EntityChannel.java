@@ -23,9 +23,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * A channel associated to an XWiki entity.
@@ -125,7 +124,7 @@ public class EntityChannel
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this, ToStringStyle.JSON_STYLE).append("entity", this.entityReference)
-            .append("path", this.path).append("key", this.key).build();
+        return new XWikiToStringBuilder(this).append("entity", this.entityReference).append("path", this.path)
+            .append("key", this.key).build();
     }
 }

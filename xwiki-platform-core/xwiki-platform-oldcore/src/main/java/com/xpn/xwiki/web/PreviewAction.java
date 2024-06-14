@@ -140,7 +140,7 @@ public class PreviewAction extends EditAction
         // Make sure the current user doesn't use the programming rights of the previous content author (by editing a
         // document saved with programming rights, changing it and then previewing it). Also make sure the code
         // requiring programming rights is executed in preview mode if the current user has programming rights.
-        editedDocument.getAuthors().setEffectiveMetadataAuthor(context.getRequest().getEffectiveAuthor());
+        context.getRequest().getEffectiveAuthor().ifPresent(editedDocument.getAuthors()::setEffectiveMetadataAuthor);
         if (editedDocument.isContentDirty()) {
             editedDocument.getAuthors().setContentAuthor(editedDocument.getAuthors().getEffectiveMetadataAuthor());
         }

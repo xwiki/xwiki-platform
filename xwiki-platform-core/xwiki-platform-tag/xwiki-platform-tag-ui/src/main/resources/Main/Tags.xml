@@ -96,6 +96,28 @@ $xwiki.ssx.use('Main.Tags')##
       {{notifications useUserPreferences="false" displayOwnEvents="true" tags="$wikiEscapedTag" displayRSSLink="true" /}}
     )))
   {{/container}}
+
+  {{container}}
+      ## Getting the related tags.
+      #set ($documents = $xwiki.tag.getDocumentsWithTag($tag))
+      #set ($tagsMap = {})
+      #foreach($document in $documents)
+        #set ($tags = $xwiki.tag.getTagsFromDocument($document))
+        #foreach($tag in $tags)
+          #set($discard = $tagsMap.put($tag, 1))
+        #end
+      #end
+      #set ($discard = $tagsMap.remove($tag))
+      ## Displaying the related tags as a list with links to their own page.
+      === $services.localization.render('xe.tag.related') ===
+      #set ($relatedTags = $tagsMap.keySet())
+      #foreach($tag in $relatedTags)##
+        [[$tag>>||queryString="do=viewTag&amp;tag=$tag"]]##
+          #if($foreach.count &lt;$relatedTags.size())##
+          , ##
+          #end##
+        #end##
+  {{/container}}
 #elseif ($do == 'prepareRename')
   ##
   ## Prepare rename tag

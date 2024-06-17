@@ -19,6 +19,11 @@
  */
 package org.xwiki.netflux.internal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
 
 import javax.websocket.Session;
@@ -30,11 +35,6 @@ import org.xwiki.netflux.EntityChannel;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultEntityChannelStore}.
@@ -82,6 +82,7 @@ class DefaultEntityChannelStoreTest
 
         // Get should return the existing channel.
         assertSame(entityChannel, this.entityChannelStore.getChannel(this.entityReference, path).get());
+        assertSame(entityChannel, this.entityChannelStore.getChannel(channel.getKey()).get());
         assertEquals(1, entityChannel.getUserCount());
 
         // Disconnect the user and check again the user count.
@@ -91,6 +92,7 @@ class DefaultEntityChannelStoreTest
         // Disconnect the raw channel and check the entity channel.
         when(this.channelStore.get(channel.getKey())).thenReturn(null);
         assertFalse(this.entityChannelStore.getChannel(this.entityReference, path).isPresent());
+        assertFalse(this.entityChannelStore.getChannel(channel.getKey()).isPresent());
     }
 
     @Test
@@ -98,8 +100,7 @@ class DefaultEntityChannelStoreTest
     {
         Channel channelOne = new Channel("one");
         when(this.channelStore.create()).thenReturn(channelOne);
-        EntityChannel entityChannelOne =
-            this.entityChannelStore.createChannel(this.entityReference, List.of("a", "b"));
+        EntityChannel entityChannelOne = this.entityChannelStore.createChannel(this.entityReference, List.of("a", "b"));
         when(this.channelStore.get(channelOne.getKey())).thenReturn(channelOne);
 
         Channel channelTwo = new Channel("two");

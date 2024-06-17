@@ -176,7 +176,9 @@ body {
       & .xwikitabbar,
       & .buttonwrapper,
       & #user-menu-col,
-      & .xwiki-livedata .cell .displayer-link {
+      & .xwiki-livedata .cell .displayer-link, // Do not underline links that are in their own livedata cell
+      & .xwiki-livedata .cell .breadcrumb // Do not underline links that are in breadcrumbs in livedatas
+      {
         & a {
           .not-inline-link();
         }

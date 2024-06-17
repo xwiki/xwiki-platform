@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-requiredrights-test</artifactId>
-    <version>16.5.0-rc-1</version>
+    <version>16.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-requiredrights-test-pageobjects</artifactId>
   <name>XWiki Platform - Security - Required Rights - Tests - Page Objects</name>

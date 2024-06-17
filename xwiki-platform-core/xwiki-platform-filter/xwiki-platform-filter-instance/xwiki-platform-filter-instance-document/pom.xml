@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter-instance</artifactId>
-    <version>16.5.0-rc-1</version>
+    <version>16.5.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-filter-instance-document</artifactId>
   <name>XWiki Platform - Filter - Instance - Document</name>

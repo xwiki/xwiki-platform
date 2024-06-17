@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-sharepage</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-sharepage-api</artifactId>
   <name>XWiki Platform - Share Page - API</name>

@@ -86,7 +86,7 @@ public class TableLayoutElement extends BaseElement
      */
     public List<WebElement> getRows()
     {
-        return getRoot().findElements(By.cssSelector("tbody > tr"));
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody > tr"));
     }
 
     /**

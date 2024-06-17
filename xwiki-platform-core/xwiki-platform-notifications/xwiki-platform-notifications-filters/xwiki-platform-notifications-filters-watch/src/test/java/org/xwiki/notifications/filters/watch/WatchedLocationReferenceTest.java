@@ -27,10 +27,14 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -40,7 +44,9 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -55,31 +61,39 @@ import static org.mockito.Mockito.when;
  */
 class WatchedLocationReferenceTest
 {
-    private EntityReference entityReference;
-
     private String serializedReference;
-
+    private EntityReference entityReference;
     private EntityReferenceResolver<String> resolver;
-
     private ScopeNotificationFilterLocationStateComputer stateComputer;
-
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
     private WatchedLocationReference watchedLocationReference;
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @BeforeEach
-    void setup()
+    void setup() throws ComponentLookupException
     {
+        ComponentManager componentManager = mock(ComponentManager.class);
         this.entityReference = mock(EntityReference.class);
         this.resolver = mock(EntityReferenceResolver.class);
         this.stateComputer = mock(ScopeNotificationFilterLocationStateComputer.class);
         this.notificationFilterPreferenceManager = mock(NotificationFilterPreferenceManager.class);
+        this.userReferenceSerializer = mock(UserReferenceSerializer.class);
         this.serializedReference = "xwiki:XWiki.Location";
-        this.watchedLocationReference = new WatchedLocationReference(this.entityReference,
-            this.serializedReference,
-            this.resolver,
-            this.stateComputer,
-            this.notificationFilterPreferenceManager);
+        EntityReferenceSerializer<String> serializer = mock(EntityReferenceSerializer.class);
+
+        when(componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class))).thenReturn(this.resolver);
+        when(componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class))).thenReturn(serializer);
+        when(componentManager.getInstance(ScopeNotificationFilterLocationStateComputer.class))
+            .thenReturn(this.stateComputer);
+        when(componentManager.getInstance(NotificationFilterPreferenceManager.class))
+            .thenReturn(this.notificationFilterPreferenceManager);
+        when(componentManager.getInstance(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document"))
+            .thenReturn(this.userReferenceSerializer);
+        when(serializer.serialize(entityReference)).thenReturn(serializedReference);
+        this.watchedLocationReference = new WatchedLocationReference(this.entityReference, componentManager);
     }
 
     @Test
@@ -89,8 +103,9 @@ class WatchedLocationReferenceTest
         Collection<NotificationFilterPreference> filterPreferences = mock(Collection.class);
         when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
             .thenReturn(filterPreferences);
+        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference, null, null, false, true,
+            false)).thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
 
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(true);
         assertTrue(this.watchedLocationReference.isWatched(userReference));
 
         verify(this.notificationFilterPreferenceManager).getFilterPreferences(userReference);
@@ -104,8 +119,8 @@ class WatchedLocationReferenceTest
         when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
             .thenReturn(filterPreferences);
 
-        when(this.stateComputer.isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference))
-            .thenReturn(true);
+        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
+            .thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
         assertTrue(this.watchedLocationReference.isWatchedWithAllEventTypes(userReference));
 
         verify(this.notificationFilterPreferenceManager).getFilterPreferences(userReference);
@@ -242,30 +257,22 @@ class WatchedLocationReferenceTest
     @Test
     void getWatchedStatus() throws NotificationException
     {
-        DocumentReference userReference = mock(DocumentReference.class);
+        DocumentReference userDocReference = mock(DocumentReference.class);
+        UserReference userReference = mock(UserReference.class);
+        when(this.userReferenceSerializer.serialize(userReference)).thenReturn(userDocReference);
         Collection<NotificationFilterPreference> filterPreferences = mock(Collection.class);
-        when(this.notificationFilterPreferenceManager.getFilterPreferences(userReference))
+        when(this.notificationFilterPreferenceManager.getFilterPreferences(userDocReference))
             .thenReturn(filterPreferences);
 
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(false);
-        when(this.stateComputer.isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference))
-            .thenReturn(false);
-        assertEquals(WatchedEntityReference.WatchedStatus.NOT_WATCHED,
+        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
+            .thenReturn(new WatchedLocationState());
+        assertEquals(WatchedEntityReference.WatchedStatus.NOT_SET,
             this.watchedLocationReference.getWatchedStatus(userReference));
 
-        verify(this.stateComputer).isLocationWatched(filterPreferences, this.entityReference);
-        verify(this.stateComputer).isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference);
+        verify(this.stateComputer).isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference);
 
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(true);
-        assertEquals(WatchedEntityReference.WatchedStatus.WATCHED_FOR_SOME_EVENTS_OR_FORMATS,
-            this.watchedLocationReference.getWatchedStatus(userReference));
-
-        when(this.stateComputer.isLocationWatchedWithAllEventTypes(filterPreferences, this.entityReference))
-            .thenReturn(true);
-        assertEquals(WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
-            this.watchedLocationReference.getWatchedStatus(userReference));
-
-        when(this.stateComputer.isLocationWatched(filterPreferences, this.entityReference)).thenReturn(false);
+        when(this.stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences, this.entityReference))
+            .thenReturn(new WatchedLocationState(WatchedLocationState.WatchedState.WATCHED, new Date()));
         assertEquals(WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS,
             this.watchedLocationReference.getWatchedStatus(userReference));
     }

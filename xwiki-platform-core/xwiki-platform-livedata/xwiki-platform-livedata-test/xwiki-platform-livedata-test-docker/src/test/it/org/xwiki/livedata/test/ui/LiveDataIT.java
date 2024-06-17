@@ -245,6 +245,7 @@ class LiveDataIT
 
         // Test filter on boolean values
         suggestInputElement.clear().hideSuggestions();
+        liveDataElement.waitUntilReady();
         assertEquals(2, tableLayout.countRows());
 
         // Take the focus on the is active filter.
@@ -254,6 +255,7 @@ class LiveDataIT
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
+        liveDataElement.waitUntilReady();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
@@ -263,6 +265,7 @@ class LiveDataIT
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
+        liveDataElement.waitUntilReady();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
 

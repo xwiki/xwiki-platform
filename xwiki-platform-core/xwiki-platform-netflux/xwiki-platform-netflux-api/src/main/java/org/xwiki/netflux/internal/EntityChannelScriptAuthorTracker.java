@@ -57,7 +57,7 @@ import org.xwiki.user.UserReferenceSerializer;
  * @version $Id$
  * @since 15.10.11
  * @since 16.4.1
- * @since 16.5.0RC1
+ * @since 16.5.0
  */
 @Component(roles = EntityChannelScriptAuthorTracker.class)
 @Singleton

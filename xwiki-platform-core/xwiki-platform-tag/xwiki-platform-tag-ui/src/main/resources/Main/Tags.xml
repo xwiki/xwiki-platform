@@ -98,22 +98,16 @@ $xwiki.ssx.use('Main.Tags')##
   {{/container}}
 
   {{container}}
+      #set($tag = $escapetool.quotedPrintable($tag))##
       ## Getting the related tags.
-      #set ($documents = $xwiki.tag.getDocumentsWithTag($tag))
-      #set ($tagsMap = {})
-      #foreach($document in $documents)
-        #set ($tags = $xwiki.tag.getTagsFromDocument($document))
-        #foreach($tag in $tags)
-          #set($discard = $tagsMap.put($tag, 1))
-        #end
-      #end
-      #set ($discard = $tagsMap.remove($tag))
+      #set ($query = "select distinct obj.tags from Document doc, doc.object(XWiki.TagClass) as obj where '$tag' member of obj.tags")
+      #set ($releatedTags = $services.query.xwql($query).execute())
       ## Displaying the related tags as a list with links to their own page.
       === $services.localization.render('xe.tag.related') ===
-      #set ($relatedTags = $tagsMap.keySet())
-      #foreach($tag in $relatedTags)##
+      #foreach($tag in $releatedTags)##
+        #set($tag = $escapetool.quotedPrintable($tag))##
         [[$tag>>||queryString="do=viewTag&amp;tag=$tag"]]##
-          #if($foreach.count &lt;$relatedTags.size())##
+          #if($foreach.count &lt;$releatedTags.size())##
           , ##
           #end##
         #end##

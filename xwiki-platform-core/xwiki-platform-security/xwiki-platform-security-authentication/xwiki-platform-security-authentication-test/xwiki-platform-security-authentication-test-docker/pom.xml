@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-authentication-test</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.5.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-security-authentication-test-docker</artifactId>
   <name>XWiki Platform - Security - Authentication - Tests - Functional Docker Tests</name>

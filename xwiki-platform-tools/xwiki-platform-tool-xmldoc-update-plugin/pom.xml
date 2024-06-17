@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.5.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-tool-xmldoc-update-plugin</artifactId>
   <name>XWiki Platform - Tools - XML Doc Update Plugin</name>

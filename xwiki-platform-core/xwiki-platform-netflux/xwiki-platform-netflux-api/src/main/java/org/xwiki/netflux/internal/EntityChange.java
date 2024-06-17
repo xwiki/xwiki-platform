@@ -33,7 +33,7 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 15.10.11
  * @since 16.4.1
- * @since 16.5.0RC1
+ * @since 16.5.0
  */
 public class EntityChange implements Comparable<EntityChange>
 {

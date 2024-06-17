@@ -42,7 +42,7 @@ public interface XWikiRequest extends HttpServletRequest
      *         information is missing) should be considered the effective author.
      * @since 15.10.11
      * @since 16.4.1
-     * @since 16.5.0RC1
+     * @since 16.5.0
      */
     @Unstable
     default Optional<UserReference> getEffectiveAuthor()

@@ -78,7 +78,7 @@ public interface EntityChannelStore
      * @return the channel associated with the specified key, if any
      * @since 15.10.11
      * @since 16.4.1
-     * @since 16.5.0RC1
+     * @since 16.5.0
      */
     @Unstable
     default Optional<EntityChannel> getChannel(String key)

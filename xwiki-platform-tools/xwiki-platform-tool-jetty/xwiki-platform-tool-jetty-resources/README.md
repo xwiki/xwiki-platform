@@ -73,5 +73,6 @@ We brought the following changes from the default Jetty files obtained from the 
      </New>
     </Arg>
    ```
-10. Note that we don't include all `etc/*.xml` files nor all `modules/*.mod` files since we don't use these extra
-    features. Note that we kept `apache-jsp.mod` which is needed by the Hibernate Validator (see XWIKI-19314) 
+10. We remove:
+* any module or etc/ file related to ee8 or ee9 since we focus on ee10
+* demo related modules

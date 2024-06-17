@@ -86,7 +86,7 @@ public class EntityChannelScriptAuthorTracker
     @Named("explicit")
     private EntityReferenceResolver<String> explicitEntityReferenceResolver;
 
-    private Map<String, EntityChange> scriptAuthors = new ConcurrentHashMap<>();
+    private final Map<String, EntityChange> scriptAuthors = new ConcurrentHashMap<>();
 
     /**
      * @param channelId identifies the entity channel for which to return the script author

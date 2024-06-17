@@ -745,7 +745,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstMacroEditModal.clickCancel();
 
         firstEditPage.clickSaveAndView();
-        assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}\n\n ",
+        assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}",
             WikiEditPage.gotoPage(testReference).getContent());
     }
     

@@ -17,7 +17,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "types": "dist/index.d.ts",
   "dependencies": {

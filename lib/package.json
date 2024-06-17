@@ -29,6 +29,10 @@
   "dependencies": {
     "@mdi/font": "7.4.47",
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-backend-dexie": "workspace:*",
+    "@xwiki/cristal-backend-github": "workspace:*",
+    "@xwiki/cristal-backend-nextcloud": "workspace:*",
+    "@xwiki/cristal-backend-xwiki": "workspace:*",
     "@xwiki/cristal-browser-api": "workspace:*",
     "@xwiki/cristal-dsfr": "workspace:*",
     "@xwiki/cristal-dsshoelace": "workspace:*",
@@ -40,7 +44,6 @@
     "@xwiki/cristal-rendering": "workspace:*",
     "@xwiki/cristal-sharedworker-impl": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
-    "@xwiki/cristal-storage": "workspace:*",
     "inversify": "6.0.2",
     "pinia": "2.1.7",
     "reflect-metadata": "0.2.2",

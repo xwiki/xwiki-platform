@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-storage",
+  "name": "@xwiki/cristal-backend-dexie",
   "version": "0.8.0",
   "license": "AGPL-3.0",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "storage",
+    "directory": "/core/backend/backend-dexie",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {
@@ -18,26 +18,18 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
-    "clean": "rimraf dist",
-    "compile": "tsc --project tsconfig.json --noEmit && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "echo 'no test'"
+    "build": "tsc --project tsconfig.json --noEmit && vite build",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
-  "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
     "dexie": "4.0.7",
-    "inversify": "6.0.2",
-    "reflect-metadata": "0.2.2",
-    "vue": "3.4.27",
-    "vue-i18n": "9.13.1"
+    "inversify": "6.0.2"
   },
   "devDependencies": {
-    "@types/dompurify": "3.0.5",
-    "rimraf": "5.0.7",
+    "typescript": "5.4.5",
     "vite": "5.2.13"
   },
   "publishConfig": {

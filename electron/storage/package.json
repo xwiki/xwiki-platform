@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-storage": "workspace:*",
+    "@xwiki/cristal-backend-api": "workspace:*",
     "inversify": "6.0.2"
   },
   "peerDependencies": {

@@ -28,7 +28,10 @@ import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 import type { CristalApp, WrappingStorage } from "@xwiki/cristal-api";
 import { type WikiConfig } from "@xwiki/cristal-api";
 import { CristalLoader } from "@xwiki/cristal-extension-manager";
-import { ComponentInit as StorageComponentInit } from "@xwiki/cristal-storage";
+import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
+import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
+import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
+import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
 import type { Container } from "inversify";
 import { WorkerCristalApp } from "./workerCristalApp";
 import WorkerQueueWorker from "./workerQueueWorker";
@@ -43,7 +46,7 @@ export class Worker implements MyWorker {
   private fct: (a: string) => void;
 
   /*
-     Start worker thread 
+     Start worker thread
     */
   public async start() {
     console.log("Starting worker thread");
@@ -206,7 +209,12 @@ export class Worker implements MyWorker {
     this.cristal = this.container.get<CristalApp>("CristalApp");
     this.cristal.setContainer(this.container);
     console.log("Container status", this.container);
-    new StorageComponentInit(cristalLoader.container);
+    // TODO: find a way to do this loading differently. Here we need to
+    //  explicitly depend on all required storage and this is not good.
+    new DexieBackendComponentInit(cristalLoader.container);
+    new GithubBackendComponentInit(cristalLoader.container);
+    new NextcloudBackendComponentInit(cristalLoader.container);
+    new XWikiBackendComponentInit(cristalLoader.container);
     console.log("Loading storage components");
     this.initialized = true;
     console.log("Finished initialize");

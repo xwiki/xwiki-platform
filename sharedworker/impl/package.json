@@ -28,9 +28,12 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-backend-dexie": "workspace:*",
+    "@xwiki/cristal-backend-github": "workspace:*",
+    "@xwiki/cristal-backend-nextcloud": "workspace:*",
+    "@xwiki/cristal-backend-xwiki": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
-    "@xwiki/cristal-storage": "workspace:*",
     "comlink": "4.4.1",
     "inversify": "6.0.2",
     "vue": "3.4.27",

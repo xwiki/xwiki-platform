@@ -31,7 +31,7 @@ import {
   JSONLDDocument,
   type Logger,
 } from "@xwiki/cristal-api";
-import { AbstractStorage } from "../abstractStorage";
+import { AbstractStorage } from "@xwiki/cristal-backend-api";
 
 @injectable()
 export class XWikiStorage extends AbstractStorage {

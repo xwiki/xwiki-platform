@@ -23,7 +23,6 @@
  *
  **/
 
-import ComponentInit from "./components/componentsInit.js";
-import { AbstractStorage } from "./components/abstractStorage";
+import { generateConfig } from "../../../vite.config";
 
-export { ComponentInit, AbstractStorage };
+export default generateConfig(import.meta.url);

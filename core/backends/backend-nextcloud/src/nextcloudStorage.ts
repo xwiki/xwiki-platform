@@ -23,9 +23,9 @@
  *
  **/
 
-import { injectable, inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { DefaultPageData, Logger, PageData } from "@xwiki/cristal-api";
-import { AbstractStorage } from "../abstractStorage";
+import { AbstractStorage } from "@xwiki/cristal-backend-api";
 
 /**
  * Access Nextcloud storage through http.

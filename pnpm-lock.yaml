@@ -103,6 +103,114 @@ importers:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
 
+  core/backends/backend-api:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.1)
+
+  core/backends/backend-dexie:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../backend-api
+      '@xwiki/cristal-sharedworker-api':
+        specifier: workspace:*
+        version: link:../../../sharedworker/api
+      dexie:
+        specifier: 4.0.7
+        version: 4.0.7
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.1)
+
+  core/backends/backend-filesystem:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.1)
+
+  core/backends/backend-github:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../backend-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.1)
+
+  core/backends/backend-nextcloud:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../backend-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.1)
+
+  core/backends/backend-xwiki:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../backend-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.1)
+
   core/browser/browser-api:
     dependencies:
       '@xwiki/cristal-api':
@@ -585,9 +693,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@xwiki/cristal-storage':
+      '@xwiki/cristal-backend-api':
         specifier: workspace:*
-        version: link:../../storage
+        version: link:../../core/backends/backend-api
       electron:
         specifier: 29.4.1
         version: 29.4.1
@@ -675,6 +783,18 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-backend-dexie':
+        specifier: workspace:*
+        version: link:../core/backends/backend-dexie
+      '@xwiki/cristal-backend-github':
+        specifier: workspace:*
+        version: link:../core/backends/backend-github
+      '@xwiki/cristal-backend-nextcloud':
+        specifier: workspace:*
+        version: link:../core/backends/backend-nextcloud
+      '@xwiki/cristal-backend-xwiki':
+        specifier: workspace:*
+        version: link:../core/backends/backend-xwiki
       '@xwiki/cristal-browser-api':
         specifier: workspace:*
         version: link:../core/browser/browser-api
@@ -708,9 +828,6 @@ importers:
       '@xwiki/cristal-skin':
         specifier: workspace:*
         version: link:../skin
-      '@xwiki/cristal-storage':
-        specifier: workspace:*
-        version: link:../storage
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -860,15 +977,24 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-backend-dexie':
+        specifier: workspace:*
+        version: link:../../core/backends/backend-dexie
+      '@xwiki/cristal-backend-github':
+        specifier: workspace:*
+        version: link:../../core/backends/backend-github
+      '@xwiki/cristal-backend-nextcloud':
+        specifier: workspace:*
+        version: link:../../core/backends/backend-nextcloud
+      '@xwiki/cristal-backend-xwiki':
+        specifier: workspace:*
+        version: link:../../core/backends/backend-xwiki
       '@xwiki/cristal-extension-manager':
         specifier: workspace:*
         version: link:../../extension-manager
       '@xwiki/cristal-sharedworker-api':
         specifier: workspace:*
         version: link:../api
-      '@xwiki/cristal-storage':
-        specifier: workspace:*
-        version: link:../../storage
       comlink:
         specifier: 4.4.1
         version: 4.4.1
@@ -971,40 +1097,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-
-  storage:
-    dependencies:
-      '@xwiki/cristal-api':
-        specifier: workspace:*
-        version: link:../api
-      '@xwiki/cristal-sharedworker-api':
-        specifier: workspace:*
-        version: link:../sharedworker/api
-      dexie:
-        specifier: 4.0.7
-        version: 4.0.7
-      inversify:
-        specifier: 6.0.2
-        version: 6.0.2
-      reflect-metadata:
-        specifier: 0.2.2
-        version: 0.2.2
-      vue:
-        specifier: 3.4.27
-        version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
-    devDependencies:
-      '@types/dompurify':
-        specifier: 3.0.5
-        version: 3.0.5
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   web:
     dependencies:

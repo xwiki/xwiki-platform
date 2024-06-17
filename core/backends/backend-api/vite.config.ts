@@ -23,6 +23,6 @@
  *
  **/
 
-import { generateConfig } from "../vite.config";
+import { generateConfig } from "../../../vite.config";
 
 export default generateConfig(import.meta.url);

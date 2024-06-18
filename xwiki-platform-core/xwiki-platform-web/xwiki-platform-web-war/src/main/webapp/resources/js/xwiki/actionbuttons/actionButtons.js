@@ -278,7 +278,6 @@ var XWiki = (function(XWiki) {
 
       this.savedBox.hide();
       this.failedBox.hide();
-
       var isContinue = event.memo["continue"];
       this.form = $(event.memo.form);
 

@@ -29,7 +29,6 @@
     "@xwiki/cristal-electron-storage": "workspace:*",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",
-    "unplugin-auto-expose": "0.2.4",
-    "vite": "5.2.13"
+    "unplugin-auto-expose": "0.2.4"
   }
 }

@@ -25,8 +25,7 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "happy-dom": "14.12.0",
-    "rimraf": "5.0.7",
-    "vite": "5.2.13"
+    "rimraf": "5.0.7"
   },
   "publishConfig": {
     "exports": {

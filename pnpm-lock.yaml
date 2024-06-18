@@ -19,7 +19,7 @@ importers:
         version: 7.10.0(eslint@8.57.0)(typescript@5.4.5)
       '@vitejs/plugin-vue':
         specifier: 5.0.4
-        version: 5.0.4(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))
+        version: 5.0.4(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))
       '@vitest/coverage-v8':
         specifier: 1.6.0
         version: 1.6.0(vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.12.0))
@@ -54,20 +54,20 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
+        specifier: 5.3.1
+        version: 5.3.1(@types/node@20.14.1)
       vite-plugin-css-injected-by-js:
         specifier: 3.5.1
-        version: 3.5.1(vite@5.2.13(@types/node@20.14.1))
+        version: 3.5.1(vite@5.3.1(@types/node@20.14.1))
       vite-plugin-dts:
         specifier: 3.9.1
-        version: 3.9.1(@types/node@20.14.1)(rollup@4.18.0)(typescript@5.4.5)(vite@5.2.13(@types/node@20.14.1))
+        version: 3.9.1(@types/node@20.14.1)(rollup@4.18.0)(typescript@5.4.5)(vite@5.3.1(@types/node@20.14.1))
       vite-plugin-inspect:
         specifier: 0.8.4
-        version: 0.8.4(rollup@4.18.0)(vite@5.2.13(@types/node@20.14.1))
+        version: 0.8.4(rollup@4.18.0)(vite@5.3.1(@types/node@20.14.1))
       vite-plugin-vuetify:
         specifier: 2.0.3
-        version: 2.0.3(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
+        version: 2.0.3(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
 
   api:
     dependencies:
@@ -90,9 +90,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
@@ -144,9 +141,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/backends/backend-api:
     dependencies:
@@ -157,9 +151,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/backends/backend-dexie:
     dependencies:
@@ -182,9 +173,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/backends/backend-github:
     dependencies:
@@ -201,9 +189,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/backends/backend-nextcloud:
     dependencies:
@@ -220,9 +205,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/backends/backend-xwiki:
     dependencies:
@@ -239,9 +221,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/browser/browser-api:
     dependencies:
@@ -252,9 +231,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/browser/browser-default:
     dependencies:
@@ -271,9 +247,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/extra-tabs/extra-tabs-api:
     dependencies:
@@ -336,9 +309,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
@@ -351,9 +321,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   core/link-suggest/link-suggest-xwiki:
     dependencies:
@@ -370,9 +337,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   dev/config:
     devDependencies:
@@ -391,9 +355,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   ds/dsfr:
     dependencies:
@@ -434,9 +395,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
@@ -471,9 +429,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
@@ -502,9 +457,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -614,9 +566,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
@@ -667,9 +616,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   electron/main:
     dependencies:
@@ -695,9 +641,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   electron/preload:
     devDependencies:
@@ -719,9 +662,6 @@ importers:
       unplugin-auto-expose:
         specifier: 0.2.4
         version: 0.2.4(rollup@4.18.0)
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   electron/renderer:
     dependencies:
@@ -750,9 +690,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   electron/storage:
     dependencies:
@@ -775,12 +712,9 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vite-plugin-node:
         specifier: 3.1.0
-        version: 3.1.0(vite@5.2.13(@types/node@20.14.1))
+        version: 3.1.0(vite@5.3.1(@types/node@20.14.1))
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -803,9 +737,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
 
   extensions/menubuttons:
     dependencies:
@@ -828,9 +759,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -925,9 +853,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -950,9 +875,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -984,9 +906,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -1003,9 +922,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -1022,12 +938,9 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vite-plugin-comlink:
         specifier: 4.1.0
-        version: 4.1.0(comlink@4.4.1)(vite@5.2.13(@types/node@20.14.1))
+        version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.1))
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -1071,12 +984,9 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vite-plugin-comlink:
         specifier: 4.1.0
-        version: 4.1.0(comlink@4.4.1)(vite@5.2.13(@types/node@20.14.1))
+        version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.1))
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -1119,19 +1029,16 @@ importers:
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: 5.0.4
-        version: 5.0.4(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))
+        version: 5.0.4(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vite-plugin-inspect:
         specifier: 0.8.4
-        version: 0.8.4(rollup@4.18.0)(vite@5.2.13(@types/node@20.14.1))
+        version: 0.8.4(rollup@4.18.0)(vite@5.3.1(@types/node@20.14.1))
       vite-plugin-vuetify:
         specifier: 2.0.3
-        version: 2.0.3(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
+        version: 2.0.3(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -1193,25 +1100,22 @@ importers:
         version: 20.14.1
       '@vitejs/plugin-vue':
         specifier: 5.0.4
-        version: 5.0.4(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))
+        version: 5.0.4(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      vite:
-        specifier: 5.2.13
-        version: 5.2.13(@types/node@20.14.1)
       vite-plugin-comlink:
         specifier: 4.1.0
-        version: 4.1.0(comlink@4.4.1)(vite@5.2.13(@types/node@20.14.1))
+        version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.1))
       vite-plugin-dts:
         specifier: 3.9.1
-        version: 3.9.1(@types/node@20.14.1)(rollup@4.18.0)(typescript@5.4.5)(vite@5.2.13(@types/node@20.14.1))
+        version: 3.9.1(@types/node@20.14.1)(rollup@4.18.0)(typescript@5.4.5)(vite@5.3.1(@types/node@20.14.1))
       vite-plugin-inspect:
         specifier: 0.8.4
-        version: 0.8.4(rollup@4.18.0)(vite@5.2.13(@types/node@20.14.1))
+        version: 0.8.4(rollup@4.18.0)(vite@5.3.1(@types/node@20.14.1))
       vite-plugin-vuetify:
         specifier: 2.0.3
-        version: 2.0.3(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
+        version: 2.0.3(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
@@ -1412,140 +1316,140 @@ packages:
     resolution: {integrity: sha512-kbgXxyEauPJiQQUNG2VgUeyfQNFk6hBF11ISN2PNI6agUgPl55pv4eQmaqHzTAzchBvqZ2tQuRVaPStGf0mxGw==}
     engines: {node: '>=8.6'}
 
-  '@esbuild/aix-ppc64@0.20.2':
-    resolution: {integrity: sha512-D+EBOJHXdNZcLJRBkhENNG8Wji2kgc9AZ9KiPr1JuZjsNtyHzrsfLRrY0tk2H2aoFu6RANO1y1iPPUCDYWkb5g==}
+  '@esbuild/aix-ppc64@0.21.5':
+    resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
     engines: {node: '>=12'}
     cpu: [ppc64]
     os: [aix]
 
-  '@esbuild/android-arm64@0.20.2':
-    resolution: {integrity: sha512-mRzjLacRtl/tWU0SvD8lUEwb61yP9cqQo6noDZP/O8VkwafSYwZ4yWy24kan8jE/IMERpYncRt2dw438LP3Xmg==}
+  '@esbuild/android-arm64@0.21.5':
+    resolution: {integrity: sha512-c0uX9VAUBQ7dTDCjq+wdyGLowMdtR/GoC2U5IYk/7D1H1JYC0qseD7+11iMP2mRLN9RcCMRcjC4YMclCzGwS/A==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [android]
 
-  '@esbuild/android-arm@0.20.2':
-    resolution: {integrity: sha512-t98Ra6pw2VaDhqNWO2Oph2LXbz/EJcnLmKLGBJwEwXX/JAN83Fym1rU8l0JUWK6HkIbWONCSSatf4sf2NBRx/w==}
+  '@esbuild/android-arm@0.21.5':
+    resolution: {integrity: sha512-vCPvzSjpPHEi1siZdlvAlsPxXl7WbOVUBBAowWug4rJHb68Ox8KualB+1ocNvT5fjv6wpkX6o/iEpbDrf68zcg==}
     engines: {node: '>=12'}
     cpu: [arm]
     os: [android]
 
-  '@esbuild/android-x64@0.20.2':
-    resolution: {integrity: sha512-btzExgV+/lMGDDa194CcUQm53ncxzeBrWJcncOBxuC6ndBkKxnHdFJn86mCIgTELsooUmwUm9FkhSp5HYu00Rg==}
+  '@esbuild/android-x64@0.21.5':
+    resolution: {integrity: sha512-D7aPRUUNHRBwHxzxRvp856rjUHRFW1SdQATKXH2hqA0kAZb1hKmi02OpYRacl0TxIGz/ZmXWlbZgjwWYaCakTA==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [android]
 
-  '@esbuild/darwin-arm64@0.20.2':
-    resolution: {integrity: sha512-4J6IRT+10J3aJH3l1yzEg9y3wkTDgDk7TSDFX+wKFiWjqWp/iCfLIYzGyasx9l0SAFPT1HwSCR+0w/h1ES/MjA==}
+  '@esbuild/darwin-arm64@0.21.5':
+    resolution: {integrity: sha512-DwqXqZyuk5AiWWf3UfLiRDJ5EDd49zg6O9wclZ7kUMv2WRFr4HKjXp/5t8JZ11QbQfUS6/cRCKGwYhtNAY88kQ==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [darwin]
 
-  '@esbuild/darwin-x64@0.20.2':
-    resolution: {integrity: sha512-tBcXp9KNphnNH0dfhv8KYkZhjc+H3XBkF5DKtswJblV7KlT9EI2+jeA8DgBjp908WEuYll6pF+UStUCfEpdysA==}
+  '@esbuild/darwin-x64@0.21.5':
+    resolution: {integrity: sha512-se/JjF8NlmKVG4kNIuyWMV/22ZaerB+qaSi5MdrXtd6R08kvs2qCN4C09miupktDitvh8jRFflwGFBQcxZRjbw==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [darwin]
 
-  '@esbuild/freebsd-arm64@0.20.2':
-    resolution: {integrity: sha512-d3qI41G4SuLiCGCFGUrKsSeTXyWG6yem1KcGZVS+3FYlYhtNoNgYrWcvkOoaqMhwXSMrZRl69ArHsGJ9mYdbbw==}
+  '@esbuild/freebsd-arm64@0.21.5':
+    resolution: {integrity: sha512-5JcRxxRDUJLX8JXp/wcBCy3pENnCgBR9bN6JsY4OmhfUtIHe3ZW0mawA7+RDAcMLrMIZaf03NlQiX9DGyB8h4g==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [freebsd]
 
-  '@esbuild/freebsd-x64@0.20.2':
-    resolution: {integrity: sha512-d+DipyvHRuqEeM5zDivKV1KuXn9WeRX6vqSqIDgwIfPQtwMP4jaDsQsDncjTDDsExT4lR/91OLjRo8bmC1e+Cw==}
+  '@esbuild/freebsd-x64@0.21.5':
+    resolution: {integrity: sha512-J95kNBj1zkbMXtHVH29bBriQygMXqoVQOQYA+ISs0/2l3T9/kj42ow2mpqerRBxDJnmkUDCaQT/dfNXWX/ZZCQ==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [freebsd]
 
-  '@esbuild/linux-arm64@0.20.2':
-    resolution: {integrity: sha512-9pb6rBjGvTFNira2FLIWqDk/uaf42sSyLE8j1rnUpuzsODBq7FvpwHYZxQ/It/8b+QOS1RYfqgGFNLRI+qlq2A==}
+  '@esbuild/linux-arm64@0.21.5':
+    resolution: {integrity: sha512-ibKvmyYzKsBeX8d8I7MH/TMfWDXBF3db4qM6sy+7re0YXya+K1cem3on9XgdT2EQGMu4hQyZhan7TeQ8XkGp4Q==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [linux]
 
-  '@esbuild/linux-arm@0.20.2':
-    resolution: {integrity: sha512-VhLPeR8HTMPccbuWWcEUD1Az68TqaTYyj6nfE4QByZIQEQVWBB8vup8PpR7y1QHL3CpcF6xd5WVBU/+SBEvGTg==}
+  '@esbuild/linux-arm@0.21.5':
+    resolution: {integrity: sha512-bPb5AHZtbeNGjCKVZ9UGqGwo8EUu4cLq68E95A53KlxAPRmUyYv2D6F0uUI65XisGOL1hBP5mTronbgo+0bFcA==}
     engines: {node: '>=12'}
     cpu: [arm]
     os: [linux]
 
-  '@esbuild/linux-ia32@0.20.2':
-    resolution: {integrity: sha512-o10utieEkNPFDZFQm9CoP7Tvb33UutoJqg3qKf1PWVeeJhJw0Q347PxMvBgVVFgouYLGIhFYG0UGdBumROyiig==}
+  '@esbuild/linux-ia32@0.21.5':
+    resolution: {integrity: sha512-YvjXDqLRqPDl2dvRODYmmhz4rPeVKYvppfGYKSNGdyZkA01046pLWyRKKI3ax8fbJoK5QbxblURkwK/MWY18Tg==}
     engines: {node: '>=12'}
     cpu: [ia32]
     os: [linux]
 
-  '@esbuild/linux-loong64@0.20.2':
-    resolution: {integrity: sha512-PR7sp6R/UC4CFVomVINKJ80pMFlfDfMQMYynX7t1tNTeivQ6XdX5r2XovMmha/VjR1YN/HgHWsVcTRIMkymrgQ==}
+  '@esbuild/linux-loong64@0.21.5':
+    resolution: {integrity: sha512-uHf1BmMG8qEvzdrzAqg2SIG/02+4/DHB6a9Kbya0XDvwDEKCoC8ZRWI5JJvNdUjtciBGFQ5PuBlpEOXQj+JQSg==}
     engines: {node: '>=12'}
     cpu: [loong64]
     os: [linux]
 
-  '@esbuild/linux-mips64el@0.20.2':
-    resolution: {integrity: sha512-4BlTqeutE/KnOiTG5Y6Sb/Hw6hsBOZapOVF6njAESHInhlQAghVVZL1ZpIctBOoTFbQyGW+LsVYZ8lSSB3wkjA==}
+  '@esbuild/linux-mips64el@0.21.5':
+    resolution: {integrity: sha512-IajOmO+KJK23bj52dFSNCMsz1QP1DqM6cwLUv3W1QwyxkyIWecfafnI555fvSGqEKwjMXVLokcV5ygHW5b3Jbg==}
     engines: {node: '>=12'}
     cpu: [mips64el]
     os: [linux]
 
-  '@esbuild/linux-ppc64@0.20.2':
-    resolution: {integrity: sha512-rD3KsaDprDcfajSKdn25ooz5J5/fWBylaaXkuotBDGnMnDP1Uv5DLAN/45qfnf3JDYyJv/ytGHQaziHUdyzaAg==}
+  '@esbuild/linux-ppc64@0.21.5':
+    resolution: {integrity: sha512-1hHV/Z4OEfMwpLO8rp7CvlhBDnjsC3CttJXIhBi+5Aj5r+MBvy4egg7wCbe//hSsT+RvDAG7s81tAvpL2XAE4w==}
     engines: {node: '>=12'}
     cpu: [ppc64]
     os: [linux]
 
-  '@esbuild/linux-riscv64@0.20.2':
-    resolution: {integrity: sha512-snwmBKacKmwTMmhLlz/3aH1Q9T8v45bKYGE3j26TsaOVtjIag4wLfWSiZykXzXuE1kbCE+zJRmwp+ZbIHinnVg==}
+  '@esbuild/linux-riscv64@0.21.5':
+    resolution: {integrity: sha512-2HdXDMd9GMgTGrPWnJzP2ALSokE/0O5HhTUvWIbD3YdjME8JwvSCnNGBnTThKGEB91OZhzrJ4qIIxk/SBmyDDA==}
     engines: {node: '>=12'}
     cpu: [riscv64]
     os: [linux]
 
-  '@esbuild/linux-s390x@0.20.2':
-    resolution: {integrity: sha512-wcWISOobRWNm3cezm5HOZcYz1sKoHLd8VL1dl309DiixxVFoFe/o8HnwuIwn6sXre88Nwj+VwZUvJf4AFxkyrQ==}
+  '@esbuild/linux-s390x@0.21.5':
+    resolution: {integrity: sha512-zus5sxzqBJD3eXxwvjN1yQkRepANgxE9lgOW2qLnmr8ikMTphkjgXu1HR01K4FJg8h1kEEDAqDcZQtbrRnB41A==}
     engines: {node: '>=12'}
     cpu: [s390x]
     os: [linux]
 
-  '@esbuild/linux-x64@0.20.2':
-    resolution: {integrity: sha512-1MdwI6OOTsfQfek8sLwgyjOXAu+wKhLEoaOLTjbijk6E2WONYpH9ZU2mNtR+lZ2B4uwr+usqGuVfFT9tMtGvGw==}
+  '@esbuild/linux-x64@0.21.5':
+    resolution: {integrity: sha512-1rYdTpyv03iycF1+BhzrzQJCdOuAOtaqHTWJZCWvijKD2N5Xu0TtVC8/+1faWqcP9iBCWOmjmhoH94dH82BxPQ==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [linux]
 
-  '@esbuild/netbsd-x64@0.20.2':
-    resolution: {integrity: sha512-K8/DhBxcVQkzYc43yJXDSyjlFeHQJBiowJ0uVL6Tor3jGQfSGHNNJcWxNbOI8v5k82prYqzPuwkzHt3J1T1iZQ==}
+  '@esbuild/netbsd-x64@0.21.5':
+    resolution: {integrity: sha512-Woi2MXzXjMULccIwMnLciyZH4nCIMpWQAs049KEeMvOcNADVxo0UBIQPfSmxB3CWKedngg7sWZdLvLczpe0tLg==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [netbsd]
 
-  '@esbuild/openbsd-x64@0.20.2':
-    resolution: {integrity: sha512-eMpKlV0SThJmmJgiVyN9jTPJ2VBPquf6Kt/nAoo6DgHAoN57K15ZghiHaMvqjCye/uU4X5u3YSMgVBI1h3vKrQ==}
+  '@esbuild/openbsd-x64@0.21.5':
+    resolution: {integrity: sha512-HLNNw99xsvx12lFBUwoT8EVCsSvRNDVxNpjZ7bPn947b8gJPzeHWyNVhFsaerc0n3TsbOINvRP2byTZ5LKezow==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [openbsd]
 
-  '@esbuild/sunos-x64@0.20.2':
-    resolution: {integrity: sha512-2UyFtRC6cXLyejf/YEld4Hajo7UHILetzE1vsRcGL3earZEW77JxrFjH4Ez2qaTiEfMgAXxfAZCm1fvM/G/o8w==}
+  '@esbuild/sunos-x64@0.21.5':
+    resolution: {integrity: sha512-6+gjmFpfy0BHU5Tpptkuh8+uw3mnrvgs+dSPQXQOv3ekbordwnzTVEb4qnIvQcYXq6gzkyTnoZ9dZG+D4garKg==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [sunos]
 
-  '@esbuild/win32-arm64@0.20.2':
-    resolution: {integrity: sha512-GRibxoawM9ZCnDxnP3usoUDO9vUkpAxIIZ6GQI+IlVmr5kP3zUq+l17xELTHMWTWzjxa2guPNyrpq1GWmPvcGQ==}
+  '@esbuild/win32-arm64@0.21.5':
+    resolution: {integrity: sha512-Z0gOTd75VvXqyq7nsl93zwahcTROgqvuAcYDUr+vOv8uHhNSKROyU961kgtCD1e95IqPKSQKH7tBTslnS3tA8A==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [win32]
 
-  '@esbuild/win32-ia32@0.20.2':
-    resolution: {integrity: sha512-HfLOfn9YWmkSKRQqovpnITazdtquEW8/SoHW7pWpuEeguaZI4QnCRW6b+oZTztdBnZOS2hqJ6im/D5cPzBTTlQ==}
+  '@esbuild/win32-ia32@0.21.5':
+    resolution: {integrity: sha512-SWXFF1CL2RVNMaVs+BBClwtfZSvDgtL//G/smwAc5oVK/UPu2Gu9tIaRgFmYFFKrmg3SyAjSrElf0TiJ1v8fYA==}
     engines: {node: '>=12'}
     cpu: [ia32]
     os: [win32]
 
-  '@esbuild/win32-x64@0.20.2':
-    resolution: {integrity: sha512-N49X4lJX27+l9jbLKSqZ6bKNjzQvHaT8IIFUy+YIqmXQdjYCToGWwOItDrfby14c78aDd5NHQl29xingXfCdLQ==}
+  '@esbuild/win32-x64@0.21.5':
+    resolution: {integrity: sha512-tQd/1efJuzPC6rCFwEvLtci/xNFcTZknmXs98FYDfGE4wP9ClFV98nyKrzJKVPMhdDnjzLhdUyMX4PsQAPjwIw==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [win32]
@@ -3144,8 +3048,8 @@ packages:
   es6-error@4.1.1:
     resolution: {integrity: sha512-Um/+FxMr9CISWh0bi5Zv0iOD+4cFh5qLeks1qhAopKVAJw3drgKbKySikp7wGhDL0HPeaja0P5ULZrxLkniUVg==}
 
-  esbuild@0.20.2:
-    resolution: {integrity: sha512-WdOOppmUNU+IbZ0PaDiTst80zjnrOkyJNHoKupIcVyU8Lvla3Ugx94VzkQ32Ijqd7UhHJy75gNWDMUekcrSJ6g==}
+  esbuild@0.21.5:
+    resolution: {integrity: sha512-mg3OPMV4hXywwpoDxu3Qda5xCKQi+vCTZq8S9J/EpkhB2HzKXq4SNFZE3+NK93JYxc8VMSep+lOUSC/RVKaBqw==}
     engines: {node: '>=12'}
     hasBin: true
 
@@ -5317,8 +5221,8 @@ packages:
       vue: ^3.0.0
       vuetify: ^3.0.0
 
-  vite@5.2.13:
-    resolution: {integrity: sha512-SSq1noJfY9pR3I1TUENL3rQYDQCFqgD+lM6fTRAM8Nv6Lsg5hDLaXkjETVeBt+7vZBCMoibD+6IWnT2mJ+Zb/A==}
+  vite@5.3.1:
+    resolution: {integrity: sha512-XBmSKRLXLxiaPYamLv3/hnP/KXDai1NDexN0FpkTaZXTfycHvkRHoenpgl/fvuK/kPbB6xAgoyiryAhQNxYmAQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -5905,73 +5809,73 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@esbuild/aix-ppc64@0.20.2':
+  '@esbuild/aix-ppc64@0.21.5':
     optional: true
 
-  '@esbuild/android-arm64@0.20.2':
+  '@esbuild/android-arm64@0.21.5':
     optional: true
 
-  '@esbuild/android-arm@0.20.2':
+  '@esbuild/android-arm@0.21.5':
     optional: true
 
-  '@esbuild/android-x64@0.20.2':
+  '@esbuild/android-x64@0.21.5':
     optional: true
 
-  '@esbuild/darwin-arm64@0.20.2':
+  '@esbuild/darwin-arm64@0.21.5':
     optional: true
 
-  '@esbuild/darwin-x64@0.20.2':
+  '@esbuild/darwin-x64@0.21.5':
     optional: true
 
-  '@esbuild/freebsd-arm64@0.20.2':
+  '@esbuild/freebsd-arm64@0.21.5':
     optional: true
 
-  '@esbuild/freebsd-x64@0.20.2':
+  '@esbuild/freebsd-x64@0.21.5':
     optional: true
 
-  '@esbuild/linux-arm64@0.20.2':
+  '@esbuild/linux-arm64@0.21.5':
     optional: true
 
-  '@esbuild/linux-arm@0.20.2':
+  '@esbuild/linux-arm@0.21.5':
     optional: true
 
-  '@esbuild/linux-ia32@0.20.2':
+  '@esbuild/linux-ia32@0.21.5':
     optional: true
 
-  '@esbuild/linux-loong64@0.20.2':
+  '@esbuild/linux-loong64@0.21.5':
     optional: true
 
-  '@esbuild/linux-mips64el@0.20.2':
+  '@esbuild/linux-mips64el@0.21.5':
     optional: true
 
-  '@esbuild/linux-ppc64@0.20.2':
+  '@esbuild/linux-ppc64@0.21.5':
     optional: true
 
-  '@esbuild/linux-riscv64@0.20.2':
+  '@esbuild/linux-riscv64@0.21.5':
     optional: true
 
-  '@esbuild/linux-s390x@0.20.2':
+  '@esbuild/linux-s390x@0.21.5':
     optional: true
 
-  '@esbuild/linux-x64@0.20.2':
+  '@esbuild/linux-x64@0.21.5':
     optional: true
 
-  '@esbuild/netbsd-x64@0.20.2':
+  '@esbuild/netbsd-x64@0.21.5':
     optional: true
 
-  '@esbuild/openbsd-x64@0.20.2':
+  '@esbuild/openbsd-x64@0.21.5':
     optional: true
 
-  '@esbuild/sunos-x64@0.20.2':
+  '@esbuild/sunos-x64@0.21.5':
     optional: true
 
-  '@esbuild/win32-arm64@0.20.2':
+  '@esbuild/win32-arm64@0.21.5':
     optional: true
 
-  '@esbuild/win32-ia32@0.20.2':
+  '@esbuild/win32-ia32@0.21.5':
     optional: true
 
-  '@esbuild/win32-x64@0.20.2':
+  '@esbuild/win32-x64@0.21.5':
     optional: true
 
   '@eslint-community/eslint-utils@4.4.0(eslint@8.57.0)':
@@ -6746,9 +6650,9 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-vue@5.0.4(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))':
+  '@vitejs/plugin-vue@5.0.4(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))':
     dependencies:
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
       vue: 3.4.27(typescript@5.4.5)
 
   '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.14.1)(happy-dom@14.12.0))':
@@ -7835,31 +7739,31 @@ snapshots:
   es6-error@4.1.1:
     optional: true
 
-  esbuild@0.20.2:
+  esbuild@0.21.5:
     optionalDependencies:
-      '@esbuild/aix-ppc64': 0.20.2
-      '@esbuild/android-arm': 0.20.2
-      '@esbuild/android-arm64': 0.20.2
-      '@esbuild/android-x64': 0.20.2
-      '@esbuild/darwin-arm64': 0.20.2
-      '@esbuild/darwin-x64': 0.20.2
-      '@esbuild/freebsd-arm64': 0.20.2
-      '@esbuild/freebsd-x64': 0.20.2
-      '@esbuild/linux-arm': 0.20.2
-      '@esbuild/linux-arm64': 0.20.2
-      '@esbuild/linux-ia32': 0.20.2
-      '@esbuild/linux-loong64': 0.20.2
-      '@esbuild/linux-mips64el': 0.20.2
-      '@esbuild/linux-ppc64': 0.20.2
-      '@esbuild/linux-riscv64': 0.20.2
-      '@esbuild/linux-s390x': 0.20.2
-      '@esbuild/linux-x64': 0.20.2
-      '@esbuild/netbsd-x64': 0.20.2
-      '@esbuild/openbsd-x64': 0.20.2
-      '@esbuild/sunos-x64': 0.20.2
-      '@esbuild/win32-arm64': 0.20.2
-      '@esbuild/win32-ia32': 0.20.2
-      '@esbuild/win32-x64': 0.20.2
+      '@esbuild/aix-ppc64': 0.21.5
+      '@esbuild/android-arm': 0.21.5
+      '@esbuild/android-arm64': 0.21.5
+      '@esbuild/android-x64': 0.21.5
+      '@esbuild/darwin-arm64': 0.21.5
+      '@esbuild/darwin-x64': 0.21.5
+      '@esbuild/freebsd-arm64': 0.21.5
+      '@esbuild/freebsd-x64': 0.21.5
+      '@esbuild/linux-arm': 0.21.5
+      '@esbuild/linux-arm64': 0.21.5
+      '@esbuild/linux-ia32': 0.21.5
+      '@esbuild/linux-loong64': 0.21.5
+      '@esbuild/linux-mips64el': 0.21.5
+      '@esbuild/linux-ppc64': 0.21.5
+      '@esbuild/linux-riscv64': 0.21.5
+      '@esbuild/linux-s390x': 0.21.5
+      '@esbuild/linux-x64': 0.21.5
+      '@esbuild/netbsd-x64': 0.21.5
+      '@esbuild/openbsd-x64': 0.21.5
+      '@esbuild/sunos-x64': 0.21.5
+      '@esbuild/win32-arm64': 0.21.5
+      '@esbuild/win32-ia32': 0.21.5
+      '@esbuild/win32-x64': 0.21.5
 
   escalade@3.1.1: {}
 
@@ -10159,7 +10063,7 @@ snapshots:
       debug: 4.3.4(supports-color@5.5.0)
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -10170,19 +10074,19 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-comlink@4.1.0(comlink@4.4.1)(vite@5.2.13(@types/node@20.14.1)):
+  vite-plugin-comlink@4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.1)):
     dependencies:
       comlink: 4.4.1
       json5: 2.2.3
       magic-string: 0.30.10
       source-map: 0.7.4
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
 
-  vite-plugin-css-injected-by-js@3.5.1(vite@5.2.13(@types/node@20.14.1)):
+  vite-plugin-css-injected-by-js@3.5.1(vite@5.3.1(@types/node@20.14.1)):
     dependencies:
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
 
-  vite-plugin-dts@3.9.1(@types/node@20.14.1)(rollup@4.18.0)(typescript@5.4.5)(vite@5.2.13(@types/node@20.14.1)):
+  vite-plugin-dts@3.9.1(@types/node@20.14.1)(rollup@4.18.0)(typescript@5.4.5)(vite@5.3.1(@types/node@20.14.1)):
     dependencies:
       '@microsoft/api-extractor': 7.43.0(@types/node@20.14.1)
       '@rollup/pluginutils': 5.1.0(rollup@4.18.0)
@@ -10193,13 +10097,13 @@ snapshots:
       typescript: 5.4.5
       vue-tsc: 1.8.27(typescript@5.4.5)
     optionalDependencies:
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
 
-  vite-plugin-inspect@0.8.4(rollup@4.18.0)(vite@5.2.13(@types/node@20.14.1)):
+  vite-plugin-inspect@0.8.4(rollup@4.18.0)(vite@5.3.1(@types/node@20.14.1)):
     dependencies:
       '@antfu/utils': 0.7.7
       '@rollup/pluginutils': 5.1.0(rollup@4.18.0)
@@ -10210,34 +10114,34 @@ snapshots:
       perfect-debounce: 1.0.0
       picocolors: 1.0.0
       sirv: 2.0.4
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
     transitivePeerDependencies:
       - rollup
       - supports-color
 
-  vite-plugin-node@3.1.0(vite@5.2.13(@types/node@20.14.1)):
+  vite-plugin-node@3.1.0(vite@5.3.1(@types/node@20.14.1)):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       chalk: 4.1.2
       debug: 4.3.4(supports-color@5.5.0)
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vuetify@2.0.3(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9):
+  vite-plugin-vuetify@2.0.3(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9):
     dependencies:
       '@vuetify/loader-shared': 2.0.3(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5)))
       debug: 4.3.4(supports-color@5.5.0)
       upath: 2.0.1
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
       vue: 3.4.27(typescript@5.4.5)
       vuetify: 3.6.9(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5))
     transitivePeerDependencies:
       - supports-color
 
-  vite@5.2.13(@types/node@20.14.1):
+  vite@5.3.1(@types/node@20.14.1):
     dependencies:
-      esbuild: 0.20.2
+      esbuild: 0.21.5
       postcss: 8.4.38
       rollup: 4.18.0
     optionalDependencies:
@@ -10263,7 +10167,7 @@ snapshots:
       strip-literal: 2.0.0
       tinybench: 2.6.0
       tinypool: 0.8.3
-      vite: 5.2.13(@types/node@20.14.1)
+      vite: 5.3.1(@types/node@20.14.1)
       vite-node: 1.6.0(@types/node@20.14.1)
       why-is-node-running: 2.2.2
     optionalDependencies:
@@ -10362,7 +10266,7 @@ snapshots:
       vue: 3.4.27(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
-      vite-plugin-vuetify: 2.0.3(vite@5.2.13(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
+      vite-plugin-vuetify: 2.0.3(vite@5.3.1(@types/node@20.14.1))(vue@3.4.27(typescript@5.4.5))(vuetify@3.6.9)
       vue-i18n: 9.13.1(vue@3.4.27(typescript@5.4.5))
 
   w3c-keyname@2.2.8: {}

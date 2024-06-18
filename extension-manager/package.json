@@ -33,8 +33,7 @@
     "vue": "3.4.27"
   },
   "devDependencies": {
-    "rimraf": "5.0.7",
-    "vite": "5.2.13"
+    "rimraf": "5.0.7"
   },
   "publishConfig": {
     "exports": {

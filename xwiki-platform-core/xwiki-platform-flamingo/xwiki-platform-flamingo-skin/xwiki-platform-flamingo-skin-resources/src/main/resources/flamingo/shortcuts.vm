@@ -132,15 +132,15 @@
     };
 
     // Append developer shortcuts for toggling userType and hiddenDocuments in the current user profile
-    shortcut.add("#if($!{xwiki.getUserPreference('shortcut_developer_usertype')}!='')$!{xwiki.getUserPreference('shortcut_developer_usertype')}#{else}$services.localization.render('core.shortcuts.developer.user.type')#end", function() {
+    shortcut.add("#getShortcutValue('shortcut_developer_usertype','core.shortcuts.developer.user.type')", function() {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/usertype/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.type.error'))");
     }, {'type': #if($!xwiki.getUserPreference('shortcut_developer_usertype')!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
 
-    shortcut.add("#if($!{xwiki.getUserPreference('shortcut_developer_display_hidden_docs')}!='')$!{xwiki.getUserPreference('shortcut_developer_display_hidden_docs')}#{else}$services.localization.render('core.shortcuts.developer.user.displayHiddenDocs')#end", function () {
+    shortcut.add("#getShortcutValue('shortcut_developer_display_hidden_docs','core.shortcuts.developer.user.displayHiddenDocs')", function () {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/displayHiddenDocuments/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.displayHiddenDocs.error'))");
-    }, {'type': #if($!xwiki.getUserPreference('shortcut_developer_usertype')!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
+    }, {'type': #if($!xwiki.getUserPreference('shortcut_developer_display_hidden_docs')!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
     //]]>
   #end
 </script>

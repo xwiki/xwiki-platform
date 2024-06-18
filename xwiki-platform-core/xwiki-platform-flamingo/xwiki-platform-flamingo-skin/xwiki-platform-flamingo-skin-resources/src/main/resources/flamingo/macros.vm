@@ -66,6 +66,19 @@
 <input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/>
 #end
 #**
+ * Returns the value of the shortcut. This value can be set in two ways: via user preferences and wiki level translation
+ * keys. If there are both, the user preference will take priority.
+ * @param userPreferenceName The id of the user preference that is listed in XWikiUsersDocumentInitializer.java
+ *        e.g. `shortcut_developer_usertype`
+ * @param translationKey  The key of the translation containing the wiki level defined shortcut.
+ *        e.g. `core.shortcuts.developer.user.type`
+ * @since 16.6.0-rc-1
+ *#
+#macro(getShortcutValue $userPreferenceName $translationKey)
+#if($!xwiki.getUserPreference($userPreferenceName)!='')coucou $xwiki.getUserPreference($userPreferenceName)##
+#{else}$services.localization.render($translationKey)#end##
+#end
+#**
  * Displays a submit button for the editor. This macro calls submitButton,
  * composing all its parameters based on the action's identifier and the
  * identifier of the corresponding localized resources.
@@ -74,11 +87,9 @@
  * @param class The class to use.
  *#
 #macro(editActionButton $action $resourceIdentifier $class)
-#if($!xwiki.getUserPreference("shortcut_edit_${resourceIdentifier}") != '')
-  #set ($shortcut = $xwiki.getUserPreference("shortcut_edit_${resourceIdentifier}"))
-#else
-  #set ($shortcut = $escapetool.xml($services.localization.render("core.shortcuts.edit.${resourceIdentifier}")))
-#end
+#set ($userPreferenceName = "shortcut_edit_${resourceIdentifier}")
+#set ($translationKey = "core.shortcuts.edit.${resourceIdentifier}")
+#set ($shortcut = "#getShortcutValue($userPreferenceName , $translationKey)")
 #submitButton("action_${action}", $shortcut, $services.localization.render($resourceIdentifier), $class)
 <input type="hidden" name="xaction" value="$escapetool.xml($action)" />
 #end

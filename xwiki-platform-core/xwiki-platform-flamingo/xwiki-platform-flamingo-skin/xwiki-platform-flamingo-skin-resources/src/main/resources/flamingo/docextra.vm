@@ -156,8 +156,7 @@
         ##
         #if ($keyboardShortcutsEnabled && "$!extraShortcut" != "")
           #set ($userPreferenceName = "shortcut_view_${extraName}")
-          #set ($shortcut_view_extra = $!{xwiki.getUserPreference($userPreferenceName)})
-          #set ($extraShortcutWithUserPreferences = "#if($shortcut_view_extra!='')$shortcut_view_extra#{else}$extraShortcut#end")
+          #set ($extraShortcutWithUserPreferences = "#getShortcutValue($userPreferenceName, $extraShortcut)")
           shortcut.remove("$extraShortcutWithUserPreferences");
           shortcut.add("$extraShortcutWithUserPreferences", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'disable_in_input':true });
         #end

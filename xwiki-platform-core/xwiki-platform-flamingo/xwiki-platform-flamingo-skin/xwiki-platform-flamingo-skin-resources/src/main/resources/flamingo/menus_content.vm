@@ -287,8 +287,8 @@
     ##
     ## RIGHTS
     ##
-    ## The 'rights' editor is already present in the page administration. So we display it here only if we are not in 
-    ## a terminal document or if the user has not the admin right on the space (because right now the page 
+    ## The 'rights' editor is already present in the page administration. So we display it here only if we are not in
+    ## a terminal document or if the user has not the admin right on the space (because right now the page
     ## administration is still combined with the space administration).
     ## TODO: create a proprer 'page administration' and stop adding a right editor in this menu
     #define ($rightsEditor)
@@ -473,8 +473,7 @@
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
       #set ($shortcut_view_edit = $!xwiki.getUserPreference('shortcut_view_edit'))
-      shortcut.add("#if($shortcut_view_edit!='')$shortcut_view_edit#{else}" +
-        "$services.localization.render('core.shortcuts.view.edit')#end", function() {
+      shortcut.add("#getShortcutValue('shortcut_view_edit','core.shortcuts.view.edit')", function() {
         var editLink = $('tmEdit').down('a');
         // Make sure the shortcut doesn't work when the edit link is disabled.
         if (editLink && !editLink.classList.contains('disabled')) {
@@ -484,31 +483,22 @@
         }
       }, {'disable_in_input': true});
       #if($isAdvancedUser)
-        #set ($shortcut_view_wiki = $!xwiki.getUserPreference('shortcut_view_wiki'))
-        shortcut.add("#if($shortcut_view_wiki!='')$shortcut_view_wiki#{else}$services.localization.render('core.shortcuts.view.wiki')#end",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
-        #set ($shortcut_view_wysiwyg = $!xwiki.getUserPreference('shortcut_view_wysiwyg'))
-        shortcut.add("#if($shortcut_view_wysiwyg!='')$shortcut_view_wysiwyg#{else}$services.localization.render('core.shortcuts.view.wysiwyg')#end",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });
-        #set ($shortcut_view_inline = $!xwiki.getUserPreference('shortcut_view_inline'))
-        shortcut.add("#if($shortcut_view_inline!='')$shortcut_view_inline#{else}$services.localization.render('core.shortcuts.view.inline')#end",function() { location.href=$('tmEditInline').href; }, { 'disable_in_input':true });
-        #set ($shortcut_view_rights = $!xwiki.getUserPreference('shortcut_view_rights'))
-        shortcut.add("#if($shortcut_view_rights!='')$shortcut_view_rights#{else}$services.localization.render('core.shortcuts.view.rights')#end",function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'disable_in_input':true });
-        #set ($shortcut_view_objects = $!xwiki.getUserPreference('shortcut_view_objects'))
-        shortcut.add("#if($shortcut_view_objects!='')$shortcut_view_objects#{else}$services.localization.render('core.shortcuts.view.objects')#end",function() { location.href=$('tmEditObject').href; }, { 'disable_in_input':true });
+        shortcut.add("#getShortcutValue('shortcut_view_wiki','core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
+        shortcut.add("#getShortcutValue('shortcut_view_wysiwyg','core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });
+        shortcut.add("#getShortcutValue('shortcut_view_inline','core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'disable_in_input':true });
+        shortcut.add("#getShortcutValue('shortcut_view_rights','core.shortcuts.view.rights')",function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'disable_in_input':true });
+        shortcut.add("#getShortcutValue('shortcut_view_objects','core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'disable_in_input':true });
         #if($hasAdmin)
-          #set ($shortcut_view_class = $!xwiki.getUserPreference('shortcut_view_class'))
-          shortcut.add("#if($shortcut_view_class!='')$shortcut_view_class#{else}$services.localization.render('core.shortcuts.view.class')#end",function() { location.href=$('tmEditClass').href; }, { 'disable_in_input':true });
+          shortcut.add("#getShortcutValue('shortcut_view_class','core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'disable_in_input':true });
         #end
       #end
     #end
     #if ($canDelete && $displayAdminMenu)
-      #set ($shortcut_view_delete = $!xwiki.getUserPreference('shortcut_view_delete'))
-      shortcut.add("#if($shortcut_view_delete!='')$shortcut_view_delete#{else}$services.localization.render('core.shortcuts.view.delete')#end",function() { location.href=$('tmActionDelete').href; }, { 'disable_in_input':true });
-      #set ($shortcut_view_rename = $!xwiki.getUserPreference('shortcut_view_rename'))
-      shortcut.add("#if($shortcut_view_rename!='')$shortcut_view_rename#{else}$services.localization.render('core.shortcuts.view.rename')#end",function() { location.href=$('tmActionRename').href; }, { 'disable_in_input':true });
+      shortcut.add("#getShortcutValue('shortcut_view_delete','core.shortcuts.view.delete')",function() { location.href=$('tmActionDelete').href; }, { 'disable_in_input':true });
+      shortcut.add("#getShortcutValue('shortcut_view_rename','core.shortcuts.view.rename')",function() { location.href=$('tmActionRename').href; }, { 'disable_in_input':true });
     #end
     #if ($canView && $displayMoreActionsMenu)
-      #set ($shortcut_view_code = $!xwiki.getUserPreference('shortcut_view_code'))
-      shortcut.add("#if($shortcut_view_code!='')$shortcut_view_code#{else}$services.localization.render('core.shortcuts.view.code')#end", function() { location.href = $('tmViewSource').href; }, { 'disable_in_input': true });
+      shortcut.add("#getShortcutValue('shortcut_view_code','core.shortcuts.view.code')", function() { location.href = $('tmViewSource').href; }, { 'disable_in_input': true });
     #end
   //]]>
   </script>

@@ -287,8 +287,8 @@
     ##
     ## RIGHTS
     ##
-    ## The 'rights' editor is already present in the page administration. So we display it here only if we are not in
-    ## a terminal document or if the user has not the admin right on the space (because right now the page
+    ## The 'rights' editor is already present in the page administration. So we display it here only if we are not in 
+    ## a terminal document or if the user has not the admin right on the space (because right now the page 
     ## administration is still combined with the space administration).
     ## TODO: create a proprer 'page administration' and stop adding a right editor in this menu
     #define ($rightsEditor)

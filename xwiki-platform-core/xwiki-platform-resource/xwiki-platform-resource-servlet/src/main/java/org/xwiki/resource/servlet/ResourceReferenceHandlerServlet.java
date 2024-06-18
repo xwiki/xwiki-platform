@@ -48,11 +48,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * {@link org.xwiki.resource.ResourceReferenceHandler}) and any URL matching the corresponding {@link ResourceType} will
  * be handled.
  * <p>
- * While the class is much older, the {@code @since} was moved to 17-jakarta because it implements a completely
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implements a completely
  * different API from Java point of view.
  *
  * @version $Id$
- * @since -1.jakarta
+ * @since 42.0.0
  */
 public class ResourceReferenceHandlerServlet extends HttpServlet
 {

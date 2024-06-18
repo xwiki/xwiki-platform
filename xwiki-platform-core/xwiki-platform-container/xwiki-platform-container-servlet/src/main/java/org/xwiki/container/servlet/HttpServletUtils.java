@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HeaderElement;
 import org.apache.http.message.BasicHeader;
 import org.xwiki.container.servlet.internal.ForwardedHeader;
-import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletRequest;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
 import org.xwiki.stability.Unstable;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -81,7 +81,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      * @throws MalformedURLException when an invalid URL was received
-     * @since -1.jakarta
+     * @since 42.0.0
      */
     @Unstable
     public static URL getSourceURL(HttpServletRequest servletRequest) throws MalformedURLException
@@ -110,7 +110,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      * @throws MalformedURLException when an invalid URL was received
-     * @since -1.jakarta
+     * @since 42.0.0
      */
     @Unstable
     public static URL getSourceBaseURL(HttpServletRequest servletRequest) throws MalformedURLException
@@ -215,7 +215,7 @@ public final class HttpServletUtils
     /**
      * @param request the servlet request input
      * @return true if the request explicitly disable getting resources from the cache
-     * @since -1.jakarta
+     * @since 42.0.0
      */
     @Unstable
     public static boolean isCacheReadAllowed(HttpServletRequest request)
@@ -246,11 +246,11 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      */
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public static URL getSourceURL(javax.servlet.http.HttpServletRequest servletRequest)
     {
         try {
-            return getSourceURL(new JakartaToJavaxHttpServletRequest(servletRequest));
+            return getSourceURL(ServletBridge.toJakarta(servletRequest));
         } catch (MalformedURLException e) {
             // Not really supposed to happen
             throw new RuntimeException("XWiki received an invalid URL path or query string", e);
@@ -267,11 +267,11 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      */
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public static URL getSourceBaseURL(javax.servlet.http.HttpServletRequest servletRequest)
     {
         try {
-            return getSourceBaseURL(new JakartaToJavaxHttpServletRequest(servletRequest));
+            return getSourceBaseURL(ServletBridge.toJakarta(servletRequest));
         } catch (MalformedURLException e) {
             throw new RuntimeException("XWiki received an invalid URL", e);
         }
@@ -282,9 +282,9 @@ public final class HttpServletUtils
      * @return true if the request explicitly disable getting resources from the cache
      * @since 11.8RC1
      */
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public static boolean isCacheReadAllowed(javax.servlet.http.HttpServletRequest request)
     {
-        return isCacheReadAllowed(new JakartaToJavaxHttpServletRequest(request));
+        return isCacheReadAllowed(ServletBridge.toJakarta(request));
     }
 }

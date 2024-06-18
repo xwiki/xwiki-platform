@@ -19,6 +19,23 @@
  */
 package org.xwiki.webjars.internal;
 
+import static ch.qos.logback.classic.Level.ERROR;
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.xwiki.test.LogLevel.DEBUG;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -26,8 +43,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.velocity.exception.VelocityException;
@@ -49,22 +64,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.webjars.internal.filter.WebJarsResourceFilter;
 
-import static ch.qos.logback.classic.Level.ERROR;
-import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static org.xwiki.test.LogLevel.DEBUG;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Unit tests for {@link WebJarsResourceReferenceHandler}.
@@ -114,11 +115,11 @@ class WebJarsResourceReferenceHandlerTest
         when(this.response.getOutputStream()).thenReturn(responseOutputStream);
 
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        when(this.response.getHttpServletResponse()).thenReturn(httpResponse);
+        when(this.response.getJakartaHttpServletResponse()).thenReturn(httpResponse);
         when(this.container.getResponse()).thenReturn(this.response);
 
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        when(this.request.getHttpServletRequest()).thenReturn(httpRequest);
+        when(this.request.getJakartaHttpServletRequest()).thenReturn(httpRequest);
         when(this.container.getRequest()).thenReturn(this.request);
 
         when(this.classLoaderManager.getURLClassLoader("wiki:wiki", true)).thenReturn(this.classLoader);
@@ -133,8 +134,8 @@ class WebJarsResourceReferenceHandlerTest
         this.handler.handle(reference, this.chain);
 
         verify(this.classLoader).getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js");
-        verify(this.response.getHttpServletResponse())
-            .sendError(404, "Resource not found [angular/2.1.11/angular.js].");
+        verify(this.response.getJakartaHttpServletResponse()).sendError(404,
+            "Resource not found [angular/2.1.11/angular.js].");
         verify(this.chain).handleNext(reference);
     }
 
@@ -145,8 +146,8 @@ class WebJarsResourceReferenceHandlerTest
             new WebJarsResourceReference("wiki:wiki", asList("angular", "2.1.11", "angular.js"));
 
         ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
-        when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
-            resourceStream);
+        when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js"))
+            .thenReturn(resourceStream);
 
         long now = new Date().getTime();
         this.handler.handle(reference, this.chain);
@@ -160,15 +161,15 @@ class WebJarsResourceReferenceHandlerTest
         verify(this.response).setContentType("application/javascript");
 
         // Verify that the static resource is cached permanently.
-        verify(this.response.getHttpServletResponse()).setHeader("Cache-Control", "public");
+        verify(this.response.getJakartaHttpServletResponse()).setHeader("Cache-Control", "public");
         ArgumentCaptor<Long> expireDate = ArgumentCaptor.forClass(Long.class);
-        verify(this.response.getHttpServletResponse()).setDateHeader(eq("Expires"), expireDate.capture());
+        verify(this.response.getJakartaHttpServletResponse()).setDateHeader(eq("Expires"), expireDate.capture());
         // The expiration date should be in one year from now.
         assertTrue(expireDate.getValue() >= (now + 365 * 24 * 3600 * 1000L));
 
         // Also verify that the "Last-Modified" header has been set in the response so that the browser will send
         // an If-Modified-Since header for the next request and we can tell it to use its cache.
-        verify(this.response.getHttpServletResponse()).setDateHeader(eq("Last-Modified"), anyLong());
+        verify(this.response.getJakartaHttpServletResponse()).setDateHeader(eq("Last-Modified"), anyLong());
 
         verify(this.chain).handleNext(reference);
     }
@@ -179,12 +180,12 @@ class WebJarsResourceReferenceHandlerTest
         WebJarsResourceReference reference =
             new WebJarsResourceReference("wiki:wiki", asList("angular", "2.1.11", "angular.js"));
 
-        when(this.request.getHttpServletRequest().getHeader("If-Modified-Since")).thenReturn("some value");
+        when(this.request.getJakartaHttpServletRequest().getHeader("If-Modified-Since")).thenReturn("some value");
 
         this.handler.handle(reference, this.chain);
 
         // This the test: we verify that 304 is returned when the "If-Modified-Since" header is found in the request
-        verify(this.response.getHttpServletResponse()).setStatus(304);
+        verify(this.response.getJakartaHttpServletResponse()).setStatus(304);
 
         verify(this.chain).handleNext(reference);
     }
@@ -198,8 +199,7 @@ class WebJarsResourceReferenceHandlerTest
 
         try (ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes())) {
             when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js"))
-                .thenReturn(
-                    resourceStream);
+                .thenReturn(resourceStream);
         }
 
         when(this.velocityFilter.filter(any(), any()))
@@ -214,8 +214,8 @@ class WebJarsResourceReferenceHandlerTest
         verify(this.response).setContentType("application/javascript");
 
         // Verify that the dynamic resource is not cached.
-        verify(this.response.getHttpServletResponse(), never()).setHeader(any(), any());
-        verify(this.response.getHttpServletResponse(), never()).setDateHeader(any(), anyLong());
+        verify(this.response.getJakartaHttpServletResponse(), never()).setHeader(any(), any());
+        verify(this.response.getJakartaHttpServletResponse(), never()).setDateHeader(any(), anyLong());
     }
 
     @Test
@@ -243,7 +243,7 @@ class WebJarsResourceReferenceHandlerTest
             this.logCapture.getMessage(0));
 
         // Verify that the client is properly notified about the failure.
-        verify(this.response.getHttpServletResponse()).sendError(500,
+        verify(this.response.getJakartaHttpServletResponse()).sendError(500,
             "Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]");
 
         // The next handlers are still called.
@@ -284,9 +284,8 @@ class WebJarsResourceReferenceHandlerTest
         WebJarsResourceReference resourceReference =
             new WebJarsResourceReference("testNamespace", asList("testdirectory", "testfile.less"));
 
-        String mimeType =
-            this.handler.getContentType(new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8),
-                resourceReference);
+        String mimeType = this.handler.getContentType(
+            new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8), resourceReference);
         assertEquals("text/x-less", mimeType);
     }
 
@@ -297,9 +296,8 @@ class WebJarsResourceReferenceHandlerTest
             new WebJarsResourceReference("testNamespace", asList("testdirectory", "testfile.less"));
         resourceReference.addParameter("evaluate", "true");
 
-        String mimeType =
-            this.handler.getContentType(new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8),
-                resourceReference);
+        String mimeType = this.handler.getContentType(
+            new CharSequenceInputStream("a:\n color: #f00;", StandardCharsets.UTF_8), resourceReference);
         assertEquals("text/css", mimeType);
     }
 

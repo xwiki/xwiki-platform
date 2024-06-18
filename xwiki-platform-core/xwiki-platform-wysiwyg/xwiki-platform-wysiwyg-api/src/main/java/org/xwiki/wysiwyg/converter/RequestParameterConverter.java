@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
+import org.xwiki.wysiwyg.internal.filter.http.JakartaToJavaxMutableHttpServletRequest;
 
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -49,7 +51,7 @@ public interface RequestParameterConverter
      * @throws IOException in case of problem to write an answer in the response
      * @deprecated use {@link #convert(ServletRequest, ServletResponse)} instead
      */
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     Optional<javax.servlet.ServletRequest> convert(javax.servlet.ServletRequest request,
         javax.servlet.ServletResponse response) throws IOException;
 
@@ -64,9 +66,15 @@ public interface RequestParameterConverter
      * @param response the response used to redirect or do changes in case of conversion error
      * @return a mutable request with the converted parameters, or an empty optional in case of error
      * @throws IOException in case of problem to write an answer in the response
-     * @since -1.jakarta
+     * @since 42.0.0
      */
-    Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException;
+    default Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException
+    {
+        Optional<javax.servlet.ServletRequest> result =
+            convert(ServletBridge.toJavax(request), ServletBridge.toJavax(response));
+
+        return result.isEmpty() ? Optional.empty() : Optional.of(ServletBridge.toJakarta(result.get()));
+    }
 
     /**
      * Check if the given request needs conversion and perform those conversions. This method creates a mutable request,
@@ -80,7 +88,7 @@ public interface RequestParameterConverter
      * @since 14.10
      * @deprecated use {@link #convert(ServletRequest)} instead
      */
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     RequestParameterConversionResult convert(javax.servlet.ServletRequest request);
 
     /**
@@ -92,7 +100,11 @@ public interface RequestParameterConverter
      * @param request the request that might contain parameter needing conversion
      * @return an instance of {@link RequestParameterConversionResult} containing the modified request and the output
      *         and errors that might have occurred
-     * @since -1.jakarta
+     * @since 42.0.0
      */
-    JakartaRequestParameterConversionResult convert(ServletRequest request);
+    default JakartaRequestParameterConversionResult convert(ServletRequest request)
+    {
+        return new JakartaRequestParameterConversionResult(
+            new JakartaToJavaxMutableHttpServletRequest(convert(ServletBridge.toJavax(request)).getRequest()));
+    }
 }

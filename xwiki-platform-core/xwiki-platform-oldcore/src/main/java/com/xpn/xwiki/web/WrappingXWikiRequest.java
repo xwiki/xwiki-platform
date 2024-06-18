@@ -43,14 +43,18 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
+import org.xwiki.container.Container;
+
 /**
  * A wrapper around {@link XWikiRequest}.
  * 
  * @version $Id$
  * @since 12.4RC1
  * @since 11.10.5
+ * @deprecated use the {@link Container} API instead
  */
-@Deprecated(since = "17-jakarta")
+//TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
+//@Deprecated(since = "42.0.0")
 public class WrappingXWikiRequest implements XWikiRequest
 {
     protected final XWikiRequest request;

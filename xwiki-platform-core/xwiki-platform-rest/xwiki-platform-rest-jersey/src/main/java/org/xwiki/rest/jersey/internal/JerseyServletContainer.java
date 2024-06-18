@@ -45,11 +45,11 @@ import jakarta.servlet.http.HttpServlet;
  * Encapsulate the Jersey {@link ServletContainer} to control it's initialization and reload (when a REST component is
  * registered/unregistered).
  * <p>
- * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
- * from Java point of view.
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
- * @since -1.jakarta
+ * @since 42.0.0
  */
 @Component(roles = JerseyServletContainer.class)
 @Singleton

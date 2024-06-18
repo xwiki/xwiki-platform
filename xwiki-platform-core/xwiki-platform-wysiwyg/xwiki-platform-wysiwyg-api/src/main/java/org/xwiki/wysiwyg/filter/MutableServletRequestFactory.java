@@ -20,6 +20,8 @@
 package org.xwiki.wysiwyg.filter;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
+import org.xwiki.wysiwyg.internal.filter.http.JakartaToJavaxMutableHttpServletRequest;
 
 import jakarta.servlet.ServletRequest;
 
@@ -40,7 +42,7 @@ public interface MutableServletRequestFactory
      * @return a new mutable servlet request.
      * @deprecated use {@link #newInstance(ServletRequest)} instead
      */
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     MutableServletRequest newInstance(javax.servlet.ServletRequest request);
 
     /**
@@ -48,7 +50,10 @@ public interface MutableServletRequestFactory
      * 
      * @param request The original servlet request to wrap.
      * @return a new mutable servlet request.
-     * @since -1.jakarta
+     * @since 42.0.0
      */
-    MutableJakartaServletRequest newInstance(ServletRequest request);
+    default MutableJakartaServletRequest newInstance(ServletRequest request)
+    {
+        return new JakartaToJavaxMutableHttpServletRequest(newInstance(ServletBridge.toJavax(request)));
+    }
 }

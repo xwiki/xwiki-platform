@@ -62,10 +62,11 @@ import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
  * HTTP requests are saved.
  * </p>
  * <p>
- * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
- * from Java point of view.
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
+ * @since 42.0.0
  */
 public class SavedRequestRestorerFilter implements Filter
 {
@@ -193,13 +194,13 @@ public class SavedRequestRestorerFilter implements Filter
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-        ServletException
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException
     {
         ServletRequest filteredRequest = request;
         // This filter works only for HTTP requests, because they are the only ones with a session.
         if (request instanceof HttpServletRequest
-                && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
+            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
             // Get the saved request, if any (returns null if not applicable)
             SavedRequest savedRequest = getSavedRequest((HttpServletRequest) request);
             // Merge the new and the saved request

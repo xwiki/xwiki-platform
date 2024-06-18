@@ -52,12 +52,12 @@ import jakarta.servlet.ServletResponse;
  * and <code>User-Agent</code> headers, or a value stashed in the current user's session.
  * </p>
  * <p>
- * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different API
  * from Java point of view.
  * 
  * @author Craig McClanahan
  * @version $Id$
- * @since -1.jakarta
+ * @since 42.0.0
  */
 public class SetCharacterEncodingFilter implements Filter
 {

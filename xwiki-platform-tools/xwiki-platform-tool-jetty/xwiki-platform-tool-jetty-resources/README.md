@@ -3,10 +3,9 @@ XWiki Jetty Configuration
 
 These instructions are useful when upgrading the Jetty version used.
 
-We brought the following changes from the default Jetty files obtained from the Jetty zip file (in `jetty-home`):
+We brought the following changes from the default Jetty files obtained from the `org.eclipse.jetty:jetty-home` package:
 
-1. Addition of XWiki license headers to all files
-2. In `etc/jetty-deploy.xml` we avoid TLD scanning by replacing:
+1. `etc/jetty-deploy.xml`: we avoid TLD scanning by replacing:
    ```
    <Call name="setContextAttribute">
      <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
@@ -26,22 +25,7 @@ We brought the following changes from the default Jetty files obtained from the 
      <Arg>somethingnotmatching.jar</Arg>
    </Call>
    ```
-3. Addition of `modules/xwiki.mod`, to group all modules we depend on.
-4. Addition of `start.d/xwiki.ini` to configure the following properties:
-   1. Disable WAR scanning/hot deployment (since we use static deployment, and it speeds up 
-      Jetty) by changing the default values for:
-      ```
-      jetty.deploy.scanInterval=0
-      jetty.deploy.extractWars=false
-      ```
-   2. Configure Jetty to use RFC3986 for URLs (Jetty 10.0.3+ has added a protection in URLs so that encoded characters 
-      such as % are prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
-      https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance):
-      ```
-      jetty.httpConfig.uriCompliance=RFC3986
-      ```
-5. Addition of `etc/jetty-xwiki.xml` to print a message in the console when XWiki is started.
-6. Remove support for JSP (since XWiki doesn't use JSPs) by removing the following from `etc/webdefault.xml`:
+2. `etc/webdefault.xml`: remove support for JSP (since XWiki doesn't use JSPs) by removing the following:
    ```
    <servlet id="jsp">
    ...
@@ -49,11 +33,7 @@ We brought the following changes from the default Jetty files obtained from the 
    ```
    Also remove the `<servlet-mapping>` just below it.
    Under `<welcome-file-list>` alors remove the `<welcome-file>index.jsp</welcome-file>` line.
-7. Remove alpn (we don't need TLS/SSL for a demo packaging) and http2 support by:
-   1. Remove `lib/jetty-alpn-client-${jetty.version}.jar` from `modules/client.mod`
-   2. Remove references to `alpn` and `http2` module from `modules/https.mod`:
-8. Addition of `modules/xwiki-logging.mod` to configure logging for XWiki (provides the Jetty `logging` module name)
-9. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely we wrapp:
+4. `etc/console-capture.xml`: send logs to both the console and files. Namely we wrapp:
    ```
    <Arg>
      <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
@@ -73,6 +53,3 @@ We brought the following changes from the default Jetty files obtained from the 
      </New>
     </Arg>
    ```
-10. We remove:
-* any module or etc/ file related to ee8 or ee9 since we focus on ee10
-* demo related modules

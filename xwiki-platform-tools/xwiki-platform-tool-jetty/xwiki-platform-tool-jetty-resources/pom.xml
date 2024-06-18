@@ -38,6 +38,13 @@
       <artifactId>jetty-home</artifactId>
       <version>${jetty.server.version}</version>
       <type>zip</type>
+      <exclusions>
+        <!-- jetty-home apparently have all the dependencies it embbeds as transitive dependencies, which does not make any sense... -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -48,6 +55,56 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Unpack jetty -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.jetty</groupId>
+                  <artifactId>jetty-home</artifactId>
+                  <version>${jetty.server.version}</version>
+                  <type>zip</type>
+                  <excludes>
+                    <!-- We don't need demo packages -->
+                    **/*demo*,
+                    **/*demo*/,
+                    <!-- Remove any ee8 or ee9 libraries since we want to focus on the latest standard compatible 
+                         with the same minimum Java version XWiki supports -->
+                    **/*ee8*,
+                    **/*ee8*/,
+                    **/*ee9*,
+                    **/*ee9*/,
+                    <!-- We don't need http2 support -->
+                    **/*http2*,
+                    **/*http2*/,
+                    <!-- We don't need http3 support -->
+                    **/*http3*,
+                    **/*http3*/,
+                    <!-- We don't need Jetty injection features -->
+                    **/*cdi*,
+                    **/*cdi*/,
+                    <!-- We don't need JSTL support -->
+                    **/*jstl*,
+                    **/*jstl*/                    
+                  </excludes>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Build the final zip -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>

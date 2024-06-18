@@ -434,6 +434,12 @@
                       var insertParam = {
                         name: macro.id.id,
                         parameters: {},
+                        // We consider the macro call to be inline if the macro supports inline mode, as indicated by
+                        // its descriptor, because the caret is placed in an inline context most of the time (e.g.
+                        // inside a paragraph) in order to allow the user to type text. Moreover, the
+                        // 'xwiki-macro-maybe-install-insert' editor command is used mainly by quick actions which are
+                        // triggered by the user typing text, so in an inline context.
+                        inline: descriptor.supportsInlineMode
                       };
 
                       // Set an empty default content when it is mandatory.

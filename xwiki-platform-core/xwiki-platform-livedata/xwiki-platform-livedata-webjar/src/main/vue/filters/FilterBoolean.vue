@@ -21,7 +21,7 @@
 
 <!-- BooleanFilter is a custom filter that allow to filter boolean values. -->
 <template>
-  <select :value="filterValue" class="xwiki-selectize livedata-selectize" ref="input"
+  <select :value="filterValue" class="xwiki-selectize livedata-selectize filter-boolean" ref="input"
     :aria-label="$t('livedata.filter.boolean.label')">
     <option value=""></option>
     <option :value="trueValue">{{ $t('livedata.displayer.boolean.true') }}</option>
@@ -87,7 +87,8 @@ export default {
 </script>
 
 <style>
-.livedata-selectize.xwiki-selectize {
-  margin-top: 6px;
+.livedata-filter.filter-boolean .selectize-input {
+  height: 100%;
+  vertical-align: middle;
 }
 </style>

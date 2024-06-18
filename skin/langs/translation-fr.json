@@ -1,3 +1,4 @@
 {
-  "third": "Troisième"
+    "third": "Troisième",
+    "page.actions.create.label": "Créer un nouveau document"
 }

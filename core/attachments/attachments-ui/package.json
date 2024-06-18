@@ -1,0 +1,48 @@
+{
+  "name": "@xwiki/cristal-attachments-ui",
+  "version": "0.8.0",
+  "license": "AGPL-3.0",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "/core/attachments/attachments-ui",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "vue-tsc --project tsconfig.json --noEmit && vite build",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-attachments-api": "workspace:*",
+    "@xwiki/cristal-extra-tabs-api": "workspace:*",
+    "inversify": "6.0.2",
+    "vue": "3.4.27",
+    "vue-i18n": "9.13.1",
+    "vue-router": "4.3.2"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5",
+    "vite": "5.2.13"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

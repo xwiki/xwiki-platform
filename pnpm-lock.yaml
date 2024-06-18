@@ -100,6 +100,54 @@ importers:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.4.5)
 
+  core/attachments/attachments-api: {}
+
+  core/attachments/attachments-default:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-attachments-api':
+        specifier: workspace:*
+        version: link:../attachments-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      pinia:
+        specifier: 2.1.7
+        version: 2.1.7(typescript@5.4.5)(vue@3.4.27(typescript@5.4.5))
+
+  core/attachments/attachments-ui:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-attachments-api':
+        specifier: workspace:*
+        version: link:../attachments-api
+      '@xwiki/cristal-extra-tabs-api':
+        specifier: workspace:*
+        version: link:../../extra-tabs/extra-tabs-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      vue:
+        specifier: 3.4.27
+        version: 3.4.27(typescript@5.4.5)
+      vue-i18n:
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
+      vue-router:
+        specifier: 4.3.2
+        version: 4.3.2(vue@3.4.27(typescript@5.4.5))
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vite:
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.1)
+
   core/backends/backend-api:
     dependencies:
       '@xwiki/cristal-api':
@@ -226,6 +274,46 @@ importers:
       vite:
         specifier: 5.2.13
         version: 5.2.13(@types/node@20.14.1)
+
+  core/extra-tabs/extra-tabs-api:
+    dependencies:
+      vue:
+        specifier: 3.4.27
+        version: 3.4.27(typescript@5.4.5)
+
+  core/extra-tabs/extra-tabs-default:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-extra-tabs-api':
+        specifier: workspace:*
+        version: link:../extra-tabs-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+
+  core/extra-tabs/extra-tabs-ui:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-extra-tabs-api':
+        specifier: workspace:*
+        version: link:../extra-tabs-api
+      '@xwiki/cristal-extra-tabs-ui':
+        specifier: workspace:*
+        version: 'link:'
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
+      vue:
+        specifier: 3.4.27
+        version: 3.4.27(typescript@5.4.5)
+    devDependencies:
+      '@types/lodash':
+        specifier: 4.17.5
+        version: 4.17.5
 
   core/icons:
     dependencies:
@@ -755,6 +843,12 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-attachments-default':
+        specifier: workspace:*
+        version: link:../core/attachments/attachments-default
+      '@xwiki/cristal-attachments-ui':
+        specifier: workspace:*
+        version: link:../core/attachments/attachments-ui
       '@xwiki/cristal-backend-dexie':
         specifier: workspace:*
         version: link:../core/backends/backend-dexie
@@ -788,6 +882,9 @@ importers:
       '@xwiki/cristal-extension-menubuttons':
         specifier: workspace:*
         version: link:../extensions/menubuttons
+      '@xwiki/cristal-extra-tabs-default':
+        specifier: workspace:*
+        version: link:../core/extra-tabs/extra-tabs-default
       '@xwiki/cristal-macros':
         specifier: workspace:*
         version: link:../macros
@@ -989,6 +1086,12 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-extra-tabs-api':
+        specifier: workspace:*
+        version: link:../core/extra-tabs/extra-tabs-api
+      '@xwiki/cristal-extra-tabs-ui':
+        specifier: workspace:*
+        version: link:../core/extra-tabs/extra-tabs-ui
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../core/icons

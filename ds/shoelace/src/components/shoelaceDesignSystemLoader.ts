@@ -68,5 +68,16 @@ export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
       () => import("../vue/x-breadcrumb.vue"),
     );
     registerAsyncComponent(app, "XSearch", () => import("../vue/x-search.vue"));
+    registerAsyncComponent(app, "XTab", () => import("../vue/x-tab.vue"));
+    registerAsyncComponent(
+      app,
+      "XTabGroup",
+      () => import("../vue/x-tab-group.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XTabPanel",
+      () => import("../vue/x-tab-panel.vue"),
+    );
   }
 }

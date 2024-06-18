@@ -4,6 +4,8 @@ packages:
   - "core/backends/*"
   - "core/browser/*"
   - "core/link-suggest/*"
+  - "core/attachments/*"
+  - "core/extra-tabs/*"
   - "dev/config"
   - "ds/api"
   - "ds/dsfr"

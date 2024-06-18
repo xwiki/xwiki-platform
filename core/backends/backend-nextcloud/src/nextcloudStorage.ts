@@ -24,7 +24,12 @@
  **/
 
 import { inject, injectable } from "inversify";
-import { DefaultPageData, Logger, PageData } from "@xwiki/cristal-api";
+import {
+  DefaultPageData,
+  Logger,
+  PageAttachment,
+  PageData,
+} from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 
 /**
@@ -54,19 +59,71 @@ export class NextcloudStorage extends AbstractStorage {
     const baseRestURL = this.getWikiConfig().baseRestURL;
     const headers = this.getBaseHeaders();
 
-    const response = await fetch(`${baseRestURL}/.cristal/${page}.json`, {
-      method: "GET",
-      headers,
-    });
+    try {
+      const response = await fetch(
+        `${baseRestURL}/.cristal/${page}/page.json`,
+        {
+          method: "GET",
+          headers,
+        },
+      );
+
+      if (response.status >= 200 && response.status < 300) {
+        const json = await response.json();
+
+        return {
+          ...json,
+          headline: json.name,
+          headlineRaw: json.name,
+        };
+      } else {
+        return undefined;
+      }
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  async getAttachments(page: string): Promise<PageAttachment[] | undefined> {
+    const baseRestURL = this.getWikiConfig().baseRestURL;
+    const response = await fetch(
+      `${baseRestURL}/.cristal/${page}/attachments`,
+      {
+        method: "PROPFIND",
+        headers: {
+          ...this.getBaseHeaders(),
+          Depth: "1",
+          Accept: "application/json",
+        },
+      },
+    );
 
     if (response.status >= 200 && response.status < 300) {
-      const json = await response.json();
+      const text = await response.text();
+      const data = new window.DOMParser().parseFromString(text, "text/xml");
 
-      return {
-        ...json,
-        headline: json.name,
-        headlineRaw: json.name,
-      };
+      const responses = data.getElementsByTagName("d:response");
+      const attachments: PageAttachment[] = [];
+      for (let i = 0; i < responses.length; i++) {
+        const dresponse = responses[i];
+        if (dresponse.getElementsByTagName("d:getcontenttype").length > 0) {
+          const id = dresponse.getElementsByTagName("d:href")[0].textContent!;
+          const mimetype =
+            dresponse.getElementsByTagName("d:getcontenttype")[0].textContent!;
+          const segments = id.split("/");
+          const href = `${baseRestURL}/${segments.slice(5).join("/")}`;
+          const reference = segments[segments.length - 1];
+
+          attachments.push({
+            mimetype,
+            reference,
+            id,
+            href,
+          });
+        }
+      }
+
+      return attachments;
     } else {
       return undefined;
     }
@@ -86,22 +143,21 @@ export class NextcloudStorage extends AbstractStorage {
 
     for (let i = 0; i < directories.length; i++) {
       currentTarget = `${currentTarget}/${directories[i]}`;
-      if (i < directories.length - 1) {
-        // The intermediate directories must exist for a the target file to be
-        // accepted by webdav.
-        await this.createDirectory(currentTarget, headers);
-      } else {
-        await fetch(`${currentTarget}.json`, {
-          method: "PUT",
-          headers: headers,
-          body: JSON.stringify({
-            source: content,
-            name: title,
-            syntax: "markdown/1.2",
-          }),
-        });
-      }
+
+      // The intermediate directories must exist for a the target file to be
+      // accepted by webdav.
+      await this.createDirectory(currentTarget, headers);
     }
+
+    await fetch(`${currentTarget}/page.json`, {
+      method: "PUT",
+      headers: headers,
+      body: JSON.stringify({
+        source: content,
+        name: title,
+        syntax: "markdown/1.2",
+      }),
+    });
 
     return;
   }

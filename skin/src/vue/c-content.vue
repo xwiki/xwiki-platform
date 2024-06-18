@@ -38,6 +38,7 @@ import { marked } from "marked";
 import { ContentTools } from "./contentTools";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import xavatarImg from "../images/no-one.svg";
+import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { useI18n } from "vue-i18n";
 import messages from "../translations";
 
@@ -199,9 +200,12 @@ onUpdated(() => {
               The requested page could not be found. You can edit the page to
               create it.
             </div>
-            <div class="doc-info-footer">
-              <x-avatar class="avatar"></x-avatar>
-              <span class="doc-info-user-info">User name created...</span>
+            <!-- The footer is not displayed in case of unknown page. -->
+            <div v-if="content" class="doc-info-footer">
+              <!-- Suspense is mandatory here as extra-tabs is asynchronous -->
+              <suspense>
+                <extra-tabs></extra-tabs>
+              </suspense>
             </div>
           </div>
         </div>

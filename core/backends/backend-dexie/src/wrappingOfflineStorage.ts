@@ -28,6 +28,7 @@ import "reflect-metadata";
 import type {
   Document,
   Logger,
+  PageAttachment,
   PageData,
   Storage,
   WikiConfig,
@@ -118,6 +119,11 @@ export class WrappingOfflineStorage implements WrappingStorage {
       this.logger.debug("No offline local storage available");
       return this.storage.getPageContent(page, syntax);
     }
+  }
+
+  public getAttachments(page: string): Promise<PageAttachment[] | undefined> {
+    // TODO: add support for offline storage of attachments.
+    return this.storage.getAttachments(page);
   }
 
   private async savePageContent(

@@ -16,6 +16,8 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    // Deactivate slot globally as it's annoying with shoelance, and it's not an error we make
+    "vue/no-deprecated-slot-attribute": "off"
   }
 }

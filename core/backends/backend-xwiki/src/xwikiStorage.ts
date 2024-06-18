@@ -25,13 +25,44 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import type { Document, PageData } from "@xwiki/cristal-api";
 import {
   DefaultPageData,
+  Document,
   JSONLDDocument,
   type Logger,
+  PageAttachment,
+  PageData,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
+
+/**
+ * The type of individual attachments.
+ * @since 0.9
+ */
+type Attachment = {
+  id: string;
+  name: string;
+  size: number;
+  longSize: number;
+  version: string;
+  pageId: string;
+  pageVersion: string;
+  mimeType: string;
+  author: string;
+  authorName: string | null;
+  date: number;
+  xwikiRelativeUrl: string;
+  xwikiAbsoluteUrl: string;
+  // TODO: add hierarchy
+};
+
+/**
+ * The attachments rest response type
+ * @since 0.9
+ */
+type AttachmentsRest = {
+  attachments: Attachment[];
+};
 
 @injectable()
 export class XWikiStorage extends AbstractStorage {
@@ -135,6 +166,29 @@ export class XWikiStorage extends AbstractStorage {
     return pageContentData;
   }
 
+  async getAttachments(page: string): Promise<PageAttachment[] | undefined> {
+    const strings = page.split(".");
+    const lastIndex = strings.length - 1;
+    const spaces = strings.splice(0, lastIndex).join("/spaces/");
+    const pageName = strings[lastIndex] || "WebHome";
+    const endpointURL = `${this.wikiConfig.baseURL}/rest/wikis/xwiki/spaces/${spaces}/pages/${pageName}/attachments`;
+    const response = await fetch(endpointURL, {
+      headers: { Accept: "application/json", ...this.getCredentials() },
+    });
+    const json: AttachmentsRest = await response.json();
+
+    // /wikis/{wikiName}/spaces/{spaceName}[/spaces/{nestedSpaceName}]*/pages/{pageName}/attachments[?start=offset&number=n]
+    // TODO: implement this method
+    return json.attachments.map(({ id, name, mimeType, xwikiAbsoluteUrl }) => {
+      return {
+        id,
+        reference: name,
+        mimetype: mimeType,
+        href: xwikiAbsoluteUrl,
+      };
+    });
+  }
+
   async getPanelContent(panel: string, contextPage: string): Promise<PageData> {
     const url =
       this.wikiConfig.baseURL +
@@ -210,13 +264,19 @@ export class XWikiStorage extends AbstractStorage {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        // TODO: externalize credentials
-        Authorization: `Basic ${btoa("Test:xwikirox")}`,
+        ...this.getCredentials(),
       },
       // TODO: the syntax provided by the save is ignored and the content is always saved as markdown.
       body: JSON.stringify({ content, title, syntax: "markdown/1.2" }),
     });
 
     return;
+  }
+
+  private getCredentials() {
+    return {
+      // TODO: externalize credentials
+      Authorization: `Basic ${btoa("Admin:admin")}`,
+    };
   }
 }

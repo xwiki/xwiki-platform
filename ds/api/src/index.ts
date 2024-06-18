@@ -31,4 +31,21 @@ type BreadcrumbProps = {
   items: string[];
 };
 
-export { BreadcrumbProps };
+/**
+ * Props of the x-tab-panel component.
+ *
+ * @since 0.9
+ */
+type TabPanelProps = {
+  tabId: string;
+};
+
+/**
+ * Props of the x-tab component.
+ * @since 0.9
+ */
+type TabProps = {
+  tabId: string;
+};
+
+export { BreadcrumbProps, TabPanelProps, TabProps };

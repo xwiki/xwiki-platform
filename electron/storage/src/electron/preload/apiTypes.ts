@@ -23,12 +23,16 @@
  *
  **/
 
-import { PageData } from "@xwiki/cristal-api";
+import { PageAttachment, PageData } from "@xwiki/cristal-api";
 
 export interface APITypes {
-  resolvePath(page: string, syntax: string): Promise<string>;
+  resolvePath(page: string): Promise<string>;
+
+  resolveAttachmentsPath(page: string): Promise<string>;
 
   readPage(path: string): Promise<PageData>;
+
+  readAttachments(path: string): Promise<PageAttachment[]>;
 
   savePage(path: string, content: string, title: string): Promise<PageData>;
 }

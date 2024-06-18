@@ -32,6 +32,8 @@ import { UIXVueTemplateProvider } from "./uixVueTemplateProvider";
 import { UIXLoginTemplateProvider } from "./uixLoginTemplateProvider";
 import type { UIXTemplateProvider } from "../api/uixTemplateProvider";
 import { UIXSearchTemplateProvider } from "./uixSearchTemplateProvider";
+import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
+import { InformationExtraTab } from "./InformationTab";
 
 export default class ComponentInit {
   logger: Logger;
@@ -56,6 +58,10 @@ export default class ComponentInit {
     container
       .bind<VueTemplateProvider>("VueTemplateProvider")
       .to(UIXVueTemplateProvider);
+    container
+      .bind<ExtraTab>("ExtraTab")
+      .to(InformationExtraTab)
+      .inSingletonScope();
     this.logger?.debug("Init Skin components end");
   }
 }

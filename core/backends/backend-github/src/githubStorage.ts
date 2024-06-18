@@ -25,8 +25,13 @@
 
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
-import type { Logger, PageData, WikiConfig } from "@xwiki/cristal-api";
-import { DefaultPageData } from "@xwiki/cristal-api";
+import {
+  DefaultPageData,
+  Logger,
+  PageAttachment,
+  PageData,
+  WikiConfig,
+} from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 
 @injectable()
@@ -65,7 +70,9 @@ export class GitHubStorage extends AbstractStorage {
     let hash = 0,
       i,
       chr;
-    if (str.length === 0) return "" + hash;
+    if (str.length === 0) {
+      return "" + hash;
+    }
     for (i = 0; i < str.length; i++) {
       chr = str.charCodeAt(i);
       hash = (hash << 5) - hash + chr;
@@ -80,11 +87,15 @@ export class GitHubStorage extends AbstractStorage {
     const response = await fetch(url, { cache: "no-store" });
     const text = await response.text();
     let content = "";
-    if (syntax == "json") content = "";
-    else if (syntax == "md") content = text;
-    else if (syntax == "html") {
+    if (syntax == "json") {
+      content = "";
+    } else if (syntax == "md") {
       content = text;
-    } else content = "";
+    } else if (syntax == "html") {
+      content = text;
+    } else {
+      content = "";
+    }
 
     const pageContentData = new DefaultPageData();
     pageContentData.source = content;
@@ -92,6 +103,14 @@ export class GitHubStorage extends AbstractStorage {
     pageContentData.css = [];
     pageContentData.version = this.hashCode(content);
     return pageContentData;
+  }
+
+  /**
+   * @since 0.9
+   */
+  getAttachments(): Promise<PageAttachment[] | undefined> {
+    // TODO: to be implemented.
+    throw new Error("unsupported");
   }
 
   async getPanelContent(): Promise<PageData> {

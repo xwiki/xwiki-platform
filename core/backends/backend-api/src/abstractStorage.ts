@@ -23,7 +23,13 @@
  *
  **/
 
-import { Logger, PageData, Storage, WikiConfig } from "@xwiki/cristal-api";
+import {
+  Logger,
+  PageAttachment,
+  PageData,
+  Storage,
+  WikiConfig,
+} from "@xwiki/cristal-api";
 import { injectable, unmanaged } from "inversify";
 
 @injectable()
@@ -56,6 +62,13 @@ export abstract class AbstractStorage implements Storage {
     page: string,
     syntax: string,
   ): Promise<PageData | undefined>;
+
+  /**
+   * Returns the list of attachments of a given page.
+   * TODO: this API is missing pagination.
+   * @since 0.9
+   */
+  abstract getAttachments(page: string): Promise<PageAttachment[] | undefined>;
 
   abstract getPageFromViewURL(url: string): string | null;
 

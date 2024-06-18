@@ -25,14 +25,20 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import { APITypes } from "./apiTypes";
-import { PageData } from "@xwiki/cristal-api";
+import { PageAttachment, PageData } from "@xwiki/cristal-api";
 
 const api: APITypes = {
   readPage: (path: string) => {
     return ipcRenderer.invoke("readPage", { path });
   },
-  resolvePath: (page: string, syntax: string) => {
-    return ipcRenderer.invoke("resolvePath", { page: page || "", syntax });
+  readAttachments(path: string): Promise<PageAttachment[]> {
+    return ipcRenderer.invoke("readAttachments", { path });
+  },
+  resolvePath: (page: string) => {
+    return ipcRenderer.invoke("resolvePath", { page: page || "" });
+  },
+  resolveAttachmentsPath: (page: string) => {
+    return ipcRenderer.invoke("resolveAttachmentsPath", { page: page || "" });
   },
   savePage(path: string, content: string, title: string): Promise<PageData> {
     return ipcRenderer.invoke("savePage", { path, content, title });

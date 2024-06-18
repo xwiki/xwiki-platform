@@ -29,6 +29,8 @@
   "dependencies": {
     "@mdi/font": "7.4.47",
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-attachments-default": "workspace:*",
+    "@xwiki/cristal-attachments-ui": "workspace:*",
     "@xwiki/cristal-backend-dexie": "workspace:*",
     "@xwiki/cristal-backend-github": "workspace:*",
     "@xwiki/cristal-backend-nextcloud": "workspace:*",
@@ -40,6 +42,7 @@
     "@xwiki/cristal-editors-tiptap": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-extension-menubuttons": "workspace:*",
+    "@xwiki/cristal-extra-tabs-default": "workspace:*",
     "@xwiki/cristal-macros": "workspace:*",
     "@xwiki/cristal-rendering": "workspace:*",
     "@xwiki/cristal-sharedworker-impl": "workspace:*",

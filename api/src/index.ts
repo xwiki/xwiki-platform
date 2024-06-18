@@ -28,6 +28,7 @@ import type { CristalApp } from "./api/cristalApp.js";
 import type { WikiConfig } from "./api/WikiConfig.js";
 import type { Storage } from "./api/storage.js";
 import type { PageData } from "./api/PageData.js";
+import type { PageAttachment } from "./api/pageAttachment";
 import type { Document } from "./api/document.js";
 import type { Logger } from "./api/logger.js";
 import type { LoggerConfig } from "./api/loggerConfig.js";
@@ -54,6 +55,7 @@ export type {
   LoggerConfig,
   Document,
   DesignSystemLoader,
+  PageAttachment,
 };
 export {
   ComponentInit,

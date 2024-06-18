@@ -38,6 +38,12 @@ import { marked } from "marked";
 import { ContentTools } from "./contentTools";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import xavatarImg from "../images/no-one.svg";
+import { useI18n } from "vue-i18n";
+import messages from "../translations";
+
+const { t } = useI18n({
+  messages,
+});
 
 const route = useRoute();
 
@@ -124,13 +130,13 @@ onUpdated(() => {
       <div class="content-header">
         <XBreadcrumb
           class="breadcrumb"
-          :items="['Home', 'First', 'Second', 'Third']"
+          :items="['Home', 'First', 'Second', t('third')]"
         ></XBreadcrumb>
         <x-btn circle size="small" variant="primary" color="primary">
           <c-icon
             class="new-page"
             name="plus"
-            label="Create a new document"
+            :label="t('page.actions.create.label')"
           ></c-icon>
         </x-btn>
       </div>

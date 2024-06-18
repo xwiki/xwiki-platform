@@ -62,6 +62,7 @@ import type {
 import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";
 import type { Renderer } from "@xwiki/cristal-rendering";
 import { createPinia } from "pinia";
+import { createI18n } from "vue-i18n";
 
 @injectable()
 export class DefaultCristalApp implements CristalApp {
@@ -440,7 +441,10 @@ export class DefaultCristalApp implements CristalApp {
       routes,
     });
 
-    this.app = createApp(Index).use(this.router).use(createPinia());
+    this.app = createApp(Index)
+      .use(this.router)
+      .use(createPinia())
+      .use(createI18n({ legacy: false, fallbackLocale: "en" }));
     this.app.provide("count", 0);
     this.app.provide("skinManager", this.skinManager);
     this.app.provide("cristal", this);

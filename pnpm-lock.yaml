@@ -77,9 +77,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
       vue-router:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.27(typescript@5.4.5))
@@ -330,9 +327,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
       vue-router:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.27(typescript@5.4.5))
@@ -413,9 +407,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
       vuetify:
         specifier: 3.6.9
         version: 3.6.9(typescript@5.4.5)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.27(typescript@5.4.5)))(vue@3.4.27(typescript@5.4.5))
@@ -720,9 +711,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.7
@@ -748,9 +736,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.7
@@ -864,9 +849,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.7
@@ -920,9 +902,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.7
@@ -942,9 +921,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.7
@@ -991,9 +967,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
       vue-router:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.27(typescript@5.4.5))
@@ -1102,9 +1075,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
       vue-router:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.27(typescript@5.4.5))
@@ -1157,9 +1127,6 @@ importers:
       vue:
         specifier: 3.4.27
         version: 3.4.27(typescript@5.4.5)
-      vue-i18n:
-        specifier: 9.13.1
-        version: 9.13.1(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       rimraf:
         specifier: 5.0.7

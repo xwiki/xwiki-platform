@@ -38,11 +38,11 @@ import jakarta.servlet.http.HttpServlet;
  * <li>Injection of XWikiResource components</li>
  * </ul>
  * <p>
- * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
- * from Java point of view.
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
- * @since -1.jakarta
+ * @since 42.0.0
  */
 public class XWikiRESTServlet extends HttpServlet
 {

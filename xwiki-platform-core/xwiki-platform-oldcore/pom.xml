@@ -170,6 +170,11 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
     </dependency>
@@ -899,7 +904,7 @@
                 **/web/ViewrevAction.java,
                 **/web/XWikiAction.java,
                 **/web/XWikiConfigurationService.java,
-                **/web/XWikiContextInitializationFilter.java,
+                **/web/XWikiContextInitializer.java,
                 **/web/XWikiDefaultURLFactory.java,
                 **/web/XWikiEngineContext.java,
                 **/web/XWikiForm.java,

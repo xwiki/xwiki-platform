@@ -24,10 +24,8 @@ import java.io.OutputStream;
 
 import org.xwiki.container.RedirectResponse;
 import org.xwiki.container.Response;
-import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletResponse;
-import org.xwiki.jakartabridge.servlet.internal.JavaxToJakartaHttpServletResponse;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
@@ -42,28 +40,28 @@ public class ServletResponse implements Response, RedirectResponse
     private javax.servlet.http.HttpServletResponse javaxHttpServletResponse;
 
     /**
-     * @param jakartaHttpServletRequest the standard Jakarta {@link HttpServletRequest} instance
-     * @since -1.jakarta
+     * @param jakartaHttpServletResponse the standard Jakarta {@link HttpServletResponse} instance
+     * @since 42.0.0
      */
-    public ServletResponse(HttpServletResponse httpServletResponse)
+    public ServletResponse(HttpServletResponse jakartaHttpServletResponse)
     {
-        this.jakartaHttpServletResponse = httpServletResponse;
+        this.jakartaHttpServletResponse = jakartaHttpServletResponse;
     }
 
     /**
      * @param javaxHttpServletResponse the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
      * @deprecated use {@link #ServletResponse(HttpServletResponse)} instead
      */
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public ServletResponse(javax.servlet.http.HttpServletResponse javaxHttpServletResponse)
     {
         this.javaxHttpServletResponse = javaxHttpServletResponse;
-        this.jakartaHttpServletResponse = new JakartaToJavaxHttpServletResponse(javaxHttpServletResponse);
+        this.jakartaHttpServletResponse = ServletBridge.toJakarta(javaxHttpServletResponse);
     }
 
     /**
      * @return the standard Jakarta {@link HttpServletResponse} instance
-     * @since -1.jakarta
+     * @since 42.0.0
      */
     public HttpServletResponse getJakartaHttpServletResponse()
     {
@@ -74,14 +72,14 @@ public class ServletResponse implements Response, RedirectResponse
      * @return the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
      * @deprecated use {@link #getJakartaHttpServletResponse()} instead
      */
-    @Deprecated(since = "17-jakarta")
-    public HttpServletResponse getHttpServletResponse()
+    @Deprecated(since = "42.0.0")
+    public javax.servlet.http.HttpServletResponse getHttpServletResponse()
     {
         if (this.javaxHttpServletResponse == null) {
-            this.javaxHttpServletResponse = new JavaxToJakartaHttpServletResponse(this.jakartaHttpServletResponse);
+            this.javaxHttpServletResponse = ServletBridge.toJavax(this.jakartaHttpServletResponse);
         }
 
-        return this.jakartaHttpServletResponse;
+        return this.javaxHttpServletResponse;
     }
 
     @Override

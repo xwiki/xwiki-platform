@@ -105,7 +105,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     }
 
     @Override
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public void initializeRequest(javax.servlet.http.HttpServletRequest httpServletRequest, Object xwikiContext)
         throws ServletContainerException
     {
@@ -147,7 +147,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     }
 
     @Override
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public void initializeRequest(javax.servlet.http.HttpServletRequest httpServletRequest)
         throws ServletContainerException
     {
@@ -155,14 +155,14 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     }
 
     @Override
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public void initializeResponse(javax.servlet.http.HttpServletResponse httpServletResponse)
     {
         this.container.setResponse(new ServletResponse(httpServletResponse));
     }
 
     @Override
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public void initializeSession(javax.servlet.http.HttpServletRequest httpServletRequest)
     {
         this.container.setSession(new ServletSession(httpServletRequest));

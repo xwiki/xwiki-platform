@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -35,13 +34,15 @@ import org.xwiki.captcha.CaptchaException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
- * Captcha Strategy for repeated authentication failures.
- * The main idea of this strategy is to add a captcha form field in the login form and to ask user to fill it for
- * validating their authentication.
+ * Captcha Strategy for repeated authentication failures. The main idea of this strategy is to add a captcha form field
+ * in the login form and to ask user to fill it for validating their authentication.
  *
  * @version $Id$
  * @since 11.6RC1
@@ -54,8 +55,8 @@ public class CaptchaAuthenticationFailureStrategy implements AuthenticationFailu
     /**
      * Exception message thrown by jCaptcha library when no captcha is registered for the session id.
      */
-    private static final String UNEXISTING_CAPTCHA_EXCEPTION = "Invalid ID, could not validate unexisting or already "
-        + "validated captcha";
+    private static final String UNEXISTING_CAPTCHA_EXCEPTION =
+        "Invalid ID, could not validate unexisting or already " + "validated captcha";
 
     @Inject
     private CaptchaConfiguration captchaConfiguration;
@@ -90,6 +91,12 @@ public class CaptchaAuthenticationFailureStrategy implements AuthenticationFailu
             logger.error("Error while displaying the CAPTCHA.", e);
             return "";
         }
+    }
+
+    @Override
+    public boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
+    {
+        return validateForm(username, ServletBridge.toJakarta(request));
     }
 
     @Override

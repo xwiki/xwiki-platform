@@ -62,7 +62,7 @@ import org.apache.commons.lang3.ArrayUtils;
  *
  * @version $Id$
  */
-@Deprecated(since = "17-jakarta")
+@Deprecated(since = "42.0.0")
 public class XWikiServletRequestStub implements XWikiRequest
 {
     /**

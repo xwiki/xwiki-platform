@@ -56,15 +56,16 @@ import org.xwiki.url.ExtendedURL;
  * As time progresses it is expected that more and more Resource Types will have registered
  * {@link org.xwiki.resource.ResourceReferenceHandler}.
  * <p>
- * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
- * from Java point of view.
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  *
  * @version $Id$
- * @since -1.jakarta
+ * @since 42.0.0
  */
 public class RoutingFilter implements Filter
 {
     static final String RESOURCE_TYPE_NAME = "resourceType";
+
     static final String RESOURCE_EXTENDEDURL = "resourceURL";
 
     private ComponentManager rootComponentManager;
@@ -171,8 +172,8 @@ public class RoutingFilter implements Filter
     {
         ResourceTypeResolver<ExtendedURL> urlResourceTypeResolver;
         try {
-            urlResourceTypeResolver = this.rootComponentManager.getInstance(
-                new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
+            urlResourceTypeResolver = this.rootComponentManager
+                .getInstance(new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
         } catch (ComponentLookupException e) {
             // Should not happen since an ExtendedURL Resource Type Resolver should exist on the system.
             throw new ServletException("Failed to locate an ExtendedURL Resource Type Resolver component", e);
@@ -210,7 +211,8 @@ public class RoutingFilter implements Filter
             // Shouldn't happen normally!
             throw new ServletException(
                 String.format("Failed to reconstruct URL from HTTP Servlet Request (URL [%s], Query String [%s])",
-                    request.getRequestURL(), request.getQueryString()), e);
+                    request.getRequestURL(), request.getQueryString()),
+                e);
         }
         return url;
     }

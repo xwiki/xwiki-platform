@@ -30,7 +30,7 @@ import org.xwiki.wysiwyg.filter.MutableJakartaServletRequest;
  * the conversion for each parameter, and a map of the output of the conversion for each parameter.
  *
  * @version $Id$
- * @since -1.jakarta
+ * @since 42.0.0
  */
 public class JakartaRequestParameterConversionResult
 {

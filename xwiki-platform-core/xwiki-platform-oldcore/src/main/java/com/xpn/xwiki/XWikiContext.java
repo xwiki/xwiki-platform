@@ -269,13 +269,13 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.engine_context = engine_context;
     }
 
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public XWikiRequest getRequest()
     {
         return this.request;
     }
 
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public void setRequest(XWikiRequest request)
     {
         this.request = request;
@@ -291,13 +291,13 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.action = action;
     }
 
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public XWikiResponse getResponse()
     {
         return this.response;
     }
 
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     public void setResponse(XWikiResponse response)
     {
         this.response = response;

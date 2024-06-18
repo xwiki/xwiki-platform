@@ -25,12 +25,14 @@
 ee10
 
 [depend]
+ext
 console-capture
 ee10-apache-jsp
 ee10-deploy
 ee10-websocket-jakarta
 http
 http-forwarded
+work
 
 [xml]
 etc/xwiki.xml

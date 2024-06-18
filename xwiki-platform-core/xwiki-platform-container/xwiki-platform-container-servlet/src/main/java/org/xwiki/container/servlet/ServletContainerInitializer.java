@@ -20,6 +20,7 @@
 package org.xwiki.container.servlet;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
 import org.xwiki.stability.Unstable;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,17 +29,17 @@ import jakarta.servlet.http.HttpServletResponse;
 @Role
 public interface ServletContainerInitializer
 {
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     void initializeRequest(javax.servlet.http.HttpServletRequest request, Object xwikiContext)
         throws ServletContainerException;
 
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     void initializeRequest(javax.servlet.http.HttpServletRequest request) throws ServletContainerException;
 
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     void initializeResponse(javax.servlet.http.HttpServletResponse response);
 
-    @Deprecated(since = "17-jakarta")
+    @Deprecated(since = "42.0.0")
     void initializeSession(javax.servlet.http.HttpServletRequest request);
 
     /**
@@ -50,8 +51,12 @@ public interface ServletContainerInitializer
     /**
      * @param request the current request
      * @param response the current response
-     * @since -1.jakarta
+     * @since 42.0.0
      */
     @Unstable
-    void initializeRequest(HttpServletRequest request, HttpServletResponse response) throws ServletContainerException;
+    default void initializeRequest(HttpServletRequest request, HttpServletResponse response)
+        throws ServletContainerException
+    {
+        initializeRequest(ServletBridge.toJavax(request), ServletBridge.toJavax(response));
+    }
 }

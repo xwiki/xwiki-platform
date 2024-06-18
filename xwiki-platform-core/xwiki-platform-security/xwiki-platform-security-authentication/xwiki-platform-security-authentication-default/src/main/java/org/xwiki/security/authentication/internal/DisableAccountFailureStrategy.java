@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.jakartabridge.servlet.ServletBridge;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -44,6 +44,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * A strategy to disable authentication in case of repeated failure with a login.
@@ -103,12 +105,28 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
      * @return true if the user account associated to the username is enabled. False in other cases.
      */
     @Override
+    @Deprecated
+    public boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
+    {
+        return validateForm(username, ServletBridge.toJakarta(request));
+    }
+
+    /**
+     * Here the validate form is used to remove the authentication failure record if the user account associated to the
+     * username has been enabled back.
+     *
+     * @param username the username used for the authentication failure.
+     * @param request the authentication request.
+     * @return true if the user account associated to the username is enabled. False in other cases.
+     */
+    @Override
     public boolean validateForm(String username, HttpServletRequest request)
     {
         DocumentReference userDocumentReference = this.authenticationFailureManager.get().findUser(username);
         if (userDocumentReference != null) {
             return !new XWikiUser(userDocumentReference).isDisabled(this.contextProvider.get());
         }
+
         return false;
     }
 

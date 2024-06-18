@@ -25,16 +25,15 @@ import jakarta.servlet.ServletRequestListener;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Make threads names created by the application server more meaningful.
+ * Make threads names created by the application server more meaningful. TODO When it will be possible it would be
+ * better to do this a component like a RequestInitializer component to work for any kind of container. Right now
+ * component can't really access the initial URL.
  * <p>
- * TODO: When it will be possible it would be better to do this a component like a RequestInitializer component to work
- * for any kind of container. Right now component can't really access the initial URL.
- * <p>
- * While the class is much older, the @since was moved to 17-jakarta because it implement a completely different API
- * from Java point of view.
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
- * @since -1.jakarta
+ * @since 42.0.0
  */
 public class SetThreadNameServletRequestListener implements ServletRequestListener
 {

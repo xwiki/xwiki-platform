@@ -18,167 +18,167 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 .load-spinner {
-   background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="40" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="100" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="160" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>') ;  
-   background-size: cover;
-   width: 64px;
-   height: 64px;
-  }
-  
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="40" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="100" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="160" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>');
+  background-size: cover;
+  width: 64px;
+  height: 64px;
+}
+
 :root {
-   --cr-sizes-max-page-width: 960px; /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
-   --cr-sizes-left-sidebar-width: 15%; /*The default width of the sidebar*/
-   --cr-sizes-left-sidebar-min-width: 250px; /*The minimum width of the sidebar*/
-   --cr-sizes-collapsed-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard left sidebar*/
-   --cr-base-font-size: 16px;
-   
-    /*
-     * Typography
-     */
-  
-    /* Fonts */
-    --cr-font-mono: var(--sl-font-mono);
-    --cr-font-sans: var(--sl-font-sans);    
-    --cr-font-serif: var(--sl-font-serif) ;
-  
-    /* Font sizes */
-    --cr-font-size-2x-small: var(--sl-font-size-2x-small);
-    --cr-font-size-x-small: var(--sl-font-size-x-small);
-    --cr-font-size-small: var(--sl-font-size-small);
-    --cr-font-size-medium: var(--sl-font-size-medium);
-    --cr-font-size-large: var(--sl-font-size-large);
-    --cr-font-size-x-large: var(--sl-font-size-x-large);
-    --cr-font-size-2x-large: var(--sl-font-size-2x-large);
-    --cr-font-size-3x-large: var(--sl-font-size-3x-large);
-    --cr-font-size-4x-large: var(--sl-font-size-4x-large);
-  
-    /* Font weights */
-    --cr-font-weight-light: var(--sl-font-weight-light);
-    --cr-font-weight-normal: var(--sl-font-weight-normal);
-    --cr-font-weight-semibold: var(--sl-font-weight-semibold);
-    --cr-font-weight-bold: var(--sl-font-weight-bold);
-  
-    /* Letter spacings */
-    --cr-letter-spacing-denser:  var(--sl-letter-spacing-denser);
-    --cr-letter-spacing-dense: var(--sl-letter-spacing-dense);
-    --cr-letter-spacing-normal: var(--sl-letter-spacing-normal);
-    --cr-letter-spacing-loose: var(--sl-letter-spacing-loose);
-    --cr-letter-spacing-looser: var(--sl-letter-spacing-looser);
-  
-    /* Line heights */
-    --cr-line-height-denser: var(--sl-line-height-denser);
-    --cr-line-height-dense: var(--sl-line-height-dense);
-    --cr-line-height-normal: var(--sl-line-height-normal);
-    --cr-line-height-loose: var(--sl-line-height-loose);
-    --cr-line-height-looser: var(--sl-line-height-looser);
-  
-    /* Focus rings */
-    --cr-focus-ring-color: var(--sl-color-primary-600);
-    --cr-focus-ring-style: solid;
-    --cr-focus-ring-width: 3px;
-    --cr-focus-ring: var(--sl-focus-ring-style) var(--sl-focus-ring-width) var(--sl-focus-ring-color);
-    --cr-focus-ring-offset: 1px;
-  
-  
+  --cr-sizes-max-page-width: 960px; /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
+  --cr-sizes-left-sidebar-width: 15%; /*The default width of the sidebar*/
+  --cr-sizes-left-sidebar-min-width: 250px; /*The minimum width of the sidebar*/
+  --cr-sizes-collapsed-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard left sidebar*/
+  --cr-base-font-size: 16px;
+
+  /*
+   * Typography
+   */
+
+  /* Fonts */
+  --cr-font-mono: var(--sl-font-mono);
+  --cr-font-sans: var(--sl-font-sans);
+  --cr-font-serif: var(--sl-font-serif);
+
+  /* Font sizes */
+  --cr-font-size-2x-small: var(--sl-font-size-2x-small);
+  --cr-font-size-x-small: var(--sl-font-size-x-small);
+  --cr-font-size-small: var(--sl-font-size-small);
+  --cr-font-size-medium: var(--sl-font-size-medium);
+  --cr-font-size-large: var(--sl-font-size-large);
+  --cr-font-size-x-large: var(--sl-font-size-x-large);
+  --cr-font-size-2x-large: var(--sl-font-size-2x-large);
+  --cr-font-size-3x-large: var(--sl-font-size-3x-large);
+  --cr-font-size-4x-large: var(--sl-font-size-4x-large);
+
+  /* Font weights */
+  --cr-font-weight-light: var(--sl-font-weight-light);
+  --cr-font-weight-normal: var(--sl-font-weight-normal);
+  --cr-font-weight-semibold: var(--sl-font-weight-semibold);
+  --cr-font-weight-bold: var(--sl-font-weight-bold);
+
+  /* Letter spacings */
+  --cr-letter-spacing-denser: var(--sl-letter-spacing-denser);
+  --cr-letter-spacing-dense: var(--sl-letter-spacing-dense);
+  --cr-letter-spacing-normal: var(--sl-letter-spacing-normal);
+  --cr-letter-spacing-loose: var(--sl-letter-spacing-loose);
+  --cr-letter-spacing-looser: var(--sl-letter-spacing-looser);
+
+  /* Line heights */
+  --cr-line-height-denser: var(--sl-line-height-denser);
+  --cr-line-height-dense: var(--sl-line-height-dense);
+  --cr-line-height-normal: var(--sl-line-height-normal);
+  --cr-line-height-loose: var(--sl-line-height-loose);
+  --cr-line-height-looser: var(--sl-line-height-looser);
+
+  /* Focus rings */
+  --cr-focus-ring-color: var(--sl-color-primary-600);
+  --cr-focus-ring-style: solid;
+  --cr-focus-ring-width: 3px;
+  --cr-focus-ring: var(--sl-focus-ring-style) var(--sl-focus-ring-width) var(--sl-focus-ring-color);
+  --cr-focus-ring-offset: 1px;
+
+
   /*Colors*/
-  
+
   /*
      * Theme Tokens
      */
-  
-    /* Primary */
-    --cr-color-primary-50: var(--sl-color-sky-50);
-    --cr-color-primary-100: var(--sl-color-sky-100);
-    --cr-color-primary-200: var(--sl-color-sky-200);
-    --cr-color-primary-300: var(--sl-color-sky-300);
-    --cr-color-primary-400: var(--sl-color-sky-400);
-    --cr-color-primary-500: var(--sl-color-sky-500);
-    --cr-color-primary-600: var(--sl-color-sky-600);
-    --cr-color-primary-700: var(--sl-color-sky-700);
-    --cr-color-primary-800: var(--sl-color-sky-800);
-    --cr-color-primary-900: var(--sl-color-sky-900);
-    --cr-color-primary-950: var(--sl-color-sky-950);
-  
-    /* Success */
-    --cr-color-success-50: var(--sl-color-green-50);
-    --cr-color-success-100: var(--sl-color-green-100);
-    --cr-color-success-200: var(--sl-color-green-200);
-    --cr-color-success-300: var(--sl-color-green-300);
-    --cr-color-success-400: var(--sl-color-green-400);
-    --cr-color-success-500: var(--sl-color-green-500);
-    --cr-color-success-600: var(--sl-color-green-600);
-    --cr-color-success-700: var(--sl-color-green-700);
-    --cr-color-success-800: var(--sl-color-green-800);
-    --cr-color-success-900: var(--sl-color-green-900);
-    --cr-color-success-950: var(--sl-color-green-950);
-  
-    /* Warning */
-    --cr-color-warning-50: var(--sl-color-amber-50);
-    --cr-color-warning-100: var(--sl-color-amber-100);
-    --cr-color-warning-200: var(--sl-color-amber-200);
-    --cr-color-warning-300: var(--sl-color-amber-300);
-    --cr-color-warning-400: var(--sl-color-amber-400);
-    --cr-color-warning-500: var(--sl-color-amber-500);
-    --cr-color-warning-600: var(--sl-color-amber-600);
-    --cr-color-warning-700: var(--sl-color-amber-700);
-    --cr-color-warning-800: var(--sl-color-amber-800);
-    --cr-color-warning-900: var(--sl-color-amber-900);
-    --cr-color-warning-950: var(--sl-color-amber-950);
-  
-    /* Danger */
-    --cr-color-danger-50: var(--sl-color-red-50);
-    --cr-color-danger-100: var(--sl-color-red-100);
-    --cr-color-danger-200: var(--sl-color-red-200);
-    --cr-color-danger-300: var(--sl-color-red-300);
-    --cr-color-danger-400: var(--sl-color-red-400);
-    --cr-color-danger-500: var(--sl-color-red-500);
-    --cr-color-danger-600: var(--sl-color-red-600);
-    --cr-color-danger-700: var(--sl-color-red-700);
-    --cr-color-danger-800: var(--sl-color-red-800);
-    --cr-color-danger-900: var(--sl-color-red-900);
-    --cr-color-danger-950: var(--sl-color-red-950);
-  
-    /* Neutral */
-    --cr-color-neutral-50: var(--sl-color-gray-50);
-    --cr-color-neutral-100: var(--sl-color-gray-100);
-    --cr-color-neutral-200: var(--sl-color-gray-200);
-    --cr-color-neutral-300: var(--sl-color-gray-300);
-    --cr-color-neutral-400: var(--sl-color-gray-400);
-    --cr-color-neutral-500: var(--sl-color-gray-500);
-    --cr-color-neutral-600: var(--sl-color-gray-600);
-    --cr-color-neutral-700: var(--sl-color-gray-700);
-    --cr-color-neutral-800: var(--sl-color-gray-800);
-    --cr-color-neutral-900: var(--sl-color-gray-900);
-    --cr-color-neutral-950: var(--sl-color-gray-950);
-  
-    /*
-     * Elevations
-     */
-  
-     --cr-shadow-x-small: var(--sl-shadow-x-small);
-     --cr-shadow-small: var(--sl-shadow-small);
-     --cr-shadow-medium: var(--sl-shadow-medium);
-     --cr-shadow-large: var(--sl-shadow-large);
-     --cr-shadow-x-large: var(--sl-shadow-x-large);
+
+  /* Primary */
+  --cr-color-primary-50: var(--sl-color-sky-50);
+  --cr-color-primary-100: var(--sl-color-sky-100);
+  --cr-color-primary-200: var(--sl-color-sky-200);
+  --cr-color-primary-300: var(--sl-color-sky-300);
+  --cr-color-primary-400: var(--sl-color-sky-400);
+  --cr-color-primary-500: var(--sl-color-sky-500);
+  --cr-color-primary-600: var(--sl-color-sky-600);
+  --cr-color-primary-700: var(--sl-color-sky-700);
+  --cr-color-primary-800: var(--sl-color-sky-800);
+  --cr-color-primary-900: var(--sl-color-sky-900);
+  --cr-color-primary-950: var(--sl-color-sky-950);
+
+  /* Success */
+  --cr-color-success-50: var(--sl-color-green-50);
+  --cr-color-success-100: var(--sl-color-green-100);
+  --cr-color-success-200: var(--sl-color-green-200);
+  --cr-color-success-300: var(--sl-color-green-300);
+  --cr-color-success-400: var(--sl-color-green-400);
+  --cr-color-success-500: var(--sl-color-green-500);
+  --cr-color-success-600: var(--sl-color-green-600);
+  --cr-color-success-700: var(--sl-color-green-700);
+  --cr-color-success-800: var(--sl-color-green-800);
+  --cr-color-success-900: var(--sl-color-green-900);
+  --cr-color-success-950: var(--sl-color-green-950);
+
+  /* Warning */
+  --cr-color-warning-50: var(--sl-color-amber-50);
+  --cr-color-warning-100: var(--sl-color-amber-100);
+  --cr-color-warning-200: var(--sl-color-amber-200);
+  --cr-color-warning-300: var(--sl-color-amber-300);
+  --cr-color-warning-400: var(--sl-color-amber-400);
+  --cr-color-warning-500: var(--sl-color-amber-500);
+  --cr-color-warning-600: var(--sl-color-amber-600);
+  --cr-color-warning-700: var(--sl-color-amber-700);
+  --cr-color-warning-800: var(--sl-color-amber-800);
+  --cr-color-warning-900: var(--sl-color-amber-900);
+  --cr-color-warning-950: var(--sl-color-amber-950);
+
+  /* Danger */
+  --cr-color-danger-50: var(--sl-color-red-50);
+  --cr-color-danger-100: var(--sl-color-red-100);
+  --cr-color-danger-200: var(--sl-color-red-200);
+  --cr-color-danger-300: var(--sl-color-red-300);
+  --cr-color-danger-400: var(--sl-color-red-400);
+  --cr-color-danger-500: var(--sl-color-red-500);
+  --cr-color-danger-600: var(--sl-color-red-600);
+  --cr-color-danger-700: var(--sl-color-red-700);
+  --cr-color-danger-800: var(--sl-color-red-800);
+  --cr-color-danger-900: var(--sl-color-red-900);
+  --cr-color-danger-950: var(--sl-color-red-950);
+
+  /* Neutral */
+  --cr-color-neutral-50: var(--sl-color-gray-50);
+  --cr-color-neutral-100: var(--sl-color-gray-100);
+  --cr-color-neutral-200: var(--sl-color-gray-200);
+  --cr-color-neutral-300: var(--sl-color-gray-300);
+  --cr-color-neutral-400: var(--sl-color-gray-400);
+  --cr-color-neutral-500: var(--sl-color-gray-500);
+  --cr-color-neutral-600: var(--sl-color-gray-600);
+  --cr-color-neutral-700: var(--sl-color-gray-700);
+  --cr-color-neutral-800: var(--sl-color-gray-800);
+  --cr-color-neutral-900: var(--sl-color-gray-900);
+  --cr-color-neutral-950: var(--sl-color-gray-950);
+
+  /*
+   * Elevations
+   */
+
+  --cr-shadow-x-small: var(--sl-shadow-x-small);
+  --cr-shadow-small: var(--sl-shadow-small);
+  --cr-shadow-medium: var(--sl-shadow-medium);
+  --cr-shadow-large: var(--sl-shadow-large);
+  --cr-shadow-x-large: var(--sl-shadow-x-large);
 
   /*
    * Spacings
    */
 
-   
-   --cr-spacing-3x-small: var(--sl-spacing-3x-small);
-   --cr-spacing-2x-small: var(--sl-spacing-2x-small);
-   --cr-spacing-x-small:  var(--sl-spacing-x-small);
-   --cr-spacing-small: var(--sl-spacing-small);
-   --cr-spacing-medium: var(--sl-spacing-medium);
-   --cr-spacing-large: var(--sl-spacing-large);
-   --cr-spacing-x-large: var(--sl-spacing-x-large);
-   --cr-spacing-2x-large: var(--sl-spacing-2x-large);
-   --cr-spacing-3x-large: var(--sl-spacing-3x-large);
-   --cr-spacing-4x-large: var(--sl-spacing-4x-large);
 
-/*
-   * Transitions
-   */
+  --cr-spacing-3x-small: var(--sl-spacing-3x-small);
+  --cr-spacing-2x-small: var(--sl-spacing-2x-small);
+  --cr-spacing-x-small: var(--sl-spacing-x-small);
+  --cr-spacing-small: var(--sl-spacing-small);
+  --cr-spacing-medium: var(--sl-spacing-medium);
+  --cr-spacing-large: var(--sl-spacing-large);
+  --cr-spacing-x-large: var(--sl-spacing-x-large);
+  --cr-spacing-2x-large: var(--sl-spacing-2x-large);
+  --cr-spacing-3x-large: var(--sl-spacing-3x-large);
+  --cr-spacing-4x-large: var(--sl-spacing-4x-large);
+
+  /*
+     * Transitions
+     */
 
   --cr-transition-x-slow: var(--sl-transition-x-slow);
   --cr-transition-slow: var(--sl-transition-slow);

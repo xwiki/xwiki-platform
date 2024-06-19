@@ -56,13 +56,8 @@ html {
   height: 100%;
   padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-large);
 }
-/* 
-.content-scroll > div {
-  width: 100%;
-  max-width: var(--cr-sizes-max-page-width);
-} */
 
-.center-content{
+.center-content {
   width: 100%;
   max-width: var(--cr-sizes-max-page-width);
 }
@@ -86,7 +81,7 @@ main {
   height: 100dvh;
   overflow: hidden;
   position: fixed;
-  left: max(var(--cr-sizes-left-sidebar-min-width) , var(--cr-sizes-left-sidebar-width));
+  left: max(var(--cr-sizes-left-sidebar-min-width), var(--cr-sizes-left-sidebar-width));
   top: 0;
   right: 0;
   bottom: 0;
@@ -200,7 +195,7 @@ TODO: Discuss and move them to a more appropriate place
     &:has(.left-sidebar.is-visible) {
       &:before {
         content: ' ';
-        background-color: var(--cr-overlay-background-color);        
+        background-color: var(--cr-overlay-background-color);
         position: fixed;
         width: unset;
         top: 0;
@@ -211,7 +206,7 @@ TODO: Discuss and move them to a more appropriate place
       }
     }
   }
-  
+
   .left-sidebar {
     width: 80%;
   }

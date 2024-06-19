@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 .load-spinner {
-   background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="40" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="100" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="160" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>') ;  
-   background-size: cover;
-   width: 64px;
-   height: 64px;
-  }
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="40" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="100" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="160" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>');
+  background-size: cover;
+  width: 64px;
+  height: 64px;
+}
 
 :root {
   --cr-sizes-max-page-width: 960px; /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
@@ -30,7 +30,6 @@
   --cr-sizes-left-sidebar-min-width: 250px; /*The minimum width of the sidebar*/
   --cr-sizes-collapsed-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard left sidebar*/
   --cr-base-font-size: 16px;
-  
 
 
   /*
@@ -40,7 +39,7 @@
   /* Fonts */
   --cr-font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
   --cr-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   --cr-font-serif: Georgia, 'Times New Roman', serif;
 
   /* Font sizes */
@@ -81,9 +80,9 @@
   --cr-focus-ring: var(--cr-focus-ring-style) var(--cr-focus-ring-width) var(--cr-focus-ring-color);
   --cr-focus-ring-offset: 1px;
 
-    /*
-   * Color Primitives
-   */
+/*
+ * Color Primitives
+ */
 
   /* Gray */
   --cr-color-gray-50: hsl(0 0% 97.5%);

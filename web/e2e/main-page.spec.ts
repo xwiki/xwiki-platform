@@ -75,10 +75,10 @@ test("has breadcrumb", async ({ page }) => {
   await expect(breadcrumbItems).toHaveCount(2);
   await expect(breadcrumbItems.first()).toContainText("Home");
   expect(await breadcrumbItems.first().getAttribute("href")).toEqual(
-    "http://localhost:15680/xwiki/bin/view/Main/"
+    "http://localhost:15680/xwiki/bin/view/Main/",
   );
   await expect(breadcrumbItems.last()).toContainText("Main");
   expect(await breadcrumbItems.last().getAttribute("href")).toEqual(
-    "http://localhost:15680/xwiki/bin/view/Main/"
+    "http://localhost:15680/xwiki/bin/view/Main/",
   );
 });

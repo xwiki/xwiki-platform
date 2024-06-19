@@ -9,6 +9,9 @@
     "require-homepage": "error",
     "valid-values-author": ["error", [
       "XWiki Org Community <contact@xwiki.org>"
+    ]],
+    "valid-values-license": ["error", [
+      "LGPL 2.1"
     ]]
   }
 }

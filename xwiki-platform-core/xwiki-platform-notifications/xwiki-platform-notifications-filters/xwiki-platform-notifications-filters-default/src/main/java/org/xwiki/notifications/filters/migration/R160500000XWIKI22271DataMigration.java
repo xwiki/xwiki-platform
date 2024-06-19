@@ -59,7 +59,7 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
         + "from DefaultNotificationFilterPreference nfp "
         + "where nfp.page not like :wikiPrefix and "
         + "nfp.pageOnly not like :wikiPrefix and "
-        + "nfp.user not like :wikiPrefix and"
+        + "nfp.user not like :wikiPrefix and "
         + "nfp.wiki <> :wikiId";
 
     private static final String DELETE_FILTER_STATEMENT = "delete from DefaultNotificationFilterPreference "
@@ -91,7 +91,10 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        boolean shouldExecute = super.shouldExecute(startupVersion);
+        // We only execute the migration on main wiki: we cannot have filters related to another subwiki in a subwiki
+        // DB.
+        boolean shouldExecute = super.shouldExecute(startupVersion) &&
+            this.wikiDescriptorManager.isMainWiki(this.wikiDescriptorManager.getCurrentWikiId());
 
         if (shouldExecute) {
             int version = startupVersion.getVersion();

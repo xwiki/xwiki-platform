@@ -128,7 +128,7 @@ class R160500000XWIKI22271DataMigrationTest
             + "from DefaultNotificationFilterPreference nfp "
             + "where nfp.page not like :wikiPrefix and "
             + "nfp.pageOnly not like :wikiPrefix and "
-            + "nfp.user not like :wikiPrefix and"
+            + "nfp.user not like :wikiPrefix and "
             + "nfp.wiki <> :wikiId", Query.HQL))
             .thenReturn(query1)
             .thenReturn(query2)

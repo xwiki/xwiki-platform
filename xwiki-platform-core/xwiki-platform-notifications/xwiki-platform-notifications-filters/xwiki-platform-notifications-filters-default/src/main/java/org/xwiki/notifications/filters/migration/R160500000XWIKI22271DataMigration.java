@@ -57,10 +57,13 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
 {
     private static final String SEARCH_FILTERS_STATEMENT = "select nfp "
         + "from DefaultNotificationFilterPreference nfp "
-        + "where nfp.page not like :wikiPrefix and "
-        + "nfp.pageOnly not like :wikiPrefix and "
-        + "nfp.user not like :wikiPrefix and "
-        + "nfp.wiki <> :wikiId";
+        + "where nfp.id not in ("
+        + "select nfp2.id from DefaultNotificationFilterPreference nfp2 "
+        + "where nfp2.page like :wikiPrefix or "
+        + "nfp2.pageOnly like :wikiPrefix or "
+        + "nfp2.user like :wikiPrefix or "
+        + "nfp2.wiki = :wikiId"
+        + ")";
 
     private static final String DELETE_FILTER_STATEMENT = "delete from DefaultNotificationFilterPreference "
         + "where internalId in (:filterIds)";
@@ -93,8 +96,8 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
     {
         // We only execute the migration on main wiki: we cannot have filters related to another subwiki in a subwiki
         // DB.
-        boolean shouldExecute = super.shouldExecute(startupVersion) &&
-            this.wikiDescriptorManager.isMainWiki(this.wikiDescriptorManager.getCurrentWikiId());
+        boolean shouldExecute = super.shouldExecute(startupVersion)
+            && this.wikiDescriptorManager.isMainWiki(this.wikiDescriptorManager.getCurrentWikiId());
 
         if (shouldExecute) {
             int version = startupVersion.getVersion();
@@ -116,13 +119,11 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
             do {
                 results = this.queryManager
                     .createQuery(SEARCH_FILTERS_STATEMENT, Query.HQL)
-                    .bindValue("wikiPrefix")
-                    .literal(currentWikiId + ":")
-                    .anyChars()
-                    .query()
-                    .bindValue("wikiId")
-                    .literal(currentWikiId)
-                    .query()
+                    // Same escaping logic as documented in EscapeLikeParametersQuery
+                    // Note that we can't rely on using a DefaultQueryParameter here because of the nested query...
+                    // See XWIKI-22279
+                    .bindValue("wikiPrefix", currentWikiId.replaceAll("([%_!])", "!$1") + ":%")
+                    .bindValue("wikiId", currentWikiId)
                     .setOffset(offset)
                     .setLimit(BATCH_SIZE)
                     .execute();

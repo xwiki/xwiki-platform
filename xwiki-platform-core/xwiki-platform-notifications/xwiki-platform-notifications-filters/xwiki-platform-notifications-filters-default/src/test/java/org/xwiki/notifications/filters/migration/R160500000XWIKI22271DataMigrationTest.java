@@ -35,7 +35,6 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.query.QueryParameter;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -71,7 +70,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class R160500000XWIKI22271DataMigrationTest
 {
-    private static final String CURRENT_WIKI = "currentWiki";
+    private static final String CURRENT_WIKI = "current_Wiki";
+    private static final String CURRENT_WIKI_ESCAPED = "current!_Wiki";
 
     @InjectMockComponents(role = HibernateDataMigration.class)
     private R160500000XWIKI22271DataMigration dataMigration;
@@ -126,24 +126,19 @@ class R160500000XWIKI22271DataMigrationTest
 
         when(this.queryManager.createQuery("select nfp "
             + "from DefaultNotificationFilterPreference nfp "
-            + "where nfp.page not like :wikiPrefix and "
-            + "nfp.pageOnly not like :wikiPrefix and "
-            + "nfp.user not like :wikiPrefix and "
-            + "nfp.wiki <> :wikiId", Query.HQL))
+            + "where nfp.id not in ("
+            + "select nfp2.id from DefaultNotificationFilterPreference nfp2 "
+            + "where nfp2.page like :wikiPrefix or "
+            + "nfp2.pageOnly like :wikiPrefix or "
+            + "nfp2.user like :wikiPrefix or "
+            + "nfp2.wiki = :wikiId"
+            + ")", Query.HQL))
             .thenReturn(query1)
             .thenReturn(query2)
             .thenReturn(query3);
 
-        QueryParameter queryParameter1 = mock(QueryParameter.class);
-        when(query1.bindValue("wikiPrefix")).thenReturn(queryParameter1);
-        when(queryParameter1.literal(CURRENT_WIKI + ":")).thenReturn(queryParameter1);
-        when(queryParameter1.anyChars()).thenReturn(queryParameter1);
-        when(queryParameter1.query()).thenReturn(query1);
-
-        QueryParameter queryParameter1Bis = mock(QueryParameter.class);
-        when(query1.bindValue("wikiId")).thenReturn(queryParameter1Bis);
-        when(queryParameter1Bis.literal(CURRENT_WIKI)).thenReturn(queryParameter1Bis);
-        when(queryParameter1Bis.query()).thenReturn(query1);
+        when(query1.bindValue("wikiPrefix", CURRENT_WIKI_ESCAPED + ":%")).thenReturn(query1);
+        when(query1.bindValue("wikiId", CURRENT_WIKI)).thenReturn(query1);
 
         when(query1.setOffset(0)).thenReturn(query1);
         when(query1.setLimit(100)).thenReturn(query1);
@@ -164,16 +159,8 @@ class R160500000XWIKI22271DataMigrationTest
         when(query1.execute()).thenReturn(resultQuery1);
 
         // query 2
-        QueryParameter queryParameter2 = mock(QueryParameter.class);
-        when(query2.bindValue("wikiPrefix")).thenReturn(queryParameter2);
-        when(queryParameter2.literal(CURRENT_WIKI + ":")).thenReturn(queryParameter2);
-        when(queryParameter2.anyChars()).thenReturn(queryParameter2);
-        when(queryParameter2.query()).thenReturn(query2);
-
-        QueryParameter queryParameter2Bis = mock(QueryParameter.class);
-        when(query2.bindValue("wikiId")).thenReturn(queryParameter2Bis);
-        when(queryParameter2Bis.literal(CURRENT_WIKI)).thenReturn(queryParameter2Bis);
-        when(queryParameter2Bis.query()).thenReturn(query2);
+        when(query2.bindValue("wikiPrefix", CURRENT_WIKI_ESCAPED + ":%")).thenReturn(query2);
+        when(query2.bindValue("wikiId", CURRENT_WIKI)).thenReturn(query2);
 
         when(query2.setOffset(100)).thenReturn(query2);
         when(query2.setLimit(100)).thenReturn(query2);
@@ -194,16 +181,8 @@ class R160500000XWIKI22271DataMigrationTest
         when(query2.execute()).thenReturn(resultQuery2);
 
         // query 3
-        QueryParameter queryParameter3 = mock(QueryParameter.class);
-        when(query3.bindValue("wikiPrefix")).thenReturn(queryParameter3);
-        when(queryParameter3.literal(CURRENT_WIKI + ":")).thenReturn(queryParameter3);
-        when(queryParameter3.anyChars()).thenReturn(queryParameter3);
-        when(queryParameter3.query()).thenReturn(query3);
-
-        QueryParameter queryParameter3Bis = mock(QueryParameter.class);
-        when(query3.bindValue("wikiId")).thenReturn(queryParameter3Bis);
-        when(queryParameter3Bis.literal(CURRENT_WIKI)).thenReturn(queryParameter3Bis);
-        when(queryParameter3Bis.query()).thenReturn(query3);
+        when(query3.bindValue("wikiPrefix", CURRENT_WIKI_ESCAPED + ":%")).thenReturn(query3);
+        when(query3.bindValue("wikiId", CURRENT_WIKI)).thenReturn(query3);
 
         when(query3.setOffset(136)).thenReturn(query3);
         when(query3.setLimit(100)).thenReturn(query3);
@@ -247,15 +226,12 @@ class R160500000XWIKI22271DataMigrationTest
         verify(query1).execute();
         verify(query2).execute();
         verify(query3).execute();
-        verify(queryParameter1).literal(CURRENT_WIKI + ":");
-        verify(queryParameter1).anyChars();
-        verify(queryParameter2).literal(CURRENT_WIKI + ":");
-        verify(queryParameter2).anyChars();
-        verify(queryParameter3).literal(CURRENT_WIKI + ":");
-        verify(queryParameter3).anyChars();
-        verify(queryParameter1Bis).literal(CURRENT_WIKI);
-        verify(queryParameter2Bis).literal(CURRENT_WIKI);
-        verify(queryParameter3Bis).literal(CURRENT_WIKI);
+        verify(query1).bindValue("wikiPrefix", CURRENT_WIKI_ESCAPED + ":%");
+        verify(query1).bindValue("wikiId", CURRENT_WIKI);
+        verify(query2).bindValue("wikiPrefix", CURRENT_WIKI_ESCAPED + ":%");
+        verify(query2).bindValue("wikiId", CURRENT_WIKI);
+        verify(query3).bindValue("wikiPrefix", CURRENT_WIKI_ESCAPED + ":%");
+        verify(query3).bindValue("wikiId", CURRENT_WIKI);
         verify(sessionQuery).executeUpdate();
     }
 }

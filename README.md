@@ -37,16 +37,17 @@ Page" style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2)">
 ## Project details
 
 * Project Lead: [Manuel Leduc](https://www.xwiki.org/xwiki/bin/view/XWiki/mleduc)
-* Documentation & Downloads: N/A <!-- [Documentation & Download](https://extensions.xwiki.org/xwiki/bin/view/Extension/
-  (extension
-  name)))-->
+* Documentation: [Documentation](https://cristal.xwiki.org/)
+* Downloads:
+  * `@xwiki/cristal-*` on https://www.npmjs.com/org/xwiki
+  * binary artifacts on https://github.com/xwiki-contrib/cristal/releases
 * [Issue Tracker](https://jira.xwiki.org/projects/CRISTAL/summary)
 * Communication: [Forum](https://forum.xwiki.org/c/cristal/18)<!--, [Chat](https://dev.xwiki.
   org/xwiki/bin/view/Community/Chat)-->
 * [Development Practices](https://dev.xwiki.org)
-* Minimal XWiki version supported: N/A <!-- XWiki (minimal xwiki version)-->
+* [Supported backends](https://cristal.xwiki.org/xwiki/bin/view/Backends/)
 * License: LGPL 2.1
-* Translations: N/A
+* Translations: all `Cristal - *` components on https://l10n.xwiki.org/projects/xwiki-contrib/
 * Sonar Dashboard: N/A <!--[![Status](https://sonarcloud.io/api/project_badges/measure?project=(group id):(artifact id)&metric=alert_status)](https://sonarcloud.io/dashboard?id=(group
   id):(artifact id))-->
 

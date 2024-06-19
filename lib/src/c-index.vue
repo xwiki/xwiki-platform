@@ -1,4 +1,4 @@
-<!--
+q<!--
  * See the LICENSE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -22,20 +22,11 @@
  * @license    http://opensource.org/licenses/AGPL-3.0 AGPL-3.0
  *
 -->
-<script lang="ts">
+<script lang="ts" setup>
 import { CTemplate } from "@xwiki/cristal-skin";
-import { defineComponent } from "vue";
 import "./index.css";
-
-export default defineComponent({
-  components: {
-    CTemplate,
-  },
-  setup() {},
-});
 </script>
 <template>
   <CTemplate name="view" />
 </template>
-<!-- TODO CRISTAL-165: these styles need to me moved to a generic CSS that loads last in the main template-->
 <style scoped></style>

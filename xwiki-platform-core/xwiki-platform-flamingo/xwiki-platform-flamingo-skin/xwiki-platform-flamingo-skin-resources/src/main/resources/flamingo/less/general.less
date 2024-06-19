@@ -160,9 +160,10 @@ body {
     }
 
     // UIs where we want to underline outside of content.
-    .xdocLastModification,
-    .panel[class*="HelpTipsPanel "],
-    .commentauthor {
+    .xdocLastModification, // Under the title, this link is inline so we want to underline it.
+    .panel[class*="HelpTipsPanel "], // This panel, unlike other panels, contains mostly text with underline links.
+    .commentauthor // Similarly to the page last modificator, we want to underline comment authors.
+    {
       & a {
         text-decoration: underline;
       }
@@ -171,11 +172,13 @@ body {
     /* UIs in content where we want to not underline by default.
       Those elements usually contain only links that are not inline (and a lot of links). */
     #xwikicontent {
-      & .xwiki-livetable-container,
-      & .xtree,
-      & .xwikitabbar,
-      & .buttonwrapper,
-      & #user-menu-col {
+      & .xwiki-livetable-container, // Do not underline links in livetables
+      & .xtree, // Do not underline links in livetables
+      & .xwikitabbar, // Do not underline links in the tab bar. An example of this is the one containing document metadata at the bottom of ny doc.
+      & .buttonwrapper, // Do not underline links that are inside buttonwrapper. Those will be styled like buttons and we want to keep their style consistent with buttons.
+      & #user-menu-col, // In the user profile, do not underline the menu items.
+      & .jstree-xwiki // Do not underline links in jstrees
+      {
         & a {
           .not-inline-link();
         }

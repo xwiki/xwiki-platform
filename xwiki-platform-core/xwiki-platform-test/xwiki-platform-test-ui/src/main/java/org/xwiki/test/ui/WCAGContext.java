@@ -96,12 +96,9 @@ public class WCAGContext
             entry("definition-list", true),
             entry("dlitem", true),
             entry("document-title", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id-active", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id-aria", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id", false),
+            entry("duplicate-id-active", true),
+            entry("duplicate-id-aria", true),
+            entry("duplicate-id", true),
             entry("form-field-multiple-labels", true),
             entry("frame-focusable-content", true),
             entry("frame-title-unique", true),
@@ -258,6 +255,8 @@ public class WCAGContext
     private String testClassName;
 
     private String testMethodName;
+
+    private boolean stopOnError = true;
 
     /**
      * Sets the current test class name. This name is the string representation of the TestUI class in which the
@@ -449,6 +448,22 @@ public class WCAGContext
     public boolean isWCAGEnabled()
     {
         return this.wcagEnabled;
+    }
+
+    /**
+     * @param stopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public void setWCAGStopOnError(boolean stopOnError)
+    {
+        this.stopOnError = stopOnError;
+    }
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public boolean shouldWCAGStopOnError()
+    {
+        return this.stopOnError;
     }
 
     /**

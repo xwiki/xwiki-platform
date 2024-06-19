@@ -49,4 +49,10 @@ public class AllIT
     class NestedOrphanedPagesIT extends OrphanedPagesIT
     {
     }
+
+    @Nested
+    @DisplayName("Documents Macro UI")
+    class NestedDocumentsMacroIT extends DocumentsMacroIT
+    {
+    }
 }

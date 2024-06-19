@@ -116,7 +116,7 @@ public class DocumentContentAsyncExecutor
         this.parameters = parameters;
 
         this.transformationId = transformationId;
-        this.xdom = getContent(document, parameters);
+        this.xdom = getPreparedContent(document, parameters);
         this.documentReference = document.getDocumentReference();
         this.syntax = document.getSyntax();
         this.document = document;
@@ -129,9 +129,10 @@ public class DocumentContentAsyncExecutor
      * @param parameters the display parameters
      * @return the content as an XDOM tree
      */
-    private XDOM getContent(DocumentModelBridge document, final DocumentDisplayerParameters parameters)
+    private XDOM getPreparedContent(DocumentModelBridge document, final DocumentDisplayerParameters parameters)
     {
-        XDOM content = parameters.isContentTranslated() ? getTranslatedContent(document) : document.getXDOM();
+        XDOM content =
+            parameters.isContentTranslated() ? getPreparedTranslatedContent(document) : document.getPreparedXDOM();
 
         if (parameters.getSectionId() != null) {
             HeaderBlock headerBlock =
@@ -203,7 +204,7 @@ public class DocumentContentAsyncExecutor
      * @param document the source document
      * @return the translated content of the given document, as XDOM tree
      */
-    private XDOM getTranslatedContent(DocumentModelBridge document)
+    private XDOM getPreparedTranslatedContent(DocumentModelBridge document)
     {
         try {
             DocumentModelBridge translatedDocument = this.documentAccessBridge.getTranslatedDocumentInstance(document);
@@ -215,7 +216,7 @@ public class DocumentContentAsyncExecutor
                 // The language of the given document doesn't match the context language. Use the translated content.
                 if (document.getSyntax().equals(translatedDocument.getSyntax())) {
                     // Use getXDOM() because it caches the XDOM.
-                    return translatedDocument.getXDOM();
+                    return translatedDocument.getPreparedXDOM();
                 } else {
                     // If the translated document has a different syntax then we have to parse its content using the
                     // syntax of the given document.
@@ -227,7 +228,7 @@ public class DocumentContentAsyncExecutor
             // Use the content of the given document.
         }
 
-        return document.getXDOM();
+        return document.getPreparedXDOM();
     }
 
     /**

@@ -51,10 +51,10 @@ public interface EntityChannelStore
      */
     default List<EntityChannel> getChannels(EntityReference entityReference, List<String> pathPrefix)
     {
-        return getChannels(entityReference).stream().filter(Objects::nonNull).filter(channel -> {
-            return channel.getPath().size() >= pathPrefix.size()
-                && Objects.equals(channel.getPath().subList(0, pathPrefix.size()), pathPrefix);
-        }).collect(Collectors.toList());
+        return getChannels(entityReference).stream().filter(Objects::nonNull)
+            .filter(channel -> channel.getPath().size() >= pathPrefix.size()
+                && Objects.equals(channel.getPath().subList(0, pathPrefix.size()), pathPrefix))
+            .collect(Collectors.toList());
     }
 
     /**

@@ -498,7 +498,7 @@ public class BasePage extends BaseElement
      */
     public void logout()
     {
-        getDrawerMenu().toggle();
+        getDrawerMenu().show();
         getDriver().findElement(By.id("tmLogout")).click();
         // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
         // TestUtils#createUser*(), which expect the currently cached token to be valid, will fail because they would be
@@ -687,23 +687,31 @@ public class BasePage extends BaseElement
             return;
         }
 
-        long startTime = System.currentTimeMillis();
-        // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
-        // the cache is disabled.
-        if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
-            XWikiWebDriver driver = this.getDriver();
-            AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
-            Results axeResult = axeBuilder.analyze(driver);
-            wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
-            long stopTime = System.currentTimeMillis();
-            long deltaTime = stopTime - startTime;
-            LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
-                this.getPageURL(), this.getClass().getName(), deltaTime);
-            wcagContext.addWCAGTime(deltaTime);
-        } else {
-            // If the identifying pair is already in the cache, don't perform accessibility validation.
-            LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
-                this.getPageURL(), this.getClass().getName());
+        try {
+            long startTime = System.currentTimeMillis();
+            // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
+            // the cache is disabled.
+            if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
+                XWikiWebDriver driver = this.getDriver();
+                AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
+                Results axeResult = axeBuilder.analyze(driver);
+                wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+                long stopTime = System.currentTimeMillis();
+                long deltaTime = stopTime - startTime;
+                LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
+                    this.getPageURL(), this.getClass().getName(), deltaTime);
+                wcagContext.addWCAGTime(deltaTime);
+            } else {
+                // If the identifying pair is already in the cache, don't perform accessibility validation.
+                LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
+                    this.getPageURL(), this.getClass().getName());
+            }
+        } catch (Exception e) {
+            if (wcagContext.shouldWCAGStopOnError()) {
+                throw e;
+            } else {
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+            }
         }
     }
 

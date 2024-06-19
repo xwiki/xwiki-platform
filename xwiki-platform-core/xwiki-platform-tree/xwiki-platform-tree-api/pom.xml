@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tree</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tree-api</artifactId>
   <name>XWiki Platform - Tree - API</name>
   <packaging>jar</packaging>
   <description>Provides a generic API for creating tree models that can be displayed using the tree widget.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.47</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tree API</xwiki.extension.name>
   </properties>

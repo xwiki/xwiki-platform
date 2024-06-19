@@ -42,11 +42,20 @@ panels.description=Beschreibung
 panels.type=Typ
 panels.category=Kategorie
 panels._actions=Aktionen
-panels.emptyvalue=
+### Missing: panels.emptyvalue=
 panels.children.title=Unterseiten
 panels.siblings.title=Geschwisterseiten
+panels.customize=Du kannst die Seitenspalte(n) mit {0} anpassen
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
 panels.documentInformation.configureSyntaxes=Weitere Syntaxen konfigurieren
 panels.documentInformation.confirmChangeSyntaxWysiwyg=Möchten Sie auch den Inhalt und die Objekte des Dokuments in die gewählte Syntax konvertieren? Wenn Sie 'Abbrechen' wählen, wird die Syntax auf die vorherige zurückgesetzt und es wird nichts unternommen. Beachten Sie, dass, wenn Sie 'ok' wählen, Änderungen verloren gehen und das Dokument automatisch gespeichert wird, Sie können diese Änderung rückgängig machen, indem Sie zur Anzeige der Dokumentenhistorie gehen und die letzte Version zurücksetzen.
 panels.documentInformation.confirmChangeSyntax=Möchten Sie auch den Inhalt und die Objekte des Dokuments in die gewählte Syntax konvertieren? Wenn Sie 'Abbrechen' wählen, wird nur die Syntaxkennung geändert, ohne den Inhalt des Dokuments zu ändern. Beachten Sie, dass, wenn Sie 'ok' wählen, das Dokument automatisch gespeichert wird, Sie diese Änderung rückgängig machen können, indem Sie zur Anzeige der Dokumentenhistorie gehen und die letzte Version zurücksetzen.
-panels.documentInformation.failedSyntaxConversion=Die Konvertierung in die ausgewählte Syntax konnte nicht durchgeführt werden. Wenn Sie diese Syntax trotzdem verwenden möchten, können Sie sie erneut auswählen und die Konvertierung nicht durchführen.</content>
+panels.documentInformation.failedSyntaxConversion=Die Konvertierung in die ausgewählte Syntax konnte nicht durchgeführt werden. Wenn Sie diese Syntax trotzdem verwenden möchten, können Sie sie erneut auswählen und die Konvertierung nicht durchführen.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

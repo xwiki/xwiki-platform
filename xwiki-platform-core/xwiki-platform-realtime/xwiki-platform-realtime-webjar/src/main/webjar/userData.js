@@ -21,8 +21,9 @@ define('xwiki-realtime-userData', [
   'chainpad',
   'chainpad-netflux',
   'json.sortify'
-], function(ChainPad, chainpadNetflux, jsonSortify) {
+], function(ChainPad, ChainPadNetflux, jsonSortify) {
   'use strict';
+
   let userData, onChange;
   function updateUserData(textData) {
     try {
@@ -33,15 +34,25 @@ define('xwiki-realtime-userData', [
       if (typeof onChange === 'function') {
         onChange(userData);
       }
-    } catch (e) {
-      console.log('Failed to parse user data: ' + textData);
-      console.error(e);
+    } catch (error) {
+      console.error('Failed to parse user data.', {userData: textData, error});
     }
   }
 
   let module = {}, online, myId;
+
+  function startInitializing() {
+    module._initializing = new Promise(resolve => {
+      module._notifyReady = () => {
+        // Mark the UserData as ready right away (rather than using a promise callback which would be called on the next
+        // tick), to be visible to the code executed right after _notifyReady is called.
+        module._initializing = false;
+        resolve();
+      };
+    });
+  }
+
   function createConfig(network, key, configData) {
-    let initializing = true;
     return {
       initialState: '{}',
       network,
@@ -52,15 +63,14 @@ define('xwiki-realtime-userData', [
       patchTransformer: ChainPad.SmartJSONTransformer,
 
       onReady: function(info) {
-        module.leave = info.leave;
         module.chainpad = info.realtime;
+        module._notifyReady();
         updateUserData(module.chainpad.getUserDoc());
-        initializing = false;
         this.onLocal();
       },
 
       onLocal: function() {
-        if (!initializing && online) {
+        if (!module._initializing && online) {
           const strHyperJSON = jsonSortify(userData);
           module.chainpad.contentUpdate(strHyperJSON);
           if (module.chainpad.getUserDoc() !== strHyperJSON) {
@@ -70,7 +80,7 @@ define('xwiki-realtime-userData', [
       },
 
       onRemote: function(info) {
-        if (!initializing) {
+        if (!module._initializing) {
           updateUserData(module.chainpad.getUserDoc());
         }
       },
@@ -80,7 +90,7 @@ define('xwiki-realtime-userData', [
           myId = info.myId;
           online = true;
           module.chainpad.start();
-          initializing = true;
+          startInitializing();
         } else {
           module.chainpad.abort();
           online = false;
@@ -129,24 +139,22 @@ define('xwiki-realtime-userData', [
       }, 3000);
     }
 
-    userData.leave = function() {
+    userData.stop = function() {
       clearInterval(intervalId);
-      try {
-        // Don't throw error if the channel is already removed.
-        module.leave();
-      } catch (e) {
-        console.error(e);
-      }
+      module.realtimeInput?.stop();
+      delete module.realtimeInput;
     };
 
     return userData;
   }
 
-  module.start = function(network, key, configData) {
+  module.start = async function(network, key, configData) {
+    startInitializing();
+
     configData = configData || {};
     myId = configData.myId;
     if (!myId || !configData.userName) {
-      console.warn("myId and userName are required!");
+      console.error("myId and userName are required!");
       return;
     }
 
@@ -156,7 +164,10 @@ define('xwiki-realtime-userData', [
     const config = createConfig(network, key, configData);
     userData = createUserData(configData, config);
 
-    chainpadNetflux.start(config);
+    // We can't store the realtimeInput in the userData object because it's not serializable to JSON.
+    module.realtimeInput = ChainPadNetflux.start(config);
+
+    await module._initializing;
 
     return userData;
   };

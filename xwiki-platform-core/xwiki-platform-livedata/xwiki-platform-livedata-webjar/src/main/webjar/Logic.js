@@ -30,11 +30,12 @@ define('xwiki-livedata', [
 ], function(
   Vue,
   VueI18n,
-  XWikiLivedata,
+  xwikiLivedataVue,
   liveDataSourceModule,
   jsonMerge,
   editBus
 ) {
+  const XWikiLivedata = xwikiLivedataVue.XWikiLivedata;
   /**
    * Make vue use the i18n plugin
    */

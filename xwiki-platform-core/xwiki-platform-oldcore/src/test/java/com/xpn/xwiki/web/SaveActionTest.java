@@ -192,8 +192,7 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(this.mockAuthors).setOriginalMetadataAuthor(this.fooUserReference);
-        verify(this.mockAuthors).setEffectiveMetadataAuthor(this.fooUserReference);
+        verify(mockClonedDocument).setAuthor(this.fooUserReference);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
@@ -270,8 +269,7 @@ class SaveActionTest
         assertFalse(saveAction.save(this.context));
         assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(this.mockAuthors).setOriginalMetadataAuthor(this.fooUserReference);
-        verify(this.mockAuthors).setEffectiveMetadataAuthor(this.fooUserReference);
+        verify(mockClonedDocument).setAuthor(this.fooUserReference);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);

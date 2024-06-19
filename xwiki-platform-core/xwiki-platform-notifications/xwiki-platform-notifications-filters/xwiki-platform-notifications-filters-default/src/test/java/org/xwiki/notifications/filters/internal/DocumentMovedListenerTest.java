@@ -56,7 +56,6 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -78,9 +77,6 @@ class DocumentMovedListenerTest
 
     @MockComponent
     private EntityReferenceSerializer<String> serializer;
-
-    @MockComponent
-    private NotificationFilterPreferenceConfiguration filterPreferencesConfiguration;
 
     @MockComponent
     private NamespaceContextExecutor namespaceContextExecutor;
@@ -137,9 +133,7 @@ class DocumentMovedListenerTest
         when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
 
         // Mock
-        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
-        when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("mainWiki"));
 
         session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
@@ -180,8 +174,6 @@ class DocumentMovedListenerTest
         when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
 
         // Mock
-        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
-        when(filterPreferencesConfiguration.useMainStore()).thenReturn(false);
         when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("foo", "bar", "mainWiki"));
 
         session = mock(Session.class);
@@ -214,28 +206,6 @@ class DocumentMovedListenerTest
         verify(namespaceContextExecutor).execute(eq(new WikiNamespace("bar")), any());
     }
 
-    @Test
-    void onEventWhenNonTerminalDocumentOnMainWikiNoStore() throws Exception
-    {
-        DocumentReference source = new DocumentReference("xwiki", "PageA", "WebHome");
-        DocumentReference target = new DocumentReference("xwiki", "PageB", "WebHome");
-        when(serializer.serialize(new SpaceReference("PageA", new WikiReference("xwiki")))).thenReturn("xwiki:PageA");
-        when(serializer.serialize(new SpaceReference("PageB", new WikiReference("xwiki")))).thenReturn("xwiki:PageB");
-        when(serializer.serialize(source)).thenReturn("xwiki:PageA.WebHome");
-        when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
-
-        // Mock
-        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(false);
-        when(filterPreferencesConfiguration.useMainStore()).thenReturn(false);
-
-        // Test
-        DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
-        this.listener.onEvent(event, null, null);
-
-        // Verify
-        verify(cachedModelBridge).clearCache();
-        verifyNoInteractions(hibernateStore);
-    }
 
     @Test
     void onEventWhenNonTerminalDocumentOnSubWiki() throws Exception
@@ -248,9 +218,7 @@ class DocumentMovedListenerTest
         when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
 
         // Mock
-        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
-        when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("mainWiki"));
 
         session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
@@ -289,9 +257,7 @@ class DocumentMovedListenerTest
         when(serializer.serialize(target)).thenReturn("xwiki:PageB.Terminal");
 
         // Mock
-        when(filterPreferencesConfiguration.useLocalStore()).thenReturn(true);
-        when(filterPreferencesConfiguration.useMainStore()).thenReturn(true);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("mainWiki"));
 
         session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);

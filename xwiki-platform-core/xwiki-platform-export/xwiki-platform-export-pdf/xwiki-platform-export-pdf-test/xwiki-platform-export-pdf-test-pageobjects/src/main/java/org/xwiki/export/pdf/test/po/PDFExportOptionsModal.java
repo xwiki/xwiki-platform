@@ -61,6 +61,9 @@ public class PDFExportOptionsModal extends BaseModal
     @FindBy(id = "pdffooter")
     private WebElement footerCheckbox;
 
+    @FindBy(id = "language")
+    private WebElement languageSelect;
+
     /**
      * Opens the PDF export options modal for the given page.
      * 
@@ -100,6 +103,14 @@ public class PDFExportOptionsModal extends BaseModal
     public Select getTemplateSelect()
     {
         return new Select(this.templateSelect);
+    }
+
+    /**
+     * @return the select used to specify the page translation that should be exported
+     */
+    public Select getLanguageSelect()
+    {
+        return new Select(this.languageSelect);
     }
 
     /**

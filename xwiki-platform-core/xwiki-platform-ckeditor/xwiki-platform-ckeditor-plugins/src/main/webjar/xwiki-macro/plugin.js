@@ -204,18 +204,17 @@
               macro.add(child);
             });
           } else {
-            var thisWidget = this;
             // If the widget has nested editables we need to include them, otherwise their content is not saved.
-            widgetElementClone.forEach(function(element) {
-              var nestedEditableType = getNestedEditableType(element);
+            widgetElementClone.forEach(element => {
+              const nestedEditableType = getNestedEditableType(element);
               if (nestedEditableType && element.attributes.contenteditable) {
-                var parameterType = thisWidget.getParameterType(element.attributes[nestedEditableNameAttribute]);
+                const parameterType = this.getParameterType(element.attributes[nestedEditableNameAttribute]);
                 // Skip the nested editable if it doesn't match the expected parameter type.
                 if (!parameterType || nestedEditableType === parameterType) {
                   macro.add(element);
                 }
                 return false;
-              } else if (thisWidget.upcast(element)) {
+              } else if (this.upcast(element)) {
                 // Skip nested macros that are outside of a nested editable.
                 return false;
               }
@@ -250,6 +249,8 @@
           var data = macroPlugin.parseMacroCall(this.element.getAttribute('data-macro'));
           // Preserve the macro type (in-line vs. block) as much as possible when editing a macro.
           data.inline = this.inline;
+          // Remove from the macro call the parameters that are editable in-place using nested editables.
+          this.simplifyMacroCall(data);
           // Update the macro widget data.
           this.setData(data);
           // Allow JavaScript code to update the macro output after the widget is ready. We have to do this only once
@@ -261,6 +262,16 @@
               $(editor.document.$).trigger('xwiki:dom:updated', {'elements': [this.element.$]});
             });
           }
+        },
+        simplifyMacroCall: function(macroCall) {
+          if (this.editables.$content) {
+            delete macroCall.content;
+          }
+          Object.keys(this.editables).forEach(name => {
+            const parameterName = Object.keys(macroCall.parameters)
+              .find(key => key.toLowerCase() === name.toLowerCase());
+            delete macroCall.parameters[parameterName];
+          });
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
@@ -304,7 +315,8 @@
           };
           // Show our custom insert/edit dialog.
           require(['macroWizard'], function(macroWizard) {
-            macroWizard(input).done(function(data) {
+            // Give the focus back to the editor after the modal is closed.
+            macroWizard(input).always(editor.focus.bind(editor)).done(function(data) {
               macroPlugin.insertOrUpdateMacroWidget(editor, data, widget);
             });
           });
@@ -321,12 +333,8 @@
             return;
           }
 
-          var command = this;
-          var handler = editor.on('afterCommandExec', function(event) {
-            if (event.data.name === 'xwiki-refresh') {
-              handler.removeListener();
-              editor.fire('afterCommandExec', {name: command.name, command: command});
-            }
+          macroPlugin.onceAfterRefresh(editor, () => {
+            editor.fire('afterCommandExec', {name: this.name, command: this});
           });
 
           macroPlugin.insertOrUpdateMacroWidget(editor, macroCall);
@@ -335,25 +343,39 @@
 
       editor.addCommand('xwiki-refresh', {
         async: true,
-        exec: function(editor) {
-          var command = this;
-          CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
+        contextSensitive: false,
+        editorFocus: false,
+        readOnly: true,
+        exec: function(editor, options) {
+          options = Object.assign({
+            preserveSelection: true
+          }, options);
+          if (options.preserveSelection) {
+            CKEDITOR.plugins.xwikiSelection.saveSelection(editor);
+          }
           editor.setLoading(true);
           CKEDITOR.plugins.xwikiSource.convertHTML(editor, {
             fromHTML: true,
             toHTML: true,
             text: editor.getData()
-          }).done(function(html, textStatus, jqXHR) {
+          }).done((html, textStatus, jqXHR) => {
             var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
-            require(['macroWizard'], function() {
+            require(['macroWizard'], () => {
               $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
             });
-            editor.setData(html, {callback: command.done.bind(command, true)});
-          }).fail(this.done.bind(this));
+            editor.setData(html, {
+              callback: () => {
+                // The new content may contain widgets (e.g. macros) that need to be initialized.
+                macroPlugin.waitForWidgetsToBeReady(editor).then(this.done.bind(this, true, options));
+              }
+            });
+          }).fail(this.done.bind(this, false, options));
         },
-        done: function(success) {
+        done: function(success, options) {
           editor.setLoading(false);
-          CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+          if (options.preserveSelection) {
+            CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+          }
           if (!success) {
             editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');
           }
@@ -382,15 +404,11 @@
                   var insertMacro = function (widget) {
 
                     // The insertion finishes after refresh.
-                    var handler = editor.on('afterCommandExec', function (event) {
-                      var command = event.data.name;
-                      if (event.data.name === 'xwiki-refresh') {
-                        handler.removeListener();
-                        editor.fire('afterCommandExec', {
-                          name: command.name,
-                          command: command
-                        });
-                      }
+                    macroPlugin.onceAfterRefresh(editor, () => {
+                      editor.fire('afterCommandExec', {
+                        name: command.name,
+                        command: command
+                      });
                     });
 
                     // Retrieve required parameters.
@@ -416,6 +434,12 @@
                       var insertParam = {
                         name: macro.id.id,
                         parameters: {},
+                        // We consider the macro call to be inline if the macro supports inline mode, as indicated by
+                        // its descriptor, because the caret is placed in an inline context most of the time (e.g.
+                        // inside a paragraph) in order to allow the user to type text. Moreover, the
+                        // 'xwiki-macro-maybe-install-insert' editor command is used mainly by quick actions which are
+                        // triggered by the user typing text, so in an inline context.
+                        inline: descriptor.supportsInlineMode
                       };
 
                       // Set an empty default content when it is mandatory.
@@ -654,15 +678,24 @@
 
     },
 
-    insertOrUpdateMacroWidget: function(editor, data, widget, skipRefresh) {
+    insertOrUpdateMacroWidget: async function(editor, data, widget, skipRefresh) {
+      await editor.toBeReady();
+
       // Save the editor state before inserting the macro in order to be able to undo the macro insertion.
       editor.fire('saveSnapshot');
       // Prevent the editor from recording Undo/Redo history entries while the edited content is being refreshed:
       // * if the macro is inserted then we need to wait for the macro markers to be replaced by the actual macro output
       // * if the macro is updated then we need to wait for the macro output to be updated to match the new macro data
       editor.fire('lockSnapshot', {dontUpdate: true});
+
       var expectedElementName = data.inline ? 'span' : 'div';
-      var updatingWidget = widget && widget.element;
+      if (widget?.element && !widget?.wrapper) {
+        // It looks like the edited macro widget was destroyed while the Macro Editor modal was open (probably because
+        // the content was updated, e.g. as a result of a remote change in a realtime session). We assume the selection
+        // was preserved so we fallback on the macro widget that is currently active.
+        widget = this.getActiveMacroWidget(editor);
+      }
+      var updatingWidget = !!widget?.element;
       if (updatingWidget && widget.element.getName() === expectedElementName) {
         // We have edited a macro and the macro type (inline vs. block) didn't change.
         // We can safely update the existing macro widget.
@@ -685,45 +718,65 @@
           inlineEnforcer.insertAfter(editor.widgets.focused.wrapper);
         }
       }
+
       // Unlock the Undo/Redo history after the edited content is updated.
-      var handler = editor.on('afterCommandExec', function(event) {
-        var command = event.data.name;
-        if (event.data.name === 'xwiki-refresh') {
-          handler.removeListener();
-          // Remove the element we added after the macro to force the inline rendering.
-          var inlineEnforcer = editor.editable().findOne('span#xwiki-macro-inline-enforcer');
-          if (inlineEnforcer) {
-            // Place the caret after the inserted inline macro in order to allow the user to continue typing. We proceed
-            // by inserting and non-breakable space after the inline enforcer. It is required to be cross-browser
-            // compatible. Without these operations, the caret is not visible in Chrome after the inline macro
-            // insertion.
-            var space = new CKEDITOR.dom.text('\u00A0');
-            space.insertAfter(inlineEnforcer);
-            var range = editor.createRange();
-            range.selectNodeContents(space);
-            // Make the range of length zero (from endOffset to endOffset) so that a caret is displayed after the
-            // space, instead of a selection of the space.
-            range.setStartAfter(space, range.endOffset);
-            editor.getSelection().selectRanges([range]);
-            // Clean up the inline enforcer to avoid duplicates for the next inline macro insertion.
-            inlineEnforcer.remove();
-          }
-          this.waitForWidgetsToBeReady(editor).then(() => {
-            editor.fire('unlockSnapshot');
-            // Save the editor state after the macro widget is inserted and initialized in order to be able to redo the
-            // macro insertion. This also triggers the 'change' event allowing others to react to the macro insertion
-            // (e.g. the real-time editing can propagate this change).
-            editor.fire('saveSnapshot');
-          });
+      this.onceAfterRefresh(editor, () => {
+        // Remove the element we added after the macro to force the inline rendering.
+        var inlineEnforcer = editor.editable().findOne('span#xwiki-macro-inline-enforcer');
+        if (inlineEnforcer) {
+          // Place the caret after the inserted inline macro in order to allow the user to continue typing. We proceed
+          // by inserting and non-breakable space after the inline enforcer. It is required to be cross-browser
+          // compatible. Without these operations, the caret is not visible in Chrome after the inline macro
+          // insertion.
+          var space = new CKEDITOR.dom.text('\u00A0');
+          space.insertAfter(inlineEnforcer);
+          var range = editor.createRange();
+          range.selectNodeContents(space);
+          // Make the range of length zero (from endOffset to endOffset) so that a caret is displayed after the
+          // space, instead of a selection of the space.
+          range.setStartAfter(space, range.endOffset);
+          editor.getSelection().selectRanges([range]);
+          // Clean up the inline enforcer to avoid duplicates for the next inline macro insertion.
+          inlineEnforcer.remove();
         }
-      }, this);
 
-      if (skipRefresh) {
-        return;
+        editor.fire('unlockSnapshot');
+        // Save the editor state after the macro widget is inserted and initialized in order to be able to redo the
+        // macro insertion. This also triggers the 'change' event allowing others to react to the macro insertion
+        // (e.g. the real-time editing can propagate this change).
+        editor.fire('saveSnapshot');
+      }, skipRefresh);
+
+      if (!skipRefresh) {
+        // Refresh all the macros because a change in one macro can affect the output of the other macros.
+        setTimeout(editor.execCommand.bind(editor, 'xwiki-refresh'), 0);
       }
+    },
 
-      // Refresh all the macros because a change in one macro can affect the output of the other macros.
-      setTimeout(editor.execCommand.bind(editor, 'xwiki-refresh'), 0);
+    getActiveMacroWidget: function(editor) {
+      let activeMacroWidget = editor.widgets.focused || editor.widgets.widgetHoldingFocusedEditable ||
+        editor.widgets.selected[0];
+      if (activeMacroWidget?.name !== 'xwiki-macro') {
+        // Check if the selected element is a macro widget or is inside a macro widget.
+        activeMacroWidget = editor.widgets.getByElement(editor.getSelection().getStartElement());
+        if (activeMacroWidget?.name !== 'xwiki-macro') {
+          activeMacroWidget = null;
+        }
+      }
+      return activeMacroWidget;
+    },
+
+    onceAfterRefresh: function (editor, callback, skipRefresh) {
+      if (skipRefresh) {
+        callback();
+      } else {
+        const handler = editor.on('afterCommandExec', function (event) {
+          if (event.data.name === 'xwiki-refresh') {
+            handler.removeListener();
+            callback();
+          }
+        });
+      }
     },
 
     createMacroWidget: function(editor, data) {

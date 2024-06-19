@@ -45,7 +45,7 @@ import org.xwiki.rest.XWikiRestException;
 @Named("org.xwiki.annotation.rest.internal.AnnotationsTranslationRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations/{language}/annotations")
 @Singleton
-public class AnnotationsTranslationRESTResource extends AnnotationsRESTResource
+public class AnnotationsTranslationRESTResource extends AbstractAnnotationsRESTResource
 {
     /**
      * @param wiki the wiki of the document to get annotations for
@@ -61,8 +61,8 @@ public class AnnotationsTranslationRESTResource extends AnnotationsRESTResource
     public Response doGetAnnotatedContent(@PathParam("spaceName") String space, @PathParam("pageName") String page,
         @PathParam("wikiName") String wiki, @PathParam("language") String language) throws XWikiRestException
     {
-        DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page,
-            LocaleUtils.toLocale(language, Locale.ROOT));
+        DocumentReference documentReference =
+            new DocumentReference(wiki, parseSpaceSegments(space), page, LocaleUtils.toLocale(language, Locale.ROOT));
         return getAnnotatedContent(documentReference);
     }
 
@@ -78,9 +78,8 @@ public class AnnotationsTranslationRESTResource extends AnnotationsRESTResource
      * @throws XWikiRestException when failing to parse space
      */
     @POST
-    public AnnotationResponse doPostAnnotation(@PathParam("wikiName") String wiki,
-        @PathParam("spaceName") String space, @PathParam("pageName") String page,
-        @PathParam("language") String language, AnnotationAddRequest request)
+    public AnnotationResponse doPostAnnotation(@PathParam("wikiName") String wiki, @PathParam("spaceName") String space,
+        @PathParam("pageName") String page, @PathParam("language") String language, AnnotationAddRequest request)
         throws XWikiRestException
     {
         DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);

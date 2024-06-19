@@ -49,6 +49,7 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -740,8 +741,7 @@ public class XWikiDocumentTest
 
         this.document.setContent("Some content");
         this.document.setTitle("some content that generate a velocity error");
-        when(this.velocityEngine.evaluate(any(), any(), any(), eq("some content that generate a velocity error")))
-            .thenThrow(new XWikiVelocityException("message"));
+        when(this.velocityManager.compile(any(), any())).thenThrow(new XWikiVelocityException("message"));
 
         assertEquals("Page", this.document.getRenderedTitle(this.oldcore.getXWikiContext()));
 
@@ -908,5 +908,19 @@ public class XWikiDocumentTest
             argThat(givenDoc -> givenDoc != XWikiDocumentTest.this.document), eq(context));
         assertNotNull(cloneArchive);
         assertNotSame(cloneArchive, documentArchive);
+    }
+
+    @Test
+    void setAuthor()
+    {
+        UserReference userReference = mock(UserReference.class);
+
+        this.document.setAuthor(userReference);
+
+        assertSame(userReference, this.document.getAuthors().getEffectiveMetadataAuthor());
+        assertSame(userReference, this.document.getAuthors().getOriginalMetadataAuthor());
+
+        assertNotSame(userReference, this.document.getAuthors().getContentAuthor());
+        assertNotSame(userReference, this.document.getAuthors().getCreator());
     }
 }

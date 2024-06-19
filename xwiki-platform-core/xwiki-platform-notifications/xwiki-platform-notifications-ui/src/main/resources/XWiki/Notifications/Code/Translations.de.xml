@@ -72,6 +72,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Benachrichtigungs
 notifications.filters.preferences.scopeNotificationFilter.page=Nur Seite
 notifications.filters.preferences.scopeNotificationFilter.space=Seite und Unterseiten
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.user=Benutzer
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Sie müssen Benachrichtigungen in Ihren Einstellungen aktivieren, wenn Sie diese Seiten abonnieren möchten
@@ -92,6 +93,7 @@ notifications.settings.filters.preferences.system.title=Systemfilter
 notifications.settings.filters.preferences.system.hint=Systemfilter, die Sie umschalten können, um eine genauere Kontrolle über die Benachrichtigungen zu haben, die Sie erhalten möchten.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Name
+notifications.settings.filters.preferences.system.table.filterDescription=Beschreibung
 notifications.settings.filters.preferences.system.table.filterType=Beschreibung
 notifications.settings.filters.preferences.system.table.notificationFormats=Formate
 notifications.settings.filters.preferences.system.table.isEnabled=Aktiviert?
@@ -100,7 +102,9 @@ notifications.settings.filters.preferences.system.table.isEnabled=Aktiviert?
 notifications.settings.filters.preferences.custom.title=Benutzerdefinierte Filter
 notifications.settings.filters.preferences.custom.hint=Erstellen Sie Filter, um die Benachrichtigungen zu steuern, die Sie erhalten möchten.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.custom.table.name=Ort
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+notifications.settings.filters.preferences.custom.table.scope=Geltungsbereich
+notifications.settings.filters.preferences.custom.table.location=Ort
 notifications.settings.filters.preferences.custom.table.filterType=Filteraktion
 notifications.settings.filters.preferences.custom.table.eventTypes=Events
 notifications.settings.filters.preferences.custom.table.notificationFormats=Formate
@@ -253,6 +257,10 @@ notifications.filters.preferences.addPreference.location.hint=Welche Seite(n) so
 ## Filter Types
 notifications.filters.type.inclusive=Eingeschlossen
 notifications.filters.type.exclusive=Ausgeschlossen
+notifications.settings.filters.preferences.custom.table.description=Hier werden alle selbst erstellten Filter dieses Nutzenden oder Wikis angezeigt.
+notifications.settings.filters.preferences.system.table.description=Hier werden alle Systemfilter dieses Wikis angezeigt.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Ort
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

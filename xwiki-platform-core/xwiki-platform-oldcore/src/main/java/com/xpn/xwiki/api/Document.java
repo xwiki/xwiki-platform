@@ -53,6 +53,7 @@ import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
@@ -1420,6 +1421,20 @@ public class Document extends Api
         return this.doc.getRevisions(getXWikiContext());
     }
 
+    /**
+     * Counts the number of document versions matching criteria like author, minimum creation date, etc.
+     *
+     * @param criteria criteria used to match versions
+     * @return the number of matching versions
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public long getRevisionsCount(RevisionCriteria criteria) throws XWikiException
+    {
+        return this.doc.getRevisionsCount(criteria, getXWikiContext());
+    }
+
     public String[] getRecentRevisions() throws XWikiException
     {
         return this.doc.getRecentRevisions(5, getXWikiContext());
@@ -1431,7 +1446,7 @@ public class Document extends Api
     }
 
     /**
-     * Get document versions matching criterias like author, minimum creation date, etc.
+     * Gets document versions matching criteria like author, minimum creation date, etc.
      *
      * @param criteria criteria used to match versions
      * @return a list of matching versions
@@ -1922,7 +1937,12 @@ public class Document extends Api
 
             return this.doc.getMetaDataDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
+            java.lang.Object[] args;
+            if (origdoc != null) {
+                args = new java.lang.Object[] { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
+            } else {
+                args = new java.lang.Object[] { doc.getFullName(), null, newdoc.getVersion() };
+            }
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
@@ -2127,6 +2147,7 @@ public class Document extends Api
      * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
      * @since 10.6RC1
      */
+    @Override
     public boolean hasAccess(Right right, DocumentReference userReference)
     {
         return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());
@@ -3310,5 +3331,30 @@ public class Document extends Api
             // in this case we don't care if the doc is cloned or not since it's readonly
             return new SafeDocumentAuthors(this.doc.getAuthors());
         }
+    }
+
+    /**
+     * You need to have programming right to use this API.
+     * <p>
+     * Update the author of the document. It's the recommended way to update it if you don't fully understand the
+     * various types of authors exposed by {@link #getAuthor()}.
+     * <p>
+     * What will happen in practice is the following:
+     * <ul>
+     * <li>the effective and original metadata authors are set to the passed reference</li>
+     * <li>when saving the document, if the content is modified (the content dirty flag is true) then the content author
+     * will also be updated to the passed reference</li>
+     * </ul>
+     * 
+     * @param userReference the reference of the new author of the document
+     * @throws AccessDeniedException when the current author is not allowed to use this API
+     * @since 16.1.0RC1
+     */
+    @Unstable
+    public void setAuthor(UserReference userReference) throws AccessDeniedException
+    {
+        getContextualAuthorizationManager().checkAccess(Right.PROGRAM);
+
+        getDoc().setAuthor(userReference);
     }
 }

@@ -114,6 +114,12 @@ public @interface UITest
     String jdbcDriverVersion() default "";
 
     /**
+     * @return the docker image tag to use for the browser (if not specified, uses the "latest" tag)
+     * @since 16.3.0RC1
+     */
+    String browserTag() default "";
+
+    /**
      * @return true if VNC container is started and recording is done and saved on test exit
      * @since 10.10RC1
      */
@@ -123,6 +129,12 @@ public @interface UITest
      * @return true if WCAG tests should be executed, false otherwise
      */
     boolean wcag() default false;
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    boolean wcagStopOnError() default true;
 
     /**
      * @return the list of configuration properties to use when generating the XWiki configuration files such as

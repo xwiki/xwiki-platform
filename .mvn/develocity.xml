@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<develocity
+  xmlns="https://www.gradle.com/develocity-maven" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://www.gradle.com/develocity-maven https://www.gradle.com/schema/develocity-maven.xsd">
+  <server>
+    <url>https://ge.xwiki.org</url>
+  </server>
+  <buildScan>
+    <!-- Always publish build scans on CI but on demand for devs so that we don't get false positives on ge.xwiki.org
+     due to local changes from users and so that it doesn't pollute the ge.xwiki.org data.
+     To force publishing a build scan: -Dscan -->
+    <publishing>
+      <onlyIf><![CDATA[env['CI'] != null && authenticated]]></onlyIf>
+    </publishing>
+    <captureGoalInputFiles>true</captureGoalInputFiles>
+    <!-- Use background scans only locally to avoid potential issues on CI (the ephemeral docker agent could terminate
+         as soon as the build is finished and thus the upload may be terminated before it completes) -->
+    <backgroundBuildScanUpload><![CDATA[env['CI'] == null]]></backgroundBuildScanUpload>
+  </buildScan>
+  <buildCache>
+    <!-- Notes:
+     * To disable the local build cache on the command line, pass: -Ddevelocity.cache.local.enabled=false
+     * We disable the local build cache on CI since our agents are transients and isolated, and thus it would cost
+       more to save the goal outputs since they're not going to be re-used.
+    -->
+    <local>
+      <enabled><![CDATA[env['CI'] == null]]></enabled>
+    </local>
+    <remote>
+      <!-- Notes:
+       * To disable the remote build cache on the command line, pass: -Ddevelocity.cache.remote.enabled=false
+      -->
+      <enabled>true</enabled>
+      <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
+      <storeEnabled><![CDATA[isTrue(env['CI']) and isTrue(env['DEVELOCITY_ACCESS_KEY'])]]></storeEnabled>
+      <server>
+        <!-- Note: Remote cache authentication is handled in the .m2/.develocity/keys.properties file and not
+             anymore in the Maven settings.xml file -->
+        <id>develocityCache</id>
+        <!-- We override the default built-in node to use a EU node closer to our CI to reduce the cache lag (and thus
+             to make caching more beneficial vs rebuilding) -->
+        <url>https://eu-build-cache-ge.xwiki.org/cache/</url>
+      </server>
+    </remote>
+  </buildCache>
+</develocity>

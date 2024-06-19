@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian</artifactId>
   <name>XWiki Platform - Distribution - Debian</name>
@@ -63,13 +63,14 @@
     <debian.homepage>http://www.xwiki.org</debian.homepage>
     <debian.controlDir>${project.build.directory}/maven-deb-control-directory</debian.controlDir>
 
-    <xwikiDataDir>/var/lib/xwiki/data</xwikiDataDir>
+    <debian.xwiki.var>/var/lib/xwiki</debian.xwiki.var>
+    <xwikiDataDir>${debian.xwiki.var}/data</xwikiDataDir>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-resources</artifactId>
-      <version>16.1.0-SNAPSHOT</version>
+      <version>16.6.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>

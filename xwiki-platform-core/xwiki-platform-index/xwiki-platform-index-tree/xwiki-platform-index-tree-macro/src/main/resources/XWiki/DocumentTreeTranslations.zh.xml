@@ -82,13 +82,13 @@ rendering.macro.documentTree.parameter.showOnlyViewable.name=仅显示可见
 ### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 ### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
-
-### Missing: index.documentTree.empty=No pages found
+index.documentTree.empty=无
 ### Missing: index.documentTree.more={0} more ...
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 ### Missing: rendering.macro.documentTree.parameter.showChildDocuments.name=Show Child Documents
-### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.</content>
+### Missing: rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
+</content>
 </xwikidoc>

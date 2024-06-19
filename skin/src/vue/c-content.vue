@@ -34,6 +34,10 @@ import {
 } from "vue";
 import { useRoute } from "vue-router";
 import { type CristalApp, PageData } from "@xwiki/cristal-api";
+import type {
+  PageHierarchyItem,
+  PageHierarchyResolverProvider,
+} from "@xwiki/cristal-hierarchy-api";
 import { marked } from "marked";
 import { ContentTools } from "./contentTools";
 import { CIcon, Size } from "@xwiki/cristal-icons";
@@ -59,7 +63,9 @@ const currentPageName: ComputedRef<string> = computed(() => {
     (route.params.page as string) || cristal.getCurrentPage() || "Main.WebHome"
   );
 });
+const breadcrumbItems: Ref<Array<PageHierarchyItem>> = ref([]);
 
+const breadcrumbRoot = ref(undefined);
 const contentRoot = ref(undefined);
 
 const content: ComputedRef<string | undefined> = computed(() => {
@@ -90,12 +96,20 @@ const title = computed(() => {
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
 async function fetchPage(page: string) {
+  if (page != null) {
+    page = encodeURIComponent(page);
+  }
   loading.value = true;
   try {
     // Provides a reactive variable to be updated if the page content is updated
     // in the background.
     cristal.setContentRef(currentPage);
     currentPage.value = await cristal.getPage(page || currentPageName.value);
+    breadcrumbItems.value = await cristal
+      .getContainer()
+      .get<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
+      .get()
+      .getPageHierarchy(currentPage.value!);
   } catch (e) {
     console.error(e);
     error.value = e;
@@ -108,6 +122,10 @@ watch(() => route.params.page, fetchPage, { immediate: true });
 
 onUpdated(() => {
   ContentTools.transformImages(cristal, "xwikicontent");
+
+  if (cristal && breadcrumbRoot.value) {
+    ContentTools.listenToClicks(breadcrumbRoot.value, cristal);
+  }
 
   if (cristal && contentRoot.value) {
     ContentTools.listenToClicks(contentRoot.value, cristal);
@@ -129,10 +147,14 @@ onUpdated(() => {
     <UIX uixname="content.before" />
     <div class="inner-content">
       <div class="content-header">
-        <XBreadcrumb
-          class="breadcrumb"
-          :items="['Home', 'First', 'Second', t('third')]"
-        ></XBreadcrumb>
+        <!-- This div lets us reference an actual HTML element,
+             to be used in `ContentTools.listenToClicks()`. -->
+        <div id="breadcrumbRoot" ref="breadcrumbRoot">
+          <XBreadcrumb
+            class="breadcrumb"
+            :items="breadcrumbItems"
+          ></XBreadcrumb>
+        </div>
         <x-btn circle size="small" variant="primary" color="primary">
           <c-icon
             class="new-page"

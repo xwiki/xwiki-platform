@@ -62,4 +62,8 @@ export class XWikiWikiConfig extends DefaultWikiConfig {
   defaultPageName(): string {
     return "Main.WebHome";
   }
+
+  getType(): string {
+    return "XWiki";
+  }
 }

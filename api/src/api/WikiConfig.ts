@@ -60,4 +60,12 @@ export interface WikiConfig {
    * For instance, "README" for Github, or "Main.WebHome" for XWiki.
    */
   defaultPageName(): string;
+
+  /**
+   * Returns the type of the WikiConfig implementation.
+   *
+   * @returns the type of the implementation
+   * @since 0.9
+   */
+  getType(): string;
 }

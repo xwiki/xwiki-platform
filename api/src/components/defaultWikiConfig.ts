@@ -120,4 +120,8 @@ export class DefaultWikiConfig implements WikiConfig {
   defaultPageName(): string {
     return "index";
   }
+
+  getType(): string {
+    return "Default";
+  }
 }

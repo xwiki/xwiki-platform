@@ -3,6 +3,7 @@ packages:
   - "core/icons"
   - "core/backends/*"
   - "core/browser/*"
+  - "core/hierarchy/*"
   - "core/link-suggest/*"
   - "core/attachments/*"
   - "core/extra-tabs/*"

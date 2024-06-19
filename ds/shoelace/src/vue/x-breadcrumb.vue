@@ -33,8 +33,12 @@ defineProps<BreadcrumbProps>();
 
 <template>
   <sl-breadcrumb>
-    <sl-breadcrumb-item v-for="item in items" :key="item">
-      {{ item }}
+    <sl-breadcrumb-item
+      v-for="item in items"
+      :key="item.label"
+      :href="item.url"
+    >
+      {{ item.label }}
     </sl-breadcrumb-item>
   </sl-breadcrumb>
 </template>

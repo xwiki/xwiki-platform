@@ -221,6 +221,9 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
+      vitest:
+        specifier: 1.6.0
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
 
   core/browser/browser-api:
     dependencies:
@@ -287,6 +290,86 @@ importers:
       '@types/lodash':
         specifier: 4.17.5
         version: 4.17.5
+
+  core/hierarchy/hierarchy-api:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
+  core/hierarchy/hierarchy-default:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../hierarchy-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
+  core/hierarchy/hierarchy-filesystem:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../hierarchy-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
+  core/hierarchy/hierarchy-github:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../hierarchy-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
+  core/hierarchy/hierarchy-xwiki:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../hierarchy-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+      vitest:
+        specifier: 1.6.0
+        version: 1.6.0(@types/node@20.14.1)(happy-dom@14.12.0)
 
   core/icons:
     dependencies:
@@ -671,6 +754,21 @@ importers:
       '@xwiki/cristal-electron-storage':
         specifier: workspace:*
         version: link:../storage
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../../core/hierarchy/hierarchy-api
+      '@xwiki/cristal-hierarchy-default':
+        specifier: workspace:*
+        version: link:../../core/hierarchy/hierarchy-default
+      '@xwiki/cristal-hierarchy-filesystem':
+        specifier: workspace:*
+        version: link:../../core/hierarchy/hierarchy-filesystem
+      '@xwiki/cristal-hierarchy-github':
+        specifier: workspace:*
+        version: link:../../core/hierarchy/hierarchy-github
+      '@xwiki/cristal-hierarchy-xwiki':
+        specifier: workspace:*
+        version: link:../../core/hierarchy/hierarchy-xwiki
       '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../../lib
@@ -1002,6 +1100,9 @@ importers:
       '@xwiki/cristal-extra-tabs-ui':
         specifier: workspace:*
         version: link:../core/extra-tabs/extra-tabs-ui
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../core/hierarchy/hierarchy-api
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../core/icons
@@ -1073,6 +1174,18 @@ importers:
       '@xwiki/cristal-browser-default':
         specifier: workspace:*
         version: link:../core/browser/browser-default
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../core/hierarchy/hierarchy-api
+      '@xwiki/cristal-hierarchy-default':
+        specifier: workspace:*
+        version: link:../core/hierarchy/hierarchy-default
+      '@xwiki/cristal-hierarchy-github':
+        specifier: workspace:*
+        version: link:../core/hierarchy/hierarchy-github
+      '@xwiki/cristal-hierarchy-xwiki':
+        specifier: workspace:*
+        version: link:../core/hierarchy/hierarchy-xwiki
       '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../lib

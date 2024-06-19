@@ -30,7 +30,18 @@ defineProps<BreadcrumbProps>();
 </script>
 
 <template>
-  <v-breadcrumbs :items="items"></v-breadcrumbs>
+  <v-breadcrumbs
+    :items="
+      items.map((hItem) => {
+        var bItem: { title: string; href: string } = {
+          title: hItem.label,
+          href: hItem.url,
+        };
+        return bItem;
+      })
+    "
+  >
+  </v-breadcrumbs>
 </template>
 
 <style scoped></style>

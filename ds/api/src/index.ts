@@ -24,11 +24,11 @@
  **/
 
 /**
- * Shared types for the x-brreadcrumb component implementations.
+ * Shared types for the x-breadcrumb component implementations.
  * @since 0.8
  */
 type BreadcrumbProps = {
-  items: string[];
+  items: [{ label: string; url: string }];
 };
 
 /**

@@ -90,7 +90,12 @@ export class XWikiStorage extends AbstractStorage {
     let page: string | null;
     if (url.startsWith(this.wikiConfig.baseURL)) {
       const uri = url.replace(this.wikiConfig.baseURL, "");
-      page = uri.replace("/bin", "").replace("/view/", "").replaceAll("/", ".");
+      page = uri
+        .replace("/bin", "")
+        .replace("/view/", "")
+        .replaceAll("%5C", "%5C%5C") // Escape backslashes in identifiers
+        .replaceAll(".", "%5C.") // Escape dots in identifiers
+        .replaceAll("/", "."); // Convert separators from slashes to dots
       if (page.endsWith(".")) {
         page += "WebHome";
       }

@@ -25,6 +25,9 @@
 
 import { CristalAppLoader, loadConfig } from "@xwiki/cristal-lib";
 import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-default";
+import { ComponentInit as DefaultPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-default";
+import { ComponentInit as GitHubPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-github";
+import { ComponentInit as XWikiPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-xwiki";
 import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
 
 CristalAppLoader.init(
@@ -45,5 +48,8 @@ CristalAppLoader.init(
   (container) => {
     new BrowserComponentInit(container);
     new LinkSuggestComponentInit(container);
+    new DefaultPageHierarchyComponentInit(container);
+    new GitHubPageHierarchyComponentInit(container);
+    new XWikiPageHierarchyComponentInit(container);
   },
 );

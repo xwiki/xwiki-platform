@@ -49,7 +49,10 @@ export class ContentTools {
       // TODO get rid of any
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function handleClick(event: any) {
-        const origin = event.target.closest(`a`);
+        // We cannot use `closest()` because of possible shadow roots.
+        const origin = event
+          .composedPath()
+          .find((e: HTMLElement) => e.nodeName === "A");
 
         if (origin?.href) {
           ContentTools.logger?.debug("You clicked", origin.href);

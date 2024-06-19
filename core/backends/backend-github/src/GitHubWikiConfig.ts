@@ -54,4 +54,8 @@ export class GitHubWikiConfig extends DefaultWikiConfig {
   defaultPageName(): string {
     return "README";
   }
+
+  getType(): string {
+    return "GitHub";
+  }
 }

@@ -48,4 +48,8 @@ export class FileSystemConfig extends DefaultWikiConfig {
       this.homePage = "index.md";
     }
   }
+
+  getType(): string {
+    return "FileSystem";
+  }
 }

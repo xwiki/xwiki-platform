@@ -26,6 +26,11 @@
   "dependencies": {
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
+    "@xwiki/cristal-hierarchy-api": "workspace:*",
+    "@xwiki/cristal-hierarchy-default": "workspace:*",
+    "@xwiki/cristal-hierarchy-filesystem": "workspace:*",
+    "@xwiki/cristal-hierarchy-github": "workspace:*",
+    "@xwiki/cristal-hierarchy-xwiki": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
     "inversify": "6.0.2",
     "vue": "3.4.27"

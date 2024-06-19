@@ -19,7 +19,8 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "tsc --project tsconfig.json --noEmit && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
@@ -27,7 +28,8 @@
     "inversify": "6.0.2"
   },
   "devDependencies": {
-    "typescript": "5.4.5"
+    "typescript": "5.4.5",
+    "vitest": "1.6.0"
   },
   "publishConfig": {
     "exports": {

@@ -75,6 +75,38 @@ app.get("/xwiki/rest/cristal/panel", (req: Request, res: Response) => {
   });
 });
 
+app.get(
+  "/xwiki/rest/wikis/xwiki/spaces/Main/pages/WebHome",
+  (req: Request, res: Response) => {
+    res.appendHeader("Access-Control-Allow-Origin", "*");
+
+    res.json({
+      hierarchy: {
+        items: [
+          {
+            label: "xwiki",
+            name: "xwiki",
+            type: "wiki",
+            url: `${req.protocol}://${req.headers.host}/xwiki/bin/view/Main/`,
+          },
+          {
+            label: "Main",
+            name: "Main",
+            type: "space",
+            url: `${req.protocol}://${req.headers.host}/xwiki/bin/view/Main/`,
+          },
+          {
+            label: "WebHome",
+            name: "WebHome",
+            type: "document",
+            url: `${req.protocol}://${req.headers.host}/xwiki/bin/view/Main/`,
+          },
+        ],
+      },
+    });
+  },
+);
+
 app.listen(port, () => {
   console.log(`XWiki mock server listening on http://localhost:${port}`);
 });

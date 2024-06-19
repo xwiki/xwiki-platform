@@ -32,11 +32,20 @@ type State = {
   attachments: Attachment[];
   isLoading: boolean;
   unknownPage: boolean;
+  error: string | undefined;
 };
+/**
+ * Take a given type "Type" and wraps each of its fields in a readonly Ref.
+ */
+type WrappedRefs<Type> = {
+  readonly [Property in keyof Type]: Ref<Type[Property]>;
+};
+type StateRefs = WrappedRefs<State>;
 type Getters = Record<string, never>;
 type Actions = {
   setLoading(): void;
   updateAttachments(attachments: Attachment[] | undefined): void;
+  setError(error: string): void;
 };
 type AttachmentsStoreDefinition = StoreDefinition<Id, State, Getters, Actions>;
 type AttachmentsStore = Store<Id, State, Getters, Actions>;
@@ -48,6 +57,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
       return {
         attachments: [],
         isLoading: true,
+        error: undefined,
         unknownPage: false,
       };
     },
@@ -57,6 +67,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
       },
       updateAttachments(attachments) {
         this.isLoading = false;
+        this.error = undefined;
         if (attachments) {
           this.unknownPage = false;
           this.attachments = attachments;
@@ -64,6 +75,10 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
           this.unknownPage = true;
           this.attachments = [];
         }
+      },
+      setError(error: string) {
+        this.isLoading = false;
+        this.error = error;
       },
     },
   },
@@ -74,10 +89,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
  */
 @injectable()
 export class DefaultAttachmentsService implements AttachmentsService {
-  private readonly refs: {
-    attachments: Ref<Attachment[]>;
-    isLoading: Ref<boolean>;
-  };
+  private readonly refs: StateRefs;
   private readonly store: AttachmentsStore;
 
   constructor(
@@ -88,23 +100,31 @@ export class DefaultAttachmentsService implements AttachmentsService {
     this.refs = storeToRefs(this.store);
   }
 
-  list(): Ref<Attachment[]> {
+  list(): StateRefs["attachments"] {
     return this.refs.attachments;
   }
 
-  isLoading(): Ref<boolean> {
+  isLoading(): StateRefs["isLoading"] {
     return this.refs.isLoading;
+  }
+
+  getError(): StateRefs["error"] {
+    return this.refs.error;
   }
 
   async refresh(page: string) {
     this.store.setLoading();
-    const attachments = await this.cristalApp
-      .getWikiConfig()
-      .storage.getAttachments(page);
-    this.store.updateAttachments(
-      attachments?.map(({ id, reference, mimetype, href }) => {
-        return { id, name: reference, mimetype, href };
-      }),
-    );
+    try {
+      const attachments = await this.cristalApp
+        .getWikiConfig()
+        .storage.getAttachments(page);
+      this.store.updateAttachments(
+        attachments?.map(({ id, reference, mimetype, href }) => {
+          return { id, name: reference, mimetype, href };
+        }),
+      );
+    } catch (e) {
+      this.store.setError(e.message);
+    }
   }
 }

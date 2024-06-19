@@ -36,6 +36,7 @@ const attachmentsService = cristal
 
 const attachments = attachmentsService.list();
 const isLoading = attachmentsService.isLoading();
+const errorMessage = attachmentsService.getError();
 
 // Watch for route change to refresh the tab when a user visits a new page.
 const route = useRoute();
@@ -48,6 +49,7 @@ watch(
 
 <template>
   <span v-if="isLoading">{{ t("attachments.tab.loading") }}</span>
+  <span v-else-if="errorMessage">{{ errorMessage }}</span>
   <span v-else-if="attachments.length == 0">
     {{ t("attachments.tab.noAttachments") }}
   </span>

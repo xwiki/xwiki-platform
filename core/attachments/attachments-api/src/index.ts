@@ -36,6 +36,7 @@ interface Attachment {
 interface AttachmentsService {
   list(): Ref<Attachment[]>;
   isLoading(): Ref<boolean>;
+  getError(): Ref<string | undefined>;
 
   /**
    * Load the initial state of the attachments.

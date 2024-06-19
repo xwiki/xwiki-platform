@@ -33,6 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.xwiki.model.EntityType;
+import org.xwiki.stability.Unstable;
 
 import static org.xwiki.security.SecurityReference.FARM;
 import static org.xwiki.security.authorization.RuleState.ALLOW;
@@ -99,7 +100,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         = EnumSet.of(EntityType.WIKI, EntityType.SPACE, EntityType.DOCUMENT);
 
     /** Serialization identifier. */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /** Internal list of existing instances. */
     private static final List<Right> VALUES = new CopyOnWriteArrayList<>();
@@ -134,11 +135,14 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         LOGIN = new Right("login", ALLOW, ALLOW, true, null, WIKI_ONLY, true);
         VIEW = new Right("view", ALLOW, DENY, true, null, WIKI_SPACE_DOCUMENT, true);
         EDIT = new Right("edit", ALLOW, DENY, true, new RightSet(VIEW), WIKI_SPACE_DOCUMENT, false);
+        EDIT.setNeededRights(Set.of(VIEW));
         DELETE = new Right("delete", DENY, DENY, true, Collections.singleton(VIEW), WIKI_SPACE_DOCUMENT, false);
+        DELETE.setNeededRights(Set.of(VIEW));
         CREATOR =
             new Right("creator", DENY, ALLOW, false, new RightSet(DELETE), EnumSet.of(EntityType.DOCUMENT), false);
         REGISTER = new Right("register", ALLOW, ALLOW, true, null, WIKI_ONLY, false);
         COMMENT = new Right("comment", ALLOW, DENY, true, null, WIKI_SPACE_DOCUMENT, false);
+        COMMENT.setNeededRights(Set.of(VIEW));
         SCRIPT = new Right("script", DENY, DENY, true, null, WIKI_SPACE_DOCUMENT, true);
 
         ADMIN = new Right("admin", DENY, ALLOW, false,
@@ -178,6 +182,12 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * Immutable instance of the Additional rights implied by this right.
      */
     private transient Set<Right> immutableImpliedRights;
+
+    /** Rights that are needed for this right to be granted. */
+    private Set<Right> neededRights;
+
+    /** Immutable instance of the rights that are needed for this right to be granted. */
+    private transient Set<Right> immutableNeededRights;
 
     /** Additional rights implied by this right. */
     private final boolean isReadOnly;
@@ -283,6 +293,32 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
                 impliedByRight.impliedRights.add(this);
             }
         }
+    }
+
+    /**
+     * @param neededRights the rights required for this right to be granted
+     * @since 15.10.2
+     */
+    @Unstable
+    public void setNeededRights(Set<Right> neededRights)
+    {
+        this.neededRights = neededRights;
+        this.immutableNeededRights = Collections.unmodifiableSet(neededRights);
+    }
+
+    /**
+     * @return the rights required for this right to be granted
+     * @since 15.10.2
+     */
+    @Override
+    public Set<Right> getNeededRights()
+    {
+        // We only assign an immutable set value if the needed right is not empty.
+        if (this.neededRights == null) {
+            return Set.of();
+        }
+
+        return this.immutableNeededRights;
     }
 
     /**

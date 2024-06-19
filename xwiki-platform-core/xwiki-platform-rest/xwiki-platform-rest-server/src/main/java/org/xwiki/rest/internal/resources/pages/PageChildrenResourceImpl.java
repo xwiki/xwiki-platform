@@ -21,17 +21,21 @@ package org.xwiki.rest.internal.resources.pages;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.index.tree.PageHierarchy;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
-import org.xwiki.rest.XWikiResource;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
-import org.xwiki.rest.internal.Utils;
+import org.xwiki.rest.internal.resources.AbstractPagesResource;
 import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.resources.pages.PageChildrenResource;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
@@ -39,44 +43,44 @@ import com.xpn.xwiki.api.Document;
  */
 @Component
 @Named("org.xwiki.rest.internal.resources.pages.PageChildrenResourceImpl")
-public class PageChildrenResourceImpl extends XWikiResource implements PageChildrenResource
+public class PageChildrenResourceImpl extends AbstractPagesResource implements PageChildrenResource
 {
+    @Inject
+    @Named("nestedpages")
+    private PageHierarchy nestedPageHierarchy;
+
+    @Inject
+    @Named("document")
+    private QueryFilter documentFilter;
+
     @Override
     public Pages getPageChildren(String wikiName, String spaceName, String pageName, Integer start, Integer number,
-        Boolean withPrettyNames) throws XWikiRestException
+        Boolean withPrettyNames, String hierarchy, String search) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
-            Document doc = documentInfo.getDocument();
-
-            Pages pages = objectFactory.createPages();
-
-            /* Use an explicit query to improve performance */
-            String queryString = "select distinct doc.fullName from XWikiDocument as doc "
-                + "where doc.parent = :parent order by doc.fullName asc";
-            List<String> childPageFullNames = queryManager.createQuery(queryString, Query.XWQL)
-                .bindValue("parent", doc.getFullName()).setOffset(start).setLimit(number).execute();
-
-            for (String childPageFullName : childPageFullNames) {
-                String pageId = Utils.getPageId(wikiName, childPageFullName);
-
-                if (!Utils.getXWikiApi(componentManager).exists(pageId)) {
-                    getLogger().warn("Child page [{}] of [{}] is missing.", childPageFullName, doc.getFullName());
-                } else {
-                    Document childDoc = Utils.getXWikiApi(componentManager).getDocument(pageId);
-
-                    /* We only add pages we have the right to access */
-                    if (childDoc != null) {
-                        pages.getPageSummaries().add(DomainObjectFactory.createPageSummary(objectFactory,
-                            uriInfo.getBaseUri(), childDoc, Utils.getXWikiApi(componentManager), withPrettyNames));
-                    }
-                }
+            if ("nestedpages".equals(hierarchy)) {
+                return getPages(this.nestedPageHierarchy.getChildren(documentInfo.getDocument().getDocumentReference())
+                    .withOffset(start).withLimit(number).matching(search).getDocumentReferences(), withPrettyNames);
+            } else {
+                // We fall-back (default) to the parent-child hierarchy for backwards compatibility.
+                return getPages(getPageChildrenForParentChildHierarchy(documentInfo, start, number), withPrettyNames);
             }
-
-            return pages;
-        } catch (Exception e) {
+        } catch (XWikiException | QueryException e) {
             throw new XWikiRestException(e);
         }
+    }
+
+    private List<DocumentReference> getPageChildrenForParentChildHierarchy(DocumentInfo parentInfo, int start,
+        int number) throws QueryException
+    {
+        Document parentDocument = parentInfo.getDocument();
+
+        // Use an explicit query to improve performance.
+        String queryString = "select distinct doc.fullName from XWikiDocument as doc "
+            + "where doc.parent = :parent order by doc.fullName asc";
+        return this.queryManager.createQuery(queryString, Query.XWQL).bindValue("parent", parentDocument.getFullName())
+            .setOffset(start).setLimit(number).addFilter(this.documentFilter).execute();
     }
 }

@@ -538,7 +538,6 @@ public class DefaultNotificationParametersFactory
                 pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
                 pref.setFilterType(NotificationFilterType.INCLUSIVE);
                 pref.setNotificationFormats(formats);
-                pref.setProviderHint("FACTORY");
                 switch (property) {
                     case WIKI:
                         pref.setWiki(locationArray[i]);

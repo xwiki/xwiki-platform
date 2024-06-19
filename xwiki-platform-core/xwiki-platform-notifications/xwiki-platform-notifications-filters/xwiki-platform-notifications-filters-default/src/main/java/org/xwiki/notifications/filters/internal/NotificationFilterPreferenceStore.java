@@ -42,8 +42,6 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
-import org.xwiki.notifications.preferences.internal.WikiNotificationPreferenceProvider;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -64,7 +62,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Singleton
 public class NotificationFilterPreferenceStore
 {
-    private static final String FILTER_PREFIX = "NFP_";
     private static final String ID = "id";
 
     @Inject
@@ -167,7 +164,7 @@ public class NotificationFilterPreferenceStore
         throws NotificationException
     {
         try {
-            return this.getPreferencesOfEntity(user, UserProfileNotificationPreferenceProvider.NAME);
+            return this.getPreferencesOfEntity(user);
         } catch (QueryException e) {
             throw new NotificationException(String.format(
                 "Error while loading the notification filter preferences of the user [%s].", user.toString()), e);
@@ -186,7 +183,7 @@ public class NotificationFilterPreferenceStore
         throws NotificationException
     {
         try {
-            return getPreferencesOfEntity(wikiReference, WikiNotificationPreferenceProvider.NAME);
+            return getPreferencesOfEntity(wikiReference);
         } catch (QueryException e) {
             throw new NotificationException(
                 String.format("Error while loading the notification filter preferences of the wiki [%s].",
@@ -224,8 +221,8 @@ public class NotificationFilterPreferenceStore
         });
     }
 
-    private List<DefaultNotificationFilterPreference> getPreferencesOfEntity(EntityReference entityReference,
-        String providerHint) throws QueryException
+    private List<DefaultNotificationFilterPreference> getPreferencesOfEntity(EntityReference entityReference)
+        throws QueryException
     {
         if (entityReference == null) {
             return Collections.emptyList();
@@ -239,13 +236,7 @@ public class NotificationFilterPreferenceStore
                 Query.HQL);
             query.bindValue("owner", serializedEntity);
 
-            List<DefaultNotificationFilterPreference> results = query.execute();
-
-            for (DefaultNotificationFilterPreference preference : results) {
-                preference.setProviderHint(providerHint);
-            }
-
-            return results;
+            return query.execute();
         });
     }
 
@@ -335,8 +326,9 @@ public class NotificationFilterPreferenceStore
 
     private long getInternalIdFromId(String filterPreferenceId) throws NotificationException
     {
-        if (StringUtils.startsWith(filterPreferenceId, FILTER_PREFIX)) {
-            return Long.parseLong(filterPreferenceId.substring(FILTER_PREFIX.length()));
+        if (StringUtils.startsWith(filterPreferenceId, NotificationFilterPreference.DB_ID_FILTER_PREFIX)) {
+            return Long.parseLong(
+                filterPreferenceId.substring(NotificationFilterPreference.DB_ID_FILTER_PREFIX.length()));
         } else {
             throw new NotificationException(String.format("Cannot guess internal id of preference with id [%s].",
                 filterPreferenceId));

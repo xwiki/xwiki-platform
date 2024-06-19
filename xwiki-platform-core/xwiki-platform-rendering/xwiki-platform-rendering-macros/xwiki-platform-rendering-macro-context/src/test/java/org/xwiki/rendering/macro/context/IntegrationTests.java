@@ -88,7 +88,7 @@ public class IntegrationTests implements RenderingTests
 
         Parser parser = componentManager.getInstance(Parser.class, "xwiki/2.1");
         XDOM xdom = parser.parse(new StringReader("= heading1 =\n==heading2=="));
-        when(dmb.getXDOM()).thenReturn(xdom);
+        when(dmb.getPreparedXDOM()).thenReturn(xdom);
 
         // Replace the context component manager
         componentManager.registerComponent(ComponentManager.class, "context", componentManager);

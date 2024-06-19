@@ -397,7 +397,6 @@ public class DefaultNotificationParametersFactoryTest
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setNotificationFormats(Collections.singleton(NotificationFormat.ALERT));
-        filterPreference.setProviderHint("FACTORY");
         return filterPreference;
     }
 }

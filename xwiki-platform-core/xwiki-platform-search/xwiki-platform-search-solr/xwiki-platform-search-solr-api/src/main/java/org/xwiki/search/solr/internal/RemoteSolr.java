@@ -19,6 +19,10 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,10 +30,13 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.GenericSolrRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.CoreAdminParams.CoreAdminAction;
 import org.apache.solr.common.util.NamedList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -75,7 +82,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Inject
     private SolrConfiguration configuration;
 
-    private Http2SolrClient rootClient;
+    private HttpSolrClient rootClient;
 
     private int solrMajorVersion;
 
@@ -88,7 +95,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
             this.cores.put(SolrClientInstance.CORE_NAME, new DefaultXWikiSolrCore(SolrClientInstance.CORE_NAME,
-                toSolrCoreName(SolrClientInstance.CORE_NAME), new Http2SolrClient.Builder(searchCoreURL).build()));
+                toSolrCoreName(SolrClientInstance.CORE_NAME), new HttpSolrClient.Builder(searchCoreURL).build()));
 
             // If the base URL is not provided try to guess it from the search core URL
             if (baseURL == null) {
@@ -105,7 +112,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         }
 
         // Create the root client
-        this.rootClient = new Http2SolrClient.Builder(baseURL).build();
+        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
 
         if (REQUEST_VERSION) {
             // Gather information about the server
@@ -127,7 +134,21 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         }
     }
 
-    Http2SolrClient getRootClient()
+    private Set<String> getCores() throws SolrServerException, IOException
+    {
+        CoreAdminRequest request = new CoreAdminRequest();
+        request.setAction(CoreAdminAction.STATUS);
+        CoreAdminResponse response = request.process(this.rootClient);
+
+        Set<String> cores = new HashSet<>();
+        for (int i = 0; i < response.getCoreStatus().size(); i++) {
+            cores.add(response.getCoreStatus().getName(i));
+        }
+
+        return cores;
+    }
+
+    HttpSolrClient getRootClient()
     {
         return this.rootClient;
     }
@@ -139,9 +160,19 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     }
 
     @Override
-    protected SolrClient getInternalSolrClient(String solrCoreName)
+    protected SolrClient getInternalSolrClient(String solrCoreName) throws SolrException
     {
-        return new Http2SolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+        // Check if the core exists
+        try {
+            if (getCores().contains(solrCoreName)) {
+                return new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+            }
+        } catch (Exception e) {
+            throw new SolrException("Failed to get the list of cores", e);
+        }
+
+        // If not, return null
+        return null;
     }
 
     private String getCorePrefix()
@@ -157,15 +188,11 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         // Prefix Solr cores to avoid collision with other non-xwiki cores
         builder.append(getCorePrefix());
 
-        // In Solr 8 the name of the search core is just "<prefix>" and there is no suffix
-        if (majorVersion > 8) {
-            builder.append(getSolrCoreSuffix(majorVersion));
-        } else {
-            if (!xwikiCoreName.equals(SolrClientInstance.CORE_NAME)) {
-                builder.append('_');
+        // In Solr 8 the name of the search core was just "<prefix>"
+        if (majorVersion > 8 || !xwikiCoreName.equals(SolrClientInstance.CORE_NAME)) {
+            builder.append('_');
 
-                builder.append(super.toSolrCoreName(xwikiCoreName, majorVersion));
-            }
+            builder.append(super.toSolrCoreName(xwikiCoreName, majorVersion));
         }
 
         return builder.toString();

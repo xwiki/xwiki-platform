@@ -19,21 +19,14 @@
  */
 package org.xwiki.index.tree.internal.parentchild;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryFilter;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.tree.TreeNode;
 
 /**
  * The wiki tree node for the (deprecated) parent-child hierarchy.
@@ -48,34 +41,12 @@ import org.xwiki.query.QueryFilter;
 public class WikiTreeNode extends org.xwiki.index.tree.internal.nestedpages.WikiTreeNode
 {
     @Inject
-    @Named("count")
-    private QueryFilter countQueryFilter;
-
-    @Inject
-    private DocumentQueryHelper documentQueryHelper;
+    @Named("childDocuments/parentChild")
+    private TreeNode childDocuments;
 
     @Override
-    protected List<? extends EntityReference> getChildren(WikiReference wikiReference, int offset, int limit)
-        throws QueryException
+    public void initialize() throws InitializationException
     {
-        return this.documentQueryHelper.resolve(getChildrenQuery(wikiReference), offset, limit, wikiReference);
-    }
-
-    private Query getChildrenQuery(WikiReference parentReference) throws QueryException
-    {
-        // In Oracle the empty parent is actually null.
-        Query query = this.documentQueryHelper.getQuery(
-            Arrays.asList("(doc.parent = '' or doc.parent is null)", "doc.translation = 0"),
-            Collections.<String, Object>emptyMap(), getProperties());
-        query.setWiki(parentReference.getName());
-        return query;
-    }
-
-    @Override
-    protected int getChildCount(WikiReference wikiReference) throws QueryException
-    {
-        Query query = getChildrenQuery(wikiReference);
-        query.addFilter(this.countQueryFilter);
-        return ((Long) query.execute().get(0)).intValue();
+        this.childNodes.addTreeNode(this.childDocuments, nodeId -> true);
     }
 }

@@ -125,6 +125,21 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Fills the upload comment.
+     *
+     * @param comment the upload comment.
+     * @since 16.3.0RC1
+     */
+    public void setUploadComment(final String comment)
+    {
+        final List<WebElement> inputs = this.pane.findElements(By.id("xwikiuploadcomment"));
+        WebElement input = inputs.get(inputs.size() - 1);
+        // Clean the field before setting the value in case of successive uploads.
+        input.clear();
+        input.sendKeys(comment);
+    }
+
+    /**
      * Fills the URL with the specified file paths.
      *
      * @param filePaths a list of paths to the files to upload in URL form (the files *must* exist in the target

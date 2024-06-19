@@ -127,7 +127,9 @@
     }, {
       "id" : "delete",
       "name" : "delete",
-      "icon" : { }
+      "icon" : {
+        "cssClass" : "text-danger"
+      }
     }, {
       "id" : "copy",
       "name" : "copy",

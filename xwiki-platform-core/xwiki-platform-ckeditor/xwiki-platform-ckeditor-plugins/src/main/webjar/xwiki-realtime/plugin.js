@@ -32,6 +32,19 @@
     init : function(editor) {
       applyStyleSheets(editor);
 
+      // CKEditor's HTML parser doesn't preserve the space character typed at the end of a line of text. For instance,
+      // the following:
+      //   CKEDITOR.htmlParser.fragment.fromHtml('<p>x </p>')
+      // is parsed as:
+      //   <p>x</p>
+      // Normally browsers should insert a non-breaking space when the user types a space at the end of a line. Chrome
+      // behaves like this. Firefox inserts a normal space character instead. We need to fix this otherwise that space
+      // character is lost when the content is saved or when the user switches to Source. This is especially critical
+      // for the realtime editing where the content you type is merged with the content typed by other users and fed
+      // back to your editor. So if you type at the end of a paragraph while remote changes are received you don't want
+      // the space between the words you type to be lost.
+      preserveSpaceCharAtTheEndOfLine(editor);
+
       require([
         'xwiki-realtime-loader',
         'xwiki-ckeditor-realtime-adapter'
@@ -73,6 +86,39 @@
         href: url
       }).appendTo(doc.head);
     });
+  }
+
+  function preserveSpaceCharAtTheEndOfLine(editor) {
+    editor.on('beforeGetData', () => {
+      const range = editor.getSelection()?.getRanges()[0];
+      const textNode = range?.startContainer;
+      // Check if the caret is at the end of a text node that ends with a space and is followed by a line break.
+      if (editor.mode === 'wysiwyg' && range?.collapsed && textNode.type === CKEDITOR.NODE_TEXT &&
+          range.startOffset === textNode.getLength() && textNode.getText().endsWith(' ') &&
+          isFollowedByLineBreak(textNode)) {
+        fixTrailingSpace(textNode);
+        // Make sure the caret remains at the end of the text node after we modify its data.
+        range.setStart(textNode, textNode.getLength());
+        range.select();
+      }
+    // Note that we use a high priority (0) to ensure that our listener is called before the HTML parser.
+    }, null, null, 0);
+  }
+
+  function isFollowedByLineBreak(textNode) {
+    // Is directly inside a block element...
+    return CKEDITOR.dtd.$block[textNode.getParent().getName()] &&
+      // ...and is either the last child or followed by a block element or a BR element.
+      (!textNode.getNext() || CKEDITOR.dtd.$block[textNode.getNext().getName?.()] ||
+        textNode.getNext().getName?.() === 'br');
+  }
+
+  function fixTrailingSpace(textNode) {
+    // We replicate here the behavior of Chrome when multiple space characters are typed.
+    const whitespaceLength = textNode.getLength() - textNode.getText().trimEnd().length;
+    const whitespaceSuffix = '\u00A0 '.repeat((whitespaceLength - 1) / 2) +
+      '\u00A0'.repeat((whitespaceLength - 1) % 2 + 1);
+    textNode.$.replaceData(textNode.getLength() - whitespaceLength, whitespaceLength, whitespaceSuffix);
   }
 
   function enableRealtimeEditing(editor, Loader, Adapter) {

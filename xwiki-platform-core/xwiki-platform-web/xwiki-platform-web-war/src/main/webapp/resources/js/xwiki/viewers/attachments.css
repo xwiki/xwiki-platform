@@ -28,7 +28,7 @@
   border-top: 1px solid $theme.borderColor;
 }
 #AddAttachment legend {
-  font-size: 1em;
+  font-size: 1.3em;
 }
 #attachform {
   margin-top: 2%;

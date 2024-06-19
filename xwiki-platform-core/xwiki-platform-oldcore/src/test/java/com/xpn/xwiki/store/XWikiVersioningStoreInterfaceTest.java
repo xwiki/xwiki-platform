@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -56,7 +57,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class XWikiVersioningStoreInterfaceTest
+class XWikiVersioningStoreInterfaceTest
 {
     @Spy
     private XWikiVersioningStoreInterface versioningStore;
@@ -87,19 +88,14 @@ public class XWikiVersioningStoreInterfaceTest
             archiveNodes.put((Version) arguments.get()[0], node);
         });
 
-        when(this.archive.getNode(any(Version.class))).thenAnswer(i -> {
-            Version version = i.getArgument(0);
-            return archiveNodes.getOrDefault(version, null);
-        });
-
-        List<Version> versions = archiveNodes.keySet().stream().sorted().collect(Collectors.toList());
-        Collections.reverse(versions);
-        when(this.versioningStore.getXWikiDocVersions(any(), any())).thenReturn(versions.toArray(new Version[0]));
+        List<XWikiRCSNodeInfo> nodes = new ArrayList<>(archiveNodes.values());
+        Collections.sort(nodes);
+        when(this.archive.getNodes()).thenReturn(nodes);
         when(this.versioningStore.getXWikiDocumentArchive(any(), any())).thenReturn(this.archive);
     }
 
     @Test
-    void testGetVersionsDefaultCriteria() throws XWikiException
+    void getVersionsDefaultCriteria() throws XWikiException
     {
         RevisionCriteria criteria = new RevisionCriteria();
         Collection<Version> versions = this.versioningStore.getXWikiDocVersions(null, criteria, null);
@@ -111,7 +107,7 @@ public class XWikiVersioningStoreInterfaceTest
     }
 
     @Test
-    void testGetVersionsFilterAuthor() throws XWikiException
+    void getVersionsFilterAuthor() throws XWikiException
     {
         RevisionCriteria criteria = new RevisionCriteriaFactory().createRevisionCriteria("Author1", true);
         Collection<Version> versions = this.versioningStore.getXWikiDocVersions(null, criteria, null);
@@ -123,7 +119,7 @@ public class XWikiVersioningStoreInterfaceTest
     }
 
     @Test
-    void testGetVersionsFilterDate() throws XWikiException
+    void getVersionsFilterDate() throws XWikiException
     {
         RevisionCriteria criteria = new RevisionCriteriaFactory().createRevisionCriteria(new Period(1999L, 6001L),
             true);
@@ -136,7 +132,7 @@ public class XWikiVersioningStoreInterfaceTest
     }
 
     @Test
-    void testGetLastVersion() throws XWikiException
+    void getLastVersion() throws XWikiException
     {
         RevisionCriteria criteria = new RevisionCriteriaFactory().createRevisionCriteria();
         criteria.setRange(RangeFactory.getLAST());

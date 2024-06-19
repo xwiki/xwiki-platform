@@ -37,4 +37,10 @@ public class AllIT
     class NestedMoveAttachmentIT extends MoveAttachmentIT
     {
     }
+
+    @Nested
+    @DisplayName("Set and display attachment comments test")
+    class NestedAttachmentCommentIT extends AttachmentCommentIT
+    {
+    }
 }

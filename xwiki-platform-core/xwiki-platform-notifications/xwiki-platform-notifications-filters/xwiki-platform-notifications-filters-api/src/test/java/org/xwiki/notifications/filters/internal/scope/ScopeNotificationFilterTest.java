@@ -95,6 +95,7 @@ class ScopeNotificationFilterTest
             EntityReference resultReference, NotificationFilterType filterType, String eventName)
     {
         NotificationFilterPreference preference = mock(NotificationFilterPreference.class);
+        when(preference.getId()).thenReturn("NFP_343");
         if (resultReference.getType() == EntityType.SPACE) {
             when(preference.getPage()).thenReturn(entityStringValue);
         }
@@ -116,8 +117,6 @@ class ScopeNotificationFilterTest
         when(resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 
         when(serializer.serialize(eq(resultReference))).thenReturn(entityStringValue);
-
-        when(preference.getProviderHint()).thenReturn("userProfile");
 
         when(preference.getStartingDate()).thenReturn(new Date(0));
 
@@ -268,7 +267,6 @@ class ScopeNotificationFilterTest
         DocumentReference documentReference = new DocumentReference("wikiA", "SpaceM", "DocumentN");
         NotificationFilterPreference prefζ = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
                 documentReference, NotificationFilterType.INCLUSIVE, null);
-        when(prefζ.getProviderHint()).thenReturn("userProfile");
         when(prefζ.getStartingDate()).thenReturn(new Date(99000));
 
         Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefγ, prefζ);
@@ -408,7 +406,6 @@ class ScopeNotificationFilterTest
         DocumentReference documentReference = new DocumentReference("wikiA", "SpaceM", "DocumentN");
         NotificationFilterPreference prefζ = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
             documentReference, NotificationFilterType.EXCLUSIVE, null);
-        when(prefζ.getProviderHint()).thenReturn("userProfile");
 
         Collection<NotificationFilterPreference> filterPreferences = Sets.newSet(prefγ, prefζ);
 

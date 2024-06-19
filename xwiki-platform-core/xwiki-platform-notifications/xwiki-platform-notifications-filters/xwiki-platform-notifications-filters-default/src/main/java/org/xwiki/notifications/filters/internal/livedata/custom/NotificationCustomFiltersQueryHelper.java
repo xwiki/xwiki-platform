@@ -140,10 +140,10 @@ public class NotificationCustomFiltersQueryHelper
         if (EQUALS_OPERATOR.equals(constraint.getOperator())
             && !StringUtils.isEmpty(constraintValue)) {
             if (NotificationFormat.ALERT.name().equals(constraintValue)) {
-                queryWhereClauses.add("nfp.alertEnabled = 1");
+                queryWhereClauses.add("nfp.alertEnabled = true");
             }
             if (NotificationFormat.EMAIL.name().equals(constraintValue)) {
-                queryWhereClauses.add("nfp.emailEnabled = 1");
+                queryWhereClauses.add("nfp.emailEnabled = true");
             }
         }
     }
@@ -153,9 +153,9 @@ public class NotificationCustomFiltersQueryHelper
         // We only check first constraint: if there's more they are either redundant or contradictory.
         LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
         if (Boolean.parseBoolean(String.valueOf(constraint.getValue()))) {
-            queryWhereClauses.add("nfp.enabled = 1");
+            queryWhereClauses.add("nfp.enabled = true");
         } else {
-            queryWhereClauses.add("nfp.enabled = 0");
+            queryWhereClauses.add("nfp.enabled = false");
         }
     }
 

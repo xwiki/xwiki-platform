@@ -53,7 +53,7 @@ XWiki может быть использована как база знаний 
 
 Вы также можете использовать [[Песочницу&gt;&gt;Sandbox.WebHome]] для большего количества демо-контента и в целом как место для экспериментов с возможностями вашей вики. 
 
- {{box}}Узнайте больше о том, как использовать XWiki из [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
+ {{box}}Узнайте больше о том, как использовать XWiki из [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
 (% class="row" %)
 (((
@@ -63,7 +63,7 @@ XWiki может быть использована как база знаний 
 
 Чтобы дополнить возможности и функциональность вики необходимыми //вам// функциями, перейдите к [[Менеджеру расширений&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]], где вы сможете найти и установить расширения.
 
-Для просмотра более 900 созданных сообществом расширений для XWiki, перейдите в [[Репозиторий расширений&gt;&gt;http://extensions.xwiki.org]].
+Для просмотра более 900 созданных сообществом расширений для XWiki, перейдите в [[Репозиторий расширений&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (% class="col-xs-12 col-sm-6" %)

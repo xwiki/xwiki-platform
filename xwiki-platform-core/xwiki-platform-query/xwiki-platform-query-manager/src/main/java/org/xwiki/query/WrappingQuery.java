@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class WrappingQuery implements Query
 {
-    private Query wrappedQuery;
+    private final Query wrappedQuery;
 
     /**
      * @param wrappedQuery the query being wrapped
@@ -81,27 +81,31 @@ public class WrappingQuery implements Query
     }
 
     @Override
-    public Query bindValue(String var, Object val)
+    public Query bindValue(String variable, Object val)
     {
-        return getWrappedQuery().bindValue(var, val);
+        getWrappedQuery().bindValue(variable, val);
+        return this;
     }
 
     @Override
     public Query bindValue(int index, Object val)
     {
-        return getWrappedQuery().bindValue(index, val);
+        getWrappedQuery().bindValue(index, val);
+        return this;
     }
 
     @Override
     public Query bindValues(List<Object> values)
     {
-        return getWrappedQuery().bindValues(values);
+        getWrappedQuery().bindValues(values);
+        return this;
     }
 
     @Override
     public Query bindValues(Map<String, ?> values)
     {
-        return getWrappedQuery().bindValues(values);
+        getWrappedQuery().bindValues(values);
+        return this;
     }
 
     @Override
@@ -111,9 +115,9 @@ public class WrappingQuery implements Query
     }
 
     @Override
-    public QueryParameter bindValue(String var)
+    public QueryParameter bindValue(String variable)
     {
-        return getWrappedQuery().bindValue(var);
+        return getWrappedQuery().bindValue(variable);
     }
 
     @Override

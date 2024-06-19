@@ -111,6 +111,27 @@
   });
 
   /**
+   * Escapes a single character and appends it to the result.
+   *
+   * @param character the character to append
+   * @param lastCharacter the last character
+   * @param result the output buffer to which the character should be appended
+   */
+  function appendEscapedCharacter(character, lastCharacter, result)
+  {
+    // The characters '\' and '{' always need to be escaped. The former as it is the escape character, the
+    // latter because of its special meaning in XWiki syntax that would allow to, e.g., close HTML macros.
+    const needsEscaping = character === '\\' || character === '{';
+    // Also add an escaping between any two '-' to avoid syntax that is illegal in comments and escape after
+    // '<' to avoid any matching of comment contents as HTML tags, e.g., by CKEditor.
+    if (needsEscaping || (character === '-' && lastCharacter === '-') || lastCharacter === '<') {
+      result.push('\\');
+    }
+
+    result.push(character);
+  }
+
+  /**
    * Escapes for insertion as text of a comment node, consistent with server-side escaping of XML comments.
    * 
    * @param text the text that needs to be put in a comment node
@@ -130,14 +151,11 @@
     var lastChar = '-';
     for (var i = 0; i < text.length; i++) {
       var c = text.charAt(i);
-      if (c === '\\' || c === '{' || (c === '-' && lastChar === '-')) {
-        result.push('\\');
-      }
-      result.push(c);
+      appendEscapedCharacter(c, lastChar, result);
       lastChar = c;
     }
-    if (lastChar === '-') {
-        // If the comment data ends with a short dash, add an escaping character.
+    if (lastChar === '-' || lastChar === '<') {
+      // If the comment data ends with '-' or '<', add an escaping character to be on the safe side.
         result.push('\\');
     }
     return result.join('');

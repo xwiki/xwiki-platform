@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.internal.DefaultAttachmentsManager;
+import org.xwiki.attachment.internal.configuration.DefaultAttachmentConfiguration;
 import org.xwiki.attachment.script.AttachmentScriptService;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.icon.IconManagerScriptServiceComponentList;
@@ -63,6 +64,7 @@ import static org.mockito.Mockito.when;
 @ComponentList({
     ModelScriptService.class,
     AttachmentScriptService.class,
+    DefaultAttachmentConfiguration.class,
     DefaultAttachmentsManager.class,
     DocumentReferenceConverter.class,
     EntityReferenceConverter.class,

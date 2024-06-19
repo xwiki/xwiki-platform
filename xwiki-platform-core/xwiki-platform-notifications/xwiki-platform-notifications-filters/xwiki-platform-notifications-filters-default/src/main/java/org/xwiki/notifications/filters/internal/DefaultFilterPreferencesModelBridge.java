@@ -253,7 +253,6 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
             preference.setEventTypes(new HashSet<>(eventTypes));
         }
         preference.setEnabled(true);
-        preference.setActive(false);
         preference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         preference.setStartingDate(new Date());
 

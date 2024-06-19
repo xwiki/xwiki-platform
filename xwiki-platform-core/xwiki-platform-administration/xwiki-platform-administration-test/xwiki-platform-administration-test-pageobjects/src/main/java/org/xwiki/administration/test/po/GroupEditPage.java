@@ -95,6 +95,8 @@ public class GroupEditPage extends InlinePage
             for (WebElement row : getMembersTable().getRows()) {
                 if (Objects.equals(getRowUserName(row), member)) {
                     getMembersTable().clickAction(index, "delete");
+                    // Wait for the confirmation message before moving to the next member.
+                    waitForNotificationSuccessMessage("Member successfully removed from group");
                     break;
                 }
                 index++;

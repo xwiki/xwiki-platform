@@ -73,7 +73,7 @@
   #foreach($prop in $class.properties)
     #if($prop.getName().equals('order'))
       &lt;dl&gt;
-        &lt;dt&gt;&lt;label&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt&gt;&lt;label for="stepOrderSelect"&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;
           &lt;select id="stepOrderSelect"&gt;
             #if ($nbSteps &gt; 0)

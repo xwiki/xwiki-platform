@@ -136,4 +136,4 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[{ca
 *** **##alt##**: Параметр, який визначає, який текст має відображатися, якщо браузер не може відобразити зображення. Оскільки це обов'язковий HTML-атрибут, XWiki використовуватиме замість нього ім'я файлу, якщо параметр ##alt## не визначено. Наприклад: ##alt="img.png"##
 *** **More**: Детальніше пояснення HTML ##&lt;img&gt;## тегів, що містять більше атрибутів, можна переглянути [[HTML standard&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]].
 ** **##queryString##**: Дозволяє надсилати запити на сервер під час створення посилання для завантаження зображення, на яке посилається. Наприклад: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true## зазнає невдачі, якщо ##width## та ##height## параметри вказуються додатково до ##queryString##!**)</content>
-  </xwikidoc>
+</xwikidoc>

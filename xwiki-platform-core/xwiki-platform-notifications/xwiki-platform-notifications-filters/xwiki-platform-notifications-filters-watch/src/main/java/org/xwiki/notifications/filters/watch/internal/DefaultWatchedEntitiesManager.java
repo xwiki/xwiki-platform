@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.compress.utils.Sets;
@@ -37,6 +38,9 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Default implementation of {@link WatchedEntitiesManager}.
@@ -51,17 +55,60 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
     @Inject
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
     @Override
     public void watchEntity(WatchedEntityReference entity, DocumentReference user) throws NotificationException
     {
-        handleEntity(entity, user, true);
+        UserReference userReference = this.userReferenceResolver.resolve(user);
+        handleEntity(entity, userReference, true);
+    }
+
+    @Override
+    public boolean watch(WatchedEntityReference entity, UserReference user) throws NotificationException
+    {
+        return handleEntity(entity, user, true);
+    }
+
+    @Override
+    public boolean removeWatchFilter(WatchedEntityReference entity, UserReference user) throws NotificationException
+    {
+        DocumentReference userDocRef = this.userReferenceSerializer.serialize(user);
+        Set<String> filterPreferencesIds = new HashSet<>();
+        for (NotificationFilterPreference filterPreference
+            : notificationFilterPreferenceManager.getFilterPreferences(userDocRef)) {
+            if (entity.matchExactly(filterPreference)) {
+                filterPreferencesIds.add(filterPreference.getId());
+            }
+        }
+
+        boolean result = false;
+        if (!filterPreferencesIds.isEmpty()) {
+            this.notificationFilterPreferenceManager.deleteFilterPreferences(userDocRef, filterPreferencesIds);
+            result = true;
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean block(WatchedEntityReference entity, UserReference user) throws NotificationException
+    {
+        return handleEntity(entity, user, false);
     }
 
     @Override
     public void unwatchEntity(WatchedEntityReference entity, DocumentReference user)
             throws NotificationException
     {
-        handleEntity(entity, user, false);
+        UserReference userReference = this.userReferenceResolver.resolve(user);
+        handleEntity(entity, userReference, false);
     }
 
     @Override
@@ -83,44 +130,46 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         return results;
     }
 
-    private void handleEntity(WatchedEntityReference entity, DocumentReference user, boolean shouldBeWatched)
+    private boolean handleEntity(WatchedEntityReference entity, UserReference user, boolean shouldBeWatched)
             throws NotificationException
     {
+        boolean result = false;
         if (entityIsAlreadyInDesiredState(entity, user, shouldBeWatched)) {
-            return;
+            return result;
         }
 
+        DocumentReference userDocRef = this.userReferenceSerializer.serialize(user);
         Iterator<NotificationFilterPreference> filterPreferences =
-                notificationFilterPreferenceManager.getFilterPreferences(user).iterator();
+                notificationFilterPreferenceManager.getFilterPreferences(userDocRef).iterator();
 
-        boolean thereIsAMatch = false;
-
+        boolean matchFound = false;
         // Look if an existing filter match the entity
         while (filterPreferences.hasNext()) {
             NotificationFilterPreference notificationFilterPreference = filterPreferences.next();
             if (entity.matchExactly(notificationFilterPreference)) {
-                thereIsAMatch = true;
-
+                matchFound = true;
                 if (notificationFilterPreference.getFilterType() == NotificationFilterType.INCLUSIVE
                         && notificationFilterPreference.isEnabled() != shouldBeWatched) {
-                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference, user);
+                    enableOrDeleteFilter(shouldBeWatched, notificationFilterPreference,
+                        userDocRef);
                 } else if (notificationFilterPreference.getFilterType() == NotificationFilterType.EXCLUSIVE
                         && notificationFilterPreference.isEnabled() == shouldBeWatched) {
-                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference, user);
+                    enableOrDeleteFilter(!shouldBeWatched, notificationFilterPreference,
+                        userDocRef);
                 }
             } else if (shouldDisableFilter(entity, notificationFilterPreference, shouldBeWatched)) {
                 // Disable custom filters that might be contradictory.
-                notificationFilterPreferenceManager.setFilterPreferenceEnabled(user,
+                notificationFilterPreferenceManager.setFilterPreferenceEnabled(userDocRef,
                         notificationFilterPreference.getId(),
                         false);
             }
         }
-
-        // But it might been still unwatched because of an other filter!
-        if (!thereIsAMatch || entity.isWatchedWithAllEventTypes(user) != shouldBeWatched) {
-            notificationFilterPreferenceManager.saveFilterPreferences(user,
-                    Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
+        if (!matchFound || !entityIsAlreadyInDesiredState(entity, user, shouldBeWatched)) {
+            notificationFilterPreferenceManager.saveFilterPreferences(userDocRef,
+                Sets.newHashSet(createFilterPreference(entity, shouldBeWatched)));
+            result = true;
         }
+        return result;
     }
 
     private boolean shouldDisableFilter(WatchedEntityReference entity, NotificationFilterPreference filterPreference,
@@ -136,31 +185,30 @@ public class DefaultWatchedEntitiesManager implements WatchedEntitiesManager
         return false;
     }
 
-    private boolean entityIsAlreadyInDesiredState(WatchedEntityReference entity, DocumentReference user,
+    private boolean entityIsAlreadyInDesiredState(WatchedEntityReference entity, UserReference user,
             boolean desiredState) throws NotificationException
     {
         // If the notifications are enabled and the entity is already in the desired state, then we have nothing to do
-        return entity.isWatchedWithAllEventTypes(user) == desiredState;
+        WatchedEntityReference.WatchedStatus watchedStatus = entity.getWatchedStatus(user);
+        return (desiredState && watchedStatus.isWatched()) || (!desiredState && watchedStatus.isBlocked());
     }
 
     private void enableOrDeleteFilter(boolean enable, NotificationFilterPreference notificationFilterPreference,
         DocumentReference user) throws NotificationException
     {
         if (enable) {
-            notificationFilterPreferenceManager.setFilterPreferenceEnabled(user,
-                    notificationFilterPreference.getId(),
-                    true);
-        } else  {
+            this.notificationFilterPreferenceManager.setFilterPreferenceEnabled(user,
+                notificationFilterPreference.getId(),
+                true);
+        } else {
             // Delete this filter instead of just disabling it, because we don't want to let remaining
             // filters
-            notificationFilterPreferenceManager.deleteFilterPreference(user,
-                    notificationFilterPreference.getId());
+            this.notificationFilterPreferenceManager.deleteFilterPreference(user, notificationFilterPreference.getId());
         }
     }
 
     private NotificationFilterPreference createFilterPreference(WatchedEntityReference entity, boolean shouldBeWatched)
     {
-        return shouldBeWatched ? entity.createInclusiveFilterPreference()
-                : entity.createExclusiveFilterPreference();
+        return shouldBeWatched ? entity.createInclusiveFilterPreference() : entity.createExclusiveFilterPreference();
     }
 }

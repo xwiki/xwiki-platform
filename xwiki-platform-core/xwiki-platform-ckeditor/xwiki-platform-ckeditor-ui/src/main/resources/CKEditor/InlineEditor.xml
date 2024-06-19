@@ -296,6 +296,8 @@
     });
     $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
       config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
+      // Delete the document content field that is not used so that the in-place editor knows what to submit on save.
+      delete config.document[editor.mode === 'source' ? 'renderedContent' : 'content'];
       config.document.syntax = editor.config.sourceSyntax;
     });
     $(document).one('xwiki:actions:view.contentEditor', function(event, data) {

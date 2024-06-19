@@ -741,8 +741,7 @@ public class XWikiDocumentTest
 
         this.document.setContent("Some content");
         this.document.setTitle("some content that generate a velocity error");
-        when(this.velocityEngine.evaluate(any(), any(), any(), eq("some content that generate a velocity error")))
-            .thenThrow(new XWikiVelocityException("message"));
+        when(this.velocityManager.compile(any(), any())).thenThrow(new XWikiVelocityException("message"));
 
         assertEquals("Page", this.document.getRenderedTitle(this.oldcore.getXWikiContext()));
 

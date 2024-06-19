@@ -120,7 +120,10 @@
     #set ($hiddenCategories = [])
   #end
   #set ($macroList = [])
+  #set ($installedMacros = [])
   #foreach ($macroDescriptor in $macroDescriptors)
+    #set ($discard = $installedMacros.add($macroDescriptor.id.id))
+
     #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
     #set ($categories = [])
     #set ($hidden = false)
@@ -166,25 +169,28 @@
             &amp;&amp; $services.security.authorization.hasAccess('admin', $xcontext.userReference, "wiki:$xcontext.database") &amp;&amp; $services.extension.isAllowed($extension, "wiki:$xcontext.database")))
       #foreach ($extensionComponent in $extension.getComponents())
         #if ($extensionComponent.roleType == 'org.xwiki.rendering.macro.Macro')
-          #set ($discard = $macroExtensionsList.add({
-              'id' : {
-                  'id' : $extensionComponent.roleHint
-                },
-              'name': $extensionComponent.roleHint,
-              'description': $extension.summary,
-              'defaultCategory': '_notinstalled',
-              'categories': [{
-                'id' :'_notinstalled',
-                'label': $services.localization.render('macroSelector.filter.category.notinstalled')
-              }],
-              'extensionId' : $extension.id.id,
-              'extensionVersion' : $extension.id.version.value,
-              'extensionType' : $extension.type,
-              'extensionRecommended': $extension.recommended,
-              'extensionName': $extension.name,
-              'extensionSummary': $extension.summary,
-              'extensionInstallAllowed': $extensionInstallAllowed
-            }))
+          ## Skip macros identifiers for which a macro is already installed
+          #if (!$installedMacros.contains($extensionComponent.roleHint))
+            #set ($discard = $macroExtensionsList.add({
+                'id' : {
+                    'id' : $extensionComponent.roleHint
+                  },
+                'name': $extensionComponent.roleHint,
+                'description': $extension.summary,
+                'defaultCategory': '_notinstalled',
+                'categories': [{
+                  'id' :'_notinstalled',
+                  'label': $services.localization.render('macroSelector.filter.category.notinstalled')
+                }],
+                'extensionId' : $extension.id.id,
+                'extensionVersion' : $extension.id.version.value,
+                'extensionType' : $extension.type,
+                'extensionRecommended': $extension.recommended,
+                'extensionName': $extension.name,
+                'extensionSummary': $extension.summary,
+                'extensionInstallAllowed': $extensionInstallAllowed
+              }))
+          #end
         #end
       #end
     #end

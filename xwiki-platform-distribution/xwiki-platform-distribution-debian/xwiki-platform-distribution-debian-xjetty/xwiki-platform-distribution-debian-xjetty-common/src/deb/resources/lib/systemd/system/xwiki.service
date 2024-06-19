@@ -28,6 +28,7 @@ NoNewPrivileges=true
 ProtectSystem=strict
 ReadOnlyPaths=/etc/xwiki
 ReadWritePaths=/var/lib/xwiki/data/
+ReadWritePaths=/var/lib/xwiki/tmp/
 ReadWritePaths=/var/log/xwiki/
 
 [Install]

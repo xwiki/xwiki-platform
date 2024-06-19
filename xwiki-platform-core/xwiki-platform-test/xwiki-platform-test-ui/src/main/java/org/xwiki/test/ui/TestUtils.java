@@ -1208,12 +1208,44 @@ public class TestUtils
      */
     public String executeWiki(String wikiContent, Syntax wikiSyntax) throws Exception
     {
+        return executeWiki(wikiContent, wikiSyntax, null);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     */
+    public String executeWikiPlain(String wikiContent, Syntax wikiSyntax) throws Exception
+    {
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("outputSyntax", "plain");
+
+        return executeWiki(wikiContent, wikiSyntax, queryParameters);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     */
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
+    {
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+        // Remember the current credentials
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
 
-        return executeAndGetBodyAsString(reference, null);
+        try {
+            // Make sure the page is saved with superadmin author
+            setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
+
+            // Save the page with the content to execute
+            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+        } finally {
+            // Restore initial credentials
+            setDefaultCredentials(currentCredentials);
+        }
+
+        // Execute the content and return the result
+        return executeAndGetBodyAsString(reference, queryParameters);
     }
 
     /**

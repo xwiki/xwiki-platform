@@ -433,7 +433,7 @@ class IncludeMacroTest
 
         MacroTransformationContext context = createMacroTransformationContext("whatever", false);
         // Initialize XDOM with ids from the including page.
-        context.setXDOM(getXDOM(documentContent));
+        context.setXDOM(toXDOM(documentContent));
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, context);
 
@@ -737,12 +737,13 @@ class IncludeMacroTest
         when(this.dab.getTranslatedDocumentInstance(this.includedDocument)).thenReturn(this.includedDocument);
         when(this.includedDocument.getDocumentReference()).thenReturn(includedDocumentReference);
         when(this.includedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
-        when(this.includedDocument.getXDOM()).thenReturn(getXDOM(includedContent));
+        XDOM xdom = toXDOM(includedContent);
+        when(this.includedDocument.getPreparedXDOM()).thenReturn(xdom);
         when(this.includedDocument.getRealLanguage()).thenReturn("");
         when(this.includedDocument.getContentAuthorReference()).thenReturn(INCLUDED_AUHOR);
     }
 
-    private XDOM getXDOM(String content) throws Exception
+    private XDOM toXDOM(String content) throws Exception
     {
         Parser parser = this.componentManager.getInstance(Parser.class, "xwiki/2.0");
         return parser.parse(new StringReader(content));

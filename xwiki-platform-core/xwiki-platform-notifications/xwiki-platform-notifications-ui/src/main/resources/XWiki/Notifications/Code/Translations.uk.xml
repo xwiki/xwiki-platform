@@ -71,6 +71,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Фільтр об
 notifications.filters.preferences.scopeNotificationFilter.page=Тільки сторінка
 notifications.filters.preferences.scopeNotificationFilter.space=Сторінка і нащадки
 notifications.filters.preferences.scopeNotificationFilter.wiki=Вікі
+notifications.filters.preferences.scopeNotificationFilter.user=Користувач
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Вам потрібно ввімкнути сповіщення в налаштуваннях, якщо ви хочете переглядати ці місця
@@ -93,6 +94,7 @@ notifications.settings.filters.preferences.system.title=Системні філ�
 notifications.settings.filters.preferences.system.hint=Системні фільтри, які ви можете перемикати, щоб мати більш детальний контроль над сповіщеннями, які ви хочете отримувати.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Назва
+notifications.settings.filters.preferences.system.table.filterDescription=Опис
 notifications.settings.filters.preferences.system.table.filterType=Опис
 notifications.settings.filters.preferences.system.table.notificationFormats=Формати
 notifications.settings.filters.preferences.system.table.isEnabled=Увімкнуто?
@@ -101,7 +103,9 @@ notifications.settings.filters.preferences.system.table.isEnabled=Увімкну
 notifications.settings.filters.preferences.custom.title=Користувальницькі фільтри
 notifications.settings.filters.preferences.custom.hint=Створюйте фільтри, щоб контролювати сповіщення, які ви хочете отримувати.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.custom.table.name=Розташування
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Ідентифікатор
+notifications.settings.filters.preferences.custom.table.scope=Область видимості
+notifications.settings.filters.preferences.custom.table.location=Розташування
 notifications.settings.filters.preferences.custom.table.filterType=Фільтр дії
 notifications.settings.filters.preferences.custom.table.eventTypes=Події
 notifications.settings.filters.preferences.custom.table.notificationFormats=Формати
@@ -256,6 +260,12 @@ notifications.filters.preferences.addPreference.location.hint=На яку сто
 ## Filter Types
 notifications.filters.type.inclusive=Включно
 notifications.filters.type.exclusive=Виключно
+
+## until 16.2.0RC1
+notifications.settings.filters.preferences.custom.table.description=У цій таблиці перераховано всі спеціальні фільтри, зареєстровані для поточного користувача чи поточної вікі.
+notifications.settings.filters.preferences.system.table.description=У цій таблиці перераховано всі системні фільтри, зареєстровані у вікі.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Розташування
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

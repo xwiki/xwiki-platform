@@ -102,6 +102,11 @@ class LiveDataIT
 
     private static final String CANCELED_BIRTHDAY_DATETIME = "11/05/2021 16:00:10";
 
+    private static final String IS_ACTIVE_COLUMN = "isActive";
+
+    private static final String YES = "Yes";
+    private static final String NO = "No";
+
     private static final String DOC_TITLE_COLUMN = "doc.title";
 
     private static final String FOOTNOTE_COMPUTED_TITLE =
@@ -131,7 +136,8 @@ class LiveDataIT
         initLocalization(testUtils, testReference);
 
         // Initializes the page content.
-        List<String> properties = List.of(NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, DOC_TITLE_COLUMN);
+        List<String> properties =
+            List.of(NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, IS_ACTIVE_COLUMN, DOC_TITLE_COLUMN);
         createClassNameLiveDataPage(testUtils, testReference, properties, "");
 
         // Creates the XClass.
@@ -170,6 +176,8 @@ class LiveDataIT
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_B);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_C);
         tableLayout.assertRow(BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
+        tableLayout.assertRow(IS_ACTIVE_COLUMN, YES);
+        tableLayout.assertRow(IS_ACTIVE_COLUMN, NO);
         // The canceled birthday date shouldn't appear on the table since it has been canceled. 
         tableLayout
             .assertRow(BIRTHDAY_COLUMN, not(hasItem(tableLayout.getWebElementTextMatcher(CANCELED_BIRTHDAY_DATETIME))));
@@ -234,6 +242,36 @@ class LiveDataIT
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_T, suggestionElements.get(0).getValue());
         assertEquals(CHOICE_T_TRANSLATION, suggestionElements.get(0).getLabel());
+
+        // Test filter on boolean values
+        suggestInputElement.clear().hideSuggestions();
+        liveDataElement.waitUntilReady();
+        assertEquals(2, tableLayout.countRows());
+
+        // Take the focus on the is active filter.
+        suggestInputElement = new SuggestInputElement(tableLayout.getFilter(IS_ACTIVE_COLUMN));
+        suggestInputElement.sendKeys(Boolean.TRUE.toString());
+        suggestInputElement.waitForSuggestions();
+        suggestionElements = suggestInputElement.getSuggestions();
+        assertEquals(1, suggestionElements.size());
+        suggestionElements.get(0).select();
+        liveDataElement.waitUntilReady();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        suggestInputElement.clear();
+        suggestInputElement.sendKeys(Boolean.FALSE.toString());
+        suggestInputElement.waitForSuggestions();
+        suggestionElements = suggestInputElement.getSuggestions();
+        assertEquals(1, suggestionElements.size());
+        suggestionElements.get(0).select();
+        liveDataElement.waitUntilReady();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
+
+        suggestInputElement.clear().hideSuggestions();
+        liveDataElement.waitUntilReady();
+        assertEquals(2, tableLayout.countRows());
     }
 
     private void createXObjects(TestUtils testUtils, TestReference testReference)
@@ -241,17 +279,15 @@ class LiveDataIT
         String className = testUtils.serializeReference(testReference);
         DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
         testUtils.createPage(o1, "", "O1");
-        addXObject(testUtils, o1, className,
-            NAME_LYNDA, CHOICE_A, "U1");
+        addXObject(testUtils, o1, className, NAME_LYNDA, CHOICE_A, "U1", true);
         DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
         // Make 02 not viewable by guests to test the footnotes.
         testUtils.setRights(o2, null, "XWiki.XWikiGuest", "view", false);
-        addXObject(testUtils, o2, className,
-            NAME_ESTHER, CHOICE_B, "U2");
+        addXObject(testUtils, o2, className, NAME_ESTHER, CHOICE_B, "U2", false);
         DocumentReference o3 = new DocumentReference("O3", (SpaceReference) testReference.getParent());
         // Set a localized title on O3 to test the footnotes.
         testUtils.createPage(o3, "", "$services.localization.render('computedTitle')");
-        addXObject(testUtils, o3, className, NAME_NIKOLAY, "", null);
+        addXObject(testUtils, o3, className, NAME_NIKOLAY, "", null, false);
     }
 
     /**
@@ -346,7 +382,7 @@ class LiveDataIT
      * @param username the username of the user field (e.g., {@code "U1"})
      */
     private void addXObject(TestUtils testUtils, DocumentReference documentReference, String className, String name,
-        String choice, String username)
+        String choice, String username, boolean isActive)
     {
         Map<String, Object> properties = new HashMap<>();
         properties.put(NAME_COLUMN, name);
@@ -354,6 +390,7 @@ class LiveDataIT
         if (username != null) {
             properties.put(USER_COLUMN, "XWiki." + username);
         }
+        properties.put(IS_ACTIVE_COLUMN, isActive);
         testUtils.addObject(documentReference, className, properties);
     }
 
@@ -376,6 +413,7 @@ class LiveDataIT
         classEditPage.clickSaveAndView();
         testUtils.addClassProperty(testReference, BIRTHDAY_COLUMN, "Date");
         testUtils.addClassProperty(testReference, USER_COLUMN, "Users");
+        testUtils.addClassProperty(testReference, IS_ACTIVE_COLUMN, "Boolean");
     }
 
     private static void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference,

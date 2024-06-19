@@ -170,7 +170,7 @@
     "actions":[
       {"id":"view","name":"view","icon":{"cssClass":"fa fa-eye"}},
       {"id":"edit","name":"Edit","description":"Edit entry","icon":{}},
-      {"id":"delete","name":"delete","icon":{}},
+      {"id":"delete","name":"delete","icon":{"cssClass":"text-danger"}},
       {"id":"copy","name":"copy","icon":{}},
       {"id":"rename","name":"rename","icon":{}},
       {"id":"rights","name":"rights","icon":{}}

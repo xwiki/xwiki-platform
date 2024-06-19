@@ -275,10 +275,10 @@
       <displayInCategory>edit</displayInCategory>
     </property>
     <property>
-      <displayInSection>Realtime Editors</displayInSection>
+      <displayInSection>edit.realtime</displayInSection>
     </property>
     <property>
-      <heading>Commons</heading>
+      <heading/>
     </property>
     <property>
       <iconAttachment/>
@@ -385,7 +385,7 @@
     </property>
     <property>
       <code>require(['jquery'], function ($) {
-  var form = $('#realtime\\ editors_XWiki\\.Realtime\\.Configuration');
+  var form = $('#edit\\.realtime_XWiki\\.Realtime\\.Configuration');
   if (XWiki.mainWiki === XWiki.currentWiki) {
     form.find('dt').first().hide();
     return;
@@ -456,7 +456,7 @@
       <toolbarUserlist>
         <cache>0</cache>
         <customDisplay/>
-        <defaultValue/>
+        <defaultValue>both</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText/>

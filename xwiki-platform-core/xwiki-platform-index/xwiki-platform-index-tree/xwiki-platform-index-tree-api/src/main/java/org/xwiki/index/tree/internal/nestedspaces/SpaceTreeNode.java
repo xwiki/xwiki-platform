@@ -50,10 +50,15 @@ import org.xwiki.query.QueryFilter;
  * @since 7.4.5
  */
 @Component
-@Named("space")
+@Named(SpaceTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class SpaceTreeNode extends AbstractEntityTreeNode
 {
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "space";
+
     @Inject
     private LocalizationContext localizationContext;
 
@@ -82,6 +87,14 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
     @Inject
     @Named("documentOrSpaceReferenceResolver/nestedSpaces")
     private QueryFilter documentOrSpaceReferenceResolverFilter;
+
+    /**
+     * Default constructor.
+     */
+    public SpaceTreeNode()
+    {
+        super(HINT);
+    }
 
     @Override
     public List<String> getChildren(String nodeId, int offset, int limit)
@@ -163,8 +176,8 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
 
     protected int getChildDocumentsCount(SpaceReference spaceReference) throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        List<String> constraints = new ArrayList<>();
+        Map<String, Object> parameters = new HashMap<>();
         return getChildDocumentsCount(spaceReference, constraints, parameters);
     }
 
@@ -174,7 +187,7 @@ public class SpaceTreeNode extends AbstractEntityTreeNode
         constraints.add("doc.translation = 0");
         constraints.add("doc.space = :space");
 
-        parameters.put("space", this.localEntityReferenceSerializer.serialize(spaceReference));
+        parameters.put(HINT, this.localEntityReferenceSerializer.serialize(spaceReference));
 
         Query query = this.queryManager.createQuery(whereClause(constraints), Query.HQL);
         query.addFilter(this.countQueryFilter);

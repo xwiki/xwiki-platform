@@ -45,6 +45,7 @@ panels._actions=Дії
 ### Missing: panels.emptyvalue=
 panels.children.title=Дочірні Cторінки
 panels.siblings.title=Родинні Сторінки
+panels.customize=Ви можете налаштувати бічну(і) колонку(и) за допомогою {0}
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

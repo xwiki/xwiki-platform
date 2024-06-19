@@ -55,10 +55,4 @@ public class AllIT
     class NestedDocumentsMacroIT extends DocumentsMacroIT
     {
     }
-
-    @Nested
-    @DisplayName("Spaces UI")
-    class NestedSpacesIT extends SpacesIT
-    {
-    }
 }

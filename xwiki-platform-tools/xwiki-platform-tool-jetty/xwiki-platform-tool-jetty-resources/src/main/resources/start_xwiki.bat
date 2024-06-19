@@ -74,6 +74,12 @@ REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}
 set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir="%XWIKI_DATA_DIR%"
 
+REM Make sure the standard Java tmpdir is isolated per instance (by default Jetty provides applications work dir in the Java tmpdir)
+set JAVA_TMP=tmp
+set XWIKI_OPTS=%XWIKI_OPTS% -Djava.io.tmpdir=%JAVA_TMP%
+REM Make sure the Java tmpdir exist since Jenkins does not create it
+if not exist "%JAVA_TMP%" mkdir "%JAVA_TMP%"
+
 REM Catch any Out Of Memory to make easier to analyze it
 set XWIKI_OPTS=%XWIKI_OPTS% -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath="%XWIKI_DATA_DIR%"
 

@@ -38,7 +38,6 @@ import org.xwiki.user.UserReferenceSerializer;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.criteria.impl.RangeFactory;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -148,11 +147,31 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiContext inputxcontext) throws XWikiException
     {
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
-        // We only retrieve a cached archive if we want a complete one.
-        if (archiveDoc != null && criteria.isAllInclusive()) {
-            return archiveDoc;
+        if (archiveDoc == null) {
+            archiveDoc = getXWikiDocumentArchiveFromDatabase(doc, criteria, inputxcontext);
+        // if there's an archive doc and the criteria is to not return everything then we filter, else we just return
+        } else if (!criteria.isAllInclusive()) {
+            archiveDoc = filterArchiveFromCriteria(doc, archiveDoc, criteria);
         }
+        return archiveDoc;
+    }
 
+    private XWikiDocumentArchive filterArchiveFromCriteria(XWikiDocument doc, XWikiDocumentArchive archiveDoc,
+        RevisionCriteria criteria)
+    {
+        XWikiDocumentArchive result =
+            new XWikiDocumentArchive(doc.getDocumentReference().getWikiReference(), doc.getId());
+        Collection<String> versionsToKeep = filterVersions(archiveDoc, criteria);
+        // We retrieve the actual nodes from the versions we obtained
+        result.setNodes(archiveDoc.getNodes().stream()
+            .filter(node -> versionsToKeep.contains(node.getVersion().toString())).toList());
+        return result;
+    }
+
+    private XWikiDocumentArchive getXWikiDocumentArchiveFromDatabase(XWikiDocument doc, RevisionCriteria criteria,
+        XWikiContext inputxcontext) throws XWikiException
+    {
+        XWikiDocumentArchive archiveDoc = null;
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         String db = context.getWikiId();
@@ -289,11 +308,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            RevisionCriteria criteria = new RevisionCriteria();
-            criteria.setIncludeMinorVersions(true);
-            criteria.setRange(RangeFactory.getLAST());
-
-            XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, criteria, context);
+            XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
             UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
                 new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
             String author = userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());

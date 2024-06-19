@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
-import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
+import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;

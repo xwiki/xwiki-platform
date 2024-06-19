@@ -18,13 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wikiEditor', [
-  'xwiki-realtime-config',
   'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
-  'xwiki-realtime-typingTests',
-  'json.sortify',
   'xwiki-realtime-textCursor',
   'xwiki-realtime-interface',
   'xwiki-realtime-saver',
@@ -33,8 +30,7 @@ define('xwiki-realtime-wikiEditor', [
   'jquery'
 ], function(
   /* jshint maxparams:false */
-  realtimeConfig, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, JSONSortify, TextCursor, Interface, Saver,
-    ChainPad, Crypto, $
+  ErrorBox, Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
 ) {
   'use strict';
 

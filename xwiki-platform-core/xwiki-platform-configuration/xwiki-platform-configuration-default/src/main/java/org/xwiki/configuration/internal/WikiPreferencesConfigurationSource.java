@@ -27,7 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 /**
- * Configuration source taking its data in the Wiki Preferences wiki document (using data from the
+ * Configuration source taking its data in the current Wiki Preferences wiki document (using data from the
  * XWiki.XWikiPreferences object attached to that document).
  * 
  * @version $Id$

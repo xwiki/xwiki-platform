@@ -53,7 +53,7 @@ public class MacroDialogEditModal extends BaseElement
      * @since 15.10.6
      * @since 16.0.0RC1
      */
-    public MacroDialogEditModal setMacroParameter(String name, String value)
+    public MacroDialogEditModal setMacroParameter(String name, CharSequence... value)
     {
         WebElement parameterInput = getMacroParameterInput(name);
         parameterInput.clear();
@@ -74,7 +74,7 @@ public class MacroDialogEditModal extends BaseElement
         return getMacroParameterInput(name).getAttribute("value");
     }
 
-    private WebElement getMacroParameterInput(String name)
+    public WebElement getMacroParameterInput(String name)
     {
         return getDriver().findElementWithoutWaitingWithoutScrolling(
             // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.

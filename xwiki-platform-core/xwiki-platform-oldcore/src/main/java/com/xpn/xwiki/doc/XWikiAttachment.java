@@ -250,7 +250,7 @@ public class XWikiAttachment implements Cloneable
     {
         long longSize = getLongSize();
 
-        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**
@@ -314,7 +314,7 @@ public class XWikiAttachment implements Cloneable
     {
         long longSize = getContentLongSize(context);
 
-        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**

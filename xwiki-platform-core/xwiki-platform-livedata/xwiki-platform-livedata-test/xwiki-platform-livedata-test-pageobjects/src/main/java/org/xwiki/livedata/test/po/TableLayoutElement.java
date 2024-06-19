@@ -86,7 +86,7 @@ public class TableLayoutElement extends BaseElement
      */
     public List<WebElement> getRows()
     {
-        return getRoot().findElements(By.cssSelector("tbody > tr"));
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody > tr"));
     }
 
     /**
@@ -566,7 +566,7 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = findColumnIndex(columnLabel);
 
         WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
-            + "(%d) .sort-icon", columnIndex)));
+            + "(%d) .handle", columnIndex)));
         element.click();
 
         waitUntilReady();
@@ -678,8 +678,10 @@ public class TableLayoutElement extends BaseElement
     public WebElement getFilter(String columnLabel)
     {
         int columnIndex = findColumnIndex(columnLabel);
-        return getRoot()
-            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        By cssSelector = By.cssSelector(String.format(
+            ".column-filters > th:nth-child(%1$d) input, "
+            + ".column-filters > th:nth-child(%1$d) select", columnIndex));
+        return getRoot().findElement(cssSelector);
     }
 
     /**

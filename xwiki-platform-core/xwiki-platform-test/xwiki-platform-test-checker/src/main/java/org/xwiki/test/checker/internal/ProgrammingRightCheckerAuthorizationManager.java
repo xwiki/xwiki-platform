@@ -139,7 +139,7 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
 
                 return true;
             } else {
-                this.prlogger.debug("PRChecker: Block programming right for page [{}]", sref);
+                this.prlogger.info("PRChecker: Block programming right for page [{}]", sref);
 
                 return false;
             }

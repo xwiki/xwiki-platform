@@ -268,7 +268,7 @@ class ImageIT extends AbstractCKEditorIT
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
 
-        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.END, Keys.ENTER, "Some text", Keys.ENTER);
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER, "Some text", Keys.ENTER);
 
         imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
@@ -830,7 +830,50 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("a [[image:" + imageURL + "||height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
+        assertEquals("a [[image:" + imageURL + "||alt=\"Test alt\" height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(19)
+    void editListWithImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Then test the image styles on the image dialog as a standard user.
+        createAndLoginStandardUser(setup);
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("* Item 1\n"
+            + "* Item 2 [[image:image.gif]]");
+        wikiEditPage.clickSaveAndView();
+
+        WYSIWYGEditPage wysiwygEditPage = wikiEditPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        editor.getToolBar().clickNumberedList();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("* Item 1\n"
+            + "\n"
+            + "1. Item 2 [[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(20)
+    void editImageWithDataWidgetAttribute(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        ViewPage page = setup.createPage(testReference, "[[image:image.gif||data-widget='uploadimage']]");
+        WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+        // Make sure the image can be clicked as a proof that the editor did not crash.
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
     }
 
     /**
@@ -846,7 +889,7 @@ class ImageIT extends AbstractCKEditorIT
         wikiEditPage.sendKeys("{{html clean='false'}}\n"
             + "<div contenteditable=\"true\" id=\"copyme\">\n"
             + "  <p>\n"
-            + "    a <img src=\"" + imageURL + "\" > b\n"
+            + "    a <img src=\"" + imageURL + "\" alt=\"Test alt\"> b\n"
             + "  </p>\n"
             + "</div>\n"
             + "{{/html}}");

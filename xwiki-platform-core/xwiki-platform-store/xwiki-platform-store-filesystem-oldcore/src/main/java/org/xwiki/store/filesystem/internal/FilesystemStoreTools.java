@@ -41,6 +41,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.locks.LockProvider;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
+
 /**
  * Default tools for getting files to store data in the filesystem. This should be replaced by a module which provides a
  * secure extension of java.io.File.
@@ -273,6 +275,20 @@ public class FilesystemStoreTools implements Initializable
     public AttachmentFileProvider getAttachmentFileProvider(final AttachmentReference attachmentReference)
     {
         return new DefaultAttachmentFileProvider(getAttachmentDir(attachmentReference), attachmentReference.getName());
+    }
+
+    /**
+     * @param attachment the attachment
+     * @return the content of the link file
+     * @since 16.4.0
+     */
+    public String getLinkContent(XWikiAttachment attachment)
+    {
+        AttachmentFileProvider provider = getAttachmentFileProvider(attachment.getReference());
+        File defaultFile = provider.getAttachmentContentFile();
+        File versionFile = provider.getAttachmentVersionContentFile(attachment.getVersion());
+
+        return StoreFileUtils.getLinkContent(defaultFile.getParentFile(), versionFile);
     }
 
     /**

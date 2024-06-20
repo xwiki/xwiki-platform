@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
@@ -133,7 +134,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     public DocumentReference(String wikiName, String spaceName, String pageName, String language)
     {
         this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)),
-            (language == null) ? null : new Locale(language));
+            (language == null) ? null : LocaleUtils.toLocale(language));
     }
 
     /**

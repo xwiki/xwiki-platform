@@ -1108,4 +1108,17 @@ class XWikiTest
         assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"),
             this.xwiki.getDocument(reference5, this.oldcore.getXWikiContext()).getParentReference());
     }
+
+    @Test
+    void formatDate()
+    {
+        Date date = new Date(1718887539000L);
+        String expectedResult = "2024/06/20 14:45";
+        this.oldcore.getMockWikiConfigurationSource().setProperty("default_language", "fr_CA");
+        assertEquals(expectedResult, this.xwiki.formatDate(date, null, this.oldcore.getXWikiContext()));
+
+        String format = "EEEE dd MMMM YYYY HH:mm:ss";
+        assertEquals("jeudi 20 juin 2024 14:45:39",
+            this.xwiki.formatDate(date, format, this.oldcore.getXWikiContext()));
+    }
 }

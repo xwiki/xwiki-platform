@@ -25,7 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
-    "electron": "31.0.1"
+    "electron": "31.0.2"
   },
   "devDependencies": {
     "@types/node": "20.14.7",

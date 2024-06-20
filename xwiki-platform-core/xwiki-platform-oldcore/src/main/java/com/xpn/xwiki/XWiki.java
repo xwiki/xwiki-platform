@@ -4870,6 +4870,13 @@ public class XWiki implements EventListener
             // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
             // the overwritten is accepted.
             if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
+                if (!targetDocument.isNew()) {
+                    // If there is a document at the target location we need to delete it first.
+                    // But we don't want to notify about this delete since from outside world point of view it's an
+                    // update and not a delete+create
+                    deleteDocument(targetDocument, true, false, context);
+                }
+
                 // Ensure that the current context contains the wiki reference of the source document.
                 WikiReference wikiReference = context.getWikiReference();
                 context.setWikiReference(sourceDocumentReference.getWikiReference());

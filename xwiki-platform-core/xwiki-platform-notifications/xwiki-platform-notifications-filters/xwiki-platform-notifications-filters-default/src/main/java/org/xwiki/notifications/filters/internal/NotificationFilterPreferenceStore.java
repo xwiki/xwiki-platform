@@ -48,6 +48,8 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -78,6 +80,9 @@ public class NotificationFilterPreferenceStore
 
     @Inject
     private ObservationManager observation;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     /**
      * Retrieve the notification preference that corresponds to the given id and wiki.
@@ -344,7 +349,7 @@ public class NotificationFilterPreferenceStore
     }
 
     /**
-     * Delete all the filter preferences from a wiki.
+     * Delete all the filter preferences related to a wiki.
      *
      * @param wikiReference the reference of a wiki
      * @throws NotificationException in case of error during the hibernate operations
@@ -354,31 +359,42 @@ public class NotificationFilterPreferenceStore
      */
     public void deleteFilterPreference(WikiReference wikiReference) throws NotificationException
     {
-        configureContextWrapper(wikiReference, () -> {
-            XWikiContext context = this.contextProvider.get();
+        // We iterate over all wiki dbs and we remove the preferences in each of them since they might all contain
+        // filter preferences related to the given wiki.
+        try {
+            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
+                configureContextWrapper(new WikiReference(wikiId), () -> {
+                    XWikiContext context = this.contextProvider.get();
 
-            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+                    XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
 
-            try {
-                hibernateStore.executeWrite(context, session -> {
-                    session
-                        .createQuery("delete from DefaultNotificationFilterPreference "
-                            + "where page like :wikiPrefix "
-                            + "or pageOnly like :wikiPrefix "
-                            + "or user like :wikiPrefix "
-                            + "or wiki = :wikiId")
-                        .setParameter("wikiPrefix", wikiReference.getName() + ":%")
-                        .setParameter("wikiId", wikiReference.getName()).executeUpdate();
+                    try {
+                        hibernateStore.executeWrite(context, session -> {
+                            session
+                                .createQuery("delete from DefaultNotificationFilterPreference "
+                                    + "where page like :wikiPrefix "
+                                    + "or pageOnly like :wikiPrefix "
+                                    + "or user like :wikiPrefix "
+                                    + "or wiki = :wikiId")
+                                .setParameter("wikiPrefix", wikiReference.getName() + ":%")
+                                .setParameter("wikiId", wikiReference.getName()).executeUpdate();
+
+                            return null;
+                        });
+                    } catch (XWikiException e) {
+                        throw new NotificationException(String.format(
+                            "Failed to delete the notification preferences for wiki [%s]",
+                            wikiReference.getName()), e);
+                    }
 
                     return null;
                 });
-            } catch (XWikiException e) {
-                throw new NotificationException(String
-                    .format("Failed to delete the notification preferences for wiki [%s]", wikiReference.getName()), e);
             }
-
-            return null;
-        });
+        } catch (WikiManagerException e) {
+            throw new NotificationException(String
+                .format("Error when trying to get the list of wiki ids preventing to delete filter preferences for "
+                        + "wiki [%s]", wikiReference.getName()), e);
+        }
     }
 
     /**

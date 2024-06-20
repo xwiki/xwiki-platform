@@ -51,9 +51,9 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @since 16.4.1
  */
 @Component
-@Named("R160500000XWIKI22271")
+@Named("R160401000XWIKI22271")
 @Singleton
-public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigration
+public class R160401000XWIKI22271DataMigration extends AbstractHibernateDataMigration
 {
     // We use a nested query here because the columns are all nullable and apparently any query
     // such as not length(nfp.wiki) > 0 doesn't return result if the column data is null

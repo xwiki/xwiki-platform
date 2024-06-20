@@ -23,6 +23,8 @@ import {
   type Component,
   inject,
   onBeforeMount,
+  ref,
+  Ref,
   ShallowRef,
   shallowRef,
 } from "vue";
@@ -36,11 +38,15 @@ const extraTabsService: ExtraTabsService = cristal
 
 const list: ExtraTab[] = await extraTabsService.list();
 
-const loadedTabs: ShallowRef<Record<string, Component>> = shallowRef({});
+// The record needs to be reactive for the template to detect changes when a
+// new panel is loaded.
+// But, the Components used as values must be wrapped in shallow refs for
+// performance reason (it's too costly to monitor them in depth).
+const loadedTabs: Ref<Record<string, ShallowRef<Component>>> = ref({});
 
 async function load(extraTab: ExtraTab) {
   if (extraTab && !loadedTabs.value[extraTab.id]) {
-    loadedTabs.value[extraTab.id] = await extraTab.panel();
+    loadedTabs.value[extraTab.id] = shallowRef(await extraTab.panel());
   }
 }
 

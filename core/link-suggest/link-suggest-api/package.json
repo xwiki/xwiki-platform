@@ -22,7 +22,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "devDependencies": {
-    "typescript": "5.4.5"
+    "typescript": "5.5.2"
   },
   "publishConfig": {
     "exports": {

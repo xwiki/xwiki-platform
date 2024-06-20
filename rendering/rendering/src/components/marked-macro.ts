@@ -33,7 +33,7 @@ type Config = {
 
 const startReg = new RegExp(/\{\{(.*?)\s+(.*?)\}\}/);
 const parametersReg = new RegExp(
-  /(\w*)\s*=\s*((['"])?((\\\3|[^\3])*?)\3|(\w+))/g,
+  /(\w*)\s*=\s*((['"])?((\\\3|[^\x03])*?)\3|(\w+))/g,
 );
 const debug = false;
 const config: Config = { nodeName: "pre", className: "wikimodel-macro" };

@@ -37,7 +37,7 @@
     "nx": "19.2.3",
     "prettier": "3.3.0",
     "rollup": "4.18.0",
-    "typescript": "5.4.5",
+    "typescript": "5.5.2",
     "vite": "5.3.1",
     "vite-plugin-css-injected-by-js": "3.5.1",
     "vite-plugin-dts": "3.9.1",

@@ -29,7 +29,7 @@
     "electron": "31.0.1"
   },
   "devDependencies": {
-    "@types/node": "20.14.1",
+    "@types/node": "20.14.7",
     "cross-env": "7.0.3",
     "rimraf": "5.0.7",
     "typescript": "5.4.5"

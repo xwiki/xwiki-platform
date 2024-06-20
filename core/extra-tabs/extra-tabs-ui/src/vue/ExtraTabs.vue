@@ -19,7 +19,13 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { ExtraTab, ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
-import { type Component, inject, onBeforeMount, type Ref, ref } from "vue";
+import {
+  type Component,
+  inject,
+  onBeforeMount,
+  ShallowRef,
+  shallowRef,
+} from "vue";
 import type { CristalApp } from "@xwiki/cristal-api";
 
 const cristal = inject<CristalApp>("cristal")!;
@@ -30,7 +36,7 @@ const extraTabsService: ExtraTabsService = cristal
 
 const list: ExtraTab[] = await extraTabsService.list();
 
-const loadedTabs: Ref<Record<string, Component>> = ref({});
+const loadedTabs: ShallowRef<Record<string, Component>> = shallowRef({});
 
 async function load(extraTab: ExtraTab) {
   if (extraTab && !loadedTabs.value[extraTab.id]) {

@@ -55,6 +55,11 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Singleton
 public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigration
 {
+    // We use a nested query here because the columns are all nullable and apparently any query
+    // such as not length(nfp.wiki) > 0 doesn't return result if the column data is null
+    // because length(nfp.wiki) returns null when the data is null...
+    // So easiest way to not have deal with null values (which are interpreted differently in different DBs)
+    // was to use nested query.
     private static final String SEARCH_FILTERS_STATEMENT = "select nfp "
         + "from DefaultNotificationFilterPreference nfp "
         + "where nfp.id not in ("

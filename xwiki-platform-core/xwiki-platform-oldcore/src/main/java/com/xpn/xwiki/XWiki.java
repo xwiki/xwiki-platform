@@ -6466,11 +6466,11 @@ public class XWiki implements EventListener
             DateFormatSymbols formatSymbols = null;
             try {
                 String language = getLanguagePreference(context);
-                formatSymbols = new DateFormatSymbols(new Locale(language));
+                formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
             } catch (Exception e2) {
                 String language = getXWikiPreference("default_language", context);
                 if ((language != null) && (!language.equals(""))) {
-                    formatSymbols = new DateFormatSymbols(new Locale(language));
+                    formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
                 }
             }
 

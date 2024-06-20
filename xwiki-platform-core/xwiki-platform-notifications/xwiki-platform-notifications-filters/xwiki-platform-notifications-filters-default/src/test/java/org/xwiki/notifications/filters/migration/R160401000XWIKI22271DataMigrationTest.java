@@ -61,20 +61,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link R160500000XWIKI22271DataMigration}.
+ * Tests for {@link R160401000XWIKI22271DataMigration}.
  *
  * @version $Id$
  * @since 16.5.0
  * @since 16.4.1
  */
 @ComponentTest
-class R160500000XWIKI22271DataMigrationTest
+class R160401000XWIKI22271DataMigrationTest
 {
     private static final String CURRENT_WIKI = "current_Wiki";
     private static final String CURRENT_WIKI_ESCAPED = "current!_Wiki";
 
     @InjectMockComponents(role = HibernateDataMigration.class)
-    private R160500000XWIKI22271DataMigration dataMigration;
+    private R160401000XWIKI22271DataMigration dataMigration;
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;

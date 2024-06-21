@@ -82,6 +82,7 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.URLConfiguration;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -205,6 +206,8 @@ public class MockitoOldcore
     private boolean mockXWiki = true;
 
     private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
+
+    private UserPropertiesResolver allUserPropertiesResolver;
 
     /**
      * @version $Id$
@@ -1123,6 +1126,12 @@ public class MockitoOldcore
                     getMocker().getInstance(userReferenceDocumentReferenceSerializer, "document");
             }
 
+            if (!this.componentManager.hasComponent(UserPropertiesResolver.class, "all")) {
+                this.allUserPropertiesResolver = getMocker().registerMockComponent(UserPropertiesResolver.class, "all");
+            } else {
+                this.allUserPropertiesResolver = getMocker().getInstance(UserPropertiesResolver.class, "all");
+            }
+
             // we ensure that when trying to resolve a DocumentReference to UserReference, then the returned mock
             // will return the original DocumentReference when resolved back to DocumentReference.
             when(userReferenceResolver.resolve(any()))
@@ -1422,5 +1431,10 @@ public class MockitoOldcore
 
         when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
         when(this.environment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
+    }
+
+    public UserPropertiesResolver getMockAllUserPropertiesResolver()
+    {
+        return this.allUserPropertiesResolver;
     }
 }

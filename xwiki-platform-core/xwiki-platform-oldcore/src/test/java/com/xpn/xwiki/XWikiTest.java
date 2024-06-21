@@ -54,6 +54,8 @@ import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserProperties;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -1113,12 +1115,15 @@ class XWikiTest
     void formatDate()
     {
         Date date = new Date(1718887539000L);
-        String expectedResult = "2024/06/20 14:45";
+        String expectedResult = "2024/06/20 12:45";
         this.oldcore.getMockWikiConfigurationSource().setProperty("default_language", "fr_CA");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.timezone", "BRT");
+        when(this.oldcore.getMockAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE))
+            .thenReturn(mock(UserProperties.class));
         assertEquals(expectedResult, this.xwiki.formatDate(date, null, this.oldcore.getXWikiContext()));
 
         String format = "EEEE dd MMMM YYYY HH:mm:ss";
-        assertEquals("jeudi 20 juin 2024 14:45:39",
+        assertEquals("jeudi 20 juin 2024 12:45:39",
             this.xwiki.formatDate(date, format, this.oldcore.getXWikiContext()));
     }
 }

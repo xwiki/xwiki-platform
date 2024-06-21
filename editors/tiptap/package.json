@@ -57,7 +57,7 @@
     "tippy.js": "6.3.7",
     "tiptap-markdown": "0.8.10",
     "utility-types": "3.11.0",
-    "vue": "3.4.27"
+    "vue": "3.4.29"
   },
   "devDependencies": {
     "@types/lodash": "4.17.5",

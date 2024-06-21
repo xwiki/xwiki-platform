@@ -28,7 +28,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "vue": "3.4.27"
+    "vue": "3.4.29"
   },
   "devDependencies": {
     "rimraf": "5.0.7",

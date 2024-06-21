@@ -31,7 +31,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "inversify": "6.0.2",
     "oh-vue-icons": "1.0.0-rc3",
-    "vue": "3.4.27",
+    "vue": "3.4.29",
     "vue-router": "4.3.2"
   },
   "devDependencies": {

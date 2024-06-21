@@ -30,7 +30,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "inversify": "6.0.2",
-    "vue": "3.4.27"
+    "vue": "3.4.29"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",

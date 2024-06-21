@@ -547,4 +547,50 @@ class RenamePageIT
         assertEquals("7.2", historyPane.getCurrentVersion());
         assertEquals("Update document after refactoring.", historyPane.getCurrentVersionComment());
     }
+
+    @Order(7)
+    @Test
+    void renamePageWithRedirectAndBack(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String sourceName = "Source";
+        String targetName = "Target";
+
+        DocumentReference sourceReference =
+            new DocumentReference("WebHome", new SpaceReference(sourceName, testReference.getLastSpaceReference()));
+        DocumentReference targetReference =
+            new DocumentReference("WebHome", new SpaceReference(targetName, testReference.getLastSpaceReference()));
+
+        // Clean-up: delete the pages that will be used in this test
+        setup.rest().delete(sourceReference);
+        setup.rest().delete(targetReference);
+
+        // Create the needed page
+        setup.rest().savePage(sourceReference, "source", sourceName);
+
+        // Rename source to target with redirect
+        ViewPage vp = setup.gotoPage(sourceReference);
+        RenamePage renamePage = vp.rename();
+        renamePage.setAutoRedirect(true);
+        renamePage.getDocumentPicker().setTitle(targetName);
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        assertTrue(setup.rest().exists(sourceReference));
+        assertTrue(setup.rest().exists(targetReference));
+
+        // Make sure the redirect is in place
+        vp = setup.gotoPage(sourceReference);
+        assertEquals(setup.serializeReference(targetReference), vp.getMetaDataValue("reference"));
+
+        // Rename back target to source
+        renamePage = vp.rename();
+        renamePage.getDocumentPicker().setTitle(sourceName);
+        renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        assertTrue(setup.rest().exists(sourceReference));
+        assertFalse(setup.rest().exists(targetReference));
+
+        // Make sure the source is back to normal
+        vp = setup.gotoPage(sourceReference);
+        assertEquals(setup.serializeReference(sourceReference), vp.getMetaDataValue("reference"));
+    }
 }

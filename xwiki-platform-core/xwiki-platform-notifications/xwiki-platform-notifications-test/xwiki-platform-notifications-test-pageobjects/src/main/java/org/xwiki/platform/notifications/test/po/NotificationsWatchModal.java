@@ -73,7 +73,7 @@ public class NotificationsWatchModal extends BaseModal
         UNWATCH_PAGE("unwatchPage"),
 
         /**
-         * For removing the watch filter on a page and instead watch the entire space
+         * For removing the watch filter on a page and instead watch the entire space.
          */
         UNWATCH_PAGE_WATCH_SPACE("unwatchPageWatchSpace"),
         /**
@@ -90,7 +90,7 @@ public class NotificationsWatchModal extends BaseModal
         UNBLOCK_PAGE("unblockPage"),
 
         /**
-         * For removing the block filter on a page and instead block the entire space
+         * For removing the block filter on a page and instead block the entire space.
          */
         UNBLOCK_PAGE_BLOCK_SPACE("unblockPageBlockSpace"),
         /**
@@ -120,11 +120,13 @@ public class NotificationsWatchModal extends BaseModal
      */
     public List<WatchOptions> getAvailableOptions()
     {
+        String attributeValue = "value";
         return this.container.findElements(By.name("watch-option")).stream().map(element ->
             Arrays.stream(WatchOptions.values())
-            .filter(option -> element.getAttribute("value").equals(option.getOptionValue()))
+            .filter(option -> element.getAttribute(attributeValue).equals(option.getOptionValue()))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Option " + element.getAttribute("value") + " not found"))
+            .orElseThrow(() ->
+                new IllegalArgumentException("Option " + element.getAttribute(attributeValue) + " not found"))
         ).toList();
     }
 

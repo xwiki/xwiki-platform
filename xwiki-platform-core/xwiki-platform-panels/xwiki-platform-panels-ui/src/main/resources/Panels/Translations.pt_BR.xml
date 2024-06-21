@@ -42,11 +42,20 @@ panels.description=Descrição
 panels.type=Tipo
 panels.category=Categoria
 panels._actions=Ações
-panels.emptyvalue=
+### Missing: panels.emptyvalue=
 panels.children.title=Subpáginas
 panels.siblings.title=Páginas do Nível
+panels.customize=Você pode personalizar as colunas laterais usando o {0}
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
 panels.documentInformation.configureSyntaxes=Configurar mais sintaxes
-### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.confirmChangeSyntax=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.failedSyntaxConversion=Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.</content>
+panels.documentInformation.confirmChangeSyntaxWysiwyg=Deseja também converter o conteúdo e os objetos do documento para a sintaxe selecionada? Escolher 'cancelar' redefinirá a sintaxe para a anterior e não fará nada. Observe que se você escolher 'ok' você perderá as modificações e isso salvará o documento automaticamente, você pode cancelar esta modificação acessando a interface do histórico do documento e reverter a última versão.
+panels.documentInformation.confirmChangeSyntax=Deseja também converter o conteúdo e os objetos do documento para a sintaxe selecionada? Escolher 'cancelar' alterará apenas o identificador de sintaxe, sem modificar o conteúdo do documento. Observe que se você escolher 'ok' o documento será salvo automaticamente, você pode cancelar esta modificação acessando a interface do histórico do documento e reverter a última versão.
+panels.documentInformation.failedSyntaxConversion=Falha ao converter para a sintaxe selecionada. Se você quiser usar essa sintaxe mesmo assim, poderá selecioná-la novamente e optar por não realizar a conversão.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

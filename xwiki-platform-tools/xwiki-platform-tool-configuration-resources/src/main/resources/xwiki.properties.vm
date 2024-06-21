@@ -1011,6 +1011,11 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-#
 # attachment.upload.blockList=
 
+#-# [Since 16.3.0RC1]
+#-# Indicate whether or not comments for attachment uploads should be settable from UI, and displayed whenever the
+#-# attachment revisions are listed. The default is false.
+# attachment.upload.enableComments=false
+
 #-------------------------------------------------------------------------------------
 # Active Installs 2
 #-------------------------------------------------------------------------------------

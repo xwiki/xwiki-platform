@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.internal.concurrent.DefaultContextStoreManager;
 import org.xwiki.localization.macro.internal.TranslationMacro;
@@ -49,6 +50,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 
 import com.xpn.xwiki.DefaultSkinAccessBridge;
@@ -56,6 +58,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -88,6 +91,7 @@ import static org.xwiki.rendering.wikimacro.internal.WikiMacroConstants.WIKI_MAC
     // End of XWikiWikiModel
     DocumentXHTMLLinkTypeRenderer.class,
     DocumentResourceReferenceEntityReferenceResolver.class,
+    TestNoScriptMacro.class,
     TranslationMacro.class
 })
 class XWikiSyntaxMacrosListPageTest extends PageTest
@@ -95,11 +99,21 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
     public static final DocumentReference DOCUMENT_REFERENCE =
         new DocumentReference("xwiki", "XWiki", "XWikiSyntaxMacrosList");
 
-    @Test
-    void renderTable() throws Exception
+    private DefaultWikiMacro myMacro;
+
+    @BeforeEach
+    void setUp() throws Exception
     {
         // Initialize "WikiMacroClass"
         this.xwiki.initializeMandatoryDocuments(this.context);
+
+        // Mock the database.
+        Query query = mock(Query.class);
+        QueryManagerScriptService queryManagerScriptService =
+            this.componentManager.registerMockComponent(ScriptService.class, "query", QueryManagerScriptService.class,
+                false);
+        when(queryManagerScriptService.xwql(any())).thenReturn(query);
+        when(query.execute()).thenReturn(List.of("xwiki:XWiki.MyMacro"));
 
         // Create a wiki macro.
         XWikiDocument myMacroDocument = this.xwiki.getDocument(new DocumentReference("xwiki", "XWiki", "MyMacro"),
@@ -111,20 +125,17 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
         this.xwiki.saveDocument(myMacroDocument, this.context);
 
         // Register the wiki macro component.
-        DefaultWikiMacro myMacro =
+        this.myMacro =
             this.componentManager.registerMockComponent(Macro.class, "mymacro", DefaultWikiMacro.class, false);
-        DefaultMacroDescriptor macroDescriptor =
-            new DefaultMacroDescriptor(new MacroId("mymacro"), "My Macro", "My Macro Description");
-        macroDescriptor.setDefaultCategories(Set.of("Category1", "Category2"));
-        when(myMacro.getDescriptor()).thenReturn(macroDescriptor);
+    }
 
-        // Mock the database.
-        Query query = mock(Query.class);
-        QueryManagerScriptService queryManagerScriptService =
-            this.componentManager.registerMockComponent(ScriptService.class, "query", QueryManagerScriptService.class,
-                false);
-        when(queryManagerScriptService.xwql(any())).thenReturn(query);
-        when(query.execute()).thenReturn(List.of("xwiki:XWiki.MyMacro"));
+    @Test
+    void renderTable() throws Exception
+    {
+        DefaultMacroDescriptor macroDescriptor = new DefaultMacroDescriptor(new MacroId("mymacro"), "My Macro",
+            "My Macro Description");
+        macroDescriptor.setDefaultCategories(Set.of("Category1", "Category2"));
+        when(this.myMacro.getDescriptor()).thenReturn(macroDescriptor);
 
         // Render the page.
         Document document = renderHTMLPage(DOCUMENT_REFERENCE);
@@ -144,10 +155,37 @@ class XWikiSyntaxMacrosListPageTest extends PageTest
             "XWiki.WikiMacroClass_visibility_Global");
         assertWikiMacro(trs.get(3), "mymacro", "/xwiki/bin/view/XWiki/MyMacro", "My Macro",
             Set.of("Category1", "Category2"), "My Macro Description", "XWiki.WikiMacroClass_visibility_WIKI");
-        assertJavaMacro(trs.get(4), "translation", "Translation", "Content",
+        assertJavaMacro(trs.get(4), "noscript", "NoScript", "", "No Script!", "XWiki.WikiMacroClass_visibility_Global");
+        assertJavaMacro(trs.get(5), "translation", "Translation", "Content",
             "Display a translation message.", "XWiki.WikiMacroClass_visibility_Global");
-        assertJavaMacro(trs.get(5), "velocity", "Velocity", "Development", "Executes a Velocity script.",
+        assertJavaMacro(trs.get(6), "velocity", "Velocity", "Development", "Executes a Velocity script.",
             "XWiki.WikiMacroClass_visibility_Global");
+    }
+
+    @Test
+    void checkTableEscaping() throws Exception
+    {
+        String unescapedString = "{{noscript /}}";
+
+        DefaultMacroDescriptor macroDescriptor = new DefaultMacroDescriptor(new MacroId("mymacro"), unescapedString,
+            unescapedString);
+        macroDescriptor.setDefaultCategories(Set.of(unescapedString));
+        when(this.myMacro.getDescriptor()).thenReturn(macroDescriptor);
+
+        Document document = renderHTMLPage(DOCUMENT_REFERENCE);
+
+        Elements trs = document.select("tr");
+        Element myMacroTr = null;
+        for (Element tr : trs) {
+            Element th = tr.selectFirst("td");
+            if (th != null && th.text().equals("mymacro")) {
+                myMacroTr = tr;
+            }
+        }
+
+        assertNotNull(myMacroTr);
+        assertWikiMacro(myMacroTr, "mymacro", "/xwiki/bin/view/XWiki/MyMacro", unescapedString, Set.of(unescapedString),
+            unescapedString, "XWiki.WikiMacroClass_visibility_WIKI");
     }
 
     private void assertWikiMacro(Element rowElement, String id, String link, String name, Set<String> categories,

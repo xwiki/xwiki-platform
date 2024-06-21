@@ -96,12 +96,9 @@ public class WCAGContext
             entry("definition-list", true),
             entry("dlitem", true),
             entry("document-title", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id-active", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id-aria", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id", false),
+            entry("duplicate-id-active", true),
+            entry("duplicate-id-aria", true),
+            entry("duplicate-id", true),
             entry("form-field-multiple-labels", true),
             entry("frame-focusable-content", true),
             entry("frame-title-unique", true),

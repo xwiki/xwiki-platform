@@ -155,7 +155,7 @@
       }
     });
     // Submit form on Enter key pressed
-    results.on('keypress', 'a', function(event) {
+    results.on('keyup', 'a', function(event) {
       // 13 is the key id of the Enter key
       if (event.which === 13) {
         validateForm(event);

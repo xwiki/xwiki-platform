@@ -4869,6 +4869,13 @@ public class XWiki implements EventListener
             // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
             // the overwritten is accepted.
             if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
+                if (!targetDocument.isNew()) {
+                    // If there is a document at the target location we need to delete it first.
+                    // But we don't want to notify about this delete since from outside world point of view it's an
+                    // update and not a delete+create
+                    deleteDocument(targetDocument, true, false, context);
+                }
+
                 // Ensure that the current context contains the wiki reference of the source document.
                 WikiReference wikiReference = context.getWikiReference();
                 context.setWikiReference(sourceDocumentReference.getWikiReference());
@@ -6272,14 +6279,21 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Generate a display user name and return it.
+     * Generate a username for display.
      *
-     * @param userReference
-     * @param format a Velocity scnippet used to format the user name
-     * @param link true if a full html link snippet should be returned
-     * @param escapeXML true if the returned name should be escaped (forced true if {@code link} is true)
+     * @param userReference the reference to the user profile page
+     * @param format an optional Velocity script used to format the username. If {@code null} the use the user's first
+     *        name followed by the user's last name and separated by a space. All the {@code XWiki.XWikiUsers}
+     *        xproperties are bound to the Velocity Context and can be referenced in the passed script.
+     * @param link true if an HTML link snippet should be returned. If false, just return the username for display as
+     *        a plain text string.
+     * @param escapeXML true if the returned text should be escaped (forced to true if the {@code link} parameter is
+     *        true)
      * @param context see {@link XWikiContext}
-     * @return the display user name or a html snippet with the link to the passed user
+     * @return the username for display as plain text, or a HTML snippet with the link to the passed user, or the
+     *         user profile page name if an error occurred when computing the username to display (e.g. when executing
+     *         the passed Velocity script). If the passed user reference is null, return some text specifying an
+     *         unknown user
      * @since 6.4RC1
      */
     public String getUserName(DocumentReference userReference, String format, boolean link, boolean escapeXML,
@@ -6289,7 +6303,7 @@ public class XWiki implements EventListener
             return localizePlainOrKey("core.users.unknownUser");
         }
 
-        XWikiDocument userdoc = null;
+        XWikiDocument userdoc;
         try {
             userdoc = getDocument(userReference, context);
             if (userdoc == null) {
@@ -6320,15 +6334,14 @@ public class XWiki implements EventListener
                     vcontext = getVelocityContextFactory().createContext();
                 } catch (XWikiVelocityException e) {
                     LOGGER.error("Failed to create standard VelocityContext", e);
-
                     vcontext = new XWikiVelocityContext();
                 }
-
                 for (String propname : userobj.getPropertyList()) {
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
                 text = evaluateVelocity(format,
-                    "<username formatting code in " + context.getDoc().getDocumentReference() + ">", vcontext);
+                    String.format("<username formatting code in %s>", context.getDoc().getDocumentReference()),
+                    vcontext);
             }
 
             if (escapeXML || link) {
@@ -6336,8 +6349,8 @@ public class XWiki implements EventListener
             }
 
             if (link) {
-                text = "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">" + text
-                    + "</a></span>";
+                text = String.format("<span class=\"wikilink\"><a href=\"%s\">%s</a></span>",
+                    userdoc.getURL("view", context), text);
             }
             return text;
         } catch (Exception e) {
@@ -6459,11 +6472,11 @@ public class XWiki implements EventListener
             DateFormatSymbols formatSymbols = null;
             try {
                 String language = getLanguagePreference(context);
-                formatSymbols = new DateFormatSymbols(new Locale(language));
+                formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
             } catch (Exception e2) {
                 String language = getXWikiPreference("default_language", context);
                 if ((language != null) && (!language.equals(""))) {
-                    formatSymbols = new DateFormatSymbols(new Locale(language));
+                    formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
                 }
             }
 

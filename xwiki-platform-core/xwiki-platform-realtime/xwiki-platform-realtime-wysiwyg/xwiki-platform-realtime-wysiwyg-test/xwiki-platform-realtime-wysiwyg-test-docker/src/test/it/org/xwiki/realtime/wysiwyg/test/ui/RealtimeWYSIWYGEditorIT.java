@@ -309,23 +309,21 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
+        secondTextArea.waitUntilMacrosAreRendered();
 
-        // The content is reloaded when a macro is inserted.
-        secondTextArea = secondEditor.getRichTextArea();
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
-        secondTextArea.sendKeys("my info tex");
-        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_LEFT, Keys.ARROW_LEFT, Keys.ARROW_LEFT));
+        secondTextArea.sendKeys("my info");
 
         //
         // First Tab
         //
 
         setup.getDriver().switchTo().window(firstTabHandle);
-
-        // Continue typing to verify that the selection is not lost in the second tab.
-        // Notice that we don't wait for the content to be updated because we want to verfiy that this can happen while
-        // we are typing.
+        // Continue typing to verify that the selection is not lost in the second tab. Wait for the inserted macro to be
+        // rendered server-side.
+        firstTextArea.waitUntilTextContains("my");
+        firstTextArea.waitUntilMacrosAreRendered();
         firstTextArea.sendKeys(" two");
 
         //
@@ -333,17 +331,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
-
-        // Again, we don't wait for the content to be updated, because we don't need to. The content should be
-        // synchronized while we are typing.
-        secondTextArea.sendKeys("message");
+        // Don't wait for content from the first tab because we want to check that the selection is preserved.
+        secondTextArea.sendKeys(" tex");
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_LEFT, Keys.ARROW_LEFT, Keys.ARROW_LEFT));
 
         //
         // First Tab
         //
 
         setup.getDriver().switchTo().window(firstTabHandle);
-
+        // Don't wait for content from the first tab because we want to check that the selection is preserved.
         firstTextArea.sendKeys(" three");
 
         //
@@ -351,6 +348,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
+        // Again, we don't wait for the content to be updated, because we don't need to. The content should be
+        // synchronized while we are typing.
+        secondTextArea.sendKeys("message");
 
         // Wait for the content to be synchronized before saving, otherwise we might save partial content and, more
         // importantly, we could trigger the leave confirmation (if the content is synchronized after the content dirty
@@ -554,19 +554,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(secondTabHandle);
         secondTextArea.sendKeys(Keys.ARROW_RIGHT);
-        // At this point the caret is inside the underline style, at the end. We could remove the underline style by
-        // pressing Ctrl+U, which would move the caret after the underline style, but this can lead to a flacky
-        // behavior, if a remote change arrives at the same time in the same paragraph (which is the point of this
-        // test). When this happens, the selection has to be restored because the remote change affects the selection
-        // (the caret container is modified directly leading to a change in the number of child nodes which requires an
-        // update of the DOM range that specifies the caret position). When the selection is restored the caret is
-        // placed back in the underline style, at the end (because the selection is saved and restored relative to the
-        // text found before the caret). In order to avoid this flacky behavior we first type some text, then select it
-        // and finally remove the underline style.
-        secondTextArea.sendKeys(" ");
-        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_LEFT));
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "u"));
-        secondTextArea.sendKeys(Keys.ARROW_RIGHT, "end");
+        secondTextArea.sendKeys(" end");
 
         //
         // First Tab
@@ -682,9 +671,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
+        firstTextArea.waitUntilMacrosAreRendered();
 
-        // The content is reloaded when a macro is inserted.
-        firstTextArea = firstEditor.getRichTextArea();
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         firstTextArea.sendKeys("one");
@@ -710,7 +698,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.sendKeys(Keys.ARROW_UP, "two ");
 
         MacroDialogEditModal secondMacroEditModal = secondEditor.getBalloonToolBar().editMacro();
-        secondMacroEditModal.setMacroParameter("cssClass", "bar");
+        // We want to verify that remote changes don't steal the focus from the modal.
+        secondMacroEditModal.setMacroParameter("cssClass", "br", Keys.ARROW_LEFT);
 
         //
         // First Tab
@@ -721,9 +710,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // overwrite the text typed in the second tab.
         firstTextArea.waitUntilTextContains("two");
         firstMacroEditModal.clickSubmit();
-
-        // The content is reloaded when a macro is updated.
-        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilMacrosAreRendered();
 
         // Move to the information box title field and type something.
         firstTextArea.sendKeys(Keys.ARROW_UP, Keys.END, " title");
@@ -734,14 +721,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(secondTabHandle);
 
-        // The content was reloaded because the macro parameters have changed (from the first tab).
-        secondTextArea = secondEditor.getRichTextArea();
-
         secondTextArea.waitUntilTextContains("Some title");
+        // Verify that the remote change (which included a macro parameter update) didn't steal the focus.
+        secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
         secondMacroEditModal.clickSubmit();
-
-        // The content is again reloaded because we modified the macro parameters.
-        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilMacrosAreRendered();
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
@@ -761,7 +745,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstMacroEditModal.clickCancel();
 
         firstEditPage.clickSaveAndView();
-        assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}\n\n ",
+        assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}",
             WikiEditPage.gotoPage(testReference).getContent());
     }
     
@@ -913,9 +897,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-
-        // The content is reloaded when a macro is inserted.
-        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilMacrosAreRendered();
 
         // Select the default information message and delete it.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -926,9 +908,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/err", "Error Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-
-        // The content is reloaded when a macro is inserted.
-        firstTextArea = firstEditor.getRichTextArea();
+        firstTextArea.waitUntilMacrosAreRendered();
 
         // Replace the default error message.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);

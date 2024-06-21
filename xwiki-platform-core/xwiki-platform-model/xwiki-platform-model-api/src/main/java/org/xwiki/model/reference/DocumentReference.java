@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
@@ -72,7 +73,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
-     * Clone an DocumentReference, but replace one of the parent in the chain by a new one.
+     * Clone a DocumentReference, but replace one of the parent in the chain by a new one.
      *
      * @param reference the reference that is cloned
      * @param oldReference the old parent that will be replaced
@@ -133,7 +134,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     public DocumentReference(String wikiName, String spaceName, String pageName, String language)
     {
         this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)),
-            (language == null) ? null : new Locale(language));
+            (language == null) ? null : LocaleUtils.toLocale(language));
     }
 
     /**
@@ -210,7 +211,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
     }
 
     /**
-     * Clone an DocumentReference, but use the specified parent for its new parent.
+     * Clone a DocumentReference, but use the specified parent for its new parent.
      *
      * @param reference the reference to clone
      * @param parent the new parent to use

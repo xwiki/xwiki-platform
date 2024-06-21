@@ -47,7 +47,7 @@ Page" style="box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2)">
 * [Development Practices](https://dev.xwiki.org)
 * [Supported backends](https://cristal.xwiki.org/xwiki/bin/view/Backends/)
 * License: LGPL 2.1
-* Translations: all `Cristal - *` components on https://l10n.xwiki.org/projects/xwiki-contrib/
+* Translations: all components of https://l10n.xwiki.org/projects/xwiki-contrib/cristal/
 * Sonar Dashboard: N/A <!--[![Status](https://sonarcloud.io/api/project_badges/measure?project=(group id):(artifact id)&metric=alert_status)](https://sonarcloud.io/dashboard?id=(group
   id):(artifact id))-->
 

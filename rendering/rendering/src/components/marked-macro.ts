@@ -33,6 +33,7 @@ type Config = {
 
 const startReg = new RegExp(/\{\{(.*?)\s+(.*?)\}\}/);
 const parametersReg = new RegExp(
+  // eslint-disable-next-line no-control-regex
   /(\w*)\s*=\s*((['"])?((\\\3|[^\x03])*?)\3|(\w+))/g,
 );
 const debug = false;

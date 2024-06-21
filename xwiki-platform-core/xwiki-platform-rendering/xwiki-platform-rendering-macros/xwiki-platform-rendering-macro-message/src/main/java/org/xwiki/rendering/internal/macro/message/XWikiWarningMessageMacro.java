@@ -30,14 +30,14 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Displays a warning message.
  *
  * @version $Id$
- * @since 16.4.0RC1
+ * @since 16.6.0RC1
  */
 @Component
 @Named("warning")
 @Singleton
 public class XWikiWarningMessageMacro extends WarningMessageMacro
 {
-    private static String iconPrettyNameKey = "rendering.macro.message.icon.alternative.warning";
+    private static final String ICON_PRETTY_NAME_KEY = "rendering.macro.message.icon.alternative.warning";
     @Inject
     private ContextualLocalizationManager l10n;
 
@@ -47,6 +47,6 @@ public class XWikiWarningMessageMacro extends WarningMessageMacro
     public XWikiWarningMessageMacro()
     {
         super();
-        this.iconPrettyName = l10n.getTranslation(iconPrettyNameKey).toString();
+        this.iconPrettyName = l10n.getTranslationPlain(ICON_PRETTY_NAME_KEY);
     }
 }

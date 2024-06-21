@@ -30,14 +30,14 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Displays an error message.
  *
  * @version $Id$
- * @since 16.4.0RC1
+ * @since 16.6.0RC1
  */
 @Component
 @Named("error")
 @Singleton
 public class XWikiErrorMessageMacro extends ErrorMessageMacro
 {
-    private static String iconPrettyNameKey = "rendering.macro.message.icon.alternative.error";
+    private static final String ICON_PRETTY_NAME_KEY = "rendering.macro.message.icon.alternative.error";
     @Inject
     private ContextualLocalizationManager l10n;
 
@@ -47,6 +47,6 @@ public class XWikiErrorMessageMacro extends ErrorMessageMacro
     public XWikiErrorMessageMacro()
     {
         super();
-        this.iconPrettyName = l10n.getTranslation(iconPrettyNameKey).toString();
+        this.iconPrettyName = l10n.getTranslationPlain(ICON_PRETTY_NAME_KEY);
     }
 }

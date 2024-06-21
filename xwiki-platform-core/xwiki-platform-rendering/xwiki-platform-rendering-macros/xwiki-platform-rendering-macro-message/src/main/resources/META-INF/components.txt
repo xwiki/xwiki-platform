@@ -1,4 +1,4 @@
-org.xwiki.rendering.internal.macro.message.XWikiInfoMessageMacro
-org.xwiki.rendering.internal.macro.message.XWikiWarningMessageMacro
-org.xwiki.rendering.internal.macro.message.XWikiErrorMessageMacro
-org.xwiki.rendering.internal.macro.message.XWikiSuccessMessageMacro
+500:org.xwiki.rendering.internal.macro.message.XWikiInfoMessageMacro
+500:org.xwiki.rendering.internal.macro.message.XWikiWarningMessageMacro
+500:org.xwiki.rendering.internal.macro.message.XWikiErrorMessageMacro
+500:org.xwiki.rendering.internal.macro.message.XWikiSuccessMessageMacro

@@ -30,14 +30,14 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Displays an info message.
  *
  * @version $Id$
- * @since 16.4.0RC1
+ * @since 16.6.0RC1
  */
 @Component
 @Named("info")
 @Singleton
 public class XWikiInfoMessageMacro extends InfoMessageMacro
 {
-    private static String iconPrettyNameKey = "rendering.macro.message.icon.alternative.info";
+    private static final String ICON_PRETTY_NAME_KEY = "rendering.macro.message.icon.alternative.info";
     @Inject
     private ContextualLocalizationManager l10n;
 
@@ -47,6 +47,6 @@ public class XWikiInfoMessageMacro extends InfoMessageMacro
     public XWikiInfoMessageMacro()
     {
         super();
-        this.iconPrettyName = l10n.getTranslation(iconPrettyNameKey).toString();
+        this.iconPrettyName = l10n.getTranslationPlain(ICON_PRETTY_NAME_KEY);
     }
 }

@@ -26,9 +26,7 @@ import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.localization.LocalizationException;
 import org.xwiki.localization.Translation;
-import org.xwiki.localization.internal.DefaultTranslation;
 import org.xwiki.rendering.block.*;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -82,17 +80,11 @@ class XWikiIconProviderTest
 
         // Test
         Block result = iconProvider.get("test");
-        // We want to make sure that the returned result is a composite block
-        assertEquals(result.getClass(), CompositeBlock.class);
-        // We make sure we have two blocks inside the result
-        assertEquals(result.getChildren().size(), 2);
+        // We want to make sure that the returned result is a raw block
+        assertEquals(result.getClass(), RawBlock.class);
         // We check the icon itself
-        assertEquals(RawBlock.class, result.getChildren().get(0).getClass());
-        assertEquals(testIconFA, ((RawBlock)result.getChildren().get(0)).getRawContent());
-        // We check that the second block is the icon alternative
-        assertEquals(FormatBlock.class, result.getChildren().get(1).getClass());
-        assertEquals("sr-only", result.getChildren().get(1).getParameter("class"));
-        assertEquals(translationRendered, result.getChildren().get(1).getChildren().get(0));
+        assertEquals(RawBlock.class, result.getClass());
+        assertEquals(testIconFA, ((RawBlock)result).getRawContent());
     }
 
     @Test
@@ -116,9 +108,6 @@ class XWikiIconProviderTest
 
         // Test
         Block result = iconProvider.get("test");
-        // We check that an icon alternative got generated, despite the lack of translation
-        assertEquals(WordBlock.class, result.getChildren().get(1).getChildren().get(0).getClass());
-        assertEquals("test", ((WordBlock)result.getChildren().get(1).getChildren().get(0)).getWord());
     }
 
     @Test
@@ -146,6 +135,6 @@ class XWikiIconProviderTest
         // Test
         Block result = iconProvider.get("test");
         // We check that the icon provider fell back on the default icon theme when needed
-        assertEquals(testIconSilk, ((RawBlock)result.getChildren().get(0)).getRawContent());
+        assertEquals(testIconSilk, ((RawBlock)result).getRawContent());
     }
 }

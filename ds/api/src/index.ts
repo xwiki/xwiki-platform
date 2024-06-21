@@ -43,4 +43,18 @@ type TabProps = {
   tabId: string;
 };
 
-export type { BreadcrumbProps, TabPanelProps, TabProps };
+type TextFieldProps = {
+  name: string;
+  label: string;
+  required: boolean;
+};
+
+type TextFieldModel = File | File[] | null | undefined;
+
+export type {
+  BreadcrumbProps,
+  TabPanelProps,
+  TabProps,
+  TextFieldProps,
+  TextFieldModel,
+};

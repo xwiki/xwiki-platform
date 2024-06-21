@@ -122,4 +122,9 @@ export class GitHubStorage extends AbstractStorage {
   save(): Promise<unknown> {
     throw new Error("Save not supported");
   }
+
+  async saveAttachments(): Promise<unknown> {
+    // TODO: to be implemented
+    throw new Error("unsupported");
+  }
 }

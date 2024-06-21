@@ -36,6 +36,8 @@ import { AbstractStorage } from "@xwiki/cristal-backend-api";
  */
 @injectable()
 export class NextcloudStorage extends AbstractStorage {
+  private readonly ATTACHMENTS = "attachments";
+
   constructor(@inject<Logger>("Logger") logger: Logger) {
     super(logger, "storage.components.nextcloudStorage");
   }
@@ -80,18 +82,14 @@ export class NextcloudStorage extends AbstractStorage {
   }
 
   async getAttachments(page: string): Promise<PageAttachment[] | undefined> {
-    const baseRestURL = this.getWikiConfig().baseRestURL;
-    const response = await fetch(
-      `${baseRestURL}/.cristal/${page}/attachments`,
-      {
-        method: "PROPFIND",
-        headers: {
-          ...this.getBaseHeaders(),
-          Depth: "1",
-          Accept: "application/json",
-        },
+    const response = await fetch(this.getAttachmentsBasePath(page), {
+      method: "PROPFIND",
+      headers: {
+        ...this.getBaseHeaders(),
+        Depth: "1",
+        Accept: "application/json",
       },
-    );
+    });
 
     if (response.status >= 200 && response.status < 300) {
       const text = await response.text();
@@ -106,7 +104,7 @@ export class NextcloudStorage extends AbstractStorage {
           const mimetype =
             dresponse.getElementsByTagName("d:getcontenttype")[0].textContent!;
           const segments = id.split("/");
-          const href = `${baseRestURL}/${segments.slice(5).join("/")}`;
+          const href = `${this.getWikiConfig().baseRestURL}/${segments.slice(5).join("/")}`;
           const reference = segments[segments.length - 1];
 
           attachments.push({
@@ -124,29 +122,23 @@ export class NextcloudStorage extends AbstractStorage {
     }
   }
 
+  private getAttachmentsBasePath(page: string) {
+    return `${this.getWikiConfig().baseRestURL}/.cristal/${page}/${this.ATTACHMENTS}`;
+  }
+
   async save(page: string, content: string, title: string): Promise<unknown> {
     // Splits the page reference along the / and create intermediate directories
     // for each segment, expect the last one where the content and title are
     // persisted.
     const directories = page.split("/");
 
-    const headers = this.getBaseHeaders();
-    const baseRestURL = this.getWikiConfig().baseRestURL;
     // Create the root directory. We also need to create all intermediate directories.
-    let currentTarget = `${baseRestURL}/.cristal`;
-    await this.createDirectory(currentTarget, headers);
+    const rootURL = `${this.getWikiConfig().baseRestURL}/.cristal`;
+    await this.createIntermediateDirectories(rootURL, directories);
 
-    for (let i = 0; i < directories.length; i++) {
-      currentTarget = `${currentTarget}/${directories[i]}`;
-
-      // The intermediate directories must exist for a the target file to be
-      // accepted by webdav.
-      await this.createDirectory(currentTarget, headers);
-    }
-
-    await fetch(`${currentTarget}/page.json`, {
+    await fetch(`${rootURL}/${directories.join("/")}/page.json`, {
       method: "PUT",
-      headers: headers,
+      headers: this.getBaseHeaders(),
       body: JSON.stringify({
         source: content,
         name: title,
@@ -154,6 +146,46 @@ export class NextcloudStorage extends AbstractStorage {
       }),
     });
 
+    return;
+  }
+
+  private async createIntermediateDirectories(
+    rootURL: string,
+    directories: string[],
+  ) {
+    await this.createDirectory(rootURL);
+
+    for (let i = 0; i < directories.length; i++) {
+      // The intermediate directories must exist for the target file to be
+      // accepted by webdav.
+      await this.createDirectory(
+        `${rootURL}/${directories.slice(0, i + 1).join("/")}`,
+      );
+    }
+  }
+
+  async saveAttachments(page: string, files: File[]): Promise<unknown> {
+    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
+  }
+
+  private async saveAttachment(page: string, file: File): Promise<unknown> {
+    const directories = page.split("/");
+
+    // Create the root directory. We also need to create all intermediate directories.
+    const rootURL = `${this.getWikiConfig().baseRestURL}/.cristal`;
+    await this.createIntermediateDirectories(rootURL, [
+      ...directories,
+      this.ATTACHMENTS,
+    ]);
+
+    const fileURL = this.getAttachmentsBasePath(page) + "/" + file.name;
+    const formData = new FormData();
+    formData.append(file.name, file);
+    await fetch(fileURL, {
+      method: "PUT",
+      headers: this.getBaseHeaders(),
+      body: formData,
+    });
     return;
   }
 
@@ -174,20 +206,17 @@ export class NextcloudStorage extends AbstractStorage {
     return true;
   }
 
-  private async createDirectory(
-    currentTarget: string,
-    headers: { Authorization: string },
-  ) {
+  private async createDirectory(currentTarget: string) {
     await fetch(currentTarget, {
       method: "MKCOL",
-      headers: headers,
+      headers: this.getBaseHeaders(),
     });
   }
 
   private getBaseHeaders() {
     // TODO: the authentication is currently hardcoded.
     return {
-      Authorization: `Basic ${btoa("test:test")}`,
+      Authorization: `Basic ${btoa("Admin:admin")}`,
     };
   }
 }

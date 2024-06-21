@@ -18,20 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { PageAttachment, PageData } from "@xwiki/cristal-api";
+import en from "../langs/translation-en.json";
 
-export interface APITypes {
-  resolvePath(page: string): Promise<string>;
-
-  resolveAttachmentsPath(page: string): Promise<string>;
-
-  resolveAttachmentPath(page: string, filename: string): Promise<string>;
-
-  readPage(path: string): Promise<PageData>;
-
-  readAttachments(path: string): Promise<PageAttachment[]>;
-
-  savePage(path: string, content: string, title: string): Promise<PageData>;
-
-  saveAttachment(path: string, file: File): Promise<PageData>;
-}
+const translations: Record<string, Record<string, string>> = {
+  en,
+};
+export default translations;

@@ -24,6 +24,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-attachments-api": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
     "inversify": "6.0.2",
     "vue": "3.4.27",

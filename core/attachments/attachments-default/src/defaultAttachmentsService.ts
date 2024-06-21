@@ -31,6 +31,7 @@ type Id = "attachments";
 type State = {
   attachments: Attachment[];
   isLoading: boolean;
+  isUploading: false;
   unknownPage: boolean;
   error: string | undefined;
 };
@@ -46,6 +47,8 @@ type Actions = {
   setLoading(): void;
   updateAttachments(attachments: Attachment[] | undefined): void;
   setError(error: string): void;
+  startUploading(): void;
+  stopUploading(): void;
 };
 type AttachmentsStoreDefinition = StoreDefinition<Id, State, Getters, Actions>;
 type AttachmentsStore = Store<Id, State, Getters, Actions>;
@@ -57,6 +60,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
       return {
         attachments: [],
         isLoading: true,
+        isUploading: false,
         error: undefined,
         unknownPage: false,
       };
@@ -79,6 +83,12 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
       setError(error: string) {
         this.isLoading = false;
         this.error = error;
+      },
+      startUploading() {
+        this.isUploading = true;
+      },
+      stopUploading() {
+        this.isUploading = false;
       },
     },
   },
@@ -108,6 +118,10 @@ export class DefaultAttachmentsService implements AttachmentsService {
     return this.refs.isLoading;
   }
 
+  isUploading(): StateRefs["isUploading"] {
+    return this.refs.isUploading;
+  }
+
   getError(): StateRefs["error"] {
     return this.refs.error;
   }
@@ -115,9 +129,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
   async refresh(page: string): Promise<void> {
     this.store.setLoading();
     try {
-      const attachments = await this.cristalApp
-        .getWikiConfig()
-        .storage.getAttachments(page);
+      const attachments = await this.getStorage().getAttachments(page);
       this.store.updateAttachments(
         attachments?.map(({ id, reference, mimetype, href }) => {
           return { id, name: reference, mimetype, href };
@@ -126,5 +138,21 @@ export class DefaultAttachmentsService implements AttachmentsService {
     } catch (e) {
       this.store.setError(e.message);
     }
+  }
+
+  private getStorage() {
+    return this.cristalApp.getWikiConfig().storage;
+  }
+
+  async upload(page: string, files: File[]): Promise<void> {
+    this.store.startUploading();
+    try {
+      await this.getStorage().saveAttachments(page, files);
+    } finally {
+      this.store.stopUploading();
+    }
+
+    await this.refresh(page);
+    return;
   }
 }

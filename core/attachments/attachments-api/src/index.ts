@@ -36,12 +36,15 @@ interface Attachment {
 interface AttachmentsService {
   list(): Ref<Attachment[]>;
   isLoading(): Ref<boolean>;
+  isUploading(): Ref<boolean>;
   getError(): Ref<string | undefined>;
 
   /**
    * Load the initial state of the attachments.
    */
   refresh(page: string): void;
+
+  upload(page: string, files: File[]): Promise<void>;
 }
 
 export type { AttachmentsService, Attachment };

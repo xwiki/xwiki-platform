@@ -74,5 +74,20 @@ export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
       "XTabPanel",
       () => import("../vue/x-tab-panel.vue"),
     );
+    registerAsyncComponent(
+      app,
+      "XForm",
+      () => import("../vue/form/x-form.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XTextField",
+      () => import("../vue/form/x-text-field.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XFileInput",
+      () => import("../vue/form/x-file-input.vue"),
+    );
   }
 }

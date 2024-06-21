@@ -26,9 +26,9 @@ import { PageAttachment, PageData } from "@xwiki/cristal-api";
 const HOME_PATH = ".cristal";
 const HOME_PATH_FULL = join(app.getPath("home"), HOME_PATH);
 
-function resolvePath(page: string, lastSegment: string) {
+function resolvePath(page: string, ...lastSegments: string[]) {
   const homedir = app.getPath("home");
-  return join(homedir, HOME_PATH, page, lastSegment);
+  return join(homedir, HOME_PATH, page, ...lastSegments);
 }
 
 function resolvePagePath(page: string): string {
@@ -37,6 +37,9 @@ function resolvePagePath(page: string): string {
 
 function resolveAttachmentsPath(page: string): string {
   return resolvePath(page, "attachments");
+}
+function resolveAttachmentPath(page: string, filename: string): string {
+  return resolvePath(page, "attachments", filename);
 }
 
 async function isFile(path: string) {
@@ -151,7 +154,18 @@ async function savePage(
   return readPage(path);
 }
 
-export default function load() {
+async function saveAttachment(path: string, filePath: string) {
+  if (!(await isWithin(HOME_PATH_FULL, path))) {
+    throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+  }
+  const parentDirectory = dirname(path);
+
+  // Create the parent directories in case they do not exist.
+  await fs.promises.mkdir(parentDirectory, { recursive: true });
+  await fs.promises.copyFile(filePath, path);
+}
+
+export default function load(): void {
   ipcMain.handle("resolvePath", (event, { page }) => {
     return resolvePagePath(page);
   });
@@ -166,5 +180,11 @@ export default function load() {
   });
   ipcMain.handle("savePage", (event, { path, content, title }) => {
     return savePage(path, content, title);
+  });
+  ipcMain.handle("resolveAttachmentPath", (event, { page, filename }) => {
+    return resolveAttachmentPath(page, filename);
+  });
+  ipcMain.handle("saveAttachment", (event, { path, filePath }) => {
+    return saveAttachment(path, filePath);
   });
 }

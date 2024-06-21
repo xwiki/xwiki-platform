@@ -199,4 +199,8 @@ export class WrappingOfflineStorage implements WrappingStorage {
   ): Promise<unknown> {
     return this.storage.save(page, title, content, syntax);
   }
+
+  async saveAttachments(page: string, files: File[]): Promise<unknown> {
+    return this.storage.saveAttachments(page, files);
+  }
 }

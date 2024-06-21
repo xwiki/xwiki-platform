@@ -167,18 +167,10 @@ export class XWikiStorage extends AbstractStorage {
   }
 
   async getAttachments(page: string): Promise<PageAttachment[] | undefined> {
-    const strings = page.split(".");
-    const lastIndex = strings.length - 1;
-    const spaces = strings.splice(0, lastIndex).join("/spaces/");
-    const pageName = strings[lastIndex] || "WebHome";
-    const endpointURL = `${this.wikiConfig.baseURL}/rest/wikis/xwiki/spaces/${spaces}/pages/${pageName}/attachments`;
-    const response = await fetch(endpointURL, {
+    const response = await fetch(this.buildAttachmentsURL(page), {
       headers: { Accept: "application/json", ...this.getCredentials() },
     });
     const json: AttachmentsRest = await response.json();
-
-    // /wikis/{wikiName}/spaces/{spaceName}[/spaces/{nestedSpaceName}]*/pages/{pageName}/attachments[?start=offset&number=n]
-    // TODO: implement this method
     return json.attachments.map(({ id, name, mimeType, xwikiAbsoluteUrl }) => {
       return {
         id,
@@ -249,18 +241,9 @@ export class XWikiStorage extends AbstractStorage {
   }
 
   async save(page: string, content: string, title: string): Promise<unknown> {
-    const url = this.wikiConfig.baseURL;
-    const segments = ["rest", "wikis", "xwiki"];
-    const referenceParts = page.split(".");
-    for (let i = 0; i < referenceParts.length; i++) {
-      const segment = i < referenceParts.length - 1 ? "spaces" : "pages";
-      segments.push(segment);
-      segments.push(referenceParts[i]);
-    }
+    const url = this.buildSavePageURL(page, ["rest", "wikis", "xwiki"]);
 
-    const fullUrl = `${url}/${segments.join("/")}`;
-
-    await fetch(fullUrl, {
+    await fetch(url, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -273,10 +256,44 @@ export class XWikiStorage extends AbstractStorage {
     return;
   }
 
+  async saveAttachments(page: string, files: File[]): Promise<unknown> {
+    return Promise.all(files.map((file) => this.saveAttachment(page, file)));
+  }
+
+  async saveAttachment(page: string, file: File): Promise<unknown> {
+    const data = new FormData();
+    data.append(file.name, file);
+    await fetch(this.buildAttachmentsURL(page) + "/" + file.name, {
+      method: "PUT",
+      body: data,
+      headers: { ...this.getCredentials(), "Content-Type": file.type },
+    });
+    return;
+  }
+
   private getCredentials() {
     return {
       // TODO: externalize credentials
       Authorization: `Basic ${btoa("Admin:admin")}`,
     };
+  }
+
+  private buildSavePageURL(page: string, segments: string[]) {
+    const url = this.wikiConfig.baseURL;
+    const referenceParts = page.split(".");
+    for (let i = 0; i < referenceParts.length; i++) {
+      const segment = i < referenceParts.length - 1 ? "spaces" : "pages";
+      segments.push(segment);
+      segments.push(referenceParts[i]);
+    }
+
+    return `${url}/${segments.join("/")}`;
+  }
+  private buildAttachmentsURL(page: string) {
+    const strings = page.split(".");
+    const lastIndex = strings.length - 1;
+    const spaces = strings.splice(0, lastIndex).join("/spaces/");
+    const pageName = strings[lastIndex] || "WebHome";
+    return `${this.wikiConfig.baseURL}/rest/wikis/xwiki/spaces/${spaces}/pages/${pageName}/attachments`;
   }
 }

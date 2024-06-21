@@ -122,6 +122,9 @@ importers:
       '@xwiki/cristal-attachments-api':
         specifier: workspace:*
         version: link:../attachments-api
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       '@xwiki/cristal-extra-tabs-api':
         specifier: workspace:*
         version: link:../../extra-tabs/extra-tabs-api

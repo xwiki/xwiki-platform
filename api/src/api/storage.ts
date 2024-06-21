@@ -85,4 +85,13 @@ export interface Storage {
     content: string,
     syntax: string,
   ): Promise<unknown>;
+
+  /**
+   *
+   * @param page the page where to save attachments at
+   * @param files the files to save
+   *
+   * @since 0.9
+   */
+  saveAttachments(page: string, files: File[]): Promise<unknown>;
 }

@@ -96,8 +96,6 @@ export abstract class AbstractStorage implements Storage {
 
   /**
    * @since 0.9
-   * @param page
-   * @param files
    */
   abstract saveAttachments(page: string, files: File[]): Promise<unknown>;
 }

@@ -9,7 +9,7 @@ const emits = defineEmits<{
 }>();
 
 defineExpose({
-  raz() {
+  reset() {
     fileInputValue.value = undefined;
   },
 });

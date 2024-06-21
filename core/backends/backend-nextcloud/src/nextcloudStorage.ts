@@ -216,7 +216,7 @@ export class NextcloudStorage extends AbstractStorage {
   private getBaseHeaders() {
     // TODO: the authentication is currently hardcoded.
     return {
-      Authorization: `Basic ${btoa("Admin:admin")}`,
+      Authorization: `Basic ${btoa("test:test")}`,
     };
   }
 }

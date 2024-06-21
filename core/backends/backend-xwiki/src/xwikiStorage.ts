@@ -289,6 +289,7 @@ export class XWikiStorage extends AbstractStorage {
 
     return `${url}/${segments.join("/")}`;
   }
+
   private buildAttachmentsURL(page: string) {
     const strings = page.split(".");
     const lastIndex = strings.length - 1;

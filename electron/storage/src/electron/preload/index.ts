@@ -30,17 +30,19 @@ const api: APITypes = {
     return ipcRenderer.invoke("readAttachments", { path });
   },
   resolvePath: (page: string) => {
-    return ipcRenderer.invoke("resolvePath", { page: page || "" });
+    return ipcRenderer.invoke("resolvePath", { page: page || "index" });
   },
   resolveAttachmentsPath: (page: string) => {
-    return ipcRenderer.invoke("resolveAttachmentsPath", { page: page || "" });
+    return ipcRenderer.invoke("resolveAttachmentsPath", {
+      page: page || "index",
+    });
   },
   savePage(path: string, content: string, title: string): Promise<PageData> {
     return ipcRenderer.invoke("savePage", { path, content, title });
   },
   resolveAttachmentPath(page: string, filename: string): Promise<string> {
     return ipcRenderer.invoke("resolveAttachmentPath", {
-      page: page || "",
+      page: page || "index",
       filename,
     });
   },

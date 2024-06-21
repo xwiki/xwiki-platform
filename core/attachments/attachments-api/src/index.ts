@@ -36,6 +36,10 @@ interface Attachment {
 interface AttachmentsService {
   list(): Ref<Attachment[]>;
   isLoading(): Ref<boolean>;
+
+  /**
+   * True while an attachment is uploading.
+   */
   isUploading(): Ref<boolean>;
   getError(): Ref<string | undefined>;
 
@@ -44,6 +48,11 @@ interface AttachmentsService {
    */
   refresh(page: string): void;
 
+  /**
+   * Upload the provided list of files to a given page
+   * @param page the page where to save the files
+   * @param files the list of files to upload
+   */
   upload(page: string, files: File[]): Promise<void>;
 }
 

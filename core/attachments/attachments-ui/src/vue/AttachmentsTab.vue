@@ -51,7 +51,7 @@ const attachmentUpload = ref();
 async function upload(files: File[]) {
   try {
     await attachmentsService.upload(route.params.page as string, files);
-    attachmentUpload.value?.raz();
+    attachmentUpload.value?.reset();
   } catch (e) {
     uploadError.value = e.message;
   }

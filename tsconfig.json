@@ -23,6 +23,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "isolatedModules": true,
-    "isolatedDeclarations": true
+    "isolatedDeclarations": true,
+    "resolveJsonModule": true
   }
 }

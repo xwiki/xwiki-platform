@@ -41,8 +41,7 @@
     "vite": "5.3.1",
     "vite-plugin-css-injected-by-js": "3.5.1",
     "vite-plugin-dts": "3.9.1",
-    "vite-plugin-inspect": "0.8.4",
-    "vite-plugin-vuetify": "2.0.3"
+    "vite-plugin-inspect": "0.8.4"
   },
   "engines": {
     "node": "20.15.0"

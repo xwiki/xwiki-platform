@@ -157,6 +157,14 @@ class LiveDataIT
 
         // Test the Live Data content.
         assertEquals(3, tableLayout.countRows());
+
+        assertEquals(List.of(5, 15, 25, 50, 100), liveDataElement.getPaginationPageSizes());
+
+        // Check that the list of page sizes is preserved when we select a standard page size (see XWIKI-20650)
+        liveDataElement = liveDataElement.setPagination(15);
+        assertEquals(3, liveDataElement.getTableLayout().countRows());
+        assertEquals(List.of(5, 15, 25, 50, 100), liveDataElement.getPaginationPageSizes());
+
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O1");
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O2 1");
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O3 1");
@@ -425,6 +433,7 @@ class LiveDataIT
             + "{{liveData\n"
             + "  id=\"test\"\n"
             + "  properties=\"" + String.join(",", properties) + "\"\n"
+            + "  limit=\"5\"\n"
             + "  source=\"liveTable\"\n"
             + "  sourceParameters=\"translationPrefix=&className=" + testUtils.serializeReference(
             testReference.getLocalDocumentReference()) + "\"\n"

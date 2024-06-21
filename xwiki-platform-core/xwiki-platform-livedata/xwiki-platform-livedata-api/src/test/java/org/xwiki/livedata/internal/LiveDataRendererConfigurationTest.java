@@ -19,6 +19,8 @@
  */
 package org.xwiki.livedata.internal;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -68,5 +70,14 @@ class LiveDataRendererConfigurationTest
         parameters.setDescription(description);
         LiveDataConfiguration liveDataConfiguration = this.configuration.getLiveDataConfiguration("{}", parameters);
         assertEquals(description, liveDataConfiguration.getMeta().getDescription());
+    }
+
+    @Test
+    void getLiveDataConfigurationLimitIsDefined() throws Exception
+    {
+        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
+        parameters.setLimit(2);
+        LiveDataConfiguration liveDataConfiguration = this.configuration.getLiveDataConfiguration("{}", parameters);
+        assertEquals(List.of(2), liveDataConfiguration.getMeta().getPagination().getPageSizes());
     }
 }

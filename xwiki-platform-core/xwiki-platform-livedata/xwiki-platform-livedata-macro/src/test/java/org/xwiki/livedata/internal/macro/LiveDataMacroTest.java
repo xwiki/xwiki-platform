@@ -173,7 +173,7 @@ class LiveDataMacroTest
         expectedConfig.append("    ],".trim());
         expectedConfig.append("    'defaultLayout':'table',".trim());
         expectedConfig.append("    'pagination':{".trim());
-        expectedConfig.append("      'pageSizes':[15,25,50],".trim());
+        expectedConfig.append("      'pageSizes':[10,15,25,50],".trim());
         expectedConfig.append("      'showPageSizeDropdown':true".trim());
         expectedConfig.append("    },'description':'A description'".trim());
         expectedConfig.append("  }".trim());
@@ -235,7 +235,9 @@ class LiveDataMacroTest
         expectedConfig.append("    'limit':10".trim());
         expectedConfig.append("  },".trim());
         expectedConfig.append("  'meta':{".trim());
-        expectedConfig.append("    'pagination':{}".trim());
+        expectedConfig.append("    'pagination':{".trim());
+        expectedConfig.append("        'pageSizes':[10]".trim());
+        expectedConfig.append("     }".trim());
         expectedConfig.append("  }".trim());
         expectedConfig.append("}");
 

@@ -257,15 +257,27 @@ public class LiveDataRendererConfiguration
     private static void addPageSizeToPaginationIfMissing(LiveDataRendererParameters parameters,
         LiveDataConfiguration configuration)
     {
-        if (configuration.getMeta() == null) {
-            configuration.setMeta(new LiveDataMeta());
-        }
-        if (configuration.getMeta().getPagination() == null) {
-            configuration.getMeta().setPagination(new LiveDataPaginationConfiguration());
-        }
-        List<Integer> pageSizes = configuration.getMeta().getPagination().getPageSizes();
-        if (!pageSizes.contains(parameters.getLimit())) {
-            pageSizes.add(parameters.getLimit());
+        Integer limit = parameters.getLimit();
+        if (limit != null) {
+            LiveDataMeta meta = configuration.getMeta();
+            if (meta == null) {
+                meta = new LiveDataMeta();
+                configuration.setMeta(meta);
+            }
+            LiveDataPaginationConfiguration pagination = meta.getPagination();
+            if (pagination == null) {
+                pagination = new LiveDataPaginationConfiguration();
+                meta.setPagination(pagination);
+            }
+            List<Integer> pageSizes = pagination.getPageSizes();
+            if (pageSizes == null) {
+                pageSizes = new ArrayList<>();
+                pagination.setPageSizes(pageSizes);
+            }
+            if (!pageSizes.contains(limit)) {
+                pageSizes.add(limit);
+                Collections.sort(pageSizes);
+            }
         }
     }
 }

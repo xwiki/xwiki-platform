@@ -86,7 +86,9 @@ public class LiveDataRendererConfiguration
         LiveDataConfiguration basicConfig = getLiveDataConfiguration(parameters);
         // Make sure both configurations have the same id so that they are properly merged.
         advancedConfig.setId(basicConfig.getId());
-        return this.jsonMerge.merge(advancedConfig, basicConfig);
+        LiveDataConfiguration configuration = this.jsonMerge.merge(advancedConfig, basicConfig);
+        addPageSizeToPaginationIfMissing(parameters, configuration);
+        return configuration;
     }
 
     private LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
@@ -184,7 +186,7 @@ public class LiveDataRendererConfiguration
         LiveDataMeta meta = new LiveDataMeta();
         List<LiveDataLayoutDescriptor> layouts = getLayouts(parameters);
         meta.setLayouts(layouts);
-        // If it exists, use the id of the first layout as the default layout. 
+        // If it exists, use the id of the first layout as the default layout.
         Optional.ofNullable(layouts)
             .flatMap(ls -> ls.stream().findFirst().map(BaseDescriptor::getId))
             .ifPresent(meta::setDefaultLayout);
@@ -244,5 +246,26 @@ public class LiveDataRendererConfiguration
     private Stream<String> getSplitStringStream(String commaListAsString)
     {
         return Stream.of(commaListAsString.split(",")).map(StringUtils::trim);
+    }
+
+    /**
+     * If the pagination sizes are missing the limit define in the parameters, add it to the allowed page limits.
+     *
+     * @param parameters the live data parameters
+     * @param configuration the computed live data configuration
+     */
+    private static void addPageSizeToPaginationIfMissing(LiveDataRendererParameters parameters,
+        LiveDataConfiguration configuration)
+    {
+        if (configuration.getMeta() == null) {
+            configuration.setMeta(new LiveDataMeta());
+        }
+        if (configuration.getMeta().getPagination() == null) {
+            configuration.getMeta().setPagination(new LiveDataPaginationConfiguration());
+        }
+        List<Integer> pageSizes = configuration.getMeta().getPagination().getPageSizes();
+        if (!pageSizes.contains(parameters.getLimit())) {
+            pageSizes.add(parameters.getLimit());
+        }
     }
 }

@@ -813,9 +813,6 @@ importers:
       vite-plugin-node:
         specifier: 3.1.0
         version: 3.1.0(vite@5.3.1(@types/node@20.14.7))
-      vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
 
   extension-manager:
     dependencies:
@@ -828,9 +825,6 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
-      vue:
-        specifier: 3.4.27
-        version: 3.4.27(typescript@5.5.2)
     devDependencies:
       rimraf:
         specifier: 5.0.7
@@ -1214,6 +1208,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: 5.0.4
         version: 5.0.4(vite@5.3.1(@types/node@20.14.7))(vue@3.4.27(typescript@5.5.2))
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
       rimraf:
         specifier: 5.0.7
         version: 5.0.7

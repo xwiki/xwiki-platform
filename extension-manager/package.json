@@ -29,8 +29,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "inversify": "6.0.2",
-    "reflect-metadata": "0.2.2",
-    "vue": "3.4.27"
+    "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
     "rimraf": "5.0.7"

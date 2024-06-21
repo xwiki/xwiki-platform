@@ -4,6 +4,7 @@ import { computed } from "vue";
 import { VFileInput } from "vuetify/components/VFileInput";
 import messages from "../../translations";
 import { useI18n } from "vue-i18n";
+import { defineModel } from "vue";
 
 const { t } = useI18n({
   messages,

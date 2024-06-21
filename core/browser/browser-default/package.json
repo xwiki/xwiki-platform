@@ -26,9 +26,6 @@
     "@xwiki/cristal-browser-api": "workspace:*",
     "inversify": "6.0.2"
   },
-  "devDependencies": {
-    "typescript": "5.5.2"
-  },
   "publishConfig": {
     "exports": {
       ".": {

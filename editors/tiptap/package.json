@@ -62,7 +62,6 @@
   "devDependencies": {
     "@types/lodash": "4.17.5",
     "rimraf": "5.0.7",
-    "typescript": "5.5.2",
     "vitest": "1.6.0",
     "vue-tsc": "2.0.21"
   },

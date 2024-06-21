@@ -31,9 +31,6 @@
   "peerDependencies": {
     "electron": "31.0.1"
   },
-  "devDependencies": {
-    "typescript": "5.5.2"
-  },
   "publishConfig": {
     "exports": {
       ".": {

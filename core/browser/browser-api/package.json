@@ -24,9 +24,6 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*"
   },
-  "devDependencies": {
-    "typescript": "5.5.2"
-  },
   "publishConfig": {
     "exports": {
       ".": {

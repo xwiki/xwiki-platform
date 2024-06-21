@@ -28,9 +28,6 @@
     "dexie": "4.0.7",
     "inversify": "6.0.2"
   },
-  "devDependencies": {
-    "typescript": "5.5.2"
-  },
   "publishConfig": {
     "exports": {
       ".": {

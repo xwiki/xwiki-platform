@@ -21,9 +21,6 @@
     "build": "tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
-  "devDependencies": {
-    "typescript": "5.5.2"
-  },
   "publishConfig": {
     "exports": {
       ".": {

@@ -137,20 +137,12 @@ importers:
       vue-router:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.27(typescript@5.5.2))
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/backends/backend-api:
     dependencies:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/backends/backend-dexie:
     dependencies:
@@ -169,10 +161,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/backends/backend-github:
     dependencies:
@@ -185,10 +173,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/backends/backend-nextcloud:
     dependencies:
@@ -201,10 +185,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/backends/backend-xwiki:
     dependencies:
@@ -218,9 +198,6 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
     devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
@@ -230,10 +207,6 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/browser/browser-default:
     dependencies:
@@ -246,10 +219,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/extra-tabs/extra-tabs-api:
     dependencies:
@@ -299,10 +268,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/hierarchy/hierarchy-default:
     dependencies:
@@ -315,10 +280,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/hierarchy/hierarchy-filesystem:
     dependencies:
@@ -331,10 +292,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/hierarchy/hierarchy-github:
     dependencies:
@@ -347,10 +304,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   core/hierarchy/hierarchy-xwiki:
     dependencies:
@@ -364,9 +317,6 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
     devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
@@ -399,11 +349,7 @@ importers:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.5.2)
 
-  core/link-suggest/link-suggest-api:
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
+  core/link-suggest/link-suggest-api: {}
 
   core/link-suggest/link-suggest-xwiki:
     dependencies:
@@ -416,10 +362,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   dev/config:
     devDependencies:
@@ -646,9 +588,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
@@ -695,10 +634,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-    devDependencies:
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   electron/main:
     dependencies:
@@ -721,9 +656,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   electron/preload:
     devDependencies:
@@ -739,9 +671,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
       unplugin-auto-expose:
         specifier: 0.2.4
         version: 0.2.4(rollup@4.18.0)
@@ -785,9 +714,6 @@ importers:
       rimraf:
         specifier: 5.0.7
         version: 5.0.7
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   electron/storage:
     dependencies:
@@ -1159,9 +1085,6 @@ importers:
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@types/node@20.14.7)(typescript@5.5.2)
-      typescript:
-        specifier: 5.5.2
-        version: 5.5.2
 
   web:
     dependencies:

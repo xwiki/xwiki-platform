@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.resolver;
 
+import java.util.List;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -67,7 +69,7 @@ class PageAttachmentResourceReferenceEntityReferenceResolverTest
         DocumentReference baseReference = new DocumentReference("wiki", "space", "document");
         PageAttachmentReference pageAttachmentReference =
             new PageAttachmentReference("file.txt", new PageReference("wiki", "page1", "page2"));
-        DocumentReference documentReference = new DocumentReference("wiki", "page1", "page2", "WebHome");
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("page1", "page2"), "WebHome");
         when(this.currentEntityReferenceResolver.resolve(pageAttachment.getBaseReferences().get(0), EntityType.DOCUMENT,
             null)).thenReturn(baseReference);
         when(this.defaultStringAttachmentReferenceResolver.resolve("page1/page2/file.txt", baseReference))

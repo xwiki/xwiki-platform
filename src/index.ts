@@ -67,8 +67,8 @@ interface PageHierarchyResolverProvider {
 const name = "PageHierarchyResolver";
 
 export {
-  PageHierarchyItem,
-  PageHierarchyResolver,
-  PageHierarchyResolverProvider,
+  type PageHierarchyItem,
+  type PageHierarchyResolver,
+  type PageHierarchyResolverProvider,
   name,
 };

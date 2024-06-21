@@ -21,7 +21,6 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   <x-alert type="error" :title="title" :description="content">
     <!-- eslint-disable vue/no-v-html -->
     <div class="renderedContent" v-html="html"></div>
-    aaa
   </x-alert>
 </template>
 <script lang="ts">

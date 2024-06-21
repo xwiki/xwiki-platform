@@ -43,7 +43,7 @@ export class Worker implements MyWorker {
   /*
      Start worker thread
     */
-  public async start() {
+  public async start(): Promise<void> {
     console.log("Starting worker thread");
     this.initialize();
     // eslint-disable-next-line no-constant-condition
@@ -57,7 +57,7 @@ export class Worker implements MyWorker {
     this.fct = fct;
   }
 
-  public sleep(ms: number) {
+  public sleep(ms: number): Promise<unknown> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
@@ -182,7 +182,7 @@ export class Worker implements MyWorker {
     }
   }
 
-  public async initialize() {
+  public async initialize(): Promise<void> {
     console.log("Starting initialize");
     const extensionList: Array<string> = ["storage"];
     const response = await fetch("/config.json");

@@ -27,7 +27,7 @@ export default class WorkerQueueWorker implements QueueWorker {
     this.initialize();
   }
 
-  public initialize() {}
+  public initialize(): void {}
 
   public getStatus(): boolean {
     return true;

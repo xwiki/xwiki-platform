@@ -48,4 +48,4 @@ interface LinkSuggestService {
  */
 const name = "LinkSuggestService";
 
-export { LinkSuggestService, name, Link };
+export { type LinkSuggestService, name, type Link };

@@ -30,7 +30,7 @@ function reloadBrowser(window: BrowserWindow) {
   window.loadFile(resolve(app.getAppPath(), "./renderer/dist/index.html"));
 }
 
-export default function load(window: BrowserWindow) {
+export default function load(window: BrowserWindow): void {
   ipcMain.handle("reloadBrowser", () => {
     return reloadBrowser(window);
   });

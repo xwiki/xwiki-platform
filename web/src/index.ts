@@ -24,6 +24,7 @@ import { ComponentInit as DefaultPageHierarchyComponentInit } from "@xwiki/crist
 import { ComponentInit as GitHubPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-github";
 import { ComponentInit as XWikiPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-xwiki";
 import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
+import { Container } from "inversify";
 
 CristalAppLoader.init(
   [
@@ -40,7 +41,7 @@ CristalAppLoader.init(
   true,
   false,
   "XWiki",
-  (container) => {
+  (container: Container) => {
     new BrowserComponentInit(container);
     new LinkSuggestComponentInit(container);
     new DefaultPageHierarchyComponentInit(container);

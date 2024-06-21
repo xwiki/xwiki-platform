@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { defineConfig, mergeConfig } from "vite";
+import { defineConfig, mergeConfig, UserConfig } from "vite";
 import dts from "vite-plugin-dts";
 import { readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
@@ -35,7 +35,7 @@ function pathsComputation(path: string) {
   return { packageDirName, pkg };
 }
 
-export function generateConfig(path: string) {
+export function generateConfig(path: string): UserConfig {
   const { packageDirName, pkg } = pathsComputation(path);
 
   const libFileName = (format: string) => `index.${format}.js`;
@@ -60,7 +60,7 @@ export function generateConfig(path: string) {
   });
 }
 
-export function generateConfigVue(path: string) {
+export function generateConfigVue(path: string): Record<string, any> {
   return mergeConfig(
     generateConfig(path),
     defineConfig({

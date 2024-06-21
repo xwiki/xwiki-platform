@@ -46,7 +46,7 @@ export class WikiModel {
     return false;
   }
 
-  public loadWikiModel() {
+  public loadWikiModel(): void {
     this.parse("**hello**");
   }
 

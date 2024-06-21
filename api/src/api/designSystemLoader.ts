@@ -49,7 +49,7 @@ export function registerAsyncComponent<
   app: App,
   name: string,
   source: AsyncComponentLoader<T> | AsyncComponentOptions<T>,
-) {
+): void {
   // Register a component as an async component.
   app.component(name, defineAsyncComponent(source));
 }

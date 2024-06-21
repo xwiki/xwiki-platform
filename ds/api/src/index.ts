@@ -43,4 +43,4 @@ type TabProps = {
   tabId: string;
 };
 
-export { BreadcrumbProps, TabPanelProps, TabProps };
+export type { BreadcrumbProps, TabPanelProps, TabProps };

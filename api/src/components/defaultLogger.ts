@@ -30,7 +30,7 @@ export class DefaultLogger implements Logger {
   @inject("LoggerConfig")
   loggerConfig: LoggerConfig;
 
-  setModule(module: string) {
+  setModule(module: string): void {
     this.module = module;
   }
 

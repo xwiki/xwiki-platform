@@ -17,6 +17,15 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script lang="ts" setup>
+import type { CristalApp } from "@xwiki/cristal-api";
+
+import { inject } from "vue";
+
+const cristal = inject<CristalApp>("cristal")!;
+const items: Array<string> = cristal.getMenuEntries();
+</script>
+
 <template>
   <h2>Menu</h2>
   <ul>
@@ -25,20 +34,3 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
     </li>
   </ul>
 </template>
-<script lang="ts">
-import type { CristalApp } from "@xwiki/cristal-api";
-
-import { inject } from "vue";
-
-export default {
-  name: "CMenu",
-  setup() {
-    const cristal = inject<CristalApp>("cristal");
-    let items: Array<string> = [];
-    if (cristal) {
-      items = cristal.getMenuEntries();
-    }
-    return { items };
-  },
-};
-</script>

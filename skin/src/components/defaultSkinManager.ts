@@ -59,11 +59,11 @@ export class DefaultSkinManager implements SkinManager {
     this.templates.set("movie", Movie);
   }
 
-  public setDesignSystem(designSystem: string) {
+  public setDesignSystem(designSystem: string): void {
     this.designSystem = designSystem;
   }
 
-  public getDesignSystem() {
+  public getDesignSystem(): string {
     return this.designSystem;
   }
 
@@ -80,7 +80,7 @@ export class DefaultSkinManager implements SkinManager {
     }
   }
 
-  public loadDesignSystem(app: App, container: Container) {
+  public loadDesignSystem(app: App, container: Container): void {
     let designSystemLoader: DesignSystemLoader | null = null;
 
     try {

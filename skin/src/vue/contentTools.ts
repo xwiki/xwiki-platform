@@ -28,7 +28,7 @@ import { createVNode, render } from "vue";
 export class ContentTools {
   static logger: Logger;
 
-  public static init(cristal: CristalApp) {
+  public static init(cristal: CristalApp): void {
     this.logger = cristal?.getLogger("skin.vue.contenttools");
   }
 
@@ -38,7 +38,7 @@ export class ContentTools {
   public static listenToClicks(
     element: HTMLElement,
     cristal: CristalApp | undefined,
-  ) {
+  ): void {
     element.addEventListener(
       `click`,
       // TODO get rid of any
@@ -93,7 +93,7 @@ export class ContentTools {
   /*
         Method to load CSS sent by XWiki page
     */
-  public static loadCSS(css: string[]) {
+  public static loadCSS(css: string[]): void {
     if (css && css.length > 0) {
       // check new css
       ContentTools.logger?.debug("Current CSS is ", css.length);
@@ -117,7 +117,7 @@ export class ContentTools {
         Method to load JS send by XWiki page
         THis code is not working
     */
-  public static loadJS(js: string[]) {
+  public static loadJS(js: string[]): void {
     if (js && js.length > 0) {
       ContentTools.logger?.debug("Loading JS code for content");
       js.forEach((jsLink) => {
@@ -175,7 +175,7 @@ export class ContentTools {
   public static transformImages(
     cristal: CristalApp | undefined,
     element: string,
-  ) {
+  ): void {
     const xwikiContentEl = document.getElementById(element);
     if (xwikiContentEl) {
       const transform = function (img: HTMLImageElement | HTMLScriptElement) {
@@ -217,7 +217,7 @@ export class ContentTools {
   /*
         Experimental function to transform scripts
     */
-  public static transformScripts() {
+  public static transformScripts(): void {
     const transformScript = function (scriptEl: HTMLScriptElement) {
       const srcItem = scriptEl.attributes.getNamedItem("src");
       if (srcItem) {
@@ -312,7 +312,10 @@ export class ContentTools {
             <!--[CDATA[This is a warning message]]-->
           </pre>
     */
-  public static transformMacros(element: HTMLElement, cristal: CristalApp) {
+  public static transformMacros(
+    element: HTMLElement,
+    cristal: CristalApp,
+  ): void {
     const macroTagList = element.getElementsByTagName("pre");
     for (let i = 0; i < macroTagList.length; i++) {
       const macroTag = macroTagList[i];

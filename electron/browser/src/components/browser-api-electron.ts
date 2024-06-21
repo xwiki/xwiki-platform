@@ -31,7 +31,7 @@ declare const browserElectron: APITypes;
  */
 @injectable()
 export class BrowserApiElectron implements BrowserApi {
-  switchLocation(wikiConfig: WikiConfig) {
+  switchLocation(wikiConfig: WikiConfig): void {
     window.localStorage.setItem("currentApp", wikiConfig.name);
     browserElectron.reloadBrowser();
   }

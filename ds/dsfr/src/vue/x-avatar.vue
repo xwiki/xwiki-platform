@@ -17,18 +17,16 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script lang="ts" setup>
+import { DsfrPicture } from "@gouvminint/vue-dsfr";
+
+defineProps<{ image: string }>();
+</script>
 <template>
   <DsfrPicture v-if="image" :src="image" class="avatar"></DsfrPicture>
   <DsfrPicture v-else size="small" class="avatar" src=""></DsfrPicture>
 </template>
-<script lang="ts">
-import { DsfrPicture } from "@gouvminint/vue-dsfr";
 
-export default {
-  components: { DsfrPicture },
-  props: { image: { type: String, required: true } },
-};
-</script>
 <style scoped>
 .avatar {
   display: inline-block;

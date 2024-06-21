@@ -28,7 +28,7 @@ import { WikiConfig } from "@xwiki/cristal-api";
  */
 @injectable()
 export class BrowserApiDefault implements BrowserApi {
-  switchLocation(wikiConfig: WikiConfig) {
+  switchLocation(wikiConfig: WikiConfig): void {
     window.location.href = `/${wikiConfig.name}/#/${wikiConfig.homePage}/`;
   }
 }

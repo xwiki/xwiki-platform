@@ -21,6 +21,7 @@
 import { DefaultMacroProvider } from "./defaultMacroProvider";
 import type { MacroData } from "@xwiki/cristal-skin";
 import Warning from "../vue/c-warning.vue";
+import { Component } from "vue";
 
 export class AlertMacro extends DefaultMacroProvider {
   public static cname = "cristal.macro.alert";
@@ -37,11 +38,11 @@ export class AlertMacro extends DefaultMacroProvider {
     return AlertMacro.macroName;
   }
 
-  getVueComponent() {
+  getVueComponent(): Component {
     return Warning;
   }
 
-  protected escapeHTML(source: string) {
+  protected escapeHTML(source: string): string {
     const escape = document.createElement("textarea");
     escape.textContent = source.toString();
     return escape.innerHTML;

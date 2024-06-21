@@ -70,7 +70,7 @@ export class WorkerCristalApp implements CristalApp {
 
   // TODO remove use of any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setAvailableConfigurations(config: Map<string, any>) {
+  setAvailableConfigurations(config: Map<string, any>): void {
     console.log(config);
     // TODO remove use of any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -17,12 +17,11 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script lang="ts" setup>
+defineProps<{ src: string }>();
+</script>
+
 <template>
   <!-- TODO: Add an alt property to the image, as a prop. -->
   <img :src="src" />
 </template>
-<script lang="ts">
-export default {
-  props: { src: { type: String, required: true } },
-};
-</script>

@@ -75,7 +75,7 @@ export class DefaultWikiConfig implements WikiConfig {
     this.designSystem = configObject.designSystem;
   }
 
-  setupOfflineStorage() {
+  setupOfflineStorage(): void {
     this.logger.debug("Checking offline storage");
     if (this.offline && this.cristal) {
       this.logger.debug("Looking for wrapping offline storage");
@@ -104,7 +104,7 @@ export class DefaultWikiConfig implements WikiConfig {
     return format == "html";
   }
 
-  initialize() {
+  initialize(): void {
     if (this.offline && !this.offlineSetup) {
       this.setupOfflineStorage();
       this.offlineSetup = true;

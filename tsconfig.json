@@ -21,7 +21,8 @@
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "declaration": true
-
+    "declaration": true,
+    "isolatedModules": true,
+    "isolatedDeclarations": true
   }
 }

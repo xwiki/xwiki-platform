@@ -41,7 +41,7 @@ export class StaticBuild {
     container: Container,
     forceStaticBuild: boolean,
     additionalComponents?: (container: Container) => void,
-  ) {
+  ): void {
     if (
       (import.meta.env && import.meta.env.MODE == "development") ||
       forceStaticBuild

@@ -19,7 +19,7 @@
  */
 
 import {
-  Logger,
+  type Logger,
   PageAttachment,
   PageData,
   Storage,
@@ -37,12 +37,12 @@ export abstract class AbstractStorage implements Storage {
     this.logger.setModule(module);
   }
 
-  setWikiConfig(wikiConfig: WikiConfig) {
+  setWikiConfig(wikiConfig: WikiConfig): void {
     this.logger.debug("Setting wiki Config: ", wikiConfig);
     this.wikiConfig = wikiConfig;
   }
 
-  getWikiConfig() {
+  getWikiConfig(): WikiConfig {
     return this.wikiConfig;
   }
 

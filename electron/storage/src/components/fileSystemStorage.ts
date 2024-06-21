@@ -21,7 +21,7 @@
 import { inject, injectable } from "inversify";
 import {
   DefaultPageData,
-  Logger,
+  type Logger,
   PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";

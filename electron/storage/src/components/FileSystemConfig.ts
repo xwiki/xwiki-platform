@@ -20,10 +20,10 @@
 
 import { inject, injectable, named } from "inversify";
 import {
-  CristalApp,
+  type CristalApp,
   DefaultWikiConfig,
-  Logger,
-  Storage,
+  type Logger,
+  type Storage,
 } from "@xwiki/cristal-api";
 
 @injectable()

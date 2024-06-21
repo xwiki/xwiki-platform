@@ -20,6 +20,7 @@
 
 import { AlertMacro } from "./alertMacro";
 import Warning from "../vue/c-warning.vue";
+import { Component } from "vue";
 
 export class WarningMacro extends AlertMacro {
   public static cname = "cristal.macro.warning";
@@ -33,7 +34,7 @@ export class WarningMacro extends AlertMacro {
     return WarningMacro.macroName;
   }
 
-  getVueComponent() {
+  getVueComponent(): Component {
     return Warning;
   }
 }

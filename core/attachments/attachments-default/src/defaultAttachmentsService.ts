@@ -25,7 +25,7 @@ import type {
 import { Ref } from "vue";
 import { inject, injectable } from "inversify";
 import { defineStore, Store, StoreDefinition, storeToRefs } from "pinia";
-import { CristalApp } from "@xwiki/cristal-api";
+import { type CristalApp } from "@xwiki/cristal-api";
 
 type Id = "attachments";
 type State = {
@@ -112,7 +112,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
     return this.refs.error;
   }
 
-  async refresh(page: string) {
+  async refresh(page: string): Promise<void> {
     this.store.setLoading();
     try {
       const attachments = await this.cristalApp

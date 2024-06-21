@@ -20,6 +20,7 @@
 
 import { AlertMacro } from "./alertMacro";
 import Error from "../vue/c-error.vue";
+import { Component } from "vue";
 
 export class ErrorMacro extends AlertMacro {
   public static cname = "cristal.macro.error";
@@ -33,7 +34,7 @@ export class ErrorMacro extends AlertMacro {
     return ErrorMacro.macroName;
   }
 
-  getVueComponent() {
+  getVueComponent(): Component {
     return Error;
   }
 }

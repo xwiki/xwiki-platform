@@ -30,7 +30,7 @@
  */
 function queryEqualityOperator(query: string) {
   const queryNoCase = query.toLowerCase();
-  return (value: string) => {
+  return (value: string): boolean => {
     return value.toLowerCase().includes(queryNoCase);
   };
 }

@@ -24,7 +24,7 @@ import {
   LinkSuggestService,
   name,
 } from "@xwiki/cristal-link-suggest-api";
-import { CristalApp } from "@xwiki/cristal-api";
+import { type CristalApp } from "@xwiki/cristal-api";
 
 /**
  * Default implementation of the link suggestion service, for XWiki.

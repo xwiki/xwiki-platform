@@ -19,6 +19,8 @@
  */
 
 import en from "../langs/translation-en.json";
-export default {
+
+const translations: Record<string, Record<string, string>> = {
   en,
 };
+export default translations;

@@ -117,7 +117,7 @@ export class DefaultExtensionManager
     }
   }
 
-  async loadExtensions(container: Container) {
+  async loadExtensions(container: Container): Promise<void> {
     // loading component from App module
     for (const key of this.remoteExtensions.keys()) {
       await this.loadExtension(key, container);

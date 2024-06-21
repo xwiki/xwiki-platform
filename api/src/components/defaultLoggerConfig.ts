@@ -68,7 +68,7 @@ export class DefaultLoggerConfig implements LoggerConfig {
     else return nbLevel;
   }
 
-  setDefaultLevel(level: string) {
+  setDefaultLevel(level: string): void {
     this.defaultLevel = level;
     this.defaultLevelId = this.getLevelId(this.defaultLevel);
   }

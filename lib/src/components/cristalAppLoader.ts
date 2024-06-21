@@ -30,7 +30,7 @@ import { Primitive } from "utility-types";
  * @since 0.8
  */
 export function loadConfig(input: string) {
-  return async () => {
+  return async (): Promise<Record<string, Primitive>> => {
     const response = await fetch(input);
     return await response.json();
   };
@@ -47,7 +47,7 @@ export class CristalAppLoader extends CristalLoader {
     config: { [s: string]: T },
     isElectron: boolean,
     configName: string,
-  ) {
+  ): void {
     const defaultConfig = configName;
     const configMap = new Map<string, T>(Object.entries(config));
     this.cristal.setAvailableConfigurations(configMap);
@@ -103,7 +103,7 @@ export class CristalAppLoader extends CristalLoader {
     isElectron: boolean,
     configName: string,
     additionalComponents?: (container: Container) => void,
-  ) {
+  ): Promise<void> {
     let staticMode = forceStaticMode;
     if (import.meta.env.MODE == "development" || staticMode) {
       staticMode = true;
@@ -137,7 +137,7 @@ export class CristalAppLoader extends CristalLoader {
     isElectron: boolean,
     configName: string,
     additionalComponents: (container: Container) => void,
-  ) {
+  ): void {
     const cristalLoader = new CristalAppLoader(extensionList);
     cristalLoader.initializeContainer();
     cristalLoader.launchApp(

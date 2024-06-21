@@ -17,22 +17,15 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script lang="ts" setup>
+import { DsfrAlert } from "@gouvminint/vue-dsfr";
+import type { DsfrAlertType } from "@gouvminint/vue-dsfr/types/components/DsfrAlert/DsfrAlert.vue";
+
+defineProps<{ title: string; type: DsfrAlertType; description: string }>();
+</script>
+
 <template>
   <DsfrAlert :title="title" :type="type" :description="description">
     <slot />
   </DsfrAlert>
 </template>
-<script lang="ts">
-import { DsfrAlert } from "@gouvminint/vue-dsfr";
-import type { PropType } from "vue";
-import type { DsfrAlertType } from "@gouvminint/vue-dsfr/types/components/DsfrAlert/DsfrAlert.vue";
-
-export default {
-  components: { DsfrAlert },
-  props: {
-    title: { type: String, required: true },
-    type: { type: Object as PropType<DsfrAlertType>, required: true },
-    description: { type: String, required: true },
-  },
-};
-</script>

@@ -30,7 +30,7 @@ import type {
   WrappingStorage,
 } from "@xwiki/cristal-api";
 import type { QueueWorker } from "@xwiki/cristal-sharedworker-api";
-import { OfflineStorage } from "@xwiki/cristal-backend-api";
+import { type OfflineStorage } from "@xwiki/cristal-backend-api";
 
 @injectable()
 export class WrappingOfflineStorage implements WrappingStorage {
@@ -50,19 +50,19 @@ export class WrappingOfflineStorage implements WrappingStorage {
     this.queueWorker = queueWorker;
   }
 
-  public setStorage(storage: Storage) {
+  public setStorage(storage: Storage): void {
     this.storage = storage;
   }
 
-  public getStorage() {
+  public getStorage(): Storage {
     return this.storage;
   }
 
-  public setWikiConfig(config: WikiConfig) {
+  public setWikiConfig(config: WikiConfig): void {
     return this.storage.setWikiConfig(config);
   }
 
-  public getWikiConfig() {
+  public getWikiConfig(): WikiConfig {
     return this.storage.getWikiConfig();
   }
 

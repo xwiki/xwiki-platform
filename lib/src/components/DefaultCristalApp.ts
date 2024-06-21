@@ -43,7 +43,7 @@ import {
   RouteRecordRaw,
 } from "vue-router";
 
-import { BrowserApi } from "@xwiki/cristal-browser-api";
+import { type BrowserApi } from "@xwiki/cristal-browser-api";
 
 import "@mdi/font/css/materialdesignicons.css";
 
@@ -110,14 +110,14 @@ export class DefaultCristalApp implements CristalApp {
     return this.page.name || this.wikiConfig.defaultPageName();
   }
 
-  setCurrentPage(newPage: string, mode: string = "view") {
+  setCurrentPage(newPage: string, mode: string = "view"): void {
     this.router.push({
       name: mode,
       params: { page: decodeURIComponent(newPage) },
     });
   }
 
-  handlePopState(event: PopStateEvent) {
+  handlePopState(event: PopStateEvent): void {
     this.logger?.debug("In handlePopState ", event);
     if (event.state && event.state.page) {
       const pageName = event.state.page;
@@ -139,11 +139,11 @@ export class DefaultCristalApp implements CristalApp {
     }
   }
 
-  setWikiConfig(wikiConfig: WikiConfig) {
+  setWikiConfig(wikiConfig: WikiConfig): void {
     this.wikiConfig = wikiConfig;
   }
 
-  getWikiConfig() {
+  getWikiConfig(): WikiConfig {
     return this.wikiConfig;
   }
 
@@ -165,7 +165,7 @@ export class DefaultCristalApp implements CristalApp {
 
   // TODO remplace any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setAvailableConfigurations(config: Map<string, any>) {
+  setAvailableConfigurations(config: Map<string, any>): void {
     console.log(config);
     // TODO remplace any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -221,7 +221,7 @@ export class DefaultCristalApp implements CristalApp {
     }
   }
 
-  async preloadConverters() {
+  async preloadConverters(): Promise<void> {
     this.logger.debug("Loading rendering module");
     try {
       const renderer = this.container.get<Renderer>("Renderer");
@@ -238,7 +238,7 @@ export class DefaultCristalApp implements CristalApp {
    * content is allowed. When undefinied, default to true.
    * @since 0.8
    */
-  async loadPage(options?: { requeue: boolean }) {
+  async loadPage(options?: { requeue: boolean }): Promise<void> {
     try {
       this.logger?.debug("Loading page", this.page.name);
       if (this.getWikiConfig().isSupported("jsonld")) {
@@ -321,7 +321,7 @@ export class DefaultCristalApp implements CristalApp {
     }
   }
 
-  async loadPageFromURL(url: string) {
+  async loadPageFromURL(url: string): Promise<void> {
     this.logger?.debug("Trying to load", url);
     const page = this.getWikiConfig().storage.getPageFromViewURL(url);
     if (page != null) {
@@ -389,7 +389,7 @@ export class DefaultCristalApp implements CristalApp {
     return page;
   }
 
-  async run() {
+  async run(): Promise<void> {
     this.logger?.debug("Before vue");
 
     // initializing the page data

@@ -20,6 +20,7 @@
 
 import { AlertMacro } from "./alertMacro";
 import Info from "../vue/c-info.vue";
+import { Component } from "vue";
 
 export class InfoMacro extends AlertMacro {
   public static cname = "cristal.macro.info";
@@ -33,7 +34,7 @@ export class InfoMacro extends AlertMacro {
     return InfoMacro.macroName;
   }
 
-  getVueComponent() {
+  getVueComponent(): Component {
     return Info;
   }
 }

@@ -112,7 +112,7 @@ export class CristalLoader {
     return extensionManager;
   }
 
-  public initializeContainer() {
+  public initializeContainer(): void {
     this.container = new Container();
 
     // Register main CristalApp component

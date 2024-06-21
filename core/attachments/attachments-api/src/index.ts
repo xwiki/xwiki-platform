@@ -44,4 +44,4 @@ interface AttachmentsService {
   refresh(page: string): void;
 }
 
-export { AttachmentsService, Attachment };
+export type { AttachmentsService, Attachment };

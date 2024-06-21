@@ -41,7 +41,7 @@ export default class DefaultQueueWorker implements QueueWorker {
     this.cristalApp = cristalApp;
   }
 
-  public pageLoaded(page: string) {
+  public pageLoaded(page: string): void {
     try {
       this.logger.debug(
         "Received callback that new document has been loaded",
@@ -61,7 +61,7 @@ export default class DefaultQueueWorker implements QueueWorker {
     }
   }
 
-  public initialize() {
+  public initialize(): void {
     try {
       if (this.workerInstance == null) {
         // this.workerInstance = new ComlinkWorker<typeof import('./worker')>(new URL('./worker',

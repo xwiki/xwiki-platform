@@ -71,7 +71,7 @@ export class DefaultPageData implements PageData {
 
   // TODO get rid of any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fromObject(object: any) {
+  fromObject(object: any): void {
     this.id = object.id;
     this.name = object.name;
     this.source = object.source;

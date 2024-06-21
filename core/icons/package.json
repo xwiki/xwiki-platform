@@ -19,7 +19,7 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "vue-tsc --project tsconfig.json --noEmit && vite build",
+    "build": "vue-tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "vitest --run"

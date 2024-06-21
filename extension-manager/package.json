@@ -18,9 +18,8 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
-    "compile": "tsc --project tsconfig.json --noEmit && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "prepack": "pnpm build",
     "test": "echo 'no test'"

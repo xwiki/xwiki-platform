@@ -1,22 +1,27 @@
 {
-    "compilerOptions": {
-        "target": "es2021",
-        "lib": ["es2021", "dom"],
-        "module": "esnext",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "noImplicitAny": true,
-        "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": false,
-        "allowSyntheticDefaultImports" : true,
-        "noResolve": false,
-        "noUnusedParameters": false,
-        "noUnusedLocals": true,
-        "strictNullChecks": true,
-        "forceConsistentCasingInFileNames": true,
-        "skipLibCheck": true,
-        "declaration": true
-    },
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "es2021",
+    "lib": [
+      "es2021",
+      "dom"
+    ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "allowSyntheticDefaultImports": true,
+    "noResolve": false,
+    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "declaration": true
+
+  }
 }

@@ -13,9 +13,8 @@
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
   "scripts": {
-    "build": "pnpm compile",
+    "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
-    "compile": "tsc --project tsconfig.json --noEmit && vite build",
     "electron": "echo 'no task'",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "linux": "echo 'no task'",

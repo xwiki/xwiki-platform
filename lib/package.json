@@ -20,7 +20,7 @@
   "scripts": {
     "build": "pnpm compile",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json --noEmit && vite build",
+    "compile": "vue-tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "prepack": "pnpm build",
     "test": "echo 'no test'"

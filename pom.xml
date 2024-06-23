@@ -761,7 +761,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>4.2.1</version>
+        <version>4.3</version>
       </dependency>
 
       <!-- Used by solr-core and closure-compiler -->

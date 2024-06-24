@@ -88,3 +88,6 @@ e2e-tests.xml
 /*.tgz
 .nx/
 .pnpm-store/
+
+## Vite specifics
+vite.*.timestamp-*

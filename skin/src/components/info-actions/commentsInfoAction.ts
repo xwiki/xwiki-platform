@@ -18,43 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Ref } from "vue";
+import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { ref } from "vue";
+import { injectable } from "inversify";
 
-/**
- * @since 0.9
- */
-interface Attachment {
-  id: string;
-  name: string;
-  mimetype: string;
-  href: string;
+@injectable()
+export class CommentsInfoAction implements InfoAction {
+  iconName = "chat";
+  id = "comments";
+  order = 2000;
+
+  async counter() {
+    return ref(99);
+  }
 }
-
-/**
- * @since 0.9
- */
-interface AttachmentsService {
-  list(): Ref<Attachment[]>;
-  count(): Ref<number>;
-  isLoading(): Ref<boolean>;
-
-  /**
-   * True while an attachment is uploading.
-   */
-  isUploading(): Ref<boolean>;
-  getError(): Ref<string | undefined>;
-
-  /**
-   * Load the initial state of the attachments.
-   */
-  refresh(page: string): Promise<void>;
-
-  /**
-   * Upload the provided list of files to a given page
-   * @param page the page where to save the files
-   * @param files the list of files to upload
-   */
-  upload(page: string, files: File[]): Promise<void>;
-}
-
-export type { AttachmentsService, Attachment };

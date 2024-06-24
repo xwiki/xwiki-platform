@@ -29,6 +29,9 @@ import type { UIXTemplateProvider } from "../api/uixTemplateProvider";
 import { UIXSearchTemplateProvider } from "./uixSearchTemplateProvider";
 import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import { InformationExtraTab } from "./InformationTab";
+import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { LikesInfoAction } from "./info-actions/likesInfoAction";
+import { CommentsInfoAction } from "./info-actions/commentsInfoAction";
 
 export default class ComponentInit {
   logger: Logger;
@@ -56,6 +59,14 @@ export default class ComponentInit {
     container
       .bind<ExtraTab>("ExtraTab")
       .to(InformationExtraTab)
+      .inSingletonScope();
+    container
+      .bind<InfoAction>("InfoAction")
+      .to(LikesInfoAction)
+      .inSingletonScope();
+    container
+      .bind<InfoAction>("InfoAction")
+      .to(CommentsInfoAction)
       .inSingletonScope();
     this.logger?.debug("Init Skin components end");
   }

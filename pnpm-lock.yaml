@@ -132,6 +132,9 @@ importers:
       '@xwiki/cristal-extra-tabs-api':
         specifier: workspace:*
         version: link:../../extra-tabs/extra-tabs-api
+      '@xwiki/cristal-info-actions-api':
+        specifier: workspace:*
+        version: link:../../info-actions/info-actions-api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -366,6 +369,47 @@ importers:
       vitest:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
+      vue-tsc:
+        specifier: 2.0.21
+        version: 2.0.21(typescript@5.5.2)
+
+  core/info-actions/info-actions-api:
+    dependencies:
+      vue:
+        specifier: 3.4.29
+        version: 3.4.29(typescript@5.5.2)
+
+  core/info-actions/info-actions-default:
+    dependencies:
+      '@xwiki/cristal-info-actions-api':
+        specifier: workspace:*
+        version: link:../info-actions-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@types/lodash':
+        specifier: 4.17.5
+        version: 4.17.5
+
+  core/info-actions/info-actions-ui:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-icons':
+        specifier: workspace:*
+        version: link:../../icons
+      '@xwiki/cristal-info-actions-api':
+        specifier: workspace:*
+        version: link:../info-actions-api
+      vue:
+        specifier: 3.4.29
+        version: 3.4.29(typescript@5.5.2)
+    devDependencies:
       vue-tsc:
         specifier: 2.0.21
         version: 2.0.21(typescript@5.5.2)
@@ -864,6 +908,9 @@ importers:
       '@xwiki/cristal-extra-tabs-default':
         specifier: workspace:*
         version: link:../core/extra-tabs/extra-tabs-default
+      '@xwiki/cristal-info-actions-default':
+        specifier: workspace:*
+        version: link:../core/info-actions/info-actions-default
       '@xwiki/cristal-macros':
         specifier: workspace:*
         version: link:../macros
@@ -1056,6 +1103,12 @@ importers:
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../core/icons
+      '@xwiki/cristal-info-actions-api':
+        specifier: workspace:*
+        version: link:../core/info-actions/info-actions-api
+      '@xwiki/cristal-info-actions-ui':
+        specifier: workspace:*
+        version: link:../core/info-actions/info-actions-ui
       inversify:
         specifier: 6.0.2
         version: 6.0.2

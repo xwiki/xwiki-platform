@@ -21,6 +21,8 @@
 import { Container, injectable } from "inversify";
 import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import AttachmentsTab from "./vue/AttachmentsTab.vue";
+import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { AttachmentsInfoAction } from "./AttachmentsInfoAction";
 
 @injectable()
 class AttachmentExtraTab implements ExtraTab {
@@ -37,6 +39,10 @@ export class ComponentInit {
     container
       .bind<ExtraTab>("ExtraTab")
       .to(AttachmentExtraTab)
+      .inSingletonScope();
+    container
+      .bind<InfoAction>("InfoAction")
+      .to(AttachmentsInfoAction)
       .inSingletonScope();
   }
 }

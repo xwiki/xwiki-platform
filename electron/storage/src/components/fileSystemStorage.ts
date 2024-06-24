@@ -20,9 +20,9 @@
 
 import { inject, injectable } from "inversify";
 import {
+  AttachmentsData,
   DefaultPageData,
   type Logger,
-  PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
@@ -56,9 +56,11 @@ export default class FileSystemStorage extends AbstractStorage {
     return pageData;
   }
 
-  async getAttachments(page: string): Promise<PageAttachment[] | undefined> {
+  async getAttachments(page: string): Promise<AttachmentsData | undefined> {
     const path = await fileSystemStorage.resolveAttachmentsPath(page);
-    return fileSystemStorage.readAttachments(path);
+    return {
+      attachments: await fileSystemStorage.readAttachments(path),
+    };
   }
 
   getPageFromViewURL(): string | null {

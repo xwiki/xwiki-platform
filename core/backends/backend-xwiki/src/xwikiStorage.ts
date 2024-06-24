@@ -20,11 +20,11 @@
 
 import { inject, injectable } from "inversify";
 import {
+  AttachmentsData,
   DefaultPageData,
   Document,
   JSONLDDocument,
   type Logger,
-  PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
@@ -165,19 +165,25 @@ export class XWikiStorage extends AbstractStorage {
     return pageContentData;
   }
 
-  async getAttachments(page: string): Promise<PageAttachment[] | undefined> {
+  async getAttachments(page: string): Promise<AttachmentsData | undefined> {
     const response = await fetch(this.buildAttachmentsURL(page), {
       headers: { Accept: "application/json", ...this.getCredentials() },
     });
     const json: AttachmentsRest = await response.json();
-    return json.attachments.map(({ id, name, mimeType, xwikiAbsoluteUrl }) => {
-      return {
-        id,
-        reference: name,
-        mimetype: mimeType,
-        href: xwikiAbsoluteUrl,
-      };
-    });
+    const attachments = json.attachments.map(
+      ({ id, name, mimeType, xwikiAbsoluteUrl }) => {
+        return {
+          id,
+          reference: name,
+          mimetype: mimeType,
+          href: xwikiAbsoluteUrl,
+        };
+      },
+    );
+    // TODO: It's currently not possible to get the attachment count from
+    // XWiki's rest endpoints without asking for the full list of attachments
+    // of a page (see XWIKI-22297).
+    return { attachments };
   }
 
   async getPanelContent(panel: string, contextPage: string): Promise<PageData> {

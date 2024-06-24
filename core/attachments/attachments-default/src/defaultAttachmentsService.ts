@@ -30,6 +30,7 @@ import { type CristalApp } from "@xwiki/cristal-api";
 type Id = "attachments";
 type State = {
   attachments: Attachment[];
+  count: number;
   isLoading: boolean;
   isUploading: false;
   unknownPage: boolean;
@@ -45,7 +46,16 @@ type StateRefs = WrappedRefs<State>;
 type Getters = Record<string, never>;
 type Actions = {
   setLoading(): void;
-  updateAttachments(attachments: Attachment[] | undefined): void;
+  /**
+   * Update the attachments of the store
+   * @param attachments the list of attachments to store
+   * @param count an optional count, used for the count status if available,
+   *  otherwise the size of the attachment list is used
+   */
+  updateAttachments(
+    attachments: Attachment[] | undefined,
+    count?: number,
+  ): void;
   setError(error: string): void;
   startUploading(): void;
   stopUploading(): void;
@@ -59,6 +69,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
     state() {
       return {
         attachments: [],
+        count: 0,
         isLoading: true,
         isUploading: false,
         error: undefined,
@@ -69,12 +80,13 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore(
       setLoading() {
         this.isLoading = true;
       },
-      updateAttachments(attachments) {
+      updateAttachments(attachments, count?: number) {
         this.isLoading = false;
         this.error = undefined;
         if (attachments) {
           this.unknownPage = false;
           this.attachments = attachments;
+          this.count = count || attachments.length;
         } else {
           this.unknownPage = true;
           this.attachments = [];
@@ -114,6 +126,10 @@ export class DefaultAttachmentsService implements AttachmentsService {
     return this.refs.attachments;
   }
 
+  count(): StateRefs["count"] {
+    return this.refs.count;
+  }
+
   isLoading(): StateRefs["isLoading"] {
     return this.refs.isLoading;
   }
@@ -129,12 +145,16 @@ export class DefaultAttachmentsService implements AttachmentsService {
   async refresh(page: string): Promise<void> {
     this.store.setLoading();
     try {
-      const attachments = await this.getStorage().getAttachments(page);
-      this.store.updateAttachments(
-        attachments?.map(({ id, reference, mimetype, href }) => {
-          return { id, name: reference, mimetype, href };
-        }),
-      );
+      const attachmentData = await this.getStorage().getAttachments(page);
+      if (attachmentData) {
+        const { attachments, count } = attachmentData;
+        this.store.updateAttachments(
+          attachments.map(({ id, reference, mimetype, href }) => {
+            return { id, name: reference, mimetype, href };
+          }),
+          count,
+        );
+      }
     } catch (e) {
       this.store.setError(e.message);
     }

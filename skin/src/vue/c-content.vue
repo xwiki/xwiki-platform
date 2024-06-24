@@ -40,6 +40,7 @@ import xavatarImg from "../images/no-one.svg";
 import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { useI18n } from "vue-i18n";
 import messages from "../translations";
+import { InfoActions } from "@xwiki/cristal-info-actions-ui";
 
 const { t } = useI18n({
   messages,
@@ -170,20 +171,9 @@ onUpdated(() => {
               <!-- TODO: add a way to inject those by extension
                and provide one for the number of attachments.
               It must be reactive whenever the attachment store is updated -->
-              <div class="doc-info-actions">
-                <div class="info-action like">
-                  <c-icon name="heart" :size="Size.Small"></c-icon>
-                  <span class="counter">99</span>
-                </div>
-                <div class="info-action comments">
-                  <c-icon name="chat" :size="Size.Small"></c-icon>
-                  <span class="counter">99</span>
-                </div>
-                <div class="info-action attachments">
-                  <c-icon name="paperclip" :size="Size.Small"></c-icon>
-                  <span class="counter">99</span>
-                </div>
-              </div>
+              <suspense>
+                <info-actions></info-actions>
+              </suspense>
               <div class="doc-page-actions">
                 <router-link
                   :to="{
@@ -319,45 +309,12 @@ onUpdated(() => {
   line-height: var(--cr-font-size-2x-large);
 }
 
-.counter {
-  background-color: var(--cr-color-primary-600);
-  font-weight: var(--cr-font-weight-semibold);
-  font-size: var(--cr-font-size-x-small);
-  line-height: var(--cr-font-size-2x-small);
-  border-radius: 99px;
-  color: #fff;
-  flex-shrink: 1;
-  flex-grow: 0;
-  display: block;
-  padding: var(--cr-spacing-2x-small) var(--cr-spacing-x-small);
-}
-
-.doc-info-actions,
 .doc-page-actions {
   display: flex;
   flex-wrap: wrap;
   flex-flow: row;
   align-items: center;
   gap: var(--cr-spacing-2x-small);
-}
-
-.doc-info-actions {
-  margin-right: var(--cr-spacing-medium);
-}
-
-.info-action {
-  display: flex;
-  background-color: var(--cr-color-neutral-100);
-  border-radius: 99px;
-  padding: var(--cr-spacing-2x-small) var(--cr-spacing-2x-small);
-  font-size: var(--cr-font-size-medium);
-  flex-flow: row;
-  gap: var(--cr-spacing-2x-small);
-  align-items: center;
-}
-
-.info-action .cr-icon {
-  line-height: 1.3rem;
 }
 
 .doc-info-header,

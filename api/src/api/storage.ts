@@ -20,7 +20,7 @@
 
 import type { PageData } from "./PageData";
 import type { WikiConfig } from "./WikiConfig";
-import { PageAttachment } from "./pageAttachment";
+import { AttachmentsData } from "./attachmentsData";
 
 export interface Storage {
   setWikiConfig(config: WikiConfig): void;
@@ -51,12 +51,12 @@ export interface Storage {
 
   /**
    * @param page the page to get the attachments from
-   * @return a promise wrapping an array of attachments, or undefined if the
+   * @return a promise wrapping an array of attachments and an optional count, or undefined if the
    *  requested page is not found
    *
    * @since 0.9
    */
-  getAttachments(page: string): Promise<PageAttachment[] | undefined>;
+  getAttachments(page: string): Promise<AttachmentsData | undefined>;
 
   getPanelContent(
     panel: string,

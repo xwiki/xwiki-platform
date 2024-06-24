@@ -23,6 +23,7 @@ packages:
   - "core/extra-tabs/*"
   - "core/hierarchy/*"
   - "core/icons"
+  - "core/info-actions/*"
   - "core/link-suggest/*"
   - "dev/config"
   - "ds/api"

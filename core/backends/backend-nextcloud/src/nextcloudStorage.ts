@@ -20,6 +20,7 @@
 
 import { inject, injectable } from "inversify";
 import {
+  AttachmentsData,
   DefaultPageData,
   type Logger,
   PageAttachment,
@@ -81,7 +82,7 @@ export class NextcloudStorage extends AbstractStorage {
     }
   }
 
-  async getAttachments(page: string): Promise<PageAttachment[] | undefined> {
+  async getAttachments(page: string): Promise<AttachmentsData | undefined> {
     const response = await fetch(this.getAttachmentsBasePath(page), {
       method: "PROPFIND",
       headers: {
@@ -116,7 +117,7 @@ export class NextcloudStorage extends AbstractStorage {
         }
       }
 
-      return attachments;
+      return { attachments };
     } else {
       return undefined;
     }

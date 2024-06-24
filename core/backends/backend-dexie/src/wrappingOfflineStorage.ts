@@ -20,9 +20,9 @@
 
 import { inject, injectable } from "inversify";
 import type {
+  AttachmentsData,
   Document,
   Logger,
-  PageAttachment,
   PageData,
   Storage,
   WikiConfig,
@@ -115,7 +115,7 @@ export class WrappingOfflineStorage implements WrappingStorage {
     }
   }
 
-  public getAttachments(page: string): Promise<PageAttachment[] | undefined> {
+  public getAttachments(page: string): Promise<AttachmentsData | undefined> {
     // TODO: add support for offline storage of attachments.
     return this.storage.getAttachments(page);
   }

@@ -43,6 +43,7 @@
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-extension-menubuttons": "workspace:*",
     "@xwiki/cristal-extra-tabs-default": "workspace:*",
+    "@xwiki/cristal-info-actions-default": "workspace:*",
     "@xwiki/cristal-macros": "workspace:*",
     "@xwiki/cristal-rendering": "workspace:*",
     "@xwiki/cristal-sharedworker-impl": "workspace:*",

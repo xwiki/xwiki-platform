@@ -27,6 +27,7 @@ import type { PageAttachment } from "./api/pageAttachment";
 import type { Document } from "./api/document.js";
 import type { Logger } from "./api/logger.js";
 import type { LoggerConfig } from "./api/loggerConfig.js";
+import type { AttachmentsData } from "./api/attachmentsData";
 import {
   type DesignSystemLoader,
   registerAsyncComponent,
@@ -51,6 +52,7 @@ export type {
   Document,
   DesignSystemLoader,
   PageAttachment,
+  AttachmentsData,
 };
 export {
   ComponentInit,

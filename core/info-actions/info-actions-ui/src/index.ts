@@ -17,44 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import InfoActions from "./vue/InfoActions.vue";
 
-import { Ref } from "vue";
-
-/**
- * @since 0.9
- */
-interface Attachment {
-  id: string;
-  name: string;
-  mimetype: string;
-  href: string;
-}
-
-/**
- * @since 0.9
- */
-interface AttachmentsService {
-  list(): Ref<Attachment[]>;
-  count(): Ref<number>;
-  isLoading(): Ref<boolean>;
-
-  /**
-   * True while an attachment is uploading.
-   */
-  isUploading(): Ref<boolean>;
-  getError(): Ref<string | undefined>;
-
-  /**
-   * Load the initial state of the attachments.
-   */
-  refresh(page: string): Promise<void>;
-
-  /**
-   * Upload the provided list of files to a given page
-   * @param page the page where to save the files
-   * @param files the list of files to upload
-   */
-  upload(page: string, files: File[]): Promise<void>;
-}
-
-export type { AttachmentsService, Attachment };
+export { InfoActions };

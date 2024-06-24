@@ -17,44 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
+import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { inject, injectable } from "inversify";
 import { Ref } from "vue";
+import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 /**
+ * Display the total attachments count of the current page.
  * @since 0.9
  */
-interface Attachment {
-  id: string;
-  name: string;
-  mimetype: string;
-  href: string;
+@injectable()
+export class AttachmentsInfoAction implements InfoAction {
+  iconName = "paperclip";
+  id = "attachments";
+  order = 3000;
+
+  constructor(
+    @inject<AttachmentsService>("AttachmentsService")
+    private readonly attachmentsService: AttachmentsService,
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
+
+  async counter(): Promise<Ref<number>> {
+    await this.attachmentsService.refresh(this.cristalApp.getCurrentPage());
+    return this.attachmentsService.count();
+  }
 }
-
-/**
- * @since 0.9
- */
-interface AttachmentsService {
-  list(): Ref<Attachment[]>;
-  count(): Ref<number>;
-  isLoading(): Ref<boolean>;
-
-  /**
-   * True while an attachment is uploading.
-   */
-  isUploading(): Ref<boolean>;
-  getError(): Ref<string | undefined>;
-
-  /**
-   * Load the initial state of the attachments.
-   */
-  refresh(page: string): Promise<void>;
-
-  /**
-   * Upload the provided list of files to a given page
-   * @param page the page where to save the files
-   * @param files the list of files to upload
-   */
-  upload(page: string, files: File[]): Promise<void>;
-}
-
-export type { AttachmentsService, Attachment };

@@ -17,44 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 import { Ref } from "vue";
 
 /**
+ * The information to provide for an info action element.
+ *
  * @since 0.9
  */
-interface Attachment {
+interface InfoAction {
   id: string;
-  name: string;
-  mimetype: string;
-  href: string;
+  iconName: string;
+  counter(): Promise<Ref<number>>;
+  order: number;
 }
 
 /**
+ * Provide the operations to interact with the info actions. Currently, returns
+ * the full list of available info actions.
+ *
  * @since 0.9
  */
-interface AttachmentsService {
-  list(): Ref<Attachment[]>;
-  count(): Ref<number>;
-  isLoading(): Ref<boolean>;
-
-  /**
-   * True while an attachment is uploading.
-   */
-  isUploading(): Ref<boolean>;
-  getError(): Ref<string | undefined>;
-
-  /**
-   * Load the initial state of the attachments.
-   */
-  refresh(page: string): Promise<void>;
-
-  /**
-   * Upload the provided list of files to a given page
-   * @param page the page where to save the files
-   * @param files the list of files to upload
-   */
-  upload(page: string, files: File[]): Promise<void>;
+interface InfoActionsService {
+  list(): Promise<InfoAction[]>;
 }
 
-export type { AttachmentsService, Attachment };
+export type { InfoActionsService, InfoAction };

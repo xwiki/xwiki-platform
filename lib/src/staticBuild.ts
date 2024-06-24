@@ -32,6 +32,7 @@ import { ComponentInit as QueueWorkerComponentInit } from "@xwiki/cristal-shared
 import { ComponentInit as RenderingComponentInit } from "@xwiki/cristal-rendering";
 import { ComponentInit as EditorTiptapComponentInit } from "@xwiki/cristal-editors-tiptap";
 import { ComponentInit as ExtraTabsComponentInit } from "@xwiki/cristal-extra-tabs-default";
+import { ComponentInit as InfoActionsComponentInit } from "@xwiki/cristal-info-actions-default";
 import { ComponentInit as AttachmentsUIComponentInit } from "@xwiki/cristal-attachments-ui";
 import { ComponentInit as AttachmentsDefaultComponentInit } from "@xwiki/cristal-attachments-default";
 import type { Container } from "inversify";
@@ -60,6 +61,7 @@ export class StaticBuild {
       new RenderingComponentInit(container);
       new EditorTiptapComponentInit(container);
       new ExtraTabsComponentInit(container);
+      new InfoActionsComponentInit(container);
       new AttachmentsUIComponentInit(container);
       new AttachmentsDefaultComponentInit(container);
     }

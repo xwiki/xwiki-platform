@@ -6,7 +6,7 @@
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "/core/browser/browser-api",
+    "directory": "/core/extra-tabs/extra-tabs-default",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {

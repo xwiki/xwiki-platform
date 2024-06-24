@@ -129,7 +129,33 @@
 #if($xcontext.action == "admin" || $xcontext.action == "import" || $xcontext.action == "export")
   #set($bodyAction = "view")
 #end
+## Query user preferences for UI customization
+## Get the legacy preference for backward compatibility
+#set ($a11y = "$!{xwiki.getUserPreference('accessibility')}")
+#set ($underlining = "$!{xwiki.getUserPreference('underline')}")
+## Underlining of links
+## This preference will take the values: preference-underlining-yes, preference-underlining-only-inline-links and
+## preference-underlining-no
+#set ($preferenceUnderlining = "preference-underlining-")
+#if ($underlining == 'Yes' || $a11y == '1')
+  #set ($preferenceUnderlining = $preferenceUnderlining + "yes")
+#elseif($underlining == 'No')
+  ## The legacy a11y preference is never ON when reaching here
+  #set ($preferenceUnderlining = $preferenceUnderlining + "no")
+#else
+  ## The default value `OnlyInlineLinks` has the same behavior as the fallback
+  #set ($preferenceUnderlining = $preferenceUnderlining + "only-inline-links")
+#end
 ## These elements will be closed in the htmlfooter.vm file
-<$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} #if("$!doc.space" != "")space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end ${bodyAction}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1)content#end panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right">
+## We put a space before each class added in #if, to avoid losing them because of velocity line stripping
+## TODO: the classes should be refactored to use a array of classes where individal classes are happened on by one and
+## joined with space at the end
+## Note: when showLeftPanels and showRightPanels are both equals to 0, it is intentional of hideleft and hideright to
+## be concatenated without space.
+<$bodyTagName id="body" class="skin-flamingo wiki-${xcontext.database} ${bodyAction}body panel-left-width-${leftPanelsWidth} panel-right-width-${rightPanelsWidth} drawer drawer--right ${preferenceUnderlining}
+  #if("$!doc.space" != "") space-${escapetool.xml($doc.space.replaceAll(' ', '_'))}#end
+  #if($showLeftPanels == "0") hideleft#end#if($showRightPanels == "0")hideright#end##Take care not to add any space between these two classes, they should combine in only one class if both are present.
+  #if($hidecolumns && ($!hidecolumns == 1)) hidelefthideright#end
+  #if($showLeftPanels != "0" && $showRightPanels != "0" && $!hidecolumns != 1) content#end">
 <div id="xwikimaincontainer">
 <div id="xwikimaincontainerinner">

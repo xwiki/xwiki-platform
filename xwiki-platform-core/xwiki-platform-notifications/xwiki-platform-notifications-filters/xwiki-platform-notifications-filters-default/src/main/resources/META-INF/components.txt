@@ -24,6 +24,7 @@ org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerComponen
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerDocumentInitializer
 org.xwiki.notifications.filters.migration.R140401000XWIKI15460DataMigration
 org.xwiki.notifications.filters.migration.R151002000XWIKI21448DataMigration
-org.xwiki.notifications.filters.migration.R160000000XWIKI17243DataMigration
+org.xwiki.notifications.filters.migration.R160300000XWIKI17243DataMigration
 org.xwiki.notifications.filters.migration.R160100000XWIKI21738DataMigration
+org.xwiki.notifications.filters.migration.R160500000XWIKI22271DataMigration
 org.xwiki.notifications.filters.migration.WatchListObjectsRemovalTaskConsumer

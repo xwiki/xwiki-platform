@@ -35,6 +35,7 @@ import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.resource.CreateResourceTypeException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
@@ -59,6 +60,7 @@ import org.xwiki.url.internal.standard.skins.SkinsResourceReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -153,7 +155,18 @@ public class IntegrationTest
         // Skins Resource References
         assertURL("http://localhost:8080/xwiki/skins/flamingo/logo.png", SkinsResourceReference.TYPE,
             new SkinsResourceReference());
+    }
 
+    @Test
+    public void resolveResoureReferenceWhenInvalid() throws Exception
+    {
+        ExtendedURL extendedURL = new ExtendedURL(new URL("http://localhost:8080/xwiki"), "xwiki");
+
+        Throwable exception = assertThrows(CreateResourceTypeException.class, () -> {
+            this.resourceTypeResolver.resolve(extendedURL, Collections.emptyMap());
+        });
+        assertEquals("Invalid standard scheme URL type. The URL is missing a path segment and should be of the "
+            + "format [/<type>/something/...]", exception.getMessage());
     }
 
     private void assertURL(String url, ResourceType expectedType, ResourceReference expectedReference) throws Exception

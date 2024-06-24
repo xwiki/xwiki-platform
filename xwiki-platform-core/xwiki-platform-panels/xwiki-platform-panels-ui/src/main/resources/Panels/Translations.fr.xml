@@ -45,6 +45,7 @@ panels._actions=Actions
 panels.emptyvalue=
 panels.children.title=Pages enfants
 panels.siblings.title=Pages sœurs
+panels.customize=Vous pouvez personnaliser les colonnes latérales en utilisant les {0}
 panels.documentInformation.configureSyntaxes=Configurer d'autres syntaxes
 panels.documentInformation.confirmChangeSyntaxWysiwyg=Souhaitez vous également convertir le contenu du document et ses objets dans la syntaxe sélectionnée ? Choisir 'Annuler' rétablira la syntaxe précédente et ne fera rien. Veuillez noter que si vous choisissez 'Ok' vous perdrez vos modifications et le document sera automatiquement enregistré, vous pourrez annuler ces modifications en allant dans l'historique du document et en restaurant la version précédente.
 panels.documentInformation.confirmChangeSyntax=Souhaitez vous également convertir le contenu du document et ses objets dans la syntaxe sélectionnée ? Choisir 'Annuler' modifiera uniquement l'identifiant de syntaxe, sans modifier le contenu du document. Veuillez noter que si vous choisissez 'Ok' cela enregistrera automatiquement le document. Vous pourrez annuler ces modifications en allant dans l'historique du document et en restaurant la version précédente.

@@ -83,7 +83,7 @@ class DefaultDocumentContextExecutorTest
     private WikiReference modelWikiReference;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         when(this.documentModelBridge.getDocumentReference()).thenReturn(TEST_DOCUMENT_REFERENCE);
 

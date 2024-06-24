@@ -69,7 +69,7 @@
       #set ($exportFormatsForCategory = $exportFormatsByCategory.getOrDefault($categoryId, []))
       #set ($discard = $exportFormatsByCategory.put($categoryId, $exportFormatsForCategory))
       #set ($exportFormat = {
-        'name': $uix.parameters.label,
+        'name': $services.localization.render($uix.parameters.label),
         'value': $uix.id,
         'description': $services.localization.render($uix.parameters.hint),
         'icon': $uix.parameters.icon,

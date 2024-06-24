@@ -86,9 +86,7 @@ public class LiveDataRendererConfiguration
         LiveDataConfiguration basicConfig = getLiveDataConfiguration(parameters);
         // Make sure both configurations have the same id so that they are properly merged.
         advancedConfig.setId(basicConfig.getId());
-        LiveDataConfiguration configuration = this.jsonMerge.merge(advancedConfig, basicConfig);
-        addPageSizeToPaginationIfMissing(parameters, configuration);
-        return configuration;
+        return this.jsonMerge.merge(advancedConfig, basicConfig);
     }
 
     private LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
@@ -246,38 +244,5 @@ public class LiveDataRendererConfiguration
     private Stream<String> getSplitStringStream(String commaListAsString)
     {
         return Stream.of(commaListAsString.split(",")).map(StringUtils::trim);
-    }
-
-    /**
-     * If the pagination sizes are missing the limit define in the parameters, add it to the allowed page limits.
-     *
-     * @param parameters the live data parameters
-     * @param configuration the computed live data configuration
-     */
-    private static void addPageSizeToPaginationIfMissing(LiveDataRendererParameters parameters,
-        LiveDataConfiguration configuration)
-    {
-        Integer limit = parameters.getLimit();
-        if (limit != null) {
-            LiveDataMeta meta = configuration.getMeta();
-            if (meta == null) {
-                meta = new LiveDataMeta();
-                configuration.setMeta(meta);
-            }
-            LiveDataPaginationConfiguration pagination = meta.getPagination();
-            if (pagination == null) {
-                pagination = new LiveDataPaginationConfiguration();
-                meta.setPagination(pagination);
-            }
-            List<Integer> pageSizes = pagination.getPageSizes();
-            if (pageSizes == null) {
-                pageSizes = new ArrayList<>();
-                pagination.setPageSizes(pageSizes);
-            }
-            if (!pageSizes.contains(limit)) {
-                pageSizes.add(limit);
-                Collections.sort(pageSizes);
-            }
-        }
     }
 }

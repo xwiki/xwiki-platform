@@ -71,13 +71,4 @@ class LiveDataRendererConfigurationTest
         LiveDataConfiguration liveDataConfiguration = this.configuration.getLiveDataConfiguration("{}", parameters);
         assertEquals(description, liveDataConfiguration.getMeta().getDescription());
     }
-
-    @Test
-    void getLiveDataConfigurationLimitIsDefined() throws Exception
-    {
-        LiveDataRendererParameters parameters = new LiveDataRendererParameters();
-        parameters.setLimit(2);
-        LiveDataConfiguration liveDataConfiguration = this.configuration.getLiveDataConfiguration("{}", parameters);
-        assertEquals(List.of(2), liveDataConfiguration.getMeta().getPagination().getPageSizes());
-    }
 }

@@ -21,18 +21,19 @@ package org.xwiki.notifications.filters.watch.internal;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.filters.watch.AutomaticWatchMode;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,79 +41,79 @@ import static org.mockito.Mockito.when;
  * @since 10.6RC1
  * @since 9.11.8
  */
-public class DefaultWatchedEntitiesConfigurationTest
+@ComponentTest
+class DefaultWatchedEntitiesConfigurationTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultWatchedEntitiesConfiguration> mocker =
-            new MockitoComponentMockingRule<>(DefaultWatchedEntitiesConfiguration.class);
-
+    @InjectMockComponents
+    private DefaultWatchedEntitiesConfiguration watchedEntitiesConfiguration;
+    
     private static final DocumentReference CURRENT_USER
             = new DocumentReference("wikiA", "XWiki", "UserA");
 
     private static final WikiReference CURRENT_WIKI = new WikiReference("wikiA");
 
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
+    
+    @MockComponent
     private ConfigurationSource configurationSource;
+    
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void setUp()
     {
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-        configurationSource = mocker.getInstance(ConfigurationSource.class);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-
-        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(new DocumentReference("wikiA", "Main", "WebHome"));
+        when(documentAccessBridge.getCurrentDocumentReference())
+            .thenReturn(new DocumentReference("wikiA", "Main", "WebHome"));
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
     }
 
     @Test
-    public void getAutomaticWatchMode() throws Exception
+    void getAutomaticWatchMode() throws Exception
     {
         // Default value
-        assertEquals(AutomaticWatchMode.MAJOR, mocker.getComponentUnderTest().getAutomaticWatchMode(CURRENT_USER));
-
-        // Fallback to the value of the Watchlist
-        when(documentAccessBridge.getProperty(
-                CURRENT_USER,
-                new DocumentReference("wikiA", "XWiki", "WatchListClass"),
-                "automaticwatch")).thenReturn("NEW");
-        assertEquals(AutomaticWatchMode.NEW, mocker.getComponentUnderTest().getAutomaticWatchMode(CURRENT_USER));
+        assertEquals(AutomaticWatchMode.MAJOR, watchedEntitiesConfiguration.getAutomaticWatchMode(CURRENT_USER));
 
         // User the user's preference
         when(documentAccessBridge.getProperty(
                 CURRENT_USER,
-                new DocumentReference("wikiA", Arrays.asList("XWiki", "Notifications", "Code"), "AutomaticWatchModeClass"),
+                new DocumentReference("wikiA", Arrays.asList("XWiki", "Notifications", "Code"),
+                    "AutomaticWatchModeClass"),
                 "automaticWatchMode")).thenReturn("ALL");
-        assertEquals(AutomaticWatchMode.ALL, mocker.getComponentUnderTest().getAutomaticWatchMode(CURRENT_USER));
+        assertEquals(AutomaticWatchMode.ALL, watchedEntitiesConfiguration.getAutomaticWatchMode(CURRENT_USER));
     }
 
     @Test
-    public void getDefaultAutomaticWatchMode() throws Exception
+    void getDefaultAutomaticWatchMode() throws Exception
     {
         // Default value
-        assertEquals(AutomaticWatchMode.MAJOR, mocker.getComponentUnderTest().getDefaultAutomaticWatchMode(CURRENT_WIKI));
+        assertEquals(AutomaticWatchMode.MAJOR, watchedEntitiesConfiguration.getDefaultAutomaticWatchMode(CURRENT_WIKI));
 
         // Fallback on the watchlist configuration
         when(configurationSource.getProperty("xwiki.plugin.watchlist.automaticwatch")).thenReturn("new");
-        assertEquals(AutomaticWatchMode.NEW, mocker.getComponentUnderTest().getDefaultAutomaticWatchMode(CURRENT_WIKI));
+        assertEquals(AutomaticWatchMode.NEW, watchedEntitiesConfiguration.getDefaultAutomaticWatchMode(CURRENT_WIKI));
 
         // Fallback on the notifications configuration
         when(configurationSource.getProperty("notifications.watchedEntities.autoWatch")).thenReturn("all");
-        assertEquals(AutomaticWatchMode.ALL, mocker.getComponentUnderTest().getDefaultAutomaticWatchMode(CURRENT_WIKI));
+        assertEquals(AutomaticWatchMode.ALL, watchedEntitiesConfiguration.getDefaultAutomaticWatchMode(CURRENT_WIKI));
 
         // Fallback on the main wiki's configuration
         when(documentAccessBridge.getProperty(
-                new DocumentReference("mainWiki", Arrays.asList("XWiki", "Notifications", "Code"), "NotificationAdministration"),
-                new DocumentReference("mainWiki", Arrays.asList("XWiki", "Notifications", "Code"), "AutomaticWatchModeClass"),
+                new DocumentReference("mainWiki", Arrays.asList("XWiki", "Notifications", "Code"),
+                    "NotificationAdministration"),
+                new DocumentReference("mainWiki", Arrays.asList("XWiki", "Notifications", "Code"),
+                    "AutomaticWatchModeClass"),
                 "automaticWatchMode")).thenReturn("NONE");
-        assertEquals(AutomaticWatchMode.NONE, mocker.getComponentUnderTest().getDefaultAutomaticWatchMode(CURRENT_WIKI));
+        assertEquals(AutomaticWatchMode.NONE, watchedEntitiesConfiguration.getDefaultAutomaticWatchMode(CURRENT_WIKI));
 
         // Use the wiki's configuration
         when(documentAccessBridge.getProperty(
-                new DocumentReference("wikiA", Arrays.asList("XWiki", "Notifications", "Code"), "NotificationAdministration"),
-                new DocumentReference("wikiA", Arrays.asList("XWiki", "Notifications", "Code"), "AutomaticWatchModeClass"),
+                new DocumentReference("wikiA", Arrays.asList("XWiki", "Notifications", "Code"),
+                    "NotificationAdministration"),
+                new DocumentReference("wikiA", Arrays.asList("XWiki", "Notifications", "Code"),
+                    "AutomaticWatchModeClass"),
                 "automaticWatchMode")).thenReturn("NEW");
-        assertEquals(AutomaticWatchMode.NEW, mocker.getComponentUnderTest().getDefaultAutomaticWatchMode(CURRENT_WIKI));
+        assertEquals(AutomaticWatchMode.NEW, watchedEntitiesConfiguration.getDefaultAutomaticWatchMode(CURRENT_WIKI));
     }
 }

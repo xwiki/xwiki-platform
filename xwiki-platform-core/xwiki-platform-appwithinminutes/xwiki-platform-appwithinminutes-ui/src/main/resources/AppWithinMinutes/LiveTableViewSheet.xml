@@ -401,7 +401,8 @@ return XWiki;
  * Rename Application
  */
 require(['jquery', 'bootstrap', 'xwiki-form-validation-async'], function($) {
-  #set ($currentDocReference = $xwiki.getDocument($request.currentApp).getDocumentReference())
+  ## Note: if not currentApp request param is not passed, we default to the wiki home page reference to avoid a NPE
+  #set ($currentDocReference = $xwiki.getDocument("$!request.currentApp").getDocumentReference())
   // if we cannot find any extension related to this page app, it's not part of an extension.
   var isNotAnExtension = $services.extension.xar.getInstalledExtensions($currentDocReference).isEmpty();
 

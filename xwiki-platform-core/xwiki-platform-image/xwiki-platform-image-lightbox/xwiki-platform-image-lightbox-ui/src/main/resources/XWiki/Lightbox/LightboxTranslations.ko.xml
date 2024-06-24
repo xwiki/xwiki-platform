@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Lightbox.LightboxTranslations" locale="ko">
+  <web>XWiki.Lightbox</web>
+  <name>LightboxTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>LightboxTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Admin section
+admin.lightbox=라이트박스
+admin.lightbox.description=이미지 라이트박스 갤러리 구성
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=라이트박스 활성화
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=라이트박스에서 콘텐츠 이미지를 열 수 있는 기능을 활성화합니다.
+
+# Gallery template
+image.lightbox.autoPlay.title=슬라이드쇼
+image.lightbox.caption.label=표제
+image.lightbox.imageId.title=이미지 ID
+image.lightbox.imageId.copy.title=이미지 ID 복사
+image.lightbox.imageId.copy.copied=클립보드에 복사됨
+image.lightbox.imageId.permalink=고유링크
+image.lightbox.date.label=새 공개 메시지가 수신되었습니다.
+image.lightbox.download.title=다운로드
+image.lightbox.escape.title=탈출하다
+image.lightbox.fileName.label=파일 이름
+image.lightbox.fullscreen.title=전체 화면
+image.lightbox.gallery.title=이미지 갤러리
+image.lightbox.nextSlide.title=다음 이미지
+image.lightbox.prevSlide.title=이전 이미지
+image.lightbox.publisher.label=이미지 게시자
+image.lightbox.toggler.label=이미지 작업 열기
+</content>
+  </xwikidoc>

@@ -33,7 +33,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;
@@ -99,9 +98,8 @@ public class QueryExpressionGenerator
         // First: get the active preferences of the given user
         Collection<NotificationPreference> preferences = parameters.preferences;
 
-        // Ensure that we have at least one filter preference that is active
-        if (preferences.isEmpty()
-            && parameters.filterPreferences.stream().noneMatch(NotificationFilterPreference::isActive)) {
+        // Ensure that we have at least one filter preference
+        if (preferences.isEmpty()) {
             return null;
         }
 

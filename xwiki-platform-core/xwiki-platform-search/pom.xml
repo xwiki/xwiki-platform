@@ -25,14 +25,24 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search</artifactId>
   <name>XWiki Platform - Search - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Search - Parent POM</description>
   <modules>
+    <module>xwiki-platform-search-api</module>
     <module>xwiki-platform-search-solr</module>
     <module>xwiki-platform-search-ui</module>
+    <module>xwiki-platform-search-webjar</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-search-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

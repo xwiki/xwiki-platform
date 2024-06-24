@@ -65,7 +65,8 @@ public class CustomUserUpdatedDocumentEventListener extends AbstractEventListene
         UserUpdatingDocumentEvent userEvent = (UserUpdatingDocumentEvent) event;
         XWikiDocument sourceDoc = (XWikiDocument) source;
         DocumentReference expectedReference = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
-        if (StringUtils.equals(userEvent.getUserReference().getName(), "DeleteVersionTestUserCancelEvent")
+        if (userEvent.getUserReference() != null
+            && StringUtils.equals(userEvent.getUserReference().getName(), "DeleteVersionTestUserCancelEvent")
             && sourceDoc.getDocumentReference().equals(expectedReference)) {
             logger.info("Cancelling user event on purpose");
             userEvent.cancel();

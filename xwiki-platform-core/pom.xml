@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -33,6 +33,19 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+    <!-- Define here extension features that will be used within some modules and their legacy versions -->
+    <!-- Extension features of xwiki-platform-oldcore -->
+    <xwiki.platform.oldcore.extension.features>
+      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+      com.xpn.xwiki.platform:xwiki-core,
+
+      <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
+      org.xwiki.platform:xwiki-platform-filter-instance-oldcore,
+
+      <!-- A contrib extension to use with versions of oldcore which does not support authservice API -->
+      org.xwiki.contrib:authservice-backport-api,
+      org.xwiki.contrib:authservice-backport-default
+    </xwiki.platform.oldcore.extension.features>
   </properties>
   <build>
     <pluginManagement>
@@ -126,70 +139,79 @@
                  Single justification example:
             -->
             <revapi.differences>
-              <justification>Those APIs are still available with legacy packages.</justification>
+              <justification>Deprecated method available through legacy but breakage triggered by a
+                dependant module.</justification>
               <criticality>allowed</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>
                   <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltip(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.XWiki::addTooltipJS(com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.Document::displayTooltip(java.lang.String, com.xpn.xwiki.api.Object)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.doc.XWikiDocument::displayTooltip(java.lang.String, com.xpn.xwiki.objects.BaseObject, com.xpn.xwiki.XWikiContext)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltip(java.lang.String, java.lang.String)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltip(java.lang.String, java.lang.String, java.lang.String)</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String com.xpn.xwiki.api.XWiki::addTooltipJS()</old>
+                  <old>method java.lang.String org.xwiki.notifications.filters.NotificationFilterPreference::getProviderHint()</old>
                 </item>
               </differences>
             </revapi.differences>
             <revapi.differences>
+              <justification>
+                The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
+                parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
+              </justification>
+              <criticality>allowed</criticality>
               <differences>
                 <item>
-                  <criticality>allowed</criticality>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</old>
-                  <new>class org.xwiki.filter.instance.output.DocumentInstanceOutputProperties</new>
-                  <superClass>org.xwiki.filter.instance.output.EntityInstanceOutputProperties</superClass>
-                  <justification>Not a breakage, the old DocumentInstanceOutputProperties content has been moved to the new EntityInstanceOutputProperties class and old class now inherits from the new one</justification>
+                <ignore>true</ignore>
+                <code>java.method.numberOfParametersChanged</code>
+                <old>method org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</old>
+                <new>method org.xwiki.rest.model.jaxb.Pages org.xwiki.rest.resources.pages.PageChildrenResource::getPageChildren(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Changes in unstable API of notification for watching pages.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus.NOT_WATCHED</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.removed</code>
+                  <old>field org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus.WATCHED_FOR_SOME_EVENTS_OR_FORMATS</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedEntityReference::getWatchedStatus(===org.xwiki.model.reference.DocumentReference===) throws org.xwiki.notifications.NotificationException</old>
+                  <new>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedEntityReference::getWatchedStatus(===org.xwiki.user.UserReference===) throws org.xwiki.notifications.NotificationException</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedEntityReference::getWatchedStatus(===org.xwiki.model.reference.DocumentReference===) throws org.xwiki.notifications.NotificationException @ org.xwiki.notifications.filters.watch.WatchedUserReference</old>
+                  <new>parameter org.xwiki.notifications.filters.watch.WatchedEntityReference.WatchedStatus org.xwiki.notifications.filters.watch.WatchedUserReference::getWatchedStatus(===org.xwiki.user.UserReference===) throws org.xwiki.notifications.NotificationException</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Watch page API changes to be able to compute it more exactly</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.notifications.filters.watch.WatchedLocationReference::&lt;init&gt;(org.xwiki.model.reference.EntityReference, java.lang.String, org.xwiki.model.reference.EntityReferenceResolver&lt;java.lang.String&gt;, org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer, org.xwiki.notifications.filters.NotificationFilterPreferenceManager)</old>
+                  <new>method void org.xwiki.notifications.filters.watch.WatchedLocationReference::&lt;init&gt;(org.xwiki.model.reference.EntityReference, org.xwiki.component.manager.ComponentManager) throws org.xwiki.component.manager.ComponentLookupException</new>
+                  <justification>Simplify future extensions of this API.</justification>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter, org.xwiki.notifications.filters.NotificationFilterPreferenceManager)</old>
+                  <new>method void org.xwiki.notifications.filters.watch.WatchedUserReference::&lt;init&gt;(java.lang.String, org.xwiki.component.manager.ComponentManager) throws org.xwiki.component.manager.ComponentLookupException</new>
+                  <justification>Simplify future extensions of this API.</justification>
                 </item>
               </differences>
             </revapi.differences>
@@ -340,12 +362,12 @@
                      If you are using Groovy >= 2.3.0-rc-1, remember to include groovy-ant as a dependency.
                -->
               <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy</artifactId>
                 <version>${groovy.version}</version>
               </dependency>
               <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-ant</artifactId>
                 <version>${groovy.version}</version>
               </dependency>

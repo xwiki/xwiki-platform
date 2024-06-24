@@ -37,7 +37,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -64,7 +64,7 @@ public class NotificationFilterPreferencesMigratorTest
     public final MockitoComponentMockingRule<NotificationFilterPreferencesMigrator> mocker =
             new MockitoComponentMockingRule<>(NotificationFilterPreferencesMigrator.class);
 
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
     private QueryManager queryManager;
     private DocumentReferenceResolver<String> referenceResolver;
     private Provider<XWikiContext> contextProvider;
@@ -75,7 +75,7 @@ public class NotificationFilterPreferencesMigratorTest
     @Before
     public void setUp() throws Exception
     {
-        modelBridge = mocker.getInstance(ModelBridge.class);
+        filterPreferencesModelBridge = mocker.getInstance(FilterPreferencesModelBridge.class);
         queryManager = mocker.getInstance(QueryManager.class);
         referenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
         contextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
@@ -133,7 +133,7 @@ public class NotificationFilterPreferencesMigratorTest
         verify(xwiki).saveDocument(userAdoc, "Migrate notification filter preferences to the new store.",
                 xwikicontext);
 
-        verify(modelBridge).saveFilterPreferences(userA, Arrays.asList(
+        verify(filterPreferencesModelBridge).saveFilterPreferences(userA, Arrays.asList(
                 createExpectedPreference(SetUtils.hashSet("update", "create"),
                         SetUtils.hashSet(NotificationFormat.ALERT), NotificationFilterType.INCLUSIVE,
                         "filter1", true, new Date(100L), "", "", "page1", ""),
@@ -195,7 +195,6 @@ public class NotificationFilterPreferencesMigratorTest
         preference.setEventTypes(eventType);
         preference.setNotificationFormats(formats);
         preference.setFilterType(filterType);
-        preference.setProviderHint("userProfile");
         preference.setFilterName(filterName);
         preference.setEnabled(isEnabled);
         preference.setStartingDate(date);

@@ -1,0 +1,55 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.SolrSearchAdminIndexingUserTranslations" locale="ko">
+  <web>XWiki</web>
+  <name>SolrSearchAdminIndexingUserTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.SolrSearchAdminIndexingUser</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Admin Indexing User Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## keys for the admin section navigation
+admin.indexinguser=인덱싱 사용자
+admin.indexinguser.description=위키 콘텐츠를 색인화할 사용자를 선택하세요.
+
+## keys use on the admin "indexing user" page itself
+admin.indexinguser.explanation.part1=인덱서는 일반적으로 연결된 사용자 없이 백그라운드 작업으로 실행됩니다. 제목이 "시트" 문서에 의해 계산된 페이지의 경우 시트가 익명 사용자에게 표시되지 않으면 계산된 제목이 표시되지 않습니다. 특히 위키가 닫혀 있는 경우에는 더욱 그렇습니다. 이 경우, 예를 들어 사용자 프로필에 대한 검색 결과는 계산된 제목인 "Profile of "firstname" "lastname""과 함께 표시되지 않고 해당 페이지 이름(일반적으로 "login")만 표시됩니다.
+admin.indexinguser.explanation.part2=검색 결과 에 동일한 제목을 표시하려면 시트 페이지에 액세스할 수 있는 사용자를 인덱서에 제공해야 합니다. 특별한 권한이 없는 전용, 잠긴 사용자 계정을 생성하는 것이 좋습니다.
+admin.indexinguser.explanation.security.head=보안 참고사항:
+admin.indexinguser.explanation.security.content=다른 사용자보다 더 많은 보기 권한을 가진 계정을 사용하면 해당 사용자가 일반적으로 볼 수 없는 페이지에서 페이지 제목이 유출될 수 있습니다.
+admin.indexinguser.explanation.part3=이 설정에 대한 변경 사항은 변경 후 색인이 생성된 페이지에만 적용됩니다. 변경 사항을 일관되게 적용하려면 전체 재색인을 수행하는 것이 좋습니다.
+admin.indexinguser.explanation.mainwikionly=Solr 인덱서는 기본 위키에서 실행되므로 이 설정은 기본 위키에서만 수행할 수 있습니다.
+
+## keys used by the configuration class
+XWiki.SolrSearchAdminIndexingUser_indexer.description=인덱싱 사용자
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=백그라운드에서 페이지를 색인화하는 데 사용되는 XWiki 사용자 계정.
+</content>
+  </xwikidoc>

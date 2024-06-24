@@ -40,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.async.internal.AbstractExecutedContentMacro;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -156,8 +157,14 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
             metaData = new MetaData(Map.of(MetaData.SOURCE, stringReference));
         }
 
-        return this.parser.parse(iconContent, Syntax.XWIKI_2_1, context, false, metaData,
-            context.isInline());
+        XDOM iconXDOM = this.parser.parse(iconContent, Syntax.XWIKI_2_1, context, false, metaData, true);
+        if (!context.isInline()) {
+            // Wrap the children of the XDOM in a paragraph. We don't ask the parser to produce block content as
+            // icons should always be inline, and some icons are defined as raw inline HTML.
+            Block wrapper = new ParagraphBlock(iconXDOM.getChildren());
+            iconXDOM.setChildren(List.of(wrapper));
+        }
+        return iconXDOM;
     }
 
     private IconSet getIconSet(DisplayIconMacroParameters parameters) throws IconException, MacroExecutionException

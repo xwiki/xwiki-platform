@@ -122,8 +122,14 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
             imageSelector.removeClass('loading');
 
             // Update the selection with the value of the current tab on tab change.
-            imageSelector.on('shown.bs.tab', function () {
-              setImageReferenceValue(mapTabReference[getCurrentTabId()]);
+            // This needs to be done before the tab is actually switched as otherwise there is a risk that the saved
+            // value overrides a value updated in the short laps of time between the show.bs.tab and shown.bs.tab
+            // events. This is unlikely to happen in practice but happens quite often with automated tests (e.g.,
+            // selenium).
+            imageSelector.on('show.bs.tab', function (e) {
+              // Retrieve the id of the to be shown tab.
+              const nextTabId = $(e.target).attr("aria-controls");
+              setImageReferenceValue(mapTabReference[nextTabId]);
             });
 
             modal.data('initialized', true);
@@ -225,8 +231,12 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
     }
 
     function updateSelectedImageReferences(imageReferences, element) {
-      var documentReference = getDocumentReference(element.parents('.image-selector-modal').data('input'));
-      mapScopes[documentReference].updateSelectedImageReferences(imageReferences);
+      // If this method is called when the corresponding tab is not active (e.g., a slow asynchronous query leads
+      // to a call to this method while the tab is not active anymore), then the update is skipped.
+      if (element.parents(".tab-pane").hasClass('active')) {
+        var documentReference = getDocumentReference(element.parents('.image-selector-modal').data('input'));
+        mapScopes[documentReference].updateSelectedImageReferences(imageReferences);
+      }
     }
 
     function createLoader(uploadField, options, element) {

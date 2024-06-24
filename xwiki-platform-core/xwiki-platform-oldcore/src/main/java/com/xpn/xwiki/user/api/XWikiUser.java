@@ -31,6 +31,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -70,6 +72,8 @@ public class XWikiUser
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     private ContextualLocalizationManager localization;
+
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
 
@@ -202,6 +206,15 @@ public class XWikiUser
             localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
         }
         return localEntityReferenceSerializer;
+    }
+
+    private UserReferenceResolver<DocumentReference> getDocumentReferenceUserReferenceResolver()
+    {
+        if (this.documentReferenceUserReferenceResolver == null) {
+            this.documentReferenceUserReferenceResolver =
+                Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, "document");
+        }
+        return this.documentReferenceUserReferenceResolver;
     }
 
     private ContextualLocalizationManager getLocalization()
@@ -337,7 +350,9 @@ public class XWikiUser
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
-                userdoc.setAuthorReference(context.getUserReference());
+                UserReference userReference =
+                    getDocumentReferenceUserReferenceResolver().resolve(context.getUserReference());
+                userdoc.getAuthors().setOriginalMetadataAuthor(userReference);
                 context.getWiki().saveDocument(userdoc,
                     localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {

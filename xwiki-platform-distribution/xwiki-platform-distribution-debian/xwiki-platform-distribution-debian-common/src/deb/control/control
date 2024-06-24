@@ -4,7 +4,7 @@ Section: java
 Priority: optional
 Provides: xwiki
 Architecture: all
-Depends: ucf (>= 0.30), dbconfig-common (>= 1.8.0), openjdk-17-jre-headless | openjdk-11-jre-headless
+Depends: ucf (>= 0.30), dbconfig-common (>= 1.8.0), openjdk-17-jre-headless | java17-runtime-headless
 Conflicts: xwiki-enterprise-common
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]

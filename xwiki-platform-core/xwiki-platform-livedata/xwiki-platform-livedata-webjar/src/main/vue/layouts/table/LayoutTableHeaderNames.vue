@@ -58,45 +58,40 @@
       v-show="logic.isPropertyVisible(property.id)"
     >
       <!-- Wrapper for the column header -->
-      <div
-        class="column-name"
-        @click="sort(property)"
-      >
-        <!--
-          Specify the handle to drag properties.
-          Use the stop propagation modifier on click event
-          to prevent sorting the column unintentionally.
-        -->
-        <div
-          role="presentation"
-          class="handle"
-          :title="$t('livedata.action.reorder.hint')"
-          @click.stop
-        >
-          <XWikiIcon :icon-descriptor="{name: 'text_align_justify'}"/>
-        </div>
+      <div class="column-name">
         <!-- Property Name -->
-        <span class="property-name">{{ property.name }}</span>
-        <!--
-          Sort icon
-          Only show the icon for the first-level sort property
-        -->
-        <XWikiIcon
-          v-if="logic.isPropertySortable(property.id)"
-          :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
-          :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
+        <button type="button" class="handle"
+          @click="sort(property)"
+          @keydown.left="keyboardDragNDrop($event, -1)"
+          @keydown.right="keyboardDragNDrop($event, 1)"
+          :title="logic.isPropertySortable(property.id) ?
+            $t('livedata.action.columnName.sortable.hint') :
+            $t('livedata.action.columnName.default.hint')"
+        >
+          <span class="property-name">{{ property.name }}</span>
+          <!--
+            Sort icon
+            Only show the icon for the first-level sort property
+          -->
+          <XWikiIcon
+            v-if="logic.isPropertySortable(property.id)"
+            :icon-descriptor="{name: isFirstSortLevel(property) && firstSortLevel.descending? 'caret-down': 'caret-up'}"
+            :class="['sort-icon',  isFirstSortLevel(property)? 'sorted': '']"/>
+        </button>
       </div>
       <!--
-        Resize handle
-        Use the stop propagation modifier on click event
-        to prevent sorting the column unintentionally.
-      -->
-      <div role="presentation" class="resize-handle" :title="$t('livedata.action.resizeColumn.hint')"
-        v-mousedownmove="resizeColumnInit"
-        @mousedownmove="resizeColumn"
-        @click.stop
-        @dblclick="resetColumnSize"
-      ></div>
+          Specify the handle to resize properties
+        -->
+      <button type="button" class="resize-handle btn btn-xs btn-default"
+              :title="$t('livedata.action.resizeColumn.hint')"
+              v-mousedownmove="mouseResizeColumnInit"
+              @mousedownmove="mouseResizeColumn"
+              @keydown.left="keyboardResizeColumn($event, -10)"
+              @keydown.right="keyboardResizeColumn($event, 10)"
+              @dblclick="resetColumnSize"
+              @keydown.esc="resetColumnSize"
+      >
+      </button>
     </th>
 
   </XWikiDraggable>
@@ -169,8 +164,8 @@ export default {
         so that it matches the true property order
         When selection is disabled (and the select-entry-all component hidden)
         we don't need to readjust the offset of the indexes
-        as Vue handily creates a html comment where the component shoud be
-        So that it does not messes up with indexes
+        as Vue handily creates a html comment where the component should be
+        So that it does not mess up with indexes
       */
       this.logic.reorderProperty(e.moved.oldIndex - 1, e.moved.newIndex - 1);
     },
@@ -182,13 +177,32 @@ export default {
       }
     },
 
-    resizeColumnInit (e) {
+    keyboardDragNDrop(e, deltaIndex) {
+      let handles = e.currentTarget.closest('tr').querySelectorAll('.handle');
+      let oldIndex = Array.from(handles).indexOf(e.currentTarget);
+      let newIndex = oldIndex + deltaIndex;
+      if (newIndex >= handles.length) {
+        this.logic.reorderProperty(oldIndex, newIndex - handles.length);
+      } else if (newIndex <= -1) {
+        this.logic.reorderProperty(oldIndex, handles.length + newIndex);
+      } else {
+        this.logic.reorderProperty(oldIndex, newIndex);
+      }
+      this.$nextTick(() => {
+          handles[oldIndex].focus();
+      });
+    },
+
+    mouseResizeColumnInit (e) {
       const th = e.currentTarget.closest("th");
       e.data.leftColumn = th.querySelector(".column-name");
       e.data.leftColumnBaseWidth = e.data.leftColumn.getBoundingClientRect()?.width;
       e.data.rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
       e.data.rightColumnBaseWidth = e.data.rightColumn?.getBoundingClientRect()?.width;
+      this.resizeColumnInit(th);
+    },
 
+    resizeColumnInit (th) {
       // Give all column names a fixed width so that relative widths don't change when resizing (in case the current
       // widths are not the actual column widths).
       // First, collect all widths, then set them all to avoid that due to the first values being set the other values
@@ -205,19 +219,37 @@ export default {
       }
     },
 
-    resizeColumn (e) {
-      const offsetX = e.clientX - e.data.clickEvent.clientX;
+    resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth, rightColumnBaseWidth) {
       // Resize left column
-      const leftColumnWidth = e.data.leftColumnBaseWidth + offsetX;
-      e.data.leftColumn.style.width = `${leftColumnWidth}px`;
-
+      let leftColumnWidth = leftColumnBaseWidth + offsetX;
+      leftColumn.style.width = `${leftColumnWidth}px`;
       // Resize right column
-      if (e.data.rightColumn) {
-        const rightColumnWidth = e.data.rightColumnBaseWidth - offsetX;
-        e.data.rightColumn.style.width = `${rightColumnWidth}px`;
+      if (rightColumn) {
+          let rightColumnWidth = rightColumnBaseWidth - offsetX;
+          rightColumn.style.width = `${rightColumnWidth}px`;
       }
     },
 
+    mouseResizeColumn (e) {
+      let offsetX = e.clientX - e.data.clickEvent.clientX;
+      let leftColumn = e.data.leftColumn;
+      let rightColumn = e.data.rightColumn;
+      let leftColumnBaseWidth = e.data.leftColumnBaseWidth;
+      let rightColumnBaseWidth = e.data.rightColumnBaseWidth;
+      this.resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth, rightColumnBaseWidth);
+    },
+
+    keyboardResizeColumn (e, offsetX) {
+      const th = e.currentTarget.closest("th");
+      this.resizeColumnInit(th);
+
+      let leftColumn = th.querySelector(".column-name");
+      let leftColumnBaseWidth = leftColumn.getBoundingClientRect()?.width;
+      let rightColumn = this.getNextVisibleProperty(th)?.querySelector(".column-name");
+      let rightColumnBaseWidth = rightColumn?.getBoundingClientRect()?.width;
+      this.resizeColumn(offsetX, leftColumn, rightColumn, leftColumnBaseWidth, rightColumnBaseWidth);
+    },
+    
     resetColumnSize (e) {
       // Reset all column sizes as resizing a single column sets sizes for all columns.
       for (const column of e.currentTarget.closest("tr").querySelectorAll(".column-name")) {
@@ -236,55 +268,75 @@ export default {
 .layout-table th.draggable-item {
   display: table-cell;
   min-width: 4rem;
-  overflow: hidden;
+  padding: 8px 0 8px 4px;
 }
 
 .layout-table .column-name {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  cursor: pointer;
-  /* Ensure that the name is never smaller than the width of the column, i.e., it always fills the available space even
-   when the column has been resized to a smaller width that is prevented by some table cell. */
-  min-width: 100%;
-  position: relative;
+  justify-content: space-between;
 }
 
-.layout-table .handle {
-  height: 100%;
-  margin-left: -@table-cell-padding;
-  padding: 0 @table-cell-padding;
-  color: @text-color;
-  background-color: @xwiki-page-content-bg;
-  cursor: pointer; /* IE */
-  cursor: grab;
-  opacity: 0;
+.layout-table .draggable-item .resize-handle {
   position: absolute;
-}
-.layout-table .column-name:hover .handle {
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-.layout-table .handle .fa {
-  vertical-align: middle;
+  right: 0;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  /* TODO: Discussion about the exact display of resize handles.
+      See https://jira.xwiki.org/browse/XWIKI-21816 */
+  opacity: 0;
+  padding: 0;
+  cursor: col-resize;
+  min-width: 0;
+  width: 0;
+  border-width: 2px;
+  border-radius: 0;
+  margin-left: 2px;
 }
 
-.layout-table .property-name {
+.layout-table .draggable-item:focus-within .resize-handle,
+.layout-table .draggable-item:hover .resize-handle {
+  opacity: 1;
+  border-color: @text-muted;
+  border-width: 3px;
+  margin-left: 0;
+}
+
+.layout-table .draggable-item:not(:last-child) .resize-handle {
+  margin-right: -2px;
+}
+
+.layout-table .draggable-item:not(:last-child):focus-within .resize-handle,
+.layout-table .draggable-item:not(:last-child):hover .resize-handle {
+  margin-right: -3px;
+}
+
+.layout-table .draggable-item .handle {
+  opacity: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  background: transparent;
+  border: 0;
+  text-align: left;
 }
 
 .layout-table .sort-icon {
   color: currentColor;
   opacity: 0;
   padding-left: @table-cell-padding;
+  cursor: pointer;
 }
+
+.layout-table .property-name + .sort-icon {
+  vertical-align: baseline;
+}
+
 .layout-table .sort-icon.sorted {
   opacity: 1;
 }
-.layout-table .column-name:hover .sort-icon:not(.sorted) {
+
+.layout-table .column-name:hover .sort-icon:not(.sorted),
+.layout-table .column-name:focus-within .sort-icon:not(.sorted) {
   opacity: 0.5;
 }
 
@@ -292,36 +344,11 @@ export default {
   position: relative;
 }
 
-.layout-table .resize-handle {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-  transform: translateX(50%);
-  width: 10px;
-  background-color: transparent;
-  cursor: ew-resize;
-  user-select: none;
-  z-index: 100;
-
-  &:hover {
-    background-color: @breadcrumb-bg;
-  }
-}
-
 /* Responsive mode */
 @media screen and (max-width: @screen-xs-max) {
   .layout-table th.draggable-item {
     /* Overwrite the draggable-item display in order to show the property names (table header) as a column. */
     display: block;
-
-    .handle {
-      /* Always show the drag handler because hover is not available on mobile. */
-      opacity: 1;
-      /* Display the drag handler next to the property name to avoid always hiding it. */
-      position: static;
-    }
-
     /* Trim long property names. */
     .property-name {
       white-space: nowrap;

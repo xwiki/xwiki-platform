@@ -30,6 +30,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
@@ -62,8 +63,15 @@ public class DefaultSolr implements Solr, Initializable
     }
 
     @Override
+    @Deprecated
     public SolrClient getClient(String name) throws SolrException
     {
         return this.configuredSolr.getClient(name);
+    }
+
+    @Override
+    public XWikiSolrCore getCore(String name) throws SolrException
+    {
+        return this.configuredSolr.getCore(name);
     }
 }

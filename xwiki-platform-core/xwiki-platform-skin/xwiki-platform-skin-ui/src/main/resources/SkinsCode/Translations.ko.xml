@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ko">
+  <web>SkinsCode</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>SkinsCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>skin.sheet.title=피부
+skin.sheet.properties=피부 속성
+skin.sheet.deprecatedProperties=더 이상 사용되지 않는 속성
+skin.sheet.overriddenTemplates=재정의된 템플릿
+skin.sheet.addTemplate=새 재정의 템플릿 추가
+skin.sheet.add=추가하다
+skin.sheet.overrideTemplateWarning=이 섹션에서는 스킨 템플릿을 재정의할 수 있습니다. 이는 기술적인 문제이므로 결과를 알고 있어야 합니다.
+skin.sheet.deprecatedPropertiesWarning=이 섹션은 역호환성을 이유로 여기에 있습니다. 위의 '재정의된 템플릿' 메커니즘을 사용해야 합니다.
+skin.sheet.nojs=JavaScript가 없으면 이 섹션을 사용할 수 없습니다. 하지만 대신 {0}객체 편집기{1}를 사용하여 {2} 객체를 수동으로 추가할 수 있습니다.
+skin.sheet.js.deleting=삭제 중...
+skin.sheet.js.deletingDone=템플릿이 삭제되었습니다!
+skin.sheet.js.error.csrf=저장 시 CSRF 검증에 실패했습니다. 다시 시도하려면 브라우저를 새로 고치세요.
+skin.sheet.js.error.rights=권한이 부족하여 스킨을 저장하지 못했습니다.
+skin.sheet.js.deleteConfirmationText=이 템플릿을 삭제하시겠습니까?
+skin.sheet.js.deleteConfirmationYes=응, 삭제해
+skin.sheet.js.deleteConfirmationNo=아니요, 취소합니다
+skin.sheet.js.adding=첨가...
+skin.sheet.js.addingDone=템플릿이 추가되었습니다!
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.1M1
+#######################################
+skin.sheet.overridedTemplates=재정의된 템플릿
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

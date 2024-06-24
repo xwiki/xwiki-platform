@@ -241,6 +241,17 @@
   };
 
   var createEditors = function(ckeditor, container, config) {
+    if (config.editorName) {
+      // We cannot set the editor name through the editor configuration. The editor name is taken by default from the
+      // container id or name. To overcome this we set the editor name just after the editor instance is created.
+      const handler = ckeditor.on('instanceCreated', event =&gt; {
+        if (event.editor.element.$ === container[0]) {
+          event.editor.name = config.editorName;
+          handler.removeListener();
+        }
+      });
+    }
+
     container.attr({
       'data-sourceDocumentReference': XWiki.Model.serialize(config.document.documentReference),
       'data-syntax': config.document.syntax
@@ -285,6 +296,8 @@
     });
     $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
       config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
+      // Delete the document content field that is not used so that the in-place editor knows what to submit on save.
+      delete config.document[editor.mode === 'source' ? 'renderedContent' : 'content'];
       config.document.syntax = editor.config.sourceSyntax;
     });
     $(document).one('xwiki:actions:view.contentEditor', function(event, data) {

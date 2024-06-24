@@ -30,6 +30,7 @@
     #set ($entityReference = $entry.key)
     #define($elementUrl)
       #getHierarchyPathData_url($entityReference)
+      $url
     #end
     #if ($entityReference.type == 'DOCUMENT')
       #set ($translatedDocument = $xwiki.getDocument($entityReference).translatedDocument)
@@ -37,7 +38,7 @@
     #else
       #set ($entityLabel = $entityReference.name)
     #end
-    <h3>
+    <h3 class="group-title">
       <a href="$escapetool.xml($elementUrl)">
         $escapetool.xml($entityLabel)
       </a>

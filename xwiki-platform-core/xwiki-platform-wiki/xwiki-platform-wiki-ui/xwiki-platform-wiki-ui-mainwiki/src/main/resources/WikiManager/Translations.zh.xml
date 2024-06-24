@@ -141,13 +141,13 @@ platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是wiki {3}{4
 ### Missing: platform.wiki.users.join.request.cancel.label=Back
 
 ## User profile
-### Missing: platform.wiki.users.profile.joinedwikis.label=Joined wikis
-### Missing: platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
-### Missing: platform.wiki.users.profile.activity.title=Activity of wiki {0}
+platform.wiki.users.profile.joinedwikis.label=已加入的wiki
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=你还不是任何wiki的成员。
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=该用户还不是任何wiki的成员。
+platform.wiki.users.profile.activity.title={0} 的活动
 ### Missing: platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
 ### Missing: platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
-### Missing: platform.wiki.users.profile.activity.show=show activity
+platform.wiki.users.profile.activity.show=显示活动
 
 ## Wiki Deletion
 ### Missing: platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
@@ -226,7 +226,6 @@ platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是wiki {3}{4
 ### Missing: platform.wiki.create.wizard.step.previous=Previous Step
 ### Missing: platform.wiki.create.wizard.step.next=Next step
 ### Missing: platform.wiki.create.wizard.step.create=Create
-
 ### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
 ### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
 ### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
@@ -244,7 +243,7 @@ platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是wiki {3}{4
 ## XWikiServer Sheet
 ### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
 ### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
 ### Missing: platform.wiki.sheet.title.settings=Wiki properties
 ### Missing: platform.wiki.sheet.title.createnewalias=Create new alias
 ### Missing: platform.wiki.sheet.title.viewaliases=View aliases
@@ -303,5 +302,6 @@ platform.wiki.users.userAlreadyMemberOfWiki=用户 {0}{1}{2} 已经是wiki {3}{4
 ### Missing: platform.wiki.delete.confirmation.no=No, take me back!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

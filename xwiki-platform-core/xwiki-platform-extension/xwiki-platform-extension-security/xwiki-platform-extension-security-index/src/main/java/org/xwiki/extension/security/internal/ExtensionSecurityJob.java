@@ -130,7 +130,7 @@ public class ExtensionSecurityJob
     {
         ReviewsMap reviewsMap;
         try {
-            reviewsMap = this.reviewsFetcher.fetch().orElseGet(ReviewsMap::new);
+            reviewsMap = this.reviewsFetcher.fetch();
         } catch (ExtensionSecurityException e) {
             this.logger.warn("Vulnerabilities reviews fetch failed. All the security issues are going to be displayed "
                 + "without reviews. Cause: [{}]", getRootCauseMessage(e));

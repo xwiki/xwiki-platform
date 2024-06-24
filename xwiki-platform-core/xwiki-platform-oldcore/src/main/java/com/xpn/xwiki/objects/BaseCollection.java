@@ -897,7 +897,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         }
                     }
                 } else {
-                    // collision between DB and new: property to modify but does not exists in DB
+                    // collision between DB and new: property to modify but does not exist in DB
                     // Lets assume it's a mistake to fix
                     mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
 

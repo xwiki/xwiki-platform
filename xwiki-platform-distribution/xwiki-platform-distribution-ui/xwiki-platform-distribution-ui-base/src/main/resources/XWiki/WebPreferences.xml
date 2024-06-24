@@ -1232,6 +1232,30 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
+      <underline>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>underline</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>Underline links</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort>none</sort>
+        <tooltip/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>OnlyInlineLinks|Yes|No</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </underline>
       <upload_maxsize>
         <customDisplay/>
         <disabled>0</disabled>

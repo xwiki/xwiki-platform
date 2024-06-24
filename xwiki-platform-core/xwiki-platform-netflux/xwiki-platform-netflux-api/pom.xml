@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-netflux</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-netflux-api</artifactId>
   <name>XWiki Platform - Netflux - API</name>
@@ -34,7 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Netflux API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

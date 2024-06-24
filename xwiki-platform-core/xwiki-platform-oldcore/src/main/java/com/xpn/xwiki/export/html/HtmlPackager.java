@@ -408,14 +408,16 @@ public class HtmlPackager
     private void generateIndexPage(ZipOutputStream zos, XWikiContext context) throws IOException
     {
         StringBuilder builder = new StringBuilder();
-        builder.append("<!DOCTYPE HTML>\n"
-            + "<html lang=\"en-US\">\n"
-            + "    <head>\n"
-            + "        <meta charset=\"UTF-8\">\n"
-            + "        <title>Export Index</title>\n"
-            + "    </head>\n"
-            + "    <body>\n"
-            + "      <ul>\n");
+        builder.append("""
+            <!DOCTYPE HTML>
+            <html lang="en-US">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Export Index</title>
+                </head>
+                <body>
+                  <ul>
+            """);
 
         for (DocumentReference reference : this.pageReferences) {
             builder.append("        <li><a href=\"");
@@ -430,9 +432,11 @@ public class HtmlPackager
             builder.append("</a></li>\n");
         }
 
-        builder.append("      </ul>\n"
-            + "    </body>\n"
-            + "</html>\n");
+        builder.append("""
+                  </ul>
+                </body>
+            </html>
+            """);
 
         ZipEntry zipentry = new ZipEntry("index.html");
         zos.putNextEntry(zipentry);

@@ -19,10 +19,13 @@
  */
 package org.xwiki.ckeditor.test.po.image;
 
+import java.util.function.Supplier;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogTreeSelectForm;
+import org.xwiki.ckeditor.test.po.image.select.ImageDialogUploadSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.test.ui.po.BaseModal;
 
@@ -72,8 +75,7 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogTreeSelectForm switchToTreeTab()
     {
-        this.container.findElement(By.cssSelector(".image-selector a[href='#documentTree-0']")).click();
-        return new ImageDialogTreeSelectForm();
+        return switchTab(".image-selector a[href='#documentTree-0']", ImageDialogTreeSelectForm::new);
     }
 
     /**
@@ -83,8 +85,7 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogIconSelectForm switchToIconTab()
     {
-        this.container.findElement(By.cssSelector(".image-selector a[href='#iconTab-0']")).click();
-        return new ImageDialogIconSelectForm();
+        return switchTab(".image-selector a[href='#iconTab-0']", ImageDialogIconSelectForm::new);
     }
 
     /**
@@ -94,7 +95,27 @@ public class ImageDialogSelectModal extends BaseModal
      */
     public ImageDialogUrlSelectForm switchToUrlTab()
     {
-        this.container.findElement(By.cssSelector(".image-selector a[href='#urlTab-0']")).click();
-        return new ImageDialogUrlSelectForm();
+        return switchTab(".image-selector a[href='#urlTab-0']", ImageDialogUrlSelectForm::new);
+    }
+
+    /**
+     * Click on the Upload tab to switch to the upload selection form.
+     *
+     * @return an upload selection form page object
+     * @since 16.1.0RC1
+     * @since 15.10.7
+     */
+    public ImageDialogUploadSelectForm switchToUploadTab()
+    {
+        return switchTab(".image-selector a[href='#upload-0']", ImageDialogUploadSelectForm::new);
+    }
+
+    private <T> T switchTab(String cssSelector, Supplier<T> supplier)
+    {
+        By selector = By.cssSelector(cssSelector);
+        this.container.findElement(selector).click();
+        // Prevent the test from continuing before the tab is fully switched.
+        getDriver().waitUntilElementContainsAttributeValue(selector, "aria-expanded", "true");
+        return supplier.get();
     }
 }

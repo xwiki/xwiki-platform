@@ -25,7 +25,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.xwiki.component.manager.ComponentManager;
+import javax.inject.Inject;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
@@ -52,13 +56,21 @@ import com.xpn.xwiki.objects.BaseProperty;
  * @version $Id$
  * @since 9.7RC1
  */
+@Component(roles = WikiNotificationFilterDisplayer.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterDisplayer implements WikiComponent
 {
+    @Inject
     private TemplateManager templateManager;
 
+    @Inject
     private ScriptContextManager scriptContextManager;
 
-    private ComponentManager componentManager;
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    private NotificationFilterDisplayer notificationFilterDisplayer;
 
     private BaseObjectReference objectReference;
 
@@ -71,27 +83,21 @@ public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterD
     private String componentHint;
 
     /**
-     * Constructs a new {@link WikiNotificationFilterDisplayer}.
+     * Initialize a new {@link WikiNotificationFilterDisplayer}.
      *
      * @param authorReference the author reference of the document
-     * @param componentManager the {@link ComponentManager} to use
      * @param baseObject the XObject which has the required properties to instantiate the component
      * @throws NotificationException if the properties of the given BaseObject could not be loaded
      */
-    public WikiNotificationFilterDisplayer(DocumentReference authorReference, ComponentManager componentManager,
-            BaseObject baseObject)
+    public void initialize(DocumentReference authorReference, BaseObject baseObject)
             throws NotificationException
     {
         this.objectReference = baseObject.getReference();
-        this.componentManager = componentManager;
         this.authorReference = authorReference;
 
         try {
-            // Extract the templateManager and the scriptContextManager
-            templateManager = componentManager.getInstance(TemplateManager.class);
-            scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
-
             // Extract the supported displayer filters from the given baseObject
+            //noinspection unchecked
             supportedFilters = new HashSet<String>(
                     baseObject.getListValue(WikiNotificationFilterDisplayerDocumentInitializer.SUPPORTED_FILTERS));
 
@@ -104,8 +110,6 @@ public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterD
             if (property != null && property.getValue() != null) {
                 String xObjectTemplate = property.getValue().toString();
                 if (!StringUtils.isBlank(xObjectTemplate)) {
-                    EntityReferenceSerializer<String> serializer =
-                        componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
                     filterTemplate = templateManager.createStringTemplate(serializer.serialize(property.getReference()),
                         xObjectTemplate, getAuthorReference(), baseObject.getDocumentReference());
                 }
@@ -113,7 +117,7 @@ public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterD
 
         } catch (Exception e) {
             throw new NotificationException(
-                    String.format("Unable to construct a new WikiNotificationFilterDisplayer from"
+                    String.format("Unable to initialize a new WikiNotificationFilterDisplayer from"
                                     + " the base object [%s]", baseObject), e);
         }
     }
@@ -146,8 +150,7 @@ public class WikiNotificationFilterDisplayer extends AbstractNotificationFilterD
         try {
             // If we have no template defined, fallback on the default displayer.
             if (filterTemplate == null) {
-                return ((NotificationFilterDisplayer) componentManager.getInstance(NotificationFilterDisplayer.class))
-                    .display(filter, preference);
+                return this.notificationFilterDisplayer.display(filter, preference);
             }
 
             return templateManager.execute(filterTemplate);

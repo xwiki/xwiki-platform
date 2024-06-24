@@ -42,6 +42,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import org.xwiki.text.StringUtils;
@@ -101,11 +102,18 @@ class LiveDataIT
 
     private static final String CANCELED_BIRTHDAY_DATETIME = "11/05/2021 16:00:10";
 
+    private static final String IS_ACTIVE_COLUMN = "isActive";
+
+    private static final String YES = "Yes";
+    private static final String NO = "No";
+
     private static final String DOC_TITLE_COLUMN = "doc.title";
 
     private static final String FOOTNOTE_COMPUTED_TITLE =
         "(1) Some pages have a computed title. Filtering and sorting by title will not work as expected for these "
             + "pages.";
+
+    public static final String ACTIONS_COLUMN = "_actions";
 
     /**
      * Test the view and edition of the cells of a live data in table layout with a liveTable source. Creates an XClass
@@ -127,28 +135,16 @@ class LiveDataIT
 
         initLocalization(testUtils, testReference);
 
-        String className = testUtils.serializeReference(testReference);
-
         // Initializes the page content.
-        createClassNameLiveDataPage(testUtils, testReference);
+        List<String> properties =
+            List.of(NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, IS_ACTIVE_COLUMN, DOC_TITLE_COLUMN);
+        createClassNameLiveDataPage(testUtils, testReference, properties, "");
 
         // Creates the XClass.
         createXClass(testUtils, testReference);
 
         // Creates corresponding XObjects.
-        DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
-        testUtils.createPage(o1, "", "O1");
-        addXObject(testUtils, o1, className,
-            NAME_LYNDA, CHOICE_A, "U1");
-        DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
-        // Make 02 not viewable by guests to test the footnotes.
-        testUtils.setRights(o2, null, "XWiki.XWikiGuest", "view", false);
-        addXObject(testUtils, o2, className,
-            NAME_ESTHER, CHOICE_B, "U2");
-        DocumentReference o3 = new DocumentReference("O3", (SpaceReference) testReference.getParent());
-        // Set a localized title on O3 to test the footnotes.
-        testUtils.createPage(o3, "", "$services.localization.render('computedTitle')");
-        addXObject(testUtils, o3, className, NAME_NIKOLAY, "", null);
+        createXObjects(testUtils, testReference);
 
         testUtils.gotoPage(testReference);
 
@@ -180,6 +176,8 @@ class LiveDataIT
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_B);
         tableLayout.assertRow(CHOICE_COLUMN, CHOICE_C);
         tableLayout.assertRow(BIRTHDAY_COLUMN, BIRTHDAY_DATETIME);
+        tableLayout.assertRow(IS_ACTIVE_COLUMN, YES);
+        tableLayout.assertRow(IS_ACTIVE_COLUMN, NO);
         // The canceled birthday date shouldn't appear on the table since it has been canceled. 
         tableLayout
             .assertRow(BIRTHDAY_COLUMN, not(hasItem(tableLayout.getWebElementTextMatcher(CANCELED_BIRTHDAY_DATETIME))));
@@ -244,6 +242,52 @@ class LiveDataIT
         assertEquals(1, suggestionElements.size());
         assertEquals(CHOICE_T, suggestionElements.get(0).getValue());
         assertEquals(CHOICE_T_TRANSLATION, suggestionElements.get(0).getLabel());
+
+        // Test filter on boolean values
+        suggestInputElement.clear().hideSuggestions();
+        liveDataElement.waitUntilReady();
+        assertEquals(2, tableLayout.countRows());
+
+        // Take the focus on the is active filter.
+        suggestInputElement = new SuggestInputElement(tableLayout.getFilter(IS_ACTIVE_COLUMN));
+        suggestInputElement.sendKeys(Boolean.TRUE.toString());
+        suggestInputElement.waitForSuggestions();
+        suggestionElements = suggestInputElement.getSuggestions();
+        assertEquals(1, suggestionElements.size());
+        suggestionElements.get(0).select();
+        liveDataElement.waitUntilReady();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        suggestInputElement.clear();
+        suggestInputElement.sendKeys(Boolean.FALSE.toString());
+        suggestInputElement.waitForSuggestions();
+        suggestionElements = suggestInputElement.getSuggestions();
+        assertEquals(1, suggestionElements.size());
+        suggestionElements.get(0).select();
+        liveDataElement.waitUntilReady();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
+
+        suggestInputElement.clear().hideSuggestions();
+        liveDataElement.waitUntilReady();
+        assertEquals(2, tableLayout.countRows());
+    }
+
+    private void createXObjects(TestUtils testUtils, TestReference testReference)
+    {
+        String className = testUtils.serializeReference(testReference);
+        DocumentReference o1 = new DocumentReference("O1", (SpaceReference) testReference.getParent());
+        testUtils.createPage(o1, "", "O1");
+        addXObject(testUtils, o1, className, NAME_LYNDA, CHOICE_A, "U1", true);
+        DocumentReference o2 = new DocumentReference("O2", (SpaceReference) testReference.getParent());
+        // Make 02 not viewable by guests to test the footnotes.
+        testUtils.setRights(o2, null, "XWiki.XWikiGuest", "view", false);
+        addXObject(testUtils, o2, className, NAME_ESTHER, CHOICE_B, "U2", false);
+        DocumentReference o3 = new DocumentReference("O3", (SpaceReference) testReference.getParent());
+        // Set a localized title on O3 to test the footnotes.
+        testUtils.createPage(o3, "", "$services.localization.render('computedTitle')");
+        addXObject(testUtils, o3, className, NAME_NIKOLAY, "", null, false);
     }
 
     /**
@@ -276,6 +320,43 @@ class LiveDataIT
         assertEquals(Set.of("100", "25", "15", "50"), tableLayout.getPaginationSizes());
     }
 
+    @Test
+    @Order(3)
+    void asyncAction(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference.getLastSpaceReference(), true);
+
+        List<String> properties = List.of(NAME_COLUMN, ACTIONS_COLUMN);
+        createClassNameLiveDataPage(testUtils, testReference, properties, """
+            {
+              "meta": {
+                "actions": [{
+                    "id": "delete",
+                    "async": {
+                      "httpMethod": "POST",
+                      "loadingMessage": "Loading",
+                      "successMessage": "Delete Success",
+                      "failureMessage": "Failed",
+                      "body": "newBacklinkTarget=&updateLinks=false&autoRedirect=false&form_token=${services.csrf.token}&confirm=1&async=true",
+                      "headers": {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                      }
+                    }
+                  }]
+              }
+            }
+            """);
+        createXClass(testUtils, testReference);
+        createXObjects(testUtils, testReference);
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        TableLayoutElement tableLayout = new LiveDataElement("test").getTableLayout();
+        assertEquals(3, tableLayout.countRows());
+        tableLayout.clickAction(1, "delete");
+        viewPage.waitForNotificationSuccessMessage("Delete Success");
+        assertEquals(2, tableLayout.countRows());
+    }
+
     private void initLocalization(TestUtils testUtils, TestReference testReference) throws Exception
     {
         DocumentReference translationDocumentReference =
@@ -301,7 +382,7 @@ class LiveDataIT
      * @param username the username of the user field (e.g., {@code "U1"})
      */
     private void addXObject(TestUtils testUtils, DocumentReference documentReference, String className, String name,
-        String choice, String username)
+        String choice, String username, boolean isActive)
     {
         Map<String, Object> properties = new HashMap<>();
         properties.put(NAME_COLUMN, name);
@@ -309,6 +390,7 @@ class LiveDataIT
         if (username != null) {
             properties.put(USER_COLUMN, "XWiki." + username);
         }
+        properties.put(IS_ACTIVE_COLUMN, isActive);
         testUtils.addObject(documentReference, className, properties);
     }
 
@@ -331,23 +413,22 @@ class LiveDataIT
         classEditPage.clickSaveAndView();
         testUtils.addClassProperty(testReference, BIRTHDAY_COLUMN, "Date");
         testUtils.addClassProperty(testReference, USER_COLUMN, "Users");
+        testUtils.addClassProperty(testReference, IS_ACTIVE_COLUMN, "Boolean");
     }
 
-    private void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference)
-        throws Exception
+    private static void createClassNameLiveDataPage(TestUtils testUtils, TestReference testReference,
+        List<String> properties, String body) throws Exception
     {
         TestUtils.RestTestUtils rest = testUtils.rest();
         Page page = rest.page(testReference);
-        String properties =
-            StringUtils.joinWith(",", NAME_COLUMN, CHOICE_COLUMN, BIRTHDAY_COLUMN, USER_COLUMN, DOC_TITLE_COLUMN);
         page.setContent("{{velocity}}\n"
             + "{{liveData\n"
             + "  id=\"test\"\n"
-            + "  properties=\"" + properties + "\"\n"
+            + "  properties=\"" + String.join(",", properties) + "\"\n"
             + "  source=\"liveTable\"\n"
             + "  sourceParameters=\"translationPrefix=&className=" + testUtils.serializeReference(
             testReference.getLocalDocumentReference()) + "\"\n"
-            + "}}{{/liveData}}\n"
+            + "}}" + body + "{{/liveData}}\n"
             + "{{/velocity}}");
         rest.save(page);
     }

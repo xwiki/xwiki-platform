@@ -1,0 +1,1 @@
+org.xwiki.administration.api.ConfigurableObjectEvaluator

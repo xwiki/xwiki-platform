@@ -48,7 +48,7 @@ public class ConfirmationPage extends ViewPage
      */
     public void clickYes()
     {
-        this.yesButton.click();
+        getDriver().scrollTo(this.yesButton).click();
     }
 
     /**
@@ -56,7 +56,7 @@ public class ConfirmationPage extends ViewPage
      */
     public void clickNo()
     {
-        this.noButton.click();
+        getDriver().scrollTo(this.noButton).click();
     }
 
     /**

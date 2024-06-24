@@ -1,0 +1,241 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxLinks" locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxLinks</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxLinks</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 편집 중 =
+
+== 링크 ==
+
+=== 1.0 링크 ===
+
+|=(% style="width:20%" %)Feature|= XWiki 구문 1.0|=(% style="width:20%" %)결과
+|현재 스페이스의 페이지 링크|{{{[WebHome]}}}|[[웹 홈&gt;&gt;웹홈]]
+|라벨이 있는 링크|{{{[label&gt;WebHome]}}}|[[label&gt;&gt;WebHome]]
+| 레이블 의 XWiki 구문 에 대한 링크 |{{{&lt;a href="$ xwiki .getURL("WebHome")"&gt;&lt;strong&gt;굵은 레이블&lt;/strong&gt;&lt;/a&gt;}}}|[[**bold 라벨**&gt;&gt;웹홈]]
+|공백이 지정된 페이지로 링크|{{{[Main.WebHome]}}}|[[웹 홈&gt;&gt;Main.WebHome]]
+|하위위키 링크|{{{[subwiki:Main.WebHome]}}}|[[웹 홈&gt;&gt; xwiki :Main.WebHome]]
+|새 창에서 열리는 링크|{{{[label&gt;WebHome&gt;_blank]}}}|[[label&gt;&gt;WebHome||target="_blank"]]
+| 텍스트에서 직접 URL 에 연결 |{{{ URL 은 https:// xwiki .org입니다.}}}|URL은 https :// xwiki .org 입니다.
+| URL 링크 |{{{[https:// xwiki .org]}}}|[[https:// xwiki .org]]
+| 라벨이 있는 URL 에 대한 링크 |{{{[ XWiki &gt;https:// xwiki .org]}}}|[[ XWiki &gt;&gt;https:// xwiki .org]]
+|이메일 주소 링크|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|이미지 링크|{{{ &lt;a href="$ xwiki .getURL("Space1.Page1")"&gt; {image:img.png|document=Space2.Page2}&lt;/a&gt;}}}|[[이미지: XWiki .XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|이미지 매개변수가 포함된 이미지 링크|{{{ &lt;a href="$ xwiki .getURL("Space1.Page1")"&gt; {image:img.png|document=Space2.Page2|width=26|height=26}&lt; /a&gt;}}}|[[[[image: XWiki .XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|현재 페이지의 첨부파일 링크|(((
+{{info}}[[매크로 첨부&gt;&gt;https://extensions를 참조하세요. xwiki .org/ xwiki /bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] 자세한 내용은{{/info}}
+{{{{attach:text|file=img.png}}}}
+)))|[[텍스트&gt;&gt;첨부: XWiki .XWikiSyntaxLinks@img.png]]
+|다른 페이지의 첨부파일 링크|(((
+{{info}}[[매크로 첨부&gt;&gt;https://extensions를 참조하세요. xwiki .org/ xwiki /bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] 자세한 내용은{{/info}}
+{{{{attach:text|document=Space.Page|file=img.png}}}}
+)))|[[텍스트&gt;&gt;첨부: XWiki .XWikiSyntaxLinks@img.png]]
+|페이지의 앵커에 대한 링크|{{{[label&gt;Space.Page#anchor]}}}|[[label&gt;&gt; XWiki .XWikiSyntax||anchor=anchor]]
+|페이지의 제목에 대한 링크|(((
+{{{[라벨&gt;Space.Page#HMyheading]}}}
+)))|[[레이블&gt;&gt; XWiki .XWikiSyntax||anchor=HMyheading]]
+
+{{info}}제목을 추가하면 "H"라는 앵커와 그 뒤에 알파벳 문자만 포함된 제목 제목이 생성됩니다. 예를 들어 'My header'라는 제목의 경우 생성된 앵커는 'HMyheading'이 됩니다.{{/info}}
+
+{{velocity}}$subHeading XWiki 구문 1.0 링크 사양 $subHeading{{/velocity}}
+
+{{정보}}
+##( )## 부분은 필수이고 ##[ ]## 부분은 선택 사항이며 선택 부분을 사용하는 경우 ##{ }##의 두 문자 중 하나를 추가해야 합니다.
+{{/정보}}
+
+링크의 전체 형식은 **##[라벨 {&gt; 또는 |}](자원) [@interWikiAlias] [{&gt; 또는 |} 대상]##**입니다.
+
+* **##label##**: 렌더링 시 사용자에게 링크 이름으로 표시되는 선택적 문자열입니다. 예: ##내 페이지##
+* **##resource##**: 다음 구문을 사용하는 전체 링크 참조: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: 링크 참조입니다. 이는 다음 중 하나일 수 있습니다.
+*** ****##protocol:path##** 형식의 URI**(예: ##http:~/~/ xwiki .org##, ##mailto~:john@smith.com ##), 또는
+*** **위키 페이지** 형식 **##~[~[wikiName:] spaceNameList.] (페이지 이름)##** 형식의 참조입니다. 예: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 링크는 해당 위키 내부의 페이지를 가리킵니다. 예: ##mywiki##
+**** **##spaceNameList##**: 선택적으로 점으로 구분된 Wiki Space 이름 목록입니다. 공간을 지정하지 않으면 현재 공간이 사용됩니다. 예: ##메인##, ##AB##, ##ABC##
+**** **##pageName##**: 링크된 위키 페이지의 이름을 포함하는 필수 문자열입니다. 예: ##웹홈##
+** **##queryString##**: 렌더링된 URL 에 사용될 매개변수를 지정하기 위한 선택적 쿼리 문자열입니다 . 예: ##mydata1=5&amp;mydata2=안녕하세요##
+** **##anchor##**: 참조된 링크에 정의된 앵커를 가리키는 선택적 앵커 이름입니다. XWiki 에서는 제목에 대한 앵커가 자동으로 생성됩니다. 예: ##HTableOfContents##
+* **##interWikiAlias##**: InterWiki 맵에 정의된 선택적 [[InterWiki&gt;&gt;en.wikipedia.org/wiki/InterWiki]] 별칭([[관리 가이드&gt;&gt;https:// www 참조) . xwiki .org/ xwiki /bin/view/ 문서 /AdminGuide/]]). 이는 위키 페이지 이름에만 유효합니다. 예: ##위키피디아##
+* **##target##**: HTML ##A## 링크 요소 의 Hhttps://TML ##target## 속성에 해당하는 선택적 문자열입니다 . 이 요소는 링크를 렌더링할 때 사용됩니다. 기본값은 현재 창에서 링크를 여는 것입니다. 예: ##_self##, ##_blank##
+
+=== 2.0 링크 ===
+
+|=(% style="width:20%" %)Feature|= XWiki 구문 2.0|=(% style="width:20%" %)결과
+|현재 스페이스의 페이지 링크|{{{[[WebHome]]}}}|[[WebHome]]
+|라벨이 있는 링크|(((
+{{{[[라벨&gt;&gt;웹홈]]}}}
+{{info}} XWiki 구문은 링크 라벨 내에서 지원됩니다.{{/info}}
+)))|[[레이블&gt;&gt;웹홈]]
+| 레이블의 XWiki 구문 에 대한 링크 |{{{[[**굵은 레이블**&gt;&gt;웹홈]]}}}|[[**굵은 레이블**&gt;&gt;웹홈]]
+|공백이 지정된 페이지로 링크|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
+|하위위키 링크|{{{[[subwiki:Main.WebHome]]}}}|[[ xwiki :Main.WebHome]]
+|새 창에서 열리는 링크|{{{[[label&gt;&gt;WebHome||target="_blank"]]}}}|[[label&gt;&gt;WebHome||target="_blank"]]
+| 텍스트에서 직접 URL 에 연결 |{{{ URL 은 https:// xwiki .org입니다.}}}|URL은 https :// xwiki .org 입니다.
+| URL 링크 |{{{[[https:// xwiki .org]]}}}|[[https:// xwiki .org]]
+|라벨이 있는 URL 에 대한 링크 |{{{[[ XWiki &gt;&gt;https:// xwiki .org]]}}}|[[ XWiki &gt;&gt;https:// xwiki .org]]
+|이메일 주소 링크|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|이미지 링크|{{{[[image:Space2.Page2@img.png&gt;&gt;Space1.Page1]]}}}|[[image: XWiki .XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|이미지 매개변수가 포함된 이미지 링크|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[ [[이미지: XWiki .XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|현재 페이지의 첨부 파일 링크|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach: XWiki .XWikiSyntaxLinks@img.png]]
+|다른 페이지의 첨부 파일 링크|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach: XWiki .XWikiSyntaxLinks@img.png]]
+|페이지의 앵커에 대한 링크|{{{[[label&gt;&gt;Space.Page#anchor]]}}}|[[label&gt;&gt; XWiki .XWikiSyntax||anchor="anchor"]]
+|페이지의 제목에 대한 링크|{{{[[label&gt;&gt;Space.Page#HMyheading]]}}}|[[label&gt;&gt; XWiki .XWikiSyntax||anchor="HMyheading"]]
+|현재 페이지의 앵커에 대한 링크|{{{[[label&gt;&gt;#anchor]]}}}|[[label&gt;&gt;||anchor="anchor"]]
+
+{{info}}제목을 추가하면 "H"라는 앵커와 그 뒤에 알파벳 문자만 포함된 제목 제목이 생성됩니다. 예를 들어 'My header'라는 제목의 경우 생성된 앵커는 'HMyheading'이 됩니다.{{/info}}
+
+{{velocity}}$subHeading XWiki 구문 2.0 링크 사양 $subHeading{{/velocity}}
+
+{{정보}}
+##( )## 부분은 필수이고 ##[ ]## 부분은 선택사항입니다.
+{{/정보}}
+
+링크의 전체 형식은 **##[label&gt;&gt;](자원) [@interWikiAlias] [||매개변수]##**입니다.
+
+* **##label##**: 렌더링 시 사용자에게 링크 이름으로 표시되는 선택적 문자열입니다. 레이블에는 XWiki 구문이 포함될 수 있습니다. 라벨을 지정하지 않으면 기본 라벨이 생성됩니다. 생성 패턴은 변경할 수 있으며, [[관리자 가이드&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ 문서 /AdminGuide/]]. 예: ##내 페이지##
+* **##resource##**: 다음 구문을 사용하는 전체 링크 참조: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: 다음 형식 중 하나의 링크 참조입니다.
+*** ** URL **: **##protocol:~/~/path##** 형식의 모든 URL 입니다. 예: ##http:~/~/ xwiki .org##, ##https:~/~/svn. xwiki.org/## _
+*** **Wiki 페이지** 형식은 **##~[~[wikiName:] spaceNameList.] (pageName)##** 형식입니다. 예: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 링크는 해당 위키 내부의 페이지를 가리킵니다. 예: ##mywiki##
+**** **##spaceNameList##**: 선택적으로 점으로 구분된 Wiki Space 이름 목록입니다. 공간을 지정하지 않으면 현재 공간이 사용됩니다. 예: ##메인##, ##AB##, ##ABC##
+**** **##pageName##**: 링크된 위키 페이지의 이름을 포함하는 필수 문자열입니다. 예: ##웹홈##
+*** **첨부파일** 참조 형식은 **##attach~: [wikiPageName@] (attachmentName)##**입니다. 예: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
+**** **##attach~:##** 리소스를 첨부 파일로 식별하는 필수 문자열입니다.
+**** **##wikiPageName##**: 첨부 파일이 포함된 페이지를 참조하는 선택적 문자열입니다. 위의 "Wiki 페이지"를 참조하세요.
+**** **##attachmentName##**: 위키에 저장된 첨부 파일의 이름입니다.
+*** **이메일 주소** **##mailto~: (emailAddress)##** 형식(###anchor##은 유효하지 않음). 예: ##mailto~:john@smith.com##
+**** **##mailto~:##** 리소스를 이메일로 식별하는 필수 문자열입니다.
+**** **##emailAddress##**: 대상 이메일 주소입니다. 예: "##john@smith.com##"
+** **##queryString##**: 렌더링된 URL 에 사용될 매개변수를 지정하기 위한 선택적 쿼리 문자열입니다 . 예: ##mydata1=5&amp;mydata2=안녕하세요##
+** **##anchor##**: 참조된 링크에 정의된 앵커를 가리키는 선택적 앵커 이름입니다. XWiki 에서는 제목과 이미지에 대한 앵커가 자동으로 생성됩니다. 예: ##HTableOfContents##
+* **##interWikiAlias##**: InterWiki 맵에 정의된 선택적 [[InterWiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]] 별칭([[관리 가이드&gt;&gt; 참조) .https ://www.xwiki.org/xwiki/bin/view/ 문서 / AdminGuide / ] ]) . 이는 위키 페이지 이름에만 유효합니다. 예: ##위키피디아##
+* **##parameters##**: 링크에 전달되는 선택적 매개변수 목록입니다. 예: ##target="~_blank"##(새 창에서 열기)
+
+=== 2.1 링크 ===
+
+|=기능|= XWiki 구문 2.1|=결과
+|##PageA##에 위치한 ##PageB## 페이지에 대한 절대 링크|{{{[[PageA.PageB]]}}}|[[PageB&gt;&gt;]
+|현재 페이지의 ##PageA## 페이지에 대한 상대 링크|{{{[[PageA]]}}} 또는 {{{[[.PageA]]}}}|[[PageA&gt;&gt;]]
+|현재 페이지의 ##PageA##에 있는 ##PageB## 페이지에 대한 관련 링크|
+|라벨이 있는 링크|(((
+{{{[[라벨&gt;&gt;페이지A]]}}}
+
+{{info}} XWiki 구문은 링크 라벨 내에서 지원됩니다.{{/info}}
+)))|[[라벨&gt;&gt;]]
+|레이블에 위키 구문이 있는 링크|{{{[[**굵은 레이블**&gt;&gt;페이지A]]}}}|[[**굵은 레이블**&gt;&gt;]]
+이미지: XWiki .XWikiSyntaxLinks@img.png&gt;&gt;]
+|위키 ##WikiA##|{{{[[WikiA:PageA.PageB]]}}}|[[PageB&gt;&gt;] 위키의 ##PageA##에 위치한 ##PageB## 페이지에 대한 절대 링크
+|새 창에서 열리는 링크|{{{[[PageA||target="_blank"]]}}}|[[PageA&gt;&gt;]]
+| URL 에 대한 암시적 링크 |{{{URL은 https :// xwiki .org입니다.}}}|URL은 https :// xwiki .org 입니다.
+| URL 에 대한 명시적 링크 |{{{[[https:// xwiki .org]]}}}|[[https:// xwiki .org]]
+|레이블이 있는 URL 에 대한 명시적 링크 |{{{[[ XWiki &gt;&gt;https:// xwiki .org]]}}}|[[ XWiki &gt;&gt;https:// xwiki .org]]
+|이메일 주소 링크|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|현재 페이지의 첨부파일 링크|{{{[[attach:img.png]]}}}|[[img.png&gt;&gt;]]
+|다른 페이지의 첨부파일 링크|{{{[[attach:PageA.PageB@img.png]]}}}|[[img.png&gt;&gt;]]
+|페이지의 앵커에 대한 링크|{{{[[PageA.PageB||anchor="anchor"]]}}}|[[PageB&gt;&gt;]]
+|페이지의 제목에 대한 링크|(((
+{{{[[PageA.PageB||anchor="HMyheading"]]}}}
+
+{{info}}제목을 추가하면 "H"라는 앵커와 그 뒤에 알파벳 문자만 포함된 제목 제목이 생성됩니다. 예를 들어 'My header'라는 제목의 경우 생성된 앵커는 'HMyheading'이 됩니다.{{/info}}
+)))|[[페이지B&gt;&gt;]]
+|현재 페이지의 앵커에 대한 링크|{{{[[label&gt;&gt;||anchor="anchor"]]}}}|[[label&gt;&gt;]]
+|쿼리 문자열이 있는 페이지에 링크|{{{[[PageA.PageB||queryString="param1=value1¶m2=value2"]]}}}|[[PageB&gt;&gt;]]
+|쿼리 문자열을 사용하여 현재 페이지에 연결|{{{[[label&gt;&gt;||queryString="param1=value1¶m2=value2"]]}}}|[[label&gt;&gt;]]
+
+{{velocity}}$subHeading XWiki 구문 2.1 링크 사양 $subHeading{{/velocity}}
+
+{{정보}}
+범례: ##()## 부분은 필수이고 ##[]## 부분은 선택사항입니다.
+{{/정보}}
+
+링크의 전체 형식은 **##[라벨&gt;&gt;](리소스) [||매개변수]##**입니다.
+
+* **##label##**: 렌더링 시 사용자에게 링크 이름으로 표시되는 선택적 문자열입니다. 레이블에는 XWiki 구문이 포함될 수 있습니다. 라벨을 지정하지 않으면 기본 라벨이 생성됩니다. 생성 패턴은 변경할 수 있으며, [[관리자 가이드&gt;&gt;https://www. xwiki .org/ xwiki /bin/view/ 문서 /AdminGuide/]]. 예: ##내 페이지##
+* **##resource##**: 다음 형식 중 하나의 링크 참조가 포함된 필수 문자열
+** ** URL **: **##[ url :](프로토콜:~/~/경로)##** 형식의 모든 URL 입니다. 예: ##http:~/~/ xwiki .org##, ## url :https:~/~/svn. xwiki.org/## _
+*** **## url :##** 리소스를 URL 로 식별하는 선택적 문자열입니다 .
+*** **##protocol:~/~/path##**: URL 자체
+** **Wiki 페이지**: **##page:[(wikiName):](pageNameList)##** 형식의 참조입니다. 예: ##page:Page##, ##page:myxwiki:Page##, ##page:ParentPage.ChildPage.SubChildPage##, ##page:../SiblingPage##, ##page:./ChildPage ##
+*** **##page:##** 리소스를 XWiki 페이지로 식별하는 필수 문자열입니다. 터미널 또는 비터미널 페이지에 동일한 참조를 사용할 수 있습니다. 둘 다 존재하는 경우 비터미널 페이지로 연결됩니다.
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 링크는 그 안에 있는 페이지를 가리킵니다.  위키. Wiki를 지정하지 않으면 현재 Wiki가 사용됩니다. 예: ##mywiki##
+*** **##pageNameList##**: 최종 연결된 위키 페이지 구문을 가리키는 슬래시로 구분된 위키 페이지 이름의 필수 목록입니다. 현재 또는 상위 페이지/위키를 나타내기 위해 ##.## 및 ##..##을 사용하는 것도 가능합니다. 예: ##Main##, ##A/B##, ##A/B/C##, ##../Sibling##, ##./Child##
+** **Wiki 문서**: **##[doc:]~[~[(wikiName):](spaceNameList).](documentName)##** 형식의 참조입니다. 예: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##, ##Welcome##
+*** **##doc:##** 리소스를 XWiki 터미널 페이지로 식별하는 선택적 문자열입니다. 비터미널 페이지도 이 방법으로 참조할 수 있지만 ##.WebHome## 부분을 추가해야 합니다(예: ##doc:Sandbox.WebHome##).
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 링크는 해당 위키 내부의 페이지를 가리킵니다. Wiki를 지정하지 않으면 현재 Wiki가 사용됩니다. 예: ##mywiki##.
+*** **##spaceNameList##**: 선택적으로 점으로 구분된 위키 스페이스 이름 목록입니다. 공간을 지정하지 않으면 현재 공간이 사용됩니다. 예: ##메인##, ##AB##, ##ABC##
+*** **##documentName##**: 링크된 위키 페이지의 이름을 포함하는 필수 문자열입니다. 예: ##환영합니다##
+** **Wiki 공간**: **##space:[(wikiName):](spaceNameList)##** 형식의 참조입니다. 예: ##space:Main##, ##space:mywiki:Main##, ##space:ABC##
+*** **##space:##** 리소스를 XWiki 비터미널 페이지(예: 공백) 로 식별하는 필수 문자열입니다 .
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 링크는 해당 위키 내부의 페이지를 가리킵니다. Wiki를 지정하지 않으면 현재 Wiki가 사용됩니다. 예: ##mywiki##
+*** **##spaceNameList##**: 최종 연결된 위키 스페이스(또는 비터미널 페이지)를 가리키는 점으로 구분된 위키 스페이스 이름의 필수 목록입니다. 예: ##메인##, ##AB##, ##ABC##
+** **InterWiki 페이지**: **##interwiki:[(interWikiAlias):](pageName)##** 형식의 참조입니다. 예: ##interwiki:wikipedia: XWiki ##
+*** **##interwiki:##** 리소스를 InterWiki 링크로 식별하는 필수 문자열입니다.
+*** **##interWikiAlias##**: InterWiki 맵에 정의된 선택적 [[InterWiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]] 별칭([[관리 가이드] 참조) . &gt;&gt;https://www.xwiki .org / xwiki /bin/view/ 문서 /AdminGuide/]]). 예: ##위키피디아##
+*** **##pageName##**: 링크된 페이지의 이름을 포함하는 필수 문자열입니다. 예: ## XWiki ##
+** **첨부 파일**: **##attach~:~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##** 형식의 참조
+*** **##attach~:##** 참조를 XWiki 문서 첨부로 식별하는 필수 문자열입니다.
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 이미지 참조는 해당 위키 내부 페이지에 첨부된 이미지를 가리킵니다. Wiki를 지정하지 않으면 현재 Wiki가 사용됩니다. 예: ##mywiki##.
+*** **##spaceNameList##**: 선택적으로 점으로 구분된 위키 스페이스 이름 목록입니다. 공간을 지정하지 않으면 현재 공간이 사용됩니다. 예: ##메인##, ##AB##, ##ABC##
+*** **##pageName##**: 참조된 이미지가 첨부된 위키 페이지의 이름을 포함하는 선택적 문자열입니다. 예: ##환영합니다##
+*** **##attachmentName##**: 위키에 저장된 첨부 파일의 이름입니다. 예: ##photo.png##
+** **페이지 첨부**: **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##** 형식의 참조
+*** **##pageAttach~:##** 참조를 XWiki 페이지 첨부 로 식별하는 필수 문자열입니다 .
+*** **##wikiName##**: 위키 이름을 포함하는 선택적 문자열입니다. 이미지 참조는 해당 위키 내부 페이지에 첨부된 이미지를 가리킵니다. Wiki를 지정하지 않으면 현재 Wiki가 사용됩니다. 예: ##mywiki##.
+*** **##pageNameList##**: 선택적으로 점으로 구분된 위키 페이지 이름 목록입니다. 페이지가 지정되지 않으면 현재 페이지가 사용됩니다. 예: ##메인##, ##A/B##, ##A/B/C##
+*** **##attachmentName##**: 위키에 저장된 첨부 파일의 이름입니다. 예: ##photo.png##
+** **이메일 주소**: **##mailto{{{:(}}}emailAddress)##** 형식의 참조입니다(###anchor##은 유효하지 않습니다). 예: ##mailto~:john@smith.com##
+*** **##mailto~:##** 리소스를 이메일로 식별하는 필수 문자열입니다.
+*** **##emailAddress##**: 대상 이메일 주소입니다. 예: ##john@smith.com##
+** **상대 경로**: **##path{{{:(}}}relPath)##** 형식의 서버 참조입니다. 예: ##path:$doc.getURL('reset')##은 대상 주소를 생성합니다. ##http:~/~/server.domain.com/ xwiki /bin/reset/Space/Page## 여기서 ##/ xwiki /bin/reset/Space/Page##는 ##$doc.getURL('reset')##에 의해 생성됩니다.
+*** **##path:##** 리소스를 상대 경로로 식별하는 필수 문자열입니다.
+*** **##relPath##**: 연결할 서버의 리소스에 대한 상대 경로를 포함하는 필수 문자열입니다.
+** **UNC(Windows 탐색기)**: **##unc{{{:(}}}path)##** 형식의 참조입니다. 링크는 ##file:~/~/## 링크로 렌더링됩니다. 예: ##unc:C:Windows##, ##unc:~~myserverpathimg.png##, ##unc:home/user/somefile##
+*** **##unc:##** 리소스를 UNC(Windows 탐색기) 경로로 식별하는 필수 문자열입니다.
+*** **##path##**: 사용자가 접근할 수 있는 리소스의 로컬 경로를 포함하는 필수 문자열입니다. 예: ##C:Windows##, ##~~myserverpathimg.png##, ##home/user/somefile##
+** **유형이 지정되지 않음**: 위에서 언급한 리소스 유형 중 어느 것도 지정되지 않은 경우(즉, 링크에 ##type:## 리소스 접두사가 지정되지 않은 경우) 링크는 XWiki 터미널 에 대한 링크로 처리됩니다. 또는 다음 알고리즘을 사용하는 비터미널 페이지:
+*** **##터미널 페이지##** 현재 공간에 //있는 경우에만//. 예: ##~[~[A]]##은 ##~[~[doc:currentSpace.A]]##과 동일하게 해석됩니다.
+*** **##비터미널 페이지##**  현재 공간에서. 예: ##~[~[A]]##은 ##~[~[space:currentSpace.A]]##과 동등한 것으로 해석됩니다. 이는 ##~[~[doc:currentSpace. A.웹홈]]##
+*** 현재 페이지가 비터미널 페이지이고 위의 이전 2개 검사에서 기존 페이지를 찾지 못한 경우 2개의 추가 검사가 수행됩니다.
+**** **##터미널 페이지##**는 상위 공간의 형제로 //존재하는 경우에만//입니다. 예: 비터미널 페이지 ##AC## 내부의 ##~[~[B]]## 링크는 ##~[~[doc:AB]]##에 해당하는 것으로 확인됩니다.
+**** **##비터미널 페이지##** 존재 여부에 관계없이 상위 공간의 형제 페이지입니다. 예: 비터미널 페이지 ##AC## 내부의 ##~[~[B]]## 링크는 ##~[~[space:AB]]##과 동등한 것으로 해석됩니다. ~[~[doc:ABWebHome]]##
+*** //참고1 - 절대 링크//: 유형이 지정되지 않은 링크에 점으로 구분된 구성 요소가 2개 이상 지정된 경우(예: 공백 이름 및 페이지 이름처럼 보임) 위 알고리즘은 현재 링크를 기준으로 페이지를 확인합니다. 현재 공간이 아닌 위키입니다. 예: ##~[~[AB]]##은 ##~[~[doc:currentWiki:AB]]##(존재하는 경우) 또는 ##~[~[space:currentWiki:로 해석될 수 있습니다. AB]##](##~[~[doc:currentWiki:ABWebHome]]##과 동일하며 ##~[~[doc:currentWiki:currentSpace.AB]]## 또는 ##~[~와 동일하지 않음 [doc:currentWiki:currentSpace.ABWebHome]]##.
+*** //참고2 - ##.WebHome##//의 특수 처리: 입력되지 않은 링크가 ##.WebHome##으로 끝나면 //항상// 터미널 페이지로 처리됩니다. 예: ##~[~[A.WebHome]]##은 항상 ##~[~[doc:A.WebHome]]##과 동등한 것으로 해석되며 ##~[~[doc:A는 아닙니다. .웹홈.웹홈]]##.
+* **##parameters##**: 링크에 전달되는 공백으로 구분된 매개변수의 선택적 목록입니다. 예: ##queryString="mydata1=5&amp;mydata2=Hello" 앵커="HTableOfContents" target="~_blank"##
+** **##queryString##**: 링크 대상 주소에 추가되고 렌더링된 URL 에 사용될 매개변수를 지정하기 위한 선택적 쿼리 문자열입니다 . 예: ## url :http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"##는 대상 주소를 생성합니다 ##http:~/~/domain.com/path?mydata1=5&amp;mydata2 =안녕하세요##
+** **##anchor##**: 참조된 링크에 정의된 앵커를 가리키는 선택적 앵커 이름입니다. XWiki 에서는 제목과 이미지에 대한 앵커가 자동으로 생성됩니다. 예: ## url :http:~/~/domain.com/path||anchor="HTableOfContents"##는 대상 주소를 생성합니다 ##http:~/~/domain.com/path#HTableOfContents##
+** **##target##**: 링크 대상을 새 창에서 열 수 있도록 하는 선택적 매개변수입니다. 예: ##target="~_blank"##</content>
+</xwikidoc>

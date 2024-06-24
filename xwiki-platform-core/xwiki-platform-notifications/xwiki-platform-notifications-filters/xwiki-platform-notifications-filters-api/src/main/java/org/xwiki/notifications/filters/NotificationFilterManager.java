@@ -110,7 +110,7 @@ public interface NotificationFilterManager
     Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters);
 
     /**
-     * For all toggeable notification filters, get if the filter is enabled regarding the user profile.
+     * For all toggleable notification filters, get if the filter is enabled regarding the user profile.
      *
      * @param user the user to use
      * @return a map of notification filters with their activation state

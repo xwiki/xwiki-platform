@@ -23,7 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
+import org.xwiki.like.test.po.LikersPage;
 import org.xwiki.like.test.po.UserProfileLikedPagesPage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -138,7 +140,7 @@ class LikeIT
         tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
         tableLayout.assertRow(LIKES_COLUMN_NAME, "1");
 
-        // Go to the profile of user 1 and verify that the like pages are displayed and valid.
+        // Go to the profile of user 1 and verify that the liked pages are displayed and valid.
         UserProfileLikedPagesPage user1ProfileLikedPagesPage = new UserProfileLikedPagesPage(USER1);
         user1ProfileLikedPagesPage.gotoPage();
         tableLayout = user1ProfileLikedPagesPage.getLiveData().getTableLayout();
@@ -146,6 +148,14 @@ class LikeIT
         tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
             testUtils.getURL(testReference.getLastSpaceReference()));
         tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
+
+        // Go to the likers of the page and verify the Live Data is accurate.
+        LikersPage likersPage = LikersPage.goToLikers(testReference);
+        LiveDataElement likersLiveData = likersPage.getLiveData();
+        TableLayoutElement likersTableLayout = likersLiveData.getTableLayout();
+        assertEquals(2, likersTableLayout.countRows());
+        likersTableLayout.assertRow("User", "LikeUser1");
+        likersTableLayout.assertRow("User", "LikeUser2");
 
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);

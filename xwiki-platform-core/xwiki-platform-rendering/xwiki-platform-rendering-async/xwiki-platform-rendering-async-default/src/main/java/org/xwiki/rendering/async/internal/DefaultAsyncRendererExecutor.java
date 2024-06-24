@@ -397,11 +397,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             boolean encode = false;
 
             switch (c) {
-                // '/' and '\' has been known to cause issues with various default server setup (Tomcat for example)
-                case '/':
-                case '\\':
+                // '/' and '\' have been known to cause issues with various default server setup (Tomcat for example)
+                case '/', '\\':
                     encode = true;
-
                     break;
 
                 default:

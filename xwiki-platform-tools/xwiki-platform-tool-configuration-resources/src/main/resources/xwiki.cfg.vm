@@ -327,8 +327,8 @@ xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 #-# is set for the exact domain name of the wiki.
 #-#
 #-# For example, suppose the cookiedomains is set to "mydomain.net". If I log in
-#-# on wiki1.xwiki.com, then the cookie will be set for the entire mydomain.net
-#-# domain, and if I visit wiki2.xwiki.com I will still be authenticated. If I log
+#-# on wiki1.mydomain.net, then the cookie will be set for the entire mydomain.net
+#-# domain, and if I visit wiki2.mydomain.net I will still be authenticated. If I log
 #-# in on wiki1.otherdomain.net, then I will only be authenticated on
 #-# wiki1.otherdomain.net, and not on wiki2.otherdomain.net.
 #-#

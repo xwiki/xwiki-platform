@@ -27,6 +27,9 @@
     "@xwiki/cristal-extra-tabs-ui": "workspace:*",
     "vue": "3.4.29"
   },
+  "devDependencies": {
+    "vue-tsc": "2.0.21"
+  },
   "publishConfig": {
     "exports": {
       ".": {
@@ -37,8 +40,5 @@
     },
     "main": "./dist/index.es.js",
     "types": "./dist/index.d.ts"
-  },
-  "devDependencies": {
-    "vue-tsc": "2.0.21"
   }
 }

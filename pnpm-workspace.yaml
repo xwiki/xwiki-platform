@@ -17,13 +17,13 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 packages:
   - "api"
-  - "core/icons"
+  - "core/attachments/*"
   - "core/backends/*"
   - "core/browser/*"
-  - "core/hierarchy/*"
-  - "core/link-suggest/*"
-  - "core/attachments/*"
   - "core/extra-tabs/*"
+  - "core/hierarchy/*"
+  - "core/icons"
+  - "core/link-suggest/*"
   - "dev/config"
   - "ds/api"
   - "ds/dsfr"

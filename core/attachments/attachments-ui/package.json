@@ -41,5 +41,8 @@
     },
     "main": "./dist/index.es.js",
     "types": "./dist/index.d.ts"
+  },
+  "devDependencies": {
+    "vue-tsc": "2.0.21"
   }
 }

@@ -167,6 +167,9 @@ onUpdated(() => {
               <span class="doc-info-user-info">
                 User Name edited on 12/12/2024 at 12:00
               </span>
+              <!-- TODO: add a way to inject those by extension
+               and provide one for the number of attachments.
+              It must be reactive whenever the attachment store is updated -->
               <div class="doc-info-actions">
                 <div class="info-action like">
                   <c-icon name="heart" :size="Size.Small"></c-icon>

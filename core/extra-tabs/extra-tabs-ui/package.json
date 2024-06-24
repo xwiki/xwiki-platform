@@ -25,11 +25,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
     "@xwiki/cristal-extra-tabs-ui": "workspace:*",
-    "lodash": "4.17.21",
     "vue": "3.4.29"
-  },
-  "devDependencies": {
-    "@types/lodash": "4.17.5"
   },
   "publishConfig": {
     "exports": {
@@ -41,5 +37,8 @@
     },
     "main": "./dist/index.es.js",
     "types": "./dist/index.d.ts"
+  },
+  "devDependencies": {
+    "vue-tsc": "2.0.21"
   }
 }

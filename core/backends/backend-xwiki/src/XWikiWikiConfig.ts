@@ -25,7 +25,6 @@ import {
   type Storage,
 } from "@xwiki/cristal-api";
 import { inject, injectable, named } from "inversify";
-import "reflect-metadata";
 
 @injectable()
 export class XWikiWikiConfig extends DefaultWikiConfig {

@@ -27,6 +27,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@tiptap/core": "2.4.0",
     "@tiptap/extension-blockquote": "2.4.0",
     "@tiptap/extension-bullet-list": "2.4.0",
     "@tiptap/extension-code": "2.4.0",
@@ -53,14 +54,17 @@
     "@xwiki/cristal-skin": "workspace:*",
     "inversify": "6.0.2",
     "lodash": "4.17.21",
+    "markdown-it": "14.1.0",
     "pinia": "2.1.7",
     "tippy.js": "6.3.7",
     "tiptap-markdown": "0.8.10",
     "utility-types": "3.11.0",
-    "vue": "3.4.29"
+    "vue": "3.4.29",
+    "vue-router": "4.3.2"
   },
   "devDependencies": {
     "@types/lodash": "4.17.5",
+    "@types/markdown-it": "14.1.1",
     "rimraf": "5.0.7",
     "vitest": "1.6.0",
     "vue-tsc": "2.0.21"

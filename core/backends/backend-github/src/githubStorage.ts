@@ -19,7 +19,6 @@
  */
 
 import { inject, injectable } from "inversify";
-import "reflect-metadata";
 import {
   DefaultPageData,
   type Logger,

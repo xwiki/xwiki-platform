@@ -19,8 +19,7 @@
  */
 
 import { generateConfig } from "../../vite.config";
-import { mergeConfig } from "vitest/config";
-import { defineConfig } from "vite";
+import { defineConfig, mergeConfig } from "vite";
 
 export default mergeConfig(
   generateConfig(import.meta.url),

@@ -22,7 +22,7 @@ import { Editor, Extension, Range } from "@tiptap/core";
 import Suggestion from "@tiptap/suggestion";
 import { App, createApp } from "vue";
 import Selector from "../../vue/c-tiptap-selector.vue";
-import { Plugin } from "prosemirror-state";
+import { Plugin } from "@tiptap/pm/state";
 import { CommandParams } from "./menu-helpers";
 import { createPinia } from "pinia";
 import slashStore, { Props, SlashStore } from "../../stores/slash-store";

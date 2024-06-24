@@ -34,7 +34,7 @@
     "eslint": "8.57.0",
     "rimraf": "5.0.7",
     "vitest": "1.6.0",
-    "vue-tsc": "2.0.21"
+    "vue-tsc": "2.0.22"
   },
   "keywords": [
     "icons"

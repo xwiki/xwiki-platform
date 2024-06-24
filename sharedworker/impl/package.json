@@ -42,7 +42,7 @@
   "devDependencies": {
     "rimraf": "5.0.7",
     "vite-plugin-comlink": "4.1.0",
-    "vue-tsc": "2.0.21"
+    "vue-tsc": "2.0.22"
   },
   "publishConfig": {
     "exports": {

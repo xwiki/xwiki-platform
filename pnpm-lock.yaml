@@ -91,8 +91,8 @@ importers:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   core/attachments/attachments-api:
     dependencies:
@@ -149,8 +149,8 @@ importers:
         version: 4.3.2(vue@3.4.29(typescript@5.5.2))
     devDependencies:
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   core/backends/backend-api:
     dependencies:
@@ -284,8 +284,8 @@ importers:
         version: 3.4.29(typescript@5.5.2)
     devDependencies:
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   core/hierarchy/hierarchy-api:
     dependencies:
@@ -373,8 +373,8 @@ importers:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   core/info-actions/info-actions-api:
     dependencies:
@@ -414,8 +414,8 @@ importers:
         version: 3.4.29(typescript@5.5.2)
     devDependencies:
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   core/link-suggest/link-suggest-api: {}
 
@@ -489,8 +489,8 @@ importers:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   ds/shoelace:
     dependencies:
@@ -523,8 +523,8 @@ importers:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   ds/vuetify:
     dependencies:
@@ -551,8 +551,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   editors/tiptap:
     dependencies:
@@ -672,8 +672,8 @@ importers:
         specifier: 1.6.0
         version: 1.6.0(@types/node@20.14.7)(happy-dom@14.12.0)
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   electron:
     dependencies:
@@ -858,8 +858,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   lib:
     dependencies:
@@ -952,8 +952,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   macros:
     dependencies:
@@ -974,8 +974,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   rendering/rendering:
     dependencies:
@@ -1005,8 +1005,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   rendering/wikimodel:
     dependencies:
@@ -1021,8 +1021,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   sharedworker/api:
     dependencies:
@@ -1040,8 +1040,8 @@ importers:
         specifier: 4.1.0
         version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.7))
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   sharedworker/impl:
     dependencies:
@@ -1086,8 +1086,8 @@ importers:
         specifier: 4.1.0
         version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.7))
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   skin:
     dependencies:
@@ -1138,8 +1138,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   sources/xwiki/mock-server:
     dependencies:
@@ -1224,8 +1224,8 @@ importers:
         specifier: 2.0.3
         version: 2.0.3(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))(vuetify@3.6.10)
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
   xwiki/remoteinlineeditor:
     dependencies:
@@ -1246,8 +1246,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       vue-tsc:
-        specifier: 2.0.21
-        version: 2.0.21(typescript@5.5.2)
+        specifier: 2.0.22
+        version: 2.0.22(typescript@5.5.2)
 
 packages:
 
@@ -2340,20 +2340,20 @@ packages:
   '@volar/language-core@1.11.1':
     resolution: {integrity: sha512-dOcNn3i9GgZAcJt43wuaEykSluAuOkQgzni1cuxLxTV0nJKanQztp7FxyswdRILaKH+P2XZMPRp2S4MV/pElCw==}
 
-  '@volar/language-core@2.3.0':
-    resolution: {integrity: sha512-pvhL24WUh3VDnv7Yw5N1sjhPtdx7q9g+Wl3tggmnkMcyK8GcCNElF2zHiKznryn0DiUGk+eez/p2qQhz+puuHw==}
+  '@volar/language-core@2.3.3':
+    resolution: {integrity: sha512-Blu4NQaRszEsgK/QvWFRSQPRAhPDbYef+peFV9Gb86swxRCs01q7h673/HYstaPsTbjh/F5mXjozoOFxQ8tLYw==}
 
   '@volar/source-map@1.11.1':
     resolution: {integrity: sha512-hJnOnwZ4+WT5iupLRnuzbULZ42L7BWWPMmruzwtLhJfpDVoZLjNBxHDi2sY2bgZXCKlpU5XcsMFoYrsQmPhfZg==}
 
-  '@volar/source-map@2.3.0':
-    resolution: {integrity: sha512-G/228aZjAOGhDjhlyZ++nDbKrS9uk+5DMaEstjvzglaAw7nqtDyhnQAsYzUg6BMP9BtwZ59RIw5HGePrutn00Q==}
+  '@volar/source-map@2.3.3':
+    resolution: {integrity: sha512-eFRHA13hxiGPt+Xa0EX3yNd50ozctnW5KzQj/IllKmSK/KuBEkSAsIhBdOxCpv1YhV4GmI3iKG9peOs6k9LtnA==}
 
   '@volar/typescript@1.11.1':
     resolution: {integrity: sha512-iU+t2mas/4lYierSnoFOeRFQUhAEMgsFuQxoxvwn5EdQopw43j+J27a4lt9LMInx1gLJBC6qL14WYGlgymaSMQ==}
 
-  '@volar/typescript@2.3.0':
-    resolution: {integrity: sha512-PtUwMM87WsKVeLJN33GSTUjBexlKfKgouWlOUIv7pjrOnTwhXHZNSmpc312xgXdTjQPpToK6KXSIcKu9sBQ5LQ==}
+  '@volar/typescript@2.3.3':
+    resolution: {integrity: sha512-cwGMSwqIR54Hngu5dYmUJPHFpo6KGj7BlpwT2G9WTKwEjFlH4g/0IPeq064428DAi/VMP42vqAQSBiEHi5Gc4A==}
 
   '@vue/compiler-core@3.4.29':
     resolution: {integrity: sha512-TFKiRkKKsRCKvg/jTSSKK7mYLJEQdUiUfykbG49rubC9SfDyvT2JrzTReopWlz2MxqeLyxh9UZhvxEIBgAhtrg==}
@@ -2395,8 +2395,8 @@ packages:
       typescript:
         optional: true
 
-  '@vue/language-core@2.0.21':
-    resolution: {integrity: sha512-vjs6KwnCK++kIXT+eI63BGpJHfHNVJcUCr3RnvJsccT3vbJnZV5IhHR2puEkoOkIbDdp0Gqi1wEnv3hEd3WsxQ==}
+  '@vue/language-core@2.0.22':
+    resolution: {integrity: sha512-dNTAAtEOuMiz7N1s5tKpypnVVCtawxVSF5BukD0ELcYSw+DSbrSlYYSw8GuwvurodCeYFSHsmslE+c2sYDNoiA==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -5449,8 +5449,8 @@ packages:
     peerDependencies:
       typescript: '*'
 
-  vue-tsc@2.0.21:
-    resolution: {integrity: sha512-E6x1p1HaHES6Doy8pqtm7kQern79zRtIewkf9fiv7Y43Zo4AFDS5hKi+iHi2RwEhqRmuiwliB1LCEFEGwvxQnw==}
+  vue-tsc@2.0.22:
+    resolution: {integrity: sha512-lMBIwPBO0sxCcmvu45yt1b035AaQ8/XSXQDk8m75y4j0jSXY/y/XzfEtssQ9JMS47lDaR10O3/926oCs8OeGUw==}
     hasBin: true
     peerDependencies:
       typescript: '*'
@@ -6839,26 +6839,24 @@ snapshots:
     dependencies:
       '@volar/source-map': 1.11.1
 
-  '@volar/language-core@2.3.0':
+  '@volar/language-core@2.3.3':
     dependencies:
-      '@volar/source-map': 2.3.0
+      '@volar/source-map': 2.3.3
 
   '@volar/source-map@1.11.1':
     dependencies:
       muggle-string: 0.3.1
 
-  '@volar/source-map@2.3.0':
-    dependencies:
-      muggle-string: 0.4.1
+  '@volar/source-map@2.3.3': {}
 
   '@volar/typescript@1.11.1':
     dependencies:
       '@volar/language-core': 1.11.1
       path-browserify: 1.0.1
 
-  '@volar/typescript@2.3.0':
+  '@volar/typescript@2.3.3':
     dependencies:
-      '@volar/language-core': 2.3.0
+      '@volar/language-core': 2.3.3
       path-browserify: 1.0.1
       vscode-uri: 3.0.8
 
@@ -6929,13 +6927,14 @@ snapshots:
     optionalDependencies:
       typescript: 5.5.2
 
-  '@vue/language-core@2.0.21(typescript@5.5.2)':
+  '@vue/language-core@2.0.22(typescript@5.5.2)':
     dependencies:
-      '@volar/language-core': 2.3.0
+      '@volar/language-core': 2.3.3
       '@vue/compiler-dom': 3.4.29
       '@vue/shared': 3.4.29
       computeds: 0.0.1
       minimatch: 9.0.4
+      muggle-string: 0.4.1
       path-browserify: 1.0.1
       vue-template-compiler: 2.7.15
     optionalDependencies:
@@ -10362,10 +10361,10 @@ snapshots:
       semver: 7.6.0
       typescript: 5.5.2
 
-  vue-tsc@2.0.21(typescript@5.5.2):
+  vue-tsc@2.0.22(typescript@5.5.2):
     dependencies:
-      '@volar/typescript': 2.3.0
-      '@vue/language-core': 2.0.21(typescript@5.5.2)
+      '@volar/typescript': 2.3.3
+      '@vue/language-core': 2.0.22(typescript@5.5.2)
       semver: 7.6.0
       typescript: 5.5.2
 

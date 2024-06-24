@@ -35,7 +35,7 @@
     "reflect-metadata": "0.2.2",
     "rimraf": "5.0.7",
     "vitest": "1.6.0",
-    "vue-tsc": "2.0.21"
+    "vue-tsc": "2.0.22"
   },
   "publishConfig": {
     "exports": {

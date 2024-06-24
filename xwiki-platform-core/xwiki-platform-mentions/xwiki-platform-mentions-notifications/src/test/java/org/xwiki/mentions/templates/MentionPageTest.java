@@ -25,6 +25,9 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.velocity.VelocityContext;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -51,6 +54,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -208,10 +212,14 @@ class MentionPageTest extends PageTest
         velocityContext.put("compositeEventParams", compositeEventParams);
         velocityContext.put("xcontext", this.context);
         // Template rendering.
-        String actual = templateManager.render("mentions/mention.vm");
-        String expected = IOUtils.toString(getClass().getResourceAsStream("/templates/mentions/mention2.html"),
-                UTF_8);
-
-        assertThat(actual, equalToCompressingWhiteSpace(expected));
+        Document render = Jsoup.parse(templateManager.render("mentions/mention.vm"));
+        Element activitySummary = render.getElementsByClass("activity-summary").get(0);
+        // Check that the activity summary contains the proper information about the wiki where the mention happened
+        assertEquals("mentions.event.mention.summary.singular", activitySummary.ownText());
+        assertEquals(1, activitySummary.childrenSize());
+        Element activityWiki = activitySummary.child(0);
+        assertEquals("text-muted", activityWiki.attr("class"));
+        assertEquals("($services.wiki.getById($compositeEvent.document.wikiReference.name).prettyName)",
+                activityWiki.text());
     }
 }

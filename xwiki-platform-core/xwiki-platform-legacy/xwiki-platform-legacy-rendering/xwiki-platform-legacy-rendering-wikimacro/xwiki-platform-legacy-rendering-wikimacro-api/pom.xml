@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-rendering-wikimacro</artifactId>
-    <version>16.5.0</version>
+    <version>16.5.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-rendering-wikimacro-api</artifactId>
   <name>XWiki Platform - Legacy - Rendering - Wiki Macro Bridge - API</name>

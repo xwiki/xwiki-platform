@@ -32,7 +32,7 @@ type State = {
   attachments: Attachment[];
   count: number;
   isLoading: boolean;
-  isUploading: false;
+  isUploading: boolean;
   unknownPage: boolean;
   error: string | undefined;
 };
@@ -63,48 +63,50 @@ type Actions = {
 type AttachmentsStoreDefinition = StoreDefinition<Id, State, Getters, Actions>;
 type AttachmentsStore = Store<Id, State, Getters, Actions>;
 
-const attachmentsStore: AttachmentsStoreDefinition = defineStore(
-  "attachments",
-  {
-    state() {
-      return {
-        attachments: [],
-        count: 0,
-        isLoading: true,
-        isUploading: false,
-        error: undefined,
-        unknownPage: false,
-      };
+const attachmentsStore: AttachmentsStoreDefinition = defineStore<
+  Id,
+  State,
+  Getters,
+  Actions
+>("attachments", {
+  state() {
+    return {
+      attachments: [],
+      count: 0,
+      isLoading: true,
+      isUploading: false,
+      error: undefined,
+      unknownPage: false,
+    };
+  },
+  actions: {
+    setLoading() {
+      this.isLoading = true;
     },
-    actions: {
-      setLoading() {
-        this.isLoading = true;
-      },
-      updateAttachments(attachments, count?: number) {
-        this.isLoading = false;
-        this.error = undefined;
-        if (attachments) {
-          this.unknownPage = false;
-          this.attachments = attachments;
-          this.count = count || attachments.length;
-        } else {
-          this.unknownPage = true;
-          this.attachments = [];
-        }
-      },
-      setError(error: string) {
-        this.isLoading = false;
-        this.error = error;
-      },
-      startUploading() {
-        this.isUploading = true;
-      },
-      stopUploading() {
-        this.isUploading = false;
-      },
+    updateAttachments(attachments, count?: number) {
+      this.isLoading = false;
+      this.error = undefined;
+      if (attachments) {
+        this.unknownPage = false;
+        this.attachments = attachments;
+        this.count = count || attachments.length;
+      } else {
+        this.unknownPage = true;
+        this.attachments = [];
+      }
+    },
+    setError(error: string) {
+      this.isLoading = false;
+      this.error = error;
+    },
+    startUploading() {
+      this.isUploading = true;
+    },
+    stopUploading() {
+      this.isUploading = false;
     },
   },
-);
+});
 
 /**
  * @since 0.9

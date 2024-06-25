@@ -195,7 +195,6 @@ function renderItems(
         elemDiv = document.createElement("div");
         document.body.appendChild(elemDiv);
         const pinia = createPinia();
-        this.container = new Container();
 
         editor = props.editor;
         range = props.range;

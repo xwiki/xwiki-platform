@@ -44,7 +44,12 @@ type LinkSuggestStoreDefinition = StoreDefinition<
   Actions
 >;
 
-const store: LinkSuggestStoreDefinition = defineStore("link-suggest-store", {
+const store: LinkSuggestStoreDefinition = defineStore<
+  StoreId,
+  State,
+  Getters,
+  Actions
+>("link-suggest-store", {
   state: () => {
     return {
       links: [],

@@ -25,7 +25,7 @@ import type { Document } from "../api/document";
 export class DefaultPageData implements PageData {
   id: string;
   name: string;
-  mode: string;
+  mode: string = "";
   source: string;
   syntax: string;
   html: string;
@@ -33,8 +33,8 @@ export class DefaultPageData implements PageData {
   css: Array<string>;
   js: Array<string>;
   version: string;
-  headline: string;
-  headlineRaw: string;
+  headline: string = "";
+  headlineRaw: string = "";
 
   public constructor(
     id: string = "",

@@ -80,9 +80,9 @@ abstract class AbstractExtraTab implements ExtraTab {
     this.t = t;
   }
 
-  id: string;
-  order: number;
-  title: string;
+  abstract id: string;
+  abstract order: number;
+  abstract title: string;
 
   abstract panel(): Promise<Component>;
 }

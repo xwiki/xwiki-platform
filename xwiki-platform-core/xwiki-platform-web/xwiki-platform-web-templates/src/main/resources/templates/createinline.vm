@@ -81,6 +81,7 @@
 ## 11016 one, nothing will be displayed, depending on the other passed parameters.
 ## ---------------------------------------------------------------------------------------------------------
 #set($exception = $createException)
+#set ($disableModalConfirmation = false)
 ## check if the exception is about the non-allowed spaces for template
 #if("$!exception" != '' && $exception.code == 11016)
   <div class="box errormessage">
@@ -93,6 +94,7 @@
         $allowedSpaces.toString()]))
     #end
   </div>
+  #set ($disableModalConfirmation = true)
 #end
 ## check if the exception is about the document which already exists
 #if("$!exception" != '' && $exception.code == 11002)
@@ -105,13 +107,25 @@
         ]
       )
   </div>
+  #set ($disableModalConfirmation = true)
 #end
 ## check if the exception is about the document name being invalid
 #if("$!exception" != '' && $exception.code == 11018)
 <div class='box errormessage'>
   ## Use the 'invalidNameReference' context binding set by the create action for this case.
-  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference]))
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidnameError', [$invalidNameReference]))
+  #if ($isAjaxRequest)
+    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname.possiblesolutionForLink'))
+  #else
+    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname.possiblesolution'))
+  #end
+  <br /><br />
+  #set ($currentStrategy = $services.modelvalidation.configuration.entityNameValidation)
+  #set ($strategyName = $services.localization.render("entitynamevalidation.${currentStrategy}.name"))
+  #set ($strategyUsage = $services.localization.render("entitynamevalidation.${currentStrategy}.usage"))
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname.strategyInfo',[$strategyName, $strategyUsage]))
 </div>
+  #set ($disableModalConfirmation = true)
 #end
 
 ## check if the exception is about the document having a path too long
@@ -127,6 +141,7 @@
         ]
       )
   </div>
+  #set ($disableModalConfirmation = true)
 #end
 
 ## ---------------------------------------------------------------------------------------------------------
@@ -428,7 +443,9 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">$services.localization.render('cancel')</button>
-    <button type="submit" class="btn btn-primary">$services.localization.render('create')</button>
+    <button type="submit" class="btn btn-primary" #if($disableModalConfirmation)disabled="disabled")#end>
+      $services.localization.render('create')
+    </button>
   </div>
   </form>
 </div><!-- /.modal-content -->

@@ -1,5 +1,35 @@
 # @xwiki/cristal-lib
 
+## 0.9.0
+
+### Minor Changes
+
+- efbd020: Cristal 0.9 Release
+
+### Patch Changes
+
+- Updated dependencies [efbd020]
+  - @xwiki/cristal-api@0.9.0
+  - @xwiki/cristal-attachments-default@0.9.0
+  - @xwiki/cristal-attachments-ui@0.9.0
+  - @xwiki/cristal-backend-dexie@0.9.0
+  - @xwiki/cristal-backend-github@0.9.0
+  - @xwiki/cristal-backend-nextcloud@0.9.0
+  - @xwiki/cristal-backend-xwiki@0.9.0
+  - @xwiki/cristal-browser-api@0.9.0
+  - @xwiki/cristal-extra-tabs-default@0.9.0
+  - @xwiki/cristal-info-actions-default@0.9.0
+  - @xwiki/cristal-dsfr@0.9.0
+  - @xwiki/cristal-dsshoelace@0.9.0
+  - @xwiki/cristal-dsvuetify@0.9.0
+  - @xwiki/cristal-editors-tiptap@0.9.0
+  - @xwiki/cristal-extension-manager@0.9.0
+  - @xwiki/cristal-extension-menubuttons@0.9.0
+  - @xwiki/cristal-macros@0.9.0
+  - @xwiki/cristal-rendering@0.9.0
+  - @xwiki/cristal-sharedworker-impl@0.9.0
+  - @xwiki/cristal-skin@0.9.0
+
 ## 0.8.0
 
 ### Minor Changes

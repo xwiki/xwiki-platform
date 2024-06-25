@@ -1,5 +1,17 @@
 # @xwiki/cristal-electron-main
 
+## 0.9.0
+
+### Minor Changes
+
+- efbd020: Cristal 0.9 Release
+
+### Patch Changes
+
+- Updated dependencies [efbd020]
+  - @xwiki/cristal-browser-electron@0.9.0
+  - @xwiki/cristal-electron-storage@0.9.0
+
 ## 0.8.0
 
 ### Minor Changes

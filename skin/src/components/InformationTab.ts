@@ -19,15 +19,24 @@
  */
 
 import { injectable } from "inversify";
-import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
+import { AbstractExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import InformationTab from "../vue/extra-tabs/InformationTab.vue";
 import { Component } from "vue";
+import messages from "../translations";
 
 @injectable()
-class InformationExtraTab implements ExtraTab {
+class InformationExtraTab extends AbstractExtraTab {
+  title: string;
+
+  constructor() {
+    super(messages);
+    this.title = this.t("information.extraTabs.title");
+  }
+
   order = 1000;
-  title = "Information";
+
   id = "information";
+
   async panel(): Promise<Component> {
     return InformationTab;
   }

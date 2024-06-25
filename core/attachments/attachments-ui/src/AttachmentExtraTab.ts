@@ -18,21 +18,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Container } from "inversify";
-import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
-import { InfoAction } from "@xwiki/cristal-info-actions-api";
-import { AttachmentsInfoAction } from "./AttachmentsInfoAction";
-import { AttachmentExtraTab } from "./AttachmentExtraTab";
+import { injectable } from "inversify";
+import { AbstractExtraTab } from "@xwiki/cristal-extra-tabs-api";
+import messages from "./translations";
+import AttachmentsTab from "./vue/AttachmentsTab.vue";
+import { Component } from "vue";
 
-export class ComponentInit {
-  constructor(container: Container) {
-    container
-      .bind<ExtraTab>("ExtraTab")
-      .to(AttachmentExtraTab)
-      .inSingletonScope();
-    container
-      .bind<InfoAction>("InfoAction")
-      .to(AttachmentsInfoAction)
-      .inSingletonScope();
+@injectable()
+export class AttachmentExtraTab extends AbstractExtraTab {
+  title: string;
+
+  constructor() {
+    super(messages);
+    this.title = this.t("attachments.extraTabs.title");
+  }
+
+  order = 2000;
+  id = "attachments";
+
+  async panel(): Promise<Component> {
+    return AttachmentsTab;
   }
 }

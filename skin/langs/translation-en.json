@@ -1,4 +1,5 @@
 {
   "third": "Third",
-  "page.actions.create.label": "Create a new document"
+  "page.actions.create.label": "Create a new document",
+  "information.extraTabs.title": "Information"
 }

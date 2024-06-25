@@ -19,6 +19,8 @@
  */
 
 import { Component } from "vue";
+import { ComposerTranslation, useI18n } from "vue-i18n";
+import { injectable, unmanaged } from "inversify";
 
 /**
  * Defines the structure of a tab. Including its content.
@@ -61,4 +63,28 @@ interface ExtraTabsService {
   list(): Promise<ExtraTab[]>;
 }
 
-export { type ExtraTabsService, type ExtraTab };
+/**
+ * Abstract class helping with localization of extra tabs.
+ *
+ * @since 0.9
+ */
+@injectable()
+abstract class AbstractExtraTab implements ExtraTab {
+  protected t: ComposerTranslation;
+
+  constructor(@unmanaged() messages: Record<string, Record<string, string>>) {
+    const { t, mergeLocaleMessage } = useI18n();
+    for (const messagesKey in messages) {
+      mergeLocaleMessage(messagesKey, messages[messagesKey]);
+    }
+    this.t = t;
+  }
+
+  id: string;
+  order: number;
+  title: string;
+
+  abstract panel(): Promise<Component>;
+}
+
+export { type ExtraTabsService, type ExtraTab, AbstractExtraTab };

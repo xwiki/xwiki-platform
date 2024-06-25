@@ -242,9 +242,15 @@ importers:
 
   core/extra-tabs/extra-tabs-api:
     dependencies:
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
       vue:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)
+      vue-i18n:
+        specifier: 9.13.1
+        version: 9.13.1(vue@3.4.29(typescript@5.5.2))
 
   core/extra-tabs/extra-tabs-default:
     dependencies:

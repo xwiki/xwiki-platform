@@ -66,7 +66,7 @@
 <input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/>
 #end
 #**
- * Returns the value of the shortcut. This value can be set in two ways: via user preferences and wiki level translation
+ * Returns the escaped value of the shortcut. This value can be set in two ways: via user preferences and wiki level translation
  * keys. If there are both, the user preference will take priority.
  * @param userPreferenceName The id of the user preference that is listed in XWikiUsersDocumentInitializer.java
  *        e.g. `shortcut_developer_usertype`
@@ -75,8 +75,8 @@
  * @since 16.6.0-rc-1
  *#
 #macro(getShortcutValue $userPreferenceName $translationKey)
-#if($!xwiki.getUserPreference($userPreferenceName)!='')coucou $xwiki.getUserPreference($userPreferenceName)##
-#{else}$services.localization.render($translationKey)#end##
+#if($!xwiki.getUserPreference($userPreferenceName)!='')$escapetool.javascript($escapetool.xml($xwiki.getUserPreference($userPreferenceName)))##
+#{else}$escapetool.javascript($escapetool.xml($services.localization.render($translationKey)))#end##
 #end
 #**
  * Displays a submit button for the editor. This macro calls submitButton,

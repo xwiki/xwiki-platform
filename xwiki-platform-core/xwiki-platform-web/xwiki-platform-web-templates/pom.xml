@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
-      <version>1.5.2</version>
+      <version>1.5.1</version>
       <scope>test</scope>
     </dependency>
     <!-- Security Script Component List for the Page Tests -->

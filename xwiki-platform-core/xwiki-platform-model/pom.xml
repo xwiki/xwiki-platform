@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.5.0</version>
   </parent>
   <artifactId>xwiki-platform-model</artifactId>
   <name>XWiki Platform - Model - Parent POM</name>

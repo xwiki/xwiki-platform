@@ -146,7 +146,13 @@ defineExpose({
           @click="apply(linkIndex + 1)"
         >
           {{ link.title }}
-          <XBreadcrumb :items="link.segments"></XBreadcrumb>
+          <XBreadcrumb
+            :items="
+              link.segments.map((segment) => {
+                return { label: segment };
+              })
+            "
+          ></XBreadcrumb>
         </button>
       </template>
       <span v-else class="information"> No suggestion service available </span>

@@ -19,23 +19,22 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { BreadcrumbProps } from "@xwiki/cristal-dsapi";
+import { computed } from "vue";
 
-defineProps<BreadcrumbProps>();
+const props = defineProps<BreadcrumbProps>();
+// Converts props items to the format expected by v-breadcrumbs
+const items = computed(() => {
+  return props.items.map(({ label, url }) => {
+    return {
+      title: label,
+      href: url,
+    };
+  });
+});
 </script>
 
 <template>
-  <v-breadcrumbs
-    :items="
-      items.map((hItem) => {
-        var bItem: { title: string; href: string } = {
-          title: hItem.label,
-          href: hItem.url,
-        };
-        return bItem;
-      })
-    "
-  >
-  </v-breadcrumbs>
+  <v-breadcrumbs :items="items"></v-breadcrumbs>
 </template>
 
 <style scoped></style>

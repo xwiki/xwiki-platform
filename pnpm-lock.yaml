@@ -279,9 +279,6 @@ importers:
       '@xwiki/cristal-extra-tabs-api':
         specifier: workspace:*
         version: link:../extra-tabs-api
-      '@xwiki/cristal-extra-tabs-ui':
-        specifier: workspace:*
-        version: 'link:'
       vue:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)

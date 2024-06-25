@@ -69,7 +69,9 @@ async function fetchPage() {
     currentPage.value = await cristal.getPage(currentPageName.value);
   } catch (e) {
     console.error(e);
-    error.value = e;
+    if (e instanceof Error) {
+      error.value = e;
+    }
   } finally {
     loading.value = false;
   }

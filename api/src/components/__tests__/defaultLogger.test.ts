@@ -21,13 +21,16 @@
 import "reflect-metadata";
 import { describe, expect, it, vi } from "vitest";
 import { DefaultLogger } from "../defaultLogger";
+import { Container } from "inversify";
 
 describe("DefaultPageData", () => {
   it("info", () => {
+    const container = new Container();
+    container.bind(DefaultLogger).toSelf();
     const consoleMock = vi
       .spyOn(console, "info")
       .mockImplementation(() => undefined);
-    const defaultLogger = new DefaultLogger();
+    const defaultLogger = container.get(DefaultLogger);
     defaultLogger.setModule("m1");
 
     defaultLogger.info(["message"]);

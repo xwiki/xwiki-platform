@@ -37,6 +37,8 @@ export function loadConfig(input: string) {
 }
 
 export class CristalAppLoader extends CristalLoader {
+  // @ts-expect-error cristal is temporarily undefined during class
+  // initialization
   public cristal: DefaultCristalApp;
 
   public constructor(extensionList: Array<string>) {

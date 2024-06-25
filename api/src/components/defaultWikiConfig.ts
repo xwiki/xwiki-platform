@@ -27,15 +27,33 @@ import type { Logger } from "../api/logger";
 
 @injectable()
 export class DefaultWikiConfig implements WikiConfig {
+  // @ts-expect-error name is temporarily undefined during class
+  // initialization
   public name: string;
+  // @ts-expect-error baseURL is temporarily undefined during class
+  // initialization
   public baseURL: string;
+  // @ts-expect-error baseRestURL is temporarily undefined during class
+  // initialization
   public baseRestURL: string;
+  // @ts-expect-error homePage is temporarily undefined during class
+  // initialization
   public homePage: string;
+  // @ts-expect-error storage is temporarily undefined during class
+  // initialization
   public storage: Storage;
+  // @ts-expect-error serverRendering is temporarily undefined during class
+  // initialization
   public serverRendering: boolean;
+  // @ts-expect-error designSystem is temporarily undefined during class
+  // initialization
   public designSystem: string;
+  // @ts-expect-error offline is temporarily undefined during class
+  // initialization
   public offline: boolean;
   public offlineSetup: boolean;
+  // @ts-expect-error cristal is temporarily undefined during class
+  // initialization
   public cristal: CristalApp;
   public logger: Logger;
 

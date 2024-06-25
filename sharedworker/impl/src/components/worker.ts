@@ -34,10 +34,18 @@ import WorkerQueueWorker from "./workerQueueWorker";
 export class Worker implements MyWorker {
   private currentNumber: number = 0;
   private queue: Array<string> = [];
+  // @ts-expect-error container is temporarily undefined during class
+  // initialization
   private container: Container;
+  // @ts-expect-error cristal is temporarily undefined during class
+  // initialization
   private cristal: CristalApp;
+  // @ts-expect-error configMap is temporarily undefined during class
+  // initialization
   private configMap: Map<string, object>;
   private initialized: boolean = false;
+  // @ts-expect-error fct is temporarily undefined during class
+  // initialization
   private fct: (a: string) => void;
 
   /*

@@ -44,7 +44,7 @@ const store: StoreDefinition<"slash-store", State, Getters, Actions> =
     state: () => {
       return {
         props: {
-          items: [],
+          items: [] as ActionCategoryDescriptor[],
         },
       };
     },

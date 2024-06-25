@@ -24,15 +24,11 @@ import {
   DefaultPageData,
   type Logger,
   PageData,
-  WikiConfig,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 
 @injectable()
 export class GitHubStorage extends AbstractStorage {
-  public wikiConfig: WikiConfig;
-  public logger: Logger;
-
   constructor(@inject<Logger>("Logger") logger: Logger) {
     super(logger, "storage.components.githubStorage");
   }

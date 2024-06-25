@@ -158,7 +158,9 @@ export class DefaultAttachmentsService implements AttachmentsService {
         );
       }
     } catch (e) {
-      this.store.setError(e.message);
+      if (e instanceof Error) {
+        this.store.setError(e.message);
+      }
     }
   }
 

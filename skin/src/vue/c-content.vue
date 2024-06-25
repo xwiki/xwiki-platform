@@ -108,13 +108,15 @@ async function fetchPage(page: string) {
       .getPageHierarchy(currentPage.value!);
   } catch (e) {
     console.error(e);
-    error.value = e;
+    if (e instanceof Error) {
+      error.value = e;
+    }
   } finally {
     loading.value = false;
   }
 }
 
-watch(() => route.params.page, fetchPage, { immediate: true });
+watch(() => route.params.page as string, fetchPage, { immediate: true });
 
 onUpdated(() => {
   ContentTools.transformImages(cristal, "xwikicontent");

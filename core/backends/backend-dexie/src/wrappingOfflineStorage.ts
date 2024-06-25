@@ -34,6 +34,8 @@ import { type OfflineStorage } from "@xwiki/cristal-backend-api";
 @injectable()
 export class WrappingOfflineStorage implements WrappingStorage {
   public logger: Logger;
+  // @ts-expect-error storage can be temporarily undefined during class
+  // initialization
   public storage: Storage;
   public offlineStorage: OfflineStorage;
   public queueWorker: QueueWorker;

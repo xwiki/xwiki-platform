@@ -25,10 +25,14 @@ import type { LoggerConfig } from "../api/loggerConfig";
 
 @injectable()
 export class DefaultLogger implements Logger {
+  // @ts-expect-error module is temporarily undefined during class
+  // initialization
   module: string;
 
-  @inject("LoggerConfig")
-  loggerConfig: LoggerConfig;
+  constructor(
+    @inject("LoggerConfig")
+    readonly loggerConfig?: LoggerConfig | undefined,
+  ) {}
 
   setModule(module: string): void {
     this.module = module;

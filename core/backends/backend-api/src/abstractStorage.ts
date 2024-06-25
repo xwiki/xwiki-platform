@@ -25,6 +25,8 @@ import { AttachmentsData } from "@xwiki/cristal-api";
 @injectable()
 export abstract class AbstractStorage implements Storage {
   protected logger: Logger;
+  // @ts-expect-error wikiConfig is temporarily undefined during class
+  // initialization
   protected wikiConfig: WikiConfig;
 
   constructor(@unmanaged() logger: Logger, module: string) {

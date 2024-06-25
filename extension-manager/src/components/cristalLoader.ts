@@ -26,7 +26,11 @@ import ComponentInit from "./componentsInit";
 import { Container } from "inversify";
 
 export class CristalLoader {
+  // @ts-expect-error logger can be temporarily undefined during class
+  // initialization
   public logger: Logger;
+  // @ts-expect-error container can be temporarily undefined during class
+  // initialization
   public container: Container;
   public extensionList: Array<string>;
 

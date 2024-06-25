@@ -33,7 +33,11 @@ import type { Router } from "vue-router";
 
 @injectable()
 export class WorkerCristalApp implements CristalApp {
+  // @ts-expect-error wikiConfig is temporarily undefined during class
+  // initialization
   private wikiConfig: WikiConfig;
+  // @ts-expect-error container is temporarily undefined during class
+  // initialization
   private container: Container;
   private availableConfigurations: Map<string, WikiConfig>;
 

@@ -63,16 +63,27 @@ import { createI18n } from "vue-i18n";
 export class DefaultCristalApp implements CristalApp {
   public skinManager: SkinManager;
   public extensionManager: ExtensionManager;
+  // @ts-expect-error app is temporarily undefined during class initialization
   public app: App;
   public page: PageData;
   public mode: string;
   public browserApi: BrowserApi;
+  // @ts-expect-error currentContentRef is temporarily undefined during class
+  // initialization
   public currentContentRef: Ref;
+  // @ts-expect-error container is temporarily undefined during class
+  // initialization
   public container: Container;
   public vueTemplateProviders: VueTemplateProvider[];
+  // @ts-expect-error wikiConfig is temporarily undefined during class
+  // initialization
   public wikiConfig: WikiConfig;
+  // @ts-expect-error router is temporarily undefined during class
+  // initialization
   public router: Router;
   public logger: Logger;
+  // @ts-expect-error isElectron is temporarily undefined during class
+  // initialization
   public isElectron: boolean;
   public availableConfigurations: Map<string, WikiConfig>;
 
@@ -541,7 +552,10 @@ export class DefaultCristalApp implements CristalApp {
         uixTemplates.push(uixComponents[i].getVueComponent());
       }
     } catch (e) {
-      if (e.message.indexOf("no matching bindings") == 0) {
+      if (
+        e instanceof Error &&
+        e.message.indexOf("no matching bindings") == 0
+      ) {
         this.logger?.debug("No uix entry found", e);
       }
     }

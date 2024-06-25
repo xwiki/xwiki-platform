@@ -92,6 +92,7 @@ export function getLinkAction(editor: Editor): BubbleMenuAction {
     title: "Link",
     icon: "link-45deg",
     additionalComponent: CTiptapLinkEdit,
+    // @ts-expect-error TODO the types needs to be refined
     command(
       { editor },
       { linkValue, removeLink }: { linkValue?: string; removeLink?: boolean },

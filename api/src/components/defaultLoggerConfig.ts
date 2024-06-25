@@ -26,6 +26,8 @@ export class DefaultLoggerConfig implements LoggerConfig {
   protected config: Map<string, string>;
   protected computedConfig: Map<string, number>;
   protected defaultLevel: string;
+  // @ts-expect-error defaultLevelId is temporarily undefined during class
+  // initialization
   protected defaultLevelId: number;
   protected levels: Map<string, number> = new Map<string, number>();
 

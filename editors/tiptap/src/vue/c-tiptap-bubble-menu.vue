@@ -195,6 +195,7 @@ const linkAction = getLinkAction(props.editor);
 </script>
 
 <template>
+  <!-- @vue-ignore TODO the type of shouldShow needs to be refined-->
   <bubble-menu
     :editor="editor"
     :tippy-options="{

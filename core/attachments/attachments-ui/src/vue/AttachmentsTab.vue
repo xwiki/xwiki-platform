@@ -53,7 +53,9 @@ async function upload(files: File[]) {
     await attachmentsService.upload(route.params.page as string, files);
     attachmentUpload.value?.reset();
   } catch (e) {
-    uploadError.value = e.message;
+    if (e instanceof Error) {
+      uploadError.value = e.message;
+    }
   }
 }
 </script>

@@ -23,8 +23,10 @@ const tab = ref(null);
 
 const emits = defineEmits(["change"]);
 
-function change(tabId: string) {
-  emits("change", tabId);
+function change(tabId: unknown) {
+  if (typeof tabId == "string") {
+    emits("change", tabId);
+  }
 }
 </script>
 

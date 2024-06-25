@@ -28,8 +28,8 @@ import { inject, injectable, named } from "inversify";
 
 @injectable()
 export class XWikiWikiConfig extends DefaultWikiConfig {
-  storage: Storage;
-  cristal: CristalApp;
+  override storage: Storage;
+  override cristal: CristalApp;
 
   constructor(
     @inject<Logger>("Logger") logger: Logger,
@@ -45,19 +45,15 @@ export class XWikiWikiConfig extends DefaultWikiConfig {
     }
   }
 
-  isSupported(format: string): boolean {
-    if (format == "html" || format == "jsonld") {
-      return true;
-    } else {
-      return false;
-    }
+  override isSupported(format: string): boolean {
+    return format == "html" || format == "jsonld";
   }
 
-  defaultPageName(): string {
+  override defaultPageName(): string {
     return "Main.WebHome";
   }
 
-  getType(): string {
+  override getType(): string {
     return "XWiki";
   }
 }

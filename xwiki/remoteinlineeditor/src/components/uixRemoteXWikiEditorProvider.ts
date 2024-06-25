@@ -26,21 +26,21 @@ import { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 export class UIXRemoteXWikiEditorProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.editor.remotexwiki";
-  public static hint = "";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.editor.remotexwiki";
+  public static override hint = "";
+  public static override priority = 1000;
+  public static override singleton = true;
   public static extensionPoint = "editor";
 
   registered = false;
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return TextEditor;
   }
-  getVueName(): string {
+  override getVueName(): string {
     return "c-edit-xwikiremote";
   }
-  isGlobal(): boolean {
+  override isGlobal(): boolean {
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

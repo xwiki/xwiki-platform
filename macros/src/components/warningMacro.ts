@@ -23,18 +23,18 @@ import Warning from "../vue/c-warning.vue";
 import { Component } from "vue";
 
 export class WarningMacro extends AlertMacro {
-  public static cname = "cristal.macro.warning";
-  public static macroName = "warning";
+  public static override cname = "cristal.macro.warning";
+  public static override macroName = "warning";
 
   constructor() {
     super();
   }
 
-  getMacroName(): string {
+  override getMacroName(): string {
     return WarningMacro.macroName;
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Warning;
   }
 }

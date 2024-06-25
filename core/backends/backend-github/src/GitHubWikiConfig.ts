@@ -28,8 +28,8 @@ import { inject, injectable, named } from "inversify";
 
 @injectable()
 export class GitHubWikiConfig extends DefaultWikiConfig {
-  storage: Storage;
-  cristal: CristalApp;
+  override storage: Storage;
+  override cristal: CristalApp;
 
   constructor(
     @inject<Logger>("Logger") logger: Logger,
@@ -45,11 +45,11 @@ export class GitHubWikiConfig extends DefaultWikiConfig {
     }
   }
 
-  defaultPageName(): string {
+  override defaultPageName(): string {
     return "README";
   }
 
-  getType(): string {
+  override getType(): string {
     return "GitHub";
   }
 }

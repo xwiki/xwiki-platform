@@ -29,10 +29,10 @@ export default class DefaultUIXEditorProvider
   extends DefaultUIXTemplateProvider
   implements UIXEditorProvider
 {
-  public static cname = "cristal.editor.component";
-  public static hint = "uix";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.editor.component";
+  public static override hint = "uix";
+  public static override priority = 1000;
+  public static override singleton = true;
 
   constructor() {
     super();

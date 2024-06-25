@@ -28,10 +28,10 @@ export default class DefaultUIXTemplateProvider
   extends DefaultVueTemplateProvider
   implements VueTemplateProvider
 {
-  public static cname = "cristal.vuejs.component";
-  public static hint = "uix";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.vuejs.component";
+  public static override hint = "uix";
+  public static override priority = 1000;
+  public static override singleton = true;
 
   constructor() {
     super();

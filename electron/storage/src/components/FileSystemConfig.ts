@@ -28,8 +28,8 @@ import {
 
 @injectable()
 export class FileSystemConfig extends DefaultWikiConfig {
-  storage: Storage;
-  cristal: CristalApp;
+  override storage: Storage;
+  override cristal: CristalApp;
   constructor(
     @inject<Logger>("Logger") logger: Logger,
     @inject("Storage") @named("FileSystem") storage: Storage,
@@ -44,7 +44,7 @@ export class FileSystemConfig extends DefaultWikiConfig {
     }
   }
 
-  getType(): string {
+  override getType(): string {
     return "FileSystem";
   }
 }

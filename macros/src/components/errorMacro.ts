@@ -23,18 +23,18 @@ import Error from "../vue/c-error.vue";
 import { Component } from "vue";
 
 export class ErrorMacro extends AlertMacro {
-  public static cname = "cristal.macro.error";
-  public static macroName = "error";
+  public static override cname = "cristal.macro.error";
+  public static override macroName = "error";
 
   constructor() {
     super();
   }
 
-  getMacroName(): string {
+  override getMacroName(): string {
     return ErrorMacro.macroName;
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Error;
   }
 }

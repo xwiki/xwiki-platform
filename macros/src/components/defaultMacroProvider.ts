@@ -28,10 +28,10 @@ export abstract class DefaultMacroProvider
   extends DefaultVueTemplateProvider
   implements MacroProvider
 {
-  public static cname = "cristal.macro";
-  public static hint = "macro";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.macro";
+  public static override hint = "macro";
+  public static override priority = 1000;
+  public static override singleton = true;
 
   getMacroRenderingType() {
     return "vue";

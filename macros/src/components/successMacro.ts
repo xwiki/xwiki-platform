@@ -23,18 +23,18 @@ import Success from "../vue/c-success.vue";
 import { Component } from "vue";
 
 export class SuccessMacro extends AlertMacro {
-  public static cname = "cristal.macro.success";
-  public static macroName = "success";
+  public static override cname = "cristal.macro.success";
+  public static override macroName = "success";
 
   constructor() {
     super();
   }
 
-  getMacroName(): string {
+  override getMacroName(): string {
     return SuccessMacro.macroName;
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Success;
   }
 }

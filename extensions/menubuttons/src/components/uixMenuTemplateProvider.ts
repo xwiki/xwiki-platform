@@ -26,17 +26,17 @@ import type { Component } from "vue";
 
 @injectable()
 export class UIXMenuTemplateProvider extends DefaultUIXTemplateProvider {
-  public static cname = "cristal.vuejs.component";
-  public static hint = "menu";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.vuejs.component";
+  public static override hint = "menu";
+  public static override priority = 1000;
+  public static override singleton = true;
   public static extensionPoint = "sidebar.before";
 
   constructor() {
     super();
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Menu;
   }
 
@@ -45,11 +45,11 @@ export class UIXMenuTemplateProvider extends DefaultUIXTemplateProvider {
     return menus;
   }
 
-  getVueName(): string {
+  override getVueName(): string {
     return "Menu";
   }
 
-  isGlobal(): boolean {
+  override isGlobal(): boolean {
     return false;
   }
 }

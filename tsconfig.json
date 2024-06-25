@@ -25,6 +25,7 @@
     "isolatedModules": true,
     "isolatedDeclarations": true,
     "resolveJsonModule": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+    "noImplicitOverride": true
   }
 }

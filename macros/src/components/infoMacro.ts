@@ -23,18 +23,18 @@ import Info from "../vue/c-info.vue";
 import { Component } from "vue";
 
 export class InfoMacro extends AlertMacro {
-  public static cname = "cristal.macro.info";
-  public static macroName = "info";
+  public static override cname = "cristal.macro.info";
+  public static override macroName = "info";
 
   constructor() {
     super();
   }
 
-  getMacroName(): string {
+  override getMacroName(): string {
     return InfoMacro.macroName;
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Info;
   }
 }

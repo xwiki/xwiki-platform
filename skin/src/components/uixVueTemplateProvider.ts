@@ -28,24 +28,24 @@ import "reflect-metadata";
 
 @injectable()
 export class UIXVueTemplateProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.vuejs.component";
-  public static hint = "uix";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.vuejs.component";
+  public static override hint = "uix";
+  public static override priority = 1000;
+  public static override singleton = true;
 
   constructor() {
     super();
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return UIX;
   }
 
-  getVueName(): string {
+  override getVueName(): string {
     return "UIX";
   }
 
-  isGlobal(): boolean {
+  override isGlobal(): boolean {
     return true;
   }
 

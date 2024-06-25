@@ -24,11 +24,11 @@ import Warning from "../vue/c-warning.vue";
 import { Component } from "vue";
 
 export class AlertMacro extends DefaultMacroProvider {
-  public static cname = "cristal.macro.alert";
+  public static override cname = "cristal.macro.alert";
   public static macroName = "alert";
-  public static hint = "macro";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override hint = "macro";
+  public static override priority = 1000;
+  public static override singleton = true;
 
   constructor() {
     super();
@@ -38,7 +38,7 @@ export class AlertMacro extends DefaultMacroProvider {
     return AlertMacro.macroName;
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Warning;
   }
 

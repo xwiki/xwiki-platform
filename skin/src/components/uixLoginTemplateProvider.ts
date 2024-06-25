@@ -25,21 +25,21 @@ import { injectable } from "inversify";
 
 @injectable()
 export class UIXLoginTemplateProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.vuejs.component";
-  public static hint = "";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.vuejs.component";
+  public static override hint = "";
+  public static override priority = 1000;
+  public static override singleton = true;
   public static extensionPoint = "header.nav.right";
 
   registered = false;
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Login;
   }
-  getVueName(): string {
+  override getVueName(): string {
     return "Login";
   }
-  isGlobal(): boolean {
+  override isGlobal(): boolean {
     return false;
   }
 }

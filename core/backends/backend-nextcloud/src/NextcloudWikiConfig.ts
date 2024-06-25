@@ -32,8 +32,8 @@ import { inject, injectable, named } from "inversify";
  */
 @injectable()
 export class NextcloudWikiConfig extends DefaultWikiConfig {
-  storage: Storage;
-  cristal: CristalApp;
+  override storage: Storage;
+  override cristal: CristalApp;
 
   constructor(
     @inject<Logger>("Logger") logger: Logger,
@@ -46,11 +46,11 @@ export class NextcloudWikiConfig extends DefaultWikiConfig {
     this.storage.setWikiConfig(this);
   }
 
-  isSupported(format: string): boolean {
+  override isSupported(format: string): boolean {
     return format == "html";
   }
 
-  defaultPageName(): string {
+  override defaultPageName(): string {
     return "home";
   }
 }

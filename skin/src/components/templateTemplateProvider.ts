@@ -28,24 +28,24 @@ import "reflect-metadata";
 
 @injectable()
 export class TemplateComponent extends DefaultVueTemplateProvider {
-  public static cname = "cristal.vuejs.component";
-  public static hint = "template";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.vuejs.component";
+  public static override hint = "template";
+  public static override priority = 1000;
+  public static override singleton = true;
 
   constructor() {
     super();
   }
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Template;
   }
 
-  getVueName(): string {
+  override getVueName(): string {
     return "Template";
   }
 
-  isGlobal(): boolean {
+  override isGlobal(): boolean {
     return true;
   }
 

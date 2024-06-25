@@ -25,21 +25,21 @@ import { injectable } from "inversify";
 
 @injectable()
 export class UIXSearchTemplateProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.vuejs.component";
-  public static hint = "";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.vuejs.component";
+  public static override hint = "";
+  public static override priority = 1000;
+  public static override singleton = true;
   public static extensionPoint = "header.nav.center";
 
   registered = false;
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     return Search;
   }
-  getVueName(): string {
+  override getVueName(): string {
     return "Search";
   }
-  isGlobal(): boolean {
+  override isGlobal(): boolean {
     return false;
   }
 }

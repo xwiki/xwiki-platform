@@ -26,22 +26,22 @@ import { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 export class UixTiptapEditorProvider extends DefaultVueTemplateProvider {
-  public static cname = "cristal.editor.tiptap";
-  public static hint = "";
-  public static priority = 1000;
-  public static singleton = true;
+  public static override cname = "cristal.editor.tiptap";
+  public static override hint = "";
+  public static override priority = 1000;
+  public static override singleton = true;
   public static extensionPoint = "editor";
 
   registered = false;
 
-  getVueComponent(): Component {
+  override getVueComponent(): Component {
     TiptapEditor.editorname = "tiptap";
     return TiptapEditor;
   }
-  getVueName(): string {
+  override getVueName(): string {
     return "TiptapEditor";
   }
-  isGlobal(): boolean {
+  override isGlobal(): boolean {
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

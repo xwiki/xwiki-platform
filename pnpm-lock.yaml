@@ -18,8 +18,8 @@ importers:
         specifier: 7.10.0
         version: 7.10.0(eslint@8.57.0)(typescript@5.5.2)
       '@vitejs/plugin-vue':
-        specifier: 5.0.4
-        version: 5.0.4(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))
+        specifier: 5.0.5
+        version: 5.0.5(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))
       '@vitest/coverage-v8':
         specifier: 1.6.0
         version: 1.6.0(vitest@1.6.0(@types/node@20.14.7)(happy-dom@14.12.0))
@@ -1063,8 +1063,8 @@ importers:
         version: 4.3.2(vue@3.4.29(typescript@5.5.2))
     devDependencies:
       '@vitejs/plugin-vue':
-        specifier: 5.0.4
-        version: 5.0.4(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))
+        specifier: 5.0.5
+        version: 5.0.5(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -1131,8 +1131,8 @@ importers:
         specifier: 20.14.7
         version: 20.14.7
       '@vitejs/plugin-vue':
-        specifier: 5.0.4
-        version: 5.0.4(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))
+        specifier: 5.0.5
+        version: 5.0.5(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -2226,8 +2226,8 @@ packages:
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
 
-  '@vitejs/plugin-vue@5.0.4':
-    resolution: {integrity: sha512-WS3hevEszI6CEVEx28F8RjTX97k3KsrcY6kvTg7+Whm5y3oYvcqzVeGCU3hxSAn4uY2CLCkeokkGKpoctccilQ==}
+  '@vitejs/plugin-vue@5.0.5':
+    resolution: {integrity: sha512-LOjm7XeIimLBZyzinBQ6OSm3UBCNVCpLkxGC0oWmm2YPzVZoxMsdvNVimLTBzpAnR9hl/yn1SHGuRfe6/Td9rQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       vite: ^5.0.0
@@ -6303,7 +6303,7 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-vue@5.0.4(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))':
+  '@vitejs/plugin-vue@5.0.5(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))':
     dependencies:
       vite: 5.3.1(@types/node@20.14.7)
       vue: 3.4.29(typescript@5.5.2)

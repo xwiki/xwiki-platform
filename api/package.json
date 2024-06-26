@@ -33,7 +33,6 @@
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
-    "rimraf": "5.0.7",
     "vue-tsc": "2.0.22"
   },
   "publishConfig": {

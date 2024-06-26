@@ -36,7 +36,6 @@
     "vue": "3.4.29"
   },
   "devDependencies": {
-    "@types/node": "20.14.7",
-    "rimraf": "5.0.7"
+    "@types/node": "20.14.7"
   }
 }

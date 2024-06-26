@@ -34,7 +34,6 @@
     "vuetify": "3.6.10"
   },
   "devDependencies": {
-    "rimraf": "5.0.7",
     "vue-tsc": "2.0.22"
   },
   "publishConfig": {

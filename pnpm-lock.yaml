@@ -47,6 +47,9 @@ importers:
       prettier:
         specifier: 3.3.2
         version: 3.3.2
+      rimraf:
+        specifier: 5.0.7
+        version: 5.0.7
       rollup:
         specifier: 4.18.0
         version: 4.18.0
@@ -87,9 +90,6 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -359,9 +359,6 @@ importers:
       eslint:
         specifier: 8.57.0
         version: 8.57.0
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -431,9 +428,6 @@ importers:
       happy-dom:
         specifier: 14.12.0
         version: 14.12.0
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
 
   ds/dsfr:
     dependencies:
@@ -468,9 +462,6 @@ importers:
       happy-dom:
         specifier: 14.12.0
         version: 14.12.0
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -499,9 +490,6 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -527,9 +515,6 @@ importers:
         specifier: 3.6.10
         version: 3.6.10(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.29(typescript@5.5.2)))(vue@3.4.29(typescript@5.5.2))
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -645,9 +630,6 @@ importers:
       '@types/markdown-it':
         specifier: 14.1.1
         version: 14.1.1
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -673,9 +655,6 @@ importers:
       electron-builder:
         specifier: 24.13.3
         version: 24.13.3(electron-builder-squirrel-windows@24.13.3(dmg-builder@24.13.3))
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
 
   electron/browser:
     dependencies:
@@ -710,9 +689,6 @@ importers:
       cross-env:
         specifier: 7.0.3
         version: 7.0.3
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
 
   electron/preload:
     devDependencies:
@@ -725,9 +701,6 @@ importers:
       '@xwiki/cristal-electron-storage':
         specifier: workspace:*
         version: link:../storage
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       unplugin-auto-expose:
         specifier: 0.2.4
         version: 0.2.4(rollup@4.18.0)
@@ -768,9 +741,6 @@ importers:
       '@types/node':
         specifier: 20.14.7
         version: 20.14.7
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
 
   electron/storage:
     dependencies:
@@ -790,9 +760,6 @@ importers:
       '@types/node':
         specifier: 20.14.7
         version: 20.14.7
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vite-plugin-node:
         specifier: 3.1.0
         version: 3.1.0(vite@5.3.1(@types/node@20.14.7))
@@ -831,9 +798,6 @@ importers:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -925,9 +889,6 @@ importers:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.29(typescript@5.5.2))
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -947,9 +908,6 @@ importers:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -978,9 +936,6 @@ importers:
       '@types/dompurify':
         specifier: 3.0.5
         version: 3.0.5
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -994,9 +949,6 @@ importers:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -1010,9 +962,6 @@ importers:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vite-plugin-comlink:
         specifier: 4.1.0
         version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.7))
@@ -1056,9 +1005,6 @@ importers:
         specifier: 4.3.2
         version: 4.3.2(vue@3.4.29(typescript@5.5.2))
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vite-plugin-comlink:
         specifier: 4.1.0
         version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.7))
@@ -1111,9 +1057,6 @@ importers:
       '@vitejs/plugin-vue':
         specifier: 5.0.4
         version: 5.0.4(vite@5.3.1(@types/node@20.14.7))(vue@3.4.29(typescript@5.5.2))
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -1185,9 +1128,6 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vite-plugin-comlink:
         specifier: 4.1.0
         version: 4.1.0(comlink@4.4.1)(vite@5.3.1(@types/node@20.14.7))
@@ -1219,9 +1159,6 @@ importers:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)
     devDependencies:
-      rimraf:
-        specifier: 5.0.7
-        version: 5.0.7
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)

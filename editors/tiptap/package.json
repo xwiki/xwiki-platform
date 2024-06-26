@@ -65,7 +65,6 @@
   "devDependencies": {
     "@types/lodash": "4.17.5",
     "@types/markdown-it": "14.1.1",
-    "rimraf": "5.0.7",
     "vue-tsc": "2.0.22"
   },
   "publishConfig": {

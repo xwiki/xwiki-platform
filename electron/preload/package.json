@@ -26,7 +26,6 @@
     "@types/node": "20.14.7",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
-    "rimraf": "5.0.7",
     "unplugin-auto-expose": "0.2.4"
   }
 }

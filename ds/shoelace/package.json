@@ -35,7 +35,6 @@
   "devDependencies": {
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "rimraf": "5.0.7",
     "vue-tsc": "2.0.22"
   },
   "publishConfig": {

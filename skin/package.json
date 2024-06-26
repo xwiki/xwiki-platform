@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "5.0.4",
-    "rimraf": "5.0.7",
     "vue-tsc": "2.0.22"
   },
   "publishConfig": {

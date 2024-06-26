@@ -33,7 +33,7 @@ function click() {
   <span @click="click">
     <slot name="activator" />
   </span>
-  <sl-dialog :label="title" class="dialog-overview" ref="dialog">
+  <sl-dialog ref="dialog" :label="title" class="dialog-overview">
     <slot name="default" />
   </sl-dialog>
 </template>

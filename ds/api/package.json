@@ -22,10 +22,6 @@
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
-  "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*",
-    "happy-dom": "14.12.0"
-  },
   "publishConfig": {
     "exports": {
       ".": {

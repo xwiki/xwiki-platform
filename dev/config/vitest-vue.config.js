@@ -18,8 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { mergeConfig } from "vitest/config";
-import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";
-import localConfig from "./vite.config";
+import { defineConfig, mergeConfig } from "vitest/config";
+import defaultConfig from "./vitest.config.js";
 
-export default mergeConfig(defaultConfig, localConfig);
+export default mergeConfig(
+  defaultConfig,
+  defineConfig({
+    test: {
+      environment: "happy-dom",
+    },
+  }),
+);

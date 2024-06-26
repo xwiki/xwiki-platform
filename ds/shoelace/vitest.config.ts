@@ -19,11 +19,7 @@
  */
 
 import { mergeConfig } from "vitest/config";
-import defaultConfig from "@xwiki/cristal-dev-config/vitest.config";
+import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";
 import localConfig from "./vite.config";
 
-export default mergeConfig(mergeConfig(defaultConfig, localConfig), {
-  test: {
-    environment: "happy-dom",
-  },
-});
+export default mergeConfig(defaultConfig, localConfig);

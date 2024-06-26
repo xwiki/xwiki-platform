@@ -20,7 +20,7 @@
 
 import type { Logger } from "../api/logger";
 
-import { inject, injectable } from "inversify";
+import { inject, injectable, optional } from "inversify";
 import type { LoggerConfig } from "../api/loggerConfig";
 
 @injectable()
@@ -31,6 +31,7 @@ export class DefaultLogger implements Logger {
 
   constructor(
     @inject("LoggerConfig")
+    @optional()
     readonly loggerConfig?: LoggerConfig | undefined,
   ) {}
 

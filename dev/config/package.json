@@ -13,8 +13,5 @@
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
-  "type": "module",
-  "devDependencies": {
-    "vitest": "1.6.0"
-  }
+  "type": "module"
 }

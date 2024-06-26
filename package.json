@@ -18,6 +18,7 @@
   },
   "main": "./src/index.ts",
   "scripts": {
+    "clean": "rimraf dist",
     "build": "tsc --project tsconfig.json && vite build",
     "test": "vitest --run"
   },

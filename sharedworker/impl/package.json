@@ -37,7 +37,7 @@
     "comlink": "4.4.1",
     "inversify": "6.0.2",
     "vue": "3.4.29",
-    "vue-router": "4.3.2"
+    "vue-router": "4.4.0"
   },
   "devDependencies": {
     "vite-plugin-comlink": "4.1.0",

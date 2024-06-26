@@ -41,7 +41,7 @@
     "@xwiki/cristal-link-suggest-xwiki": "workspace:*",
     "express": "4.19.2",
     "vue": "3.4.29",
-    "vue-router": "4.3.2"
+    "vue-router": "4.4.0"
   },
   "devDependencies": {
     "@playwright/test": "1.45.0",

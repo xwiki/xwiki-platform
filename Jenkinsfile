@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 pipeline {
+    options { disableConcurrentBuilds() }
     agent {
       label 'dockernodejs'
     }

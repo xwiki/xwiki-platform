@@ -21,8 +21,20 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script lang="ts" setup>
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { watch } from "vue";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const props = defineProps<{ infoAction: InfoAction }>();
+
+function refresh(): Promise<void> | undefined {
+  return props.infoAction.refresh?.(route.params.page as string);
+}
+
+watch(() => route.params.page, refresh);
+// We don't use immediate in the watch because we want to be able to wait on
+// the first refresh call, to have an initialized counter.
+await refresh();
 const counter = await props.infoAction.counter();
 </script>
 

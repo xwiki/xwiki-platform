@@ -17,36 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Ref } from "vue";
 
-/**
- * The information to provide for an info action element.
- *
- * @since 0.9
- */
-interface InfoAction {
-  id: string;
-  iconName: string;
-  counter(): Promise<Ref<number>>;
-  order: number;
+import { mergeConfig } from "vitest/config";
+import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";
+import localConfig from "./vite.config";
 
-  /**
-   * And optional refresh action. Otherwise, we assume asking for the counter
-   * is enough.
-   * @param page an option page reference, otherwise the current page is used
-   * @since 0.10
-   */
-  refresh?(page?: string): Promise<void>;
-}
-
-/**
- * Provide the operations to interact with the info actions. Currently, returns
- * the full list of available info actions.
- *
- * @since 0.9
- */
-interface InfoActionsService {
-  list(): Promise<InfoAction[]>;
-}
-
-export type { InfoActionsService, InfoAction };
+export default mergeConfig(defaultConfig, localConfig);

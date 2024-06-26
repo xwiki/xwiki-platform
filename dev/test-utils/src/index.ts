@@ -17,36 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Ref } from "vue";
+import { defineComponent, h, Suspense } from "vue";
 
 /**
- * The information to provide for an info action element.
- *
- * @since 0.9
+ * Wraps a component with an async setup in a suspense component and pass it
+ * the provided props
+ * @param component the component with an async setup to wrap in a suspense
+ * @param props the props of the wrapped component
  */
-interface InfoAction {
-  id: string;
-  iconName: string;
-  counter(): Promise<Ref<number>>;
-  order: number;
-
-  /**
-   * And optional refresh action. Otherwise, we assume asking for the counter
-   * is enough.
-   * @param page an option page reference, otherwise the current page is used
-   * @since 0.10
-   */
-  refresh?(page?: string): Promise<void>;
+function wrapInSuspense(
+  component: ReturnType<typeof defineComponent>,
+  { props }: { props: object },
+) {
+  return defineComponent({
+    render() {
+      return h(Suspense, null, {
+        default() {
+          return h(component, props);
+        },
+      });
+    },
+  });
 }
 
-/**
- * Provide the operations to interact with the info actions. Currently, returns
- * the full list of available info actions.
- *
- * @since 0.9
- */
-interface InfoActionsService {
-  list(): Promise<InfoAction[]>;
-}
-
-export type { InfoActionsService, InfoAction };
+export { wrapInSuspense };

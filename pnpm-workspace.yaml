@@ -25,7 +25,7 @@ packages:
   - "core/icons"
   - "core/info-actions/*"
   - "core/link-suggest/*"
-  - "dev/config"
+  - "dev/*"
   - "ds/api"
   - "ds/dsfr"
   - "ds/shoelace"

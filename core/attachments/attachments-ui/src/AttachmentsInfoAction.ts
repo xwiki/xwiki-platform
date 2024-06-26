@@ -40,7 +40,12 @@ export class AttachmentsInfoAction implements InfoAction {
   ) {}
 
   async counter(): Promise<Ref<number>> {
-    await this.attachmentsService.refresh(this.cristalApp.getCurrentPage());
     return this.attachmentsService.count();
+  }
+
+  async refresh(page?: string): Promise<void> {
+    await this.attachmentsService.refresh(
+      page || this.cristalApp.getCurrentPage(),
+    );
   }
 }

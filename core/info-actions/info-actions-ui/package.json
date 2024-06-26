@@ -20,15 +20,21 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-info-actions-api": "workspace:*",
-    "vue": "3.4.29"
+    "vue": "3.4.29",
+    "vue-router": "4.3.2"
   },
   "devDependencies": {
+    "@vue/test-utils": "2.4.6",
+    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dev-test-utils": "workspace:*",
+    "happy-dom": "14.12.0",
     "vue-tsc": "2.0.22"
   },
   "publishConfig": {

@@ -399,7 +399,22 @@ importers:
       vue:
         specifier: 3.4.29
         version: 3.4.29(typescript@5.5.2)
+      vue-router:
+        specifier: 4.3.2
+        version: 4.3.2(vue@3.4.29(typescript@5.5.2))
     devDependencies:
+      '@vue/test-utils':
+        specifier: 2.4.6
+        version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/cristal-dev-test-utils':
+        specifier: workspace:*
+        version: link:../../../dev/test-utils
+      happy-dom:
+        specifier: 14.12.0
+        version: 14.12.0
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -420,14 +435,13 @@ importers:
 
   dev/config: {}
 
-  ds/api:
+  dev/test-utils:
     devDependencies:
-      '@xwiki/cristal-dev-config':
-        specifier: workspace:*
-        version: link:../../dev/config
-      happy-dom:
-        specifier: 14.12.0
-        version: 14.12.0
+      vue:
+        specifier: 3.4.29
+        version: 3.4.29(typescript@5.5.2)
+
+  ds/api: {}
 
   ds/dsfr:
     dependencies:

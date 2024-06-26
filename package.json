@@ -26,9 +26,6 @@
     "@xwiki/cristal-hierarchy-api": "workspace:*",
     "inversify": "6.0.2"
   },
-  "devDependencies": {
-    "vitest": "1.6.0"
-  },
   "publishConfig": {
     "exports": {
       ".": {

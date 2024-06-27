@@ -40,9 +40,12 @@ import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
@@ -107,6 +110,9 @@ public class SolrRatingsManagerTest
     @MockComponent
     private AverageRatingManager averageRatingManager;
 
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
     @Mock
     private SolrClient solrClient;
 
@@ -155,6 +161,7 @@ public class SolrRatingsManagerTest
         }).when(this.solrUtils).setString(any(), any(Object.class), any(), any());
         when(this.configuration.getAverageRatingStorageHint()).thenReturn("averageHint");
         componentManager.registerComponent(AverageRatingManager.class, "averageHint", this.averageRatingManager);
+        when(this.documentAccessBridge.exists(any(DocumentReference.class))).thenReturn(true);
     }
 
     private QueryResponse prepareSolrClientQueryWhenStatement(SolrClient solrClient, SolrQuery expectedQuery)
@@ -430,7 +437,7 @@ public class SolrRatingsManagerTest
         this.manager.setIdentifier(managerId);
         int scale = 10;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        EntityReference reference = mock(EntityReference.class);
+        DocumentReference reference = mock(DocumentReference.class);
         when(reference.toString()).thenReturn("wiki:foobar");
         UserReference userReference = mock(UserReference.class);
         when(userReference.toString()).thenReturn("user:Toto");
@@ -512,7 +519,7 @@ public class SolrRatingsManagerTest
         int newVote = 2;
         int oldVote = 3;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        EntityReference reference = mock(EntityReference.class);
+        DocumentReference reference = mock(DocumentReference.class);
         when(reference.toString()).thenReturn("wiki:foobar");
         UserReference userReference = mock(UserReference.class);
         when(userReference.toString()).thenReturn("user:Toto");
@@ -602,7 +609,7 @@ public class SolrRatingsManagerTest
         int newVote = 0;
         int oldVote = 3;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        EntityReference reference = mock(EntityReference.class);
+        DocumentReference reference = mock(DocumentReference.class);
         when(reference.toString()).thenReturn("wiki:foobar");
         UserReference userReference = mock(UserReference.class);
         when(userReference.toString()).thenReturn("user:Toto");
@@ -726,6 +733,18 @@ public class SolrRatingsManagerTest
         expectedRating.setUpdatedAt(rating.getUpdatedAt());
         assertEquals(expectedRating, rating);
         verify(this.solrClient).add(any(SolrInputDocument.class));
+    }
+
+    @Test
+    void saveRatingNonExistingPage()
+    {
+        when(this.configuration.getScaleUpperBound()).thenReturn(2);
+        EntityReference reference = mock(SpaceReference.class);
+        when(reference.toString()).thenReturn("xwiki:ref");
+        UserReference userReference = mock(UserReference.class);
+        RatingsException exception =
+            assertThrows(RatingsException.class, () -> this.manager.saveRating(reference, userReference, 1));
+        assertEquals("The reference [xwiki:ref] is not an existing page.", exception.getMessage());
     }
 
     @Test
@@ -937,7 +956,7 @@ public class SolrRatingsManagerTest
         String managerId = "moveRatingsManagerId";
         this.manager.setIdentifier(managerId);
         when(this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE)).thenReturn(this.solrClient);
-        
+
         EntityReference oldReference = mock(EntityReference.class);
         EntityReference newReference = mock(EntityReference.class);
         when(oldReference.toString()).thenReturn("document:My.Old.Doc");

@@ -40,7 +40,6 @@
   <modules>
     <module>xwiki-platform-panels-test-content</module>
     <module>xwiki-platform-panels-test-pageobjects</module>
-    <module>xwiki-platform-panels-test-tests</module>
   </modules>
   <profiles>
     <profile>

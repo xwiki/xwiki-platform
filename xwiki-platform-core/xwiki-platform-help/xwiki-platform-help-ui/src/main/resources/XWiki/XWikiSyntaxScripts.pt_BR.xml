@@ -43,7 +43,7 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Scripts ===
 
-{{info}}No XWiki Syntax 1.0 era possível inserir scripts Velocity em qualquer lugar diretamente na página. Isso pode levar a problemas, por exemplo, quando o usuário entra involuntariamente no conteúdo do Velocity. Também exige desempenho para páginas que não requerem conteúdo do Velocity. Existem várias outras limitações técnicas. O mesmo vale para inserir scripts Groovy.{{/info}}
+{{info}}Na sintaxe XWiki 1.0 era possível inserir scripts Velocity em qualquer lugar diretamente na página. Isso pode levar a problemas, por exemplo, quando o usuário entra involuntariamente no conteúdo do Velocity. Também exige desempenho para páginas que não requerem conteúdo do Velocity. Existem várias outras limitações técnicas. O mesmo vale para inserir scripts Groovy.{{/info}}
 
 |=Recurso|=Sintaxe do XWiki 1.0
 |Script Velocity|((({{{

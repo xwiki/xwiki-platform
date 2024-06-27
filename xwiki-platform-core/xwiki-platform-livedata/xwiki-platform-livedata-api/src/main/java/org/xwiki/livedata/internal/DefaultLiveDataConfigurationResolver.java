@@ -124,7 +124,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     }
 
     /**
-     * If the pagination sizes are missing the limit define in the query, add it to the allowed page limits.
+     * If the pagination sizes are missing the limit defined in the query, add it to the allowed page limits.
      *
      * @param mergedConfiguration the live data configuration
      */

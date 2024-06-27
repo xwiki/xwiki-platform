@@ -242,11 +242,6 @@ public class RepositoryManager implements Initializable, Disposable
         this.documentReferenceCache.dispose();
     }
 
-    public <T> XWikiDocument getDocument(T[] data) throws XWikiException
-    {
-        return getDocument((String) data[0]);
-    }
-
     public XWikiDocument getDocument(String fullName) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();

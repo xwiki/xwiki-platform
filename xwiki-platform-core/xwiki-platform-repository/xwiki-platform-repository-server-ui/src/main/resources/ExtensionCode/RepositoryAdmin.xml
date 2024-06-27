@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="ExtensionCode.RepositoryAdmin" locale="">
+<xwikidoc version="1.5" reference="ExtensionCode.RepositoryAdmin" locale="">
   <web>ExtensionCode</web>
   <name>RepositoryAdmin</name>
   <language/>
@@ -50,15 +50,9 @@
 
 #set($erDefaultIdPrefixPropertyClass = $repositoryConfigClass.defaultIdPrefix)
 #set($erValidTypesPropertyClass = $repositoryConfigClass.validTypes)
-
-## Form submission depends on this.
-$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
-## In case of conflict issue we want to display the diff properly
-#set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
-#set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
 {{/velocity}}
 
-= Configuration
+= Configuration =
 
 {{velocity}}
 {{html}}
@@ -78,30 +72,6 @@ $repositoryConfigDoc.displayEdit($erValidTypesPropertyClass, "${repositoryConfig
 
 &lt;span class="buttonwrapper"&gt;&lt;input name="action_saveandcontinue" value="Update" class="button" type="submit"&gt;&lt;/span&gt;
 
-&lt;/fieldset&gt;
-&lt;/form&gt;
-{{/html}}
-{{/velocity}}
-
-= Actions
-
-{{velocity}}
-#if ($request.actionvalidateextenions)
-  #set($void = $repositoryManager.validateExtensions())
-  #set($error = $repositoryManager.lastError)
-  #if ($error)
-    {{error}}Failed to validate extensions: #printThrowable($error){{/error}}
-  #else
-    {{success}}Successfully validated extensions{{/success}}
-  #end
-#end
-{{/velocity}}
-
-{{velocity}}
-{{html}}
-&lt;form id="extension_repository_validateextensions" method="post" action="$xwiki.requestURL"&gt;
-&lt;fieldset&gt;
-&lt;span class="buttonwrapper"&gt;&lt;input name="actionvalidateextenions" value="Validate extensions" class="button" type="submit"&gt;&lt;/span&gt;
 &lt;/fieldset&gt;
 &lt;/form&gt;
 {{/html}}

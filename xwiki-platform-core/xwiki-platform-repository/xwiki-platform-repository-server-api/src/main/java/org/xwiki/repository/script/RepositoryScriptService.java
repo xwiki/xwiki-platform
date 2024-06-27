@@ -57,7 +57,7 @@ public class RepositoryScriptService implements ScriptService
 
     /**
      * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
-     * 
+     *
      * @param e the exception to store, can be {@code null} to clear the previously stored exception
      * @see #getLastError()
      */
@@ -68,7 +68,7 @@ public class RepositoryScriptService implements ScriptService
 
     /**
      * Get the error generated while performing the previously called action.
-     * 
+     *
      * @return an eventual exception or {@code null} if no exception was thrown
      */
     public Exception getLastError()
@@ -76,6 +76,7 @@ public class RepositoryScriptService implements ScriptService
         return (Exception) this.execution.getContext().getProperty(REPOSITORYERROR_KEY);
     }
 
+    @Deprecated(since = "16.6.0RC1")
     public void validateExtensions()
     {
         setError(null);

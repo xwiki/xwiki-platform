@@ -1240,6 +1240,16 @@
       </analyzer>
     </fieldType>
 
+    <!-- XWIKI: Traditional Chinese -->
+    <dynamicField name="*_zh_TW" type="text_zh_TW"  indexed="true"  stored="true" multiValued="true"/>
+    <fieldType name="text_TW" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer name="icu"/>
+        <filter name="cjkWidth"/>
+        <filter name="lowercase"/>
+      </analyzer>
+    </fieldType>
+
     <!-- XWIKI: A text field used to index XWiki attachment file names. -->
     <fieldType name="text_filename" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">

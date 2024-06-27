@@ -20,51 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc locale="ko">
-  <web>XWiki</web>
-  <name>XWikiSyntaxHorizontalLine</name>
-  <language>ko</language>
+<xwikidoc reference="Applications.Translations" locale="tr">
+  <web>Applications</web>
+  <name>Translations</name>
+  <language>tr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>XWiki.XWikiSyntax</parent>
+  <parent>Applications.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxHorizontalLine</title>
+  <title>Translations</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>= 편집 중 =
-
-== 가로선 ==
-
-=== 1.0 가로선 ===
-
-{{info}}대시가 4개 이상 있어야 합니다.{{/info}}
-
-|=기능|= XWiki 구문 1.0|=결과
-|간단한 수평선|{{{--}}}|(((--)))
-|매개변수화된 수평선|&lt;hr style="테두리-색상:파란색"/&gt;|(((
-(% 스타일="테두리-색상:파란색" %)
-----
-)))
-
-=== 2.0 가로선 ===
-
-{{info}}대시가 4개 이상 있어야 합니다.{{/info}}
-
-|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
-|간단한 수평선|{{{--}}}|(((--)))
-|매개변수화된 수평선|((({{{
-(% 스타일="테두리-색상:파란색" %)
-----
-}}})))|(((
-(% 스타일="테두리-색상:파란색" %)
-----
-)))</content>
+  <content>application.index.title=Uygulama İndeksi
+application.index.drawer=Uygulama İndeksi
+</content>
 </xwikidoc>

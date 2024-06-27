@@ -43,7 +43,8 @@
 
 == Formatação de texto ==
 
-=== 1.0 Formatação de texto ===
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Text Formatting ===
 
 |=Recurso|=Sintaxe do XWiki 1.0|=Resultado
 |Negrito|{{{*negrito*}}}|**negrito**
@@ -54,7 +55,7 @@
 |Sobrescrito|algum &lt;sup&gt;sobrescrito&lt;/sup&gt;|algum ^^sobrescrito^^
 |Subscrito|algum &lt;sub&gt;subscrito&lt;/sub&gt;|algum ,,subscrito,,
 
-=== 2.0 Formatação de texto ===
+=== 2.0 Text Formatting ===
 
 |=Recurso|=Sintaxe do XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultado
 |Negrito|{{{**negrito**}}}|**negrito**

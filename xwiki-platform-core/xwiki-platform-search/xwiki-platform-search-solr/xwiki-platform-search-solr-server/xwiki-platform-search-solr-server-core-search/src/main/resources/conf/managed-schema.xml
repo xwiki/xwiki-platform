@@ -1127,6 +1127,16 @@
       </analyzer>
     </fieldType>
 
+    <!-- XWIKI: Persian -->
+    <dynamicField name="*_pl" type="text_pl"  indexed="true"  stored="true" multiValued="true"/>
+    <fieldType name="text_pl" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer name="standard"/>
+        <filter name="lowercase"/>
+        <filter name="stempelPolishStem"/>
+      </analyzer>
+    </fieldType>
+
     <!-- Portuguese -->
     <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_pt" type="text_pt"  indexed="true"  stored="true" multiValued="true"/>

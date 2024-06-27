@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-scheduler-test</artifactId>
-    <version>15.10.11-SNAPSHOT</version>
+    <version>15.10.11</version>
   </parent>
   <artifactId>xwiki-platform-scheduler-test-docker</artifactId>
   <name>XWiki Platform - Scheduler - Tests - Functional Docker Tests</name>

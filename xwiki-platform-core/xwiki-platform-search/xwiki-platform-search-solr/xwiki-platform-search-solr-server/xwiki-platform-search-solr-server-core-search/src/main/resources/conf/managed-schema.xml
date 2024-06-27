@@ -1227,6 +1227,17 @@
       </analyzer>
     </fieldType>
 
+    <!-- XWIKI: Ukrainian -->
+    <dynamicField name="*_uk" type="text_uk"  indexed="true"  stored="true" multiValued="true"/>
+    <fieldType name="text_uk" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer name="standard"/>
+        <filter name="stop" words="org/apache/lucene/analysis/uk/stopwords.txt"/>
+        <filter name="lowercase"/>
+        <filter name="morfologik" dictionary="org/apache/lucene/analysis/uk/ukrainian.dict"/>
+      </analyzer>
+    </fieldType>
+
     <!-- XWIKI: Simplified Chinese -->
     <dynamicField name="*_zh" type="text_zh"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_zh" class="solr.TextField" positionIncrementGap="100">

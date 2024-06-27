@@ -19,8 +19,8 @@
  */
 package org.xwiki.livedata.internal.macro;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,10 +34,16 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.icon.IconManager;
+import org.xwiki.livedata.LiveData;
+import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
+import org.xwiki.livedata.LiveDataEntryDescriptor;
+import org.xwiki.livedata.LiveDataLayoutDescriptor;
+import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPaginationConfiguration;
+import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.livedata.LiveDataQuery;
-import org.xwiki.livedata.LiveDataQuery.Filter;
-import org.xwiki.livedata.LiveDataQuery.SortEntry;
+import org.xwiki.livedata.LiveDataSelectionConfiguration;
 import org.xwiki.livedata.internal.DefaultLiveDataConfigurationResolver;
 import org.xwiki.livedata.internal.LiveDataRenderer;
 import org.xwiki.livedata.internal.LiveDataRendererConfiguration;
@@ -70,7 +76,10 @@ import org.xwiki.xml.internal.html.MathMLDefinitions;
 import org.xwiki.xml.internal.html.SVGDefinitions;
 import org.xwiki.xml.internal.html.SecureHTMLElementSanitizer;
 
-import static org.mockito.ArgumentMatchers.any;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static org.mockito.Mockito.when;
 import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
 
@@ -135,10 +144,141 @@ class LiveDataMacroTest
     @Mock
     private TransformationContext transformationContext;
 
+    private LiveDataConfiguration liveDataConfiguration;
+
     @BeforeComponent
     void beforeComponent(MockitoComponentManager componentManager) throws Exception
     {
         componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+
+        // setup default LD configuration
+        this.liveDataConfiguration = new LiveDataConfiguration();
+        LiveDataQuery liveDataQuery = new LiveDataQuery();
+        liveDataQuery.setLimit(15);
+        liveDataQuery.setProperties(List.of());
+        liveDataQuery.setSource(new LiveDataQuery.Source());
+        liveDataQuery.setFilters(List.of());
+        liveDataQuery.setSort(List.of());
+        liveDataQuery.setOffset(0L);
+        this.liveDataConfiguration.setQuery(liveDataQuery);
+
+        LiveData liveData = new LiveData();
+        liveData.setCount(0);
+        this.liveDataConfiguration.setData(liveData);
+
+        LiveDataMeta meta = new LiveDataMeta();
+        LiveDataLayoutDescriptor tableLayout = new LiveDataLayoutDescriptor("table");
+        tableLayout.setName("table");
+        tableLayout.setIcon(Map.of());
+        LiveDataLayoutDescriptor cardsLayout = new LiveDataLayoutDescriptor("cards");
+        cardsLayout.setName("cards");
+        cardsLayout.setIcon(Map.of());
+        meta.setLayouts(List.of(
+            tableLayout,
+            cardsLayout
+        ));
+        meta.setDefaultLayout(tableLayout.getId());
+
+        LiveDataPropertyDescriptor.OperatorDescriptor contains =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("contains", "contains");
+        LiveDataPropertyDescriptor.OperatorDescriptor equals =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("equals", "equals");
+        LiveDataPropertyDescriptor.OperatorDescriptor startsWith =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("startsWith", "startsWith");
+        LiveDataPropertyDescriptor.FilterDescriptor textFilter =
+            new LiveDataPropertyDescriptor.FilterDescriptor("text");
+        textFilter.setOperators(List.of(contains, startsWith, equals));
+        textFilter.setDefaultOperator("contains");
+
+        LiveDataPropertyDescriptor.OperatorDescriptor equalsNumber =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("equals", "=");
+        LiveDataPropertyDescriptor.OperatorDescriptor less =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("less", "<");
+        LiveDataPropertyDescriptor.OperatorDescriptor greater =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("greater", ">");
+        LiveDataPropertyDescriptor.FilterDescriptor numberFilter =
+            new LiveDataPropertyDescriptor.FilterDescriptor("number");
+        numberFilter.setOperators(List.of(equalsNumber, less, greater));
+        numberFilter.setDefaultOperator("equals");
+
+        LiveDataPropertyDescriptor.FilterDescriptor booleanFilter =
+            new LiveDataPropertyDescriptor.FilterDescriptor("boolean");
+        booleanFilter.setOperators(List.of(equals));
+        booleanFilter.setDefaultOperator("equals");
+
+        LiveDataPropertyDescriptor.OperatorDescriptor between =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("between", "between");
+        LiveDataPropertyDescriptor.OperatorDescriptor before =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("before", "before");
+        LiveDataPropertyDescriptor.OperatorDescriptor after =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("after", "after");
+        LiveDataPropertyDescriptor.FilterDescriptor dateFilter =
+            new LiveDataPropertyDescriptor.FilterDescriptor("date");
+        dateFilter.setOperators(List.of(between, before, after, contains));
+        dateFilter.setDefaultOperator("between");
+        dateFilter.setParameter("dateFormat", "yyyy/MM/dd HH:mm");
+
+        LiveDataPropertyDescriptor.OperatorDescriptor empty =
+            new LiveDataPropertyDescriptor.OperatorDescriptor("empty", "empty");
+        LiveDataPropertyDescriptor.FilterDescriptor listFilter =
+            new LiveDataPropertyDescriptor.FilterDescriptor("list");
+        listFilter.setOperators(List.of(equals, startsWith, contains, empty));
+        listFilter.setDefaultOperator("contains");
+        meta.setFilters(List.of(
+            textFilter,
+            numberFilter,
+            booleanFilter,
+            dateFilter,
+            listFilter
+        ));
+        meta.setDefaultFilter("text");
+
+        meta.setDisplayers(List.of(
+            new LiveDataPropertyDescriptor.DisplayerDescriptor("text"),
+            new LiveDataPropertyDescriptor.DisplayerDescriptor("link"),
+            new LiveDataPropertyDescriptor.DisplayerDescriptor("html"),
+            new LiveDataPropertyDescriptor.DisplayerDescriptor("actions"),
+            new LiveDataPropertyDescriptor.DisplayerDescriptor("boolean")
+        ));
+        meta.setDefaultDisplayer("text");
+
+        LiveDataPaginationConfiguration paginationConfiguration = new LiveDataPaginationConfiguration();
+        paginationConfiguration.setMaxShownPages(10);
+        paginationConfiguration.setPageSizes(List.of(15,25,50,100));
+        paginationConfiguration.setShowEntryRange(true);
+        paginationConfiguration.setShowNextPrevious(true);
+        meta.setPagination(paginationConfiguration);
+
+        meta.setPropertyDescriptors(List.of());
+        meta.setPropertyTypes(List.of());
+        meta.setEntryDescriptor(new LiveDataEntryDescriptor());
+
+        LiveDataActionDescriptor view = new LiveDataActionDescriptor("view");
+        view.setName("view");
+        view.setIcon(Map.of());
+
+        LiveDataActionDescriptor edit = new LiveDataActionDescriptor("edit");
+        edit.setName("edit");
+        edit.setIcon(Map.of());
+
+        LiveDataActionDescriptor delete = new LiveDataActionDescriptor("delete");
+        delete.setName("delete");
+        delete.setIcon(Map.of("cssClass", "text-danger"));
+
+        LiveDataActionDescriptor copy = new LiveDataActionDescriptor("copy");
+        copy.setName("copy");
+        copy.setIcon(Map.of());
+
+        LiveDataActionDescriptor rename = new LiveDataActionDescriptor("rename");
+        rename.setName("rename");
+        rename.setIcon(Map.of());
+
+        LiveDataActionDescriptor rights = new LiveDataActionDescriptor("rights");
+        rights.setName("rights");
+        rights.setIcon(Map.of());
+        meta.setActions(List.of(view, edit, delete, copy, rename, rights));
+        meta.setSelection(new LiveDataSelectionConfiguration());
+        this.liveDataConfiguration.setMeta(meta);
     }
 
     @BeforeEach
@@ -150,98 +290,11 @@ class LiveDataMacroTest
     @Test
     void executeWithoutParams() throws Exception
     {
-        StringBuilder expectedConfig = new StringBuilder();
-        expectedConfig.append("{");
-        expectedConfig.append("  'query':{".trim());
-        expectedConfig.append("    'properties':[],'source':{},'filters':[],'sort':[],'offset':0,'limit':15".trim());
-        expectedConfig.append("  },".trim());
-        expectedConfig.append("  'data':{'count':0,'entries':[]},".trim());
-        expectedConfig.append("  'meta':{".trim());
-        expectedConfig.append("    'layouts':[".trim());
-        expectedConfig.append("      {'id':'table','name':'table','icon':{}},".trim());
-        expectedConfig.append("      {'id':'cards','name':'cards','icon':{}}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultLayout':'table',".trim());
-        expectedConfig.append("    'propertyDescriptors':[],".trim());
-        expectedConfig.append("    'propertyTypes':[],".trim());
-        expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'text',".trim());
-        expectedConfig.append("        'defaultOperator':'contains',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'},".trim());
-        expectedConfig.append("          {'id':'startsWith','name':'startsWith'},".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'number',".trim());
-        expectedConfig.append("        'defaultOperator':'equals',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'='},".trim());
-        expectedConfig.append("          {'id':'less','name':'<'},".trim());
-        expectedConfig.append("          {'id':'greater','name':'>'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'boolean',".trim());
-        expectedConfig.append("        'defaultOperator':'equals',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'date',".trim());
-        expectedConfig.append("        'defaultOperator':'between',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'between','name':'between'},".trim());
-        expectedConfig.append("          {'id':'before','name':'before'},".trim());
-        expectedConfig.append("          {'id':'after','name':'after'},".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'}".trim());
-        expectedConfig.append("        ],".trim());
-        expectedConfig.append("        'dateFormat':'yyyy/MM/dd HH:mm'".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'list',".trim());
-        expectedConfig.append("        'defaultOperator':'contains',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'},".trim());
-        expectedConfig.append("          {'id':'startsWith','name':'startsWith'},".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'},".trim());
-        expectedConfig.append("          {'id':'empty','name':'empty'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      }".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultFilter':'text',".trim());
-        expectedConfig.append("    'displayers':[".trim());
-        expectedConfig.append("      {'id':'text'},".trim());
-        expectedConfig.append("      {'id':'link'},".trim());
-        expectedConfig.append("      {'id':'html'},".trim());
-        expectedConfig.append("      {'id':'actions'},".trim());
-        expectedConfig.append("      {'id':'boolean'}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultDisplayer':'text',".trim());
-        expectedConfig.append("    'pagination':{".trim());
-        expectedConfig.append("      'maxShownPages':10,".trim());
-        expectedConfig.append("      'pageSizes':[15,25,50,100],".trim());
-        expectedConfig.append("      'showEntryRange':true,".trim());
-        expectedConfig.append("      'showNextPrevious':true".trim());
-        expectedConfig.append("    },".trim());
-        expectedConfig.append("    'entryDescriptor':{},".trim());
-        expectedConfig.append("    'actions':[".trim());
-        expectedConfig.append("      {'id':'view','name':'view','icon':{}},".trim());
-        expectedConfig.append("      {'id':'edit','name':'edit','icon':{}},".trim());
-        expectedConfig.append("      {'id':'delete','name':'delete','icon':{'cssClass':'text-danger'}},".trim());
-        expectedConfig.append("      {'id':'copy','name':'copy','icon':{}},".trim());
-        expectedConfig.append("      {'id':'rename','name':'rename','icon':{}},".trim());
-        expectedConfig.append("      {'id':'rights','name':'rights','icon':{}}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'selection':{'enabled':false}".trim());
-        expectedConfig.append("  }".trim());
-        expectedConfig.append("}".trim());
+
         String expected =
             String.format("<div class=\"liveData loading\" data-config=\"%s\" "
-                + "data-config-content-trusted=\"true\"></div>", escapeXML(json(expectedConfig.toString())));
+                + "data-config-content-trusted=\"true\"></div>",
+                escapeXML(json(this.liveDataConfiguration)));
 
         List<Block> blocks =
             this.liveDataMacro.execute(new LiveDataMacroParameters(), null, this.macroTransformationContext);
@@ -251,112 +304,33 @@ class LiveDataMacroTest
     @Test
     void execute() throws Exception
     {
-        StringBuilder expectedConfig = new StringBuilder();
-        expectedConfig.append("{");
-        expectedConfig.append("  'id':'test',".trim());
-        expectedConfig.append("  'query':{".trim());
-        expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
-        expectedConfig.append("    'source':{'id':'users','wiki':'dev','group':'apps'},".trim());
-        expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {'property':'firstName','constraints':[{'value':'m'}]},".trim());
-        expectedConfig.append("      {'property':'position','constraints':[{'value':'lead'}]}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'sort':[".trim());
-        expectedConfig.append("      {'property':'firstName'},".trim());
-        expectedConfig.append("      {'property':'lastName','descending':true},".trim());
-        expectedConfig.append("      {'property':'position'}],".trim());
-        expectedConfig.append("    'offset':20,".trim());
-        expectedConfig.append("    'limit':10".trim());
-        expectedConfig.append("  },".trim());
-        expectedConfig.append("  'data':{'count':0,'entries':[]},".trim());
-        expectedConfig.append("  'meta':{".trim());
-        expectedConfig.append("    'layouts':[".trim());
-        expectedConfig.append("      {'id':'table','name':'table','icon':{}},".trim());
-        expectedConfig.append("      {'id':'cards','name':'cards','icon':{}}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultLayout':'table',".trim());
-        expectedConfig.append("    'propertyDescriptors':[],".trim());
-        expectedConfig.append("    'propertyTypes':[],".trim());
-        expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'text',".trim());
-        expectedConfig.append("        'defaultOperator':'contains',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'},".trim());
-        expectedConfig.append("          {'id':'startsWith','name':'startsWith'},".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'number',".trim());
-        expectedConfig.append("        'defaultOperator':'equals',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'='},".trim());
-        expectedConfig.append("          {'id':'less','name':'<'},".trim());
-        expectedConfig.append("          {'id':'greater','name':'>'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'boolean',".trim());
-        expectedConfig.append("        'defaultOperator':'equals',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'date',".trim());
-        expectedConfig.append("        'defaultOperator':'between',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'between','name':'between'},".trim());
-        expectedConfig.append("          {'id':'before','name':'before'},".trim());
-        expectedConfig.append("          {'id':'after','name':'after'},".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'}".trim());
-        expectedConfig.append("        ],".trim());
-        expectedConfig.append("        'dateFormat':'yyyy/MM/dd HH:mm'".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'list',".trim());
-        expectedConfig.append("        'defaultOperator':'contains',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'},".trim());
-        expectedConfig.append("          {'id':'startsWith','name':'startsWith'},".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'},".trim());
-        expectedConfig.append("          {'id':'empty','name':'empty'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      }".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultFilter':'text',".trim());
-        expectedConfig.append("    'displayers':[".trim());
-        expectedConfig.append("      {'id':'text'},".trim());
-        expectedConfig.append("      {'id':'link'},".trim());
-        expectedConfig.append("      {'id':'html'},".trim());
-        expectedConfig.append("      {'id':'actions'},".trim());
-        expectedConfig.append("      {'id':'boolean'}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultDisplayer':'text',".trim());
-        expectedConfig.append("    'pagination':{".trim());
-        expectedConfig.append("      'maxShownPages':10,".trim());
-        expectedConfig.append("      'pageSizes':[10,15,25,50],".trim());
-        expectedConfig.append("      'showEntryRange':true,".trim());
-        expectedConfig.append("      'showNextPrevious':true,".trim());
-        expectedConfig.append("      'showPageSizeDropdown':true".trim());
-        expectedConfig.append("    },".trim());
-        expectedConfig.append("    'entryDescriptor':{},".trim());
-        expectedConfig.append("    'actions':[".trim());
-        expectedConfig.append("      {'id':'view','name':'view','icon':{}},".trim());
-        expectedConfig.append("      {'id':'edit','name':'edit','icon':{}},".trim());
-        expectedConfig.append("      {'id':'delete','name':'delete','icon':{'cssClass':'text-danger'}},".trim());
-        expectedConfig.append("      {'id':'copy','name':'copy','icon':{}},".trim());
-        expectedConfig.append("      {'id':'rename','name':'rename','icon':{}},".trim());
-        expectedConfig.append("      {'id':'rights','name':'rights','icon':{}}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'selection':{'enabled':false},".trim());
-        expectedConfig.append("    'description':'A description'".trim());
-        expectedConfig.append("  }".trim());
-        expectedConfig.append("}".trim());
+        this.liveDataConfiguration.setId("test");
+        LiveDataQuery query = this.liveDataConfiguration.getQuery();
+        query.setProperties(List.of("avatar", "firstName", "lastName", "position"));
+        LiveDataQuery.Source source = new LiveDataQuery.Source("users");
+        source.setParameter("wiki", "dev");
+        source.setParameter("group", "apps");
+        query.setSource(source);
+        query.setFilters(List.of(
+            new LiveDataQuery.Filter("firstName", "m"),
+            new LiveDataQuery.Filter("position", "lead")
+        ));
+        query.setSort(List.of(
+            new LiveDataQuery.SortEntry("firstName"),
+            new LiveDataQuery.SortEntry("lastName", true),
+            new LiveDataQuery.SortEntry("position")
+        ));
+        query.setOffset(20L);
+        query.setLimit(10);
+
+        LiveDataPaginationConfiguration pagination = this.liveDataConfiguration.getMeta().getPagination();
+        pagination.setPageSizes(List.of(10,15,25,50));
+        pagination.setShowPageSizeDropdown(true);
+
+        this.liveDataConfiguration.getMeta().setDescription("A description");
 
         String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
-            + "data-config-content-trusted=\"true\"></div>", escapeXML(json(expectedConfig.toString())));
+            + "data-config-content-trusted=\"true\"></div>", escapeXML(json(this.liveDataConfiguration)));
 
         LiveDataMacroParameters parameters = new LiveDataMacroParameters();
         parameters.setId("test");
@@ -397,109 +371,24 @@ class LiveDataMacroTest
         advancedConfig.append("  }".trim());
         advancedConfig.append("}");
 
+        this.liveDataConfiguration.setId("test");
+        LiveDataQuery query = this.liveDataConfiguration.getQuery();
+        query.setProperties(List.of("avatar", "firstName", "lastName", "position"));
+        LiveDataQuery.Source source = new LiveDataQuery.Source("users");
+        query.setSource(source);
+        query.setFilters(List.of(
+            new LiveDataQuery.Filter("position", "R&D")
+        ));
+        query.setSort(List.of(
+            new LiveDataQuery.SortEntry("firstName")
+        ));
+        query.setLimit(10);
 
-        StringBuilder expectedConfig = new StringBuilder();
-        expectedConfig.append("{");
-        expectedConfig.append("  'id':'test',".trim());
-        expectedConfig.append("  'query':{".trim());
-        expectedConfig.append("    'properties':['avatar','firstName','lastName','position'],".trim());
-        expectedConfig.append("    'source':{'id':'users'},".trim());
-        expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {'property':'position','constraints':[{'value':'R&D'}]}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'sort':[".trim());
-        expectedConfig.append("      {'property':'firstName'}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'offset':0,".trim());
-        expectedConfig.append("    'limit':10".trim());
-        expectedConfig.append("  },".trim());
-        expectedConfig.append("  'data':{'count':0,'entries':[]},".trim());
-        expectedConfig.append("  'meta':{".trim());
-        expectedConfig.append("    'layouts':[".trim());
-        expectedConfig.append("      {'id':'table','name':'table','icon':{}},".trim());
-        expectedConfig.append("      {'id':'cards','name':'cards','icon':{}}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultLayout':'table',".trim());
-        expectedConfig.append("    'propertyDescriptors':[],".trim());
-        expectedConfig.append("    'propertyTypes':[],".trim());
-        expectedConfig.append("    'filters':[".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'text',".trim());
-        expectedConfig.append("        'defaultOperator':'contains',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'},".trim());
-        expectedConfig.append("          {'id':'startsWith','name':'startsWith'},".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'number',".trim());
-        expectedConfig.append("        'defaultOperator':'equals',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'='},".trim());
-        expectedConfig.append("          {'id':'less','name':'<'},".trim());
-        expectedConfig.append("          {'id':'greater','name':'>'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'boolean',".trim());
-        expectedConfig.append("        'defaultOperator':'equals',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'date',".trim());
-        expectedConfig.append("        'defaultOperator':'between',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'between','name':'between'},".trim());
-        expectedConfig.append("          {'id':'before','name':'before'},".trim());
-        expectedConfig.append("          {'id':'after','name':'after'},".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'}".trim());
-        expectedConfig.append("        ],".trim());
-        expectedConfig.append("        'dateFormat':'yyyy/MM/dd HH:mm'".trim());
-        expectedConfig.append("      },".trim());
-        expectedConfig.append("      {".trim());
-        expectedConfig.append("        'id':'list',".trim());
-        expectedConfig.append("        'defaultOperator':'contains',".trim());
-        expectedConfig.append("        'operators':[".trim());
-        expectedConfig.append("          {'id':'equals','name':'equals'},".trim());
-        expectedConfig.append("          {'id':'startsWith','name':'startsWith'},".trim());
-        expectedConfig.append("          {'id':'contains','name':'contains'},".trim());
-        expectedConfig.append("          {'id':'empty','name':'empty'}".trim());
-        expectedConfig.append("        ]".trim());
-        expectedConfig.append("      }".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultFilter':'text',".trim());
-        expectedConfig.append("    'displayers':[".trim());
-        expectedConfig.append("      {'id':'text'},".trim());
-        expectedConfig.append("      {'id':'link'},".trim());
-        expectedConfig.append("      {'id':'html'},".trim());
-        expectedConfig.append("      {'id':'actions'},".trim());
-        expectedConfig.append("      {'id':'boolean'}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'defaultDisplayer':'text',".trim());
-        expectedConfig.append("    'pagination':{".trim());
-        expectedConfig.append("      'maxShownPages':10,".trim());
-        expectedConfig.append("      'pageSizes':[10,15,25,50,100],".trim());
-        expectedConfig.append("      'showEntryRange':true,".trim());
-        expectedConfig.append("      'showNextPrevious':true".trim());
-        expectedConfig.append("    },".trim());
-        expectedConfig.append("    'entryDescriptor':{},".trim());
-        expectedConfig.append("    'actions':[".trim());
-        expectedConfig.append("      {'id':'view','name':'view','icon':{}},".trim());
-        expectedConfig.append("      {'id':'edit','name':'edit','icon':{}},".trim());
-        expectedConfig.append("      {'id':'delete','name':'delete','icon':{'cssClass':'text-danger'}},".trim());
-        expectedConfig.append("      {'id':'copy','name':'copy','icon':{}},".trim());
-        expectedConfig.append("      {'id':'rename','name':'rename','icon':{}},".trim());
-        expectedConfig.append("      {'id':'rights','name':'rights','icon':{}}".trim());
-        expectedConfig.append("    ],".trim());
-        expectedConfig.append("    'selection':{'enabled':false}".trim());
-        expectedConfig.append("  }".trim());
-        expectedConfig.append("}".trim());
+        LiveDataPaginationConfiguration pagination = this.liveDataConfiguration.getMeta().getPagination();
+        pagination.setPageSizes(List.of(10,15,25,50,100));
 
         String expected = String.format("<div class=\"liveData loading\" id=\"test\" data-config=\"%s\" "
-            + "data-config-content-trusted=\"false\"></div>", escapeXML(json(expectedConfig.toString())));
+            + "data-config-content-trusted=\"false\"></div>", escapeXML(json(this.liveDataConfiguration)));
 
         List<Block> blocks = this.liveDataMacro.execute(parameters, json(advancedConfig.toString()),
             this.macroTransformationContext);
@@ -509,6 +398,13 @@ class LiveDataMacroTest
     private String json(String text)
     {
         return text.replace('\'', '"');
+    }
+
+    private String json(LiveDataConfiguration liveDataConfiguration) throws JsonProcessingException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return objectMapper.writeValueAsString(liveDataConfiguration);
     }
 
     private String escapeXML(String value)

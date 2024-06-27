@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.RepositoryCode" locale="">
+<xwikidoc version="1.2" reference="ExtensionCode.RepositoryCode" locale="">
   <web>ExtensionCode</web>
   <name>RepositoryCode</name>
   <language/>
@@ -57,6 +57,17 @@
 #end
 #if ("$!defaultIdPrefix" == '')
   #set($defaultIdPrefix = "${xcontext.userReference.name.toLowerCase().replace(' ', '-')}:")
+#end
+
+#macro (printThrowable $throwable)
+  $throwable.class: #if(!$throwable.message)null#else$throwable.message#end
+
+  #foreach($stackTraceElement in $throwable.stackTrace)
+    ~    at $stackTraceElement
+  #end
+  #if ($throwable.cause)
+    Caused by: #printThrowable($throwable.cause)
+  #end
 #end
 
 ## Find out if the Recommended feature is on

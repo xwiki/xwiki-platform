@@ -520,7 +520,7 @@ public class RepositoryManager implements Initializable, Disposable
         Query query = this.queryManager.createQuery("select doc.fullName from Document doc, doc.object("
             + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
-        for (Object[] documentName : query.<Object[]>execute()) {
+        for (String documentName : query.<String>execute()) {
             validateExtension(getDocument(documentName), true);
         }
     }
@@ -1167,7 +1167,7 @@ public class RepositoryManager implements Initializable, Disposable
     /**
      * This method factually resolves extension from remote source (when it's possible). Call it only when the data that
      * is going to be obtained cannot be got from extension document xobject
-     * 
+     *
      * @since 9.5RC1
      */
     public Extension resolveExtensionVersion(XWikiDocument extensionDocument, String extensionVersion)

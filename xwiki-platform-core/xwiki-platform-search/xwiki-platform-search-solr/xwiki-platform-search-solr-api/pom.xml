@@ -54,6 +54,10 @@
       <artifactId>solr-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-analysis-extras</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-backward-codecs</artifactId>
     </dependency>

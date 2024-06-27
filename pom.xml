@@ -986,6 +986,11 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-analysis-extras</artifactId>
+        <version>${solr.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-backward-codecs</artifactId>
         <version>${lucene.version}</version>

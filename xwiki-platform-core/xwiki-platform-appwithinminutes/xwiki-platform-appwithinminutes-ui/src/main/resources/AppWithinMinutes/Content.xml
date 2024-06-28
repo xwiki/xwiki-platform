@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($type == 'edit')
+#if ($type == 'edit' || $type == 'hidden')
   #set ($className = $object.getxWikiClass().name)
   #if ($doc.fullName == $className)
     ## We are editing the class so the content must be read from / written to the template document.
@@ -52,28 +52,32 @@
     ## Use the preferred content editor.
     #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   #end
-  {{html clean="false"}}
   ## The "content" id is expected by some JavaScript and CSS code.
   #set ($id = 'content')
-  #if (!$useWysiwygEditor)
-    &lt;div id="xwikieditcontentinner"&gt;
-      ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.
-      #set ($toolBar = "#template('simpleedittoolbar.vm')")
-      $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
-      ## Display a simple textarea.
-      &lt;textarea id="$id" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
-  #end
-  #if ($useWysiwygEditor)
-    $!services.edit.syntaxContent.wysiwyg($editedDocument.content, $editedDocument.syntax, {
-      'id': "$id",
-      'name': "$name",
-      'rows': 25,
-      'cols': 80,
-      'full': true,
-      'restricted': $editedDocument.isRestricted()
-    })
-  #else
-    &lt;/div&gt;
+  {{html clean="false"}}
+  #if ($type == 'edit')
+    #if (!$useWysiwygEditor)
+      &lt;div id="xwikieditcontentinner"&gt;
+        ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.
+        #set ($toolBar = "#template('simpleedittoolbar.vm')")
+        $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
+        ## Display a simple textarea.
+        &lt;textarea id="$id" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
+    #end
+    #if ($useWysiwygEditor)
+      $!services.edit.syntaxContent.wysiwyg($editedDocument.content, $editedDocument.syntax, {
+        'id': "$id",
+        'name': "$name",
+        'rows': 25,
+        'cols': 80,
+        'full': true,
+        'restricted': $editedDocument.isRestricted()
+      })
+    #else
+      &lt;/div&gt;
+    #end
+  #elseif ($type == 'hidden')
+    &lt;input type="hidden" id="$id" name="$name" value="$!escapetool.xml($editedDocument.content)"/>
   #end
   {{/html}}
 #elseif ("$!type" != '')

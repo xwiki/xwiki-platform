@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "bootstrap-icons": "1.11.3",
-    "vue": "3.4.29"
+    "vue": "3.4.31"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",

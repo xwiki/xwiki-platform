@@ -31,7 +31,7 @@
     "@xwiki/cristal-skin": "workspace:*",
     "inversify": "6.0.2",
     "reflect-metadata": "0.2.2",
-    "vue": "3.4.29"
+    "vue": "3.4.31"
   },
   "devDependencies": {
     "vue-tsc": "2.0.22"

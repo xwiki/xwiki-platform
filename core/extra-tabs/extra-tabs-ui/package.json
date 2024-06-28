@@ -24,7 +24,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
-    "vue": "3.4.29"
+    "vue": "3.4.31"
   },
   "devDependencies": {
     "vue-tsc": "2.0.22"

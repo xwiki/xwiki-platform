@@ -30,9 +30,7 @@
     "@gouvminint/vue-dsfr": "5.11.0",
     "@xwiki/cristal-api": "workspace:*",
     "inversify": "6.0.2",
-    "oh-vue-icons": "1.0.0-rc3",
-    "vue": "3.4.31",
-    "vue-router": "4.4.0"
+    "vue": "3.4.31"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",

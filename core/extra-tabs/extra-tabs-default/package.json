@@ -22,7 +22,6 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
     "inversify": "6.0.2",
     "lodash": "4.17.21"

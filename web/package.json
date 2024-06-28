@@ -33,7 +33,6 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-browser-default": "workspace:*",
-    "@xwiki/cristal-hierarchy-api": "workspace:*",
     "@xwiki/cristal-hierarchy-default": "workspace:*",
     "@xwiki/cristal-hierarchy-github": "workspace:*",
     "@xwiki/cristal-hierarchy-xwiki": "workspace:*",

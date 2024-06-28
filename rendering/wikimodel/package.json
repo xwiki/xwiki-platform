@@ -26,10 +26,6 @@
     "test": "echo 'no test'"
   },
   "types": "dist/index.d.ts",
-  "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
-    "vue": "3.4.31"
-  },
   "devDependencies": {
     "vue-tsc": "2.0.22"
   },

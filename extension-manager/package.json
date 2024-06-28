@@ -30,9 +30,6 @@
     "inversify": "6.0.2",
     "reflect-metadata": "0.2.2"
   },
-  "devDependencies": {
-    "rimraf": "5.0.7"
-  },
   "publishConfig": {
     "exports": {
       ".": {

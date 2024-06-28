@@ -21,8 +21,7 @@
     "build": "tsc --project tsconfig.json && vite build"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
-    "inversify": "6.0.2"
+    "@xwiki/cristal-api": "workspace:*"
   },
   "publishConfig": {
     "exports": {

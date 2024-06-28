@@ -437,12 +437,11 @@ public class SolrRatingsManagerTest
         this.manager.setIdentifier(managerId);
         int scale = 10;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        DocumentReference reference = mock(DocumentReference.class);
-        when(reference.toString()).thenReturn("wiki:foobar");
+        DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
         UserReference userReference = mock(UserReference.class);
         when(userReference.toString()).thenReturn("user:Toto");
 
-        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+        String filterQuery = "filter(reference:wiki\\:Space.Page) AND filter(author:user\\:Toto) "
             + "AND filter(managerId:saveRating2)";
         SolrQuery expectedQuery = new SolrQuery()
             .addFilterQuery(filterQuery)
@@ -477,7 +476,7 @@ public class SolrRatingsManagerTest
 
         SolrInputDocument expectedInputDocument = new SolrInputDocument();
         expectedInputDocument.setField("id", "");
-        expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:Space.Page");
         expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), new Date());
         expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), new Date());
         expectedInputDocument.setField(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
@@ -519,12 +518,11 @@ public class SolrRatingsManagerTest
         int newVote = 2;
         int oldVote = 3;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        DocumentReference reference = mock(DocumentReference.class);
-        when(reference.toString()).thenReturn("wiki:foobar");
+        DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
         UserReference userReference = mock(UserReference.class);
         when(userReference.toString()).thenReturn("user:Toto");
 
-        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+        String filterQuery = "filter(reference:wiki\\:Space.Page) AND filter(author:user\\:Toto) "
             + "AND filter(managerId:saveRating3)";
         SolrQuery expectedQuery = new SolrQuery()
             .addFilterQuery(filterQuery)
@@ -542,7 +540,7 @@ public class SolrRatingsManagerTest
         fieldMap.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(422));
         fieldMap.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(422));
         fieldMap.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
-        fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:Space.Page");
         fieldMap.put(RatingQueryField.SCALE.getFieldName(), scale);
         fieldMap.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
 
@@ -572,7 +570,7 @@ public class SolrRatingsManagerTest
 
         SolrInputDocument expectedInputDocument = new SolrInputDocument();
         expectedInputDocument.setField("id", "myRating");
-        expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        expectedInputDocument.setField(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:Space.Page");
         expectedInputDocument.setField(RatingQueryField.CREATED_DATE.getFieldName(), new Date(422));
         expectedInputDocument.setField(RatingQueryField.UPDATED_DATE.getFieldName(), new Date());
         expectedInputDocument.setField(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
@@ -609,12 +607,11 @@ public class SolrRatingsManagerTest
         int newVote = 0;
         int oldVote = 3;
         when(this.configuration.getScaleUpperBound()).thenReturn(scale);
-        DocumentReference reference = mock(DocumentReference.class);
-        when(reference.toString()).thenReturn("wiki:foobar");
+        DocumentReference reference = new DocumentReference("wiki", "Space", "Page");
         UserReference userReference = mock(UserReference.class);
         when(userReference.toString()).thenReturn("user:Toto");
 
-        String filterQuery = "filter(reference:wiki\\:foobar) AND filter(author:user\\:Toto) "
+        String filterQuery = "filter(reference:wiki\\:Space.Page) AND filter(author:user\\:Toto) "
             + "AND filter(managerId:saveRating4)";
         SolrQuery firstExpectedQuery = new SolrQuery()
             .addFilterQuery(filterQuery)
@@ -628,7 +625,7 @@ public class SolrRatingsManagerTest
         fieldMap.put(RatingQueryField.CREATED_DATE.getFieldName(), new Date(422));
         fieldMap.put(RatingQueryField.UPDATED_DATE.getFieldName(), new Date(422));
         fieldMap.put(RatingQueryField.USER_REFERENCE.getFieldName(), "user:Toto");
-        fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:foobar");
+        fieldMap.put(RatingQueryField.ENTITY_REFERENCE.getFieldName(), "wiki:Space.Page");
         fieldMap.put(RatingQueryField.SCALE.getFieldName(), scale);
         fieldMap.put(RatingQueryField.MANAGER_ID.getFieldName(), managerId);
 
@@ -736,15 +733,28 @@ public class SolrRatingsManagerTest
     }
 
     @Test
-    void saveRatingNonExistingPage()
+    void saveRatingWrongEntityType() throws Exception
     {
         when(this.configuration.getScaleUpperBound()).thenReturn(2);
-        EntityReference reference = mock(SpaceReference.class);
-        when(reference.toString()).thenReturn("xwiki:ref");
+        EntityReference reference = new SpaceReference("xwiki", "Space");
         UserReference userReference = mock(UserReference.class);
         RatingsException exception =
             assertThrows(RatingsException.class, () -> this.manager.saveRating(reference, userReference, 1));
-        assertEquals("The reference [xwiki:ref] is not an existing page.", exception.getMessage());
+        assertEquals("The reference [Space xwiki:Space] is not an existing page.", exception.getMessage());
+        verify(this.documentAccessBridge, never()).exists(any(DocumentReference.class));
+    }
+
+    @Test
+    void saveRatingNoneExistingPage() throws Exception
+    {
+        when(this.configuration.getScaleUpperBound()).thenReturn(2);
+        DocumentReference reference = new DocumentReference("xwiki", "Space", "Page");
+        when(this.documentAccessBridge.exists(reference)).thenReturn(false);
+        UserReference userReference = mock(UserReference.class);
+        RatingsException exception =
+            assertThrows(RatingsException.class, () -> this.manager.saveRating(reference, userReference, 1));
+        assertEquals("The reference [xwiki:Space.Page] is not an existing page.", exception.getMessage());
+        verify(this.documentAccessBridge).exists(reference);
     }
 
     @Test

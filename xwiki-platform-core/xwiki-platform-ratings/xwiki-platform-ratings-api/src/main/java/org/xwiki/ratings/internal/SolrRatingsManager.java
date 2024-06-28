@@ -66,6 +66,8 @@ import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.user.UserReference;
 
+import static org.xwiki.model.EntityType.DOCUMENT;
+
 /**
  * Default implementation of {@link RatingsManager} which stores Rating and AverageRating in Solr.
  *
@@ -578,9 +580,8 @@ public class SolrRatingsManager implements RatingsManager
     private void checkIfDocumentExists(EntityReference reference) throws RatingsException
     {
         try {
-            if (!(reference instanceof DocumentReference documentReference)
-                || !this.documentAccessBridge.exists(documentReference))
-            {
+            EntityReference entityReference = reference.extractReference(DOCUMENT);
+            if (entityReference == null || !this.documentAccessBridge.exists((DocumentReference) entityReference)) {
                 throw new RatingsException(String.format("The reference [%s] is not an existing page.", reference));
             }
         } catch (Exception e) {

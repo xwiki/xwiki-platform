@@ -23,7 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -243,6 +245,10 @@ public class EditIT
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {
+        Assumptions.assumeFalse(StringUtils.equalsIgnoreCase("firefox",
+                setup.getDriver().getCapabilities().getBrowserName()),
+            "Alert handling in Firefox currently isn't working, see also https://jira.xwiki.org/browse/XWIKI-22282");
+
         setup.deletePage(reference);
         ViewPage viewPage = setup.gotoPage(reference);
         WikiEditPage editWiki = viewPage.editWiki();

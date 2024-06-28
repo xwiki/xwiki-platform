@@ -53,7 +53,11 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   font-weight: bold;
   font-size: 100%;
   margin: 0;
-  padding: 0 0 0 0px;
+  padding: 0;
+}
+
+.xclass-content .xobject-title h3 {
+  padding: 0;
 }
 
 .xclass-content {
@@ -179,15 +183,15 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   align-items: baseline;
 }
 
-#body .collapsable > .xobject-title > .toggle-collapsable,
-#body .collapsable > .xclass-title > .toggle-collapsable,
-#body .collapsable > .xproperty-title > .toggle-collapsable{
+#body .collapsable > .xobject-title > .toggle-collapsable > *,
+#body .collapsable > .xclass-title > .toggle-collapsable > *,
+#body .collapsable > .xproperty-title > .toggle-collapsable > * {
   transform:  rotate(0);
 }
 
-#body .collapsable.collapsed > .xobject-title > .toggle-collapsable,
-#body .collapsable.collapsed > .xclass-title > .toggle-collapsable,
-#body .collapsable.collapsed > .xproperty-title > .toggle-collapsable{
+#body .collapsable.collapsed > .xobject-title > .toggle-collapsable > *,
+#body .collapsable.collapsed > .xclass-title > .toggle-collapsable > *,
+#body .collapsable.collapsed > .xproperty-title > .toggle-collapsable > * {
   transform:  rotate(-90deg);
 }
 

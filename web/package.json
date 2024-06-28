@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.45.0",
-    "@types/node": "20.14.7",
+    "@types/node": "20.14.9",
     "@vitejs/plugin-vue": "5.0.5",
     "inversify": "6.0.2",
     "vite-plugin-comlink": "4.1.0",

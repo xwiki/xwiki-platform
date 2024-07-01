@@ -191,7 +191,17 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
           &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
         #end
         #if($ddoc.canDelete())
-          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
+          #set ($deleteQueryParametersMap = {
+            "id": $id,
+            "xredirect": "$!{request.getRequestURI()}?$!{request.getQueryString()}"
+          })
+          &lt;a
+            href="$escapetool.xml(${originalDocument.getURL('delete', $escapetool.url($deleteQueryParametersMap))})"
+            class="tool delete"
+            title="$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"
+          &gt;
+            $services.localization.render('platform.index.trashDocumentsActionsDeleteText')
+          &lt;/a&gt;
         #end
       &lt;/td&gt;
     &lt;/tr&gt;
@@ -327,7 +337,7 @@ if (typeof XWiki.index.trash.documents == "undefined") {
 
 /**
  * Callback function used by the DeletedDocuments livetable for generating the HTML code needed to display an entry.
- * 
+ *
  * @param row the JSON data corresponding to the entry to be displayed
  * @param i the index of the row in the list of entries
  * @param table the LiveTable javascript object
@@ -386,7 +396,7 @@ XWiki.index.trash.documents.displayEntry = function (row, i, table) {
 /**
  * Event listener, called when clicking a delete version link. It displays a confirmation box, speeding up the two-step
  * deletion process.
- * 
+ *
  * @param event the link activation event
  * @param table the LiveTable javascript object
  * @param rowIdx the index of the row corresponding to the entry to be deleted

@@ -6699,6 +6699,9 @@ public class XWiki implements EventListener
         throws IOException
     {
         HttpClient client = getHttpClient(timeout, userAgent);
+        
+        // otherwise there is no authentification credentials will be sent
+        client.getParams().setAuthenticationPreemptive(true);
 
         // pass our credentials to HttpClient, they will only be used for
         // authenticating to servers with realm "realm", to authenticate agains
@@ -6764,6 +6767,9 @@ public class XWiki implements EventListener
         throws IOException
     {
         HttpClient client = getHttpClient(timeout, userAgent);
+
+        // otherwise there is no authentification credentials will be sent
+        client.getParams().setAuthenticationPreemptive(true);
 
         // pass our credentials to HttpClient, they will only be used for
         // authenticating to servers with realm "realm", to authenticate agains

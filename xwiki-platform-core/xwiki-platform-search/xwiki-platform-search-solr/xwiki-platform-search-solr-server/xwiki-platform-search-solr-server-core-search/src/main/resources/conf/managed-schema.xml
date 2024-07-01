@@ -1244,6 +1244,7 @@
         <tokenizer name="standard"/>
         <filter name="stop" words="org/apache/lucene/analysis/uk/stopwords.txt"/>
         <filter name="lowercase"/>
+        <filter name="morfologik" dictionary="org/languagetool/resource/uk/ukrainian.dict"/>
       </analyzer>
     </fieldType>
 

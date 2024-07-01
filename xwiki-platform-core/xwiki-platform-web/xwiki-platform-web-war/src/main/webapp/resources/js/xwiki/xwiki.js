@@ -509,97 +509,6 @@ Object.extend(XWiki, {
       }
   },
 
-  /**
-   * Watchlist methods.
-   * 
-   * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not 
-   * break the retro-compatibility but we can consider removing it.
-   */
-  watchlist : {
-
-    /**
-     * Mapping between link IDs and associated actions.
-     */
-    actionsMap : {
-        'tmWatchDocument' : 'adddocument',
-        'tmUnwatchDocument' : 'removedocument',
-        'tmWatchSpace' : 'addspace',
-        'tmUnwatchSpace' : 'removespace',
-        'tmWatchWiki' : 'addwiki',
-        'tmUnwatchWiki' : 'removewiki'
-    },
-
-    /**
-     * Mapping allowing to know which action to display when a previous action has been executed.
-     */
-    flowMap : {
-        'tmWatchDocument' : 'tmUnwatchDocument',
-        'tmUnwatchDocument' : 'tmWatchDocument',
-        'tmWatchSpace' : 'tmUnwatchSpace',
-        'tmUnwatchSpace' : 'tmWatchSpace',
-        'tmWatchWiki' : 'tmUnwatchWiki',
-        'tmUnwatchWiki' : 'tmWatchWiki'
-    },
-
-    /**
-     * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
-     *
-     * @param element the element that fired the action.
-     */
-    executeAction : function(element) {
-        var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
-        new Ajax.Request(
-          surl,
-          {
-            method: 'get',
-            onComplete: function() {
-              if (element.nodeName == 'A') {
-                element.up().toggleClassName('hidden');
-                $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
-              } else {
-                element.toggleClassName('hidden');
-                $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
-              }
-            }
-          });
-    },
-
-    /**
-     * Initialize watchlist UI.
-     */
-    initialize: function(container) {
-        container = $(container || 'body');
-        for (var button in XWiki.watchlist.actionsMap) {
-          var element = container.down('#' + button);
-          if (element) {
-            if (element.nodeName != 'A') {
-              element = $(button).down('A');
-            }
-
-            if (!element) {
-              // This is supposed to happen every time since the watchlist icons are implemented in the notifications
-              // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled with a 
-              // custom solution (bootstrap-switch).
-              // For these reasons, we stop the initialization here.
-              // We keep this function for old skins (like Colibri), that still have the old-fashioned watchlist icons.
-              return;
-            }
-
-            // unregister previously registered handler if any
-            element.stopObserving('click');
-            element.observe('click', function(event) {
-                Event.stop(event);
-                var element = event.element();
-                while (element.id == '') {
-                    element = element.up();
-                }
-                XWiki.watchlist.executeAction(element);
-              });
-          }
-        }
-    }
-  },
-
   cookies: {
     /**
      * Create a cookie, with or without expiration date.
@@ -669,33 +578,6 @@ Object.extend(XWiki, {
   },
 
   /**
-   * Extracts the file name from the value of the specified file input.
-   */
-  extractFileName: function(fileInput) {
-    fileInput = $(fileInput);
-    if (fileInput.files && fileInput.files.length > 0) {
-      // Modern browsers provide additional information about the selected file(s).
-      return fileInput.files[0].name;
-    } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
-      // Most browsers hide the real path for security reasons.
-      return fileInput.value.substr(12);
-    } else {
-      var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
-      if (lastPathSeparatorIndex >= 0) {
-        // Unix-based path.
-        return fileInput.value.substr(lastPathSeparatorIndex + 1);
-      }
-      lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
-      if (lastPathSeparatorIndex >= 0) {
-        // Windows-based path.
-        return fileInput.value.substr(lastPathSeparatorIndex + 1);
-      }
-      // The file input value is just the file name.
-      return fileInput.value;
-    }
-  },
-
-  /**
    * Initialize method for the XWiki object. This is to be called only once upon dom loading.
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
@@ -738,7 +620,6 @@ Object.extend(XWiki, {
     this.fixLinksTargetAttribute(container);
     this.insertSectionEditLinks(container);
     this.insertCreatePageFromTemplateModalBoxes(container);
-    this.watchlist.initialize(container);
     this.registerPanelToggle(container);
   }
 });

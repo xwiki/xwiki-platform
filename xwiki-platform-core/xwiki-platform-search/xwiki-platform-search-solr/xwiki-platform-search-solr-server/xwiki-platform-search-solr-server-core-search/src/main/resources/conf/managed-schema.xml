@@ -1127,7 +1127,7 @@
       </analyzer>
     </fieldType>
 
-    <!-- XWIKI: Persian -->
+    <!-- XWIKI: Polish -->
     <dynamicField name="*_pl" type="text_pl"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_pl" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1244,7 +1244,6 @@
         <tokenizer name="standard"/>
         <filter name="stop" words="org/apache/lucene/analysis/uk/stopwords.txt"/>
         <filter name="lowercase"/>
-        <filter name="morfologik" dictionary="org/apache/lucene/analysis/uk/ukrainian.dict"/>
       </analyzer>
     </fieldType>
 

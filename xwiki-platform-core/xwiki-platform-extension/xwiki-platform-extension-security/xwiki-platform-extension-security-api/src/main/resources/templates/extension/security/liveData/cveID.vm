@@ -43,7 +43,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
+              <span aria-hidden="true">$services.icon.renderHTML('cross')</span>
             </button>
             <h2 class="modal-title">
               $escapetool.xml($services.localization.render(

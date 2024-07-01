@@ -595,7 +595,6 @@ viewers.Comments = Class.create({
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       if ($(".commenteditor").length) {
-        CKEDITOR.config.startupFocus = true;
         $.post(new XWiki.Document().getURL("get") + '?' + $.param({
           xpage: 'xpart',
           vm: 'commentfield.vm',

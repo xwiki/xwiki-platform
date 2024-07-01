@@ -44,6 +44,7 @@ help.tipsPanel.improveXWikiTip=Did you know that you can improve XWiki? Take 5 m
 help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
 help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
+help.tipsPanel.WYSIWYGEditorTip=When editing in WYSIWYG mode, the {0}Alt + 0{1} shortcut ({0}⌥0{1} on macOS) opens a help modal with information about using the keyboard to navigate the editor.
 help.macroList.title=Available Macros
 help.macroList.id=Id
 help.macroList.name=Name

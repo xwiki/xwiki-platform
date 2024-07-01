@@ -31,11 +31,39 @@ app.get("/", (_req, res) => {
   res.send("READY");
 });
 
-app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
-  const page = req.query.page || "Main.WebHome";
+let offlineCount = 0;
 
+function getHtml(page: string, options: { offline: boolean }) {
+  let html = `<h1>Welcome to ${page}!</h1>
+
+XWiki is the best tool to organize your knowledge.
+
+<a href="Page2.WebHome">XWiki Syntax</a>
+`;
+
+  if (options.offline) {
+    // Add a movable part when offline, to make it easier to assert the
+    // asynchronous refresh feature of offline mode.
+    html += `<p class="offlinecount">${offlineCount}</p>`;
+    offlineCount++;
+  }
+  return html;
+}
+
+app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
+  const page: string = (req.query.page as string) || "Main.WebHome";
+  const offline = page === "Main.Offline";
   res.appendHeader("Access-Control-Allow-Origin", "*");
 
+  const text = `= Welcome to ${page} =
+
+XWiki is the best tool to organize your knowledge.
+
+[[XWiki Syntax>>Page2.WebHome]]
+`;
+  const html = getHtml(page, {
+    offline,
+  });
   res.json({
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -44,18 +72,8 @@ app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
     headline: page,
     creator: page,
     encodingFormat: "xwiki/2.1",
-    text: `= Welcome to ${page} =
-
-XWiki is the best tool to organize your knowledge.
-
-[[XWiki Syntax>>Page2.WebHome]]
-`,
-    html: `<h1>Welcome to ${page}!</h1>
-
-XWiki is the best tool to organize your knowledge.
-
-<a href="Page2.WebHome">XWiki Syntax</a>
-`,
+    text: text,
+    html: html,
   });
 });
 

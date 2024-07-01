@@ -12,7 +12,7 @@
   "XWikiOffline": {
     "name": "XWikiOffline",
     "configType": "XWiki",
-    "serverRendering": false,
+    "serverRendering": true,
     "offline": true,
     "baseURL": "https://cristal.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
@@ -82,7 +82,7 @@
   "LocalhostOffline": {
     "name": "LocalhostOffline",
     "configType": "XWiki",
-    "serverRendering": false,
+    "serverRendering": true,
     "offline": true,
     "baseURL": "http://localhost:15680/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",

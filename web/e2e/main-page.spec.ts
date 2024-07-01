@@ -19,6 +19,8 @@
  */
 
 import { expect, test } from "@playwright/test";
+import { DesignSystem } from "./DesignSystem";
+import { BreadcrumbPageObject } from "./pageObjects/Breadcrumb";
 
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -35,50 +37,94 @@ test.afterEach(async ({ page }, testInfo) => {
   }
 });
 
-// const localDefaultPage = "/Localhost/#/";
-const localDefaultPage = "/Localhost/#/Main.WebHome/view";
-test("has title", async ({ page }) => {
-  await page.goto(localDefaultPage);
+// A set of variability setting
+const configs: {
+  localDefaultPage: string;
+  offlineDefaultPage?: string;
+  name: string;
+  designSystem: DesignSystem;
+}[] = [
+  {
+    name: "Vuetify",
+    localDefaultPage: "/Localhost/#/Main.WebHome/view",
+    offlineDefaultPage: "/LocalhostOffline/#/Main.Offline/view",
+    designSystem: DesignSystem.VUETIFY,
+  },
+  {
+    name: "Shoelace",
+    localDefaultPage: "/LocalhostSL/#/Main.WebHome/view",
+    designSystem: DesignSystem.SHOELACE,
+  },
+];
+configs.forEach(
+  ({ name, localDefaultPage, offlineDefaultPage, designSystem }) => {
+    test(`[${name}] has title`, async ({ page }) => {
+      await page.goto(localDefaultPage);
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Cristal Wiki/);
-});
+      // Expect a title "to contain" a substring.
+      await expect(page).toHaveTitle(/Cristal Wiki/);
+    });
 
-test("has content", async ({ page }) => {
-  await page.goto(localDefaultPage);
+    test(`[${name}] has content`, async ({ page }) => {
+      await page.goto(localDefaultPage);
 
-  const locator = page.locator("#xwikicontent");
-  await expect(locator).toContainText("Welcome to Main.WebHome");
-});
+      const locator = page.locator("#xwikicontent");
+      await expect(locator).toContainText("Welcome to Main.WebHome");
+    });
 
-test("can follow links", async ({ page }) => {
-  await page.goto(localDefaultPage);
+    test(`[${name}] can follow links`, async ({ page }) => {
+      await page.goto(localDefaultPage);
 
-  await page.locator('a[href="Page2.WebHome"]').click();
+      await page.locator('a[href="Page2.WebHome"]').click();
 
-  await expect(page.locator("#xwikicontent")).toContainText(
-    "Welcome to Page2.WebHome",
-  );
+      await expect(page.locator("#xwikicontent")).toContainText(
+        "Welcome to Page2.WebHome",
+      );
 
-  await page.goBack();
+      await page.goBack();
 
-  await expect(page.locator("#xwikicontent")).toContainText(
-    "Welcome to Main.WebHome",
-  );
-});
+      await expect(page.locator("#xwikicontent")).toContainText(
+        "Welcome to Main.WebHome",
+      );
+    });
 
-test("has breadcrumb", async ({ page }) => {
-  await page.goto(localDefaultPage);
+    test(`[${name}] has breadcrumb`, async ({ page }) => {
+      await page.goto(localDefaultPage);
 
-  const breadcrumbItems = page.locator("#breadcrumbRoot li a");
+      const breadcrumbItems = await new BreadcrumbPageObject(
+        page,
+        designSystem,
+      ).findItems();
 
-  await expect(breadcrumbItems).toHaveCount(2);
-  await expect(breadcrumbItems.first()).toContainText("Home");
-  expect(await breadcrumbItems.first().getAttribute("href")).toEqual(
-    "http://localhost:15680/xwiki/bin/view/Main/",
-  );
-  await expect(breadcrumbItems.last()).toContainText("Main");
-  expect(await breadcrumbItems.last().getAttribute("href")).toEqual(
-    "http://localhost:15680/xwiki/bin/view/Main/",
-  );
-});
+      expect(breadcrumbItems.length).toEqual(2);
+      await expect(breadcrumbItems[0].getText()).toContainText("Home");
+      expect(await breadcrumbItems[0].getLink()).toEqual(
+        "http://localhost:15680/xwiki/bin/view/Main/",
+      );
+      await expect(breadcrumbItems[1].getText()).toContainText("Main");
+      expect(await breadcrumbItems[1].getLink()).toEqual(
+        "http://localhost:15680/xwiki/bin/view/Main/",
+      );
+    });
+
+    if (offlineDefaultPage) {
+      test(`[${name}] offline actually fetch updated versions`, async ({
+        page,
+      }) => {
+        await page.goto(offlineDefaultPage);
+
+        const locator = page.locator("#xwikicontent");
+        await expect(locator).toContainText("Welcome to Main.Offline");
+        const textBefore = (await page.locator(".offlinecount").textContent())!;
+        await page.reload();
+        await expect(locator).toContainText("Welcome to Main.Offline");
+        // Assert that at some point to page content is reloaded with a more recent
+        // version from the server (the counter is incremented by one at each
+        // request).
+        await expect(page.locator(".offlinecount")).not.toContainText(
+          textBefore,
+        );
+      });
+    }
+  },
+);

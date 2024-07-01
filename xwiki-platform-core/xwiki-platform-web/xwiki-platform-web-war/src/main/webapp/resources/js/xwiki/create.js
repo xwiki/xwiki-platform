@@ -18,9 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery', 'xwiki-meta'], function($, xm) {
-  $(function() {
-
-    var form = $('form#create');
+  let initCreateForm = function(form) {
     var nameField = form.find('input.location-name-field');
     var parentReferenceField = form.find('input.location-parent-field');
     var terminalCheckbox = form.find('input[name="tocreate"]');
@@ -199,5 +197,11 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 
     // Initialize the UI with any pre-selected template provider's preferences.
     form.find('.xwiki-select').trigger('xwiki:select:updated');
+  };
+
+  $(document).on('xwiki:dom:updated', (event, data) => {
+    const containers = data?.elements || [document.documentElement];
+    $(containers).find('form#create').each(() => initCreateForm($(this)));
   });
+  $(() => initCreateForm($(document).find('form#create')));
 });

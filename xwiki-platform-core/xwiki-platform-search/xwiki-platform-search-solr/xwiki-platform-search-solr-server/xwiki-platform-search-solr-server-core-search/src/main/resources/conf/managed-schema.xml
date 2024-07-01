@@ -1263,7 +1263,7 @@
 
     <!-- XWIKI: Traditional Chinese -->
     <dynamicField name="*_zh_TW" type="text_zh_TW"  indexed="true"  stored="true" multiValued="true"/>
-    <fieldType name="text_TW" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text_zh_TW" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer name="icu"/>
         <filter name="cjkWidth"/>

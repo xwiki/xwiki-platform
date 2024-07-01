@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Tour.HomepageTour.WebHome" locale="">
+<xwikidoc version="1.5" reference="Tour.HomepageTour.WebHome" locale="">
   <web>Tour.HomepageTour</web>
   <name>WebHome</name>
   <language/>
@@ -145,6 +145,20 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -180,6 +194,7 @@
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.welcome.content')
 {{/velocity}}</content>
     </property>
@@ -194,6 +209,9 @@ $services.localization.render('tour.homepageTour.welcome.content')
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -310,6 +328,20 @@ $services.localization.render('tour.homepageTour.welcome.content')
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -345,6 +377,7 @@ $services.localization.render('tour.homepageTour.welcome.content')
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.panels.contentA')
 
 
@@ -362,6 +395,9 @@ $services.localization.render('tour.homepageTour.panels.contentB')
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -478,6 +514,20 @@ $services.localization.render('tour.homepageTour.panels.contentB')
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -513,6 +563,7 @@ $services.localization.render('tour.homepageTour.panels.contentB')
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.breadcrumbs.contentA')
 
 
@@ -530,6 +581,9 @@ $services.localization.render('tour.homepageTour.breadcrumbs.contentB', [" $serv
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -646,6 +700,20 @@ $services.localization.render('tour.homepageTour.breadcrumbs.contentB', [" $serv
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -681,6 +749,7 @@ $services.localization.render('tour.homepageTour.breadcrumbs.contentB', [" $serv
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.pageContent.contentA')
 
 
@@ -698,6 +767,9 @@ $services.localization.render('tour.homepageTour.pageContent.contentB')
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -814,6 +886,20 @@ $services.localization.render('tour.homepageTour.pageContent.contentB')
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -849,6 +935,7 @@ $services.localization.render('tour.homepageTour.pageContent.contentB')
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.pageMenu.contentA')
 
 
@@ -866,6 +953,9 @@ $services.localization.render('tour.homepageTour.pageMenu.contentB', [" $service
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -982,6 +1072,20 @@ $services.localization.render('tour.homepageTour.pageMenu.contentB', [" $service
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -1017,6 +1121,7 @@ $services.localization.render('tour.homepageTour.pageMenu.contentB', [" $service
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.pageTabs.contentA')
 
 
@@ -1034,6 +1139,9 @@ $services.localization.render('tour.homepageTour.pageTabs.contentB')
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -1150,6 +1258,20 @@ $services.localization.render('tour.homepageTour.pageTabs.contentB')
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -1185,6 +1307,7 @@ $services.localization.render('tour.homepageTour.pageTabs.contentB')
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.header.contentA')
 
 
@@ -1202,6 +1325,9 @@ $services.localization.render('tour.homepageTour.header.contentB', [" $services.
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -1318,6 +1444,20 @@ $services.localization.render('tour.homepageTour.header.contentB', [" $services.
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </queryString>
+      <reflex>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>reflex</name>
+        <number>10</number>
+        <prettyName>Reflex</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </reflex>
       <targetPage>
         <customDisplay/>
         <disabled>0</disabled>
@@ -1353,6 +1493,7 @@ $services.localization.render('tour.homepageTour.header.contentB', [" $services.
     </property>
     <property>
       <content>{{velocity}}
+$xwiki.ssx.use('Tour.HomepageTour.WebHome')
 $services.localization.render('tour.homepageTour.tourComplete.contentA')
 
 
@@ -1370,6 +1511,9 @@ $services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', 
     </property>
     <property>
       <queryString/>
+    </property>
+    <property>
+      <reflex>0</reflex>
     </property>
     <property>
       <targetPage/>
@@ -1477,8 +1621,11 @@ $services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', 
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -1498,6 +1645,7 @@ $services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', 
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -1507,6 +1655,8 @@ $services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', 
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -1542,6 +1692,8 @@ $services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', 
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1565,28 +1717,26 @@ $services.localization.render('tour.homepageTour.tourComplete.contentB', ['[[', 
 */
 /*START Workaround for TOUR-36*/
 /*Get colors from the current Color Theme*/
-#set($currentTheme = $xwiki.getXWikiPreference('colorTheme'))
-#set($currentThemeDoc = $xwiki.getDocument($currentTheme))
 
 #docextrapanes {
-  background-color: $currentThemeDoc.getValue('xwiki-page-content-bg');
+  background-color: @xwiki-page-content-bg;
 }
 ul.tour-step-backdrop.tour-tour_95_Tour_46_HomepageTour_46_WebHome-element {
-  background-color: $currentThemeDoc.getValue('navbar-default-bg');
+  background-color: @navbar-default-bg;
 }
 /*END*/</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

@@ -66,7 +66,9 @@ export default class DefaultQueueWorker implements QueueWorker {
       if (this.workerInstance == null) {
         // this.workerInstance = new ComlinkWorker<typeof import('./worker')>(new URL('./worker',
         // import.meta.url), {/* normal Worker options*/})
-        const sworker = new Worker();
+        const sworker = new Worker({
+          name: "cristal-sharedworker",
+        });
         this.workerInstance = Comlink.wrap<MyWorker>(sworker.port);
         // TODO get rid of aliasing
         // eslint-disable-next-line @typescript-eslint/no-this-alias

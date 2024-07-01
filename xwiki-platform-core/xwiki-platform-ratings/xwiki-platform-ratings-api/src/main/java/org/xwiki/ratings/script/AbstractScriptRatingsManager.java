@@ -55,6 +55,9 @@ import com.xpn.xwiki.XWikiContext;
  */
 public abstract class AbstractScriptRatingsManager implements RatingsScriptServiceAPI
 {
+    @Inject
+    protected Logger logger;
+
     private RatingsManager ratingsManager;
 
     @Inject
@@ -66,9 +69,6 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
 
     @Inject
     private ContextualAuthorizationManager authorizationManager;
-
-    @Inject
-    private Logger logger;
 
     void setRatingsManager(RatingsManager ratingsManager)
     {
@@ -97,7 +97,8 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
                     result = Optional.of(rating);
                 }
             } catch (RatingsException e) {
-                logger.error("Error while trying to rate reference [{}].", reference, ExceptionUtils.getRootCause(e));
+                this.logger.error("Error while trying to rate reference [{}].", reference,
+                    ExceptionUtils.getRootCause(e));
             }
         }
         return result;

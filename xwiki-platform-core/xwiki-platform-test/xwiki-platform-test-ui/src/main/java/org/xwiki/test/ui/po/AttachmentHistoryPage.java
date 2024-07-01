@@ -36,6 +36,8 @@ public class AttachmentHistoryPage extends ViewPage
 
     private static final int AUTHOR_COL_IDX = 4;
 
+    private static final int COMMENT_COL_IDX = 6;
+
     /**
      * @param rowIdx the index of the row of the attachment, starting at 1
      * @return the version for the requested attachment version
@@ -77,6 +79,16 @@ public class AttachmentHistoryPage extends ViewPage
     public String getAuthor(int rowIdx)
     {
         return getCell(rowIdx, AUTHOR_COL_IDX).getText();
+    }
+
+    /**
+     * @param rowIdx the index of the row of the attachment, starting at 1
+     * @return the comment of the requested attachment version
+     * @since 16.3.0RC1
+     */
+    public String getComment(int rowIdx)
+    {
+        return getCell(rowIdx, COMMENT_COL_IDX).getText();
     }
 
     private WebElement getCell(long rowIdx, int columnIdx)

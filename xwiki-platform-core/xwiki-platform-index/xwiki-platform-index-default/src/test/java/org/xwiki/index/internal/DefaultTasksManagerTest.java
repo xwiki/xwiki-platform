@@ -236,6 +236,9 @@ class DefaultTasksManagerTest
 
         // Block the fist task and let the next tasks execute instantly.
         doAnswer(invocation -> {
+            // TODO: Remove once XWIKI-21820 is closed, without this sleep the test might flicker if the two addTask to 
+            // doc 442 version 1.2 are executed during the same millisecond, leading to a flickering test.
+            Thread.sleep(1);
             taskDataCompletableFuture.set(this.tasksManager.addTask("wikiA", 42, "1.2", "concurrent"));
             return null;
         })

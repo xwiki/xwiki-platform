@@ -27,4 +27,6 @@
 <suppressions>
   <suppress checks="FanOutComplexity" files="NotificationFilterPreferenceStore.java"/>
   <suppress checks="FanOutComplexity" files="R140401000XWIKI15460DataMigration.java"/>
+  <suppress checks="FanOutComplexity" files="R160300000XWIKI17243DataMigration.java"/>
+  <suppress checks="FanOutComplexity" files="NotificationCustomFiltersLiveDataEntryStore.java"/>
 </suppressions>

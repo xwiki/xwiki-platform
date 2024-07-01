@@ -72,7 +72,7 @@ public class LESSSkinFileResourceReference implements LESSResourceReference
     {
         Template template = templateManager.getTemplate("less/" + fileName, skinManager.getSkin(skin));
         if (template == null) {
-            throw new LESSCompilerException(String.format("The template [%s] does not exists.", fileName));
+            throw new LESSCompilerException(String.format("The template [%s] does not exist.", fileName));
         }
 
         try {

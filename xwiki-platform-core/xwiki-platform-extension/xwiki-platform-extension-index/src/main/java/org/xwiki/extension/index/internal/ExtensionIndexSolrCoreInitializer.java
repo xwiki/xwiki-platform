@@ -260,7 +260,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
             if (cversion >= SCHEMA_VERSION_15_6) {
                 // Cleanup previously required field from the index.
                 try {
-                    this.client.deleteByQuery("is_installed:[* TO *] OR is_from_environment:[* TO *]");
+                    this.core.getClient().deleteByQuery("is_installed:[* TO *] OR is_from_environment:[* TO *]");
                 } catch (SolrServerException | IOException e) {
                     throw new SolrException("Failed to cleanup is_installed field", e);
                 }

@@ -33,6 +33,19 @@
           }, function () {
             console.debug("Failed to resolve image style [" + styleId + "]");
           });
+      } else {
+        // In case of empty imageStyle, check if this is because the default style is forced.
+        // In this case, allow resizing according to the default style configuration.
+        imageStyleClient.loadImageStylesDefault().then((defaultStyle) => {
+          if (defaultStyle.forceDefaultStyle === "true") {
+            imageStyleClient.loadImageStyles().then((values) => {
+              var forcedStyle = values.imageStyles.filter((style) => style.identifier === defaultStyle.defaultStyle)[0];
+              if (forcedStyle.adjustableSize === false) {
+                widget.resizer.addClass('hidden');
+              }
+            });
+          }
+        });
       }
     });
   }

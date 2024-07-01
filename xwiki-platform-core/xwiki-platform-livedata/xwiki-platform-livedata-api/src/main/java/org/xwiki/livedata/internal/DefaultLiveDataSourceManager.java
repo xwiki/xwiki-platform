@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -61,6 +62,9 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
     @Inject
     private ComponentManagerManager componentManagerManager;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Optional<LiveDataSource> get(Source sourceConfig, String namespace)
     {
@@ -73,7 +77,7 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
                 }
                 return Optional.of(liveDataSource);
             } catch (ComponentLookupException e) {
-                // Shouldn't happen normally, unless the component was just unregistered by another thread.
+                this.logger.error("Error when initializing LiveDataSource with hint [{}]", sourceConfig.getId(), e);
             }
         }
 

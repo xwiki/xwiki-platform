@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -143,7 +142,7 @@ class ImportInlinePageTest extends PageTest
             document.select("#packagelistcontainer .xitemcontainer.package .name>a")
                 .stream()
                 .map(Element::text)
-                .collect(Collectors.toList());
+                .toList();
         assertThat(attachmentLinksText,
             containsInAnyOrder("><script>console.log('secondAttachment')</script>{{/html}}{{noscript/}}",
                 "attachment.xar"));

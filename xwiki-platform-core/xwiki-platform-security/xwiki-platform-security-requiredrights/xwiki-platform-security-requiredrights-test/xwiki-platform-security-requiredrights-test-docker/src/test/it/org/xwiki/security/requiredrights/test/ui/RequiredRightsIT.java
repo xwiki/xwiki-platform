@@ -61,6 +61,8 @@ class RequiredRightsIT
             requiredRightsPreEditCheckElement.getSummary(0));
         requiredRightsPreEditCheckElement.toggleDetailedMessage(0);
         requiredRightsPreEditCheckElement.waitForDetailedMessage(0, "The title is [Hello $a].");
+        assertEquals(setup.getURL(testReference.getLastSpaceReference()) + "/",
+            requiredRightsPreEditCheckElement.getTitleHref(0));
     }
 
     @Test

@@ -21,7 +21,7 @@
 
 <!-- BooleanFilter is a custom filter that allow to filter boolean values. -->
 <template>
-  <select :value="filterValue" class="xwiki-selectize livedata-selectize" ref="input"
+  <select :value="filterValue" class="xwiki-selectize livedata-selectize filter-boolean" ref="input"
     :aria-label="$t('livedata.filter.boolean.label')">
     <option value=""></option>
     <option :value="trueValue">{{ $t('livedata.displayer.boolean.true') }}</option>
@@ -57,7 +57,10 @@ export default {
 
   watch: {
     filterValue(newValue, oldValue) {
-      if (newValue !== oldValue) {
+      if (this.$refs.input.selectize.items.length === 0) {
+        // When no values are selected, simply remove the filter.
+        this.removeFilter();
+      } else if (newValue !== oldValue) {
         $(this.$refs.input).val(newValue).trigger('change');
         this.applyFilter(newValue);
       }
@@ -65,7 +68,9 @@ export default {
   },
 
   // Create the selectize widget.
-  mounted() {
+  async mounted() {
+    // Wait for the translations to be loaded, otherwise the true / false option label might be displayed untranslated.
+    await this.logic.translationsLoaded();
     $(this.$refs.input).xwikiSelectize({
       onChange: value => {
         this.filterValue = value;
@@ -82,7 +87,8 @@ export default {
 </script>
 
 <style>
-.livedata-selectize.xwiki-selectize {
-  margin-top: 6px;
+.livedata-filter.filter-boolean .selectize-input {
+  height: 100%;
+  vertical-align: middle;
 }
 </style>

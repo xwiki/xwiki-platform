@@ -58,7 +58,7 @@ public interface RegistrationConfiguration
         /**
          * When one symbol character is mandatory.
          */
-        ONE_SYMBOL_CHARACTER(".*(_\\W)+.*"),
+        ONE_SYMBOL_CHARACTER(".*[_\\W]+.*"),
 
         /**
          * When one number character is mandatory.

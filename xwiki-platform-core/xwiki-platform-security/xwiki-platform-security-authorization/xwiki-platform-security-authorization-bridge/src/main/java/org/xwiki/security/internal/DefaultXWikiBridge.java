@@ -119,8 +119,11 @@ public class DefaultXWikiBridge implements XWikiBridge
             return reference;
         }
 
+        // Discard the parameters since they are not used by the authorization system but cause issues when comparing
+        // references for equality.
         // Make sure the reference is complete
-        EntityReference compatibleReference = this.currentResolver.resolve(reference, reference.getType());
+        EntityReference compatibleReference = this.currentResolver.resolve(reference.removeParameters(true),
+            reference.getType());
 
         // Convert to PAGE reference to DOCUMENT reference since the security system design does not work well with PAGE
         // one (which have different kinds of right at the same level)

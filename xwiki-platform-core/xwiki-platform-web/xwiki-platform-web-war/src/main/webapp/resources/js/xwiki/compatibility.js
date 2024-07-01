@@ -396,4 +396,10 @@ Object.extend(XWiki.constants, {
   head.insert(new Element('meta', {'name': 'language', 'content': html.readAttribute('lang')}));
 })();
 
+/**
+ * Use to hold the list of blacklistedSpaces: this concept has been removed in favor of the hidden attribute in pages.
+ * @deprecated since 16.0RC1
+ */
+XWiki.blacklistedSpaces = XWiki.blacklistedSpaces || [];
+
 })();

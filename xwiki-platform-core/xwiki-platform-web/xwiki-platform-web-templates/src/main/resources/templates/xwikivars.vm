@@ -104,15 +104,6 @@
 ## - guest users who have admin rights (i.e. when the wiki is empty with no rights set)
 ## =====================================================================================
 #set ($isAdvancedUser = (($isGuest && $hasAdmin) || $services.user.allProperties.type == 'ADVANCED'))
-## ======================================================================================
-## Compute list of spaces to blacklist so that simple users don't see them.
-## TODO : replace this list by a hidden space feature.
-## ======================================================================================
-#if ($hasAdmin || $isAdvancedUser)
-  #set ($blacklistedSpaces = [])
-#else
-  #set ($blacklistedSpaces = ['Import', 'Panels', 'Scheduler', 'Stats', 'XAppClasses', 'XAppSheets', 'XAppTemplates', 'XWiki', 'WatchCode', 'WatchSheets', 'XApp', 'WatchAdmin', 'Watch', 'ColorThemes', 'AnnotationCode'])
-#end
 #set ($parent ="<a href='$parentDoc.getURL()'>$escapetool.xml(${parentDoc.displayTitle})</a>")
 #if ($tdoc)
   #set ($headertitle = "<a href='$viewUrl'>$escapetool.xml(${tdoc.displayTitle})</a>")

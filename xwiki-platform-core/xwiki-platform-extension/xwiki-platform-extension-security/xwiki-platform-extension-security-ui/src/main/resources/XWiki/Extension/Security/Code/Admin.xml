@@ -62,7 +62,8 @@
   source="extensionSecurity"
   sourceParameters="isFromEnvironment=false"
   properties="name,wikis,maxCVSS,cveID,fixVersion,advice"
-  showPageSizeDropdown="false"}}
+  showPageSizeDropdown="false"
+  sort="name:asc"}}
 {{/liveData}}
 
 &lt;/div&gt;
@@ -79,7 +80,8 @@
   source="extensionSecurity"
   sourceParameters="isFromEnvironment=true"
   properties="name,wikis,maxCVSS,cveID,fixVersion,advice"
-  showPageSizeDropdown="false"}}
+  showPageSizeDropdown="false"
+  sort="name:asc"}}
 {{/liveData}}
 
   &lt;/div&gt;

@@ -19,10 +19,13 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.WYSIWYGEditorAdministrationSectionPage;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.BootstrapSelect;
 
 /**
  * Represents the CKEditor administration pane.
@@ -35,6 +38,9 @@ public class CKEditorConfigurationPane extends BaseElement
     private static final String EDITOR_ID = "ckeditor";
 
     private final WebElement container;
+
+    @FindBy(css = "#CKEditor\\.ConfigClass_0_removePlugins + .bootstrap-select")
+    private WebElement disabledPluginsSelect;
 
     @FindBy(id = "CKEditor.ConfigClass_0_loadJavaScriptSkinExtensions")
     private WebElement loadJavaScriptCheckBox;
@@ -64,6 +70,29 @@ public class CKEditorConfigurationPane extends BaseElement
     private CKEditorConfigurationPane(WebElement container)
     {
         this.container = container;
+    }
+
+    /**
+     * @return the list of disabled CKEditor plugins
+     * @since 16.2.0RC1
+     */
+    public List<String> getDisabledPlugins()
+    {
+        BootstrapSelect select = new BootstrapSelect(this.disabledPluginsSelect, getDriver());
+        return select.getSelectedValues();
+    }
+
+    /**
+     * Sets the list of disabled CKEditor plugins.
+     * 
+     * @param pluginNames the list of plugin names to disable
+     * @return this object
+     */
+    public CKEditorConfigurationPane setDisabledPlugins(List<String> pluginNames)
+    {
+        BootstrapSelect select = new BootstrapSelect(this.disabledPluginsSelect, getDriver());
+        select.selectByValues(pluginNames);
+        return this;
     }
 
     /**

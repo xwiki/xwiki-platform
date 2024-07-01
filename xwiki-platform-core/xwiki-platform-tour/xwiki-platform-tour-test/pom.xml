@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tour</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tour-test</artifactId>
   <packaging>pom</packaging>
@@ -39,6 +39,13 @@
   </properties>
   <modules>
     <module>xwiki-platform-tour-test-pageobjects</module>
-    <module>xwiki-platform-tour-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-tour-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

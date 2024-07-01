@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -67,6 +66,7 @@ import org.xwiki.user.UserReference;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -631,8 +631,10 @@ public class SolrRatingsManagerTest
         when(this.solrUtils.get(RatingQueryField.USER_REFERENCE.getFieldName(), solrDocument, UserReference.class))
             .thenReturn(userReference);
         when(this.documentList.stream())
-            .thenReturn(Collections.singletonList(solrDocument).stream())
-            .thenReturn(Collections.singletonList(solrDocument).stream());
+            .thenReturn(Stream.of(solrDocument))
+            .thenReturn(Stream.of(solrDocument))
+            .thenReturn(Stream.of(solrDocument))
+            .thenReturn(Stream.of(solrDocument));
         // Those are used for deletion.
         when(this.documentList.isEmpty()).thenReturn(false);
         when(this.documentList.get(0)).thenReturn(solrDocument);
@@ -660,16 +662,39 @@ public class SolrRatingsManagerTest
             .addSort(RatingQueryField.CREATED_DATE.getFieldName(), SolrQuery.ORDER.asc);
 
         QueryResponse response = mock(QueryResponse.class);
-        final AtomicBoolean flag = new AtomicBoolean(false);
         when(solrClient.query(any())).then(invocationOnMock -> {
             SolrQuery givenQuery = invocationOnMock.getArgument(0);
-            SolrQuery checkExpectedQuery;
-            if (!flag.get()) {
-                checkExpectedQuery = firstExpectedQuery;
-                flag.set(true);
-            } else {
-                checkExpectedQuery = secondExpectedQuery;
-            }
+            SolrQuery checkExpectedQuery = firstExpectedQuery;
+
+            assertEquals(checkExpectedQuery.getQuery(), givenQuery.getQuery());
+            assertArrayEquals(checkExpectedQuery.getFilterQueries(), givenQuery.getFilterQueries());
+            assertEquals(checkExpectedQuery.getRows(), givenQuery.getRows());
+            assertEquals(checkExpectedQuery.getStart(), givenQuery.getStart());
+            assertEquals(checkExpectedQuery.getSorts(), givenQuery.getSorts());
+            return response;
+        }).then(invocationOnMock -> {
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            SolrQuery checkExpectedQuery = secondExpectedQuery;
+
+            assertEquals(checkExpectedQuery.getQuery(), givenQuery.getQuery());
+            assertArrayEquals(checkExpectedQuery.getFilterQueries(), givenQuery.getFilterQueries());
+            assertEquals(checkExpectedQuery.getRows(), givenQuery.getRows());
+            assertEquals(checkExpectedQuery.getStart(), givenQuery.getStart());
+            assertEquals(checkExpectedQuery.getSorts(), givenQuery.getSorts());
+            return response;
+        }).then(invocationOnMock -> {
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            SolrQuery checkExpectedQuery = firstExpectedQuery;
+
+            assertEquals(checkExpectedQuery.getQuery(), givenQuery.getQuery());
+            assertArrayEquals(checkExpectedQuery.getFilterQueries(), givenQuery.getFilterQueries());
+            assertEquals(checkExpectedQuery.getRows(), givenQuery.getRows());
+            assertEquals(checkExpectedQuery.getStart(), givenQuery.getStart());
+            assertEquals(checkExpectedQuery.getSorts(), givenQuery.getSorts());
+            return response;
+        }).then(invocationOnMock -> {
+            SolrQuery givenQuery = invocationOnMock.getArgument(0);
+            SolrQuery checkExpectedQuery = secondExpectedQuery;
 
             assertEquals(checkExpectedQuery.getQuery(), givenQuery.getQuery());
             assertArrayEquals(checkExpectedQuery.getFilterQueries(), givenQuery.getFilterQueries());
@@ -680,13 +705,27 @@ public class SolrRatingsManagerTest
         });
         when(response.getResults()).thenReturn(this.documentList);
 
-        when(this.configuration.isZeroStored()).thenReturn(true);
+        when(this.configuration.isZeroStored()).thenReturn(false);
         assertNull(this.manager.saveRating(reference, userReference, newVote));
         verify(this.solrClient, never()).add(any(SolrInputDocument.class));
         verify(this.solrClient).deleteById("myRating");
         verify(this.solrClient).commit();
         verify(this.observationManager).notify(any(DeletedRatingEvent.class), eq(managerId), eq(oldRating));
         verify(this.averageRatingManager).removeVote(reference, oldVote);
+
+        when(this.configuration.isZeroStored()).thenReturn(true);
+        DefaultRating expectedRating = new DefaultRating("myRating")
+            .setManagerId(managerId)
+            .setReference(reference)
+            .setCreatedAt(new Date(422))
+            .setVote(0)
+            .setScaleUpperBound(scale)
+            .setAuthor(userReference);
+        Rating rating = this.manager.saveRating(reference, userReference, newVote);
+        assertNotNull(rating);
+        expectedRating.setUpdatedAt(rating.getUpdatedAt());
+        assertEquals(expectedRating, rating);
+        verify(this.solrClient).add(any(SolrInputDocument.class));
     }
 
     @Test

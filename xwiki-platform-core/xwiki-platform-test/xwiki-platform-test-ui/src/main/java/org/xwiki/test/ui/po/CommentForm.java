@@ -21,7 +21,6 @@ package org.xwiki.test.ui.po;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -70,10 +69,10 @@ public class CommentForm extends BaseElement
     private void runOnContentField(Consumer<WebElement> action)
     {
         List<WebElement> textareas = getContainer()
-                                         .findElements(By.tagName("textarea"))
-                                         .stream()
-                                         .filter(it -> !it.getAttribute("class").contains("ckeditor-textarea"))
-                                         .collect(Collectors.toList());
+            .findElements(By.tagName("textarea"))
+            .stream()
+            .filter(it -> !it.getAttribute("class").contains("ckeditor-textarea"))
+            .toList();
 
         if (textareas.size() == 0 || !textareas.get(0).isDisplayed()) {
             WebElement iframe = getContainer().findElement(By.tagName("iframe"));

@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="ko">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
+core.menu.type.wiki=Wiki
+core.menu.watchlist.add.wiki=위키 보기
+core.menu.watchlist.remove.wiki=위키 보기 해제
+core.menu.admin.wiki=이 위키 관리
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=위키 정보
+
+# MESSAGES
+platform.wiki.currentwiki.welcome={0}{1}{2} 위키에 오신 것을 환영합니다.
+platform.wiki.currentwiki.currentUserIsOwner=당신은 이 위키의 소유자입니다.
+platform.wiki.currentwiki.currentUserIsAdmin=귀하는 이 위키의 관리자입니다.
+platform.wiki.currentwiki.joinNeedToLogin=이 위키에 참여하려면 로그인이 필요합니다.
+platform.wiki.currentwiki.currentUserNotMember=당신은 이 위키의 회원이 아닙니다.
+platform.wiki.currentwiki.currentuserCanJoin=원하시면 {0}이 Wiki에 가입{1}하실 수 있습니다.
+platform.wiki.currentwiki.currentUserIsMember=귀하는 이 위키의 회원입니다.
+platform.wiki.currentwiki.currentUserCanLeave=원하시면 {0}이 Wiki를 나가실 수 있습니다{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Wiki 회원의 전체 목록을 보려면 {0}사용자 디렉토리{1}를 참조하세요.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=귀하는 이 위키에 가입하도록 초대되었습니다.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=귀하는 이 위키에 가입을 요청했습니다.
+platform.wiki.currentwiki.joinRequestAcceptedNotification=''{0}'' 위키 가입 요청이 승인되었습니다.
+platform.wiki.currentwiki.joinRequestRejectedNotification=''{0}'' Wiki 가입 요청이 거부되었습니다.
+platform.wiki.currentwiki.candidateHandledSaveComment=처리된 후보 {0}({1})
+platform.wiki.currentwiki.candidateHandledComment=논평:
+platform.wiki.currentwiki.candidateAcceptedSuccess=요청이 승인되었습니다.
+platform.wiki.currentwiki.candidateRejectedSuccess=요청이 거부되었습니다.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0}은(는) 이미 위키 회원입니다.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0}에 이미 대기 중인 요청이 있습니다. 대신 해당 요청에 응답해 주세요.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0}님에게 이미 대기 중인 초대가 있습니다.
+platform.wiki.currentwiki.inviteSaveComment=사용자 ''{0}''이(가) 위키에 가입하도록 초대되었습니다.
+platform.wiki.currentwiki.inviteNotification=''{0}'' 위키에 가입하도록 초대받았습니다.
+platform.wiki.currentwiki.inviteSuccess={0}님이 성공적으로 초대되었습니다.
+platform.wiki.currentwiki.invitationCancelSaveComment=취소된 초대 {0} ({1})
+platform.wiki.currentwiki.invitationCancelNotification=귀하의 초대는 취소되어 더 이상 유효하지 않습니다.
+platform.wiki.currentwiki.invitationCancelSuccess=초대가 취소되었습니다.
+platform.wiki.currentwiki.invitationCancelFailure=오류가 발생했습니다. 이 초대를 취소할 수 없습니다.
+platform.wiki.currentwiki.candidateReviewFailure=오류가 발생했습니다. 이 초대를 취소할 수 없습니다.
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label={0} 개 항목이 선택됨
+platform.wiki.currentwiki.prop.description.label=설명
+platform.wiki.currentwiki.prop.owner.label=소유자
+platform.wiki.currentwiki.prop.membershipType.label=회원 유형
+platform.wiki.currentwiki.prop.secure.label=보안(SSL)
+platform.wiki.currentwiki.member.add=Wiki에 사용자 추가 또는 초대
+platform.wiki.currentwiki.gadget.wikiInformation.label=위키 정보
+platform.wiki.currentwiki.gadget.topActiveUsers.label=최고 활동 기여자
+platform.wiki.currentwiki.panel.information.name.label=이름
+platform.wiki.currentwiki.panel.information.description.label=설명
+platform.wiki.currentwiki.panel.information.members.label=회원
+platform.wiki.currentwiki.invitation.view.label=초대장 보기
+platform.wiki.currentwiki.joinrequest.cancel.label=요청 취소
+platform.wiki.currentwiki.joinreques.request.label=가입 요청
+platform.wiki.currentwiki.join.label=가입하다
+platform.wiki.currentwiki.leave.label=위키 나가기
+platform.wiki.currentwiki.invite.username.label=사용자 이름
+platform.wiki.currentwiki.invite.message.label=메시지
+platform.wiki.currentwiki.invite.button.label=초대하다
+platform.wiki.currentwiki.candidates.label=후보자
+platform.wiki.currentwiki.candidates.status.label=상태:
+platform.wiki.currentwiki.candidates.type.label=유형:
+platform.wiki.currentwiki.candidates.reviewer.label=관리자:
+platform.wiki.currentwiki.candidates.reviewermessage.label=관리자 메시지:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=비공개 댓글:
+platform.wiki.currentwiki.candidates.accept.label=수용하다
+platform.wiki.currentwiki.candidates.reject.label=거부하다
+platform.wiki.currentwiki.candidates.invitation.cancel.label=초대 취소
+platform.wiki.currentwiki.wikiusers.title=위키 사용자
+platform.wiki.currentwiki.managewikis.title=일주일
+WikiManager.WikiCandidateMemberClass_status_pending=보류 중
+WikiManager.WikiCandidateMemberClass_status_accepted=수락됨
+WikiManager.WikiCandidateMemberClass_status_rejected=거부됨
+WikiManager.WikiCandidateMemberClass_type_request=요구
+WikiManager.WikiCandidateMemberClass_type_invitation=초대
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=위키의 표시 이름입니다.
+platform.wiki.currentwiki.prop.description.hint=위키와 그 목적에 대한 간략한 설명입니다.
+platform.wiki.currentwiki.prop.owner.hint=위키에 대한 모든 권리를 가진 사용자입니다.
+platform.wiki.currentwiki.prop.membershipType.hint=사용자가 이 위키에 참여할 수 있는 방법입니다.
+platform.wiki.currentwiki.prop.secure.hint=사용하도록 설정하면 이 Wiki에서 생성된 모든 외부 URL이 {0}https:~/~/{1}로 시작됩니다.
+platform.wiki.currentwiki.invite.username.hint=Wiki에 추가할 사용자의 이름입니다.
+platform.wiki.currentwiki.invite.message.hint=사용자에게 보낼 메시지입니다.
+platform.wiki.currentwiki.candidates.hint=위키 가입을 요청했거나 초대받은 사용자입니다.
+platform.wiki.currentwiki.candidates.empty=위키에 가입하도록 요청하거나 초대받은 사용자가 없습니다.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=위키 이름, 설명, 소유자, 회원 유형 등의 설정을 관리합니다.
+admin.xwiki.workspaceusers.description=위키 회원 관리: 위키 회원을 추가, 제거, 초대, 수락 또는 거부합니다.
+admin.xwiki.usersconfiguration.title=구성
+admin.xwiki.members.title=현재 회원
+admin.xwiki.users.title=모든 사용자들
+
+# DRAWER ITEM
+platform.wiki.drawer.homeWiki=집
+</content>
+</xwikidoc>

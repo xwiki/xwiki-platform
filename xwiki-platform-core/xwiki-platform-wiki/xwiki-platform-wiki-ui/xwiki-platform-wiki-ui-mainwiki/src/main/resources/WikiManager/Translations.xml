@@ -244,7 +244,7 @@ admin.wikis.rights=Creation Right
 ## XWikiServer Sheet
 platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
 platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
 platform.wiki.sheet.title.settings=Wiki properties
 platform.wiki.sheet.title.createnewalias=Create new alias
 platform.wiki.sheet.title.viewaliases=View aliases

@@ -124,7 +124,7 @@ var XWiki = (function(XWiki) {
 
       if (this.options.enableFileInfo) {
         statusUI.FILE_INFO   = UploadUtils.createDiv('file-info');
-        (statusUI.FILE_NAME  = UploadUtils.createSpan('file-name', this.file.name)).title = this.file.type;
+        (statusUI.FILE_NAME  = UploadUtils.createSpan('file-name', this.file.name.escapeHTML())).title = this.file.type;
         statusUI.FILE_SIZE   = UploadUtils.createSpan('file-size', ' (' + UploadUtils.bytesToSize(this.file.size) + ')');
         statusUI.FILE_CANCEL = UploadUtils.createButton("$services.localization.render('core.widgets.html5upload.item.cancel')", this.cancelUpload.bindAsEventListener(this));
         // TODO MIME type icon?
@@ -201,6 +201,11 @@ var XWiki = (function(XWiki) {
       Object.keys(fields).each(function(key) {
         fields[key] && formData.append(key, fields[key]);
       });
+
+      if (this.formData.comment) {
+        const commentValue = this.formData.comment.value;
+        commentValue && formData.append('comment', commentValue);
+      }
 
       // Create XMLHttpRequest object, adding few event listeners, and POST the data
       var request = this.request = new XMLHttpRequest();
@@ -295,7 +300,7 @@ var XWiki = (function(XWiki) {
         this.statusUI.FILE_CANCEL.addClassName('hidden');
       }
       this.formData.input.fire('xwiki:html5upload:message', {content: 'UPLOAD_FINISHING', type: 'inprogress', source: this,
-        parameters : {name : this.file.name}
+        parameters : {name : this.file.name.escapeHTML()}
       });
     },
 
@@ -324,7 +329,7 @@ var XWiki = (function(XWiki) {
         }
       }
       this.formData.input.fire('xwiki:html5upload:message', {content: 'UPLOAD_FINISHED', type: 'done', source: this,
-        parameters : {name : this.file.name, size : UploadUtils.bytesToSize(this.file.size)}
+        parameters : {name : this.file.name.escapeHTML(), size : UploadUtils.bytesToSize(this.file.size)}
       });
       this.formData.input.fire('xwiki:html5upload:fileFinished', {source: this});
       clearInterval(this.timer);
@@ -354,7 +359,8 @@ var XWiki = (function(XWiki) {
      */
     abnormalUploadFinish : function (message) {
       clearInterval(this.timer);
-      this.formData.input.fire('xwiki:html5upload:message', {content: message, type: 'error', source: this, parameters : {name : this.file.name}});
+      this.formData.input.fire('xwiki:html5upload:message', {content: message, type: 'error', source: this, parameters :
+       {name : this.file.name.escapeHTML()}});
       this.formData.input.fire('xwiki:html5upload:fileFinished', {source: this});
     }
   });
@@ -437,10 +443,14 @@ var XWiki = (function(XWiki) {
       // What is the URL where the file should be sent?
       this.options.targetURL = this.options.targetURL || this.form.action;
 
+      // Get the input that contains the comment
+      var comment = this.form.down('input[name=comment]');
+
       // Prepare common form data to send with each uploaded file
       this.formData = {
         input : this.input,
         action : this.options.targetURL,
+        comment: comment,
         additionalFields : {}
       };
       var redirect = this.form.down('input[name=xredirect]');
@@ -517,7 +527,7 @@ var XWiki = (function(XWiki) {
           }
         } catch (ex) {
           this.showMessage(ex, 'error', {size : UploadUtils.bytesToSize(this.options && this.options.maxFilesize),
-                                         name : file.name, type: file.type
+                                         name : file.name.escapeHTML(), type: file.type
           });
         }
       }

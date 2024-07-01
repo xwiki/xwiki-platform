@@ -19,12 +19,17 @@
  */
 package org.xwiki.attachment.internal;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,7 +46,6 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -132,23 +136,34 @@ class DefaultAttachmentsManagerTest
         verifyNoInteractions(this.documentReferenceResolver);
     }
 
-    @Test
-    void getRedirection() throws Exception
+    @ParameterizedTest
+    @MethodSource("getRedirectionSource")
+    void getRedirection(List<BaseObject> xObjects) throws Exception
     {
         DocumentReference targetReference = new DocumentReference("xwiki", "Space", "Target");
-
-        BaseObject redirectObj = mock(BaseObject.class);
-
         when(this.wiki.getDocument(DOCUMENT_REFERENCE, this.xWikiContext)).thenReturn(this.document);
-        when(redirectObj.getStringValue(SOURCE_NAME_FIELD)).thenReturn("file.txt");
-        when(redirectObj.getStringValue(TARGET_NAME_FIELD)).thenReturn("newName.txt");
-        when(redirectObj.getStringValue(TARGET_LOCATION_FIELD)).thenReturn("xwiki:Space.Target");
         when(this.document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE))
-            .thenReturn(singletonList(redirectObj));
+            .thenReturn(xObjects);
         when(this.documentReferenceResolver.resolve("xwiki:Space.Target"))
             .thenReturn(targetReference);
         assertEquals(Optional.of(new AttachmentReference("newName.txt", targetReference)),
             this.attachmentsManager.getRedirection(ATTACHMENT_LOCATION));
+    }
+
+    public static Stream<Arguments> getRedirectionSource()
+    {
+        BaseObject redirectObj = mock(BaseObject.class);
+        when(redirectObj.getStringValue(SOURCE_NAME_FIELD)).thenReturn("file.txt");
+        when(redirectObj.getStringValue(TARGET_NAME_FIELD)).thenReturn("newName.txt");
+        when(redirectObj.getStringValue(TARGET_LOCATION_FIELD)).thenReturn("xwiki:Space.Target");
+        List<BaseObject> xObjectWithNullValues = new java.util.ArrayList<>();
+        xObjectWithNullValues.add(null);
+        xObjectWithNullValues.add(redirectObj);
+        xObjectWithNullValues.add(null);
+        return Stream.of(
+            Arguments.of(List.of(redirectObj)),
+            Arguments.of(xObjectWithNullValues)
+        );
     }
 
     @Test
@@ -168,6 +183,20 @@ class DefaultAttachmentsManagerTest
         when(redirection2.getStringValue(SOURCE_NAME_FIELD)).thenReturn("file2.txt");
         when(this.document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE))
             .thenReturn(asList(redirection1, redirection2));
+        assertTrue(this.attachmentsManager.removeExistingRedirection("file.txt", this.document));
+        verify(this.document).removeXObject(redirection1);
+        verify(this.document, never()).removeXObject(redirection2);
+    }
+
+    @Test
+    void removeExistingRedirectionWithNullXObjects()
+    {
+        BaseObject redirection1 = mock(BaseObject.class);
+        BaseObject redirection2 = mock(BaseObject.class);
+        when(redirection1.getStringValue(SOURCE_NAME_FIELD)).thenReturn("file.txt");
+        when(redirection2.getStringValue(SOURCE_NAME_FIELD)).thenReturn("file2.txt");
+        when(this.document.getXObjects(RedirectAttachmentClassDocumentInitializer.REFERENCE))
+            .thenReturn(asList(null, redirection1, redirection2));
         assertTrue(this.attachmentsManager.removeExistingRedirection("file.txt", this.document));
         verify(this.document).removeXObject(redirection1);
         verify(this.document, never()).removeXObject(redirection2);

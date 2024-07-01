@@ -39,6 +39,8 @@
   <content>{{velocity wiki="false"}}
 #if ($request.action == 'lock')
   ## This could be moved later to a Velocity template (e.g. lock.vm).
+  ## We set the editor variable to be able to detect the inplace editor within the edit confirmation checkers.
+  #set ($editor = 'inplace')
   #template('edit_macros.vm')
   #getEditConfirmation()
   #if ($editConfirmation)
@@ -695,6 +697,8 @@ define('editInPlace', [
     viewContent.trigger('xwiki:actions:view', {document: xwikiDocument});
     $('#document-title h1').html(xwikiDocument.renderedTitle);
     viewContent.html(xwikiDocument.renderedContent);
+    // Reset the editor to let others know that we're no editing anymore.
+    XWiki.editor = '';
     if (!reload) {
       // If the user has canceled the edit then the restored page content may include the section edit links. Show them
       // in case they were hidden.
@@ -717,6 +721,8 @@ define('editInPlace', [
     // for editing the document content in place and one for editing the document syntax in-place) and we don't want
     // them to interfere (e.g. canceling one form shouldn't cancel the other forms).
     $('#xwikicontent').closest('.xcontent').addClass('form');
+    // Let others know which editor is used for the page content.
+    XWiki.editor = config.editMode;
     return initActionButtons(xwikiDocument).then(initTitleEditor).then(initContentEditor)
       .then(startRealTimeEditingSession);
   };
@@ -869,7 +875,7 @@ define('editInPlace', [
 
     // Submit either the raw (source) content (no syntax conversion needed in this case) or the rendered content (HTML)
     // in which case we have to force the conversion to the document syntax on the server.
-    const submitRawContent = xwikiDocument.content !== xwikiDocument.originalDocument.content;
+    const submitRawContent = typeof xwikiDocument.renderedContent !== 'string';
     form.find('input[name="content"]').val(submitRawContent ? xwikiDocument.content : xwikiDocument.renderedContent);
     form.find('input[name="RequiresHTMLConversion"]').prop('disabled', submitRawContent);
     form.find('input[name="content_syntax"]').val(xwikiDocument.syntax).prop('disabled', submitRawContent);
@@ -957,6 +963,8 @@ define('editInPlace', [
       viewContent.focus();
     }
     var data = $.extend({}, config, {
+      // Use the same name as for the standalone editor, in order to be consistent.
+      editorName: 'content',
       document: xwikiDocument,
       // The content editor is loaded on demand, asynchronously.
       deferred: $.Deferred()

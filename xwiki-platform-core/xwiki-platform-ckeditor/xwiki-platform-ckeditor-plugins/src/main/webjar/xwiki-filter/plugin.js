@@ -26,6 +26,7 @@
  *   <li>submits only the significant content</li>
  *   <li>converts the font tags into span tags</li>
  *   <li>unprotect allowed scripts</li>
+ *   <li>escapes the content of style tags to avoid breaking the HTML parser</li>
  * </ul>
  *
  * @see http://docs.cksource.com/CKEditor_3.x/Developers_Guide/Data_Processor
@@ -162,6 +163,32 @@
         htmlFilter.addRules(submitOnlySignificantContent, {priority: 5, applyToAll: true});
       }
 
+      // We have to filter both the input HTML (toHtml) and the output HTML (toDataFormat) because the CKEditor HTML
+      // parser is called in both cases. Priority 1 is needed to ensure our listener is called before the HTML parser
+      // (which has priority 5).
+      editor.on('toHtml', escapeStyleContent, null, null, 1);
+      // Remove data-widget attributes on images, as otherwise they might be badly interpreted as another type of
+      // widget, leading to CKEditor crashing.
+      editor.on('toHtml', (event) => {
+        event.data.dataValue.filter(new CKEDITOR.htmlParser.filter({
+          elements: {
+            img: function (element) {
+              const dataWidgetAttribute = element.attributes['data-widget'];
+              const dataCkeUploadIdAttribute = element.attributes['data-cke-upload-id'];
+              const isUploadImageWidget = dataWidgetAttribute === 'uploadimage';
+              // Cleanup data-widget attributes on images. Except for 'uploadimage' which is only cleaned up when
+              // the image is not currently being uploaded (i.e., has a data-cke-upload-id attribute)
+              if (!isUploadImageWidget || dataCkeUploadIdAttribute === undefined)
+              {
+                delete element.attributes['data-widget'];
+              }
+            }
+          }
+        }));
+        // We must use a priority below 8 to make sure our filter is executed before widgets are upcasted.
+      }, null, null, 7);
+      editor.on('toDataFormat', escapeStyleContent, null, null, 1);
+
       // Transform <font color="..." face="..."> into <span style="color: ...; font-family: ...">.
       // See https://ckeditor.com/old//comment/125305#comment-125305
       editor.filter.addTransformations([
@@ -254,7 +281,10 @@
           }
           return textNodes;
         };
-        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious');
+        // When the direction is 'getPrevious', getSiblingTextNodes returns an array of DOM Nodes in reverse order.
+        // The maybeFixNonBreakingSpace method expects both arrays to be in the actual DOM order.
+        // This is why we need to reverse the textNodesBefore array.
+        var textNodesBefore = getSiblingTextNodes(node.getChild(offset - 1), 'getPrevious').reverse();
         var textNodesAfter = getSiblingTextNodes(node.getChild(offset), 'getNext');
         return this.maybeFixNonBreakingSpace(textNodesBefore, textNodesAfter);
       } else if (node.type === CKEDITOR.NODE_TEXT) {
@@ -310,4 +340,31 @@
       }
     }
   });
+
+  const domParser = new DOMParser();
+  function escapeStyleContent(event) {
+    let html = event.data.dataValue;
+    // Depending on the editor type (inline or iframe-based) and configuration (fullPage true or false) the HTML
+    // string can be a full HTML document or just a fragment (e.g. the content of the BODY tag).
+    const isFragment = !html.trimEnd().endsWith('</html>');
+    try {
+      const doc = domParser.parseFromString(html, 'text/html');
+      // We want to modify the input HTML string only if there is a style tag that need escaping.
+      let modified = false;
+      doc.querySelectorAll('style').forEach(style => {
+        const styleContent = style.textContent;
+        // Escaping the '<' (less than) character in the style content is normally not required but unfortunately
+        // CKEditor's HTML parser relies heavily on regular expressions to match the start / end tags and considers
+        // the '<' character as the start of a new tag, even when '<' is used inside CSS (e.g. with the content
+        // property). See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_htmlParser.html
+        style.textContent = styleContent.replaceAll('<', '\\3C');
+        modified = modified || (styleContent !== style.textContent);
+      });
+      if (modified) {
+        event.data.dataValue = isFragment ? doc.body.innerHTML : doc.documentElement.outerHTML;
+      }
+    } catch (e) {
+      console.warn('Failed to escape the style tags from the given HTML string: ' + html, e);
+    }
+  }
 })();

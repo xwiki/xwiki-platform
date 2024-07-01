@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -1397,9 +1398,10 @@ public privileged aspect XWikiCompatibilityAspect
         if (this.configuredSyntaxes == null) {
             ExtendedRenderingConfiguration extendedRenderingConfiguration =
                 Utils.getComponent(ExtendedRenderingConfiguration.class);
-            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes",
-                extendedRenderingConfiguration.getDefaultContentSyntax().toIdString());
-            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+            this.configuredSyntaxes = extendedRenderingConfiguration.getConfiguredSyntaxes()
+              .stream()
+              .map(Syntax::toIdString)
+              .collect(Collectors.toList());
         }
         return this.configuredSyntaxes;
     }
@@ -1464,5 +1466,38 @@ public privileged aspect XWikiCompatibilityAspect
         // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
         // invalid XWikiDocument object as it's been deleted...
         sourceDoc.clone(newDocument);
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, String params, XWikiContext context)
+    {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("<span class=\"tooltip_span\" onmouseover=\"");
+        buffer.append(params);
+        buffer.append("; return escape('");
+        buffer.append(message.replaceAll("'", "\\'"));
+        buffer.append("');\">");
+        buffer.append(html);
+        buffer.append("</span>");
+
+        return buffer.toString();
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltipJS(XWikiContext context)
+    {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("<script src=\"");
+        buffer.append(getSkinFile("ajax/wzToolTip.js", context));
+        buffer.append("\"></script>");
+        // buffer.append("<div id=\"dhtmltooltip\"></div>");
+
+        return buffer.toString();
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, XWikiContext context)
+    {
+        return addTooltip(html, message, "this.WIDTH='300'", context);
     }
 }

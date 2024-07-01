@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.DocumentEventType;
 
 /**
  * Descriptor for the {@link org.xwiki.bridge.event.DocumentDeletedEvent}.
@@ -38,7 +39,7 @@ public class DocumentDeletedEventDescriptor extends AbstractXWikiRecordableEvent
     /**
      * Name of the supported type (as it is stored in Activity Stream).
      */
-    public static final String EVENT_TYPE = "delete";
+    public static final String EVENT_TYPE = DocumentEventType.DELETE;
 
     /**
      * Construct a DocumentDeletedEventDescriptor.

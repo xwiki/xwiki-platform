@@ -35,6 +35,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.flamingo.skin.test.po.RestoreStatusPage;
 import org.xwiki.flamingo.skin.test.po.UndeletePage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -43,8 +44,6 @@ import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -57,6 +56,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -273,6 +273,20 @@ class DeletePageIT
         confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
+        confirmationPage.openAffectChildrenPanel();
+        TableLayoutElement affectChildrenLiveData = new LiveDataElement("deleteSpaceIndex").getTableLayout();
+        assertEquals(nbChildren, affectChildrenLiveData.countRows());
+        for (int i = 1; i <= nbChildren; i++) {
+            SpaceReference childSpaceReference = childrenReferences[i - 1].getLastSpaceReference();
+            affectChildrenLiveData.assertCellWithLink("Title", String.format("Child %d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertCellWithLink("Location", String.format("Child_%d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertRow("Date", hasItem(affectChildrenLiveData.getDatePatternMatcher()));
+            affectChildrenLiveData.assertCellWithLink("Last Author", "superadmin",
+                setup.getURL(new DocumentReference("xwiki", "XWiki", "superadmin")));
+        }
+
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
         assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
@@ -743,7 +757,7 @@ class DeletePageIT
         testUtils.createPage(newTargetReference, "", "New target");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -782,7 +796,7 @@ class DeletePageIT
         testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete page without specifying a new target.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -825,7 +839,7 @@ class DeletePageIT
             String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
         ViewPage parentPage = testUtils.gotoPage(parentReference);
@@ -847,12 +861,5 @@ class DeletePageIT
         assertEquals("New target", parentPage.getDocumentTitle());
         ViewPage childPage = testUtils.gotoPage(childReference);
         assertEquals("Child", childPage.getDocumentTitle());
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

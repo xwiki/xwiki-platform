@@ -35,13 +35,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>= Willkommen in Ihrem Wiki =
+  <content>== Willkommen in Ihrem Wiki ==
 
 XWiki ist das beste Werkzeug, um Ihr Wissen zu organisieren und zu verwalten. Ein //Wiki// ist aufgeteilt in eine Hierarchie von //Seiten//. Sie können mehrere Wikis erstellen, jedes mit einem eigenen Satz von Seiten.
 
 XWiki kann als Wissensdatenbank (Support, Dokumentation, Vertrieb, etc.), für kollaborative Arbeitsbereiche oder sogar als komplettes Intranet genutzt werden.
 
-= Die Grundlagen =
+== Die Grundlagen ==
 
 Um das Meiste aus Ihrem Wiki herauszuholen, melden Sie sich an und:
 
@@ -54,23 +54,23 @@ Verwenden Sie die {{displayIcon name="home"/}} Breadcrumbs über dem Titel, um i
 Außerdem können Sie den [[Sandkasten&gt;&gt;Sandbox.WebHome]] verwenden, um weitere Demo-Inhalte anzusehen und die einzelnen Funktionen des Wikis auszuprobieren und besser kennenzulernen. 
 
 {{box}}
-Mit dem [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]] erfahren Sie mehr darüber, wie Sie XWiki verwenden.
+Mit dem [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]] erfahren Sie mehr darüber, wie Sie XWiki verwenden.
 {{/box}}
 
 (%class="row"%)
 (((
 (%class="col-xs-12 col-sm-6"%)
 (((
-= Erweitern Sie Ihr Wiki =
+== Erweitern Sie Ihr Wiki ==
 
 Um die Leistungsfähigkeit zu erhöhen und den Funktionsumfang Ihres Wikis zu erweitern, verwenden Sie den [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]], um Erweiterungen zu suchen und zu installieren.
 
-Benutzen Sie das [[Erweiterungsverzeichnis&gt;&gt;http://extensions.xwiki.org]], um durch die mehr als 900 für XWiki verfügbaren Community-Erweiterungen zu blättern.
+Benutzen Sie das [[Erweiterungsverzeichnis&gt;&gt;https://extensions.xwiki.org]], um durch die mehr als 900 für XWiki verfügbaren Community-Erweiterungen zu blättern.
 )))
 
 (%class="col-xs-12 col-sm-6"%)
 (((
-= Erstellen Sie Ihre Anwendung =
+== Erstellen Sie Ihre Anwendung ==
 
 Gehen Sie über die verfügbaren Erweiterungen hinaus und definieren Sie die //Struktur// Ihrer Daten basierend auf //Ihrem// Bedarf, indem Sie //Ihre// eigenen Anwendungen mit [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM) erstellen. 
 

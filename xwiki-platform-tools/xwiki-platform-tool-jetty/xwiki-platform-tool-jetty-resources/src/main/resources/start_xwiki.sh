@@ -73,8 +73,16 @@ if [ -z "$JETTY_STOP_PORT" ]; then
   JETTY_STOP_PORT=8079
 fi
 
+# Make sure the standard Java tmpdir is isolated per instance (by default Jetty provides applications work dir in the Java tmpdir)
+JAVA_TMP="${PRGDIR}/tmp"
+XWIKI_OPTS="$XWIKI_OPTS -Djava.io.tmpdir=${JAVA_TMP}"
+# Make sure the Java tmpdir exist since Jenkins does not create it
+if [ ! -d ${JAVA_TMP} ]; then
+  mkdir ${JAVA_TMP}
+fi
+
 # The location where to store the process id
-XWIKI_LOCK_DIR="/var/tmp"
+XWIKI_LOCK_DIR="${JAVA_TMP}"
 
 # Parse script parameters
 while [[ $# > 0 ]]; do

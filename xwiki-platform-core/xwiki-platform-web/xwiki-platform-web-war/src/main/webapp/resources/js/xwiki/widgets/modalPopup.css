@@ -29,8 +29,7 @@
   color: $theme.panelTextColor;
   border: 1px solid $theme.borderColor;
   background-color: $theme.panelBackgroundColor;
-  border-radius: 7px;
-  box-shadow: 0 0 7px $theme.borderColor;
+  border-radius: 10px;
 }
 .xdialog-box {
   max-height: 100%; /* Needed because of position: fixed */
@@ -42,34 +41,21 @@
     width: 400px; /* Should be: @modal-md */
   }
 }
-.xdialog-box .xdialog-content {
+.xdialog-box .xdialog-content,
+.xdialog-box > .xdialog-close {
   margin: .8em;
 }
-.xdialog-close {
+.xdialog-box > .xdialog-close {
   float: right;
-  margin-right: .8em;
 }
 .xdialog-title .xdialog-close {
   font-size: 1.25em;
-  margin-right: -0.56em;
-  margin-top: -0.24em;
   color: $theme.panelHeaderTextColor;
 }
 .xdialog-title {
-  font-size: 80%;
-  font-weight: bold;
-  padding: .3em 1.2em .3em .8em;
-  background-color: $theme.panelHeaderBackgroundColor;
-  #css3_backgroundLinearGradient({
-     'to': 'bottom',
-     'colors': [
-      {'color': $theme.panelHeaderGradientColor, 'position': '0%'},
-      {'color': $theme.panelHeaderBackgroundColor, 'position': '100%'}
-    ]
-  })
-  border-radius: 7px 7px 0 0;
-  color: $theme.panelHeaderTextColor;
-  text-shadow: 0 1px 0 $theme.panelHeaderGradientColor;
+  font-size: 142%;
+  padding: 15px;
+  border-bottom: 1px solid $theme.borderColor;
 }
 .xdialog-box .xform {
   width: 100%;

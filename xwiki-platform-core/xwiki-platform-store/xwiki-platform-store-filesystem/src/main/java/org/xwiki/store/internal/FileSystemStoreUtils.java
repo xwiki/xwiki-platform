@@ -53,7 +53,7 @@ public final class FileSystemStoreUtils
      * </ul>
      * 
      * @param name the name to escape
-     * @param caseInsensitive true if case insensitive filesystems should be supported
+     * @param caseInsensitive true if case-insensitive filesystems should be supported
      * @return a safe version of the name
      */
     public static String encode(String name, boolean caseInsensitive)
@@ -70,19 +70,8 @@ public final class FileSystemStoreUtils
                 // + is used for encoding
                 // Characters reserved on Windows and Unix
                 // (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx#naming_conventions)
-                case '%':
-                case '+':
-                case '<':
-                case '>':
-                case ':':
-                case '"':
-                case '/':
-                case '\\':
-                case '|':
-                case '?':
-                case '*':
+                case '%', '+', '<', '>', ':', '"', '/', '\\', '|', '?', '*':
                     encode = true;
-
                     break;
 
                 case ' ':
@@ -90,7 +79,6 @@ public final class FileSystemStoreUtils
                     if (i == 0 || i == name.length() - 1) {
                         encode = true;
                     }
-
                     break;
 
                 case '.':
@@ -99,16 +87,14 @@ public final class FileSystemStoreUtils
                     if (i == 0 || i == name.length() - 1) {
                         encode = true;
                     }
-
                     break;
 
                 default:
                     // Encode any non ASCII character to avoid surprises
-                    // For case insensitive filesystem encode upper case characters
+                    // For case-insensitive filesystem encode upper case characters
                     if (!CharUtils.isAscii(c) || (caseInsensitive && Character.isUpperCase(c))) {
                         encode = true;
                     }
-
                     break;
             }
 

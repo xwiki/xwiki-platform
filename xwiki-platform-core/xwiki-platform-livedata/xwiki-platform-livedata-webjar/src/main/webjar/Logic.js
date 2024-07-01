@@ -30,12 +30,12 @@ define('xwiki-livedata', [
 ], function(
   Vue,
   VueI18n,
-  XWikiLivedata,
-  liveDataSource,
+  xwikiLivedataVue,
+  liveDataSourceModule,
   jsonMerge,
   editBus
 ) {
-
+  const XWikiLivedata = xwikiLivedataVue.XWikiLivedata;
   /**
    * Make vue use the i18n plugin
    */
@@ -53,7 +53,7 @@ define('xwiki-livedata', [
   /**
    * The init function of the logic script
    * For each livedata element on the page, returns its corresponding data / API
-   * If the data does not exists yet, create it from the element
+   * If the data does not exist yet, create it from the element
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
    */
   const init = function (element) {
@@ -109,6 +109,8 @@ define('xwiki-livedata', [
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
   const Logic = function (element) {
+    // Make sure to have one Live Data source instance per Live Data instance. 
+    this.liveDataSource = liveDataSourceModule.init();
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
     this.contentTrusted = element.getAttribute("data-config-content-trusted") === "true"; 
@@ -178,7 +180,7 @@ define('xwiki-livedata', [
       this.firstEntriesLoading = false;
     }
 
-    editBus.init(this);
+    this.setEditBus(editBus.init(this));
 
     /**
      * Load given translations from the server
@@ -195,7 +197,7 @@ define('xwiki-livedata', [
       this.loadTranslations[componentName] = true;
       // Fetch translation and load them.
       try {
-        const translations = await liveDataSource.getTranslations(locale, prefix, keys);
+        const translations = await this.liveDataSource.getTranslations(locale, prefix, keys);
         i18n.mergeLocaleMessage(locale, translations)
       } catch (error) {
         console.error(error);
@@ -229,7 +231,8 @@ define('xwiki-livedata', [
         "pagination.last",
         "action.refresh",
         "action.addEntry",
-        "action.reorder.hint",
+        "action.columnName.sortable.hint",
+        "action.columnName.default.hint",
         "action.resizeColumn.hint",
         "panel.filter.title",
         "panel.filter.noneFilterable",
@@ -501,7 +504,7 @@ define('xwiki-livedata', [
       const propertyDescriptor = this.data.meta.propertyDescriptors
         .find(propertyDescriptor => propertyDescriptor.id === propertyId);
       if (!propertyDescriptor) {
-        console.error("Property descriptor of property `" + propertyId + "` does not exists");
+        console.error("Property descriptor of property `" + propertyId + "` does not exist");
       }
       return propertyDescriptor;
     },
@@ -587,7 +590,7 @@ define('xwiki-livedata', [
       // Before fetch event
       this.triggerEvent("beforeEntryFetch");
       // Fetch entries from data source
-      return liveDataSource.getEntries(this.data.query)
+      return this.liveDataSource.getEntries(this.data.query)
         .then(data => {
           // After fetch event
           return data
@@ -612,7 +615,12 @@ define('xwiki-livedata', [
             this.translate('livedata.error.updateEntriesFailed')
               .then(value => new XWiki.widgets.Notification(value, 'error'));
           }
-          console.error('Failed to fetch the entries', err)
+          
+          // Do not log if the request has been aborted (e.g., because a second request was started for the same LD with
+          // new criteria).
+          if(err.statusText !== 'abort') {
+            console.error('Failed to fetch the entries', err);
+          }
         });
     },
 
@@ -685,7 +693,7 @@ define('xwiki-livedata', [
       const entryId = this.getEntryId(entry);
       // Once the entry updated, reload the whole livedata because changing a single entry can have an impact on other 
       // properties of the entry, but also possibly on other entriers, or in the way they are sorted.
-      liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
+      this.liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
         .then(() => this.updateEntries());
     },
 
@@ -696,7 +704,7 @@ define('xwiki-livedata', [
      */
     setValues({entryId, values}) {
       const source = this.data.query.source;
-      return liveDataSource.updateEntry(source, entryId, values)
+      return this.liveDataSource.updateEntry(source, entryId, values)
         .then(() => this.updateEntries());
 
     },
@@ -1520,8 +1528,12 @@ define('xwiki-livedata', [
     // Edit Bus
     //
 
+    setEditBus(editBusInstance) {
+      this.editBusInstance = editBusInstance;
+    },
+
     getEditBus() {
-      return editBus;
+      return this.editBusInstance;
     },
 
     /**

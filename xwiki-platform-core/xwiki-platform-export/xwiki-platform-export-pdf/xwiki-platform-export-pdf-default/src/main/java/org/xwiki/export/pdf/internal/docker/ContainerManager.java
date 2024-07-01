@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -98,7 +97,7 @@ public class ContainerManager implements Initializable
         // The previous name filtering doesn't perform exact matching (it's more of a partial / contains search).
         containers = containers.stream().filter(container -> {
             return Arrays.asList(container.getNames()).contains("/" + containerName);
-        }).collect(Collectors.toList());
+        }).toList();
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
@@ -169,7 +168,7 @@ public class ContainerManager implements Initializable
 
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
             List<ExposedPort> exposedPorts =
-                hostConfig.getPortBindings().getBindings().keySet().stream().collect(Collectors.toList());
+                hostConfig.getPortBindings().getBindings().keySet().stream().toList();
             CreateContainerResponse container = createContainerCmd.withName(containerName).withLabels(DEFAULT_LABELS)
                 .withCmd(parameters).withExposedPorts(exposedPorts).withHostConfig(hostConfig).withEnv(envVars).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());

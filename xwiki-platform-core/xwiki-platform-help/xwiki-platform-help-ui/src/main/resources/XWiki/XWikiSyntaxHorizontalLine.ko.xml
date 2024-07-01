@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxHorizontalLine</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxHorizontalLine</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 편집 중 =
+
+== 가로선 ==
+
+=== 1.0 가로선 ===
+
+{{info}}대시가 4개 이상 있어야 합니다.{{/info}}
+
+|=기능|= XWiki 구문 1.0|=결과
+|간단한 수평선|{{{--}}}|(((--)))
+|매개변수화된 수평선|&lt;hr style="테두리-색상:파란색"/&gt;|(((
+(% 스타일="테두리-색상:파란색" %)
+----
+)))
+
+=== 2.0 가로선 ===
+
+{{info}}대시가 4개 이상 있어야 합니다.{{/info}}
+
+|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|간단한 수평선|{{{--}}}|(((--)))
+|매개변수화된 수평선|((({{{
+(% 스타일="테두리-색상:파란색" %)
+----
+}}})))|(((
+(% 스타일="테두리-색상:파란색" %)
+----
+)))</content>
+</xwikidoc>

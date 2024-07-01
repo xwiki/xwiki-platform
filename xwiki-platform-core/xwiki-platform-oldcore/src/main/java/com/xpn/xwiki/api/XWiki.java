@@ -257,7 +257,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      * <p>
      * This is a helper for document reference but you can use {@link #getEntityDocument(String, EntityType)} for any
      * other kind of reference.
@@ -285,7 +285,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      *
      * @param reference the reference of the document to be loaded
      * @param type the type of the reference
@@ -349,7 +349,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * Loads a Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
      *
      * @param fullName the full name of the XWiki document to be loaded
@@ -375,7 +375,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * Loads a Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
      *
      * @param reference the reference of the XWiki document to be loaded
@@ -606,7 +606,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      *
      * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
@@ -1928,7 +1928,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -1979,7 +1979,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -1995,7 +1995,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment). It
      * is important to always use the URL functions to generate URL and never hardcode URLs.
@@ -2050,7 +2050,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode, optionally adding an anchor. The URL is generated
+     * API to retrieve the URL of a Wiki Document in any mode, optionally adding an anchor. The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the environment
      * needs it. It is important to not add the anchor parameter manually after a URL. Some environments will not accept
@@ -2776,41 +2776,6 @@ public class XWiki extends Api
     public String getUniquePageName(String space, String name) throws XWikiException
     {
         return this.xwiki.getUniquePageName(space, name, getXWikiContext());
-    }
-
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @param params Parameters in Javascropt added to the tooltip config
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message, String params)
-    {
-        return this.xwiki.addTooltip(html, message, params, getXWikiContext());
-    }
-
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message)
-    {
-        return this.xwiki.addTooltip(html, message, getXWikiContext());
-    }
-
-    /**
-     * Inserts the tooltip Javascript
-     *
-     * @return
-     */
-    public String addTooltipJS()
-    {
-        return this.xwiki.addTooltipJS(getXWikiContext());
     }
 
     /*

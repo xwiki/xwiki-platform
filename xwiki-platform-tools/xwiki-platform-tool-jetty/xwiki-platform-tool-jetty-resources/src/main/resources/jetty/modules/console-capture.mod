@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/
+# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
 Redirects the JVM console stderr and stdout to a rolling log file.

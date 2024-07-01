@@ -214,13 +214,13 @@ public class FilterScriptService extends AbstractFilterScriptService
     /**
      * @since 6.2M1
      */
-    private FilterStreamDescriptor getFilterStreamDescriptor(Type factoryType, FilterStreamType inputType)
+    private FilterStreamDescriptor getFilterStreamDescriptor(Type factoryType, FilterStreamType type)
     {
         resetError();
 
         try {
             return this.componentManagerProvider.get()
-                .<FilterStreamFactory>getInstance(factoryType, inputType.serialize()).getDescriptor();
+                .<FilterStreamFactory>getInstance(factoryType, type.serialize()).getDescriptor();
         } catch (Exception e) {
             setError(e);
         }
@@ -239,9 +239,9 @@ public class FilterScriptService extends AbstractFilterScriptService
     /**
      * @since 6.2M1
      */
-    public FilterStreamDescriptor getOutputFilterStreamDescriptor(FilterStreamType inputType)
+    public FilterStreamDescriptor getOutputFilterStreamDescriptor(FilterStreamType outputType)
     {
-        return getFilterStreamDescriptor(OutputFilterStreamFactory.class, inputType);
+        return getFilterStreamDescriptor(OutputFilterStreamFactory.class, outputType);
     }
 
     /**

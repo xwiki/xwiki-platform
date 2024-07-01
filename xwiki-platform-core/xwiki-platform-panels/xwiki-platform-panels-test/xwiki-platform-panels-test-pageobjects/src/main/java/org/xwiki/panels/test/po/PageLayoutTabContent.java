@@ -130,7 +130,7 @@ public class PageLayoutTabContent extends BaseElement
 
     public void dragPanelToColumn(String panelName, Column column)
     {
-        String cssSelector = String.format(".panel.%s h1", panelName);
+        String cssSelector = String.format(".panel.%s h2", panelName);
         WebElement element = getDriver().findElementWithoutWaiting(By.cssSelector(cssSelector));
         if (column == Column.RIGHT) {
             getDriver().dragAndDrop(element, rightPanels);
@@ -141,7 +141,7 @@ public class PageLayoutTabContent extends BaseElement
 
     public void removePanelFromColumn(String panelName, Column column)
     {
-        String cssSelector = String.format("#%%s .panel.%s h1", panelName);
+        String cssSelector = String.format("#%%s .panel.%s h2", panelName);
 
         if (column == Column.RIGHT) {
             cssSelector = String.format(cssSelector, "rightPanels");

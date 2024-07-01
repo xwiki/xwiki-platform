@@ -53,8 +53,9 @@ nbproject
 # Visual Studio Code
 .vscode
 
-# Gradle Enterprise
+# Gradle Enterprise/Develocity
 .mvn/.gradle-enterprise
+.mvn/.develocity
 
 # Debugging stuff to not commit
 xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core.zip

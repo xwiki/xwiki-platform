@@ -115,7 +115,7 @@ define('imageEditor', [
                       let type = value.type;
                       // We don't persist the type (i.e., the empty string) when the default style is forced.
                       // To do so, we replace the type of the default style with the empty string.
-                      if (defaultStyle.forceDefaultStyle === "true" && type === defaultStyle.defaultStyle) {
+                      if (defaultStyle.forceDefaultStyle === "true" && value.identifier === defaultStyle.defaultStyle) {
                         type = '';
                       }
                       return {
@@ -202,6 +202,14 @@ define('imageEditor', [
       
       var data = modal.data('input');
       // Resolve the image url and assign it to a transient image object to be able to access its width and height.
+      if(!data.imageData.resourceReference) {
+        // In case of pasted image, the resource reference is undefined. We initialize it the first time the image
+        // is edited after being pasted.
+        data.imageData.resourceReference = {
+          'type': 'url',
+          'reference': data.imageData.src
+        };
+      }
       img.src = getImageResourceURL(data.imageData.resourceReference, data.editor);
       return promise;
     }
@@ -537,10 +545,15 @@ define('imageEditor', [
         var searchedImageStyle = imageStyle;
         // Use the constraints of the default style when the style value is the empty string and forceDefaultStyle
         // is set to true, as the default style is not persisted (i.e., the empty string).
-        if(defaultStyleCache.forceDefaultStyle === "true" && imageStyle === '') {
-          searchedImageStyle = defaultStyleCache.defaultStyle;
+        const forceDefaultStyle = defaultStyleCache.forceDefaultStyle === "true";
+        if(forceDefaultStyle && imageStyle === '') {
+          // Convert the identifier to a type in case of default image style.
+          searchedImageStyle = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
+            return imageStyleConfig.type !== '' && imageStyleConfig.identifier === defaultStyleCache.defaultStyle;
+          }).type;
         }
         
+        // Search the image style config by its type.
         var config = (imageStylesConfig.imageStyles || []).find(function(imageStyleConfig) {
           return imageStyleConfig.type !== '' && imageStyleConfig.type === searchedImageStyle;
         });

@@ -19,8 +19,12 @@
  */
 package org.xwiki.realtime.wysiwyg.test.po;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
@@ -49,6 +53,17 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     }
 
     /**
+     * Default constructor. Waits for the realtime connection to be established.
+     */
+    public RealtimeWYSIWYGEditPage()
+    {
+        // Wait for the "Allow Realtime" checkbox to be injected in the action buttons toolbar.
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.allowRealtimeCheckbox));
+        // The "Save" button is disabled while the realtime connection is being established.
+        getDriver().waitUntilElementIsEnabled(this.save);
+    }
+
+    /**
      * @return the editor used to edit the content of the page
      */
     public RealtimeCKEditor getContenEditor()
@@ -71,7 +86,7 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     {
         if (isRealtimeEditing()) {
             this.allowRealtimeCheckbox.click();
-            // TODO: Handle the confirmation modal.
+            getDriver().findElement(By.cssSelector(".modal-popup .realtime-buttons .btn-primary")).click();
         }
     }
 
@@ -81,8 +96,11 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     public void joinRealtimeEditing()
     {
         if (!isRealtimeEditing()) {
-            // TODO: Handle the confirmation modal and the page reload.
             this.allowRealtimeCheckbox.click();
+            // The checkbox is disabled while the connection is being established.
+            getDriver().waitUntilElementIsEnabled(this.allowRealtimeCheckbox);
+            // The checkbox is unchecked if the connection fails.
+            assertTrue(isRealtimeEditing());
         }
     }
 }

@@ -79,11 +79,12 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     {
         String statement = dbListClass.getSql();
         DocumentReference authorReference = dbListClass.getOwnerDocument().getAuthorReference();
-        if (this.authorizationManager.hasAccess(Right.SCRIPT, authorReference, dbListClass.getReference())) {
-            String namespace = this.entityReferenceSerializer.serialize(dbListClass.getDocumentReference());
+        DocumentReference documentReference = dbListClass.getOwnerDocument().getDocumentReference();
+        if (this.authorizationManager.hasAccess(Right.SCRIPT, authorReference, documentReference)) {
+            String namespace = this.entityReferenceSerializer.serialize(dbListClass.getReference());
             try {
                 statement = this.authorExecutor.call(() -> evaluateVelocityCode(dbListClass.getSql(), namespace),
-                    authorReference, dbListClass.getDocumentReference());
+                    authorReference, documentReference);
             } catch (Exception e) {
                 this.logger.warn(
                     "Failed to evaluate the Velocity code from the query [{}]."
@@ -93,7 +94,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         }
 
         Query query = this.secureQueryManager.createQuery(statement, Query.HQL);
-        query.setWiki(dbListClass.getOwnerDocument().getDocumentReference().getWikiReference().getName());
+        query.setWiki(documentReference.getWikiReference().getName());
         return query;
     }
 

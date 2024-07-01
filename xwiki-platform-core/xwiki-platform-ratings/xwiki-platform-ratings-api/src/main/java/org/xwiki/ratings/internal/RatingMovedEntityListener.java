@@ -19,9 +19,6 @@
  */
 package org.xwiki.ratings.internal;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,7 +28,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -50,12 +47,9 @@ import org.xwiki.refactoring.event.DocumentRenamedEvent;
 @Component
 @Singleton
 @Named(RatingMovedEntityListener.NAME)
-public class RatingMovedEntityListener extends AbstractEventListener
+public class RatingMovedEntityListener extends AbstractLocalEventListener
 {
     static final String NAME = "RatingMovedEntityListener";
-    private static final List<Event> EVENT_LIST = Collections.singletonList(
-        new DocumentRenamedEvent()
-    );
 
     @Inject
     private Logger logger;
@@ -68,25 +62,23 @@ public class RatingMovedEntityListener extends AbstractEventListener
      */
     public RatingMovedEntityListener()
     {
-        super(NAME, EVENT_LIST);
+        super(NAME, new DocumentRenamedEvent());
     }
 
     @Override
-    public void onEvent(Event event, Object source, Object data)
+    public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentRenamedEvent) {
-            DocumentRenamedEvent renamedEvent = (DocumentRenamedEvent) event;
-            DocumentReference oldReference = renamedEvent.getSourceReference();
-            DocumentReference newReference = renamedEvent.getTargetReference();
+        DocumentRenamedEvent renamedEvent = (DocumentRenamedEvent) event;
+        DocumentReference oldReference = renamedEvent.getSourceReference();
+        DocumentReference newReference = renamedEvent.getTargetReference();
 
-            try {
-                for (RatingsManager manager : this.ratingsManagerFactory.getInstantiatedManagers()) {
-                    manager.moveRatings(oldReference, newReference);
-                }
-            } catch (RatingsException e) {
-                logger.error("Error while updating ratings related to old reference [{}] from ratings: [{}]",
-                    oldReference, ExceptionUtils.getRootCause(e));
+        try {
+            for (RatingsManager manager : this.ratingsManagerFactory.getInstantiatedManagers()) {
+                manager.moveRatings(oldReference, newReference);
             }
+        } catch (RatingsException e) {
+            logger.error("Error while updating ratings related to old reference [{}] from ratings: [{}]", oldReference,
+                ExceptionUtils.getRootCause(e));
         }
     }
 }

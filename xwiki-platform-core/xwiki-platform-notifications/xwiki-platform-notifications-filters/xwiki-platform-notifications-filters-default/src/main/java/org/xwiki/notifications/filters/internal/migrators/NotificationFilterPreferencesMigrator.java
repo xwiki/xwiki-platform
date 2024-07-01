@@ -45,7 +45,7 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
@@ -105,7 +105,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
     private static final String FIELD_STARTING_DATE = "startingDate";
 
     @Inject
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @Inject
     private QueryManager queryManager;
@@ -150,8 +150,9 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
             // Make sure we have not already saved in the database the migrated preferences (it would mean the migration
             // has already been executed but stopped while the user's page was saving)
-            Set<NotificationFilterPreference> preferencesInTheNewStore = this.modelBridge.getFilterPreferences(user);
-            if (!this.modelBridge.getFilterPreferences(user).isEmpty()
+            Set<NotificationFilterPreference> preferencesInTheNewStore =
+                this.filterPreferencesModelBridge.getFilterPreferences(user);
+            if (!this.filterPreferencesModelBridge.getFilterPreferences(user).isEmpty()
                 && preferencesInTheNewStore.size() == preferencesToSave.size())
             {
                 this.logger.info("It seems the notification filter preferences of user [{}] has already been migrated,"
@@ -161,7 +162,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
                 // Save to the new store
                 this.logger.info("Saving the migrated notification filter preferences of user [{}] in the new store.",
                     user);
-                this.modelBridge.saveFilterPreferences(user, preferencesToSave);
+                this.filterPreferencesModelBridge.saveFilterPreferences(user, preferencesToSave);
             }
 
             // Remove the old xobjects
@@ -205,10 +206,8 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
             filterFormats.add(NotificationFormat.valueOf(format.toUpperCase()));
         }
 
-        preference.setProviderHint("userProfile");
         preference.setFilterName(obj.getStringValue(FIELD_FILTER_NAME));
         preference.setEnabled(obj.getIntValue(FIELD_IS_ENABLED, 1) == 1);
-        preference.setActive(obj.getIntValue(FIELD_IS_ACTIVE, 1) == 1);
         preference.setFilterType(filterType);
         preference.setNotificationFormats(filterFormats);
         preference.setStartingDate(obj.getDateValue(FIELD_STARTING_DATE));

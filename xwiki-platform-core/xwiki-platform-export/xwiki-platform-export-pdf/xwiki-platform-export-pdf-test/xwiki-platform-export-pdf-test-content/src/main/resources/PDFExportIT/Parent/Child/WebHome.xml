@@ -40,7 +40,15 @@
 
 Content of first section.
 
-image:attach:xwiki-logo.png</content>
+[[image:attach:xwiki-logo.png||width="100"]]
+
+[[image:attach:xwiki-logo.png||width="100" class="force-server-side-resize"]]
+
+{{velocity}}
+{{html}}
+&lt;img src="$doc.getAttachmentURL('xwiki-logo.png', 'download', 'height=50')" alt="XWiki Logo" /&gt;
+{{/html}}
+{{/velocity}}</content>
   <attachment>
     <filename>xwiki-logo.png</filename>
     <mimetype>image/png</mimetype>

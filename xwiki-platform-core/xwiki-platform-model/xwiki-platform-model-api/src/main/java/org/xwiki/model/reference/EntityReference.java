@@ -32,6 +32,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -511,6 +512,43 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         }
 
         return actualParent != null;
+    }
+
+    /**
+     * Get a reference that is equal to this reference with all parameters removed.
+     *
+     * @param recursive whether to remove parameters recursively from all ancestors
+     * @return the reference without parameters
+     * @since 15.10.1
+     * @since 15.5.5
+     * @since 14.10.20
+     */
+    @Unstable
+    public EntityReference removeParameters(boolean recursive)
+    {
+        EntityReference current;
+        if (!recursive) {
+            if (getParameters().isEmpty()) {
+                current = this;
+            } else {
+                current = new EntityReference(getName(), getType(), getParent());
+            }
+        } else {
+            current = null;
+
+            for (EntityReference entry : getReversedReferenceChain()) {
+                // Create a new reference with the same name and type as the current one but without parameters, but
+                // only if this is actually necessary, i.e., if there are actually any parameters or any ancestor has
+                // been modified.
+                if (entry.getParent() == current && entry.getParameters().isEmpty()) {
+                    current = entry;
+                } else {
+                    current = new EntityReference(entry.getName(), entry.getType(), current);
+                }
+            }
+        }
+
+        return current;
     }
 
     @Override

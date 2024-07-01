@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.email=Mail
+  <content>admin.email=메일
 admin.email.description=메일 발송 매개변수를 구성하고 메일 상태를 봅니다.
 admin.emailgeneral=고급
 admin.emailgeneral.description=메일 주소 난독화와 같은 고급 메일 매개 변수를 구성합니다.
@@ -46,7 +46,7 @@ admin.emailstatus=메일 송신 상태
 admin.emailstatus.description=보낸 메일의 상태를 보고 오류가 발생한 메일을 다시 보냅니다.
 admin.emailstatus.hint=메일 상태를 찾을 수 없는 경우, 메일을 발송한 속성이 메일 상태를 유지하도록 지정하지 않았기 때문일 수 있습니다.
 Mail.GeneralMailConfigClass_obfuscate=전자 메일 주소 난독화
-Mail.GeneralMailConfigClass_obfuscate.hint=이는 이메일 속성 유형의 기본 사용자 지정 표시기를 덮어쓰지 않는 한 이메일 유형의 개체 속성에 저장된 이메일 주소에만 영향을 미칩니다. 예: a...@domain.syslog
+Mail.GeneralMailConfigClass_obfuscate.hint=이는 이메일 속성 유형의 기본 사용자 지정 표시기를 덮어쓰지 않는 한 이메일 유형의 개체 속성에 저장된 이메일 주소에만 영향을 미칩니다. 예시: a...@domain.syslog
 Mail.SendMailConfigClass_from=송신원 이메일 주소
 Mail.SendMailConfigClass_from.hint=알림 전자 메일을 보내는 데 사용되는 기본 전자 메일 주소
 Mail.SendMailConfigClass_bcc=숨은 참조 이메일 주소
@@ -74,7 +74,10 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=오류
 Mail.SendMailStatus_livetable.actions=작업
 Mail.SendMailStatus_livetable.resend=다시 보내기
+Mail.SendMailStatus_livetable.delete=삭제
 mailSender.admin.resendSuccess=메일이 성공적으로 재발송되었습니다
-mailSender.admin.resendFailure=재발송하지 못했습니다. 자세한 내용을 보려면 클릭하십시오.
+mailSender.admin.resendFailure=메일 재발송에 실패하였습니다. 자세한 내용을 보려면 클릭하십시오.
+mailSender.admin.deleteSuccess=메일이 정상적으로 삭제되었습니다
+mailSender.admin.deleteFailure=메일 삭제에 실패하였습니다. 자세한 내용을 보려면 클릭하십시오.
 </content>
 </xwikidoc>

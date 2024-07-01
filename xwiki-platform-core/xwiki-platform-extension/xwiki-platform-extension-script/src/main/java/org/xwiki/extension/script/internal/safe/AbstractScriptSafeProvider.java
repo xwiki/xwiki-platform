@@ -21,7 +21,7 @@ package org.xwiki.extension.script.internal.safe;
 
 import javax.inject.Inject;
 
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 

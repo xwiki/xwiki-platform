@@ -111,6 +111,7 @@ Thus it is forbidden to depend on the HTML Macro.
     <module>xwiki-platform-rendering-macro-gallery</module>
     <module>xwiki-platform-rendering-macro-groovy</module>
     <module>xwiki-platform-rendering-macro-include</module>
+    <module>xwiki-platform-rendering-macro-message</module>
     <module>xwiki-platform-rendering-macro-python</module>
     <module>xwiki-platform-rendering-macro-script</module>
     <module>xwiki-platform-rendering-macro-toc</module>

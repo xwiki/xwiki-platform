@@ -17,38 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.repository.test.po;
+package org.xwiki.rendering.internal.macro.message;
 
-import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
+ * Displays a warning message.
+ *
  * @version $Id$
- * @since 4.2M1
+ * @since 16.6.0RC1
  */
-public class ExtensionPage extends ViewPage
+@Component
+@Named("warning")
+@Singleton
+public class XWikiWarningMessageMacro extends WarningMessageMacro
 {
-    @FindBy(xpath = "//a[@title='Update extension']")
-    private WebElement update;
+    private static final String ICON_PRETTY_NAME_KEY = "rendering.macro.message.icon.alternative.warning";
+    @Inject
+    private ContextualLocalizationManager l10n;
 
     /**
-     * @since 4.2M1
+     * Create and initialize the descriptor of the macro.
      */
-    public boolean isValidExtension()
+    public XWikiWarningMessageMacro()
     {
-        List<WebElement> elements = getDriver().findElements(
-            By.xpath("//div[@class = 'box successmessage' and ./p[contains(., 'Installable with the Extension Manager')]]"));
-        return !elements.isEmpty();
-    }
-
-    public ExtensionPage updateExtension()
-    {
-        this.update.click();
-
-        return new ExtensionPage();
+        super();
+        this.iconPrettyName = l10n.getTranslationPlain(ICON_PRETTY_NAME_KEY);
     }
 }

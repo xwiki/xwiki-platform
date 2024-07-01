@@ -8,5 +8,6 @@ paths: {
   'xwiki-livedata-vue': 'xwiki-livedata-vue.umd.min',
   'xwiki-livedata-source': 'liveDataSource',
   'xwiki-livedata-xObjectPropertyHelper': 'displayerXObjectPropertyHelper',
-  'xwiki-livedata-polyfills': 'polyfills.min'
+  'xwiki-livedata-polyfills': 'polyfills.min',
+  'xwikimeta': 'xwiki-meta'
 }

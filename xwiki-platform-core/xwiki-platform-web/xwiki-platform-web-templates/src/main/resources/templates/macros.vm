@@ -318,10 +318,12 @@ $xwiki.getUserName("xwiki:${username}")
     ## We avoid the whitespace because the users are displayed as inline blocks.
     #set ($discard = $output.addAll([
       "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
+        "<$userNameTag $userNameTagAttributes>",
         $avatarWrapperStart,
-          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
+          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
         $avatarWrapperEnd,
-        "<$userNameTag $userNameTagAttributes>$escapedUserName</$userNameTag>",
+        $escapedUserName,
+        "</$userNameTag>",
         $userAliasDisplay,
       "</$userTag>"
     ]))

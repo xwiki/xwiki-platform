@@ -22,6 +22,8 @@ package org.xwiki.flamingo.test.docker;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -81,6 +83,10 @@ class ObjectEditorIT
     @Order(1)
     void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
     {
+        Assumptions.assumeFalse(StringUtils.equalsIgnoreCase("firefox",
+                testUtils.getDriver().getCapabilities().getBrowserName()),
+            "Alert handling in Firefox currently isn't working, see also https://jira.xwiki.org/browse/XWIKI-22282");
+
         // fixture
         testUtils.deletePage(testReference);
         testUtils.createPage(testReference, "Some content");

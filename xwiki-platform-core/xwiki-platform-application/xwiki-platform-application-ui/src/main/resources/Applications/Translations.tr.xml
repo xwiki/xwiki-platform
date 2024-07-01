@@ -1,4 +1,6 @@
-/*
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,19 +18,28 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.panels.test.ui;
+-->
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.ui.PageObjectSuite;
-
-/**
- * Runs all functional tests found in the classpath. This allows to start/stop XWiki only once.
- * 
- * @version $Id$
- * @since 5.0M2
- */
-@RunWith(PageObjectSuite.class)
-public class AllIT
-{
-}
+<xwikidoc reference="Applications.Translations" locale="tr">
+  <web>Applications</web>
+  <name>Translations</name>
+  <language>tr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Applications.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>application.index.title=Uygulama İndeksi
+application.index.drawer=Uygulama İndeksi
+</content>
+</xwikidoc>

@@ -17,27 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.panels.test.ui;
+package org.xwiki.panels.test.ui.docker;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.openqa.selenium.WebElement;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.panels.test.po.ApplicationsPanelAdministrationPage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPage;
-import org.xwiki.test.ui.po.editor.ObjectEditPane;
+import org.xwiki.rest.model.jaxb.Object;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests related to the ApplicationsPanel Administration
@@ -47,15 +45,30 @@ import static org.junit.Assert.assertTrue;
  * @since 7.0.1
  * @since 6.4.4
  */
-public class ApplicationsPanelAdministrationIT extends AbstractTest
+@UITest
+public class ApplicationsPanelAdministrationIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+    @AfterEach
+    void cleanUp(TestUtils testUtils) throws Exception
+    {
+        testUtils.rest().delete(
+            new LocalDocumentReference(Arrays.asList("Apps", "App1"), "WebHome"));
+        testUtils.rest().delete(
+            new LocalDocumentReference(Arrays.asList("Apps", "App2"), "WebHome"));
+        testUtils.rest().delete(
+            new LocalDocumentReference(Arrays.asList("Apps", "App3"), "WebHome"));
+        testUtils.rest().delete(
+            new LocalDocumentReference(Arrays.asList("PanelsCode"), "ApplicationsPanelConfiguration"));
+    }
 
     @Test
-    public void testApplicationsPanelAdministration() throws Exception
+    @Order(1)
+    public void testApplicationsPanelAdministration(TestUtils testUtils) throws Exception
     {
-        createApplicationUIXs();
+        testUtils.loginAsSuperAdmin();
+        createApplicationUIX(testUtils, "App1");
+        createApplicationUIX(testUtils, "App2");
+        createApplicationUIX(testUtils, "App3");
 
         // First: check that the panel displays everything in the right order
         checkInitialState(ApplicationsPanel.gotoPage());
@@ -79,11 +92,12 @@ public class ApplicationsPanelAdministrationIT extends AbstractTest
         // Go to the panel and see what are the new results
         ApplicationsPanel applicationsPanel = ApplicationsPanel.gotoPage();
         List<String> applications = applicationsPanel.getApplications();
-        assertEquals(3, applications.size());
+        assertEquals(4, applications.size());
         Iterator<String> iterator = applications.iterator();
         assertEquals("App3", iterator.next());
         assertEquals("App1", iterator.next());
         assertEquals("App2", iterator.next());
+        assertEquals("More applications", iterator.next());
 
         // Go back to the app panel admin page and verify that the settings are well displayed
         appPanelAdminPage = ApplicationsPanelAdministrationPage.gotoPage();
@@ -113,29 +127,21 @@ public class ApplicationsPanelAdministrationIT extends AbstractTest
 
         // Verify that the settings have been saved
         checkInitialState(ApplicationsPanelAdministrationPage.gotoPage());
-
-        // Cleanup
-        cleanUp();
     }
 
-    private void createApplicationUIXs()
+    private void createApplicationUIX(TestUtils testUtils, String applicationName) throws Exception
     {
-        createApplicationUIX("App1");
-        createApplicationUIX("App2");
-        createApplicationUIX("App3");
-    }
-
-    private void createApplicationUIX(String applicationName)
-    {
-        getUtil().deletePage(new LocalDocumentReference(Arrays.asList("Apps", applicationName), "WebHome"));
-        ViewPage page = getUtil().gotoPage("Apps", applicationName);
-        ObjectEditPage editPage = page.editObjects();
-        ObjectEditPane object = editPage.addObject("XWiki.UIExtensionClass");
-        fillField(object, "extensionPointId", "org.xwiki.platform.panels.Applications");
-        fillField(object, "name", applicationName);
-        fillField(object, "parameters",
-                String.format("label=%s\ntarget=Apps.%s\nicon=icon:home", applicationName, applicationName));
-        editPage.clickSaveAndView();
+        LocalDocumentReference docRef =
+            new LocalDocumentReference(Arrays.asList("Apps", applicationName), "WebHome");
+        testUtils.deletePage(docRef);
+        testUtils.createPage(docRef, "");
+        Object object = testUtils.rest().object(docRef, "XWiki.UIExtensionClass");
+        object.getProperties().add(TestUtils.RestTestUtils.property("extensionPointId", "org.xwiki.platform.panels"
+            + ".Applications"));
+        object.getProperties().add(TestUtils.RestTestUtils.property("name", applicationName));
+        object.getProperties().add(TestUtils.RestTestUtils.property("parameters",
+            String.format("label=%s\ntarget=Apps.%s\nicon=icon:home", applicationName, applicationName)));
+        testUtils.rest().add(object);
     }
 
     private void checkInitialState(ApplicationsPanelAdministrationPage appPanelAdminPage) throws Exception
@@ -154,12 +160,13 @@ public class ApplicationsPanelAdministrationIT extends AbstractTest
     private void checkInitialState(ApplicationsPanel applicationsPanel) throws Exception
     {
         List<String> applications = applicationsPanel.getApplications();
-        assertEquals(4, applications.size());
+        assertEquals(5, applications.size());
         Iterator<String> iterator = applications.iterator();
         assertEquals("App1", iterator.next());
         assertEquals("App2", iterator.next());
         assertEquals("App3", iterator.next());
         assertEquals("Panels", iterator.next());
+        assertEquals("More applications", iterator.next());
     }
 
     private void applyChanges(ApplicationsPanelAdministrationPage appPanelAdminPage) throws Exception
@@ -171,24 +178,5 @@ public class ApplicationsPanelAdministrationIT extends AbstractTest
 
         // Change the order
         appPanelAdminPage.moveAppBefore("App3", "App1");
-    }
-
-    private void fillField(ObjectEditPane object, String propertyName, String value)
-    {
-        WebElement field = getDriver().findElement(object.byPropertyName(propertyName));
-        field.clear();
-        field.sendKeys(value);
-    }
-
-    private void cleanUp() throws Exception
-    {
-        getUtil().rest().delete(
-                new LocalDocumentReference(Arrays.asList("Apps", "App1"), "WebHome"));
-        getUtil().rest().delete(
-                new LocalDocumentReference(Arrays.asList("Apps", "App2"), "WebHome"));
-        getUtil().rest().delete(
-                new LocalDocumentReference(Arrays.asList("Apps", "App3"), "WebHome"));
-        getUtil().rest().delete(
-                new LocalDocumentReference(Arrays.asList("PanelsCode"), "ApplicationsPanelConfiguration"));
     }
 }

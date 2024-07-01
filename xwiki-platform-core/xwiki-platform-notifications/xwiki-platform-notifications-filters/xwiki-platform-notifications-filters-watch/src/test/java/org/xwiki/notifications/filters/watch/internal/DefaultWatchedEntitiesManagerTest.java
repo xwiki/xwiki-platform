@@ -36,7 +36,6 @@ import org.xwiki.user.UserReferenceSerializer;
 
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

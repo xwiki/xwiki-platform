@@ -30,8 +30,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -58,9 +56,6 @@ class EffectiveAuthorSetterListenerTest
     private EntityChannelScriptAuthorTracker scriptAuthorTracker;
 
     @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
-
-    @MockComponent
     private Container container;
 
     @Mock
@@ -78,30 +73,31 @@ class EffectiveAuthorSetterListenerTest
     @Test
     void onActionExecutingEvent() throws Exception
     {
-        DocumentReference currentDocumentReference = new DocumentReference("test", "Some", "Page");
-        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
-        DocumentModelBridge tdoc = mock(DocumentModelBridge.class);
-        when(this.documentAccessBridge.getTranslatedDocumentInstance(currentDocumentReference)).thenReturn(tdoc);
-        when(tdoc.getRealLanguage()).thenReturn("fr");
-
+        DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
         UserReference otherUserReference = mock(UserReference.class);
-        // An entity change that targets a different document.
+        // An entity change that targets some document, with an older timestamp.
         EntityChange entityChangeTwo =
             new EntityChange(new DocumentReference("test", "Other", "Page"), otherUserReference, ScriptLevel.SCRIPT);
-        // An entity change that targets the current document translation, but with a higher script level.
-        EntityChange entityChangeThree =
-            new EntityChange(new DocumentReference(currentDocumentReference, Locale.FRENCH), otherUserReference,
-                ScriptLevel.PROGRAMMING);
-        // An entity change that targets the current document (access rights are checked at document level) with a lower
-        // script level. The lower script level should win.
-        EntityChange entityChangeFour = new EntityChange(new AttachmentReference("file.txt", currentDocumentReference),
+        // Wait a bit to be sure that the next entity changes have a newer timestamp.
+        Thread.sleep(10);
+        // An entity change that targets a document translation, with a higher script level.
+        EntityChange entityChangeThree = new EntityChange(new DocumentReference(documentReference, Locale.FRENCH),
+            otherUserReference, ScriptLevel.PROGRAMMING);
+        // An entity change that targets a document attachment, with a lower script level (same as the first change, but
+        // with a more recent timestamp). The lower script level with the recent timestamp should win.
+        EntityChange entityChangeFour = new EntityChange(new AttachmentReference("file.txt", documentReference),
             this.effectiveAuthor, ScriptLevel.SCRIPT);
+        // Wait a bit to be sure that the next entity changes have a newer timestamp.
+        Thread.sleep(10);
+        EntityChange entityChangeFive = new EntityChange(new DocumentReference("test", "Other", "Page"),
+            otherUserReference, ScriptLevel.PROGRAMMING);
 
         when(this.request.getProperties("netfluxChannel"))
-            .thenReturn(Arrays.asList("", "one", null, "two", "three", "four"));
+            .thenReturn(Arrays.asList("", "one", null, "two", "three", "four", "five"));
         when(this.scriptAuthorTracker.getScriptAuthor("two")).thenReturn(Optional.of(entityChangeTwo));
         when(this.scriptAuthorTracker.getScriptAuthor("three")).thenReturn(Optional.of(entityChangeThree));
         when(this.scriptAuthorTracker.getScriptAuthor("four")).thenReturn(Optional.of(entityChangeFour));
+        when(this.scriptAuthorTracker.getScriptAuthor("five")).thenReturn(Optional.of(entityChangeFive));
 
         this.listener.onEvent(new ActionExecutingEvent(), null, null);
 

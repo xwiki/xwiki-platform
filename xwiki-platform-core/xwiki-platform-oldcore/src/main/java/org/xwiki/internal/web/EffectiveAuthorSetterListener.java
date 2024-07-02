@@ -42,9 +42,9 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * set already by another component.
  *
  * @version $Id$
- * @since 15.10.11
+ * @since 15.10.12
  * @since 16.4.1
- * @since 16.5.0
+ * @since 16.6.0RC1
  */
 @Component
 @Singleton

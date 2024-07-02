@@ -54,7 +54,7 @@ public class EffectiveAuthorSetterListener extends AbstractLocalEventListener
     /**
      * The hint of the listener component.
      */
-    public static final String HINT = "com.xpn.xwiki.internal.web.EffectiveAuthorSetterListener";
+    public static final String HINT = "org.xwiki.internal.web.EffectiveAuthorSetterListener";
 
     @Inject
     private Logger logger;

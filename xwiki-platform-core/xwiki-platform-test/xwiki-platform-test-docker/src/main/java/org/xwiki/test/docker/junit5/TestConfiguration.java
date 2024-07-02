@@ -90,6 +90,8 @@ public class TestConfiguration
 
     private boolean savePermanentDirectoryData;
 
+    private List<String> servletEngineNetworkAliases;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -119,6 +121,7 @@ public class TestConfiguration
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
+        mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -333,6 +336,15 @@ public class TestConfiguration
         if (!isPermanentDirectoryDataSaved() && savePermanentDirectoryData) {
             this.savePermanentDirectoryData = true;
         }
+    }
+
+    private void mergeServletEngineNetworkAliases(List<String> aliases)
+    {
+        List<String> mergedAliases = getServletEngineNetworkAliases();
+        if (aliases != null) {
+            mergedAliases.addAll(aliases);
+        }
+        this.servletEngineNetworkAliases = mergedAliases;
     }
 
     /**
@@ -768,5 +780,27 @@ public class TestConfiguration
     public void setSavePermanentDirectoryData(boolean savePermanentDirectoryData)
     {
         this.savePermanentDirectoryData = savePermanentDirectoryData;
+    }
+
+    /**
+     * @return the list of network aliases to use for the servlet engine Docker container
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public List<String> getServletEngineNetworkAliases()
+    {
+        return this.servletEngineNetworkAliases;
+    }
+
+    /**
+     * @param servletEngineNetworkAliases see {@link #getServletEngineNetworkAliases()}
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setServletEngineNetworkAliases(List<String> servletEngineNetworkAliases)
+    {
+        this.servletEngineNetworkAliases = servletEngineNetworkAliases;
     }
 }

@@ -1487,6 +1487,20 @@ public class TestUtils
     }
 
     /**
+     * Sets the secret token used for CSRF protection. Use this method to restore a token that was previously saved. If
+     * you want to cache the current token you should use {@link #recacheSecretToken()} instead.
+     *
+     * @param secretToken the new secret token to use
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setSecretToken(String secretToken)
+    {
+        this.secretToken = secretToken;
+    }
+
+    /**
      *This class represents all cookies stored in the browser. Use with getSession() and setSession()
      */
     public class Session

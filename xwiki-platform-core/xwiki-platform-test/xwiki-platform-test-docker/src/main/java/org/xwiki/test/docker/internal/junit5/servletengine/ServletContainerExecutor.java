@@ -271,11 +271,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private void startContainer() throws Exception
     {
+        List<String> networkAliases = new ArrayList<>();
+        networkAliases.add(this.testConfiguration.getServletEngine().getInternalIP());
+        networkAliases.addAll(this.testConfiguration.getServletEngineNetworkAliases());
+
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
         // start listening.
         this.servletContainer
             .withNetwork(Network.SHARED)
-            .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
+            .withNetworkAliases(networkAliases.toArray(new String[networkAliases.size()]))
             .waitingFor(
                 Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));

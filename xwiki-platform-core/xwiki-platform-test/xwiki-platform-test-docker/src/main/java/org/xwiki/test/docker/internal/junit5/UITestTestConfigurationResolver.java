@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
@@ -80,6 +82,8 @@ public class UITestTestConfigurationResolver
 
     private static final String SAVEPERMANENTDIRECTORY_PROPERTY = "xwiki.test.ui.savePermanentDirectoryData";
 
+    private static final String SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY = "xwiki.test.ui.servletEngineNetworkAliases";
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      * @return the constructed {@link TestConfiguration} object containing the full test configuration
@@ -104,13 +108,15 @@ public class UITestTestConfigurationResolver
         configuration.setResolveExtraJARs(resolveResolveExtraJARs(uiTestAnnotation.resolveExtraJARs()));
         configuration.setExtensionOverrides(resolveExtensionOverrides(uiTestAnnotation.extensionOverrides()));
         configuration.setSSHPorts(resolveSSHPorts(uiTestAnnotation.sshPorts()));
-        configuration.setProfiles(resolveProfiles(uiTestAnnotation.profiles()));
+        configuration.setProfiles(resolveCommaSeparatedValues(uiTestAnnotation.profiles(), PROFILES_PROPERTY));
         configuration.setOffice(resolveOffice(uiTestAnnotation.office()));
         configuration.setForbiddenServletEngines(resolveForbiddenServletEngines(uiTestAnnotation.forbiddenEngines()));
         configuration.setDatabaseCommands(resolveDatabaseCommands(uiTestAnnotation.databaseCommands()));
         configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
         configuration.setSavePermanentDirectoryData(resolveSavePermanentDirectoryData(
             uiTestAnnotation.savePermanentDirectoryData()));
+        configuration.setServletEngineNetworkAliases(resolveCommaSeparatedValues(
+            uiTestAnnotation.servletEngineNetworkAliases(), SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY));
         return configuration;
     }
 
@@ -316,15 +322,11 @@ public class UITestTestConfigurationResolver
         return newSSHPorts;
     }
 
-    private List<String> resolveProfiles(String[] profiles)
+    private List<String> resolveCommaSeparatedValues(String[] values, String systemProperty)
     {
-        List<String> newProfiles = new ArrayList<>();
-        if (profiles.length > 0) {
-            newProfiles.addAll(Arrays.asList(profiles));
-        } else {
-            newProfiles.addAll(Arrays.asList(System.getProperty(PROFILES_PROPERTY, "").split(",")));
-        }
-        return newProfiles;
+        String[] actualValues = values.length > 0 ? values : System.getProperty(systemProperty, "").split("\\s*,\\s*");
+        return Stream.of(actualValues).filter(StringUtils::isNotBlank)
+            .collect(Collectors.toCollection(() -> new ArrayList<>()));
     }
 
     private List<ServletEngine> resolveForbiddenServletEngines(ServletEngine[] forbiddenServletEngines)

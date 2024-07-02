@@ -97,7 +97,7 @@
     ## Delete document action template.
     &lt;a href="" class="action actiondelete"
         title="$escapetool.xml($services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip'))"&gt;
-      &lt;span class="action-icon"&gt;$services.icon.renderHTML('cross')&lt;/span&gt;&lt;span
+      &lt;span class="action-icon"&gt;$services.icon.renderHTML('trash')&lt;/span&gt;&lt;span
         class="action-label"&gt;$escapetool.xml(
         $services.localization.render('platform.index.trashDocumentsActionsDeleteText'))
       &lt;/span&gt;

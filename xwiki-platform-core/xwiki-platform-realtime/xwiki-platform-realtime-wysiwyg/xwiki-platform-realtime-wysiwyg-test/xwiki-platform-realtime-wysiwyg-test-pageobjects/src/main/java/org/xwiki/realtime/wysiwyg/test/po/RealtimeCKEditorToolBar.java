@@ -125,8 +125,8 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
      */
     public boolean isEditingAlone()
     {
-        return "Editing alone"
-            .equals(getDriver().findElementWithoutWaiting(getContainer(), By.className("rt-user-list")).getText());
+        return getCoeditors().isEmpty() && !getDriver()
+            .findElementWithoutWaiting(getContainer(), By.className("rt-user-list")).getText().contains(":");
     }
 
     /**

@@ -19,8 +19,6 @@
  */
 package org.xwiki.netflux.internal;
 
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,17 +27,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.LocaleUtils;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.netflux.EntityChannelStore;
 import org.xwiki.netflux.internal.EntityChange.ScriptLevel;
@@ -55,9 +47,9 @@ import org.xwiki.user.UserReferenceSerializer;
  * contain scripts.
  *
  * @version $Id$
- * @since 15.10.11
+ * @since 15.10.12
  * @since 16.4.1
- * @since 16.5.0
+ * @since 16.6.0RC1
  */
 @Component(roles = EntityChannelScriptAuthorTracker.class)
 @Singleton
@@ -71,9 +63,6 @@ public class EntityChannelScriptAuthorTracker
 
     @Inject
     private AuthorizationManager authorizationManager;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     @Inject
     @Named("document")
@@ -123,46 +112,17 @@ public class EntityChannelScriptAuthorTracker
 
     void maybeUpdateScriptAuthor(EntityChannel entityChannel, UserReference scriptAuthor)
     {
-        EntityReference targetEntityReference = getTargetEntityReference(entityChannel);
-        EntityChange channelScriptAuthor =
-            this.scriptAuthors.getOrDefault(entityChannel.getKey(), getEntityScriptAuthor(targetEntityReference));
+        EntityChange channelScriptAuthor = this.scriptAuthors.get(entityChannel.getKey());
         ScriptLevel userScriptLevel = getUserScriptLevel(scriptAuthor, entityChannel.getEntityReference());
         if (channelScriptAuthor == null || userScriptLevel.compareTo(channelScriptAuthor.getScriptLevel()) <= 0) {
             // The user making the change has a lower or equal script level than the channel script level. We
             // need to update the channel script level in order to prevent privilege escalation.
-            EntityChange scriptAuthorChange = new EntityChange(targetEntityReference, scriptAuthor, userScriptLevel);
+            EntityChange scriptAuthorChange =
+                new EntityChange(entityChannel.getEntityReference(), scriptAuthor, userScriptLevel);
             this.scriptAuthors.put(entityChannel.getKey(), scriptAuthorChange);
             this.logger.debug("Updated the script author associated with the entity channel [{}] to [{}].",
                 entityChannel, scriptAuthorChange);
         }
-    }
-
-    private EntityChange getEntityScriptAuthor(EntityReference entityReference)
-    {
-        try {
-            if (entityReference instanceof DocumentReference) {
-                DocumentReference documentReference = (DocumentReference) entityReference;
-                DocumentModelBridge document =
-                    this.documentAccessBridge.getTranslatedDocumentInstance(documentReference);
-                UserReference contentAuthor = document.getAuthors().getContentAuthor();
-                return new EntityChange(documentReference, contentAuthor,
-                    getUserScriptLevel(contentAuthor, documentReference));
-            } else if (entityReference instanceof ObjectPropertyReference) {
-                ObjectPropertyReference objectPropertyReference = (ObjectPropertyReference) entityReference;
-                DocumentReference documentReference =
-                    new DocumentReference(objectPropertyReference.extractReference(EntityType.DOCUMENT));
-                // Metadata is stored on the default document translation.
-                DocumentModelBridge document = this.documentAccessBridge.getDocumentInstance(documentReference);
-                UserReference metadataAuthor = document.getAuthors().getEffectiveMetadataAuthor();
-                return new EntityChange(documentReference, metadataAuthor,
-                    getUserScriptLevel(metadataAuthor, documentReference));
-            }
-        } catch (Exception e) {
-            this.logger.warn("Failed to compute the script level for entity [{}]. Root cause is [{}].", entityReference,
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-
-        return null;
     }
 
     private ScriptLevel getUserScriptLevel(UserReference userReference, EntityReference entityReference)
@@ -175,35 +135,5 @@ public class EntityChannelScriptAuthorTracker
         } else {
             return ScriptLevel.NO_SCRIPT;
         }
-    }
-
-    private EntityReference getTargetEntityReference(EntityChannel entityChannel)
-    {
-        EntityReference targetEntityReference = entityChannel.getEntityReference();
-        List<String> path = entityChannel.getPath();
-        if (targetEntityReference.getType() == EntityType.DOCUMENT && !path.isEmpty()) {
-            try {
-                Locale locale = LocaleUtils.toLocale(path.get(0));
-                if (path.size() > 1) {
-                    // The path indicates the document property that is synchronized.
-                    String property = path.get(1);
-                    if (!"content".equals(property)) {
-                        // The entity channel is used to synchronize document metadata, which is shared by all document
-                        // translations (stored on the default translation).
-                        return new ObjectPropertyReference(this.explicitEntityReferenceResolver.resolve(property,
-                            EntityType.OBJECT_PROPERTY, targetEntityReference));
-                    }
-                }
-                // The entity channel is used to synchronize the value of a document property that is not shared between
-                // document translations. We need to take the script author from the specified document translation.
-                return new DocumentReference(targetEntityReference.extractReference(EntityType.DOCUMENT), locale);
-            } catch (Exception e) {
-                // The document reference is probably relative but we can't resolve it because there's no currrent
-                // document in the context where this method is called.
-                this.logger.warn("Failed to compute the target entity reference"
-                    + " associated with the entity channel [{}] with path [{}].", entityChannel.getKey(), path);
-            }
-        }
-        return targetEntityReference;
     }
 }

@@ -32,10 +32,7 @@ import javax.inject.Named;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -70,9 +67,6 @@ class EntityChannelScriptAuthorTrackerTest
     private AuthorizationManager authorizationManager;
 
     @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
-
-    @MockComponent
     @Named("document")
     private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
 
@@ -99,19 +93,9 @@ class EntityChannelScriptAuthorTrackerTest
     private ObjectPropertyReference objectPropertyReference =
         new ObjectPropertyReference("text", new ObjectReference("Some.Class[0]", this.documentReference));
 
-    @Mock
-    private DocumentModelBridge document;
-
-    @Mock
-    DocumentAuthors documentAuthors;
-
     @BeforeEach
     void beforeEach()
     {
-        when(this.document.getAuthors()).thenReturn(this.documentAuthors);
-        when(this.documentAuthors.getContentAuthor()).thenReturn(this.carol);
-        when(this.documentAuthors.getEffectiveMetadataAuthor()).thenReturn(this.carol);
-
         // Alice has only script rights.
         DocumentReference aliceReference = new DocumentReference("xwiki", "Users", "Alice");
         when(this.documentUserReferenceSerializer.serialize(this.alice)).thenReturn(aliceReference);
@@ -143,7 +127,7 @@ class EntityChannelScriptAuthorTrackerTest
     }
 
     @Test
-    void getScriptAuthorForDocumentContent() throws Exception
+    void getScriptAuthor()
     {
         // No messages received yet on this channel.
         assertFalse(this.tracker.getScriptAuthor("channelKey").isPresent());
@@ -151,43 +135,6 @@ class EntityChannelScriptAuthorTrackerTest
         EntityChannel entityChannel =
             new EntityChannel(documentReference, List.of("fr", "content", "wiki"), "channelKey");
         when(this.entityChannels.getChannel(entityChannel.getKey())).thenReturn(Optional.of(entityChannel));
-        when(this.documentAccessBridge.getTranslatedDocumentInstance(this.translationReference))
-            .thenReturn(this.document);
-
-        // Alice sends a message on the channel.
-        this.tracker.maybeUpdateScriptAuthor(entityChannel, alice);
-
-        assertEquals(alice, this.tracker.getScriptAuthor("channelKey").get().getAuthor());
-
-        // Bob sends a message on the channel. Bob has less script rights than Alice.
-        this.tracker.maybeUpdateScriptAuthor(entityChannel, bob);
-
-        assertEquals(bob, this.tracker.getScriptAuthor("channelKey").get().getAuthor());
-
-        // Alice sends another message on the channel, but it should not change the script author because Alice has more
-        // script rights than Bob (we can only lower the script level).
-        this.tracker.maybeUpdateScriptAuthor(entityChannel, alice);
-
-        // Close the entity channel.
-        when(this.entityChannels.getChannel(entityChannel.getKey())).thenReturn(Optional.empty());
-
-        // We can still get the script author once.
-        assertEquals(bob, this.tracker.getScriptAuthor("channelKey").get().getAuthor());
-
-        // The script author was reset.
-        assertFalse(this.tracker.getScriptAuthor("channelKey").isPresent());
-    }
-
-    @Test
-    void getScriptAuthorForDocumentMetaData() throws Exception
-    {
-        // No messages received yet on this channel.
-        assertFalse(this.tracker.getScriptAuthor("channelKey").isPresent());
-
-        EntityChannel entityChannel =
-            new EntityChannel(documentReference, List.of("en", "Some.Class[0].text", "wysiwyg"), "channelKey");
-        when(this.entityChannels.getChannel(entityChannel.getKey())).thenReturn(Optional.of(entityChannel));
-        when(this.documentAccessBridge.getDocumentInstance(this.documentReference)).thenReturn(this.document);
 
         // Alice sends a message on the channel.
         this.tracker.maybeUpdateScriptAuthor(entityChannel, alice);

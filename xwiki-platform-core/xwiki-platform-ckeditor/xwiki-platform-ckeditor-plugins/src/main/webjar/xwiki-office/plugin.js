@@ -78,7 +78,7 @@
         enabled: false,
         importer: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.OfficeImporter',
-          language: $('html').attr('lang') || ''
+          language: editor.getContentLocale()
         }))
       }, editor.config['xwiki-office']);
 

@@ -40,9 +40,9 @@ public interface XWikiRequest extends HttpServletRequest
      *         triggered by this request. If the request doesn't indicate an effective author then the user that gets
      *         authenticated with the information provided by this request (or the guest user, if authentication
      *         information is missing) should be considered the effective author.
-     * @since 15.10.11
+     * @since 15.10.12
      * @since 16.4.1
-     * @since 16.5.0
+     * @since 16.6.0RC1
      */
     @Unstable
     default Optional<UserReference> getEffectiveAuthor()

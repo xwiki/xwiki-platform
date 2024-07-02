@@ -34,7 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Netflux API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -50,11 +50,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-localization-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

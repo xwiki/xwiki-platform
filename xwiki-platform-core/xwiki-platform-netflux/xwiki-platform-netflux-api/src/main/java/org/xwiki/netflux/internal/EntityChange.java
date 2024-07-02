@@ -31,9 +31,9 @@ import org.xwiki.user.UserReference;
  * Represents a change to an entity.
  *
  * @version $Id$
- * @since 15.10.11
+ * @since 15.10.12
  * @since 16.4.1
- * @since 16.5.0
+ * @since 16.6.0RC1
  */
 public class EntityChange implements Comparable<EntityChange>
 {

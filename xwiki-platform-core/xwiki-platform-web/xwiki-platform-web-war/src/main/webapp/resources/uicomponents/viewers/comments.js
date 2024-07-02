@@ -88,6 +88,10 @@ viewers.Comments = Class.create({
             this.addSubmitListener(this.form);
             this.addCancelListener();
             this.addPreview(this.form);
+            if(typeof CKEDITOR === 'undefined') {
+              // Focus on the textarea.
+              this.form["XWiki.XWikiComments_comment"].focus();
+            }
           }.bind(this)
         });
       }.bind(this));
@@ -595,7 +599,9 @@ viewers.Comments = Class.create({
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       if ($(".commenteditor").length) {
-        CKEDITOR.config.startupFocus = true;
+        if(typeof CKEDITOR !== 'undefined') {
+          CKEDITOR.config.startupFocus = true;
+        }
         $.post(new XWiki.Document().getURL("get") + '?' + $.param({
           xpage: 'xpart',
           vm: 'commentfield.vm',

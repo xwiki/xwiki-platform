@@ -175,28 +175,39 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 
 /* Expand/collapse */
 /* We need to increase the priority of the rule in order to override Toucan styles */
-#body .collapsable > .xobject-title,
-#body .collapsable > .xclass-title,
-#body .collapsable > .xproperty-title {
+#body .xobject > .xobject-title,
+#body .xclass > .xclass-title,
+#body .xproperty > .xproperty-title {
   display: flex;
   gap: .5em;
   align-items: baseline;
 }
 
-#body .collapsable > .xobject-title > .toggle-collapsable > *,
-#body .collapsable > .xclass-title > .toggle-collapsable > *,
-#body .collapsable > .xproperty-title > .toggle-collapsable > * {
-  transform:  rotate(0);
+/* Before Javascript, the collapsable and collapsed classes are not here.
+In order to avoid flickering, we need to take into account this initial state in the style rulesets. 
+The default state is collapsed for xobjects and xproperties, but expanded for xclasses. */
+.xclass.collapsed .xclass-content, 
+.xobject .xobject-content, 
+.xproperty .xproperty-content {
+  display: none;
 }
 
-#body .collapsable.collapsed > .xobject-title > .toggle-collapsable > *,
-#body .collapsable.collapsed > .xclass-title > .toggle-collapsable > *,
-#body .collapsable.collapsed > .xproperty-title > .toggle-collapsable > * {
+.xclass.collapsable:not(.collapsed) .xclass-content,
+.xobject.collapsable:not(.collapsed) .xobject-content,
+.xproperty.collapsable:not(.collapsed) .xproperty-content {
+  display: inherit;
+}
+
+.xclass.collapsed > .xclass-title > .toggle-collapsable > *,
+.xobject > .xobject-title > .toggle-collapsable > *,
+.xproperty > .xproperty-title > .toggle-collapsable > * {
   transform:  rotate(-90deg);
 }
 
-.xclass.collapsed .xclass-content, .xobject.collapsed .xobject-content, .xproperty.collapsed .xproperty-content {
-  display: none;
+.xclass.collapsable:not(.collapsed) > .xclass-title > .toggle-collapsable > *,
+.xobject.collapsable:not(.collapsed) > .xobject-title > .toggle-collapsable > *,
+.xproperty.collapsable:not(.collapsed) > .xproperty-title > .toggle-collapsable > * {
+  transform:  rotate(0);
 }
 
 /* Disabled/Deprecated */

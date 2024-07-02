@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.docker.internal.junit5.browser;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BrowserWebDriverContainer;
@@ -28,8 +30,6 @@ import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.BrowserTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
-
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 
 /**
  * Create and execute the browser docker container for driving the tests.
@@ -96,6 +96,14 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
+
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            // The servlet engine is running on the host so we need to map the servlet engine aliases to the host in
+            // order for the browser to be able to access XWiki using the configured aliases.
+            testConfiguration.getServletEngineNetworkAliases().forEach(alias -> {
+                webDriverContainer.withExtraHost(alias, "host-gateway");
+            });
+        }
 
         // In case some test-resources are provided, they need to be available from the browser
         // for example in order to upload some files on the wiki.

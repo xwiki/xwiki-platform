@@ -40,34 +40,33 @@
 
 == Roteiros ==
 
-{{comment}}please do not translate the sub headlines{{/comment}}
-=== 1.0 Scripts ===
+=== 1.0 Roteiros ===
 
-{{info}}Na sintaxe XWiki 1.0 era possível inserir scripts Velocity em qualquer lugar diretamente na página. Isso pode levar a problemas, por exemplo, quando o usuário entra involuntariamente no conteúdo do Velocity. Também exige desempenho para páginas que não requerem conteúdo do Velocity. Existem várias outras limitações técnicas. O mesmo vale para inserir scripts Groovy.{{/info}}
+{{info}}No XWiki Syntax 1.0 era possível inserir scripts Velocity em qualquer lugar diretamente na página. Isso pode levar a problemas, por exemplo, quando o usuário entra involuntariamente no conteúdo do Velocity. Também exige desempenho para páginas que não requerem conteúdo do Velocity. Existem várias outras limitações técnicas. O mesmo vale para inserir scripts Groovy.{{/info}}
 
 |=Recurso|=Sintaxe do XWiki 1.0
-|Script Velocity|((({{{
+|Script de velocidade|((({{{
 #set($var = "tanto faz")
 }}})))
-|Script Groovy|((({{{
+|Roteiro bacana|((({{{
 &lt;%
 def var = "tanto faz"
 %&gt;
 }}})))
 
-=== 2.0 Scripts ===
+=== 2.0 Roteiros ===
 
 {{info}}XWiki [[suporta diversas linguagens de script&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Scripting/]].{{/info}}
 
 |=Recurso|=Sintaxe do XWiki {{velocity}}$crtSyntaxVer{{/velocity}}
-|Script Velocity|((({{{
-{{velocity}}
+|Script de velocidade|((({{{
+{{velocidade}}
 #set($var = "tanto faz")
-{{/velocity}}
+{{/velocidade}}
 }}})))
-|Script Groovy|((({{{
-{{groovy}}
+|Roteiro bacana|((({{{
+{{legal}}
 def var = "tanto faz"
-{{/groovy}}
+{{/legal}}
 }}})))</content>
 </xwikidoc>

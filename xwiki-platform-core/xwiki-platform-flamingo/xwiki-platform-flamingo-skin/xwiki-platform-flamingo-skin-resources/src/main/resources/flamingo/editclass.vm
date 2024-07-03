@@ -60,12 +60,16 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #macro (displayProperty $field)
   <div id="xproperty_${field.name}" class="xproperty #if($field.disabled)disabled#end">
     <div id="xproperty_${field.name}_title" class="xproperty-title ${field.type}">
-      <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
-      <h2>
-        $!escapetool.xml($doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field))
-        ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field):
+      <h3>
+        <button type="button" class="btn btn-secondary" title="$escapetool.xml($services.localization.render('core.editors.class.property.toggleDisplay.tooltip'))">
+          <span class="sr-only">$escapetool.xml($services.localization.render('core.editors.class.property.toggleDisplay.tooltip'))</span>
+          <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
+          <span class="iconHolder"></span>
+          $!escapetool.xml($doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field))
+          ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field):
           $xwiki.metaclass.get($field.classType).prettyName)
-      </h2>
+        </button>
+      </h3>
       <div class="tools propertyTools">
         #set ($deletePropURL = $doc.getURL('propdelete', $escapetool.url({
           'propname': $field.name,
@@ -176,8 +180,13 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 <div id="xwikiclassproperties">
   <div id="xclass_${escapetool.xml($class.name)}" class="xclass">
     <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title">
-      <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
-      <h2>${escapetool.xml($class.name)}</h2>
+      <h2>
+        <button type="button" class="btn btn-secondary" title="$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))">
+          <span class="sr-only">$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))</span>
+          <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
+          ${escapetool.xml($class.name)}
+        </button>
+      </h2>
     </div>
     #addPropertyForm()
     <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div id="xclassContent">

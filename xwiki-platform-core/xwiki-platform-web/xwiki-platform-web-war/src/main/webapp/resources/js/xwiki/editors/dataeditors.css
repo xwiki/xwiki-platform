@@ -13,13 +13,6 @@
   color: $theme.textPrimaryColor;
 }
 
-#body .xclass-title h2 span {
-  border: none;
-  color: inherit;
-  display: inline;
-  margin: 0;
-  position: static;
-}
 
 div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="checkbox"],
 div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio"] {
@@ -35,11 +28,13 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 /* Generic links */
 .more-actions {
   padding: 8px 2px;
+  display: flex;
+  align-items: center;
 }
 
 .more-actions .edit-all {
   display: block;
-  padding: 2px 18px;
+  padding: .2rem .5rem;
 }
 
 /* Object editor */
@@ -56,10 +51,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   padding: 0;
 }
 
-.xclass-content .xobject-title h3 {
-  padding: 0;
-}
-
 .xclass-content {
  margin: 0 0 0 16px;
 }
@@ -70,12 +61,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   border: none;
   cursor: default;
   background: transparent;
-}
-
-.xobject:hover .xobject-title,
-.xproperty:hover .xproperty-title {
-  background-color: $theme.highlightColor;
-  color: $theme.textPrimaryColor;
 }
 
 .xobject-title h3 {
@@ -94,28 +79,18 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   margin-bottom: 2px;
 }
 
-/* XProperty */
-.xobject dl, .xproperty dl {
-  margin: 0;
-}
-
-.xobject-title:hover, .xclass-title:hover, .xproperty-title:hover {
-  cursor: default;
-}
-
-.xobject-action {
-  display: block;
-  position: absolute;
-  top: 2px;
-}
-
 .xobject-title .delete {
-  right: 0;
   color: $theme.notificationErrorColor;
 }
 
-.xobject-title .edit {
-  right: 16px;
+.xobject-content xdt {
+  font-size: 75%;
+  font-weight: bold;
+}
+
+/* XProperty and XObjects */
+.xobject dl, .xproperty dl {
+  margin: 0;
 }
 
 /* XProperty definition */
@@ -143,20 +118,35 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   width: 2em;
 }
 
-.xproperty-title h2 {
+.xproperty-title h3 {
   display: block;
   padding: 2px 20px 2px 18px;
   margin: 0;
   font-size: 1em;
   font-weight: 100;
-  background: transparent url("$xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')") 0 center no-repeat;
   min-height: 16px;
-  flex-grow: 1;
+}
+
+/* We want to keep the property displays relatively compact. We reduce the default padding and margins. */
+.xproperty-title h3 button {
+  padding-bottom: 0;
+  padding-top: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+/* Default state for the icon representing the property. */
+.xproperty-title h3 button .iconHolder {
+  background: transparent url("$xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')") 0 center no-repeat;
+  display: inline-block;
+  min-width: 16px;
+  min-height: 16px;
+  vertical-align: middle;
 }
 
 .xproperty-title label {
   font-size: 60%;
-  line-height: 1em;
+  line-height: 1rem;
 }
 
 .xproperty-content {
@@ -168,19 +158,43 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   clear: both;
 }
 
-.xobject-content xdt {
-  font-size: 75%;
-  font-weight: bold;
-}
-
 /* Expand/collapse */
 /* We need to increase the priority of the rule in order to override Toucan styles */
-#body .xobject > .xobject-title,
 #body .xclass > .xclass-title,
+#body .xobject > .xobject-title,
 #body .xproperty > .xproperty-title {
   display: flex;
   gap: .5em;
   align-items: baseline;
+}
+
+.xclass-title h2,
+.xclass-content .xobject-title h3,
+.xproperty .xproperty-title h3 {
+  flex-grow: 1;
+  padding: 0;
+}
+
+.xclass-title h2 button,
+.xobject-title h3 button,
+.xproperty-title h3 button {
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.xclass-title h2 button:hover,
+.xobject .xobject-title h3 button:hover,
+.xproperty .xproperty-title h3 button:hover {
+  background-color: $theme.highlightColor;
+  color: $theme.textPrimaryColor;
+}
+
+.xclass-title h2 button:active,
+.xobject .xobject-title h3 button:active,
+.xproperty .xproperty-title h3 button:active {
+  box-shadow: none;
 }
 
 /* Before Javascript, the collapsable and collapsed classes are not here.
@@ -198,16 +212,18 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   display: inherit;
 }
 
-.xclass.collapsed > .xclass-title > .toggle-collapsable > *,
-.xobject > .xobject-title > .toggle-collapsable > *,
-.xproperty > .xproperty-title > .toggle-collapsable > * {
+.xclass.collapsed > .xclass-title .toggle-collapsable > *,
+.xobject > .xobject-title .toggle-collapsable > *,
+.xproperty > .xproperty-title .toggle-collapsable > * {
   transform:  rotate(-90deg);
+  transition: transform .2s ease-out;
 }
 
-.xclass.collapsable:not(.collapsed) > .xclass-title > .toggle-collapsable > *,
-.xobject.collapsable:not(.collapsed) > .xobject-title > .toggle-collapsable > *,
-.xproperty.collapsable:not(.collapsed) > .xproperty-title > .toggle-collapsable > * {
+.xclass.collapsable:not(.collapsed) > .xclass-title .toggle-collapsable > *,
+.xobject.collapsable:not(.collapsed) > .xobject-title .toggle-collapsable > *,
+.xproperty.collapsable:not(.collapsed) > .xproperty-title .toggle-collapsable > * {
   transform:  rotate(0);
+  transition: transform .2s ease-out;
 }
 
 /* Disabled/Deprecated */
@@ -219,7 +235,9 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   font-style: italic;
 }
 
-.disabled .xproperty-title h2, #body #xwikiclassproperties .disabled dt label, #body #xwikiobjects dt.disabled label {
+.disabled .xproperty-title h3, 
+#body #xwikiclassproperties .disabled dt label, 
+#body #xwikiobjects dt.disabled label {
   color: $theme.textColor;
 }
 
@@ -234,14 +252,9 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   font-weight: 900;
 }
 
-.xproperty-title .tools {
-  align-self: center;
-}
-
 .xproperty-title .tools .tool {
   width: 16px;
   height: 16px;
-  float: left;
   background: transparent none center no-repeat;
 }
 
@@ -259,51 +272,51 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
 }
 
 /* Property type icons */
-.StringClass h2 {
+.StringClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/string.png')");
 }
 
-.DateClass h2 {
+.DateClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/calendar.png')");
 }
 
-.TextAreaClass h2 {
+.TextAreaClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/textarea.png')");
 }
 
-.NumberClass h2 {
+.NumberClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/number.png')");
 }
 
-.BooleanClass h2 {
+.BooleanClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/boolean.png')");
 }
 
-.StaticListClass h2 {
+.StaticListClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/staticlist.png')");
 }
 
-.GroupsClass h2 {
+.GroupsClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/groups.png')");
 }
 
-.UsersClass h2 {
+.UsersClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/users.png')");
 }
 
-.LevelsClass h2 {
+.LevelsClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/rights.png')");
 }
 
-.DBListClass h2 {
+.DBListClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/database.png')");
 }
 
-.DBTreeListClass h2 {
+.DBTreeListClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/tree.png')");
 }
 
-.PasswordClass h2 {
+.PasswordClass h3 button .iconHolder {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
 }
 

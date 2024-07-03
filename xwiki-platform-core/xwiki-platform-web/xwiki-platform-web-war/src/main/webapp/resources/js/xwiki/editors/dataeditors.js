@@ -652,10 +652,10 @@ editors.XDataEditors = Class.create({
     if (objectContent.childElementCount === 0) {
       object.addClassName('collapsed');
     }
-    var objectTitle = object.down('.xobject-title');
+    var objectToggle = object.down('.xobject-title h3 button');
     var xclassName = this.getXClassNameFromXObjectId(object.id);
     var xObjectNumber = this.getXObjectNumberFromXObjectId(object.id);
-    objectTitle.observe('click', function(event) {
+    objectToggle.observe('click', function() {
       var isAlreadyLoaded = objectContent.childElementCount > 0;
       if (!isAlreadyLoaded && !object.hasClassName('loading')) {
         object.addClassName('loading');

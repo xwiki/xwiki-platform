@@ -116,7 +116,12 @@ public class MultiUserTestUtils
     {
         // Close all tabs except the first one.
         this.setup.getDriver().getWindowHandles().stream().filter(handle -> !handle.equals(this.firstTabHandle))
-            .forEach(handle -> this.setup.getDriver().switchTo().window(handle).close());
+            .forEach(handle -> {
+                this.setup.getDriver().switchTo().window(handle).close();
+                // Clean up the state associated with the closed tab.
+                this.baseURLByTab.remove(handle);
+                this.secretTokenByTab.remove(handle);
+            });
 
         // Switch back to the first tab.
         this.setup.getDriver().switchTo().window(this.firstTabHandle);

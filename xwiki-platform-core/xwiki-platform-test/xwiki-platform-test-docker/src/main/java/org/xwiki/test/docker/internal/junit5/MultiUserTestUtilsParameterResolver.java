@@ -46,12 +46,22 @@ public class MultiUserTestUtilsParameterResolver implements ParameterResolver
     @Override
     public MultiUserTestUtils resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
     {
-        TestConfiguration testConfiguration = DockerTestUtils.getTestConfiguration(extensionContext);
-
         ExtensionContext.Store store = DockerTestUtils.getStore(extensionContext);
-        PersistentTestContext testContext = store.get(PersistentTestContext.class, PersistentTestContext.class);
-        TestUtils testUtils = testContext.getUtil();
+        // All tests that share the same context should share the same MultiUserTestUtils instance because:
+        // * MultiUserTestUtils has state (keeps track of the opened tabs and their base URLs and secret tokens)
+        // * the browser instance is shared by all tests in the same context
+        MultiUserTestUtils multiUsersSetup = store.get(MultiUserTestUtils.class, MultiUserTestUtils.class);
 
-        return new MultiUserTestUtils(testUtils, testConfiguration);
+        if (multiUsersSetup == null) {
+            TestConfiguration testConfiguration = DockerTestUtils.getTestConfiguration(extensionContext);
+
+            PersistentTestContext testContext = store.get(PersistentTestContext.class, PersistentTestContext.class);
+            TestUtils testUtils = testContext.getUtil();
+
+            multiUsersSetup = new MultiUserTestUtils(testUtils, testConfiguration);
+            store.put(MultiUserTestUtils.class, multiUsersSetup);
+        }
+
+        return multiUsersSetup;
     }
 }

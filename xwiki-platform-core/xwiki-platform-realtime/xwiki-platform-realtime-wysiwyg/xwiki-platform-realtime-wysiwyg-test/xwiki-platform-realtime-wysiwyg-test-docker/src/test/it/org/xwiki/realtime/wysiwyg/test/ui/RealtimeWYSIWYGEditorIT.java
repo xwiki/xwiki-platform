@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -1094,6 +1095,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // currently).
         firstTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
 
+        // It's not enough to wait for the Velocity macro error message because the content is re-rendered twice (first
+        // time when the Velocity macro is inserted and a second time when the Velocity macro is edited), but the output
+        // is the same.
+        firstTextArea.waitUntilContentEditable();
+
         // Change the content (without modifying the script macro).
         firstTextArea.sendKeys(Keys.END, " dinner");
 
@@ -1126,6 +1132,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("lunch");
 
+        // The second user has modified the Velocity macro, which triggered a re-rendering of the content on this tab.
+        firstTextArea.waitUntilContentEditable();
+
         // Try to inject a script macro.
         firstTextArea.sendKeys(Keys.HOME);
         firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
@@ -1156,6 +1165,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         text = secondTextArea.getText();
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
 
+        // The content is re-rendered twice because the first user has inserted and modified the Velocity macro.
+        secondTextArea.waitUntilContentEditable();
+
         // Edit again the macro to see that the script level doesn't change.
         secondTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("Current: $xcontext.userReference").clickSubmit();
@@ -1176,7 +1188,10 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Start fresh.
         setup.deletePage(testReference);
 
-        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        // Force the English locale, in case this test is run multiple times (it switches to German locale at some
+        // point).
+        DocumentReference testReferenceEN = new DocumentReference(testReference, Locale.ENGLISH);
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReferenceEN);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 

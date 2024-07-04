@@ -77,7 +77,7 @@ import org.xwiki.script.internal.CloneableSimpleScriptContext;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.test.XWikiTempDirUtil;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -401,7 +401,9 @@ public class MockitoOldcore
                 when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
                     .thenReturn(new File(System.getProperty("java.io.tmpdir")));
 
-                initEnvironmentDirectories();
+                Environment testEnvironment = new TestEnvironment();
+                this.temporaryDirectory = testEnvironment.getTemporaryDirectory();
+                this.permanentDirectory = testEnvironment.getPermanentDirectory();
 
                 servletEnvironment.setTemporaryDirectory(this.temporaryDirectory);
                 servletEnvironment.setPermanentDirectory(this.permanentDirectory);
@@ -1423,25 +1425,16 @@ public class MockitoOldcore
         return this.wikiConfigurationSource;
     }
 
-    private void initEnvironmentDirectories()
-    {
-        File testDirectory = XWikiTempDirUtil.createTemporaryDirectory();
-
-        this.temporaryDirectory = new File(testDirectory, "temporary");
-        this.permanentDirectory = new File(testDirectory, "permanent-dir");
-    }
-
     /**
      * @since 7.2M2
      */
     public void registerMockEnvironment() throws Exception
     {
-        this.environment = getMocker().registerMockComponent(Environment.class);
+        this.environment = new TestEnvironment();
+        getMocker().registerComponent(Environment.class, this.environment);
 
-        initEnvironmentDirectories();
-
-        when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
-        when(this.environment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
+        this.temporaryDirectory = this.environment.getTemporaryDirectory();
+        this.permanentDirectory = this.environment.getPermanentDirectory();
     }
 
     public UserPropertiesResolver getMockAllUserPropertiesResolver()

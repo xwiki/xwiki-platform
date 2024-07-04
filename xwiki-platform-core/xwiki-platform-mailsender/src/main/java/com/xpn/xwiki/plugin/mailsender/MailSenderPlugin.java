@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -60,7 +59,6 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.environment.Environment;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.velocity.VelocityManager;
@@ -126,8 +124,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /** The name of the header that specifies the sender of the mail. */
     private static final String FROM = "From";
-
-    private final Environment environment = Utils.getComponent((Type) Environment.class);
 
     /**
      * Default plugin constructor.
@@ -275,7 +271,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         String name = attachment.getFilename();
         byte[] stream = attachment.getContent();
-        File temp = new TemporaryFile(File.createTempFile("tmpfile", ".tmp", this.environment.getTemporaryDirectory()));
+        File temp = new TemporaryFile(File.createTempFile("tmpfile", ".tmp"));
         FileOutputStream fos = new FileOutputStream(temp);
         fos.write(stream);
         fos.close();

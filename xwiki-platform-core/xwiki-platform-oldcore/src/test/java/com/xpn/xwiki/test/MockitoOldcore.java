@@ -82,6 +82,7 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.URLConfiguration;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -1108,6 +1109,16 @@ public class MockitoOldcore
                     return getXWikiContext().getWikiId();
                 }
             });
+        }
+
+        // A default implementation of UserReferenceResolver<CurrentUserReference> is expected by
+        // EffectiveAuthorSetterListener which otherwise fails to be registered as a component when @AllComponents
+        // annotation is used in tests that depend on oldcore. We register a mock implementation in case there's none
+        // registered already.
+        DefaultParameterizedType currentUserReferenceResolverType =
+            new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class);
+        if (!this.componentManager.hasComponent(currentUserReferenceResolverType)) {
+            getMocker().registerMockComponent(currentUserReferenceResolverType);
         }
 
         DefaultParameterizedType userReferenceDocumentReferenceResolverType =

@@ -83,12 +83,6 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- Used to mock XWiki class -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

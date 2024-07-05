@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>16.4.1</version>
+    <version>16.4.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-standards-validator</artifactId>
   <name>XWiki Platform - Tools - Web Standards Validator</name>

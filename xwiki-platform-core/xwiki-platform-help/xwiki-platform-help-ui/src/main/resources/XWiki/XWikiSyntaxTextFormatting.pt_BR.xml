@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc locale="ko">
+<xwikidoc locale="pt_BR">
   <web>XWiki</web>
-  <name>XWikiSyntaxHorizontalLine</name>
-  <language>ko</language>
+  <name>XWikiSyntaxTextFormatting</name>
+  <language>pt_BR</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XWiki.XWikiSyntax</parent>
@@ -32,39 +32,37 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxHorizontalLine</title>
+  <title>XWikiSyntaxTextFormatting</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= 편집 중 =
+  <content>= Edição =
 
-== 가로선 ==
+== Formatação de texto ==
 
-=== 1.0 가로선 ===
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Text Formatting ===
 
-{{info}}대시가 4개 이상 있어야 합니다.{{/info}}
+|=Recurso|=Sintaxe do XWiki 1.0|=Resultado
+|Negrito|{{{*negrito*}}}|**negrito**
+|Sublinhado|{{{__sublinhado___}}}|__sublinhado__
+|Itálico|{{{~~itálico~~}}}|//itálico//
+|Riscado|{{{--riscado--}}}|--riscado--
+|Monoespaço|&lt;tt&gt;monoespaço&lt;/tt&gt;|##monoespaço##
+|Sobrescrito|algum &lt;sup&gt;sobrescrito&lt;/sup&gt;|algum ^^sobrescrito^^
+|Subscrito|algum &lt;sub&gt;subscrito&lt;/sub&gt;|algum ,,subscrito,,
 
-|=기능|= XWiki 구문 1.0|=결과
-|간단한 수평선|{{{--}}}|(((--)))
-|매개변수화된 수평선|&lt;hr style="테두리-색상:파란색"/&gt;|(((
-(% 스타일="테두리-색상:파란색" %)
-----
-)))
+=== 2.0 Text Formatting ===
 
-=== 2.0 가로선 ===
-
-{{info}}대시가 4개 이상 있어야 합니다.{{/info}}
-
-|=기능|= XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
-|간단한 수평선|{{{--}}}|(((--)))
-|매개변수화된 수평선|((({{{
-(% 스타일="테두리-색상:파란색" %)
-----
-}}})))|(((
-(% 스타일="테두리-색상:파란색" %)
-----
-)))</content>
+|=Recurso|=Sintaxe do XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultado
+|Negrito|{{{**negrito**}}}|**negrito**
+|Sublinhado|{{{__sublinhado__}}}|__sublinhado__
+|Itálico|{{{//itálico//}}}|//itálico//
+|Riscado|{{{--riscado--}}}|--riscado--
+|Monoespaço|{{{##monoespaço##}}}|##monoespaço##
+|Sobrescrito|{{{alguns ^^sobrescrito^^}}}|alguns ^^sobrescrito^^
+|Subscrito|{{{algum ,,subscrito,,}}}|algum ,,subscrito,,</content>
 </xwikidoc>

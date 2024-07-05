@@ -38,35 +38,36 @@
   <hidden>true</hidden>
   <content>= Programação =
 
-== Scripts ==
+== Roteiros ==
 
-=== Scripts 1.0 ===
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Scripts ===
 
-{{info}}Na sintaxe 1.0 da Xwiki era possível inserir códigos em Velocity em qualquer lugar da página. No entanto, isso gerava problemas, como, por exemplo, quando o usuário colocava sem querer algum conteúdo em Velocity. Além disso, essa operação exige uma grande performance para páginas que não apresentam um conteúdo em Velocity. Existem várias limitações técnicas. O mesmo acontece para os scripts em Groovy.{{/info}}
+{{info}}Na sintaxe XWiki 1.0 era possível inserir scripts Velocity em qualquer lugar diretamente na página. Isso pode levar a problemas, por exemplo, quando o usuário entra involuntariamente no conteúdo do Velocity. Também exige desempenho para páginas que não requerem conteúdo do Velocity. Existem várias outras limitações técnicas. O mesmo vale para inserir scripts Groovy.{{/info}}
 
-|=Feature|=Sintaxe Xwiki 1.0
-|Script Velocity |((({{{
-#set ($var = "qualquer coisa")
+|=Recurso|=Sintaxe do XWiki 1.0
+|Script Velocity|((({{{
+#set($var = "tanto faz")
 }}})))
 |Script Groovy|((({{{
 &lt;%
-def var = "qualquer coisa"
+def var = "tanto faz"
 %&gt;
 }}})))
 
-=== Scripts 2.0 ===
+=== 2.0 Scripts ===
 
-{{info}}Na sintaxe 1.0 da Xwiki era possível inserir códigos em Velocity em qualquer lugar da página. No entanto, isso gerava problemas, como, por exemplo, quando o usuário colocava sem querer algum conteúdo em Velocity. Além disso, essa operação exige uma grande performance para páginas que não apresentam um conteúdo em Velocity. Dessa maneira, na Sintaxe {{velocity}}$crtSyntaxVer{{/velocity}} da Xwiki os scripts em Velocity devem ser inseridos usando o macro ##velocity##. O mesmo se aplica ao scripts em Groovy.
+{{info}}XWiki [[suporta diversas linguagens de script&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Scripting/]].{{/info}}
 
-|=Feature|=Sintaxe Xwiki {{velocity}}$crtSyntaxVer{{/velocity}}
+|=Recurso|=Sintaxe do XWiki {{velocity}}$crtSyntaxVer{{/velocity}}
 |Script Velocity|((({{{
 {{velocity}}
-#set ($var = "qualquer coisa")
+#set($var = "tanto faz")
 {{/velocity}}
 }}})))
 |Script Groovy|((({{{
 {{groovy}}
-def var = "qualquer coisa"
+def var = "tanto faz"
 {{/groovy}}
 }}})))</content>
 </xwikidoc>

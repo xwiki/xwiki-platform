@@ -40,7 +40,7 @@
   #getFieldSummary($obj $firstField $firstFieldSummary)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
     <h3>
-      <button type="button" class="btn btn-secondary" title="$escapetool.xml($services.localization.render('core.editors.object.toggleDisplay.tooltip'))">
+      <button type="button" class="btn btn-default btn-xs">
         <span class="sr-only">$escapetool.xml($services.localization.render('core.editors.object.toggleDisplay.tooltip'))</span>
         <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
         #cleanClassname(${class.name}) <span class="editor-objectNumber">${obj.number}</span>#if ($firstField): $firstFieldSummary#end
@@ -157,7 +157,7 @@
       #if ($object)
         <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title">
           <h2>
-            <button type="button" class="btn btn-secondary" title="$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))">
+            <button type="button" class="btn btn-default">
               <span class="sr-only">$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))</span>
               <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
               ${escapetool.xml($class.name)}
@@ -183,7 +183,7 @@
       #set ($objectCount = $objects.size())
       <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title">
         <h2>
-          <button type="button" class="btn btn-secondary" title="$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))">
+          <button type="button" class="btn btn-secondary">
             <span class="sr-only">$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))</span>
             <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
             $services.localization.render('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) 

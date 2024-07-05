@@ -96,7 +96,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 /* XProperty definition */
 .xproperty {
   border: none;
-  margin-top: .5em;
+  margin-top: .1rem;
 }
 
 .xproperty-content {
@@ -131,8 +131,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xproperty-title h3 button {
   padding-bottom: 0;
   padding-top: 0;
-  margin-bottom: 0;
-  margin-top: 0;
 }
 
 /* Default state for the icon representing the property. */
@@ -179,14 +177,21 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xobject-title h3 button,
 .xproperty-title h3 button {
   border: none;
+  margin: 0;
   background: transparent;
   width: 100%;
   text-align: left;
+  /* We overwrite the small font size that is set with btn-xs. */
+  font-size: 1em;
 }
 
 .xclass-title h2 button:hover,
-.xobject .xobject-title h3 button:hover,
-.xproperty .xproperty-title h3 button:hover {
+.xclass-title h2 button:focus,
+.xobject .xobject-title:hover h3 button,
+.xobject .xobject-title:focus-within h3 button,
+.xproperty .xproperty-title:hover h3 button,
+.xproperty .xproperty-title:focus-within h3 button {
+  border: none;
   background-color: $theme.highlightColor;
   color: $theme.textPrimaryColor;
 }
@@ -194,6 +199,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .xclass-title h2 button:active,
 .xobject .xobject-title h3 button:active,
 .xproperty .xproperty-title h3 button:active {
+  border: none;
   box-shadow: none;
 }
 
@@ -252,6 +258,11 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   font-weight: 900;
 }
 
+.xproperty-title .tools {
+  display: inline-flex;
+  align-items: baseline;
+}
+
 .xproperty-title .tools .tool {
   width: 16px;
   height: 16px;
@@ -261,6 +272,7 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
 .xproperty-title .tools .move {
   cursor: move;
   color: $theme.linkColor;
+  margin: 0;
 }
 
 .xproperty-title .tools .delete {

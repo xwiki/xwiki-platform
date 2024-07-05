@@ -61,7 +61,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   <div id="xproperty_${field.name}" class="xproperty #if($field.disabled)disabled#end">
     <div id="xproperty_${field.name}_title" class="xproperty-title ${field.type}">
       <h3>
-        <button type="button" class="btn btn-secondary" title="$escapetool.xml($services.localization.render('core.editors.class.property.toggleDisplay.tooltip'))">
+        <button type="button" class="btn btn-default btn-xs">
           <span class="sr-only">$escapetool.xml($services.localization.render('core.editors.class.property.toggleDisplay.tooltip'))</span>
           <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
           <span class="iconHolder"></span>
@@ -181,7 +181,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
   <div id="xclass_${escapetool.xml($class.name)}" class="xclass">
     <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title">
       <h2>
-        <button type="button" class="btn btn-secondary" title="$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))">
+        <button type="button" class="btn btn-default">
           <span class="sr-only">$escapetool.xml($services.localization.render('core.editors.class.toggleDisplay.tooltip'))</span>
           <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
           ${escapetool.xml($class.name)}

@@ -49,17 +49,16 @@ class PageReadyIT
             // Reduce the timeout to make the test faster.
             testUtils.getDriver().setTimeout(5);
             TimeoutException exception =
-                assertThrows(TimeoutException.class, () -> testUtils.createPage(testReference, """
-                    {{html clean="false"}}
-                    <script>
-                    require(['xwiki-page-ready'], function(pageReady) {
-                      pageReady.delayPageReady(new Promise((resolve, reject) => {
-                        // Intentionally don't resolve or reject the promise to make the pageReady wait fail.
-                      }), 'testing pageReady');
-                    });
-                    </script>
-                    {{/html}}
-                    """));
+                assertThrows(TimeoutException.class, () -> testUtils.createPage(testReference,
+                    "{{html clean=\"false\"}}\n"
+                    + "<script>\n"
+                    + "require(['xwiki-page-ready'], function(pageReady) {\n"
+                    + "  pageReady.delayPageReady(new Promise((resolve, reject) => {\n"
+                    + "    // Intentionally don't resolve or reject the promise to make the pageReady wait fail.\n"
+                    + "  }), 'testing pageReady');\n"
+                    + "});\n"
+                    + "</script>\n"
+                    + "{{/html}}"));
             // Verify that we got the pending delay in the message. We don't care for this test if there were any
             // other pending delays.
             assertThat(exception.getMessage(), containsString("testing pageReady"));

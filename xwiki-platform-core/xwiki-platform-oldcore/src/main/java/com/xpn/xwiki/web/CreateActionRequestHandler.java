@@ -552,7 +552,7 @@ public class CreateActionRequestHandler
      * @return the document reference of the new document to be created, {@code null} if a no document can be created
      *         (because the conditions are not met)
      * @since 16.6.0RC1
-     * @since 16.4.1
+     * @since 16.4.2
      * @since 15.10.12
      */
     @Unstable

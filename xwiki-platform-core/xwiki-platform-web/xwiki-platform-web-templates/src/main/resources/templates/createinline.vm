@@ -113,17 +113,17 @@
 #if("$!exception" != '' && $exception.code == 11018)
 <div class='box errormessage'>
   ## Use the 'invalidNameReference' context binding set by the create action for this case.
-  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidnameError', [$invalidNameReference]))
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidNameError', [$invalidNameReference]))
   #if ($isAjaxRequest)
-    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname.possiblesolutionForLink'))
+    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidName.possibleSolutionForLink'))
   #else
-    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname.possiblesolution'))
+    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidName.possibleSolution'))
   #end
   <br /><br />
   #set ($currentStrategy = $services.modelvalidation.configuration.entityNameValidation)
   #set ($strategyName = $services.localization.render("entitynamevalidation.${currentStrategy}.name"))
   #set ($strategyUsage = $services.localization.render("entitynamevalidation.${currentStrategy}.usage"))
-  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname.strategyInfo',[$strategyName, $strategyUsage]))
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidName.strategyInfo',[$strategyName, $strategyUsage]))
 </div>
   #set ($disableModalConfirmation = true)
 #end

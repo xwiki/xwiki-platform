@@ -49,16 +49,12 @@ define('xwiki-realtime-loader', [
   },
 
   getRTEditorURL = module.getEditorURL = function(href, info) {
-    href = href.replace(/\?(.*)$/, function (all, args) {
-      return '?' + args.split('&').filter(
-        arg => ['editor', 'section', 'force', 'realtime'].indexOf(arg.split('=', 1)[0]) < 0
-      ).join('&');
-    });
-    if (href.indexOf('?') < 0) {
-      href += '?';
-    }
-    href = href + info.href;
-    return href;
+    const currentURL = new URL(href);
+    const baseURL = new URL("?", currentURL).toString();
+    const params = new URLSearchParams(currentURL.search);
+    ['editor', 'section', 'force', 'realtime'].forEach(param => params.delete(param));
+    const hash = info.href.includes('#') ? '' : currentURL.hash;
+    return baseURL + params.toString() + info.href + hash;
   },
 
   allRt = {

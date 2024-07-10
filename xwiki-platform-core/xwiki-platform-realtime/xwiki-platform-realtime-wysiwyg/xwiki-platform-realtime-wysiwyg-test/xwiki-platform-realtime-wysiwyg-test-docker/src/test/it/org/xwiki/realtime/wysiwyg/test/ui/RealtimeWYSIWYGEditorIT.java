@@ -32,6 +32,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WindowType;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
@@ -42,6 +43,7 @@ import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
@@ -758,7 +760,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
     @Test
     @Order(9)
     void reloadEditorsMergeConflictManualSave(TestReference testReference, TestUtils setup,
-        MultiUserTestUtils multiUserSetup)
+        MultiUserTestUtils multiUserSetup) throws Exception
     {
         //
         // First Tab
@@ -766,12 +768,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Start fresh.
         setup.deletePage(testReference);
+        setup.createPage(testReference, "before\n\n[[image:image.gif||width=\"50px\"]]");
+        setup.attachFile(testReference, "image.gif", getClass().getResourceAsStream("/image.gif"), false);
 
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("First");
-        firstEditPage.clickSaveAndContinue();
+        firstTextArea.sendKeys(Keys.END, " first");
 
         //
         // Second Tab
@@ -783,7 +786,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
-        secondTextArea.waitUntilTextContains("First");
+        secondTextArea.waitUntilTextContains("first");
 
         //
         // Third Tab
@@ -793,11 +796,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage thirdEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor thirdEditor = thirdEditPage.getContenEditor();
         RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
-        thirdTextArea.waitUntilTextContains("First");
+        thirdTextArea.waitUntilTextContains("first");
 
         thirdEditPage.leaveRealtimeEditing();
 
-        thirdTextArea.sendKeys(Keys.END, " Third");
+        thirdTextArea.sendKeys(Keys.END, " third");
         thirdEditPage.clickSaveAndContinue();
 
         //
@@ -805,21 +808,30 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondTextArea.sendKeys(Keys.END, " Second");
+        secondTextArea.sendKeys(Keys.END, " second");
         secondEditPage.clickSaveAndContinue(false);
 
         EditConflictModal editConflictModal = new EditConflictModal();
         editConflictModal.makeChoiceAndSubmit(ConflictChoice.RELOAD, false);
 
-        secondTextArea.waitUntilTextContains("Third");
+        secondTextArea.waitUntilTextContains("third");
+        // Verify that the image is still properly rendered.
+        secondTextArea.verifyContent(content -> {
+            WebElement image = content.getImages().get(0);
+            AttachmentReference attachmentReference = new AttachmentReference("image.gif", testReference);
+            assertEquals(setup.getURL(attachmentReference, "download", "width=50&rev=1.1"), image.getAttribute("src"));
+            Dimension imageSize = image.getSize();
+            assertEquals(50, imageSize.width);
+            assertEquals(50, imageSize.height);
+        });
 
         //
         // First tab
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.waitUntilTextContains("Third");
-        assertEquals("First Third", firstTextArea.getText());
+        firstTextArea.waitUntilTextContains("third");
+        assertEquals("before first third", firstTextArea.getText());
     }
 
     @Test

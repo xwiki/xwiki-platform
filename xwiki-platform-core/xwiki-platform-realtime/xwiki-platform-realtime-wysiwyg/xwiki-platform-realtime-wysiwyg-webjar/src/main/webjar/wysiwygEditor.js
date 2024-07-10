@@ -256,13 +256,12 @@ define('xwiki-realtime-wysiwyg', [
             return null;
           }
         },
-        getTextAtCurrentRevision: (revision) => {
+        getTextAtCurrentRevision: () => {
           return $.get(XWiki.currentDocument.getURL('get', $.param({
             xpage:'get',
             outputSyntax:'annotatedhtml',
             outputSyntaxVersion:'5.0',
-            transformations:'macro',
-            rev:revision
+            transformations:'macro'
           })));
         },
         safeCrash: (reason, debugLog) => {

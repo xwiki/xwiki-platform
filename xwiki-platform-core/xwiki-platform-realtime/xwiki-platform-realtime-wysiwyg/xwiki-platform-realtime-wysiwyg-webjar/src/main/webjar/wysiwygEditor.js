@@ -294,19 +294,21 @@ define('xwiki-realtime-wysiwyg', [
       // If no new data (someone has just joined or left the channel), get the latest known values.
       const updatedData = newdata || this._connection.userData;
 
-      const ownerDocument = this._editor.getContentWrapper().ownerDocument;
+      const contentWrapper = this._editor.getContentWrapper();
+      const contentWrapperTop = $(contentWrapper).offset().top;
+      const ownerDocument = contentWrapper.ownerDocument;
       $(ownerDocument).find('.rt-user-position').remove();
       const positions = {};
       this._connection.userList.users.filter(id => updatedData[id]?.['cursor_' + EDITOR_TYPE]).forEach(id => {
         const data = updatedData[id];
         const name = RealtimeEditor._getPrettyName(data.name);
         // Set the user position.
-        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], this._editor.getContentWrapper(), null,
+        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], contentWrapper, null,
           XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         if (!element) {
           return;
         }
-        const top = $(element).position().top;
+        const top = $(element).offset().top - contentWrapperTop;
         if (!positions[top]) {
           positions[top] = [id];
         } else {
@@ -328,7 +330,7 @@ define('xwiki-realtime-wysiwyg', [
           // element, e.g. the BODY element for the standalone edit mode).
           'top': top > 0 ? top + 'px' : ''
         });
-        $(this._editor.getContentWrapper()).after($indicator);
+        $(contentWrapper).after($indicator);
       });
     }
 

@@ -28,6 +28,7 @@ define('entityResourcePicker', [
 ], function($, $resource, $modal, translations) {
   'use strict';
 
+  var createdNodes = {};
   var createTreeElement = function(attributes) {
     return $(document.createElement('div')).attr($.extend({
       'class': 'ckeditor-tree jstree-no-links',
@@ -77,6 +78,38 @@ define('entityResourcePicker', [
         }).on('dblclick', '.jstree-anchor', function(event) {
           if (validateSelection($.jstree.reference(this))) {
             selectButton.click();
+          }
+        }).on('select_node.jstree', function (event, data) {
+          if (data.node.data.type === 'addDocument') {
+            let inst = data.instance;
+            inst.edit(data.node, null, function (node) {
+              // jshint camelcase:false
+              $.jstree.reference(treeElement).deselect_all();
+            });
+          }
+        }).on('xtree.runJob', function (event, promise, action, node, params) {
+          if (action === 'create') {
+            promise.then(function (promiseData) {
+              if (createdNodes[params.id] === undefined) {
+                createdNodes[params.id] = [];
+              }
+              if (promiseData instanceof Array) {
+                createdNodes[params.id].push(promiseData[0]);
+              }
+            });
+          }
+        }).on('refresh_node.jstree', function (event, data) {
+          let parentNodeId = data.node.id;
+          let nodesToCreate = createdNodes[parentNodeId];
+          if ((nodesToCreate || []).length > 0) {
+            let tree = $.jstree.reference(treeElement);
+            // jshint camelcase:false
+            let parentNode = tree.get_node(parentNodeId);
+            for (let i = 0; i < nodesToCreate.length; i++) {
+              let createdNode = nodesToCreate[i];
+              // jshint camelcase:false
+              tree.create_node(parentNode, createdNode, 'last', null);
+            }
           }
         });
       } else if (openToNodeId) {
@@ -196,7 +229,9 @@ define('entityResourcePicker', [
       language: $('html').attr('lang'),
       showAttachments: false,
       showTranslations: false,
-      showWikis: true
+      showWikis: true,
+      showAddDocument: true,
+      readOnly: false
     })),
     attach: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
       outputSyntax: 'plain',
@@ -211,7 +246,8 @@ define('entityResourcePicker', [
       'class': 'entity-resource-picker-modal',
       title: title,
       content: createTreeElement({
-        'data-url': treeURL[resourceType]
+        'data-url': treeURL[resourceType],
+        'data-hasContextMenu': true
       }),
       acceptLabel: translations.get('select')
     });

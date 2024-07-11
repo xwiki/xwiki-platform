@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
@@ -268,6 +269,17 @@ class LiveDataIT
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
+        // Refresh the page and ensure the filter is still there
+        testUtils.getDriver().navigate().refresh();
+        tableLayout.waitUntilReady();
+        liveDataElement.waitUntilReady();
+
+        WebElement isActiveFilter = tableLayout.getFilter(IS_ACTIVE_COLUMN);
+        assertEquals("1", isActiveFilter.getAttribute("value"));
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        suggestInputElement = new SuggestInputElement(isActiveFilter);
         suggestInputElement.clear();
         suggestInputElement.sendKeys(Boolean.FALSE.toString());
         suggestInputElement.waitForSuggestions();

@@ -88,6 +88,7 @@ rendering.macro.children.description=Displays a tree of children pages of the cu
 
 index.documentTree.empty=No pages found
 index.documentTree.more={0} more ...
+index.documentTree.addDocument=New page...
 
 ## Deprecated translation keys
 

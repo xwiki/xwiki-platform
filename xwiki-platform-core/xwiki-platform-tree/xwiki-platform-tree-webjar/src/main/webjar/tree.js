@@ -523,7 +523,7 @@ define([
       }
       params.form_token = formToken;
       var promise = this.jobRunner.run(url, params);
-      this.element.trigger('xtree.runJob', promise);
+      this.element.trigger('xtree.runJob', [promise, action, node, params]);
       return promise;
     }
   };

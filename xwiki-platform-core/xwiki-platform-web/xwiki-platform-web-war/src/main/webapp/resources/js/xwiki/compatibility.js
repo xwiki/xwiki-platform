@@ -240,6 +240,8 @@ Object.extend(XWiki.resource, {
    * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).wiki} instead
    */
   getWikiFromResourceName: function(name) {
+    warn("XWiki.resource.getWikiFromResourceName is deprecated since XWiki 4.2M1. " +
+        "Use XWiki.resource.get(name).wiki instead.");
     if (name.include(XWiki.constants.wikiSpaceSeparator)) {
       return name.substring(0, name.indexOf(XWiki.constants.wikiSpaceSeparator));
     }
@@ -253,6 +255,8 @@ Object.extend(XWiki.resource, {
    * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).space} instead
    */
   getSpaceFromResourceName: function(name) {
+    warn("XWiki.resource.getSpaceFromResourceName is deprecated since XWiki 4.2M1. " +
+        "Use XWiki.resource.get(name).space instead.");
     var originalName = name;
     // Remove wiki if any.
     if (name.include(XWiki.constants.wikiSpaceSeparator)) {
@@ -282,6 +286,8 @@ Object.extend(XWiki.resource, {
    * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).name} instead
    */
   getNameFromResourceName: function(name) {
+    warn("XWiki.resource.getNameFromResourceName is deprecated since XWiki 4.2M1. " +
+        "Use XWiki.resource.get(name).name instead.");
     var originalName = name;
     // Remove wiki if any.
     if (name.include(XWiki.constants.wikiSpaceSeparator)) {
@@ -314,6 +320,8 @@ Object.extend(XWiki.resource, {
    * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).attachment} instead
    */
   getAttachmentFromResourceName: function(name) {
+    warn("XWiki.resource.getAttachmentFromResourceName is deprecated since XWiki 4.2M1. " +
+        "Use XWiki.resource.get(name).attachment instead.");
     if (name.include(XWiki.constants.pageAttachmentSeparator)) {
       return name.substring(name.indexOf(XWiki.constants.pageAttachmentSeparator) + 1, name.length);
     }
@@ -327,6 +335,8 @@ Object.extend(XWiki.resource, {
    * @deprecated since 4.2M1, use {@code XWiki.resource.get(name).anchor} instead
    */
   getAnchorFromResourceName: function(name) {
+    warn("XWiki.resource.getAnchorFromResourceName is deprecated since XWiki 4.2M1. " +
+        "Use XWiki.resource.get(name).anchor instead.");
     if (name.include(XWiki.constants.anchorSeparator)) {
       return name.substring(name.indexOf(XWiki.constants.anchorSeparator) + 1, name.length);
     }

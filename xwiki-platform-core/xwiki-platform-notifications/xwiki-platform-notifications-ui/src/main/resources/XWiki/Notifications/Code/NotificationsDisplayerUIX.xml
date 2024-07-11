@@ -553,7 +553,7 @@ Get the actual notifications.
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
+      <code>
 /***********************************************
  * Notifications Header
  ***********************************************/
@@ -644,7 +644,7 @@ Get the actual notifications.
       <name>LESS</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -784,8 +784,13 @@ Get the actual notifications.
   #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    ## We make sure to use the color theme of the document where this UIX is used.
+    #set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
+    #if ("$!colorTheme" != '')
+    #set ($colorTheme = $services.model.resolveDocument($colorTheme, $doc.documentReference))
+    #end
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro', {'colorTheme': $colorTheme}))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX', {'colorTheme': $colorTheme}))
     {{html clean="false"}} ## We need the clean false to avoid getting a supplementary ul element.
     &lt;li class="notification-uix loading"&gt;&lt;/li&gt;
     {{/html}}

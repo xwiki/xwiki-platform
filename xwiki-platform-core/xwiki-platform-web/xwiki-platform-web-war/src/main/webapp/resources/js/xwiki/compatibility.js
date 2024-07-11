@@ -368,7 +368,36 @@ Object.extend(XWiki.constants, {
    * @deprecated since 4.2M1, your code shouldn't be aware of this separator, use {@code XWiki.Model}
    *             to resolve/serialize entity references
    */
-  pageAttachmentSeparator: "@"
+  pageAttachmentSeparator: "@",
+
+  /**
+   * Extracts the file name from the value of the specified file input.
+   * @deprecated since 16.6.0RC1
+   */
+  extractFileName: function(fileInput) {
+      warn("XWiki.extractFileName is deprecated since 16.6.0RC1.");
+      fileInput = $(fileInput);
+      if (fileInput.files && fileInput.files.length > 0) {
+          // Modern browsers provide additional information about the selected file(s).
+          return fileInput.files[0].name;
+      } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
+          // Most browsers hide the real path for security reasons.
+          return fileInput.value.substr(12);
+      } else {
+          var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
+          if (lastPathSeparatorIndex >= 0) {
+              // Unix-based path.
+              return fileInput.value.substr(lastPathSeparatorIndex + 1);
+          }
+          lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
+          if (lastPathSeparatorIndex >= 0) {
+              // Windows-based path.
+              return fileInput.value.substr(lastPathSeparatorIndex + 1);
+          }
+          // The file input value is just the file name.
+          return fileInput.value;
+      }
+  },
 });
 
 /**

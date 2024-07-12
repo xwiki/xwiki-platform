@@ -24,7 +24,7 @@ import java.util.List;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.script.internal.safe.SafeExtensionPlan;
 import org.xwiki.platform.flavor.internal.job.FlavorSearchStatus;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a FlavorSearchStatus.

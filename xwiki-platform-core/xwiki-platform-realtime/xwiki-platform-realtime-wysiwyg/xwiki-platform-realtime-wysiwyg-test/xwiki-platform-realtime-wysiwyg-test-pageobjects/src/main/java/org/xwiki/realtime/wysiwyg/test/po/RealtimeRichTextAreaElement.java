@@ -58,10 +58,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
             // Wait for the specified coeditor position to be available in the DOM.
             if (wait) {
-                getFromIFrame(() -> {
-                    getDriver().waitUntilCondition(driver -> getContainer());
-                    return null;
-                });
+                getDriver().waitUntilCondition(driver -> getFromEditedContent(this::getContainer));
             }
         }
 
@@ -72,32 +69,30 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
 
         public String getAvatarURL()
         {
-            return getFromIFrame(() -> getContainer().getAttribute("src"));
+            return getFromEditedContent(() -> getContainer().getAttribute("src"));
         }
 
         public String getAvatarHint()
         {
-            return getFromIFrame(() -> getContainer().getAttribute("title"));
+            return getFromEditedContent(() -> getContainer().getAttribute("title"));
         }
 
         public Point getLocation()
         {
-            return getFromIFrame(() -> getContainer().getLocation());
+            return getFromEditedContent(() -> getContainer().getLocation());
         }
 
         public CoeditorPosition waitForLocation(Point point)
         {
-            return getFromIFrame(() -> {
-                getDriver().waitUntilCondition(driver -> {
-                    try {
-                        return getContainer().getLocation().equals(point);
-                    } catch (StaleElementReferenceException e) {
-                        // The coeditor position (caret indicator) can be updated while we're waiting for it.
-                        return false;
-                    }
-                });
-                return this;
-            });
+            getDriver().waitUntilCondition(driver -> getFromEditedContent(() -> {
+                try {
+                    return getContainer().getLocation().equals(point);
+                } catch (StaleElementReferenceException e) {
+                    // The coeditor position (caret indicator) can be updated while we're waiting for it.
+                    return false;
+                }
+            }));
+            return this;
         }
 
         /**
@@ -106,7 +101,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
         @SuppressWarnings("unchecked")
         public boolean isVisible()
         {
-            return getFromIFrame(() -> {
+            return getFromEditedContent(() -> {
                 WebElement root = getDriver().findElementWithoutWaitingWithoutScrolling(By.tagName("html"));
                 int viewportHeight = Integer.parseInt(root.getDomProperty("clientHeight"));
                 int viewportWidth = Integer.parseInt(root.getDomProperty("clientWidth"));
@@ -128,11 +123,12 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     /**
      * Creates a new realtime rich text area element.
      * 
-     * @param iframe the in-line frame used by the realtime rich text area
+     * @param container the element that defines the realtime rich text area
+     * @param wait whether to wait or not for the content to be editable
      */
-    public RealtimeRichTextAreaElement(WebElement iframe)
+    public RealtimeRichTextAreaElement(WebElement container, boolean wait)
     {
-        super(iframe);
+        super(container, wait);
     }
 
     /**
@@ -140,7 +136,7 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
      */
     public List<CoeditorPosition> getCoeditorPositions()
     {
-        return getFromIFrame(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
+        return getFromEditedContent(() -> getDriver().findElementsWithoutWaiting(By.className("rt-user-position")).stream()
             .map(element -> element.getAttribute("id")).map(CoeditorPosition::new).collect(Collectors.toList()));
     }
 

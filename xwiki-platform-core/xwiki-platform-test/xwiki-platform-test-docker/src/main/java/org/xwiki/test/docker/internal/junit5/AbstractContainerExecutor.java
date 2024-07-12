@@ -70,9 +70,10 @@ public abstract class AbstractContainerExecutor
         // Note 1: File mounting is awfully slow on Mac OSX. For example starting Tomcat with XWiki mounted takes
         // 45s+, while doing a COPY first and then starting Tomcat takes 8s (+5s for the copy).
         // Note 2: For the DOOD use case, we also do the copy instead of the volume mounting since that would require
-        // to have the sourceDirectory path mounted from the host and this would put and leave files on the host which
-        // would not work with parallel executions (think about multiple CI jobs executing in parallel on the same host)
-        // and would also not be clean.
+        // to have the sourceDirectory path mounted from the host, and this is not possible since the Jenkins workspace
+        // directory doesn't exist on the host (it's created only inside the agent, i.e. inside the xwiki docker build
+        // container). Even if it were possible, it would prevent being able to have several builds in parallel on the
+        // same host.
         String osName = System.getProperty("os.name").toLowerCase();
         if (isInAContainer() || osName.startsWith("mac os x")) {
             MountableFile mountableDirectory = MountableFile.forHostPath(sourceDirectory);

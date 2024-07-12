@@ -179,9 +179,9 @@ class DefaultLiveDataEntryResourceTest
             this.defaultLiveDataEntryPropertyResource.updateEntry("sourceIdTest", null, "entryIdTest", entry);
         assertEquals(ACCEPTED.getStatusCode(), response.getStatus());
         assertEquals(
-            "{\"links\":[{\"href\":\"http://test.org//liveData/sources/sourceIdTest/entries/sourceIdTest\","
+            "{\"links\":[{\"href\":\"http://test.org/liveData/sources/sourceIdTest/entries/sourceIdTest\","
                 + "\"rel\":\"self\",\"type\":null,\"hrefLang\":null},"
-                + "{\"href\":\"http://test.org//liveData/sources/sourceIdTest/entries\","
+                + "{\"href\":\"http://test.org/liveData/sources/sourceIdTest/entries\","
                 + "\"rel\":\"http://www.xwiki.org/rel/parent\",\"type\":null,\"hrefLang\":null}],\"values\":{}}",
             new ObjectMapper().writeValueAsString(response.getEntity()));
         verify(this.liveDataEntryStore).save(entry.getValues());

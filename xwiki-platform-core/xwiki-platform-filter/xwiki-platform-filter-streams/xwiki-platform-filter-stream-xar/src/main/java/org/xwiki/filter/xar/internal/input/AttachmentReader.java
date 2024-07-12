@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -35,6 +36,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.AbstractInputStreamInputSource;
@@ -160,6 +162,9 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
+    @Inject
+    private Environment environment;
+
     @Override
     public WikiAttachment read(XMLStreamReader xmlReader, XARInputProperties properties)
         throws XMLStreamException, FilterException
@@ -252,7 +257,8 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         // Allocate a temporary file in case the attachment content is big
         File temporaryFile;
         try {
-            temporaryFile = File.createTempFile("xar/attachments/attachment", ".bin");
+            temporaryFile =
+                File.createTempFile("xar/attachments/attachment", ".bin", this.environment.getTemporaryDirectory());
         } catch (IOException e) {
             throw new FilterException(e);
         }

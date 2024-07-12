@@ -23,9 +23,13 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.XWikiResource;
@@ -35,6 +39,9 @@ import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
 import org.xwiki.rest.resources.pages.PageHistoryResource;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 
@@ -45,11 +52,22 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 @Named("org.xwiki.rest.internal.resources.pages.PageHistoryResourceImpl")
 public class PageHistoryResourceImpl extends XWikiResource implements PageHistoryResource
 {
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
     @Override
     public History getPageHistory(String wikiName, String spaceName, String pageName, Integer start, Integer number,
             String order, Boolean withPrettyNames) throws XWikiRestException
     {
         List<String> spaces = parseSpaceSegments(spaceName);
+
+        DocumentReference documentReference = new DocumentReference(wikiName, spaces, pageName);
+        try {
+            this.contextualAuthorizationManager.checkAccess(Right.VIEW, documentReference);
+        } catch (AccessDeniedException e) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
+
         String spaceId = Utils.getLocalSpaceId(spaces);
 
         History history = new History();

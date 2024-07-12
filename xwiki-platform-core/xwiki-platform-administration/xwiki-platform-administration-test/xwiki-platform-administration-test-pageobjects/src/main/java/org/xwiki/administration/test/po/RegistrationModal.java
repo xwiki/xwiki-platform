@@ -38,7 +38,7 @@ public class RegistrationModal extends AbstractRegistrationPage
     public static RegistrationModal gotoPage()
     {
         UsersAdministrationSectionPage sectionPage = UsersAdministrationSectionPage.gotoPage();
-        sectionPage.getUsersLiveTable().waitUntilReady();
+        sectionPage.getUsersLiveData().getTableLayout().waitUntilReady();
         return sectionPage.clickAddNewUser();
     }
 

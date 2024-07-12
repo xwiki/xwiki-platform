@@ -24,7 +24,7 @@
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
   'exclusions': $collectiontool.set,
-  'filters': [],
+  'filters': ['pinnedChildPages'],
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',

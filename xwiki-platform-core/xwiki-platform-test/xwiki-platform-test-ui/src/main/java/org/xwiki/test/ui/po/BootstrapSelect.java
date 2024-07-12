@@ -19,17 +19,18 @@
  */
 package org.xwiki.test.ui.po;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.XWikiWebDriver;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Represent an select field enhanced with the "bootstrap-select" plugin.
@@ -61,6 +62,22 @@ public class BootstrapSelect
         return value != null && !"false".equals(value);
     }
 
+    /**
+     * @return the selected values
+     * @since 16.2.0RC1
+     */
+    public List<String> getSelectedValues()
+    {
+        return this.driver.findElementsWithoutWaiting(this.hiddenSelect, By.tagName("option")).stream()
+            .filter(option -> option.getAttribute("selected") != null).map(option -> {
+                String value = option.getAttribute("value");
+                if (value == null) {
+                    value = option.getText();
+                }
+                return value;
+            }).collect(Collectors.toList());
+    }
+
     public void selectByValue(String value)
     {
         selectByValues(Arrays.asList(value));
@@ -80,23 +97,20 @@ public class BootstrapSelect
         // value.
         for (String value : values) {
             assertFalse(value.contains("\""), "Value must not contain a double quote");
-            WebElement element = this.hiddenSelect.findElement(By.xpath("option[@value = \"" + value + "\"]"));
+            WebElement option = this.hiddenSelect.findElement(By.xpath("option[(boolean(@value) and @value = \"" + value
+                + "\") or (not(boolean(@value)) and . = \"" + value + "\")]"));
 
-            if (element.getAttribute("selected") == null) {
-                valuesToToggle.add(element.getText());
+            if (option.getAttribute("selected") == null) {
+                valuesToToggle.add(option.getText());
             }
         }
 
         if (multipleSelect) {
-            // Find all currently selected elements using a single XPath query to deselect them.
-            for (WebElement element : this.hiddenSelect.findElements(By.xpath("option[@selected = \"selected\"]"))) {
-                String value = element.getAttribute("value");
-
-                // Toggle the selection state if the value should not be selected anymore.
-                if (!values.contains(value)) {
-                    valuesToToggle.add(element.getText());
-                }
-            }
+            // From the currently selected options remove those that we want to keep selected, in order to know which
+            // options have to be deselected.
+            List<String> selectedValues = new ArrayList<>(getSelectedValues());
+            selectedValues.removeAll(values);
+            valuesToToggle.addAll(selectedValues);
         }
 
         // Open the enhanced bootstrap-select widget

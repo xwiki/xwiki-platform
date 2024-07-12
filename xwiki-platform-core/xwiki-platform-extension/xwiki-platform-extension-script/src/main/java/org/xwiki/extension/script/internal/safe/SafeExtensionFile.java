@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.xwiki.extension.ExtensionFile;
-import org.xwiki.script.internal.safe.AbstractSafeObject;
+import org.xwiki.script.safe.AbstractSafeObject;
 
 /**
  * Provide a public script access to an extension file.

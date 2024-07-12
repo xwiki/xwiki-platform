@@ -103,6 +103,7 @@ public class DefaultRecordableEventDescriptorManager implements RecordableEventD
     public RecordableEventDescriptor getDescriptorForEventType(String eventType, boolean allWikis)
             throws EventStreamException
     {
+        // FIXME: We should cache the descriptors for improving perf when calling multiple times this method.
         return getRecordableEventDescriptors(allWikis).stream().filter(descriptor
             -> eventType.equals(descriptor.getEventType())).findAny().orElse(null);
     }

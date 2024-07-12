@@ -304,9 +304,12 @@
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
     &lt;div class="panel panel-default"&gt;
       &lt;a class="panel-heading#if (!$isActive) collapsed#end" id="panel-heading-$escapedId"
-        href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
-        data-target="#panel-body-$escapedId" aria-expanded="$isActive" aria-controls="panel-body-$escapedId"
-        title="$!escapetool.xml($item.description)"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
+      href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
+      data-target="#panel-body-$escapedId" aria-expanded="$isActive" aria-controls="panel-body-$escapedId"
+      title="$!escapetool.xml($item.description)"&gt;
+        &lt;span&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/span&gt;
+        &lt;div&gt;$services.icon.renderHTML('caret-down')&lt;/div&gt;
+      &lt;/a&gt;
       &lt;section class="panel-collapse collapse#if ($isActive) in#end" id="panel-body-$escapedId"
           aria-labelledby="panel-heading-$escapedId"&gt;
         &lt;div class="list-group"&gt;
@@ -888,7 +891,7 @@ require(['jquery'], function($) {
 
 #admin-page-content label &gt; input[type="checkbox"],
 #admin-page-content label &gt; input[type="radio"] {
-  vertical-align: bottom;
+  vertical-align: middle;
 }
 
 /**
@@ -930,7 +933,7 @@ require(['jquery'], function($) {
 /* Override general table styles. */
 /* TODO: Move to livetable.css */
 
-#userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
+#usersandgroupstable td, #alldocstable td {
   border-color: transparent;
 }
 
@@ -967,20 +970,35 @@ require(['jquery'], function($) {
 }
 
 .admin-menu a.panel-heading {
-  display: block;
+  display: flex;
   font-size: 100%;
 }
+
+.admin-menu a.panel-heading span {
+  flex-grow: 1;
+}
+
 .admin-menu a.panel-heading:not(.collapsed) {
   background-color: $theme.menuBackgroundColor;
   color: $theme.menuLinkColor;
 }
+
+/* Rotate the carret on collapse. */
+.admin-menu a.panel-heading.collapsed &gt; *:last-child {
+  transform: rotate(90deg);
+}
+
+.admin-menu a.panel-heading &gt; *:last-child {
+  transition: transform 200ms ease-in-out;
+}
+
 .admin-menu a.panel-heading:active,
 .admin-menu a.panel-heading:focus,
 .admin-menu a.panel-heading:hover {
   text-decoration: none;
 }
 
-.admin-menu .panel-heading &gt; *:first-child {
+.admin-menu .panel-heading &gt; span &gt; *:first-child {
   margin-right: .8em;
 }
 

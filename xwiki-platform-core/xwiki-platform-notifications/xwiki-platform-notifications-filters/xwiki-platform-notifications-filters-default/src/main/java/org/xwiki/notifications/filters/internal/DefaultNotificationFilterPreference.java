@@ -49,11 +49,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     private String filterName;
 
-    private String providerHint;
-
     private boolean enabled;
-
-    private boolean active;
 
     private NotificationFilterType filterType;
 
@@ -105,9 +101,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
         this.id = notificationFilterPreference.getId();
         this.filterName = notificationFilterPreference.getFilterName();
-        this.providerHint = notificationFilterPreference.getProviderHint();
         this.enabled = notificationFilterPreference.isEnabled();
-        this.active = notificationFilterPreference.isActive();
         this.filterType = notificationFilterPreference.getFilterType();
         this.notificationFormats = notificationFilterPreference.getNotificationFormats();
         this.startingDate = notificationFilterPreference.getStartingDate();
@@ -142,7 +136,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setInternalId(long internalId)
     {
         this.internalId = internalId;
-        this.id = String.format("NFP_%d", internalId);
+        this.id = String.format("%s%d", DB_ID_FILTER_PREFIX, internalId);
     }
 
     /**
@@ -170,14 +164,6 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     /**
-     * @param providerHint the name of the provider that have built this preference
-     */
-    public void setProviderHint(String providerHint)
-    {
-        this.providerHint = providerHint;
-    }
-
-    /**
      * @param enabled if the preference is enabled or not
      */
     @Override
@@ -188,10 +174,11 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
 
     /**
      * @param active if the preference is active or not
+     * @deprecated this method is kept only for avoiding issues with hibernate
      */
+    @Deprecated(since = "16.5.0RC1")
     public void setActive(boolean active)
     {
-        this.active = active;
     }
 
     /**
@@ -281,21 +268,9 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     @Override
-    public String getProviderHint()
-    {
-        return providerHint;
-    }
-
-    @Override
     public boolean isEnabled()
     {
         return enabled;
-    }
-
-    @Override
-    public boolean isActive()
-    {
-        return active;
     }
 
     @Override
@@ -429,9 +404,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
                 + ", internalId=" + internalId
                 + ", owner='" + owner + '\''
                 + ", filterName='" + filterName + '\''
-                + ", providerHint='" + providerHint + '\''
                 + ", enabled=" + enabled
-                + ", active=" + active
                 + ", filterType=" + filterType
                 + ", notificationFormats=" + notificationFormats
                 + ", startingDate=" + startingDate
@@ -458,11 +431,9 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         EqualsBuilder equalsBuilder = new EqualsBuilder();
         equalsBuilder.append(internalId, other.internalId)
             .append(enabled, other.enabled)
-            .append(active, other.active)
             .append(id, other.id)
             .append(owner, other.owner)
             .append(filterName, other.filterName)
-            .append(providerHint, other.providerHint)
             .append(filterType, other.filterType)
             .append(notificationFormats, other.notificationFormats)
             .append(startingDate, other.startingDate)
@@ -480,11 +451,9 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
         hashCodeBuilder.append(internalId)
             .append(enabled)
-            .append(active)
             .append(id)
             .append(owner)
             .append(filterName)
-            .append(providerHint)
             .append(filterType)
             .append(notificationFormats)
             .append(startingDate)

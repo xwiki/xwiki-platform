@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -52,7 +53,7 @@ public class DrawerMenu extends BaseElement
 
     public boolean isVisible()
     {
-        return "true".equals(this.activator.getAttribute("aria-expanded"));
+        return this.drawerContainer.isDisplayed();
     }
 
     public boolean show()
@@ -113,6 +114,14 @@ public class DrawerMenu extends BaseElement
     {
         if (visible) {
             getDriver().waitUntilCondition(ExpectedConditions.visibilityOf(this.drawerContainer));
+            // Wait for the x position of the drawer container to be stable.
+            MutableInt x = new MutableInt(this.drawerContainer.getLocation().getX());
+            getDriver().waitUntilCondition(driver -> {
+                int newX = this.drawerContainer.getLocation().getX();
+                boolean isStable = newX == x.intValue();
+                x.setValue(newX);
+                return isStable;
+            });
         } else {
             getDriver().waitUntilCondition(ExpectedConditions.invisibilityOf(this.drawerContainer));
         }

@@ -121,7 +121,8 @@ public class ExtensionInstaller
         List<String> namespaces) throws Exception
     {
         Set<ExtensionId> extensions = new LinkedHashSet<>();
-        String xwikiVersion = this.mavenResolver.getPlatformVersion();
+        String commonsVersion = this.mavenResolver.getCommonsVersion();
+        String platformVersion = this.mavenResolver.getPlatformVersion();
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones), since they're not been installed
         // in WEB-INF/lib.
@@ -129,7 +130,7 @@ public class ExtensionInstaller
             this.testConfiguration.isResolveExtraJARs());
         this.mavenResolver.addCloverJAR(extraArtifacts);
         Collection<ArtifactResult> distributionArtifactResults =
-            this.artifactResolver.getDistributionDependencies(xwikiVersion, extraArtifacts);
+            this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
         List<ExtensionId> distributionExtensionIds = new ArrayList<>();
         for (ArtifactResult artifactResult : distributionArtifactResults) {
             Artifact artifact = artifactResult.getArtifact();

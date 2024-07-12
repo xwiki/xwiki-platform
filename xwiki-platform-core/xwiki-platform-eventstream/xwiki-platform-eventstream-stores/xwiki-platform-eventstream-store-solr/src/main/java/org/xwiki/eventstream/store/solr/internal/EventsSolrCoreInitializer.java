@@ -130,4 +130,10 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
             setStringField(Event.FIELD_REMOTE_OBSERVATION_ID, false, false);
         }
     }
+
+    @Override
+    protected int getMigrationBatchRows()
+    {
+        return 1000;
+    }
 }

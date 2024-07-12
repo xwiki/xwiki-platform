@@ -54,6 +54,7 @@ public class AllIT
         XWikiExecutor executor = executors.get(0);
 
         repositoryUtil = new RepositoryUtils();
+        repositoryUtil.setup();
 
         LOGGER.info("Adding repository to xwiki.properties");
 
@@ -80,6 +81,7 @@ public class AllIT
         // This will not be null if we are in the middle of allTests
         if (repositoryUtil == null) {
             repositoryUtil = new RepositoryUtils();
+            repositoryUtil.setup();
         }
 
         // Initialize extensions and repositories

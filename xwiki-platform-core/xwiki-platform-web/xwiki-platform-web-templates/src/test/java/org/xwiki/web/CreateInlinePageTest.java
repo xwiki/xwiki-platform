@@ -92,7 +92,11 @@ class CreateInlinePageTest extends PageTest
         Document document = Jsoup.parse(this.templateManager.render(CREATE_INLINE_VM));
         Element errormessage = document.getElementsByClass(ERROR_MESSAGE_CLASS).first();
         assertNotNull(errormessage);
-        String expectedMessage = String.format("entitynamevalidation.create.invalidname [%s]", DOCUMENT_REFERENCE);
+        String expectedMessage = String.format("entitynamevalidation.create.invalidNameError [%s] "
+            + "entitynamevalidation.create.invalidName.possibleSolution "
+            + "entitynamevalidation.create.invalidName.strategyInfo "
+            + "[entitynamevalidation.${currentStrategy}.name, entitynamevalidation.${currentStrategy}.usage]",
+            DOCUMENT_REFERENCE);
         assertEquals(expectedMessage, errormessage.text());
     }
 

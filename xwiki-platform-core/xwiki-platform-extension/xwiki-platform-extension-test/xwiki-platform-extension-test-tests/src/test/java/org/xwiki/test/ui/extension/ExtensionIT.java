@@ -210,15 +210,15 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
             + "looking for, you can use the Advanced Search form above.", searchResults.getNoResultsMessage());
 
         // Test a search query with only a few results (only one page).
-        searchResults = searchBar.search("restlet");
+        searchResults = searchBar.search("groovy");
         assertNull(searchResults.getNoResultsMessage());
         assertNull(searchResults.getPagination());
         assertTrue(searchResults.getDisplayedResultsCount() > 1);
 
         ExtensionPane extension = searchResults.getExtension(0);
         assertEquals("core", extension.getStatus());
-        assertTrue("Can't find [restlet] in the name of the extension [" + extension.getId() + "] ("
-            + extension.getName() + ")", extension.getName().toLowerCase().contains("restlet"));
+        assertTrue("Can't find [groovy] in the name of the extension [" + extension.getId() + "] ("
+            + extension.getName() + ")", extension.getName().toLowerCase().contains("groovy"));
     }
 
     /**
@@ -229,15 +229,15 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
     {
         ExtensionAdministrationPage adminPage = ExtensionAdministrationPage.gotoCoreExtensions();
 
-        SearchResultsPane searchResults = adminPage.getSearchBar().search("restlet");
+        SearchResultsPane searchResults = adminPage.getSearchBar().search("groovy");
         String version = searchResults.getExtension(0).getVersion();
 
-        searchResults = new SimpleSearchPane().clickAdvancedSearch().search("org.restlet.jse:org.restlet", version);
+        searchResults = new SimpleSearchPane().clickAdvancedSearch().search("org.apache.groovy:groovy", version);
         assertEquals(1, searchResults.getDisplayedResultsCount());
         assertNull(searchResults.getNoResultsMessage());
         ExtensionPane extension = searchResults.getExtension(0);
         assertEquals("core", extension.getStatus());
-        assertTrue(extension.getName().toLowerCase().contains("restlet"));
+        assertTrue(extension.getName().toLowerCase().contains("groovy"));
         assertEquals(version, extension.getVersion());
 
         searchResults = new SimpleSearchPane().clickAdvancedSearch().search("foo", "bar");

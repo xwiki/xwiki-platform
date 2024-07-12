@@ -1,9 +1,9 @@
-Package: xwiki-solr-all
+Package: [[debian.package]]
 Version: [[version]]
 Section: java
 Priority: optional
 Architecture: all
-Depends: xwiki-solr-core (= [[version]]), xwiki-solr-events (= [[version]]), xwiki-solr-ratings (= [[version]]), xwiki-solr-extension_index (= [[version]])
+Depends: xwiki-solr[[solr.major.version]]-search (= [[version]]), xwiki-solr[[solr.major.version]]-events (= [[version]]), xwiki-solr[[solr.major.version]]-ratings (= [[version]]), xwiki-solr[[solr.major.version]]-extension_index (= [[version]])
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

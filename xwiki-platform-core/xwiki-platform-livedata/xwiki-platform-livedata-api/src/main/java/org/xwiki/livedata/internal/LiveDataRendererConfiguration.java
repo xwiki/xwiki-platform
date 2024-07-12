@@ -184,7 +184,7 @@ public class LiveDataRendererConfiguration
         LiveDataMeta meta = new LiveDataMeta();
         List<LiveDataLayoutDescriptor> layouts = getLayouts(parameters);
         meta.setLayouts(layouts);
-        // If it exists, use the id of the first layout as the default layout. 
+        // If it exists, use the id of the first layout as the default layout.
         Optional.ofNullable(layouts)
             .flatMap(ls -> ls.stream().findFirst().map(BaseDescriptor::getId))
             .ifPresent(meta::setDefaultLayout);

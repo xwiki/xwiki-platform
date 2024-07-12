@@ -24,461 +24,460 @@ define('xwiki-realtime-saver', [
   'xwiki-realtime-crypto',
   'xwiki-meta',
   'xwiki-realtime-document',
-  'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-errorBox'
-], /* jshint maxparams:false */ function($, chainpadNetflux, jsonSortify, Crypto, xwikiMeta, doc, Messages, ErrorBox) {
+], function(
+  /* jshint maxparams:false */
+  $, ChainPadNetflux, jsonSortify, Crypto, xwikiMeta, doc, ErrorBox
+) {
   'use strict';
 
-  var warn = function() {
-    console.log.apply(console, arguments);
-  }, debug = function() {
-    console.log.apply(console, arguments);
-  }, verbose = function() {};
+  function warn(...args) {
+    console.warn(...args);
+  }
 
-  var SAVE_DOC_TIME = 60000,
-    // How often to check if the document has been saved recently.
-    SAVE_DOC_CHECK_CYCLE = 20000;
+  function debug(...args) {
+    console.debug(...args);
+  }
 
-  var now = function() {
+  function verbose() {
+    // Do nothing for now.
+  }
+
+  const SAVE_DOC_TIME = 60000;
+  // How often to check if the document has been saved recently.
+  const SAVE_DOC_CHECK_CYCLE = 20000;
+
+  function now() {
     return new Date().getTime();
-  };
+  }
 
-  var Saver = {};
+  /**
+   * Clients check for remote changes on random intervals. If another client has saved outside of the realtime session,
+   * changes are merged on the server using XWiki's three-way merge algorithm. The changes are integrated into the local
+   * textarea, which replicates across realtime sessions. If the resulting state does not match the last saved content,
+   * then the contents are saved as a new version. Other members of the session are notified of the save, and the
+   * resulting new version. They then update their local state to match. During this process, a series of checks are
+   * made to reduce the number of unnecessary saves, as well as the number of unnecessary merges.
+   */
+  class Saver {
+    constructor(config) {
+      this._startInitializing();
+      this._revertList = [];
 
-  var mainConfig = Saver.mainConfig = {};
+      this._config = {
+        formId: 'edit',
+        safeCrash: warn
+      };
 
-  // Contains the realtime data.
-  var rtData = {};
+      // Contains the realtime data.
+      this._rtData = {};
+      this._revertList.push(() => {
+        this._rtData = {};
+      });
 
-  var lastSaved = window.lastSaved = Saver.lastSaved = {
-    content: '',
-    time: 0,
-    // http://jira.xwiki.org/browse/RTWIKI-37
-    hasModifications: false,
-    // For future tracking of 'edited since last save'. Only show the merge dialog to those who have edited.
-    wasEditedLocally: false,
-    receivedISAVE: false,
-    shouldRedirect: false,
-    isavedSignature: '',
-    mergeMessage: function() {}
-  },
+      this._lastSaved = {
+        content: '',
+        time: now(),
+        // http://jira.xwiki.org/browse/RTWIKI-37
+        hasModifications: false,
+        // For future tracking of 'edited since last save'. Only show the merge dialog to those who have edited.
+        wasEditedLocally: false,
+        receivedISAVE: false,
+        shouldRedirect: false,
+        isavedSignature: '',
+        mergeMessage: () => {}
+      };
 
-  configure = Saver.configure = function(config) {
-    $.extend(mainConfig, config, {
-      safeCrash: function(reason) {
-        warn(reason);
-      }
-    });
-    $.extend(lastSaved, {
-      version: doc.version,
-      time: doc.modified
-    });
-  },
+      this._configure(config);
 
-  updateLastSaved = Saver.update = function(content) {
-    $.extend(lastSaved, {
-      time: now(),
-      content: content,
-      wasEditedLocally: false
-    });
-  },
-
-  isaveInterrupt = Saver.interrupt = function() {
-    if (lastSaved.receivedISAVE) {
-      warn("Another client sent an ISAVED message.");
-      warn("Aborting save action.");
-      // Unset the flag, or else it will persist.
-      lastSaved.receivedISAVE = false;
-      // Return true such that calling functions know to abort.
-      return true;
-    }
-    return false;
-  },
-
-  bumpVersion = function(callback, versionData) {
-    var success = function(doc) {
-      debug('Triggering lastSaved refresh on remote clients.');
-      lastSaved.version = doc.version;
-      lastSaved.content = doc.content;
-      /* jshint camelcase:false */
-      var contentHash = (mainConfig.chainpad && mainConfig.chainpad.hex_sha256 &&
-        mainConfig.chainpad.hex_sha256(doc.content)) || '';
-      saveMessage(lastSaved.version, contentHash);
-      if (typeof callback === 'function') {
-        callback(doc);
-      }
-    };
-    if (versionData) {
-      success(versionData);
-    } else {
-      doc.reload().then(success).catch(error => {
-        var debugLog = {
-          state: 'bumpVersion',
-          lastSavedVersion: lastSaved.version,
-          lastSavedContent: lastSaved.content,
-          cUser: mainConfig.userName,
-          cContent: mainConfig.getTextValue()
-        };
-        mainConfig.safeCrash('updateversion', JSON.stringify(debugLog));
-        warn(error);
+      this._realtimeInput = ChainPadNetflux.start(this._getRealtimeConfig());
+      this._revertList.push(() => {
+        this._realtimeInput?.stop();
+        delete this._realtimeInput;
       });
     }
-  },
 
-  // http://jira.xwiki.org/browse/RTWIKI-29
-  saveDocument = function(data) {
-    return doc.save($.extend({
-      // TODO make this translatable
-      comment: 'Auto-Saved by Realtime Session'
-    }, data)).catch(response => {
-      var debugLog = {
-        state: 'saveDocument',
-        lastSavedVersion: lastSaved.version,
-        lastSavedContent: lastSaved.content,
-        cUser: mainConfig.userName,
-        cContent: mainConfig.getTextValue(),
-        err: response.statusText
-      };
-      ErrorBox.show('save', JSON.stringify(debugLog));
-      warn(response.statusText);
-      return Promise.reject();
-    });
-  },
+    _startInitializing() {
+      this._initializing = new Promise(resolve => {
+        this._notifyReady = () => {
+          // Mark the Saver as ready right away (rather than using a promise callback which would be called on the next
+          // tick), to be visible to the code executed right after _notifyReady is called.
+          this._initializing = false;
+          resolve();
+        };
+      });
+    }
 
-  // sends an ISAVED message
-  saveMessage = function(version, hash) {
-    var newState = {
-      version: version,
-      by: mainConfig.userName,
-      hash: hash,
-      editorName: mainConfig.editorName
-    };
-    rtData[mainConfig.editorType] = newState;
-    mainConfig.onLocal();
-
-    mainConfig.chainpad.onSettle(function() {
-      if (typeof lastSaved.onReceiveOwnIsave === 'function') {
-        lastSaved.onReceiveOwnIsave();
+    async toBeReady() {
+      if (this._initializing) {
+        await this._initializing;
       }
-    });
-  },
-
-  destroyDialog = Saver.destroyDialog = function(callback) {
-    var $box = $('.xdialog-box.xdialog-box-confirmation'),
-      $content = $box.find('.xdialog-content');
-    if ($box.length) {
-      $content.find('.button.cancel').click();
+      return this;
     }
-    if (typeof callback === 'function') {
-      callback(!!$box.length);
+
+    _configure(config) {
+      $.extend(this._config, config);
+      $.extend(this._lastSaved, {
+        version: doc.version,
+        time: doc.modified
+      });
     }
-  },
 
-  // Only used within Saver.create().
-  redirectToView = function() {
-    window.location.href = window.XWiki.currentDocument.getURL('view');
-  },
+    _interrupt() {
+      if (this._lastSaved.receivedISAVE) {
+        debug("Another client sent an ISAVED message.");
+        debug("Aborting save action.");
+        // Unset the flag, or else it will persist.
+        this._lastSaved.receivedISAVE = false;
+        // Return true such that calling functions know to abort.
+        return true;
+      }
+      return false;
+    }
 
-  // Have rtwiki call this on local edits.
-  setLocalEditFlag = Saver.setLocalEditFlag = function(condition) {
-    lastSaved.wasEditedLocally = condition;
-  },
+    _update(content) {
+      $.extend(this._lastSaved, {
+        time: now(),
+        content,
+        wasEditedLocally: false
+      });
+    }
 
-  onMessage = function(data) {
-    // Set a flag so any concurrent processes know to abort.
-    lastSaved.receivedISAVE = true;
+    destroyDialog(callback) {
+      const $box = $('.xdialog-box.xdialog-box-confirmation'),
+        $content = $box.find('.xdialog-content');
+      if ($box.length) {
+        $content.find('.button.cancel').click();
+      }
+      if (typeof callback === 'function') {
+        callback(!!$box.length);
+      }
+    }
 
-    // RT_event-on_isave_receive
-    //
-    // Clients update lastSaved.version when they perform a save, then they send an ISAVED with the version. A single
-    // user might have multiple windows open, for some reason, but might still have different save cycles. Checking
-    // whether the received version matches the local version tells us whether the ISAVED was set by our *browser*. If
-    // not, we should treat it as foreign.
+    /**
+     * Realtime editors should call this on local edits.
+     *
+     * @param {boolean} wasEditedLocally {@code true} if the content was edited locally since the last save,
+     *   {@code false} otherwise
+     */
+    setLocalEditFlag(wasEditedLocally) {
+      this._lastSaved.wasEditedLocally = wasEditedLocally;
+    }
 
-    var newSave = function(type, msg) {
-      var msgSender = msg.by;
-      var msgVersion = msg.version;
-      var msgEditor = type;
-      var msgEditorName = msg.editorName;
+    getLocalEditFlag() {
+      return this._lastSaved.wasEditedLocally;
+    }
 
-      var displaySaverName = function(isMerged) {
-        // A merge dialog might be open, if so, remove it and say as much.
-        destroyDialog(function(dialogDestroyed) {
-          if (dialogDestroyed) {
-            // Tell the user about the merge resolution.
-            lastSaved.mergeMessage('conflictResolved', [msgVersion]);
-          } else if (!mainConfig.initializing) {
-            var sender;
-            // Otherwise say there was a remote save.
-            // http://jira.xwiki.org/browse/RTWIKI-34
-            if (mainConfig.userList) {
-              sender = msgSender.replace(/^.*-([^-]*)%2d[0-9]*$/, function(all, one) {
-                return decodeURIComponent(one);
-              });
-            }
-            if (isMerged) {
-              lastSaved.mergeMessage('savedRemote', [msgVersion, sender]);
-            } else {
-              lastSaved.mergeMessage('savedRemoteNoMerge', [msgVersion, sender, msgEditorName]);
-            }
-          }
-        });
+    _bumpVersion(callback, versionData) {
+      const success = (doc) => {
+        debug('Triggering lastSaved refresh on remote clients.');
+        this._lastSaved.version = doc.version;
+        this._lastSaved.content = doc.content;
+        /* jshint camelcase:false */
+        const contentHash = this._chainpad.hex_sha256?.(doc.content) || '';
+        this._saveMessage(this._lastSaved.version, contentHash);
+        if (typeof callback === 'function') {
+          callback(doc);
+        }
       };
+      if (versionData) {
+        success(versionData);
+      } else {
+        doc.reload().then(success).catch(error => {
+          const debugLog = {
+            state: 'bumpVersion',
+            lastSavedVersion: this._lastSaved.version,
+            lastSavedContent: this._lastSaved.content,
+            cUser: this._config.userName,
+            cContent: this._config.getTextValue()
+          };
+          this._config.safeCrash('updateversion', JSON.stringify(debugLog));
+          warn(error);
+        });
+      }
+    }
 
-      if (msgEditor === mainConfig.editorType) {
-        if (lastSaved.version !== msgVersion) {
-          displaySaverName(true);
+    /**
+     * Sends an ISAVED message.
+     */
+    _saveMessage(version, hash) {
+      const newState = {
+        version: version,
+        by: this._config.userName,
+        hash: hash,
+        editorName: this._config.editorName
+      };
+      this._rtData[this._config.editorType] = newState;
+      this._onLocal();
 
-          if (!mainConfig.initializing) {
+      this._chainpad.onSettle(() => {
+        this._lastSaved.onReceiveOwnIsave?.();
+      });
+    }
+
+    /**
+     * Only used within Saver.create().
+     */
+    static _redirectToView() {
+      window.location.href = window.XWiki.currentDocument.getURL('view');
+    }
+
+    _onMessage(data) {
+      // Set a flag so any concurrent processes know to abort.
+      this._lastSaved.receivedISAVE = true;
+
+      // If the channel data is empty, do nothing (initial call in onReady).
+      if (Object.keys(data).length === 0) {
+        return;
+      }
+      for (let editor in data) {
+        if (typeof data[editor] !== "object" || Object.keys(data[editor]).length !== 4) {
+          // Corrupted data.
+          continue;
+        }
+        if (this._rtData[editor] && jsonSortify(this._rtData[editor]) === jsonSortify(data[editor])) {
+          // No change.
+          continue;
+        }
+        this._onNewSave(editor, data[editor]);
+        xwikiMeta.refreshVersion();
+      }
+      this._rtData = data;
+
+      return false;
+    }
+
+    /**
+     * Called when we receive an ISAVED message.
+     *
+     * Clients update lastSaved.version when they perform a save, then they send an ISAVED with the version. A single
+     * user might have multiple windows open, for some reason, but might still have different save cycles. Checking
+     * whether the received version matches the local version tells us whether the ISAVED was set by our *browser*. If
+     * not, we should treat it as foreign.
+     *
+     * @param {string} type the editor type
+     * @param {Object} message the received ISAVED message, holding information about the save
+     */
+    _onNewSave(editorType, message) {
+      if (editorType === this._config.editorType) {
+        if (this._lastSaved.version !== message.version) {
+          this._displaySaverName(message, true);
+
+          if (!this._initializing) {
             debug('A remote client saved and incremented the latest common ancestor.');
           }
 
           // Update lastSaved attributes.
-          lastSaved.wasEditedLocally = false;
+          this._lastSaved.wasEditedLocally = false;
 
           // Update the local latest common ancestor version string.
-          lastSaved.version = msgVersion;
+          this._lastSaved.version = message.version;
 
           // Remember the state of the textArea when last saved so that we can avoid additional minor versions. There's
           // a *tiny* race condition here but it's probably not an issue.
-          lastSaved.content = mainConfig.getTextValue();
+          this._lastSaved.content = this._config.getTextValue();
 
           // Update the document meta in order to ensure proper merge on save (when using the form action buttons).
           doc.update({
-            version: lastSaved.version,
+            version: this._lastSaved.version,
             modified: now(),
             isNew: false
           });
-        } else if (typeof lastSaved.onReceiveOwnIsave === 'function') {
-          lastSaved.onReceiveOwnIsave();
+        } else {
+          this._lastSaved.onReceiveOwnIsave?.();
         }
-        lastSaved.time = now();
+        this._lastSaved.time = now();
       } else {
-        displaySaverName(false);
+        this._displaySaverName(message, false);
       }
-    };
-
-    // If the channel data is empty, do nothing (initial call in onReady).
-    if (Object.keys(data).length === 0) {
-      return;
     }
-    for (var editor in data) {
-      if (typeof data[editor] !== "object" || Object.keys(data[editor]).length !== 4) {
-        // Corrupted data.
-        continue;
-      }
-      if (rtData[editor] && jsonSortify(rtData[editor]) === jsonSortify(data[editor])) {
-        // No change.
-        continue;
-      }
-      newSave(editor, data[editor]);
-      xwikiMeta.refreshVersion();
+
+    _displaySaverName(message, isMerged) {
+      // A merge dialog might be open, if so, remove it and say as much.
+      this.destroyDialog(dialogDestroyed => {
+        if (dialogDestroyed) {
+          // Tell the user about the merge resolution.
+          this._lastSaved.mergeMessage('conflictResolved', [message.version]);
+        } else if (!this._initializing) {
+          let sender;
+          // Otherwise say there was a remote save.
+          // http://jira.xwiki.org/browse/RTWIKI-34
+          if (this._config.userList) {
+            sender = message.by.replace(/^.*-([^-]*)%2d\d*$/, function(all, one) {
+              return decodeURIComponent(one);
+            });
+          }
+          if (isMerged) {
+            this._lastSaved.mergeMessage('savedRemote', [message.version, sender]);
+          } else {
+            this._lastSaved.mergeMessage('savedRemoteNoMerge', [message.version, sender, message.editorName]);
+          }
+        }
+      });
     }
-    rtData = data;
 
-    return false;
-  };
+    /**
+     * Stop the autosaver / merge when the user disallows realtime or when the WebSocket is disconnected.
+     */
+    stop() {
+      this._revertList.forEach(revert => revert());
+    }
 
-  /**
-   * This contains some of the more complicated logic in this script. Clients check for remote changes on random
-   * intervals. If another client has saved outside of the realtime session, changes are merged on the server using
-   * XWiki's threeway merge algo. The changes are integrated into the local textarea, which replicates across realtime
-   * sessions. If the resulting state does not match the last saved content, then the contents are saved as a new
-   * version. Other members of the session are notified of the save, and the resulting new version. They then update
-   * their local state to match. During this process, a series of checks are made to reduce the number of unnecessary
-   * saves, as well as the number of unnecessary merges.
-   */
-  Saver.create = function(config) {
-    $.extend(mainConfig, config);
-    mainConfig.formId = mainConfig.formId || 'edit';
-    var netfluxNetwork = config.network;
-    var channel = config.channel;
+    setLastSavedContent(content) {
+      this._lastSaved.content = content;
+    }
 
-    lastSaved.time = now();
+    _onRemote(info) {
+      if (this._initializing) {
+        return;
+      }
 
-    var onOpen = function(chan) {
+      try {
+        const data = JSON.parse(this._chainpad.getUserDoc());
+        this._onMessage(data);
+      } catch (e) {
+        warn("Unable to parse realtime data from the saver.", e);
+      }
+    }
 
+    _onReady(info) {
+      this._chainpad = info.realtime;
+      this._notifyReady();
+      this._onRemote();
+      this._onOpen();
+    }
+
+    _onLocal(info) {
+      if (this._initializing) {
+        return;
+      }
+      const sjson = jsonSortify(this._rtData);
+      this._chainpad.contentUpdate(sjson);
+      if (this._chainpad.getUserDoc() !== sjson) {
+        warn("Saver: userDoc !== sjson");
+      }
+    }
+
+    _getRealtimeConfig() {
+      return {
+        initialState: '{}',
+        network: this._config.network,
+        userName: this._config.userName || '',
+        channel: this._config.channel,
+        crypto: Crypto,
+  
+        onRemote: this._onRemote.bind(this),
+        onReady: this._onReady.bind(this),
+        onLocal: this._onLocal.bind(this),
+        onAbort: this.stop.bind(this)
+      };
+    }
+
+    _onOpen() {
       // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
-      $('[name="action_preview"]').remove();
+      $('[name="action_preview"]').hide();
+      this._revertList.push(() => {
+        $('[name="action_preview"]').show();
+      });
 
       // Wait to get saved event.
-      const onSavedHandler = mainConfig.onSaved = function(event) {
-        // This means your save has worked. Cache the last version.
-        const lastVersion = lastSaved.version;
-        const toSave = mainConfig.getTextValue();
-        // Update your content.
-        updateLastSaved(toSave);
-
-        doc.reload().then(doc => {
-          lastSaved.onReceiveOwnIsave = function() {
-            // Once you get your isaved back, redirect.
-            debug("lastSaved.shouldRedirect " + lastSaved.shouldRedirect);
-            if (lastSaved.shouldRedirect) {
-              debug('Saver.create.saveandview.receivedOwnIsaved');
-              debug("redirecting!");
-              redirectToView();
-            } else {
-              debug('Saver.create.saveandcontinue.receivedOwnIsaved');
-            }
-            // Clean up after yourself..
-            lastSaved.onReceiveOwnIsave = null;
-          };
-          // Bump the version, fire your isaved.
-          bumpVersion(function(doc) {
-            if (doc.version === '1.1') {
-              debug('Created document version 1.1');
-            } else {
-              debug(`Version bumped from ${lastVersion} to ${doc.version}.`);
-            }
-            lastSaved.mergeMessage('saved', [doc.version]);
-          }, doc);
-        }).catch(error => {
-          warn(error);
-          ErrorBox.show('save');
-        });
-
-        return true;
-      };
-      $(document).on('xwiki:document:saved.realtime-saver', onSavedHandler);
-
-      var onSaveFailedHandler = mainConfig.onSaveFailed = function(ev) {
-        var debugLog = {
-          state: 'savedFailed',
-          lastSavedVersion: lastSaved.version,
-          lastSavedContent: lastSaved.content,
-          cUser: mainConfig.userName,
-          cContent: mainConfig.getTextValue()
-        };
-        if (ev.memo.response.status == 409) {
-         console.log("XWiki conflict system detected. No RT error box should be shown");
-        } else {
-         ErrorBox.show('save', JSON.stringify(debugLog));
-         warn("save failed!!!");
-         console.log(ev);
-        }
-      };
-
-      // TimeOut
-      var check = function() {
-        lastSaved.receivedISAVE = false;
-
-        const toSave = mainConfig.getTextValue();
-        if (toSave === null) {
-          warn("Unable to get the content of the document. Don't save.");
-          return;
-        }
-
-        if (lastSaved.content === toSave) {
-          verbose("No changes made since last save. Avoiding unnecessary commits.");
-          return;
-        }
-
-        clearTimeout(mainConfig.autosaveTimeout);
-        verbose("Saver.create.check");
-        var periodDuration = Math.random() * SAVE_DOC_CHECK_CYCLE;
-        mainConfig.autosaveTimeout = setTimeout(check, periodDuration);
-
-        verbose(`Will attempt to save again in ${periodDuration} ms.`);
-        if (!lastSaved.wasEditedLocally || now() - lastSaved.time < SAVE_DOC_TIME) {
-          verbose("!lastSaved.wasEditedLocally || (Now - lastSaved.time) < SAVE_DOC_TIME");
-          return;
-        }
-
-        // The merge conflict modal is displayed after clicking on the save button when there is a merge conflict.
-        // Clicking the save button again would reopen the same modal and reset the fields the user did not submit yet.
-        if (!$('#previewDiffModal').is(':visible')) {
-          $(`#${config.formId} [name="action_saveandcontinue"]`).click();
-        }
-      };
+      const saveHandler = this._onSavedHandler.bind(this);
+      $(document).on('xwiki:document:saved.realtime-saver', saveHandler);
+      this._revertList.push(() => {
+        $(document).off('xwiki:document:saved.realtime-saver', saveHandler);
+      });
 
       // Prevent the save buttons from reloading the page. Instead, reset the editor's content.
-      var overrideAjaxSaveAndContinue = function() {
-        var originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
-        $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {
-          reloadEditor: function() {
-            // TODO: Handle the page title.
-            mainConfig.getTextAtCurrentRevision().then((data) => {mainConfig.setTextValue(data);});
-          }
+      const originalReloadEditor = XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor;
+      const reloadEditor = XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor = () => {
+        // TODO: Handle the page title.
+        this._config.getTextAtCurrentRevision().then((data) => {
+          this._config.setTextValue(data);
         });
       };
-
-      overrideAjaxSaveAndContinue();
-      check();
-    };
-
-    var module = window.SAVER_MODULE = {};
-    mainConfig.initializing = true;
-
-    var rtConfig = {
-      initialState: '{}',
-      network: netfluxNetwork,
-      userName: mainConfig.userName || '',
-      channel: channel,
-      crypto: Crypto,
-
-      onRemote: function(info) {
-        if (mainConfig.initializing) {
-          return;
+      this._revertList.push(() => {
+        // Revert only if the reloadEditor method has not been overridden by another script.
+        if (XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor === reloadEditor) {
+          XWiki.actionButtons.AjaxSaveAndContinue.prototype.reloadEditor = originalReloadEditor;
         }
+      });
 
-        try {
-          var data = JSON.parse(module.chainpad.getUserDoc());
-          onMessage(data);
-        } catch (e) {
-          warn("Unable to parse realtime data from the saver", e);
-        }
-      },
+      this._check();
+      this._revertList.push(() => {
+        clearTimeout(this._autosaveTimeout);
+      });
+    }
 
-      onReady: function(info) {
-        module.chainpad = mainConfig.chainpad = info.realtime;
-        module.leave = mainConfig.leaveChannel = info.leave;
-        try {
-          var data = JSON.parse(module.chainpad.getUserDoc());
-          onMessage(data);
-        } catch (e) {
-          warn("Unable to parse realtime data from the saver", e);
-        }
-        mainConfig.initializing = false;
-        onOpen();
-      },
+    _onSavedHandler() {
+      // This means your save has worked. Cache the last version.
+      const lastVersion = this._lastSaved.version;
+      const toSave = this._config.getTextValue();
+      // Update your content.
+      this._update(toSave);
 
-      onLocal: function(info) {
-        if (mainConfig.initializing) {
-          return;
-        }
-        var sjson = jsonSortify(rtData);
-        module.chainpad.contentUpdate(sjson);
-        if (module.chainpad.getUserDoc() !== sjson) {
-          warn("Saver: userDoc !== sjson");
-        }
-      },
+      doc.reload().then(doc => {
+        this._lastSaved.onReceiveOwnIsave = () => {
+          // Once you get your ISAVED back, redirect.
+          debug("lastSaved.shouldRedirect " + this._lastSaved.shouldRedirect);
+          if (this._lastSaved.shouldRedirect) {
+            debug('Saver.create.saveandview.receivedOwnIsaved');
+            debug("redirecting!");
+            Saver._redirectToView();
+          } else {
+            debug('Saver.create.saveandcontinue.receivedOwnIsaved');
+          }
+          // Clean up after yourself.
+          delete this._lastSaved.onReceiveOwnIsave;
+        };
+        // Bump the version, fire your ISAVED.
+        this._bumpVersion(doc => {
+          if (doc.version === '1.1') {
+            debug('Created document version 1.1');
+          } else {
+            debug(`Version bumped from ${lastVersion} to ${doc.version}.`);
+          }
+          this._lastSaved.mergeMessage('saved', [doc.version]);
+        }, doc);
+      }).catch(error => {
+        warn(error);
+        ErrorBox.show('save');
+      });
 
-      onAbort: function() {
-        Saver.stop();
+      return true;
+    }
+
+    _check() {
+      // Schedule the next check before doing anything else, otherwise we stop the autosave.
+      clearTimeout(this._autosaveTimeout);
+      verbose("Saver.create.check");
+      const periodDuration = Math.random() * SAVE_DOC_CHECK_CYCLE;
+      this._autosaveTimeout = setTimeout(this._check.bind(this), periodDuration);
+      verbose(`Will attempt to save again in ${periodDuration} ms.`);
+
+      let toSave;
+      if (!this._lastSaved.wasEditedLocally || (toSave = this._config.getTextValue()) === this._lastSaved.content) {
+        verbose("No changes made since last save. Avoiding unnecessary commits.");
+        return;
       }
-    };
 
-    mainConfig.onLocal = rtConfig.onLocal;
+      if (toSave === null) {
+        warn("Unable to get the edited content. Can't save.");
+        return;
+      }
 
-    chainpadNetflux.start(rtConfig);
-  }; // END Saver.create()
+      if (now() - this._lastSaved.time < SAVE_DOC_TIME) {
+        verbose("Local changes detected, but not enough time has passed since the last check.");
+        return;
+      }
 
-  // Stop the autosaver / merge when the user disallows realtime or when the WebSocket is disconnected.
-  Saver.stop = function() {
-    if (mainConfig.realtime) {
-      mainConfig.realtime.abort();
+      // The merge conflict modal is displayed after clicking on the save button when there is a merge conflict.
+      // Clicking the save button again would reopen the same modal and reset the fields the user did not submit yet.
+      // We don't save if another user has saved since the last time we checked.
+      if (!$('#previewDiffModal').is(':visible') && !this._interrupt()) {
+        $(`#${this._config.formId} [name="action_saveandcontinue"]`).click();
+      }
     }
-    if (mainConfig.leaveChannel) {
-      mainConfig.leaveChannel();
-      delete mainConfig.leaveChannel;
-    }
-    clearTimeout(mainConfig.autosaveTimeout);
-    rtData = {};
-  };
-
-  Saver.setLastSavedContent = function(content) {
-    lastSaved.content = content;
-  };
+  }
 
   return Saver;
 });

@@ -82,7 +82,7 @@
               // reset the dirty flag and the moment we leave the edit mode, which will trigger the leave confirmation,
               // unexpectedly. In order to overcome this we have to force the editor to lose focus immediately if the
               // focus manager has a blur timer started (meaning that a blur is scheduled).
-              if (editor.focusManager?.hasFocus && editor.focusManager?._?.timer) {
+              if (!editor.isDetached() && editor.focusManager?.hasFocus && editor.focusManager?._?.timer) {
                 editor.focusManager.blur(true);
               }
               editor.resetDirty();

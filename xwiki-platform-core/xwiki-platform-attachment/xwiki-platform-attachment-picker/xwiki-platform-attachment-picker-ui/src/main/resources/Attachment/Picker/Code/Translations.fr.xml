@@ -38,5 +38,7 @@
   <hidden>true</hidden>
   <content>attachment.picker.ckeditor.pluginsImageSelector.title=Galerie
 attachment.picker.searchField.placeholder=Recherche...
+attachment.picker.searchField.scope.currentPage=Page Courante
+attachment.picker.searchField.scope.allPages=Toutes les Pages
 </content>
 </xwikidoc>

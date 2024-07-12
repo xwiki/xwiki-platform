@@ -60,10 +60,10 @@
 ## If the Rights Manager Plugin is not enabled, then return an empty JSON result.
 #if ("$!usersService" != '')
   ## The live table offset starts from 1 so we need to subtract 1.
-  #if ($request.wiki == 'local')
+  #if ($request.wiki == 'local' || $request.scope == 'local')
     #set ($users = $usersService.getAllMatchedLocalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
     #set ($countUsers = $usersService.countAllMatchedLocalUsers($filterMap))
-  #elseif ($request.wiki == 'global')
+  #elseif ($request.wiki == 'global' || $request.scope == 'global')
     #set ($users = $usersService.getAllMatchedGlobalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
     #set ($countUsers = $usersService.countAllMatchedGlobalUsers($filterMap))
   #else

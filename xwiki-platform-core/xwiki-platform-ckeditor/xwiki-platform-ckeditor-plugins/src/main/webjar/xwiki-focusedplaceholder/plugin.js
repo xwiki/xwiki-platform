@@ -149,8 +149,8 @@
        * @return the element that holds the caret and is empty, or undefined if no such element is present
        */
       function getFocusedEmptyBlock(editor) {
-        const selection = editor.getSelection();
-        if (selection?.isCollapsed() && editor.focusManager.hasFocus) {
+        const selection = !editor.isDetached() && editor.getSelection();
+        if (selection?.isCollapsed?.() && editor.focusManager.hasFocus) {
           const container = selection.getRanges()[0].startContainer;
           // Check first if the container itself is empty, in order to reduce the computations, since this method is
           // called whenever the user types (and most of the time the caret is inside a text node that is not empty).

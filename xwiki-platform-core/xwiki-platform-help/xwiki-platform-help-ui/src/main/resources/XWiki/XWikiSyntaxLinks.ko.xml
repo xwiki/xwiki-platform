@@ -238,4 +238,4 @@
 ** **##queryString##**: 링크 대상 주소에 추가되고 렌더링된 URL 에 사용될 매개변수를 지정하기 위한 선택적 쿼리 문자열입니다 . 예: ## url :http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"##는 대상 주소를 생성합니다 ##http:~/~/domain.com/path?mydata1=5&amp;mydata2 =안녕하세요##
 ** **##anchor##**: 참조된 링크에 정의된 앵커를 가리키는 선택적 앵커 이름입니다. XWiki 에서는 제목과 이미지에 대한 앵커가 자동으로 생성됩니다. 예: ## url :http:~/~/domain.com/path||anchor="HTableOfContents"##는 대상 주소를 생성합니다 ##http:~/~/domain.com/path#HTableOfContents##
 ** **##target##**: 링크 대상을 새 창에서 열 수 있도록 하는 선택적 매개변수입니다. 예: ##target="~_blank"##</content>
-  </xwikidoc>
+</xwikidoc>

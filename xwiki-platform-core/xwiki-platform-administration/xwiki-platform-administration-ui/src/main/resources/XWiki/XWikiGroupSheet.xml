@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.XWikiGroupSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.XWikiGroupSheet" locale="">
   <web>XWiki</web>
   <name>XWikiGroupSheet</name>
   <language/>
@@ -73,33 +73,49 @@
     &lt;/div&gt;
   &lt;/$wrapperTag&gt;
 #end
-#set ($columnOptions = {
-  'member': {'type': 'text', 'html': true},
-  'type': {'filterable': false, 'sortable': false},
-  'scope': {'filterable': false, 'sortable': false},
-  '_actions': {
-    'actions': [{
-      'id': 'delete',
-      'async': true,
-      'callback': 'table.deleteRow(i);'
-    }],
-    'filterable': false
-   }
-})
-#set ($columns = ['member', 'type'])
+#set ($properties = ['member', 'type'])
 #if (!$xcontext.isMainWiki() &amp;&amp; $services.wiki.user.userScope != 'LOCAL_ONLY')
-  #set ($discard = $columns.add('scope'))
+  #set ($discard = $properties.add('scope'))
 #end
 ## Keep testing the inline action for backward compatibility with existing groups.
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-  #set ($discard = $columns.add('_actions'))
+  #set ($discard = $properties.add('_actions'))
 #end
 &lt;div class="medium-avatars"&gt;
-  #livetable('groupusers' $columns $columnOptions {
-    'url': $doc.getURL('view', 'xpage=getgroupmembers'),
+  #set ($sourceParameters = {
+    'template': 'getgroupmembers.vm',
     'translationPrefix': 'xe.admin.groups.',
-    'javascriptName': 'editgrouptable',
-    'outputOnlyHtml': true
+    '$doc': $doc.documentReference
+  })
+  $services.liveData.render({
+    'id': 'groupusers',
+    'source': 'liveTable',
+    'properties': $stringtool.join($properties, ','),
+    'sourceParameters': $escapetool.url($sourceParameters)
+  }, {
+    'meta': {
+      'propertyDescriptors': [
+        {
+          'id': 'member',
+          'displayer': 'html',
+          'editable': false
+        }
+      ],
+      'actions': [
+        {
+          'id': 'edit',
+          'allowProperty': '-'
+        }, {
+          'id': 'delete',
+          'async': {
+            'httpMethod': 'POST',
+            'loadingMessage': $services.localization.render('administration.section.groups.deleteUserFromGroup.loading'),
+            'successMessage': $services.localization.render('administration.section.groups.deleteUserFromGroup.success'),
+            'failureMessage': $services.localization.render('administration.section.groups.deleteUserFromGroup.failure')
+          }
+        }
+      ]
+    }
   })
 &lt;/div&gt;
 {{/html}}
@@ -191,12 +207,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-meta'], function($, xm) {
-  // The livetable is refreshed after each action (add/remove).
-  // Refresh the document version to avoid conflicts if we try to save afterwards
-  $(document).on('xwiki:livetable:displayComplete', function (event) {
-    xm.refreshVersion();
-  });
+      <code>require(['jquery'], function($) {
   $(document).on('click', '#addMembers', function(event) {
     event.preventDefault();
     var addMembersButton = $(event.target);
@@ -222,7 +233,7 @@
       $('#userInput')[0].selectize.clear(true);
       $('#groupInput')[0].selectize.clear(true);
       // Reload the live table.
-      editgrouptable.refresh();
+      $("#groupusers").data('liveData').updateEntries();
       // Show notification message.
       if(response.hasIgnored) {
         new XWiki.widgets.Notification(response.ignoredMessage, 'warning', {timeout: 5});
@@ -353,9 +364,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
-/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
+      <code>/* Make sure the selectize dropdown is displayed on top of the Bootstrap modal. */
 body &gt; .selectize-dropdown {
   z-index: 1051;
 }
@@ -366,25 +375,25 @@ body &gt; .selectize-dropdown {
 
 #groupusers {
   margin-top: 20px;
-}
 
-#groupusers td[data-title] {
-  vertical-align: middle;
-}
+  td.cell div.view {
+    vertical-align: middle;
+  }
 
-#groupusers td.type,
-#groupusers td.scope {
-  color: $theme.textSecondaryColor;
+  [data-livedata-property-id="type"],
+  [data-livedata-property-id="scope"] {
+    color: @text-muted;   
+  }
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

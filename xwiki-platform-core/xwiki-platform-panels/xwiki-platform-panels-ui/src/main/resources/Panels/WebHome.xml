@@ -44,7 +44,7 @@
 = $services.localization.render('panels.available') =
 #if ($hasAdmin)
   {{box}}
-    [[image:icon:wand]] $services.localization.render('xe.panels.customize') [[$services.localization.render('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]].
+    [[image:icon:wand]] $services.localization.render('panels.customize', ["[[$services.localization.render('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]]"]).
   {{/box}}
 #end
 #set ($liveDataConfig = {

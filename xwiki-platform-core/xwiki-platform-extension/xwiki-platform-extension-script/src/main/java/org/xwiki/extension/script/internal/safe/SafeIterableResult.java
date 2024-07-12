@@ -23,9 +23,9 @@ import java.util.Iterator;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.script.internal.safe.AbstractSafeObject;
-import org.xwiki.script.internal.safe.SafeIterator;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.AbstractSafeObject;
+import org.xwiki.script.safe.SafeIterator;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a iterable result.

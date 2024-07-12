@@ -55,17 +55,17 @@ public class XWikiRestExceptionMapper implements ExceptionMapper<XWikiRestExcept
         if (cause instanceof XWikiException) {
             XWikiException xwikiException = (XWikiException) cause;
             if (xwikiException.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN)
-                        .build();
+                return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage())
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
             }
         } else if (cause instanceof QueryException) {
             QueryException queryException = (QueryException) cause;
 
             return Response.serverError().entity(
                 String.format("%s\n%s\n", exception.getMessage(), ExceptionUtils.getRootCauseMessage(queryException)))
-                .type(MediaType.TEXT_PLAIN).build();
+                .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
 
-        return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        return Response.serverError().entity(exception.getMessage()).type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 }

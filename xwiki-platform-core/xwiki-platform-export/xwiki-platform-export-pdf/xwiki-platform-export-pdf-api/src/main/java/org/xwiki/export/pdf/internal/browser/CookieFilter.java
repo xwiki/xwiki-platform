@@ -60,4 +60,10 @@ public interface CookieFilter
      * @param cookieFilterContext provides contextual information for cookie filtering
      */
     void filter(List<Cookie> cookies, CookieFilterContext cookieFilterContext);
+
+    /**
+     * @return {@code true} if at least one of the cookies from the current HTTP request needs to be filtered,
+     *         {@code false} otherwise
+     */
+    boolean isFilterRequired();
 }

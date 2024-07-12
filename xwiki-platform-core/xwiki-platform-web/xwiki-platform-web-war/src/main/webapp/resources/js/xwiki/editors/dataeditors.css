@@ -5,12 +5,14 @@
   overflow: auto;
   border: none !important;
 }
+
 #body #xwikiobjects label, #body #xwikiclassproperties label {
   display: inline;
   text-transform: none;
   font-variant: normal;
   color: $theme.textPrimaryColor;
 }
+
 #body .xclass-title h2 span {
   border: none;
   color: inherit;
@@ -18,11 +20,13 @@
   margin: 0;
   position: static;
 }
+
 div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="checkbox"],
 div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio"] {
   width: auto;
   border: none;
 }
+
 .boolean-property input {
   width: auto !important;
   border: none !important;
@@ -32,27 +36,32 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .more-actions {
   padding: 8px 2px;
 }
+
 .more-actions .edit-all {
   display: block;
   padding: 2px 18px;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/pencil.png')") left top no-repeat;
 }
 
 /* Object editor */
 /* XClass */
 .xclass-title {
-  margin: 16px 0 2px;
+  margin: 16px 16px 2px 0;
 }
+
 .xclass-title h2 {
   border: none;
   font-weight: bold;
   font-size: 100%;
   margin: 0;
-  padding: 0 0 0 0px;
+  padding: 0;
 }
+
+.xclass-content .xobject-title h3 {
+  padding: 0;
+}
+
 .xclass-content {
- padding: 0 0 0 16px;
- margin: 0 0 10px 0;
+ margin: 0 0 0 16px;
 }
 
 /* XObject */
@@ -62,11 +71,13 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   cursor: default;
   background: transparent;
 }
+
 .xobject:hover .xobject-title,
 .xproperty:hover .xproperty-title {
   background-color: $theme.highlightColor;
   color: $theme.textPrimaryColor;
 }
+
 .xobject-title h3 {
   border: none;
   font-size: 100%;
@@ -76,39 +87,35 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   border: none;
   color: $theme.textColor;
 }
+
 .xobject-content {
   padding: 4px 14px 8px;
   border: none;
   margin-bottom: 2px;
 }
+
 /* XProperty */
 .xobject dl, .xproperty dl {
   margin: 0;
 }
-#body .xobject-title h3, #body .xclass-title, .add_xobject-title {
-  padding-left: 14px !important; /* important for toucan */
-}
+
 .xobject-title:hover, .xclass-title:hover, .xproperty-title:hover {
   cursor: default;
 }
+
 .xobject-action {
   display: block;
-  overflow: hidden;
   position: absolute;
   top: 2px;
-  width: 16px;
-  height: 16px;
-  text-indent: 30px;
-  line-height: 30px;
-  background: transparent left top no-repeat;
 }
+
 .xobject-title .delete {
   right: 0;
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+  color: $theme.notificationErrorColor;
 }
+
 .xobject-title .edit {
   right: 16px;
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
 }
 
 /* XProperty definition */
@@ -116,41 +123,51 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   border: none;
   margin-top: .5em;
 }
+
 .xproperty-content {
   padding: 1em 0 1em 1em;
 }
+
 .xproperty-title {
   cursor: default;
   padding: 0px;
   overflow: hidden;
 }
+
 .xproperty-title .xproperty-property {
   float: left;
   margin-right: 8px;
 }
+
 .xproperty_number_input input {
   width: 2em;
 }
+
 .xproperty-title h2 {
   display: block;
-  padding: 2px 20px 2px 32px;
+  padding: 2px 20px 2px 18px;
   margin: 0;
   font-size: 1em;
   font-weight: 100;
-  background: transparent url("$xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')") 14px center no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')") 0 center no-repeat;
   min-height: 16px;
+  flex-grow: 1;
 }
+
 .xproperty-title label {
   font-size: 60%;
   line-height: 1em;
 }
+
 .xproperty-content {
   clear: both;
 }
+
 .xproperty-title .xproperty-prettyName {
   float: none;
   clear: both;
 }
+
 .xobject-content xdt {
   font-size: 75%;
   font-weight: bold;
@@ -158,118 +175,138 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 
 /* Expand/collapse */
 /* We need to increase the priority of the rule in order to override Toucan styles */
-#body .collapsable .xobject-title h3,
-#body .collapsable .xclass-title,
-#body .collapsable .xproperty-title {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')");
-  background-position: 0px center;
-  background-repeat: no-repeat;
+#body .xobject > .xobject-title,
+#body .xclass > .xclass-title,
+#body .xproperty > .xproperty-title {
+  display: flex;
+  gap: .5em;
+  align-items: baseline;
 }
-#body .collapsed .xobject-title h3,
-#body .collapsed .xclass-title,
-#body .collapsed .xproperty-title {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png')");
-}
-.xclass.collapsed .xclass-content, .xobject.collapsed .xobject-content, .xproperty.collapsed .xproperty-content {
+
+/* Before Javascript, the collapsable and collapsed classes are not here.
+In order to avoid flickering, we need to take into account this initial state in the style rulesets. 
+The default state is collapsed for xobjects and xproperties, but expanded for xclasses. */
+.xclass.collapsed .xclass-content, 
+.xobject .xobject-content, 
+.xproperty .xproperty-content {
   display: none;
 }
-.collapsable dt .collapser {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.png')");
-  background-position: -4px center;
-  background-repeat: no-repeat;
-  cursor: default;
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  vertical-align: middle;
+
+.xclass.collapsable:not(.collapsed) .xclass-content,
+.xobject.collapsable:not(.collapsed) .xobject-content,
+.xproperty.collapsable:not(.collapsed) .xproperty-content {
+  display: inherit;
 }
-.collapsable dt .collapsed {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png')");
+
+.xclass.collapsed > .xclass-title > .toggle-collapsable > *,
+.xobject > .xobject-title > .toggle-collapsable > *,
+.xproperty > .xproperty-title > .toggle-collapsable > * {
+  transform:  rotate(-90deg);
 }
+
+.xclass.collapsable:not(.collapsed) > .xclass-title > .toggle-collapsable > *,
+.xobject.collapsable:not(.collapsed) > .xobject-title > .toggle-collapsable > *,
+.xproperty.collapsable:not(.collapsed) > .xproperty-title > .toggle-collapsable > * {
+  transform:  rotate(0);
+}
+
 /* Disabled/Deprecated */
 .disabled {
   opacity: 0.5;
 }
+
 .disabled * {
   font-style: italic;
 }
+
 .disabled .xproperty-title h2, #body #xwikiclassproperties .disabled dt label, #body #xwikiobjects dt.disabled label {
   color: $theme.textColor;
 }
+
 .syncProperties {
   font-weight: 900;
   display: inline-block;
-  padding: 2px 0 2px 22px;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/cross.png')") left center no-repeat;
-  margin-left: -22px;
+  padding: 2px 0 2px 0;
+  color: $theme.notificationErrorColor;
 }
 /* XProperty tools */
 .disabletool label {
   font-weight: 900;
 }
+
 .xproperty-title .tools {
-  float: right;
-  margin-top: -18px;
+  align-self: center;
 }
+
 .xproperty-title .tools .tool {
   width: 16px;
   height: 16px;
   float: left;
   background: transparent none center no-repeat;
-  text-indent: -9999px;
 }
-.xproperty-title .tools .delete {
-  background-image: url($xwiki.getSkinFile('icons/silk/cross.png'));
-}
+
 .xproperty-title .tools .move {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/move.png'));
   cursor: move;
+  color: $theme.linkColor;
 }
+
+.xproperty-title .tools .delete {
+  color: $theme.notificationErrorColor;
+}
+
 .dragged .xproperty-title {
   border: 1px solid $theme.borderColor;
 }
+
 /* Property type icons */
 .StringClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/string.png')");
 }
+
 .DateClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/calendar.png')");
 }
+
 .TextAreaClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/textarea.png')");
 }
+
 .NumberClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/number.png')");
 }
+
 .BooleanClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/boolean.png')");
 }
+
 .StaticListClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/staticlist.png')");
 }
+
 .GroupsClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/groups.png')");
 }
+
 .UsersClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/users.png')");
 }
+
 .LevelsClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/rights.png')");
 }
+
 .DBListClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/database.png')");
 }
+
 .DBTreeListClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/tree.png')");
 }
+
 .PasswordClass h2 {
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
 }
-#add_xproperty {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") left center no-repeat;
-  padding-left: 14px;
-  margin-left: 16px;
-}
+
 #body #xwikiclassproperties #add_xproperty label,
 #body #xwikiobjects #add_xobject label {
   margin: 0;
@@ -302,45 +339,51 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .add_xobject-title {
   width: auto;
   font-style: italic;
-  background: transparent url("$xwiki.getSkinFile('icons/silk/bullet_add.png')") no-repeat left center;
-  display: inline;
   color: $theme.linkColor;
   font-size: 80%;
   padding-top: 2px;
   margin-top: 8px;
   border-top: 1px dotted $theme.borderColor;
 }
+
 .xclass-content .add_xobject-title {
   display: block;
 }
+
 .add_xobject-title a {
   color: $theme.linkColor;
   text-decoration: none;
   display: block;
   padding: 2px 0;
 }
+
 .add_xobject-title a:hover{
   text-decoration: underline;
   background-color: $theme.highlightColor;
 }
+
 #add_xobject .buttonwrapper input,
 #add_xproperty .buttonwrapper input {
   vertical-align: top;
   margin: 0;
 }
+
 #switch-xclass {
   text-align: right;
   margin: 4px 0 -16px;
 }
+
 #switch-xclass .suggest-classes {
   text-align: left;
 }
+
 .suggest-classes.selectize-control {
   /* Display on the same line as the Add button */
   display: inline-block;
   /* Align with the Add button */
   vertical-align: middle;
 }
+
 .suggest-classes > .selectize-dropdown > .selectize-dropdown-content,
 .suggest-classes.selectize-dropdown > .selectize-dropdown-content {
   /* Increase the max height because the drop down includes all the classes. */

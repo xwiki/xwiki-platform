@@ -22,7 +22,7 @@
   <parent>
     <artifactId>xwiki-platform-security</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -36,4 +36,12 @@
     <module>xwiki-platform-security-authentication-script</module>
     <module>xwiki-platform-security-authentication-ui</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-security-authentication-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

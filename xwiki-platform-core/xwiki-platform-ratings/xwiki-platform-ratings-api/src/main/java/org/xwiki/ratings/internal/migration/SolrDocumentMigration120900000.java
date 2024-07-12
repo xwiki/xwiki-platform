@@ -27,7 +27,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -43,6 +42,7 @@ import org.xwiki.ratings.internal.RatingSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.user.UserReference;
 
 /**
@@ -76,22 +76,22 @@ public class SolrDocumentMigration120900000
     @Inject
     private Solr solr;
 
-    private SolrClient getClient() throws SolrException
+    private XWikiSolrCore getCore() throws SolrException
     {
-        return this.solr.getClient(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE);
+        return this.solr.getCore(RatingSolrCoreInitializer.DEFAULT_RATINGS_SOLR_CORE);
     }
 
     /**
-     * Migrate all SolrDocument existing in the given client to the new Ratings Solr core.
+     * Migrate all SolrDocument existing in the given core to the new Ratings Solr core.
      * This method should only be used in case of SolrDocument creating between XWiki 12.7 and 12.9 in Like and Ratings
      * applications.
      *
-     * @param solrClient a client containing old Ratings SolrDocument
+     * @param core a core containing old Ratings SolrDocument
      * @param scale the default scale that was used (should be 5 for standard ratings and 1 for Likes)
      * @param managerId the name of the application to store the new ratings.
      * @throws SolrException in case of problem during the migration of the data.
      */
-    public void migrateAllDocumentsFrom1207000000(SolrClient solrClient, int scale, String managerId)
+    public void migrateAllDocumentsFrom1207000000(XWikiSolrCore core, int scale, String managerId)
         throws SolrException
     {
         SolrDocumentList documentList;
@@ -104,7 +104,7 @@ public class SolrDocumentMigration120900000
                 .setRows(BATCH_MIGRATION_SIZE)
                 .setSort(OLD_DATE_FIELD, SolrQuery.ORDER.asc);
             try {
-                QueryResponse queryResponse = solrClient.query(solrQuery);
+                QueryResponse queryResponse = core.getClient().query(solrQuery);
                 documentList = queryResponse.getResults();
                 totalNumber = queryResponse.getResults().getNumFound();
                 for (SolrDocument solrDocument : documentList) {
@@ -120,7 +120,7 @@ public class SolrDocumentMigration120900000
 
         // We commit when all documents are migrated.
         try {
-            this.getClient().commit();
+            this.getCore().getClient().commit();
         } catch (SolrServerException | IOException e) {
             throw new SolrException("Error when committing after performing 120700000 documents migration.", e);
         }
@@ -165,7 +165,7 @@ public class SolrDocumentMigration120900000
         // We use this.client here since we want to copy all documents in the current core, even if they come from
         // like core.
         try {
-            this.getClient().add(solrInputDocument);
+            this.getCore().getClient().add(solrInputDocument);
         } catch (SolrServerException | IOException e) {
             throw new SolrException("Error when adding new document for performing 120700000 document migration", e);
         }

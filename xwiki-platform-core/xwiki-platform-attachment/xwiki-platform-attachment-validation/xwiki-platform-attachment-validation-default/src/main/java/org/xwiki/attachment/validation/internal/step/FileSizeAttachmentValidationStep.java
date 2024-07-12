@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.ws.rs.core.Response;
 
 import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationException;
@@ -35,7 +36,6 @@ import com.xpn.xwiki.XWikiContext;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_DEFAULT_MAXSIZE;
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
-import static javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE;
 import static org.apache.commons.io.FileUtils.byteCountToDisplaySize;
 
 /**
@@ -62,9 +62,9 @@ public class FileSizeAttachmentValidationStep implements AttachmentValidationSte
     {
         long uploadMaxSize = getUploadMaxSize();
         if (wrapper.getSize() > uploadMaxSize) {
-            throw new AttachmentValidationException("File size too big", SC_REQUEST_ENTITY_TOO_LARGE,
-                "attachment.validation.filesize.rejected", List.of(byteCountToDisplaySize(uploadMaxSize)),
-                "fileuploadislarge");
+            throw new AttachmentValidationException("File size too big",
+                Response.Status.REQUEST_ENTITY_TOO_LARGE.getStatusCode(), "attachment.validation.filesize.rejected",
+                List.of(byteCountToDisplaySize(uploadMaxSize)), "fileuploadislarge");
         }
     }
 

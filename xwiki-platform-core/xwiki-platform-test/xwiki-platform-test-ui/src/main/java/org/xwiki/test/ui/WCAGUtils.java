@@ -52,10 +52,12 @@ public class WCAGUtils
     /**
      * @param wcag true if WCAG tests must be executed, false otherwise
      * @param testClassName the PO class name to use for logging and reporting
+     * @param stopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
      */
-    public void setupWCAGValidation(boolean wcag, String testClassName)
+    public void setupWCAGValidation(boolean wcag, String testClassName, boolean stopOnError)
     {
         this.wcagContext.setWCAGEnabled(wcag);
+        this.wcagContext.setWCAGStopOnError(stopOnError);
         if (wcag) {
             LOGGER.info("WCAG validation is enabled.");
             wcagContext.setTestClassName(testClassName);

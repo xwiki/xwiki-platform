@@ -251,9 +251,7 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <code>{{velocity}}
-{{documentTree root="document:" /}}
-{{/velocity}}</code>
+      <code>{{documentTree root="document:" /}}</code>
     </property>
     <property>
       <contentDescription/>

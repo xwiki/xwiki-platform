@@ -64,14 +64,16 @@ public class AllDocsPage extends ViewPage
         return getUtil().getURL("Main", "AllDocs");
     }
 
-    public AllDocsLivetable clickIndexTab()
+    /**
+     * Click on the index tab.
+     *
+     * @return the Live Data listing all the documents
+     */
+    public AllDocsLiveData clickIndexTab()
     {
         this.indexTab.click();
 
-        AllDocsLivetable lt = new AllDocsLivetable();
-        lt.waitUntilReady();
-
-        return lt;
+        return new AllDocsLiveData();
     }
 
     public DocumentTreeElement clickTreeTab()

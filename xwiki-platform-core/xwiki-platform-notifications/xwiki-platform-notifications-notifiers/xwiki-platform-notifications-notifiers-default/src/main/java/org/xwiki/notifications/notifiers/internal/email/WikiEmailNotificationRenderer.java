@@ -20,12 +20,14 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.email.EmailTemplateRenderer;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.notifications.notifiers.internal.AbstractWikiNotificationRenderer;
 import org.xwiki.rendering.syntax.Syntax;
@@ -77,7 +79,8 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
     {
         if (this.htmlTemplate != null) {
             return emailTemplateRenderer.renderHTML(
-                    emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.htmlTemplate, Syntax.XHTML_1_0)
+                    emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.htmlTemplate,
+                        Syntax.XHTML_1_0, Map.of())
             );
         }
         // Fallback to the default renderer
@@ -90,7 +93,7 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
         if (this.plainTextTemplate != null) {
             return emailTemplateRenderer.renderPlainText(
                     emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.plainTextTemplate,
-                            Syntax.PLAIN_1_0)
+                        Syntax.PLAIN_1_0, Map.of())
             );
         }
         // Fallback to the default renderer
@@ -104,7 +107,7 @@ public class WikiEmailNotificationRenderer extends AbstractWikiNotificationRende
         if (this.emailSubjectTemplate != null) {
             return emailTemplateRenderer.renderPlainText(
                     emailTemplateRenderer.executeTemplate(compositeEvent, userId, this.emailSubjectTemplate,
-                            Syntax.PLAIN_1_0)
+                        Syntax.PLAIN_1_0, Map.of())
             );
         }
         // Fallback to the default renderer

@@ -23,22 +23,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
-import org.restlet.Request;
-import org.restlet.data.Form;
-import org.restlet.ext.servlet.ServletUtils;
-import org.restlet.representation.InputRepresentation;
-import org.restlet.representation.Representation;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationField;
 import org.xwiki.annotation.rest.model.jaxb.AnnotationRequest;
 import org.xwiki.annotation.rest.model.jaxb.ObjectFactory;
+import org.xwiki.rest.JAXRSUtils;
 import org.xwiki.rest.XWikiRestComponent;
 
 /**
@@ -64,6 +61,9 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
      */
     protected static final String FILTER_FIELD_PREFIX = "filter_";
 
+    @Inject
+    private JAXRSUtils jaxrs;
+
     /**
      * Helper function to provide an instance of the read object from the object factory.
      *
@@ -77,38 +77,14 @@ public abstract class AbstractFormUrlEncodedAnnotationRequestReader<T extends An
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
         throws IOException, WebApplicationException
     {
+        MultivaluedMap<String, String> form = this.jaxrs.readForm(mediaType, annotations, entityStream);
+
         ObjectFactory objectFactory = new ObjectFactory();
         T annotationRequest = getReadObjectInstance(objectFactory);
 
-        Representation representation =
-            new InputRepresentation(entityStream, org.restlet.data.MediaType.APPLICATION_WWW_FORM);
-        Form form = new Form(representation);
-
-        /*
-         * If the form is empty then it might have happened that some filter has invalidated the entity stream. Try to
-         * read data using getParameter()
-         */
-        if (!form.getNames().isEmpty()) {
-            for (String paramName : form.getNames()) {
-                for (String paramValue : form.getValuesArray(paramName)) {
-                    saveField(annotationRequest, paramName, paramValue, objectFactory);
-                }
-            }
-        } else {
-            HttpServletRequest httpServletRequest = ServletUtils.getRequest(Request.getCurrent());
-
-            for (Map.Entry<String, String[]> entry : httpServletRequest.getParameterMap().entrySet()) {
-                // FIXME: this needs to be done right, it can interfere with the custom parameters names
-                // skip method & media parameters, used by REST to carry its own parameters
-                if ("method".equals(entry.getKey()) || "media".equals(entry.getKey())) {
-                    continue;
-                }
-
-                // save all the values of this field, one by one
-                String[] paramValues = entry.getValue();
-                for (String value : paramValues) {
-                    saveField(annotationRequest, entry.getKey(), value, objectFactory);
-                }
+        for (Map.Entry<String, List<String>> entry : form.entrySet()) {
+            for (String value : entry.getValue()) {
+                saveField(annotationRequest, entry.getKey(), value, objectFactory);
             }
         }
 

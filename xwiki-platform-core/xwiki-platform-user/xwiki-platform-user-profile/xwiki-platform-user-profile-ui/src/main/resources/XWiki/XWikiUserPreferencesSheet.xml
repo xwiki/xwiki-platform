@@ -277,8 +277,8 @@
       #if ($xcontext.action == 'view' &amp;&amp; $hasEdit)
         &lt;div class="editProfileCategory"&gt;
           &lt;a title="$!escapetool.xml($services.localization.render('platform.core.profile.category.preferences.edit'))"
-              href="$doc.getURL('edit', 'category=preferences')" class="btn btn-xs"&gt;
-            &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
+              href="$doc.getURL('edit', 'category=preferences')" class="btn btn-xs btn-default"&gt;
+            $services.icon.renderHTML('pencil')
             &lt;span class='sr-only'&gt;$!escapetool.xml($services.localization.render(
               'platform.core.profile.category.preferences.edit'))&lt;/span&gt;
           &lt;/a&gt;
@@ -287,7 +287,22 @@
       &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.displayPreferences'))&lt;/h2&gt;
       &lt;dl&gt;
         #displayField('displayHiddenDocuments', 'platform.core.profile.displayHiddenDocuments', '0')
-        #displayField('accessibility'         , 'platform.core.profile.enableAccessibility'   , '0')
+      &lt;/dl&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h2&gt;
+      #set ($defaultLegacyValue = $xwiki.getXWikiPreference('accessibility'))
+      &lt;dl&gt;
+        #set ($defaultValue = $xwiki.getXWikiPreference('underline'))
+        #if ("$!defaultValue" == '' &amp;&amp; "$!defaultLegacyValue" == '1')
+          #set ($defaultValue = 'Yes')
+        #end
+        #if ("$!defaultValue" == '')
+          #set ($defaultValue = 'OnlyInlineLinks')
+        #end
+        #displayField('underline', 'platform.core.profile.accessibility.underline', $defaultValue)
+      &lt;/dl&gt;
+      &lt;dl hidden&gt;
+        ## Unset the legacy 'accessibility' parameter
+        #displayField('accessibility', 'platform.core.profile.enableAccessibility', '')
       &lt;/dl&gt;
       &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.localizationPreferences'))&lt;/h2&gt;
       &lt;dl&gt;

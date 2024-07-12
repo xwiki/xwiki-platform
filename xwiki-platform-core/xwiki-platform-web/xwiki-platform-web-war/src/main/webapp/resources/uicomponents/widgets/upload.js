@@ -202,6 +202,11 @@ var XWiki = (function(XWiki) {
         fields[key] && formData.append(key, fields[key]);
       });
 
+      if (this.formData.comment) {
+        const commentValue = this.formData.comment.value;
+        commentValue && formData.append('comment', commentValue);
+      }
+
       // Create XMLHttpRequest object, adding few event listeners, and POST the data
       var request = this.request = new XMLHttpRequest();
 
@@ -438,10 +443,14 @@ var XWiki = (function(XWiki) {
       // What is the URL where the file should be sent?
       this.options.targetURL = this.options.targetURL || this.form.action;
 
+      // Get the input that contains the comment
+      var comment = this.form.down('input[name=comment]');
+
       // Prepare common form data to send with each uploaded file
       this.formData = {
         input : this.input,
         action : this.options.targetURL,
+        comment: comment,
         additionalFields : {}
       };
       var redirect = this.form.down('input[name=xredirect]');

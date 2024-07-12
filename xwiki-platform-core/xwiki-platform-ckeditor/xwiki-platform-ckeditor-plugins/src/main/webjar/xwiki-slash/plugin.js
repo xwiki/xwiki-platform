@@ -654,7 +654,9 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'info',
-              content: editor.localization.get('xwiki-slash.action.info.defaultContent')
+              content: editor.localization.get('xwiki-slash.action.info.defaultContent'),
+              // We know this macro can be called inline.
+              inline: true
             }
           }
         }, {
@@ -667,7 +669,9 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'success',
-              content: editor.localization.get('xwiki-slash.action.success.defaultContent')
+              content: editor.localization.get('xwiki-slash.action.success.defaultContent'),
+              // We know this macro can be called inline.
+              inline: true
             }
           }
         }, {
@@ -680,7 +684,9 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'warning',
-              content: editor.localization.get('xwiki-slash.action.warning.defaultContent')
+              content: editor.localization.get('xwiki-slash.action.warning.defaultContent'),
+              // We know this macro can be called inline.
+              inline: true
             }
           }
         }, {
@@ -693,7 +699,9 @@
             name: 'xwiki-macro-insert',
             data: {
               name: 'error',
-              content: editor.localization.get('xwiki-slash.action.error.defaultContent')
+              content: editor.localization.get('xwiki-slash.action.error.defaultContent'),
+              // We know this macro can be called inline.
+              inline: true
             }
           }
         }, {

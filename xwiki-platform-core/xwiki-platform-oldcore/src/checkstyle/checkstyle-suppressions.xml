@@ -27,4 +27,5 @@
 <suppressions>
   <suppress checks="FanOutComplexity" files="HqlQueryExecutor.java"/>
   <suppress checks="FanOutComplexity" files="FOPXSLFORenderer.java"/>
+  <suppress checks="FanOutComplexity" files="WrappingXWikiRequest.java"/>
 </suppressions>

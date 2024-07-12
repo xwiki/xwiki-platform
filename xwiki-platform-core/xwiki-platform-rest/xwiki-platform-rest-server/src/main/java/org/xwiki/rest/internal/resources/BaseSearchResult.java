@@ -175,14 +175,20 @@ public class BaseSearchResult extends XWikiResource
                         .equals("space")) ? "" : ", doc." + orderField;
             }
 
+            String addSpace = "";
+            if (searchScopes.contains(SearchScope.NAME)) {
+                // Join the space to get the last space name.
+                addSpace = "left join XWikiSpace as space on doc.space = space.reference";
+            }
+
             if (space != null) {
                 f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
                 f.format(addColumn);
-                f.format(" from XWikiDocument as doc where doc.space = :space and ( ");
+                f.format(" from XWikiDocument as doc %s where doc.space = :space and ( ", addSpace);
             } else {
                 f.format("select distinct doc.fullName, doc.space, doc.name, doc.language");
                 f.format(addColumn);
-                f.format(" from XWikiDocument as doc where ( ");
+                f.format(" from XWikiDocument as doc %s where ( ", addSpace);
             }
 
             /* Look for scopes related to pages */
@@ -196,8 +202,8 @@ public class BaseSearchResult extends XWikiResource
                         acceptedScopes++;
                         break;
                     case NAME:
-                        String matchTerminalPage = "doc.name <> :defaultDocName and upper(doc.fullName) like :keywords";
-                        String matchNestedPage = "doc.name = :defaultDocName and upper(doc.space) like :keywords";
+                        String matchTerminalPage = "doc.name <> :defaultDocName and upper(doc.name) like :keywords";
+                        String matchNestedPage = "doc.name = :defaultDocName and upper(space.name) like :keywords";
                         f.format("((%s) or (%s)) ", matchTerminalPage, matchNestedPage);
                         acceptedScopes++;
                         break;

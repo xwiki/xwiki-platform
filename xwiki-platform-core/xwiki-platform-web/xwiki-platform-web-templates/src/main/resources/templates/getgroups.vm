@@ -28,10 +28,10 @@
 #set ($orderList = ['name'])
 
 ## The live table offset starts from 1 so we need to subtract 1.
-#if ($request.wiki == 'local')
+#if ($request.wiki == 'local' || $request.scope == 'local')
   #set ($groups = $groupService.getAllMatchedLocalGroups($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
   #set ($countGroups = $groupService.countAllMatchedLocalGroups($filterMap))
-#elseif ($request.wiki == 'global')
+#elseif ($request.wiki == 'global' || $request.scope == 'global')
   #set ($groups = $groupService.getAllMatchedGlobalGroups($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
   #set ($countGroups = $groupService.countAllMatchedGlobalGroups($filterMap))
 #else

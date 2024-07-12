@@ -235,8 +235,10 @@ class DefaultFilterPreferencesModelBridgeTest
         BaseObject filter4Obj = mock(BaseObject.class, "filter4Obj");
         when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
             "filter2", false)).thenReturn(filter2Obj);
+        when(filter2Obj.getNumber()).thenReturn(2);
         when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
             "filter4", false)).thenReturn(filter4Obj);
+        when(filter4Obj.getNumber()).thenReturn(14);
 
         when(filter2Obj.getIntValue(FIELD_IS_ENABLED, 1)).thenReturn(1);
         when(filter4Obj.getIntValue(FIELD_IS_ENABLED, 1)).thenReturn(0);
@@ -245,19 +247,21 @@ class DefaultFilterPreferencesModelBridgeTest
         BaseObject filter7Obj = mock(BaseObject.class, "filter7Obj");
         when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
             "filter6", false)).thenReturn(filter6Obj);
+        when(filter6Obj.getNumber()).thenReturn(16);
         when(userDoc.getXObject(TOGGLEABLE_FILTER_PREFERENCE_CLASS, FIELD_FILTER_NAME,
             "filter7", false)).thenReturn(filter7Obj);
+        when(filter7Obj.getNumber()).thenReturn(17);
 
         when(filter6Obj.getIntValue(FIELD_IS_ENABLED, 0)).thenReturn(1);
         when(filter7Obj.getIntValue(FIELD_IS_ENABLED, 0)).thenReturn(0);
 
-        Map<String, Boolean> expectedResult = Map.of(
-            "filter2", true,
-            "filter3", true,
-            "filter4", false,
-            "filter5", false,
-            "filter6", true,
-            "filter7", false
+        Map<String, ToggleableNotificationFilterActivation> expectedResult = Map.of(
+            "filter2", new ToggleableNotificationFilterActivation("filter2", true, user, 2),
+            "filter3", new ToggleableNotificationFilterActivation("filter3", true, user, -1),
+            "filter4", new ToggleableNotificationFilterActivation("filter4", false, user, 14),
+            "filter5", new ToggleableNotificationFilterActivation("filter5", false, user, -1),
+            "filter6", new ToggleableNotificationFilterActivation("filter6", true, user, 16),
+            "filter7", new ToggleableNotificationFilterActivation("filter7", false, user, 17)
         );
         assertEquals(expectedResult, this.defaultModelBridge.getToggleableFilterActivations(user));
         verify(context).setWikiReference(user.getWikiReference());

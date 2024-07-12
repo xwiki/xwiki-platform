@@ -29,7 +29,6 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -203,18 +202,22 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      */
     public void flushLongCache()
     {
-        this.longEventCache.removeAll();
-        this.longIndividualEventCountCache.removeAll();
-        this.longCompositeEventCache.removeAll();
-        this.longCompositeEventCountCache.removeAll();
+        if (this.configuration.isRestCacheEnabled()) {
+            this.longEventCache.removeAll();
+            this.longIndividualEventCountCache.removeAll();
+            this.longCompositeEventCache.removeAll();
+            this.longCompositeEventCountCache.removeAll();
+        }
     }
 
     @Override
-    public void dispose() throws ComponentLifecycleException
+    public void dispose()
     {
-        this.longIndividualEventCountCache.dispose();
-        this.longEventCache.dispose();
-        this.longCompositeEventCache.dispose();
-        this.longCompositeEventCountCache.dispose();
+        if (this.configuration.isRestCacheEnabled()) {
+            this.longIndividualEventCountCache.dispose();
+            this.longEventCache.dispose();
+            this.longCompositeEventCache.dispose();
+            this.longCompositeEventCountCache.dispose();
+        }
     }
 }

@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.xml.XMLUtils;
 
@@ -132,14 +133,10 @@ public class StringClass extends PropertyClass
         input.setClass("suggested");
         XWikiContext xWikiContext = getXWikiContext();
         XWiki xwiki = xWikiContext.getWiki();
-        String path = xwiki.getURL("Main.WebHome", "view", xWikiContext);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(path);
-        stringBuilder.append('?');
-        stringBuilder.append(new EscapeTool().url(getParametersMap()));
-        stringBuilder.append('&');
+        String path = xwiki.getURL(new LocalDocumentReference("Main", "WebHome"), "view", xWikiContext);
+        String stringBuilder = String.format("%s?%s&", path, new EscapeTool().url(getParametersMap()));
         input.setOnFocus(String.format("new ajaxSuggest(this, {script:\"%s\", varname:\"input\"} )",
-            escapeJavaScript(stringBuilder.toString())));
+            escapeJavaScript(stringBuilder)));
     }
 
     private Map<String, String> getParametersMap()

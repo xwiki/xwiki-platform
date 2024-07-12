@@ -242,11 +242,6 @@ public class RepositoryManager implements Initializable, Disposable
         this.documentReferenceCache.dispose();
     }
 
-    public <T> XWikiDocument getDocument(T[] data) throws XWikiException
-    {
-        return getDocument((String) data[0]);
-    }
-
     public XWikiDocument getDocument(String fullName) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -520,7 +515,7 @@ public class RepositoryManager implements Initializable, Disposable
         Query query = this.queryManager.createQuery("select doc.fullName from Document doc, doc.object("
             + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
-        for (Object[] documentName : query.<Object[]>execute()) {
+        for (String documentName : query.<String>execute()) {
             validateExtension(getDocument(documentName), true);
         }
     }

@@ -1,0 +1,77 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="zh">
+  <web>XWiki.Notifications.Code.Macro</web>
+  <name>Translations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.notifications.name=通知
+rendering.macro.notifications.description=显示wiki中发生的事件的通知。
+rendering.macro.notifications.parameter.count.name=数量
+rendering.macro.notifications.parameter.count.description=默认的最大显示数量
+rendering.macro.notifications.parameter.useUserPreferences.name=使用用户的配置
+### Missing: rendering.macro.notifications.parameter.useUserPreferences.description=If true, the preferences of the user about notifications are used
+### Missing: rendering.macro.notifications.parameter.displayOwnEvents.name=Display own events
+### Missing: rendering.macro.notifications.parameter.displayOwnEvents.description=If true, the events of the current user are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.displayMinorEvents.name=Display minor events
+### Missing: rendering.macro.notifications.parameter.displayMinorEvents.description=If true, the events concerning minor revisions of pages are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.displaySystemEvents.name=Display system events
+### Missing: rendering.macro.notifications.parameter.displaySystemEvents.description=If true, the events triggered by the XWiki software are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.displayReadEvents.name=Display read events
+### Missing: rendering.macro.notifications.parameter.displayReadEvents.description=If true, the events that the user have already marked as read are displayed like the others. They are hidden otherwise.
+### Missing: rendering.macro.notifications.parameter.wikis.name=Wikis
+### Missing: rendering.macro.notifications.parameter.wikis.description=List of wikis (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.spaces.name=Spaces
+### Missing: rendering.macro.notifications.parameter.spaces.description=List of spaces (comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.pages.name=Pages
+### Missing: rendering.macro.notifications.parameter.pages.description=List of pages (full references, comma-separated) to consider. This parameter is ignored if useUserPreferences is set to "true".
+### Missing: rendering.macro.notifications.parameter.displayReadStatus.name=Display "read" status
+### Missing: rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
+### Missing: rendering.macro.notifications.parameter.users.name=Users
+### Missing: rendering.macro.notifications.parameter.users.description=List of users to consider (comma-separated). Ignored if "useUserPreferences" is set to "true".
+### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Display followed users only
+### Missing: rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Display only the events performed by the given list of users (if empty, the list of followed users of the current user is used).
+### Missing: rendering.macro.notifications.parameter.displayRSSLink.name=Display RSS link
+### Missing: rendering.macro.notifications.parameter.displayRSSLink.description=Display a link to the RSS view of the current macro.
+### Missing: rendering.macro.notifications.parameter.tags.name=Tags
+### Missing: rendering.macro.notifications.parameter.tags.description=List of tags to consider (comma-separated). It only works on the current wiki. Ignored if "useUserPreferences" is set to "true".
+### Missing: notifications.macro.noWatchedUsers=You are not following anybody.
+### Missing: notifications.macro.whenNotView=Notifications Macro. Could be seen on 'view' mode.
+### Missing: notifications.macro.markEventAsRead=Mark event as read
+### Missing: notifications.macro.showEventDetails=Show event details
+notifications.menu.nothing=无通知！
+notifications.menu.more=加载更旧的通知信息
+### Missing: notifications.menu.details=Details ({0})
+</content>
+  </xwikidoc>

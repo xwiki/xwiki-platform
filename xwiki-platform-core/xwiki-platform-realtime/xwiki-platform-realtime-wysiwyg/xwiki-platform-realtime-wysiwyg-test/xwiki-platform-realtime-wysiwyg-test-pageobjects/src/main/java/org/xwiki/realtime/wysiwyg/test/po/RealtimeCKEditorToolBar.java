@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.CKEditorToolBar;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -99,6 +100,15 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
     public RealtimeCKEditorToolBar(RealtimeCKEditor editor)
     {
         super(editor);
+        waitToLoad();
+    }
+
+    private void waitToLoad()
+    {
+        // We don't wait for the toolbar to be visible because the toolbar is hidden for the in-place editor when the
+        // editor doesn't have the focus (and the editor is not always focused when loaded).
+        getDriver().waitUntilCondition(ExpectedConditions.presenceOfNestedElementLocatedBy(getContainer(),
+            By.cssSelector(".rt-toolbar[data-user-id]")));
     }
 
     /**
@@ -115,8 +125,8 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
      */
     public boolean isEditingAlone()
     {
-        return "Editing alone"
-            .equals(getDriver().findElementWithoutWaiting(getContainer(), By.className("rt-user-list")).getText());
+        return getCoeditors().isEmpty() && !getDriver()
+            .findElementWithoutWaiting(getContainer(), By.className("rt-user-list")).getText().contains(":");
     }
 
     /**
@@ -158,8 +168,8 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
     public String waitForAutoSave()
     {
         // Unsaved changes are pushed after 60 seconds, but the check for unsaved changes is done every 20 seconds, so
-        // we need to wait at most 80 seconds.
-        int timeout = 80;
+        // we need to wait at most 100 seconds (adding an error margin of 20 seconds).
+        int timeout = 100;
 
         getDriver().waitUntilCondition(driver -> {
             String newMergeStatus =

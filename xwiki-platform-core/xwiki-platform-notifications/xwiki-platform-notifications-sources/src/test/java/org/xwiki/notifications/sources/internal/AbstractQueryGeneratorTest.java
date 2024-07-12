@@ -92,8 +92,6 @@ public abstract class AbstractQueryGeneratorTest
         when(this.pref1.isNotificationEnabled()).thenReturn(true);
 
         this.fakeFilterPreference = mock(NotificationFilterPreference.class);
-        when(this.fakeFilterPreference.isActive()).thenReturn(true);
-
         when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
 
         when(this.recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class)))

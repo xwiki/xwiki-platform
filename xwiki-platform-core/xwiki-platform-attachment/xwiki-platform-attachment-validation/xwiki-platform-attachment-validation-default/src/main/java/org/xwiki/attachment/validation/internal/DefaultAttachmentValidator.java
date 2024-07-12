@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.core.Response;
 
 import org.xwiki.attachment.AttachmentAccessWrapper;
 import org.xwiki.attachment.validation.AttachmentValidationConfiguration;
@@ -37,8 +38,6 @@ import org.xwiki.attachment.validation.internal.step.MimetypeAttachmentValidatio
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Default implementation of {@link AttachmentValidator}. Check for the file size and mimetype of a given file. The
@@ -86,7 +85,8 @@ public class DefaultAttachmentValidator implements AttachmentValidator
         } catch (ComponentLookupException e) {
             throw new AttachmentValidationException(
                 String.format("Failed to resolve the [%s] components.", AttachmentValidationStep.class), e,
-                SC_INTERNAL_SERVER_ERROR, "attachment.validation.attachmentValidationStep.error");
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                "attachment.validation.attachmentValidationStep.error");
         }
     }
 }

@@ -148,8 +148,7 @@ public class EditAction extends XWikiAction
         if (editedDocument.isMetaDataDirty()) {
             UserReference userReference =
                 this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
-            editedDocument.getAuthors().setEffectiveMetadataAuthor(userReference);
-            editedDocument.getAuthors().setOriginalMetadataAuthor(userReference);
+            editedDocument.setAuthor(userReference);
         }
 
         // If the content is modified, modify the content author

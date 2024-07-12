@@ -38,11 +38,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocumentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiRecycleBinContentStoreInterface;
 
 /**
- * Realization of {@link AttachmentRecycleBinStore} for filesystem storage.
+ * Implementation of {@link XWikiRecycleBinContentStoreInterface} for filesystem storage.
  *
  * @version $Id$
  * @since 9.0RC1

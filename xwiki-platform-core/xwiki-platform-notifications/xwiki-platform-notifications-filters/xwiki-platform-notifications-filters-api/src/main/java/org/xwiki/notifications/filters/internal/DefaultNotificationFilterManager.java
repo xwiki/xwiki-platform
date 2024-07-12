@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -211,7 +212,10 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user)
             throws NotificationException
     {
-        return filterPreferencesModelBridge.getToggleableFilterActivations(user);
+        return filterPreferencesModelBridge.getToggleableFilterActivations(user)
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().isEnabled()));
     }
 
     @Override

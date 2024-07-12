@@ -67,7 +67,41 @@ class MacrosTest extends PageTest
     {
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
     }
+    
+    @Test
+    void setVariableGlobal() throws Exception
+    {
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
+			+ "#macro(helloMacro $return)\n"
+			+ "  #set($return = $NULL)\n"
+			+ "  #setVariable(\"$return\" \"my new value\")\n"
+			+ "#end\n"
+			+ "#helloMacro($myVarToSet)"));
+        
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        assertEquals("my new value", velocityContext.get("myVarToSet"));
+    } 
 
+    @Test
+    void setVariableInMacroContext() throws Exception
+    {
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
+			+ "#macro(childMacro $return)\n"
+			+ "  #set($return = $NULL)\n"
+			+ "  #setVariable(\"$return\" \"value from child macro\")\n"
+			+ "#end\n"  		
+			+ "#macro(parentMacro $return)\n"
+			+ "  #childMacro($macro.childMacroResult)\n"
+			+ "  #setVariable(\"$return\" \"${macro.childMacroResult}/parentValue\")\n"
+			+ "#end\n"
+			+ "#parentMacro($myVarToSet)"));
+        
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        assertEquals("value from child macro/parentValue", velocityContext.get("myVarToSet"));
+    } 
+    
     @Test
     void addLivetableLocationFilter() throws Exception
     {

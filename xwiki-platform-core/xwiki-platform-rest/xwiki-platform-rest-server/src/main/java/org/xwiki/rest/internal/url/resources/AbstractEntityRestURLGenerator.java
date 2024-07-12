@@ -40,11 +40,14 @@ import org.xwiki.rest.internal.url.AbstractParametrizedRestURLGenerator;
 public abstract class AbstractEntityRestURLGenerator<T extends EntityReference>
     extends AbstractParametrizedRestURLGenerator<T>
 {
-    protected List<String> getSpaceList(SpaceReference spaceReference)
+    protected List<String> getRestSpaceList(SpaceReference spaceReference)
     {
         List<String> spaces = new ArrayList<>();
         for (EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE; ref =
             ref.getParent()) {
+            if (!spaces.isEmpty()) {
+                spaces.add("spaces");
+            }
             spaces.add(ref.getName());
         }
         Collections.reverse(spaces);

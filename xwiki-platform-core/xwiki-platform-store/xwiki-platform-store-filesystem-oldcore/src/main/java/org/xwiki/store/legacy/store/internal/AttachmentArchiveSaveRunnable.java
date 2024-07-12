@@ -72,8 +72,9 @@ public class AttachmentArchiveSaveRunnable extends StartableTransactionRunnable
         if (archive instanceof VoidAttachmentVersioningStore.VoidAttachmentArchive) {
             return;
         }
+        // If the archive is empty, initialize it
         if (archive.getVersions().length == 0 && archive.getAttachment() != null) {
-            archive.updateArchive(context);
+            archive.addCurrentAttachment(context);
         }
 
         final Version[] versions = archive.getVersions();

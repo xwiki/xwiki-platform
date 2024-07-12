@@ -22,7 +22,6 @@ package org.xwiki.export.pdf.internal.job;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,17 +33,11 @@ import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
 import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
-import org.xwiki.export.pdf.job.PDFExportJobStatus;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
-import org.xwiki.job.AbstractJob;
-import org.xwiki.job.GroupedJob;
-import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -56,21 +49,8 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(PDFExportJob.JOB_TYPE)
-public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobStatus> implements GroupedJob
+public class PDFExportJob extends AbstractPDFExportJob
 {
-    /**
-     * The PDF export job type.
-     */
-    public static final String JOB_TYPE = "export/pdf";
-
-    /**
-     * Used to check access permissions.
-     * 
-     * @see #hasAccess(Right, EntityReference)
-     */
-    @Inject
-    private AuthorizationManager authorization;
-
     @Inject
     private DocumentRenderer documentRenderer;
 
@@ -93,24 +73,6 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
 
     @Inject
     private PrintPreviewURLBuilder printPreviewURLBuilder;
-
-    @Override
-    public String getType()
-    {
-        return JOB_TYPE;
-    }
-
-    @Override
-    public JobGroupPath getGroupPath()
-    {
-        return new JobGroupPath(Arrays.asList("export", "pdf"));
-    }
-
-    @Override
-    protected PDFExportJobStatus createNewStatus(PDFExportJobRequest request)
-    {
-        return new PDFExportJobStatus(getType(), request, this.observationManager, this.loggerManager);
-    }
 
     @Override
     protected void runInternal() throws Exception
@@ -193,22 +155,6 @@ public class PDFExportJob extends AbstractJob<PDFExportJobRequest, PDFExportJobS
         // We approximate the size by counting the characters, which take 1 byte most of the time. We don't have to be
         // very precise.
         return renderingResult.getHTML().length();
-    }
-
-    /**
-     * Check access rights taking into account the job request.
-     * 
-     * @param right the access right to check
-     * @param reference the target entity reference
-     * @return return {@code true} if the current user or the entity author have the specified access right on the
-     *         specified entity, depending on the job request
-     */
-    private boolean hasAccess(Right right, EntityReference reference)
-    {
-        return ((!this.request.isCheckRights()
-            || this.authorization.hasAccess(right, this.request.getUserReference(), reference))
-            && (!this.request.isCheckAuthorRights()
-                || this.authorization.hasAccess(right, this.request.getAuthorReference(), reference)));
     }
 
     private void saveAsPDF() throws IOException

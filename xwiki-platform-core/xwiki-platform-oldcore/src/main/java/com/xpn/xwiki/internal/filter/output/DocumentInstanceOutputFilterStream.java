@@ -281,8 +281,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     {
         // Document author
         UserReference authorUserReference = this.documentReferenceUserReferenceResolver.resolve(authorReference);
-        document.getAuthors().setEffectiveMetadataAuthor(authorUserReference);
-        document.getAuthors().setOriginalMetadataAuthor(authorUserReference);
+        document.setAuthor(authorUserReference);
 
         // Attachments author
         for (XWikiAttachment attachment : document.getAttachmentList()) {
@@ -299,8 +298,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             documentAuthors.copyAuthors(inputDocumentAuthors);
         } else {
             documentAuthors.setEffectiveMetadataAuthor(inputDocumentAuthors.getEffectiveMetadataAuthor());
-            documentAuthors.setContentAuthor(inputDocumentAuthors.getContentAuthor());
             documentAuthors.setOriginalMetadataAuthor(inputDocumentAuthors.getOriginalMetadataAuthor());
+            documentAuthors.setContentAuthor(inputDocumentAuthors.getContentAuthor());
         }
 
         // Attachments author

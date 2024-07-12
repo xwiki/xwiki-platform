@@ -231,8 +231,12 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
     }
 
     function updateSelectedImageReferences(imageReferences, element) {
-      var documentReference = getDocumentReference(element.parents('.image-selector-modal').data('input'));
-      mapScopes[documentReference].updateSelectedImageReferences(imageReferences);
+      // If this method is called when the corresponding tab is not active (e.g., a slow asynchronous query leads
+      // to a call to this method while the tab is not active anymore), then the update is skipped.
+      if (element.parents(".tab-pane").hasClass('active')) {
+        var documentReference = getDocumentReference(element.parents('.image-selector-modal').data('input'));
+        mapScopes[documentReference].updateSelectedImageReferences(imageReferences);
+      }
     }
 
     function createLoader(uploadField, options, element) {

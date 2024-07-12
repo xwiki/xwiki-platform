@@ -43,9 +43,9 @@
 
 == Списки ==
 
-=== 1.0 Списки ===
+=== 1.0 Lists ===
 
-{{info}}Деякі зі згаданих стилів працюють не в усіх браузерах. Щоб отримати повний список, перейдіть за [[це посилання&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
+{{info}}Деякі зі згаданих стилів працюють не в усіх браузерах. Щоб отримати повний список, перейдіть за [[цим посилання&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
 
 |=Функція|=Синтаксис XWiki 1.0|=Результат
 |Маркований список|((({{{
@@ -224,5 +224,188 @@
 (% style="list-style-type: cjk-ideographic" %)
 * Пункт 1
 * Пункт 2
+)))
+
+=== 2.0 Lists ===
+
+{{info}}Some of the mentioned styles do not work on all browsers. For a comprehensive list follow [[this link&gt;&gt;http://www.quirksmode.org/css/lists.html]].{{/info}}
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Bulleted list|((({{{
+* item 1
+** item 2
+*** item 3
+* item 4
+}}})))|(((
+* item 1
+** item 2
+*** item 3
+* item 4
+)))
+|Numbered list|((({{{
+1. item 1
+11. item 2
+111. item 3
+1. item 4
+}}})))|(((
+1. item 1
+11. item 2
+111. item 3
+1. item 4
+)))
+|Mixed list|((({{{
+1. item 1
+1*. item 2
+1*. item 3
+1. item 4
+}}})))|(((
+1. item 1
+1*. item 2
+1*. item 3
+1. item 4
+)))
+|Square list|((({{{
+(% style="list-style-type: square" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: square" %)
+* item 1
+* item 2
+)))
+|Disc list|((({{{
+(% style="list-style-type: disc" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: disc" %)
+* item 1
+* item 2
+)))
+|Lowercase Alphabetical list|((({{{
+(% style="list-style-type: lower-alpha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* item 1
+* item 2
+)))
+|Uppercase Alphabetical list|((({{{
+(% style="list-style-type: upper-alpha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* item 1
+* item 2
+)))
+|Lowercase Roman list|((({{{
+(% style="list-style-type: lower-roman" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* item 1
+* item 2
+)))
+|Uppercase Roman list|((({{{
+(% style="list-style-type: upper-roman" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* item 1
+* item 2
+)))
+|Lowercase Greek list|((({{{
+(% style="list-style-type: lower-greek" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* item 1
+* item 2
+)))
+|Uppercase Greek list|((({{{
+(% style="list-style-type: upper-greek" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* item 1
+* item 2
+)))
+|Hiragana list|((({{{
+(% style="list-style-type: hiragana" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* item 1
+* item 2
+)))
+|Hiragana Iroha list|((({{{
+(% style="list-style-type: hiragana-iroha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* item 1
+* item 2
+)))
+|Katakana list|((({{{
+(% style="list-style-type: katakana" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* item 1
+* item 2
+)))
+|Katakana Iroha list|((({{{
+(% style="list-style-type: katakana-iroha" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* item 1
+* item 2
+)))
+|Armenian list|((({{{
+(% style="list-style-type: armenian" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* item 1
+* item 2
+)))
+|Hebrew list|((({{{
+(% style="list-style-type: hebrew" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* item 1
+* item 2
+)))
+|Georgian list|((({{{
+(% style="list-style-type: georgian" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* item 1
+* item 2
+)))
+|CJK ideographic list|((({{{
+(% style="list-style-type: cjk-ideographic" %)
+* item 1
+* item 2
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* item 1
+* item 2
 )))</content>
 </xwikidoc>

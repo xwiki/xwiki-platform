@@ -1,2 +1,2 @@
 org.xwiki.captcha.script.CaptchaScriptService
-org.xwiki.captcha.script.CaptchaScriptSafeProvider
+org.xwiki.captcha.script.internal.CaptchaScriptSafeProvider

@@ -19,6 +19,9 @@
  */
 package org.xwiki.query.internal;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Represents a part of a HQL parameter. There can be several parts since we separate literals (ie characters that
  * will be escaped) vs special characters having a SQL meaning and that won't be escaped (ie {@code _} and {@code %}).
@@ -45,5 +48,27 @@ public class ParameterPart
     public String getValue()
     {
         return this.value;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ParameterPart that = (ParameterPart) o;
+
+        return new EqualsBuilder().append(value, that.value).isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(63, 37).append(value).toHashCode();
     }
 }

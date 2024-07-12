@@ -53,7 +53,9 @@
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
-       without affecting the whole container (and the other applications hosted). -->
+       without affecting the whole container (and the other applications hosted).
+       The same encoding is also used as default for the response when the encoding is not explicitly
+       specified with the content type. -->
   <filter>
     <filter-name>Set Character Encoding</filter-name>
     <filter-class>org.xwiki.container.servlet.filters.internal.SetCharacterEncodingFilter</filter-class>
@@ -192,7 +194,7 @@
 
   <filter-mapping>
     <filter-name>XWikiRESTContextInitializationFilter</filter-name>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
@@ -278,17 +280,16 @@
     -->
   </servlet>
 
-  <!-- RESTful API Restlet servlet -->
+  <!-- REST Service -->
   <servlet>
-    <servlet-name>RestletServlet</servlet-name>
-    <servlet-class>
-      org.xwiki.rest.internal.XWikiRestletServlet
-    </servlet-class>
+    <servlet-name>RESTServlet</servlet-name>
+    <servlet-class>org.xwiki.rest.jersey.internal.XWikiRESTServlet</servlet-class>
+    <multipart-config/>
   </servlet>
 
   <!-- RESTful API mapping -->
   <servlet-mapping>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 

@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>16.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.30</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -113,6 +113,12 @@
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed for the nested page hierarchy. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-tree-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Needed to resolve the user serializer component -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -122,42 +128,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jee</groupId>
-      <artifactId>org.restlet.ext.servlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jaxrs</artifactId>
-    </dependency>
-    <!-- Replace the version triggered by restlet by a more accurate and up to date one -->
-    <dependency>
-      <groupId>com.tdunning</groupId>
-      <artifactId>json</artifactId>
-    </dependency>
-    <dependency>
-      <!-- We need Jackson for a proper JSON representation of our REST resources.
-        See XWIKI-9136: Rest API JSON does not retrieve inherited fields -->
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jackson</artifactId>
-    </dependency>
-    <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
-        above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not very
-        good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a dedicated
-        JAXB converter for XML representation. -->
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jaxb</artifactId>
-    </dependency>
-    <!-- Replace the version triggered by Restlet by a more accurate one -->
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
     </dependency>
 
     <dependency>
@@ -198,6 +168,11 @@
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Required to test the templates. -->
@@ -260,13 +235,13 @@
                   <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
                   <properties>
                     <property>
-                      <!-- Exclude javax.ws.rs.core.Application & org.restlet.ext.jaxrs.ObjectFactory since we use an
+                      <!-- Exclude javax.ws.rs.core.Application since we use an
                            Inject on them. These are special cases when we don't inject on an interface with a @Role
                            and there's no way for the Spoon checker to find out about this, since only the Component
                            Manager knows what has been registered in it. -->
                       <name>excludedFieldTypes</name>
                       <value><![CDATA[
-                        ["javax.ws.rs.core.Application", "org.restlet.ext.jaxrs.ObjectFactory"]
+                        ["javax.ws.rs.core.Application"]
                       ]]></value>
                     </property>
                   </properties>

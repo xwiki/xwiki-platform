@@ -499,7 +499,7 @@ class DisplayMacroTest
         when(this.dab.getTranslatedDocumentInstance(this.displayedDocument)).thenReturn(this.displayedDocument);
         when(this.displayedDocument.getDocumentReference()).thenReturn(displayedDocumentReference);
         when(this.displayedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
-        when(this.displayedDocument.getXDOM()).thenReturn(getXDOM(displayedContent));
+        when(this.displayedDocument.getPreparedXDOM()).thenReturn(getXDOM(displayedContent));
         when(this.displayedDocument.getRealLanguage()).thenReturn("");
     }
 

@@ -37,17 +37,18 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Nome
 extension.repository.summary=Resumo
 extension.repository.type=Tipo
-### Missing: extension.repository.category=Category
+extension.repository.category=Categoria
 extension.repository.authors=Autores
 extension.repository.doc.creationDate=Criado em
 extension.repository.doc.date=Última modificação
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.rating=Avaliação
+extension.repository.installedCount=Instalações
 
 ## Administration UI
-admin.repository=Repositório da extensão</content>
+admin.repository=Repositório da extensão
+</content>
 </xwikidoc>

@@ -215,13 +215,13 @@ public class LegacyDefaultNotificationFilterManagerTest
         when(filter6.getName()).thenReturn("filter6");
         when(filter7.getName()).thenReturn("filter7");
 
-        Map<String, Boolean> filterActivations = new HashMap<>();
-        filterActivations.put("filter1", true);
-        filterActivations.put("filter2", false);
-        filterActivations.put("filter3", true);
-        filterActivations.put("filter4", false);
-        filterActivations.put("filter5", true);
-        filterActivations.put("filter6", false);
+        Map<String, ToggleableNotificationFilterActivation> filterActivations = new HashMap<>();
+        filterActivations.put("filter1", new ToggleableNotificationFilterActivation("filter1", true, null, -1));
+        filterActivations.put("filter2", new ToggleableNotificationFilterActivation("filter2", false, null, -1));
+        filterActivations.put("filter3", new ToggleableNotificationFilterActivation("filter3", true, null, -1));
+        filterActivations.put("filter4", new ToggleableNotificationFilterActivation("filter4", false, null, -1));
+        filterActivations.put("filter5", new ToggleableNotificationFilterActivation("filter5", true, null, -1));
+        filterActivations.put("filter6", new ToggleableNotificationFilterActivation("filter6", false, null, -1));
         // We don't put filter7 so it should default as being considered activated
 
         when(this.filterPreferencesModelBridge.getToggleableFilterActivations(testUser)).thenReturn(filterActivations);

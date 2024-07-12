@@ -31,7 +31,6 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
@@ -50,7 +49,6 @@ import org.xwiki.rest.XWikiResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -232,18 +230,15 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     }
 
     @Override
-    public Response postNotifications() throws Exception
+    public Response postNotifications(String useUserPreferences, String userId, String untilDate,
+        boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
+        String count, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
+        String displayReadEvents, String displayReadStatus, String tags, String currentWiki, String async,
+        String asyncId, String target) throws Exception
     {
-        // We should seriously consider to stop using Restlet, because the @FormParam attribute does not work.
-        // See: https://github.com/restlet/restlet-framework-java/issues/1120
-        // That's why we need to use this workaround: manually getting the POST params in the request object.
-        XWikiRequest request = getXWikiContext().getRequest();
-        return getNotifications(request.get("useUserPreferences"), request.get("userId"), request.get("untilDate"),
-            BooleanUtils.toBooleanObject(request.get("untilDateIncluded")) != Boolean.FALSE, request.get("blackList"),
-            request.get("pages"), request.get("spaces"), request.get("wikis"), request.get("users"),
-            request.get("count"), request.get("displayOwnEvents"), request.get("displayMinorEvents"),
-            request.get("displaySystemEvents"), request.get("displayReadEvents"), request.get("displayReadStatus"),
-            request.get("tags"), request.get("currentWiki"), request.get("async"), request.get(ASYNC_ID), "alert");
+        return getNotifications(useUserPreferences, userId, untilDate, untilDateIncluded, blackList, pages, spaces,
+            wikis, users, count, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents,
+            displayReadStatus, tags, currentWiki, async, asyncId, "alert");
     }
 
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,

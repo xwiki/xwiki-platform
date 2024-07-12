@@ -623,6 +623,32 @@ XWiki.Annotation = Class.create({
     document.observe('xwiki:docextra:loaded', this.addDeleteListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addEditListenersInTab.bindAsEventListener(this));
     document.observe('xwiki:docextra:loaded', this.addValidateListenersInTab.bindAsEventListener(this));
+    // List for clicks on annotated texts on the comments. 
+    // Takes care to load the annotations and to make them visible before moving
+    // the user to the anchor corresponding to the requested annotation.
+    require(['jquery'], ($) =&gt; {
+      $(document).on('click', 'blockquote.annotatedText', (event) =&gt; {
+        if(this.fetchedAnnotations) {
+          // In this case the annotations are just made visible (if need be). This is synchrnous and
+          // we can just let the click event bubble up.
+          this.setAnnotationVisibility(true);
+          this.toggleAnnotations(this.displayingAnnotations);
+        } else {
+          // In this case we need to fetch the annotations fist. As this is asynchronous we need to wait for 
+          // the annotations to be fetched before moving the user to the anchor.
+          this.fetchAnnotations(true);
+          event.preventDefault();
+          // Wait for fetchedAnnotations to become true before changing the location, as otherwise
+          // the anchor wouldn't be present and the user wouldn't scroll to the right location.
+          const intervalId = setInterval(() =&gt; {
+            if(this.fetchedAnnotations) {
+              clearInterval(intervalId);
+              window.location = $(event.target).parents('a').attr('href');
+            }
+          })
+        }
+      });
+    });
     // refresh the annotations displayed on the document when an annotation is deleted as a comment, that is from the comments tab when annotations are merged with comments
     document.observe('xwiki:annotation:tab:deleted', this.refreshAnnotationsOnCommentDelete.bindAsEventListener(this));
     // register the key shortcuts for adding an annotation

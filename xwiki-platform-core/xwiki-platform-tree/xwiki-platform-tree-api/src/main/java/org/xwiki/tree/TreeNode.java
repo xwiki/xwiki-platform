@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * The interface used to represent a node in a tree structure.
@@ -82,4 +83,14 @@ public interface TreeNode
      * @return the map of tree node properties
      */
     Map<String, Object> getProperties();
+
+    /**
+     * @since 16.4.0RC1
+     * @return the tree node type (usually the hint of the tree node implementation)
+     */
+    @Unstable
+    default String getType()
+    {
+        return null;
+    }
 }

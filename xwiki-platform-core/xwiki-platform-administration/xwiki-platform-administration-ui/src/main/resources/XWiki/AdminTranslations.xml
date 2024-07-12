@@ -140,6 +140,11 @@ administration.section.users.deleteUser.newAuthor.error=The selected user doesn'
 administration.section.users.deleteUser.newAuthor.programming=programming
 administration.section.users.deleteUser.newAuthor.script=script
 admin.usersgroups.extensionrights=Extension Rights
+  
+# Groups section
+administration.section.groups.deleteUserFromGroup.loading=Removing member from group
+administration.section.groups.deleteUserFromGroup.success=Member successfully removed from group
+administration.section.groups.deleteUserFromGroup.failure=Failed to remove member from group
 
 # Other Category
 admin.other=Other

@@ -243,7 +243,7 @@ admin.wikis.templates.hint=Um template é uma wiki que será considerada como um
 ## XWikiServer Sheet
 platform.wiki.sheet.title=Descritor da wiki "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=O alias Wiki "{0}" já existe.
-platform.wiki.sheet.erroraliasdoesnotexists=O alias Wiki "{0}" não existe.
+platform.wiki.sheet.erroraliasdoesnotexists=O alias do wiki "{0}" não existe.
 ### Missing: platform.wiki.sheet.title.settings=Wiki properties
 platform.wiki.sheet.title.createnewalias=Criar novo apelido
 ### Missing: platform.wiki.sheet.title.viewaliases=View aliases

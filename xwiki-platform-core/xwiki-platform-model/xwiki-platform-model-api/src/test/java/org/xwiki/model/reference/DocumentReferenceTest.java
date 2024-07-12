@@ -46,6 +46,13 @@ class DocumentReferenceTest
             new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
         assertEquals(reference, new DocumentReference("wiki", Arrays.asList("space"), "page"));
         assertEquals(reference, new DocumentReference("page", new SpaceReference("space", new WikiReference("wiki"))));
+        assertEquals(reference,
+            new DocumentReference("page", new SpaceReference("space", new WikiReference("wiki")), (Locale) null));
+        assertEquals(reference, new DocumentReference("wiki", "space", "page", (Locale) null));
+        assertEquals(reference, new DocumentReference("wiki", "space", "page", (String) null));
+
+        reference = new DocumentReference("wiki", "space", "page", Locale.CANADA);
+        assertEquals(reference, new DocumentReference("wiki", "space", "page", "en_CA"));
     }
 
     @Test

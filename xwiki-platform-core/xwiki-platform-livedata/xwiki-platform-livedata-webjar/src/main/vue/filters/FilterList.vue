@@ -92,8 +92,14 @@ export default {
             // When no values are selected, simply remove the filter.
             this.removeFilter();
           } else if (value !== this.value) {
-            // If the selected value has an empty value, then use the empty filter, otherwise use the contains filter.
-            this.applyFilter(value, value === '' ? 'empty' : 'contains');
+            // If the selected value has an empty value, then use the empty operator, otherwise use the default operator
+            // Note that this imply that any filter list descriptor needs to have an empty operator defined.
+            if (value === '') {
+              this.applyFilter(value, 'empty');
+            } else {
+              // Fallback on default operator.
+              this.applyFilter(value);
+            }
           }
         },
       };

@@ -45,20 +45,7 @@
   #set ($text = "$!request.text")
   #set ($stripHTMLEnvelope = $request.stripHTMLEnvelope == 'true')
   #set ($output = "#ckeditor_convert($text $toHTML $fromHTML $stripHTMLEnvelope)")
-  #set ($characterEncoding = 'utf-8')
-  ## Make sure the Character Encoding response header matches the character encoding used to write the response and
-  ## compute its length. See CKEDITOR-162: Cannot convert to source code
-  #set ($discard = $response.setCharacterEncoding($characterEncoding))
-  ## We write the output directly to the response to avoid the execution of the Rendering Transformations. Another
-  ## option would be to specify which Rendering Transformations to execute in the query string (XWIKI-13167).
-  ## See CKEDITOR-51: Icon transformations are saved by CKEditor
-  #set ($discard = $response.writer.print($output))
-  ## The content length is measured in bytes and one character can use more than one byte.
-  #set ($discard = $response.setContentLength($output.getBytes($characterEncoding).size()))
-  ## Make sure the entire content is send back to the client.
-  #set ($discard = $response.flushBuffer())
-  ## Make sure XWiki doesn't write any more content to the response.
-  #set ($discard = $xcontext.setFinished(true))
+  #rawResponse($output)
 #else
   The service used by the CKEditor source plugin to convert between HTML and wiki syntax.
 #end

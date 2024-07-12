@@ -114,7 +114,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
             installExtension(extensionId, namespace, currentTree);
 
             // Cleanup
-            this.extensionsNodeCache.clear();
+            this.extensionsCache.clear();
 
             return currentTree.get(0).getAction().getExtension();
         } catch (InstallException e) {

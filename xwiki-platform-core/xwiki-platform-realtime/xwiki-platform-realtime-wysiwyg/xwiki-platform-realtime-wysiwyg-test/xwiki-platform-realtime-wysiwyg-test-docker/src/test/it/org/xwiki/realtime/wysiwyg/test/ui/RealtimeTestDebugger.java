@@ -78,6 +78,10 @@ public class RealtimeTestDebugger implements TestExecutionExceptionHandler
 
     private void printRealtimeDebugInfo(XWikiWebDriver driver)
     {
-        LOGGER.info("Realtime debug info: " + driver.executeScript("return JSON.stringify(window.REALTIME_DEBUG)"));
+        try {
+            LOGGER.info("Realtime debug info: " + driver.executeScript("return JSON.stringify(window.REALTIME_DEBUG)"));
+        } catch (Exception e) {
+            LOGGER.warn("Failed to get realtime debug info: " + e.getMessage());
+        }
     }
 }

@@ -47,7 +47,7 @@
         dispatcher: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.ResourceDispatcher',
           outputSyntax: 'plain',
-          language: $('html').attr('lang') || ''
+          language: editor.getContentLocale()
         }))
       }, editor.config['xwiki-resource']);
     }

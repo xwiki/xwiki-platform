@@ -21,15 +21,15 @@ package org.xwiki.wiki.template.internal;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
-import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
 import org.xwiki.wiki.template.WikiTemplatePropertyGroup;
 
 import com.xpn.xwiki.XWiki;
@@ -37,9 +37,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,43 +51,42 @@ import static org.mockito.Mockito.when;
  * @since 5.4.2
  * @version $Id$
  */
-public class WikiTemplatePropertyGroupProviderTest
+@ComponentTest
+class WikiTemplatePropertyGroupProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<WikiPropertyGroupProvider> mocker =
-            new MockitoComponentMockingRule(WikiTemplatePropertyGroupProvider.class, WikiPropertyGroupProvider.class,
-                    "template");
+    @InjectMockComponents
+    private WikiTemplatePropertyGroupProvider provider;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     private XWikiContext xcontext;
 
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        wikiDescriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
     }
 
     @Test
-    public void get() throws Exception
+    void get() throws Exception
     {
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId")).thenReturn(descriptorDocument);
+        when(this.wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId")).thenReturn(descriptorDocument);
         BaseObject object = mock(BaseObject.class);
         when(descriptorDocument.getXObject(eq(WikiTemplateClassDocumentInitializer.SERVER_CLASS))).thenReturn(object);
         when(object.getIntValue("iswikitemplate", 0)).thenReturn(1);
 
         // Test
-        WikiPropertyGroup result = mocker.getComponentUnderTest().get("wikiId");
+        WikiPropertyGroup result = this.provider.get("wikiId");
 
         // Verify
         assertEquals(true, result.get("isTemplate"));
@@ -94,13 +94,13 @@ public class WikiTemplatePropertyGroupProviderTest
         assertTrue(((WikiTemplatePropertyGroup)result).isTemplate());
 
         XWikiDocument descriptorDocument2 = mock(XWikiDocument.class);
-        when(wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId2")).thenReturn(descriptorDocument2);
+        when(this.wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId2")).thenReturn(descriptorDocument2);
         BaseObject object2 = mock(BaseObject.class);
         when(descriptorDocument2.getXObject(eq(WikiTemplateClassDocumentInitializer.SERVER_CLASS))).thenReturn(object2);
         when(object2.getIntValue("iswikitemplate", 0)).thenReturn(0);
 
         // Test
-        WikiPropertyGroup result2 = mocker.getComponentUnderTest().get("wikiId2");
+        WikiPropertyGroup result2 = this.provider.get("wikiId2");
 
         // Verify
         assertEquals(false, result2.get("isTemplate"));
@@ -109,35 +109,30 @@ public class WikiTemplatePropertyGroupProviderTest
     }
 
     @Test
-    public void getWhenNoObject() throws Exception
+    void getWhenNoObject() throws Exception
     {
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId")).thenReturn(descriptorDocument);
+        when(this.wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId")).thenReturn(descriptorDocument);
 
         // Test
-        WikiPropertyGroup result = mocker.getComponentUnderTest().get("wikiId");
+        WikiPropertyGroup result = this.provider.get("wikiId");
 
         // Verify
         assertEquals(false, result.get("isTemplate"));
     }
 
     @Test
-    public void getWhenException() throws Exception
+    void getWhenException() throws Exception
     {
-        WikiManagerException exception = new WikiManagerException("error in WikiManager");
-        when(wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId")).thenThrow(exception);
+        WikiManagerException expectedException = new WikiManagerException("error in WikiManager");
+        when(this.wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId")).thenThrow(expectedException);
 
         // Test
-        boolean exceptionCaught = false;
-        try {
-            mocker.getComponentUnderTest().get("wikiId");
-        } catch(WikiPropertyGroupException e) {
-            exceptionCaught = true;
-            assertEquals("Unable to load descriptor document for wiki [wikiId].", e.getMessage());
-            assertEquals(exception, e.getCause());
-        }
-
-        assertTrue(exceptionCaught);
+        Throwable exception = assertThrows(WikiPropertyGroupException.class, () -> {
+            this.provider.get("wikiId");
+        });
+        assertEquals("Unable to load descriptor document for wiki [wikiId].", exception.getMessage());
+        assertEquals(expectedException, exception.getCause());
     }
 
 }

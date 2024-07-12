@@ -80,7 +80,7 @@
   #set ($class = $doc.getObject($className).xWikiClass)
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
-    ; $services.rendering.escape($prop.prettyName, 'xwiki/2.1')
+    ; {{html}}&lt;label for="${className}_$escapetool.xml($doc.getObject($className).getNumber())_$escapetool.xml($prop.name)"&gt;$escapetool.xml($prop.prettyName)&lt;/label&gt;{{/html}}
     : #if($prop.name == 'logo')## Avoid line break
       {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}}## Avoid line break
     #else$doc.display($prop.name)#end

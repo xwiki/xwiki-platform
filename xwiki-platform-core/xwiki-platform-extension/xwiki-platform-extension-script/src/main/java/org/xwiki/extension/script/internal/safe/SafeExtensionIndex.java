@@ -27,7 +27,7 @@ import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.ExtensionIndexStatus;
 import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.job.JobException;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to the extension index.

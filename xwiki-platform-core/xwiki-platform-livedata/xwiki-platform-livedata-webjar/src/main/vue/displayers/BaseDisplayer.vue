@@ -231,7 +231,6 @@ export default {
       // If the touched element is a link and/or is editable, we display the popover.
       // If the touch element is a link, we get its target and display a following link action to its target.
       if(this.interceptTouch && this.isView && !this.duringEditing) {
-        e.preventDefault();
         const targetsLink = e.target.tagName.toLowerCase() === 'a';
         if (targetsLink) {
           this.href = e.target.getAttribute('href');
@@ -239,7 +238,8 @@ export default {
           this.href = undefined;
         }
 
-        if (this.isEditable || targetsLink) {
+        if (this.isEditable && targetsLink) {
+          e.preventDefault();
           this.$refs.tippy.tip.show();
         }
       }

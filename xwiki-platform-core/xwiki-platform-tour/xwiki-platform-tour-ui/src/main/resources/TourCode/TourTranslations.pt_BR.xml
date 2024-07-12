@@ -62,18 +62,19 @@ tour.livetable.targetClass=Classe de destino
 tour.popover.previous=&lt;&lt; Anterior
 tour.popover.next=Próximo &gt;&gt;
 tour.popover.end=Finalizar tour
+tour.popover.quit=Sair do passeio
 tour.popover.show=Mostrar Tour
 tour.popover.show.hint=Você pode recomeçar o tour clicando neste botão a qualquer momento
 
 # Steps
 TourCode.StepClass_order=Ordem
-### Missing: TourCode.StepClass_element=Element (CSS selector that identify an element)
+TourCode.StepClass_element=Elemento (seletor CSS que identifica um elemento)
 TourCode.StepClass_title=Título
 TourCode.StepClass_content=Conteúdo
 TourCode.StepClass_backdrop=Plano de fundo
 ### Missing: TourCode.StepClass_placement=Placement
 TourCode.StepClass_targetPage=Página de Destino
-### Missing: TourCode.StepClass_action=Target Action
+TourCode.StepClass_action=Ação alvo
 TourCode.StepClass_queryString=String de Consulta
 tour.steps=Passos
 tour.steps.new_step=Novo Passo
@@ -95,5 +96,6 @@ tour.upgrade.successNothing=Você não tem nada para atualizar!
 
 # Template
 tour.template.name=Tour
-tour.template.description=Tour passo a passo</content>
+tour.template.description=Tour passo a passo
+</content>
 </xwikidoc>

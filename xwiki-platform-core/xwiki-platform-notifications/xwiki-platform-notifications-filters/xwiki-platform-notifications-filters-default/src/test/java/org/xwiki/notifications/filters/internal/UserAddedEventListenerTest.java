@@ -102,17 +102,14 @@ public class UserAddedEventListenerTest
         Set<NotificationFilterPreference> expectedSet = new HashSet<>();
         DefaultNotificationFilterPreference expectedFilterPref1 = new DefaultNotificationFilterPreference();
         expectedFilterPref1.setFilterName("filter1");
-        expectedFilterPref1.setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
         expectedSet.add(expectedFilterPref1);
 
         DefaultNotificationFilterPreference expectedFilterPref2 = new DefaultNotificationFilterPreference();
         expectedFilterPref2.setFilterName("filter2");
-        expectedFilterPref2.setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
         expectedSet.add(expectedFilterPref2);
 
         DefaultNotificationFilterPreference expectedFilterPref3 = new DefaultNotificationFilterPreference();
         expectedFilterPref3.setFilterName("filter3");
-        expectedFilterPref3.setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
         expectedSet.add(expectedFilterPref3);
 
         when(userDoc.getXObjects(UserAddedEventListener.TOGGLEABLE_FILTER_PREFERENCE_CLASS))

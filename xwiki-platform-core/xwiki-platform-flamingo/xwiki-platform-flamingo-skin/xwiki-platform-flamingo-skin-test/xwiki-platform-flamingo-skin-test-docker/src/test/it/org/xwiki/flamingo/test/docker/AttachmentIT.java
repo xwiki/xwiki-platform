@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -57,7 +59,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.Execute\\..*"
 })
 class AttachmentIT
 {
@@ -471,5 +474,29 @@ class AttachmentIT
         sb.append("{{/velocity}}");
 
         return sb.toString();
+    }
+
+    @Test
+    @Order(10)
+    void attachmentContentLocation(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.createPage(testReference, "", "");
+
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, FIRST_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(FIRST_ATTACHMENT);
+        assertTrue(attachmentsPane.attachmentExistsByFileName(FIRST_ATTACHMENT));
+
+        // Make sure the content of the attachment is actually referencing the last version in the history storage
+        assertEquals("fv1.1.txt",
+            StringUtils.substringAfterLast(setup.executeWikiPlain(
+                """
+                    {{groovy}}
+                      println xwiki.getDocument('%s').document.getAttachment('%s').getAttachmentContent(xcontext.context).storageFile
+                    {{/groovy}}
+                    """
+                    .formatted(setup.serializeReference(testReference), FIRST_ATTACHMENT),
+                Syntax.XWIKI_2_1), '/'));
     }
 }

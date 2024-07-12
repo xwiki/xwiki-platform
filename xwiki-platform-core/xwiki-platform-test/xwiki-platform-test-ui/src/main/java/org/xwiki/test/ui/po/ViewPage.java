@@ -150,7 +150,8 @@ public class ViewPage extends BasePage
             // Ensure that the template choice popup is displayed. Since this is done using JS we need to wait till
             // it's displayed. For that we wait on the Create button since that would mean the template radio buttons
             // will all have been displayed.
-            getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='modal-popup']//input[@type='submit']"));
+            getDriver().waitUntilElementIsVisible(
+                By.xpath("//div[@class='modal-dialog']//form[@id='create']//button[@type='submit']"));
         }
     }
 

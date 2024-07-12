@@ -161,6 +161,7 @@ com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.internal.user.MyPersistentLoginManagerProvider
 com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier
 com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
+org.xwiki.internal.web.EffectiveAuthorSetterListener
 org.xwiki.internal.web.GetDocExistValidator
 org.xwiki.internal.web.ViewDocExistValidator
 com.xpn.xwiki.objects.meta.BooleanMetaClass

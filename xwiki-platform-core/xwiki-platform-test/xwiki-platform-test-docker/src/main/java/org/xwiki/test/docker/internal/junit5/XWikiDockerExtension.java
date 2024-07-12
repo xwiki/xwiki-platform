@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.slf4j.Logger;
@@ -37,7 +36,6 @@ import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
@@ -91,16 +89,13 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  * @version $Id$
  * @since 10.6RC1
  */
-public class XWikiDockerExtension extends AbstractExtension
+public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
     private static final String SUPERADMIN = "superadmin";
 
     private boolean isVncStarted;
-
-    private ExtensionContextTestConfigurationResolver testConfigurationMerger =
-        new ExtensionContextTestConfigurationResolver();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)
@@ -137,11 +132,11 @@ public class XWikiDockerExtension extends AbstractExtension
             // See https://github.com/testcontainers/testcontainers-java/issues/2253
             setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
         }
-        if (testConfiguration.isDebug()) {
-            // Debug: get logs when starting the sshd container
+        if (testConfiguration.isVerbose()) {
+            // Get logs when starting the sshd container
             setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
                 TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
-            // Debug: get logs when starting the vnc container
+            // Get logs when starting the vnc container
             setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
                 TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
         }
@@ -153,7 +148,7 @@ public class XWikiDockerExtension extends AbstractExtension
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
         ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration.isOffline(),
-            testConfiguration.isDebug(), repositoryResolver);
+            testConfiguration.isVerbose(), repositoryResolver);
         MavenResolver mavenResolver =
             new MavenResolver(testConfiguration.getProfiles(), artifactResolver, repositoryResolver);
 
@@ -278,7 +273,11 @@ public class XWikiDockerExtension extends AbstractExtension
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideo(extensionContext);
+        try {
+            saveScreenshotAndVideo(extensionContext);
+        } catch (Exception e) {
+            LOGGER.error("Failed to save the video", e);
+        }
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
         displayAgentName();
@@ -340,42 +339,6 @@ public class XWikiDockerExtension extends AbstractExtension
         }
     }
 
-    @Override
-    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
-    {
-        // This method is the first one called in the test lifecycle. It's called for the top level test class but
-        // also for nested test classes. So if the test class has parent tests and one of them has the @UITest
-        // annotation then it means all containers have already been started and the servlet engine is supported.
-        if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
-            // Create & save the test configuration so that we can access it in afterAll()
-            TestConfiguration testConfiguration = this.testConfigurationMerger.resolve(extensionContext);
-            saveTestConfiguration(extensionContext, testConfiguration);
-            // Skip the test if the Servlet Engine selected is in the forbidden list
-            if (isServletEngineForbidden(testConfiguration)) {
-                return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
-                    testConfiguration.getServletEngine()));
-            } else {
-                return ConditionEvaluationResult.enabled(String.format("Servlet Engine [%s] is supported, continuing",
-                    testConfiguration.getServletEngine()));
-            }
-        } else {
-            return ConditionEvaluationResult.enabled("Servlet Engine is supported by parent Test class, continuing");
-        }
-    }
-
-    private boolean hasParentTestContainingUITestAnnotation(ExtensionContext extensionContext)
-    {
-        boolean hasUITest = false;
-        ExtensionContext current = extensionContext;
-        // Note: the top level context is the JUnitJupiterExtensionContext one and it doesn't contain any test and
-        // thus calling getRequiredTestClass() throws an exception on it, which is why we skip it.
-        while (current.getParent().get().getParent().isPresent() && !hasUITest) {
-            current = current.getParent().get();
-            hasUITest = current.getRequiredTestClass().isAnnotationPresent(UITest.class);
-        }
-        return hasUITest;
-    }
-
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
         ExtensionContext extensionContext) throws Exception
     {
@@ -404,8 +367,10 @@ public class XWikiDockerExtension extends AbstractExtension
             testConfiguration.getServletEngine().getInternalPort()));
 
         // Setup the wcag validation context.
-        testContext.getUtil().getWCAGUtils().setupWCAGValidation(testConfiguration.isWCAG(),
-            extensionContext.getTestClass().get().getName());
+        testContext.getUtil().getWCAGUtils().setupWCAGValidation(
+            testConfiguration.isWCAG(),
+            extensionContext.getTestClass().get().getName(),
+            testConfiguration.shouldWCAGStopOnError());
 
 
         // - the one used by RestTestUtils, i.e. outside of any container
@@ -491,11 +456,6 @@ public class XWikiDockerExtension extends AbstractExtension
     private String computeXWikiURLPrefix(String ip, int port)
     {
         return String.format("http://%s:%s/xwiki", ip, port);
-    }
-
-    private boolean isServletEngineForbidden(TestConfiguration testConfiguration)
-    {
-        return testConfiguration.getForbiddenServletEngines().contains(testConfiguration.getServletEngine());
     }
 
     private void saveScreenshotAndVideo(ExtensionContext extensionContext)

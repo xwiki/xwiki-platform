@@ -1160,12 +1160,16 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
                 if (id != null) {
                     // Looking for the label associated to the input.
                     boolean hasLabel = false;
-                    for (Element label : getElement(ELEM_BODY).getElementsByTag("label")) {
+                    String labelTagName = "label";
+                    for (Element label : getElement(ELEM_BODY).getElementsByTag(labelTagName)) {
                         if (id.equals(label.attr("for"))) {
                             hasLabel = true;
                             break;
                         }
                     }
+                    // From MDN webdocs: Alternatively, you can nest the <input> directly inside the <label>,
+                    // in which case the for and id attributes are not needed because the association is implicit
+                    hasLabel = hasLabel || input.parent().tag().getName().equals(labelTagName);
                     assertTrue(Type.ERROR, message, hasLabel);
                 }
             }

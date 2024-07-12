@@ -134,11 +134,13 @@ class DefaultOfficeConverterTest
         when(this.localConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
         for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
             "application/vnd.oasis.opendocument.presentation", "application/vnd.ms-powerpoint",
-            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel")) {
-            assertTrue(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel", "text/html")) {
+            assertTrue(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"),
+                String.format("%s conversion to text/html not supported", mediaType));
         }
         for (String mediaType : Arrays.asList("foo/bar", "application/pdf")) {
-            assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+            assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"),
+                String.format("%s conversion to text/html supported while it shouldn't", mediaType));
         }
     }
 

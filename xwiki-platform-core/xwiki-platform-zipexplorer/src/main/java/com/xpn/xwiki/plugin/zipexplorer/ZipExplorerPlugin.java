@@ -106,13 +106,16 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
-        String url = context.getRequest().getRequestURI();
-
         // Verify if we should return the original attachment. We do so when:
+        // * the passed attachment is null
         // * the requested URL doesn't point to a zip file
         // * or the request URL doesn't point to a file inside a zip file
         // * or if the passed attachment points to a Nested Space. This is because currently the Zip Explorer plugin
         //   doesn't support Nested Spaces (See https://jira.xwiki.org/browse/XWIKI-12448).
+        if (attachment == null) {
+            return null;
+        }
+        String url = context.getRequest().getRequestURI();
         if (attachment.getReference().getDocumentReference().getSpaceReferences().size() > 1
             || !isValidZipURL(url, context.getAction().trim()))
         {

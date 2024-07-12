@@ -22,8 +22,8 @@ package org.xwiki.notifications;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -173,7 +173,9 @@ public class CompositeEvent
      */
     public Set<DocumentReference> getUsers()
     {
-        Set<DocumentReference> users = new HashSet();
+        // Use a linked hash set to follow the order in which events were added:
+        // this avoids problems when testing
+        Set<DocumentReference> users = new LinkedHashSet<>();
         for (Event event : events) {
             users.add(event.getUser());
         }

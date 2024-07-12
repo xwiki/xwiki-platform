@@ -95,7 +95,9 @@ define('xwiki-attachment-picker-solr-search', ['jquery'], function($) {
         } else {
           typesFqs = [];
         }
-        const computedFqs = ['type:ATTACHMENT'].concat(optionsFqs).concat(typesFqs);
+        // Forcing the acceptance of all locales, otherwise only the attachments of documents with the same locale
+        // as the current document are returned.
+        const computedFqs = ['type:ATTACHMENT', 'locale:*'].concat(optionsFqs).concat(typesFqs);
         const computedParams = [];
 
         computedParams.push(...computedFqs.map((fq) => 'fq=' + fq));

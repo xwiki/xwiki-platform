@@ -71,5 +71,5 @@
  * Display a category header in the drawer
  *#
 #macro(drawerCategoryHeader $title)
-  <li class="drawer-category-header"><hr class="hidden"/>$title</li>
+  <li class="drawer-category-header"><hr class="hidden"/>$escapetool.xml($title)</li>
 #end

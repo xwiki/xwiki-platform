@@ -339,8 +339,6 @@
       #if($propertiesToShow.size() &gt; 0 &amp;&amp; !$propertiesToShow.contains($propName))
         ## Silently skip over this property.
       #else
-        #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
-        ##
         #set($hintKey = "${obj.xWikiClass.name}_${propName}.hint")
         #set($hint = $services.localization.render($hintKey))
         #if($hint == $hintKey)
@@ -364,11 +362,10 @@
           $out ##
           #set ($out = '')
         #end
-        $escapetool.xml($prettyName)
+        $escapetool.xml($app.displayPrettyName($propName, $obj))
         &lt;/label&gt;
         #if($linkPrefix != '')
-          #set($linkScript = "$linkPrefix$propName")
-          &lt;a href="$escapetool.xml("#evaluate($linkScript)")" class="xHelp" title="$services.localization.render('admin.documentation')"&gt;$services.localization.render('admin.documentation')&lt;/a&gt;
+          &lt;a href="$escapetool.xml($linkPrefix + $propName)" class="xHelp" title="$services.localization.render('admin.documentation')"&gt;$services.localization.render('admin.documentation')&lt;/a&gt;
         #end
         #if ($hint)
           &lt;span class="xHint"&gt;$hint&lt;/span&gt;

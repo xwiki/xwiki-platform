@@ -132,3 +132,86 @@ img {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+// User preferences ===========================================================
+body {
+  /* We apply various user preference related styles to the content of the page.
+   We use classes that are added to the body itself in htmlheader.vm */
+  // Link underlining preference
+  &.preference-underlining-yes {
+    a {
+      text-decoration: underline;
+    }
+  }
+
+  &.preference-underlining-only-inline-links {
+    // Define an inline link mixin
+    .not-inline-link {
+      text-decoration: none;
+      // Make sure we don't take over the default behaviour on hover with too much specificity.
+      &:hover, &:focus {
+        text-decoration: underline;
+      }
+    }
+
+    // Main rule for the content
+    #xwikicontent a {
+      text-decoration: underline;
+    }
+
+    // UIs where we want to underline outside of content.
+    .xdocLastModification, // Under the title, this link is inline so we want to underline it.
+    .panel[class*="HelpTipsPanel "], // This panel, unlike other panels, contains mostly text with underline links.
+    .commentauthor // Similarly to the page last modificator, we want to underline comment authors.
+    {
+      & a {
+        text-decoration: underline;
+      }
+    }
+
+    /* UIs in content where we want to not underline by default.
+      Those elements usually contain only links that are not inline (and a lot of links). */
+    #xwikicontent {
+      & .xwiki-livetable-container, // Do not underline links in livetables
+      & .xtree, // Do not underline links in livetables
+      & .xwikitabbar, // Do not underline links in the tab bar. An example of this is the one containing document metadata at the bottom of ny doc.
+      & .buttonwrapper, // Do not underline links that are inside buttonwrapper. Those will be styled like buttons and we want to keep their style consistent with buttons.
+      & #user-menu-col, // In the user profile, do not underline the menu items.
+      & .jstree-xwiki // Do not underline links in jstrees
+      {
+        & a {
+          .not-inline-link();
+        }
+      }
+
+      /* Remove the underlining from links with the btn class.
+       Those are already styled differently from their neighboring text. */
+      & a.btn {
+        .not-inline-link();
+      }
+
+      /* Remove the underlining from links with an image or an icon.
+        In the vast majority of cases, these links are already easy to find.
+       */
+      & a:has(img), // With an image or an icon from the Silk iconTheme
+      & a:has(span.fa) { // With an icon from the Font Awesome iconTheme
+        .not-inline-link();
+      }
+    }
+
+    // Helper classes for easier content customization. Note that those only work for this preference.
+    #xwikicontent .force-no-underline a {
+      text-decoration: none;
+    }
+
+    .force-underline a {
+      text-decoration: underline;
+    }
+  }
+
+  &.preference-underlining-no {
+    a {
+      text-decoration: none;
+    }
+  }
+}

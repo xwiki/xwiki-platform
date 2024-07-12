@@ -212,4 +212,10 @@ public class AllIT
     class NestedXARExportIT extends XARExportIT
     {
     }
+
+    @Nested
+    @DisplayName("Page Ready Tests")
+    class NestedPageReadyIT extends PageReadyIT
+    {
+    }
 }

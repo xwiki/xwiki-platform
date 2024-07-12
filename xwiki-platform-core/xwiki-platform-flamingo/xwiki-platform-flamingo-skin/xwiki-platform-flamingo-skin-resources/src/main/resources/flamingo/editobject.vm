@@ -46,7 +46,7 @@
         #cleanClassname(${class.name}) <span class="editor-objectNumber">${obj.number}</span>#if ($firstField): $firstFieldSummary#end
       </button>
     </h3>
-    <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.icon.renderHTML('cross')</a>
+    <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.icon.renderHTML('trash')</a>
     #if (!$hasCustomObject)
       <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.icon.renderHTML('pencil')</a>
     #end

@@ -77,7 +77,7 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
         })))
         <a class="tool delete" href="$deletePropURL" title="$services.localization.render(
           'core.editors.class.deleteProperty.tooltip', [$field.name])">
-          <span role="presentation">$services.icon.renderHTML('cross')</span>
+          <span role="presentation">$services.icon.renderHTML('trash')</span>
           <span class="sr-only">$services.localization.render(
             'core.editors.class.deleteProperty.text')</span></a>
       </div>

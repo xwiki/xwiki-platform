@@ -19,7 +19,7 @@
 ## ---------------------------------------------------------------------------
 #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
 #if(!$request.getParameter("forceLeftPanels"))
-<button id="leftPanelsToggler" class="btn btn-default btn-xs" title="$services.localization.render('panels.column.toggler.left.label')">$services.icon.renderHTML('caret-right')</button>
+<button id="leftPanelsToggler" class="btn btn-default" title="$services.localization.render('panels.column.toggler.left.label')">$services.icon.renderHTML('caret-right')</button>
 #end
 <div id="leftPanels" class="panels left panel-width-$!{leftPanelsWidth}"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
 ## Global Variable

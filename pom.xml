@@ -1347,8 +1347,8 @@
               </extensionOverride>
               <extensionOverride>
                 <!-- Open Java is the same as JSON-Java but with a different license -->
-                <id>com.tdunning:json</id>
-                <features>org.json:json/20180130</features>
+                <id>org.json:json</id>
+                <features>com.tdunning:json</features>
               </extensionOverride>
               <extensionOverride>
                 <!-- Embbed javax.el:javax.el-api -->

@@ -96,7 +96,7 @@
         Required by org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry which is used to configure the
         office document conversion.
       -->
-      <groupId>com.tdunning</groupId>
+      <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
     <dependency>

@@ -22,11 +22,13 @@ package org.xwiki.model.reference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -161,5 +163,21 @@ class DocumentReferenceTest
             new DocumentReference("wiki", "space", "page", Locale.ROOT).withoutLocale());
         assertEquals(new DocumentReference("wiki", "space", "page"),
             new DocumentReference("wiki", "space", "page").withoutLocale());
+    }
+
+    @Test
+    void valueOf()
+    {
+        assertEquals(Optional.empty(), DocumentReference.valueOf(null));
+        DocumentReference documentReference = new DocumentReference("xwiki", "Foo", "Bar");
+        Optional<DocumentReference> obtainedReference = DocumentReference.valueOf(documentReference);
+        assertFalse(obtainedReference.isEmpty());
+        assertSame(documentReference, obtainedReference.get());
+
+        assertEquals(Optional.empty(), DocumentReference.valueOf(new WikiReference("foo")));
+        assertEquals(Optional.empty(), DocumentReference.valueOf(documentReference.getLastSpaceReference()));
+
+        assertEquals(Optional.of(documentReference),
+            DocumentReference.valueOf(new ObjectReference("Foo", documentReference)));
     }
 }

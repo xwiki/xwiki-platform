@@ -19,6 +19,11 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +36,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
+import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
@@ -54,18 +61,20 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Test of the CKEditor Image Plugin.
  *
  * @version $Id$
  * @since 14.7RC1
  */
-@UITest
+@UITest(
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    },
+    resolveExtraJARs = true
+)
 class ImageIT extends AbstractCKEditorIT
 {
     
@@ -162,7 +171,8 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]",
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+                + "data-xwiki-image-style-border=\"true\"]]",
             savedPage.editWiki().getContent());
 
         // Re-edit the page.
@@ -170,7 +180,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.id("Iimage.gif")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogStandardEditForm = imageDialogEditModal.switchToStandardTab();
@@ -258,7 +268,7 @@ class ImageIT extends AbstractCKEditorIT
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
 
-        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.END, Keys.ENTER, "Some text", Keys.ENTER);
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER, "Some text", Keys.ENTER);
 
         imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
@@ -275,7 +285,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = newPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
         for (String id : List.of("Iimage.gif", "customID")) {
-            editor.executeOnIframe(() -> setup.getDriver().findElement(By.id(id)).click());
+            editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.id(id)).click());
             imageDialogEditModal = editor.getToolBar().editImage();
             imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
             imageDialogEditModal.clickInsert();
@@ -319,7 +329,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -335,7 +345,7 @@ class ImageIT extends AbstractCKEditorIT
         editor = new CKEditor("content").waitToLoad();
 
         // Focus on the image to edit.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().clickCaptionCheckbox();
@@ -407,7 +417,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
         imageDialogSelectModal.clickSelect().clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceValue("doc:", false).submit();
 
@@ -439,7 +449,7 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.switchToAdvancedTab().selectCenterAlignment();
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
 
@@ -451,7 +461,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         // Verify that the caption and alignment are still set.
@@ -462,14 +472,14 @@ class ImageIT extends AbstractCKEditorIT
         imageDialogEditModal.close();
 
         // Verify that the link is still set.
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
         LinkDialog linkSelectorModal = editor.getToolBar().insertOrEditLink();
         assertEquals("doc", linkSelectorModal.getSelectedResourceType());
         assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
         linkSelectorModal.cancel();
 
         // Change the caption to ensure that saving again works.
-        editor.executeOnIframe(
+        editor.executeOnEditedContent(
             () -> setup.getDriver().findElement(By.cssSelector("figcaption"))
                 // Go to the start of the caption and insert "New ".
                 .sendKeys(Keys.HOME, "New "));
@@ -532,7 +542,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -574,7 +584,7 @@ class ImageIT extends AbstractCKEditorIT
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToAdvancedTab().setWidth(50);
@@ -732,7 +742,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -761,19 +771,20 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+            + "data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
 
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
 
         imageDialogEditModal.switchToStandardTab().setImageStyle("---");
         imageDialogEditModal.clickInsert();
 
-        editor.executeOnIframe(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         imageDialogEditModal = editor.getToolBar().editImage();
         imageDialogEditModal.switchToStandardTab().setImageStyle("Bordered");
@@ -782,7 +793,112 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\"]]", savedPage.editWiki().getContent());
+        assertEquals("[[image:image.gif||data-xwiki-image-style=\"bordered\" "
+            + "data-xwiki-image-style-border=\"true\"]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(18)
+    void pasteAndEditExternalImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String attachmentName = "image.gif";
+        AttachmentReference attachmentReference = new AttachmentReference(attachmentName, testReference);
+        String imageURL = setup.getURL(attachmentReference, "download", "");
+
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        // After this method, the clipboard contains an html content with some text and an image.
+        initPageWithImageAndCopyToClipboard(setup, newPage, imageURL);
+
+        DocumentReference subPageReference = new DocumentReference("Paste", testReference.getLastSpaceReference());
+        WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(subPageReference).editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        RichTextAreaElement richTextArea = editor.getRichTextArea();
+        richTextArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        richTextArea.verifyContent(content -> {
+            content.getImages().get(0).click();
+        });
+
+        // Verify that it's possible to edit a freshly pasted image.
+        ImageDialogEditModal imageDialogEditModal = editor.getToolBar().editImage();
+        imageDialogEditModal.switchToAdvancedTab().setWidth(100);
+        imageDialogEditModal.clickInsert();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("a [[image:" + imageURL + "||alt=\"Test alt\" height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(19)
+    void editListWithImage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Then test the image styles on the image dialog as a standard user.
+        createAndLoginStandardUser(setup);
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("* Item 1\n"
+            + "* Item 2 [[image:image.gif]]");
+        wikiEditPage.clickSaveAndView();
+
+        WYSIWYGEditPage wysiwygEditPage = wikiEditPage.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+
+        editor.getToolBar().clickNumberedList();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertEquals("* Item 1\n"
+            + "\n"
+            + "1. Item 2 [[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(20)
+    void editImageWithDataWidgetAttribute(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        ViewPage page = setup.createPage(testReference, "[[image:image.gif||data-widget='uploadimage']]");
+        WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+        // Make sure the image can be clicked as a proof that the editor did not crash.
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
+    /**
+     * Initialize a page with some content and an image. Then, copy its displayed content in the clipboard.
+     *
+     * @param setup the test setup
+     * @param viewPage the page to edit
+     * @param imageURL the url of the image to include in the content
+     */
+    private static void initPageWithImageAndCopyToClipboard(TestUtils setup, ViewPage viewPage, String imageURL)
+    {
+        WikiEditPage wikiEditPage = viewPage.editWiki();
+        wikiEditPage.sendKeys("{{html clean='false'}}\n"
+            + "<div contenteditable=\"true\" id=\"copyme\">\n"
+            + "  <p>\n"
+            + "    a <img src=\"" + imageURL + "\" alt=\"Test alt\"> b\n"
+            + "  </p>\n"
+            + "</div>\n"
+            + "{{/html}}");
+        wikiEditPage.clickSaveAndView();
+
+        WebElement element = setup.getDriver().findElement(By.id("copyme"));
+        element.click();
+        element.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        element.sendKeys(Keys.chord(Keys.CONTROL, "c"));
     }
 
     private ViewPage uploadAttachment(TestUtils setup, EntityReference entityReference, String attachmentName)
@@ -794,16 +910,19 @@ class ImageIT extends AbstractCKEditorIT
         return newPage;
     }
 
-    private static void createBorderedStyle(TestUtils setup) throws Exception
+    private static void createBorderedStyle(TestUtils setup)
     {
         DocumentReference borderedStyleDocumentReference =
-            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"), "borderedPage");
+            new DocumentReference(setup.getCurrentWiki(), List.of("Image", "Style", "Code", "ImageStyles"),
+                "borderedPage");
         // For a reason I can't explain, using the rest API lead to random 401 http response, making the tests using the
         // methods flickering. Using the UI based methods until I can understand the root cause.
         setup.deletePage(borderedStyleDocumentReference);
         setup.addObject(borderedStyleDocumentReference, "Image.Style.Code.ImageStyleClass", Map.of(
             "prettyName", "Bordered",
-            "type", "bordered"
+            "type", "bordered",
+            "defaultBorder", "1",
+            "adjustableAlignment", "1"
         ));
     }
 

@@ -33,8 +33,6 @@ import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.RenamePage;
@@ -127,7 +125,7 @@ class SubWikiIT
         setup.createPage(mainWikiLinkPage, String.format("[[%s.WebHome]]", space));
 
         // Wait for the Solr indexing to be completed before moving the page
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Move the page to subwiki.
         ViewPage viewPage = setup.gotoPage(testReference);
@@ -152,13 +150,6 @@ class SubWikiIT
         assertEquals(String.format("[[subwiki:%s.WebHome]]", space), wikiEditPage.getContent());
 
         deleteSubWiki(setup);
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 
     /**

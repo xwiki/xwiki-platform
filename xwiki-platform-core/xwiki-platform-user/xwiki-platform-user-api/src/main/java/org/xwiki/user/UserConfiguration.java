@@ -49,8 +49,8 @@ public interface UserConfiguration
     Properties getGuestPreference();
 
     /**
-     * When displaying an user in a compact mode we usually rely only on the user avatar and their full name. If this is
-     * not enough to properly identify the user then this configuration can be used to display additional information.
+     * When displaying a user in a compact mode, we usually rely only on the user avatar and their full name. If this is
+     * not enough to properly identify the user, then this configuration can be used to display additional information.
      * 
      * @return the name of the user property to be used as qualifier (hint) when displaying the user in a compact mode,
      *         or {@code null} if no additional information should be displayed

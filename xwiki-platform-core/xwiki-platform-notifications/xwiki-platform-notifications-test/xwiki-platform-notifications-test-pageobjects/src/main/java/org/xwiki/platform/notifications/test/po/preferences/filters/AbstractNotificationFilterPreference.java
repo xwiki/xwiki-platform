@@ -40,11 +40,11 @@ import static org.xwiki.test.ui.po.BootstrapSwitch.State.ON;
  */
 public abstract class AbstractNotificationFilterPreference
 {
+    private final XWikiWebDriver webDriver;
+
     private AbstractNotificationsSettingsPage parentPage;
 
     private WebElement row;
-
-    private String filterName;
 
     private List<String> formats = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public abstract class AbstractNotificationFilterPreference
      * Default constructor.
      *
      * @param parentPage the page where the settings are displayed.
-     * @param row the row of the livetable for this filter.
+     * @param row the row of the Live Data for this filter
      * @param webDriver the webdriver to initialize the switches.
      */
     public AbstractNotificationFilterPreference(AbstractNotificationsSettingsPage parentPage, WebElement row,
@@ -62,44 +62,32 @@ public abstract class AbstractNotificationFilterPreference
     {
         this.parentPage = parentPage;
         this.row = row;
-        this.filterName = getNameElement(row).getText();
         List<WebElement> formatElements = getFormatsElement(row)
             .findElements(By.tagName("li"));
         for (WebElement format : formatElements) {
             this.formats.add(format.getText());
         }
+        this.webDriver = webDriver;
         this.enabledSwitch = new BootstrapSwitch(getBootstrapSwitchElement(row), webDriver);
     }
 
     /**
-     * @param row the row to get the name from
-     * @return the {@link WebElement} containing the name of the row
-     * @since 16.1.0RC1
-     */
-    protected abstract WebElement getNameElement(WebElement row);
-
-    /**
      * @param row the row to get the formats from
      * @return the {@link WebElement} containing the formats of the row
-     * @since 16.1.0RC1
      */
-
-    protected abstract WebElement getFormatsElement(WebElement row);
+    private WebElement getFormatsElement(WebElement row)
+    {
+        return row.findElement(By.cssSelector("td[data-title='Formats'] .view"));
+    }
 
     /**
      * @param row the row to get the switch from
      * @return the {@link WebElement} containing the switch element of the row
-     * @since 16.1.0RC1
      */
-
-    protected abstract WebElement getBootstrapSwitchElement(WebElement row);
-
-    /**
-     * @return the filter name.
-     */
-    public String getFilterName()
+    private WebElement getBootstrapSwitchElement(WebElement row)
     {
-        return filterName;
+        this.webDriver.waitUntilElementIsVisible(row, By.cssSelector(".displayer-toggle .bootstrap-switch"));
+        return row.findElement(By.className("displayer-toggle")).findElement(By.className("bootstrap-switch"));
     }
 
     /**

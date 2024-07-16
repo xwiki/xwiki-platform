@@ -36,48 +36,54 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>O espaço de teste é uma parte de sua wiki que você pode modificar à vontade. É para treinar e  alterar. Você vai descobrir como funciona a alteração de páginas e criar novas páginas. Basta clicar em **Editar** para começar!
+  <content>A sandbox é uma parte do seu wiki que você pode modificar livremente. O objetivo é permitir que você pratique a edição. Você descobrirá como funciona a edição de páginas e criará novas páginas. Basta clicar em **Editar** para começar!
 
-{{info}}Não se preocupe se você sobrescrever ou perder coisas enquanto estiver editando essa página. Você pode sempre voltar para a primeira versão da página a partir da aba "Histórico" no final da página.{{/info}}
+{{info}}
+Não se preocupe em substituir ou perder coisas ao editar a página, você sempre pode reverter para a primeira versão da página na guia “Histórico” na parte inferior da página.
+{{/info}}
 
-Se você quiser dar uma olhada na [[Sintaxe XWiki&gt;&gt;XWiki.XWikiSyntax]] da página, você pode clicar em "Código Wiki" no menu "Mostrar" ou clicar na aba "Fonte" enquanto estiver editando a página.
+Se você quiser dar uma olhada no [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]], você pode clicar em "Código Wiki" no menu "Mostrar" ou clicar na guia "Fonte" ao editar a página.
 
-Aqui estão algumas páginas de teste que você pode usar:
+Aqui estão algumas páginas de teste com as quais você pode brincar:
 
-* [[Página de Teste 1&gt;&gt;Sandbox.TestPage1]]
-* [[Página de Teste 2&gt;&gt;Sandbox.TestPage2]]
-* [[Página de Teste 3&gt;&gt;Sandbox.TestPage3]]
+* [[Página de teste 1 do Sandbox &gt;&gt;Sandbox.TestPage1]]
+* [[Página de teste 2 do Sandbox &gt;&gt;Sandbox.TestPage2]]
+* [[Página de teste do Sandbox 3 &gt;&gt;Sandbox.TestPage3]]
 
-Abaixo uma demonstração da [[Sintaxe XWiki&gt;&gt;XWiki.XWikiSyntax]] que você pode usar nas suas páginas wiki (cabeçalhos, imagens, tabelas). 
+Abaixo está uma demonstração da [[Sintaxe XWiki&gt;&gt;XWiki.XWikiSyntax]] que você pode usar em páginas wiki (títulos, imagens, tabelas).
 
-== Cabeçalhos ==
+== Títulos ==
 
-A XWiki oferece 6 níveis de cabeçalhos. Você pode usá-los para estruturar suas páginas.
+XWiki oferece 6 níveis de títulos. Você pode usá-los para estruturar suas páginas.
 
-== Cabeçalho Nível 2 ==
+== Título Nível 2 ==
 
-=== Cabeçalho Nível 3 ===
+=== Título de nível 3 ===
 
-==== Cabeçalho Nível 4 ====
+==== Nível 4 Título 4 ====
 
-===== Cabeçalho Nível 5 =====
+===== Nível 5 Título 5 =====
 
-====== Cabeçalho Nível 6 ======
+====== Nível 6 Título 6 ======
+
+{{info title="Recomendação de acessibilidade"}}
+Para fornecer a melhor experiência aos usuários de tecnologia assistiva em seu wiki, você deve evitar usar o primeiro nível de cabeçalho no conteúdo da página.
+{{/info}}
 
 == Estilos ==
 
-Estilos básicos são suportados pela XWiki:
+Estilos básicos são suportados no XWiki:
 
-* **Texto em Negrito**
-* //Texto em Itálico//
-* __Texto em Sublinhado__
-* --Texto em Riscado--
+* **Texto em negrito**
+* //Texto em itálico//
+* __Texto sublinhado__
+* --Texto tachado--
 * Texto em ,,subscrito,,
 * Texto em ^^sobrescrito^^
 
 == Listas ==
 
-Você pode criar vários tipos de listas nas suas páginas wiki:
+Você pode criar vários tipos de listas em suas páginas wiki:
 
 === Lista não ordenada ===
 
@@ -89,64 +95,70 @@ Você pode criar vários tipos de listas nas suas páginas wiki:
 
 === Lista numerada ===
 
-1. Item
+1 item
 11. Subitem
-111. Item
+111. Artigo
 1. Subitem
 
 === Lista mista ===
 
 1. Item 1
 11. Item 2
-11*. Item 3
+11*. Artigo 3
 11*. Item 4
 1. Item 5
 
 == Tabelas ==
 
-Você pode criar tabelas diretamente na sua wiki:
+Você pode criar tabelas diretamente nas páginas wiki:
 
-=== Tabela com cabeçalho na linha superior ===
+=== Tabela com cabeçalhos na linha superior ===
 
-|= cabeçalho |= cabeçalho |= cabeçalho 
+|= cabeçalho da tabela |= cabeçalho da tabela |= cabeçalho da tabela
 | célula | célula | célula
 | célula | célula | célula
 
-=== Tabela com cabeçalho na linha superior e na coluna mais à esquerda ===
+=== Tabela com cabeçalhos na linha superior e na coluna esquerda ===
 
-|= cabeçalho |= cabeçalho |= cabeçalho 
-|= cabeçalho | célula | célula
-|= cabeçalho | célula | célula
+|= cabeçalho da tabela |= cabeçalho da tabela |= cabeçalho da tabela
+|= cabeçalho da tabela | célula | célula
+|= cabeçalho da tabela | célula | célula
 
 == Links ==
 
-XWiki permite que você crie links para outras páginas na sua wiki on na web:
+O XWiki permite que você crie links para outras páginas do seu wiki ou da web:
 
-* [[WebHome]] -&gt; link para a página inicial do espaço atual
-* [[Espaço de Teste&gt;&gt;WebHome]] -&gt; links podem ter textos descritivos
-* [[Página inicial da Wiki&gt;&gt;Main.WebHome]] -&gt; um link pode usar o formato NomeEspaco.NomePagina para ir a uma página localizada em outro espaço
-* [[http://www.xwiki.org]] -&gt; você pode chamar páginas wiki ou a websites externos
-* [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; texto descritivo funciona também para links externos
+* [[WebHome]] -&gt; links para a página inicial do espaço atual
+* [[Sandbox Home&gt;&gt;WebHome]] -&gt; links podem ter rótulos
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; um link pode usar o formato SpaceName.PageName para vincular a uma página localizada em outro espaço
+* [[http://www.xwiki.org]] -&gt; você pode criar links para páginas wiki ou sites externos
+* [[Site XWiki.org &gt;&gt;http://www.xwiki.org]] -&gt; rótulos de link também funcionam para links externos
+
+Você também pode criar links para anexos:
+
+attach:XWikiLogo.png
 
 == Imagens ==
 
-Você pode inserir imagens na sua página wiki:
+Você pode inserir imagens em suas páginas wiki:
 
-[[image:XWikiLogo.png]]
+image:XWikiLogo.png
 
 == Macros ==
 
-Macros permitem que você faça o conteúdo ter uma melhor aparência e adicionar novas funcionalidades à sua wiki. Aqui estão 2 exemplos de como macros podem ser usadas em páginas:
+As macros permitem melhorar a aparência do conteúdo do wiki e adicionar recursos adicionais ao seu wiki. Aqui estão 2 exemplos de como macros podem ser usadas em páginas wiki:
 
-=== Macro Aviso ===
+=== Macro de aviso ===
 
-Essa macro permite que você chame a atenção do usuário pra uma informação:
+Esta macro permite chamar a atenção dos usuários para uma informação específica:
 
-{{warning}}Alô mundo!{{/warning}}
+{{warning}}
+Olá Mundo
+{{/warning}}
 
 === Índice ===
 
-Essa macro gera automaticamente o índice da sua página baseado na formatação dos cabeçalhos:
+Esta macro gera automaticamente um índice da sua página wiki com base nos títulos:
 
 {{toc/}}</content>
 </xwikidoc>

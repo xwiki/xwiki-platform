@@ -554,7 +554,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.repositories = maven-local:maven:file://${userHome}/.m2/repository
 #-#
 #-# And an example to add the XWiki Maven Snapshot Repository
-# extension.repositories = maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots
+# extension.repositories = maven-xwiki-snapshot:maven:https://nexus-snapshots.xwiki.org/repository/snapshots/
 #-#
 #-# When not set the following is taken (in this order):
 # extension.repositories = maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public
@@ -804,14 +804,13 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 
 #-# [Since 13.10.1]
 #-# [Since 14.0RC1]
-#-# Define the lifetime of the token used for resetting passwords in minutes. Note that this value is only used after
-#-# first access.
-#-# Default value is 0 meaning that the token is immediately revoked when first accessed.
-#-# Use a different value if the reset password email link might be accessed several times (e.g. in case of using an
-#-# email link verification system): in such case the user will have the defined lifetime to use again the email link.
+#-# Define the lifetime of the token used for resetting passwords in minutes.
+#-# Default value is 60 meaning that users have 1 hour to access the link sent by email for performing password reset.
+#-# Once the password is reset using the link, the token is revoked.
+#-# Using 0 here means that the token has no expiration date, however it will be revoked at first wrong access.
 #-#
-#-# The default is:
-# security.authentication.resetPasswordTokenLifetime = 0
+#-# The value is in minutes. The default is:
+# security.authentication.resetPasswordTokenLifetime = 60
 
 #-# [Since 14.6RC1]
 #-# [Since 14.4.3]
@@ -1011,6 +1010,11 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# text/plain,image/*
 #-#
 # attachment.upload.blockList=
+
+#-# [Since 16.3.0RC1]
+#-# Indicate whether or not comments for attachment uploads should be settable from UI, and displayed whenever the
+#-# attachment revisions are listed. The default is false.
+# attachment.upload.enableComments=false
 
 #-------------------------------------------------------------------------------------
 # Active Installs 2
@@ -1323,22 +1327,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-------------------------------------------------------------------------------------
 
 #-# [Since 11.1RC1]
-#-# The Event Stream, on which the notifications are based, stores data in a dedicated table in the database.
-#-# Each wiki has its own database. The feature can be configured to store its data into the database corresponding to
-#-# the wiki, into the main database (default: xwiki) or both. These options should not be both set to false (in this
-#-# case the local store will be forced).
-#-# Important note: disabling storage in the main store will prevent the notifications from retrieving events from
-#-# subwikis. Moreover, disabling the main store makes impossible for global users to watch pages from subwikis. It is
-#-# not recommended.
-#-#
-#-# This feature was originally implemented by the Activity Stream plugin so these settings might sound familiar to you.
-#-#
-#-# The default is :
-# eventstream.uselocalstore = true
-#-#
-#-# The default is :
-# eventstream.usemainstore = true
-#-#
 #-# Number of days the events should be kept (0 or any negative value: infinite duration)
 #-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
 #-# delete events older than the configured value.

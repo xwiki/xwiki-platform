@@ -163,6 +163,7 @@ CKEDITOR.editorConfig = function(config) {
       'xwiki-macro',
       'xwiki-maximize',
       'xwiki-office',
+      'xwiki-realtime',
       'xwiki-save',
       'xwiki-selection',
       'xwiki-slash',
@@ -194,8 +195,8 @@ CKEDITOR.editorConfig = function(config) {
       'officeImporter,xwiki-macro',
     // We remove the default sourcearea plugin because we use our own xwiki-sourcearea plugin which supports switching
     // to Source while editing in-place. We still bundle the sourcearea plugin because we reuse its icons and
-    // translations.
-    removePlugins: 'bidi,colorbutton,font,justify,save,sourcearea',
+    // translations. We remove the realtime plugin by default because it's unstable.
+    removePlugins: 'bidi,colorbutton,font,justify,save,sourcearea,xwiki-realtime',
     toolbarGroups: [
       {name: 'format'},
       {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
@@ -302,6 +303,7 @@ CKEDITOR.editorConfig = function(config) {
       },
       'xwiki-macro': {label: 'xwiki-toolbar.otherMacros'}
     },
+    versionCheck: false,
     'xwiki-macro': {
       // You can restrict here the type of content the users can input when editing the macro content / parameters
       // in-line using nested editables, depending on the macro content / parameter type.

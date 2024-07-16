@@ -33,7 +33,7 @@ import org.xwiki.extension.repository.rating.Ratable;
 import org.xwiki.extension.repository.rating.RatableExtensionRepository;
 import org.xwiki.extension.repository.search.AdvancedSearchable;
 import org.xwiki.extension.repository.search.Searchable;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide safe Extension.

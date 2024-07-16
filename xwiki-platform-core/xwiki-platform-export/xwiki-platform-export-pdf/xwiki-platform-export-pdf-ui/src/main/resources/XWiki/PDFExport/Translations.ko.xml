@@ -110,4 +110,4 @@ XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=단일 PDF 내보내기 �
 XWiki.PDFExport.ConfigurationClass_replaceFOP=FOP 교체
 XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Apache Formatting Objects Processor(FOP)를 기반으로 이전 PDF 내보내기를 대체합니다.
 </content>
-  </xwikidoc>
+</xwikidoc>

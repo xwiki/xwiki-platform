@@ -28,8 +28,11 @@ import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPag
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ConfirmationBox;
 
+import static org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference.FilterAction.IGNORE_EVENT;
+import static org.xwiki.platform.notifications.test.po.preferences.filters.CustomNotificationFilterPreference.FilterAction.NOTIFY_EVENT;
+
 /**
- * Represents a custom notification filter: i.e. a scope notification filter created by the user or through the watch
+ * Represents a custom notification filter: i.e., a scope notification filter created by the user or through the watch
  * settings.
  *
  * @version $Id$
@@ -38,7 +41,7 @@ import org.xwiki.test.ui.po.ConfirmationBox;
 public class CustomNotificationFilterPreference extends AbstractNotificationFilterPreference
 {
     /**
-     * Represents the possible actions for such filter.
+     * Represents the possible actions for such filters.
      *
      * @version $Id$
      */
@@ -55,9 +58,9 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
         NOTIFY_EVENT
     }
 
-    private List<String> eventTypes = new ArrayList<>();
+    private final List<String> eventTypes = new ArrayList<>();
 
-    private FilterAction filterAction;
+    private final FilterAction filterAction;
 
     /**
      * Default constructor.
@@ -71,7 +74,8 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
     {
         super(parentPage, row, webDriver);
 
-        List<WebElement> eventTypeElements = row.findElement(By.className("eventTypes")).findElements(By.tagName("li"));
+        List<WebElement> eventTypeElements =
+            row.findElement(By.cssSelector("td[data-title='Events']")).findElements(By.tagName("li"));
         for (WebElement eventType : eventTypeElements) {
             String text = eventType.getText();
             if (!text.startsWith("All events")) {
@@ -79,54 +83,45 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
             }
         }
 
-        String filterType = row.findElement(By.className("filterType")).getText();
+        String filterType = row.findElement(By.cssSelector("td[data-title='Filter Action'] .view")).getText();
         if (filterType.startsWith("Notify")) {
-            this.filterAction = FilterAction.NOTIFY_EVENT;
+            this.filterAction = NOTIFY_EVENT;
         } else {
-            this.filterAction = FilterAction.IGNORE_EVENT;
+            this.filterAction = IGNORE_EVENT;
         }
     }
 
-    @Override
-    protected WebElement getNameElement(WebElement row)
+    /**
+     * @return the scope of the filter.
+     */
+    public String getScope()
     {
-        return row.findElement(By.className("name"));
-    }
-
-    @Override
-    protected WebElement getFormatsElement(WebElement row)
-    {
-        return row.findElement(By.className("notificationFormats"));
-    }
-
-    @Override
-    protected WebElement getBootstrapSwitchElement(WebElement row)
-    {
-        return row.findElement(By.className("isEnabled")).findElement(By.className("bootstrap-switch"));
+        return getRow().findElement(By.cssSelector("td[data-title='Scope']")).getText();
     }
 
     /**
-     * @return the event types or an empty list in case of all events.
+     * @return the event types or an empty list in case of all events
      */
     public List<String> getEventTypes()
     {
-        return eventTypes;
+        return this.eventTypes;
     }
 
     /**
-     * @return the watched location.
+     * @return the watched location
      */
     public String getLocation()
     {
-        return this.getRow().findElement(By.cssSelector("td.name ol")).getAttribute("data-entity");
+        return getRow().findElement(By.cssSelector("td[data-title='Location'] .html-wrapper ol"))
+            .getAttribute("data-entity");
     }
 
     /**
-     * @return the action performed by the filter.
+     * @return the action performed by the filter
      */
     public FilterAction getFilterAction()
     {
-        return filterAction;
+        return this.filterAction;
     }
 
     /**
@@ -134,7 +129,7 @@ public class CustomNotificationFilterPreference extends AbstractNotificationFilt
      */
     public void delete()
     {
-        this.getRow().findElement(By.cssSelector("td.actions a.actiondelete")).click();
+        this.getRow().findElement(By.cssSelector(".actions-container .action_delete")).click();
         ConfirmationBox confirmationBox = new ConfirmationBox();
         confirmationBox.clickYes();
         this.getParentPage().waitForNotificationSuccessMessage("Filter preference deleted!");

@@ -66,9 +66,6 @@ public class DocumentMovedListener extends AbstractLocalEventListener
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
-    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
-
-    @Inject
     private Logger logger;
 
     @Inject
@@ -97,24 +94,16 @@ public class DocumentMovedListener extends AbstractLocalEventListener
         DocumentReference targetLocation = renamedEvent.getTargetReference();
 
         try {
-            if (filterPreferenceConfiguration.useMainStore()) {
-                namespaceContextExecutor.execute(new WikiNamespace(wikiDescriptorManager.getMainWikiId()), () -> {
+            // Filters are stored in the DB of the users, since each wiki could possibly contain a user
+            // we need to iterate over all DB to ensure we properly migrate the filters.
+            // We could have checked the configuration of the wiki to see if they are allowed to store user or not
+            // but this config might have changed over time...
+            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
+                namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
                     updatePreferences(sourceLocation, targetLocation);
                     return null;
                 });
-            } else if (filterPreferenceConfiguration.useLocalStore()) {
-                // Filters are stored in the DB of the users, since each wiki could possibly contain a user
-                // we need to iterate over all DB to ensure we properly migrate the filters.
-                // We could have checked the configuration of the wiki to see if they are allowed to store user or not
-                // but this config might have changed over time...
-                for (String wikiId : wikiDescriptorManager.getAllIds()) {
-                    namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
-                        updatePreferences(sourceLocation, targetLocation);
-                        return null;
-                    });
-                }
             }
-
         } catch (Exception e) {
             logger.error("Failed to update the notification filter preference when [{}] has been moved to [{}].",
                 renamedEvent.getSourceReference(), renamedEvent.getTargetReference(), e);

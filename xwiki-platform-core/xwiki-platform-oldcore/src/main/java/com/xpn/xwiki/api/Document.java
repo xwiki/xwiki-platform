@@ -1421,6 +1421,20 @@ public class Document extends Api
         return this.doc.getRevisions(getXWikiContext());
     }
 
+    /**
+     * Counts the number of document versions matching criteria like author, minimum creation date, etc.
+     *
+     * @param criteria criteria used to match versions
+     * @return the number of matching versions
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public long getRevisionsCount(RevisionCriteria criteria) throws XWikiException
+    {
+        return this.doc.getRevisionsCount(criteria, getXWikiContext());
+    }
+
     public String[] getRecentRevisions() throws XWikiException
     {
         return this.doc.getRecentRevisions(5, getXWikiContext());
@@ -1432,7 +1446,7 @@ public class Document extends Api
     }
 
     /**
-     * Get document versions matching criterias like author, minimum creation date, etc.
+     * Gets document versions matching criteria like author, minimum creation date, etc.
      *
      * @param criteria criteria used to match versions
      * @return a list of matching versions
@@ -1923,7 +1937,12 @@ public class Document extends Api
 
             return this.doc.getMetaDataDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
+            java.lang.Object[] args;
+            if (origdoc != null) {
+                args = new java.lang.Object[] { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
+            } else {
+                args = new java.lang.Object[] { doc.getFullName(), null, newdoc.getVersion() };
+            }
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,

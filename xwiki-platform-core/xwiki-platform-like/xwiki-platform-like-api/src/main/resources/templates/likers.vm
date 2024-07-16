@@ -99,7 +99,8 @@
     #livetable_filterObfuscated($map)
     $jsontool.serialize($map)
 #else
-  <h1>$escapetool.xml($services.localization.render('like.likers.title', [$doc.plainTitle]))</h1>
+  #set($titleToDisplay = $services.localization.render('like.likers.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+  #template('contentheader.vm')
   ## We rely on the same column name than the Users administration, so we use same translation prefix for now.
   #set ($sourceParameters = {
     'template': 'likers.vm',
@@ -108,6 +109,8 @@
     '$doc': $doc.documentReference,
     'translationPrefix' : 'xe.admin.users.'
   })
+  ## The id of the live data needs to be complex in order to avoid 'id collision' that would break
+  ## the liveData.
   $services.liveData.render({
     'id': 'likersTable',
     'properties': 'name,first_name,last_name',

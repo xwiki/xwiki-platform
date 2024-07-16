@@ -36,7 +36,6 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -54,7 +53,6 @@ import static org.mockito.Mockito.when;
 @HTML50ComponentList
 @XWikiSyntax21ComponentList
 @ComponentList({
-    ControlCharactersFilter.class,
     TemplateScriptService.class
 })
 class RefactoringMacrosPageTest extends PageTest

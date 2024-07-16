@@ -384,7 +384,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // JODConverter: https://bit.ly/2w8B82Q
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
-                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 && "
+                                + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
+                                + "libxml2 libxslt1-dev && "
                                 + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
                                 + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "

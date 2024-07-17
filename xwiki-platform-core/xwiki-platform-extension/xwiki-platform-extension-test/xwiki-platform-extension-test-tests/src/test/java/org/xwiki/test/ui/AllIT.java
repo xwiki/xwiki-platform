@@ -33,6 +33,7 @@ import org.xwiki.extension.test.ExtensionTestUtils;
 import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.repository.test.RepositoryTestUtils;
 import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.XWikiExecutorSuite;
 
@@ -48,13 +49,15 @@ public class AllIT
 
     private static RepositoryUtils repositoryUtil;
 
+    private static TestEnvironment environment = new TestEnvironment();
+
     @XWikiExecutorSuite.PreStart
     public void preStart(List<XWikiExecutor> executors) throws Exception
     {
         XWikiExecutor executor = executors.get(0);
 
         repositoryUtil = new RepositoryUtils();
-        repositoryUtil.setup();
+        repositoryUtil.setup(environment);
 
         LOGGER.info("Adding repository to xwiki.properties");
 
@@ -81,13 +84,13 @@ public class AllIT
         // This will not be null if we are in the middle of allTests
         if (repositoryUtil == null) {
             repositoryUtil = new RepositoryUtils();
-            repositoryUtil.setup();
+            repositoryUtil.setup(environment);
         }
 
         // Initialize extensions and repositories
         RepositoryTestUtils repositoryTestUtil =
             new RepositoryTestUtils(context.getUtil(), repositoryUtil, new SolrTestUtils(context.getUtil()));
-        repositoryTestUtil.init();
+        repositoryTestUtil.init(environment);
         ExtensionTestUtils extensionTestUtil = new ExtensionTestUtils(context.getUtil());
 
         // Set integration repository and extension utils.

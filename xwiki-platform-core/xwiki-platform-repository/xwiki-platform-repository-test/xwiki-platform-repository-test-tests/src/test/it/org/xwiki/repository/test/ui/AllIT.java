@@ -31,6 +31,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.repository.test.RepositoryTestUtils;
 import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.XWikiExecutorSuite;
 import org.xwiki.test.ui.PageObjectSuite;
@@ -48,13 +49,15 @@ public class AllIT
 
     private static RepositoryUtils repositoryUtil;
 
+    private static TestEnvironment environment = new TestEnvironment();
+
     @XWikiExecutorSuite.PreStart
     public void preStart(List<XWikiExecutor> executors) throws Exception
     {
         XWikiExecutor executor = executors.get(0);
 
         repositoryUtil = new RepositoryUtils();
-        repositoryUtil.setup();
+        repositoryUtil.setup(environment);
 
         LOGGER.info("Adding maven repository to xwiki.properties");
 
@@ -81,14 +84,13 @@ public class AllIT
         // Initialize extensions and repositories
         RepositoryTestUtils repositoryTestUtil =
             new RepositoryTestUtils(context.getUtil(), repositoryUtil, new SolrTestUtils(context.getUtil()));
-        repositoryTestUtil.init();
+        repositoryTestUtil.init(environment);
 
         // Set integration repository and extension utils.
         context.getProperties().put(RepositoryTestUtils.PROPERTY_KEY, repositoryTestUtil);
 
         // Populate maven repository
-        File extensionFile =
-            repositoryTestUtil.getTestExtension(new ExtensionId("emptyjar", "1.0"), "jar").getFile().getFile();
+        File extensionFile = repositoryUtil.getExtensionPackager().getExtensionFile(new ExtensionId("emptyjar", "1.0"));
         FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),
             "maven/extension/1.0/extension-1.0.jar"));
         FileUtils.copyFile(extensionFile, new File(repositoryTestUtil.getRepositoryUtil().getMavenRepository(),

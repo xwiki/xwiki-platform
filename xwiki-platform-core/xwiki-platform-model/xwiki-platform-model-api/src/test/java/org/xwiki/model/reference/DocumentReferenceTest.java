@@ -166,18 +166,18 @@ class DocumentReferenceTest
     }
 
     @Test
-    void valueOf()
+    void extractDocument()
     {
-        assertEquals(Optional.empty(), DocumentReference.valueOf(null));
+        assertEquals(Optional.empty(), DocumentReference.extractDocument(null));
         DocumentReference documentReference = new DocumentReference("xwiki", "Foo", "Bar");
-        Optional<DocumentReference> obtainedReference = DocumentReference.valueOf(documentReference);
+        Optional<DocumentReference> obtainedReference = DocumentReference.extractDocument(documentReference);
         assertFalse(obtainedReference.isEmpty());
         assertSame(documentReference, obtainedReference.get());
 
-        assertEquals(Optional.empty(), DocumentReference.valueOf(new WikiReference("foo")));
-        assertEquals(Optional.empty(), DocumentReference.valueOf(documentReference.getLastSpaceReference()));
+        assertEquals(Optional.empty(), DocumentReference.extractDocument(new WikiReference("foo")));
+        assertEquals(Optional.empty(), DocumentReference.extractDocument(documentReference.getLastSpaceReference()));
 
         assertEquals(Optional.of(documentReference),
-            DocumentReference.valueOf(new ObjectReference("Foo", documentReference)));
+            DocumentReference.extractDocument(new ObjectReference("Foo", documentReference)));
     }
 }

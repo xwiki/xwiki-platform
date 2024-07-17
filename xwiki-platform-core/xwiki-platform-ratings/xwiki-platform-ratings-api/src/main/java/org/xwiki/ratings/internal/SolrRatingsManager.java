@@ -577,7 +577,7 @@ public class SolrRatingsManager implements RatingsManager
 
     private void checkIfDocumentExists(EntityReference reference) throws RatingsException
     {
-        Optional<DocumentReference> optionalDoc = DocumentReference.valueOf(reference);
+        Optional<DocumentReference> optionalDoc = DocumentReference.extractDocument(reference);
         try {
             if (optionalDoc.isEmpty() || !this.documentAccessBridge.exists(optionalDoc.get())) {
                 throw new RatingsException(String.format("The reference [%s] is not an existing page.", reference));

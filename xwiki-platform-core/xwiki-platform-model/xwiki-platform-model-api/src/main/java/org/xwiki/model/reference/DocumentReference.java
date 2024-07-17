@@ -392,16 +392,18 @@ public class DocumentReference extends AbstractLocalizedEntityReference
      * @since 15.10.12
      */
     @Unstable
-    public static Optional<DocumentReference> valueOf(EntityReference entityReference)
+    public static Optional<DocumentReference> extractDocument(EntityReference entityReference)
     {
         Optional<DocumentReference> result = Optional.empty();
         if (entityReference != null) {
             if (entityReference instanceof DocumentReference) {
                 result = Optional.of((DocumentReference) entityReference);
             } else {
-                EntityReference documentReference = entityReference.extractReference(EntityType.DOCUMENT);
-                if (documentReference != null) {
-                    result = Optional.of(new DocumentReference(documentReference));
+                EntityReference extractedRef = entityReference.extractReference(EntityType.DOCUMENT);
+                if (extractedRef instanceof DocumentReference) {
+                    result = Optional.of((DocumentReference) extractedRef);
+                } else if (extractedRef != null) {
+                    result = Optional.of(new DocumentReference(extractedRef));
                 }
             }
         }

@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WindowType;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
@@ -41,6 +43,7 @@ import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
@@ -757,7 +760,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
     @Test
     @Order(9)
     void reloadEditorsMergeConflictManualSave(TestReference testReference, TestUtils setup,
-        MultiUserTestUtils multiUserSetup)
+        MultiUserTestUtils multiUserSetup) throws Exception
     {
         //
         // First Tab
@@ -765,12 +768,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Start fresh.
         setup.deletePage(testReference);
+        setup.createPage(testReference, "before\n\n[[image:image.gif||width=\"50px\"]]");
+        setup.attachFile(testReference, "image.gif", getClass().getResourceAsStream("/image.gif"), false);
 
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("First");
-        firstEditPage.clickSaveAndContinue();
+        firstTextArea.sendKeys(Keys.END, " first");
 
         //
         // Second Tab
@@ -782,7 +786,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
-        secondTextArea.waitUntilTextContains("First");
+        secondTextArea.waitUntilTextContains("first");
 
         //
         // Third Tab
@@ -792,11 +796,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage thirdEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor thirdEditor = thirdEditPage.getContenEditor();
         RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
-        thirdTextArea.waitUntilTextContains("First");
+        thirdTextArea.waitUntilTextContains("first");
 
         thirdEditPage.leaveRealtimeEditing();
 
-        thirdTextArea.sendKeys(Keys.END, " Third");
+        thirdTextArea.sendKeys(Keys.END, " third");
         thirdEditPage.clickSaveAndContinue();
 
         //
@@ -804,21 +808,30 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondTextArea.sendKeys(Keys.END, " Second");
+        secondTextArea.sendKeys(Keys.END, " second");
         secondEditPage.clickSaveAndContinue(false);
 
         EditConflictModal editConflictModal = new EditConflictModal();
         editConflictModal.makeChoiceAndSubmit(ConflictChoice.RELOAD, false);
 
-        secondTextArea.waitUntilTextContains("Third");
+        secondTextArea.waitUntilTextContains("third");
+        // Verify that the image is still properly rendered.
+        secondTextArea.verifyContent(content -> {
+            WebElement image = content.getImages().get(0);
+            AttachmentReference attachmentReference = new AttachmentReference("image.gif", testReference);
+            assertEquals(setup.getURL(attachmentReference, "download", "width=50&rev=1.1"), image.getAttribute("src"));
+            Dimension imageSize = image.getSize();
+            assertEquals(50, imageSize.width);
+            assertEquals(50, imageSize.height);
+        });
 
         //
         // First tab
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.waitUntilTextContains("Third");
-        assertEquals("First Third", firstTextArea.getText());
+        firstTextArea.waitUntilTextContains("third");
+        assertEquals("before first third", firstTextArea.getText());
     }
 
     @Test
@@ -1094,6 +1107,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // currently).
         firstTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
 
+        // It's not enough to wait for the Velocity macro error message because the content is re-rendered twice (first
+        // time when the Velocity macro is inserted and a second time when the Velocity macro is edited), but the output
+        // is the same.
+        firstTextArea.waitUntilContentEditable();
+
         // Change the content (without modifying the script macro).
         firstTextArea.sendKeys(Keys.END, " dinner");
 
@@ -1126,6 +1144,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("lunch");
 
+        // The second user has modified the Velocity macro, which triggered a re-rendering of the content on this tab.
+        firstTextArea.waitUntilContentEditable();
+
         // Try to inject a script macro.
         firstTextArea.sendKeys(Keys.HOME);
         firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
@@ -1156,6 +1177,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         text = secondTextArea.getText();
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
 
+        // The content is re-rendered twice because the first user has inserted and modified the Velocity macro.
+        secondTextArea.waitUntilContentEditable();
+
         // Edit again the macro to see that the script level doesn't change.
         secondTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("Current: $xcontext.userReference").clickSubmit();
@@ -1176,7 +1200,10 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Start fresh.
         setup.deletePage(testReference);
 
-        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        // Force the English locale, in case this test is run multiple times (it switches to German locale at some
+        // point).
+        DocumentReference testReferenceEN = new DocumentReference(testReference, Locale.ENGLISH);
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReferenceEN);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
 

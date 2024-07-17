@@ -72,6 +72,7 @@
       <groupId>net.sourceforge.cssparser</groupId>
       <artifactId>cssparser</artifactId>
     </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

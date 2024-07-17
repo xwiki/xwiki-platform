@@ -33,7 +33,7 @@
   <description>Parent POM for the Active Installs 2 modules</description>
   <properties>
     <!-- Tag for the ElasticSearch docker image to use from https://hub.docker.com/_/elasticsearch -->
-    <elasticsearch.version>8.14.1</elasticsearch.version>
+    <elasticsearch.version>8.14.3</elasticsearch.version>
   </properties>
   <build>
     <pluginManagement>

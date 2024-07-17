@@ -54,6 +54,7 @@ public class AllIT
         XWikiExecutor executor = executors.get(0);
 
         repositoryUtil = new RepositoryUtils();
+        repositoryUtil.setup();
 
         LOGGER.info("Adding maven repository to xwiki.properties");
 

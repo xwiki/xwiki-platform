@@ -3264,6 +3264,34 @@ public class Document extends Api
     }
 
     /**
+     * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't
+     * use more rights than defined in the object, {@code false} otherwise
+     * @since 16.6.0RC1
+     */
+    @Unstable
+    public boolean isEnforceRequiredRights()
+    {
+        return this.doc.isEnforceRequiredRights();
+    }
+
+    /**
+     * @param enforceRequiredRights if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't use
+     * more rights than defined in the object
+     * @since 16.6.0RC1
+     */
+    @Unstable
+    public void setEnforceRequiredRights(boolean enforceRequiredRights)
+    {
+        getDoc().setEnforceRequiredRights(enforceRequiredRights);
+
+        updateAuthor();
+
+        updateContentAuthor();
+    }
+
+    /**
      * Drop permissions for the remainder of the rendering cycle. After this is called:
      * <ul>
      * <li>1. {@link com.xpn.xwiki.api.Api#hasProgrammingRights()} will always return false.</li>

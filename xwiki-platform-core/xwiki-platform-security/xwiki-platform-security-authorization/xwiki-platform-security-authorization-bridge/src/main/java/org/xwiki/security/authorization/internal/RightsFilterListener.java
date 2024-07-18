@@ -32,6 +32,9 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.security.authorization.internal.requiredrights.DocumentRequiredRightsReader;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -64,8 +67,14 @@ public class RightsFilterListener extends AbstractEventListener
      */
     public static final String NAME = "org.xwiki.security.authorization.internal.RightsFilterListener";
 
+    private static final LocalDocumentReference REQUIRED_RIGHT_CLASS =
+        new LocalDocumentReference("XWiki", "RequiredRightClass");
+
     @Inject
     private AuthorizationManager authorization;
+
+    @Inject
+    private DocumentRequiredRightsReader documentRequiredRightsReader;
 
     /**
      * The default constructor.
@@ -89,6 +98,36 @@ public class RightsFilterListener extends AbstractEventListener
         // Check global rights
         checkModifiedRights(userEvent.getUserReference(), document,
             XWikiGlobalRightsDocumentInitializer.CLASS_REFERENCE, (CancelableEvent) event);
+
+        // Check the required rights.
+        checkModifiedRequiredRights(userEvent.getUserReference(), document, (CancelableEvent) event);
+    }
+
+    private void checkModifiedRequiredRights(DocumentReference user, XWikiDocument document,
+        CancelableEvent event)
+    {
+        XWikiDocument originalDocument = document.getOriginalDocument();
+        DocumentRequiredRights originalRequiredRights =
+            this.documentRequiredRightsReader.readRequiredRights(originalDocument);
+        DocumentRequiredRights requiredRights = this.documentRequiredRightsReader.readRequiredRights(document);
+
+        if (!originalRequiredRights.equals(requiredRights) && requiredRights.enforce()) {
+            // We can assume that the current user has all existing required rights as otherwise editing would be
+            // denied.
+            // Therefore, only check if the user has all rights specified in the updated document that could either
+            // have changed required rights or where enforcing has just been enabled.
+            for (DocumentRequiredRight requiredRight : requiredRights.rights()) {
+                try {
+                    this.authorization.checkAccess(requiredRight.right(), user,
+                        document.getDocumentReference().extractReference(requiredRight.scope()));
+                } catch (AccessDeniedException e) {
+                    event.cancel(
+                        "The author doesn't have the right [%s] on the [%s] level that has been specified as required."
+                            .formatted(requiredRight.right().getName(), requiredRight.scope().getLowerCase()));
+                    break;
+                }
+            }
+        }
     }
 
     private void checkModifiedRights(DocumentReference user, XWikiDocument document,

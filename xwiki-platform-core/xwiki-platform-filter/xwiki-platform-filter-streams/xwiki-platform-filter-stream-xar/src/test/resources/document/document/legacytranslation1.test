@@ -3,7 +3,7 @@
 .# Make sure legacy XAR format is properly parsed
 .#------------------------------------------------------------------------------
 <?xml version='1.1' encoding='UTF-8'?>
-<xwikidoc version="1.5" reference="space.page" locale="fr">
+<xwikidoc version="1.6" reference="space.page" locale="fr">
   <web>space</web>
   <name>page</name>
   <language>fr</language>
@@ -26,6 +26,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>syntax/1.0</syntaxId>
   <hidden>true</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>content</content>
   <renderedcontent/>
   <attachment>
@@ -163,6 +164,10 @@
             </entry>
             <entry>
               <string>hidden</string>
+              <boolean>true</boolean>
+            </entry>
+            <entry>
+              <string>enforce_required_rights</string>
               <boolean>true</boolean>
             </entry>
             <entry>

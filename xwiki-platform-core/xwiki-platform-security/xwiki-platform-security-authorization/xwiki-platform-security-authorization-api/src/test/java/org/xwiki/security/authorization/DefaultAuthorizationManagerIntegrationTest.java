@@ -55,6 +55,7 @@ import org.xwiki.security.authorization.cache.internal.DefaultSecurityCacheLoade
 import org.xwiki.security.authorization.cache.internal.TestCache;
 import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.authorization.internal.DefaultAuthorizationSettler;
+import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
 import org.xwiki.security.authorization.testwikis.SecureTestEntity;
 import org.xwiki.security.authorization.testwikis.TestAccessRule;
 import org.xwiki.security.authorization.testwikis.TestDefinition;
@@ -137,6 +138,9 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     @MockComponent
     private SecurityCacheRulesInvalidator securityCacheRulesInvalidator;
 
+    @MockComponent
+    private DocumentRequiredRightsChecker documentRequiredRightsChecker;
+
     /** Mocked cache */
     private TestCache<Object> cache;
 
@@ -161,6 +165,8 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             });
 
         when(xWikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
+
+        when(this.documentRequiredRightsChecker.hasRequiredRights(any(), any())).thenReturn(true);
     }
 
     @BeforeEach

@@ -279,7 +279,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public Rating saveRating(EntityReference reference, UserReference user, int vote)
+    public synchronized Rating saveRating(EntityReference reference, UserReference user, int vote)
         throws RatingsException
     {
         checkIfVoteValid(vote);
@@ -399,7 +399,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public boolean removeRating(String ratingIdentifier) throws RatingsException
+    public synchronized boolean removeRating(String ratingIdentifier) throws RatingsException
     {
         Map<RatingQueryField, Object> queryMap = Collections
             .singletonMap(RatingQueryField.IDENTIFIER, ratingIdentifier);
@@ -424,7 +424,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public long removeRatings(EntityReference entityReference) throws RatingsException
+    public synchronized long removeRatings(EntityReference entityReference) throws RatingsException
     {
         String escapedEntityReference =
             this.solrUtils.toCompleteFilterQueryString(entityReference, EntityReference.class);
@@ -454,7 +454,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public long moveRatings(EntityReference oldReference, EntityReference newReference)
+    public synchronized long moveRatings(EntityReference oldReference, EntityReference newReference)
         throws RatingsException
     {
         String escapedEntityReference = this.solrUtils.toCompleteFilterQueryString(oldReference, EntityReference.class);
@@ -529,7 +529,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public void saveRating(Rating rating) throws RatingsException
+    public synchronized void saveRating(Rating rating) throws RatingsException
     {
         SolrInputDocument solrInputDocument = this.getInputDocumentFromRating(rating);
         try {
@@ -541,7 +541,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException
+    public synchronized AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException
     {
         if (this.getRatingConfiguration().isAverageStored()) {
             Map<RatingQueryField, Object> queryMap = new LinkedHashMap<>();

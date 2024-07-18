@@ -30,7 +30,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -68,15 +68,13 @@ class FormUrlEncodedPageReaderTest
     }
 
     @Test
-    void hiddenDefaultsToFalseWhenAbsent() throws Exception
+    void hiddenNotSetWhenAbsent() throws Exception
     {
-        // Pin current behavior: Boolean.valueOf(null) is false, so a page whose form has no
-        // "hidden" field is treated as not hidden.
         MultivaluedMap<String, String> form = new MultivaluedHashMap<>();
         when(this.jaxrs.readForm(any(), any(), any())).thenReturn(form);
 
         Page page = this.reader.readFrom(Page.class, null, null, null, null, null);
 
-        assertFalse(page.isHidden());
+        assertNull(page.isHidden());
     }
 }

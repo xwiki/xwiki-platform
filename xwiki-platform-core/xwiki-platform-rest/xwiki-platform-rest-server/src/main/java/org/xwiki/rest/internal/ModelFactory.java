@@ -197,7 +197,7 @@ public class ModelFactory
             modified = true;
         }
 
-        if (doc.isHidden() != restPage.isHidden()) {
+        if (restPage.isHidden() != null && doc.isHidden() != restPage.isHidden()) {
             doc.setHidden(restPage.isHidden());
             modified = true;
         }

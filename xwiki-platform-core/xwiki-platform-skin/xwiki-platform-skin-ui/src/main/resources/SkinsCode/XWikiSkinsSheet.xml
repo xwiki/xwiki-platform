@@ -81,8 +81,8 @@
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
     ; {{html}}&lt;label for="${className}_$escapetool.xml($doc.getObject($className).getNumber())_$escapetool.xml($prop.name)"&gt;$escapetool.xml($prop.prettyName)&lt;/label&gt;{{/html}}
-    : #if($prop.name == 'logo')## Avoid line break
-      {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}}## Avoid line break
+    : #if($prop.name == 'logo'){{warning}}{{translation key="skin.sheet.properties.logo.warning" /}}{{/warning}}\\\\## Avoid line break for the definition list
+    {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}}
     #else$doc.display($prop.name)#end
     
     #else

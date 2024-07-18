@@ -293,6 +293,9 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
 
         this.entity.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
 
+        this.entity.setEnforceRequiredRights(getBoolean(WikiDocumentFilter.PARAMETER_ENFORCE_REQUIRED_RIGHTS,
+            parameters, false));
+
         String revisions =
             getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, this.currentLocaleParameters, null);
         if (revisions != null) {

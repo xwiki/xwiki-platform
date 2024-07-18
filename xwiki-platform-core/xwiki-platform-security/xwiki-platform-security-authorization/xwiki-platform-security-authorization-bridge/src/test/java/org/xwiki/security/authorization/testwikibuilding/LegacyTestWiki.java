@@ -1073,6 +1073,12 @@ public class LegacyTestWiki extends AbstractTestWiki
                     allowing(mockedDocument)
                         .getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE);
                     will(returnValue(Collections.emptyList()));
+                    // TODO: implement support for returning other values to add test cases for required rights.
+                    allowing(mockedDocument).isEnforceRequiredRights();
+                    will(returnValue(false));
+                    allowing(mockedDocument)
+                        .getXObjects(with(equal(new LocalDocumentReference("XWiki", "RequiredRightClass"))));
+                    will(returnValue(List.of()));
                 }
             });
 

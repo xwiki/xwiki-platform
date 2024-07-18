@@ -212,6 +212,11 @@ public class ModelFactory
 
         doc.setHidden(restPage.isHidden());
 
+        if (restPage.isEnforceRequiredRights() != null) {
+            doc.setEnforceRequiredRights(restPage.isEnforceRequiredRights());
+            modified = true;
+        }
+
         // Set objects
         if (restPage.getObjects() != null) {
             Set<ObjectReference> newReferences = new HashSet<>();
@@ -765,6 +770,7 @@ public class ModelFactory
         page.setMajorVersion(doc.getRCSVersion().at(0));
         page.setMinorVersion(doc.getRCSVersion().at(1));
         page.setHidden(doc.isHidden());
+        page.setEnforceRequiredRights(doc.isEnforceRequiredRights());
         page.setLanguage(doc.getLocale().toString());
         page.setCreator(doc.getCreator());
         if (withPrettyNames) {

@@ -517,6 +517,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private Syntax syntax;
 
     /**
+     * If required rights that can be defined in a {@code XWiki.RequiredRightClass} shall be enforced. For
+     * backwards-compatibility reasons, this is {@code false} by default.
+     * @since 16.6.0RC1
+     */
+    private boolean enforceRequiredRights = false;
+
+    /**
      * Is latest modification a minor edit.
      */
     private boolean isMinorEdit = false;
@@ -4159,6 +4166,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (eform.getHidden() != null) {
             setHidden("1".equals(eform.getHidden()));
         }
+
+        // Read the enforce required rights flag from the form
+        if (eform.getEnforceRequiredRights() != null) {
+            setEnforceRequiredRights("1".equals(eform.getEnforceRequiredRights()));
+        }
     }
 
     private Syntax resolveSyntax(String syntaxId)
@@ -4507,6 +4519,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setMinorEdit(document.isMinorEdit());
         setSyntax(document.getSyntax());
         setHidden(document.isHidden());
+        setEnforceRequiredRights(document.isEnforceRequiredRights());
 
         cloneXObjects(document);
         cloneAttachments(document);
@@ -4590,6 +4603,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
             doc.setRestricted(isRestricted());
+            doc.setEnforceRequiredRights(isEnforceRequiredRights());
 
             if (this.xClass != null) {
                 doc.setXClass(this.xClass.clone());
@@ -4886,6 +4900,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         if (isHidden() != otherDocument.isHidden()) {
+            return false;
+        }
+
+        if (isEnforceRequiredRights() != otherDocument.isEnforceRequiredRights()) {
             return false;
         }
 
@@ -7055,6 +7073,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             list.add(new MetaDataDiff("hidden", fromDoc.isHidden(), toDoc.isHidden()));
         }
 
+        if (fromDoc.isEnforceRequiredRights() != toDoc.isEnforceRequiredRights()) {
+            list.add(new MetaDataDiff("enforceRequiredRights", fromDoc.isEnforceRequiredRights(),
+                toDoc.isEnforceRequiredRights()));
+        }
+
         return list;
     }
 
@@ -7669,6 +7692,32 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         setSyntax(syntax);
+    }
+
+    /**
+     * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't
+     * use more rights than defined in the object, {@code false} otherwise
+     * @since 16.6.0RC1
+     */
+    @Unstable
+    public boolean isEnforceRequiredRights()
+    {
+        return this.enforceRequiredRights;
+    }
+
+    /**
+     * @param enforceRequiredRights if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't use
+     * more rights than defined in the object
+     * @since 16.6.0RC1
+     */
+    @Unstable
+    public void setEnforceRequiredRights(boolean enforceRequiredRights)
+    {
+        this.enforceRequiredRights = enforceRequiredRights;
+
+        setContentDirty(true);
     }
 
     public Vector<BaseObject> getComments(boolean asc)
@@ -9338,6 +9387,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         if (isHidden() != document.isHidden()) {
             setHidden(document.isHidden());
+            modified = true;
+        }
+
+        if (isEnforceRequiredRights() != document.isEnforceRequiredRights()) {
+            setEnforceRequiredRights(document.isEnforceRequiredRights());
             modified = true;
         }
 

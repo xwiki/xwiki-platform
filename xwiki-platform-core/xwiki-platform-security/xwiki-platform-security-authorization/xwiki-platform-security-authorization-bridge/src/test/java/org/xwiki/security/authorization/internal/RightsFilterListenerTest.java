@@ -19,11 +19,14 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.internal.requiredrights.DocumentRequiredRightsReader;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -40,7 +43,9 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link RightsFilterListener}.
@@ -54,11 +59,20 @@ public class RightsFilterListenerTest
     @MockComponent
     private AuthorizationManager authorization;
 
+    @MockComponent
+    private DocumentRequiredRightsReader requiredRightsReader;
+
     @InjectMockComponents
     private RightsFilterListener listener;
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @BeforeEach
+    void setUp()
+    {
+        when(this.requiredRightsReader.readRequiredRights(any())).thenReturn(DocumentRequiredRights.EMPTY);
+    }
 
     @Test
     public void noRight()

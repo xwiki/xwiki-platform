@@ -53,13 +53,11 @@
   #set($iconTheme = $request.iconTheme)
   #set($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
   #foreach($xwikiIcon in $xwikiIcons)
-    #if($!request.subString == '' || $stringtool.contains($xwikiIcon, $request.subString))
-      #set($icon = {})
-      #set($discard = $icon.put('name', $xwikiIcon))
-      #set($discard = $icon.put('render', $services.icon.renderHTML($xwikiIcon, $iconTheme)))
-      #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
-      #set($discard = $icons.add($icon))
-    #end
+    #set($icon = {})
+    #set($discard = $icon.put('name', $xwikiIcon))
+    #set($discard = $icon.put('render', $services.icon.renderHTML($xwikiIcon, $iconTheme)))
+    #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
+    #set($discard = $icons.add($icon))
   #end
   #jsonResponse($icons)
 #else
@@ -233,23 +231,30 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
    * Display the list of icons
    */
   var displayList = function(iconTheme) {
+    // Filter the icons we display based on the value of the input field.
+    let selectedIconName = '';
+    if (currentInput.data('xwikiIconPickerSettings') !== '') {
+      selectedIconName = currentInput[0].value.replace(currentInput.data('xwikiIconPickerSettings').prefix, '');
+    }
     // For each icon
     for (var i=0; i &lt; iconTheme.length; ++i) {
       // Display the icon
-      var displayer = $(document.createElement('div'));
-      iconListSection.append(displayer);
-      displayer.addClass('xwikiIconPickerIcon');
-      var imageDiv = $(document.createElement('div'));
-      imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
-      displayer.append(imageDiv);
-      var iconNameSpan = $(document.createElement('span'));
-      iconNameSpan.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
-      displayer.append(iconNameSpan);
-      // Change the input value when the icon is clicked
-      displayer.on('click', function(event) {
-        currentInput.val(currentInput.data('xwikiIconPickerSettings').prefix + $(event.currentTarget).children('.xwikiIconPickerIconName').text() );
-        closePicker();
-      });
+      if (selectedIconName === '' || iconTheme[i].name.includes(selectedIconName)) {
+        var displayer = $(document.createElement('div'));
+        iconListSection.append(displayer);
+        displayer.addClass('xwikiIconPickerIcon');
+        var imageDiv = $(document.createElement('div'));
+        imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
+        displayer.append(imageDiv);
+        var iconNameSpan = $(document.createElement('span'));
+        iconNameSpan.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
+        displayer.append(iconNameSpan);
+        // Change the input value when the icon is clicked
+        displayer.on('click', function(event) {
+          currentInput.val(currentInput.data('xwikiIconPickerSettings').prefix + $(event.currentTarget).children('.xwikiIconPickerIconName').text());
+          closePicker();
+        });
+      }
     }
   }
   
@@ -257,8 +262,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
    * Load the icon list (get the JSON from the server) and display it afterwards
    */
   var loadIconList = function(iconTheme) {
-    let selectedIconName = currentInput[0].value.replace(currentInput[0].data('xwikiIconPickerSettings').prefix, '');
-    $.getJSON(getResourceURL('data_icons', 'iconTheme='+iconTheme+'&amp;subString=' + selectedIconName), function(dataIcons) {
+    $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme), function(dataIcons) {
       // Put the result in the icons map
       icons[iconTheme] = dataIcons;
       // Display the list
@@ -426,7 +430,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       // Remove all the displayed icons
       $('.xwikiIconPickerIcon').remove();
       // Display the new ones. We always reload because the filter results are unrelated.
-      loadIconList(iconThemeSelector.val())
+      displayList(icons[currentIconTheme]);
     };
     currentInput.on('keyup', function(event) {
       // Close the picker when the user press 'escape'.

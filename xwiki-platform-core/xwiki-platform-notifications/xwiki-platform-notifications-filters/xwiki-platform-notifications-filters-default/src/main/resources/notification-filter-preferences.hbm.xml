@@ -27,24 +27,26 @@
 <hibernate-mapping>
   <typedef name="NotificationFormat" class="org.hibernate.type.EnumType">
     <param name="enumClass">org.xwiki.notifications.NotificationFormat</param>
+    <param name="useNamed">true</param>
   </typedef>
   <class name="org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference"
-         table="notification_filter_prefs">
+         table="notification_filter_preferences">
 
     <id name="internalId" type="long">
       <column name="nfp_id" not-null="true" />
       <generator class="native"/>
     </id>
 
-    <property name="owner" type="string" column="nfp_owner" length="768" index="NFP_OWNER"/>
+    <property name="owner" type="string" column="nfp_owner" length="768" index="NFP_OWNER_INDEX"/>
 
-    <property name="filterName" type="string" column="nfp_filter_name" length="768" index="NFP_FILTER_NAME" />
+    <property name="filterName" type="string" column="nfp_filter_name" length="768" index="NFP_FILTER_NAME_INDEX" />
 
     <property name="enabled" type="boolean" column="nfp_enabled" />
 
     <property name="filterType" column="nfp_filter_type">
       <type name="org.hibernate.type.EnumType">
         <param name="enumClass">org.xwiki.notifications.filters.NotificationFilterType</param>
+        <param name="useNamed">true</param>
       </type>
     </property>
 
@@ -58,10 +60,11 @@
     <property name="scope" column="nfp_scope" not-null="true">
       <type name="org.hibernate.type.EnumType">
         <param name="enumClass">org.xwiki.notifications.filters.NotificationFilterScope</param>
+        <param name="useNamed">true</param>
       </type>
     </property>
 
-    <property name="entity" type="string" column="nfp_entity" length="768" index="NFP_ENTITY" />
+    <property name="entity" type="string" column="nfp_entity" length="768" index="NFP_ENTITY_INDEX" />
 
     <set name="notificationFormats" table="notification_filter_prefs_formats" lazy="false">
       <key column="nfp_id" />

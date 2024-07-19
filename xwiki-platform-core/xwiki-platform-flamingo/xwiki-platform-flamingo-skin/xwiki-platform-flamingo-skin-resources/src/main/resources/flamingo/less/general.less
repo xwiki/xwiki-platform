@@ -178,8 +178,18 @@ body.content {
       & .buttonwrapper, // Do not underline links that are inside buttonwrapper. Those will be styled like buttons and we want to keep their style consistent with buttons.
       & #user-menu-col, // In the user profile, do not underline the menu items.
       & .jstree-xwiki // Do not underline links in jstrees
+      & .xwiki-livedata .cell .displayer-link, // Do not underline links that are in their own livedata cell
+      & .xwiki-livedata .cell .breadcrumb // Do not underline links that are in breadcrumbs in livedatas
       {
         & a {
+          .not-inline-link();
+        }
+      }
+
+      a {
+        &.user-name, &.group-name // Usually user names and group names displayed with the userDisplayMacro
+          // are next to the user avatar. This specific rule can be removed once XWIKI-22269 is fixed.
+        {
           .not-inline-link();
         }
       }

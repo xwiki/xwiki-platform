@@ -61,7 +61,7 @@
     <jetty.version>${jetty.client.version}</jetty.version>
     <netty.version>4.1.111.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.6</dockerJava.version>
+    <dockerJava.version>3.4.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
@@ -108,7 +108,7 @@
     <hsqldb.version>2.7.3</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>8.4.0</mysql.version>
+    <mysql.version>9.0.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
     <mariadb.version>3.4.0</mariadb.version>
@@ -617,7 +617,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.17.2</version>
+        <version>1.18.1</version>
       </dependency>
 
       <!-- PDF -->
@@ -761,7 +761,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>4.2.1</version>
+        <version>4.3</version>
       </dependency>
 
       <!-- Used by solr-core and closure-compiler -->
@@ -984,6 +984,11 @@
             <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-analysis-extras</artifactId>
+        <version>${solr.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.lucene</groupId>
@@ -1342,8 +1347,8 @@
               </extensionOverride>
               <extensionOverride>
                 <!-- Open Java is the same as JSON-Java but with a different license -->
-                <id>com.tdunning:json</id>
-                <features>org.json:json/20180130</features>
+                <id>org.json:json</id>
+                <features>com.tdunning:json</features>
               </extensionOverride>
               <extensionOverride>
                 <!-- Embbed javax.el:javax.el-api -->

@@ -54,7 +54,7 @@
     <dependency>
       <groupId>org.ocpsoft.prettytime</groupId>
       <artifactId>prettytime</artifactId>
-      <version>5.0.8.Final</version>
+      <version>5.0.9.Final</version>
     </dependency>
   </dependencies>
 </project>

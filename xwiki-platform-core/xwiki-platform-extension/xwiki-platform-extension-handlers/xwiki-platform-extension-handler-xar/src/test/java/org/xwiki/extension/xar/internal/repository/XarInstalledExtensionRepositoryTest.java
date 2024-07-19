@@ -25,6 +25,7 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.environment.Environment;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -54,6 +55,7 @@ public class XarInstalledExtensionRepositoryTest
     public void afterComponent() throws Exception
     {
         this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
+        this.repositoryUtil.getComponentManager().unregisterComponent(Environment.class, "default");
     }
 
     @Before

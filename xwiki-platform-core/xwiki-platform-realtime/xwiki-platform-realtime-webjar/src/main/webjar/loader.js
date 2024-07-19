@@ -49,16 +49,12 @@ define('xwiki-realtime-loader', [
   },
 
   getRTEditorURL = module.getEditorURL = function(href, info) {
-    href = href.replace(/\?(.*)$/, function (all, args) {
-      return '?' + args.split('&').filter(
-        arg => ['editor', 'section', 'force', 'realtime'].indexOf(arg.split('=', 1)[0]) < 0
-      ).join('&');
-    });
-    if (href.indexOf('?') < 0) {
-      href += '?';
-    }
-    href = href + info.href;
-    return href;
+    const currentURL = new URL(href);
+    const baseURL = new URL("?", currentURL).toString();
+    const params = new URLSearchParams(currentURL.search);
+    ['editor', 'section', 'force', 'realtime'].forEach(param => params.delete(param));
+    const hash = info.href.includes('#') ? '' : currentURL.hash;
+    return baseURL + params.toString() + info.href + hash;
   },
 
   allRt = {
@@ -714,27 +710,30 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  joinAllUsers = async function() {
-    const getChannels = doc.getChannels.bind(doc, {
+  getAllUsersChannel = function() {
+    return doc.getChannels({
       path: doc.language + '/events/all',
       create: true
-    });
-    const channels = await getChannels();
-    const channelKey = channels[0].key;
-    if (channelKey) {
-      const Netflux = await new Promise((resolve, reject) => {
-        require(['netflux-client'], resolve, reject);
-      });
-      // Connect to the WebSocket server.
-      const network = await Netflux.connect(realtimeConfig.webSocketURL);
-      await onNetfluxConnect(getChannels, channelKey, network);
-    }
+    }).then(channels => channels[0]);
   },
 
-  onNetfluxConnect = async function(getChannels, channelKey, network) {
-    allRt.network = network;
-    // Join the "all" channel.
-    onOpen(await network.join(channelKey));
+  joinAllUsers = async function() {
+    const channelInfo = await getAllUsersChannel();
+    if (!channelInfo?.key) {
+      // We can't join the all users (events) channel if we don't know its key.
+      return;
+    }
+    if (!allRt.network) {
+      allRt.network = await connectToNetfluxWebSocket();
+    }
+    await onOpen(channelInfo);
+  },
+
+  connectToNetfluxWebSocket = async function() {
+    const Netflux = await new Promise((resolve, reject) => {
+      require(['netflux-client'], resolve, reject);
+    });
+    const network = await Netflux.connect(realtimeConfig.webSocketURL);
     // Add direct messages handler.
     network.on('message', msg => {
       const data = tryParse(msg);
@@ -747,8 +746,7 @@ define('xwiki-realtime-loader', [
     network.on('reconnect', () => {
       hideWarning();
       hideWsError();
-      module.ready = getChannels().then(channels => network.join(channels[0].key));
-      module.ready.then(onOpen, onError);
+      module.ready = joinAllUsers();
     });
     network.on('disconnect', () => {
       if (RealtimeContext.getRealtimeEditedFields().length) {
@@ -757,12 +755,27 @@ define('xwiki-realtime-loader', [
         displayWsWarning();
       }
     });
+    return network;
   },
 
-  onOpen = channel => {
+  onOpen = async channelInfo => {
+    const channel = await allRt.network.join(channelInfo.key);
     allRt.userList = channel.members;
     allRt.wChan = channel;
+    allRt.channelInfo = channelInfo;
     addMessageHandler();
+  },
+
+  maybeRejoinAllUsers = () => {
+    if (allRt.channelInfo && allRt.channelInfo.path[0] !== doc.language) {
+      // The document language has changed since we joined the all users channel (e.g. because the user has switched
+      // from editing the original document translation to editing another translation, without reloading the web page,
+      // from inplace editing). We need to join the all users channel associated with the new document language.
+      // Leave the current channel first.
+      allRt.wChan.leave('Switched to a different document translation');
+      // Then join the new channel.
+      module.ready = joinAllUsers();
+    }
   },
 
   onError = error => {
@@ -806,6 +819,7 @@ define('xwiki-realtime-loader', [
 
     whenReady: async function(callback) {
       displayConnecting();
+      maybeRejoinAllUsers();
       try {
         await module.ready;
         callback(true);

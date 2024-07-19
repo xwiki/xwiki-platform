@@ -78,19 +78,24 @@ public class DocumentRequiredRightsReader
             String[] levelRight = StringUtils.split(value, "_", 2);
             if (levelRight.length == 2) {
                 right = Right.toRight(levelRight[1]);
-                entityType = EntityType.valueOf(levelRight[0]);
+                entityType = EntityType.valueOf(levelRight[0].toUpperCase());
             }
         }
 
         // TODO: add some handling for invalid values.
         Set<EntityType> targetedEntityTypes = right.getTargetedEntityType();
-        EntityReference entityReference = object.getDocumentReference().extractReference(entityType);
-        // Try to get the highest level where this right can be assigned. This is done to ensure that, e.g.,
-        // programming right can imply admin right on the wiki level even if programming right is only specified on
-        // the document level.
-        while (!targetedEntityTypes.contains(entityType) && entityReference != null) {
-            entityType = entityReference.getType();
-            entityReference = entityReference.getParent();
+        if (targetedEntityTypes == null) {
+            // This means the right targets only the farm level, which is null.
+            entityType = null;
+        } else {
+            EntityReference entityReference = object.getDocumentReference().extractReference(entityType);
+            // Try to get the highest level where this right can be assigned. This is done to ensure that, e.g.,
+            // programming right can imply admin right on the wiki level even if programming right is only specified on
+            // the document level.
+            while (!targetedEntityTypes.contains(entityType) && entityReference != null) {
+                entityType = entityReference.getType();
+                entityReference = entityReference.getParent();
+            }
         }
 
         return new DocumentRequiredRight(right, entityType);

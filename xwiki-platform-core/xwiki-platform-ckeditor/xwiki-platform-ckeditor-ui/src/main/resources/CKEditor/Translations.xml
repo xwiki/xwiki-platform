@@ -266,6 +266,11 @@ ckeditor.plugin.focusedplaceholder.placeholder.caption=Title
 ckeditor.plugin.focusedplaceholder.placeholder.th=Header
 ckeditor.plugin.focusedplaceholder.placeholder.td=Cell
 
+ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Temporarily leaving the realtime session.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No changes were made. Re-joining the realtime session.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
+ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=There are unsaved changes. Permanently leaving the realtime session.
+
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
 ckeditor.upload.error.csrf=The CSRF token is missing.

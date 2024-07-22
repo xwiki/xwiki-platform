@@ -46,6 +46,7 @@ import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
+import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
@@ -115,8 +116,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify that we're editing alone.
         assertTrue(editor.getToolBar().isEditingAlone());
 
-        // The Source button is currently disabled.
-        assertFalse(editor.getToolBar().canToggleSourceMode());
+        // The Source button is now available.
+        assertTrue(editor.getToolBar().canToggleSourceMode());
 
         RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
         textArea.sendKeys("one");
@@ -1335,6 +1336,205 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         assertEquals("superadmin", firstEditor.getToolBar().getCoeditors().stream().map(Coeditor::getName)
             .reduce((a, b) -> a + ", " + b).get());
+    }
+    
+    @Test
+    @Order(17)
+    void editSource(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeCKEditorToolBar firstEditorToolbar = firstEditor.getToolBar();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+        
+        // Check that the source button is available.
+        assertTrue(firstEditorToolbar.canToggleSourceMode());
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab.
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeCKEditorToolBar secondEditorToolbar = secondEditor.getToolBar();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // Check that the source button is available.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        //
+        // First Tab
+        //
+
+        // Switch back to the first tab
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+       
+        
+
+        // Type in the first tab to have some content.
+        firstTextArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three");
+
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and verify the content.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("three");
+
+        assertEquals("one\ntwo\nthree", secondTextArea.getText());
+        
+        // Save to make sure the editor is not marked as dirty.
+        secondEditPage.clickSaveAndContinue();
+        
+        // Switch to source mode and check that we are not in the realtime session anymore.
+        secondEditorToolbar.toggleSourceMode();
+        assertFalse(secondEditPage.isRealtimeEditing());
+        
+        // Check that we can still switch back to wysiwyg mode.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        
+        // Check the contents of the source mode.
+        assertEquals("one\n\ntwo\n\nthree", secondEditor.getSourceTextArea().getAttribute("value"));
+        
+        
+        //
+        // First Tab
+        //
+
+        // Switch to the first tab and make more changes, while the second user is in source mode.
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        firstTextArea.sendKeys(Keys.ENTER, "four");
+        
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and switch back to view mode.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondEditorToolbar.toggleSourceMode();
+        
+        // After switching back to view mode, we need to recreate the textArea.
+        secondTextArea = secondEditor.getRichTextArea();
+        
+        // Check that the second user re-joined the realtime editing session.
+        assertTrue(secondEditPage.isRealtimeEditing());
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        secondTextArea.waitUntilContentContains("four");
+        assertEquals("one\ntwo\nthree\nfour", secondTextArea.getText());
+        
+        // Check that we can still switch to source mode.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        
+        // Save again to make the editor not dirty.
+        secondEditPage.clickSaveAndContinue();
+        
+        // Switch to source mode.
+        secondEditorToolbar.toggleSourceMode();
+        
+        assertFalse(secondEditPage.isRealtimeEditing());
+        // Check the contents of the source mode.
+        assertEquals("one\n\ntwo\n\nthree\n\nfour", secondEditor.getSourceTextArea().getAttribute("value"));
+        
+        // Add some content.
+        secondEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "five");
+        
+        //
+        // First Tab
+        //
+
+        // Switch to the first tab and make more changes, while the second user is in source mode.
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        firstTextArea.sendKeys(Keys.ENTER, "six");
+        
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and switch back to view mode.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondEditorToolbar.toggleSourceMode();
+        
+        // After switching back to view mode, we need to recreate the textArea.
+        secondTextArea = secondEditor.getRichTextArea();
+        
+        // Check that the second user did not re-join the realtime editing session.
+        assertFalse(secondEditPage.isRealtimeEditing());
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        assertEquals("one\ntwo\nthree\nfour\nfive", secondTextArea.getText());
+        
+        // Join the realtime session again and wait to be in sync.
+        secondEditPage.joinRealtimeEditing();
+        secondTextArea.waitUntilContentContains("six");
+        assertEquals("one\ntwo\nthree\nfour\nsix", secondTextArea.getText());
+        
+        // Check that we can still switch to source mode.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        
+        // Make the editor dirty by editing the content without saving.
+        secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "seven");
+        
+        // Switch to source mode and back to wysiwyg edit mode.
+        secondEditorToolbar.toggleSourceMode();
+        assertFalse(secondEditPage.isRealtimeEditing());
+        assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven", secondEditor.getSourceTextArea().getAttribute("value"));
+        secondEditorToolbar.toggleSourceMode();
+        
+        // Check that the second user did not re-join the realtime editing session.
+        assertFalse(secondEditPage.isRealtimeEditing());
+        
+        // We keep the second user out of the realtime editing session now
+        // and we do more tests with the first user.
+        
+        //
+        // First Tab
+        //
+
+        // Switch to the first tab.
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        // Check that the source button is available.
+        assertTrue(firstEditorToolbar.canToggleSourceMode());
+        
+
+        
+        // Saving might merge silently. Here is some bulletproofing cleanup.
+        firstEditPage.clickSaveAndContinue();
+        firstTextArea.clear();
+        
+        // Make the editor not dirty by saving.
+        firstEditPage.clickSaveAndContinue();        
+        
+        // Switch to source mode and back to wysiwyg.
+        firstEditorToolbar.toggleSourceMode();
+        assertFalse(firstEditPage.isRealtimeEditing());
+        firstEditorToolbar.toggleSourceMode();
+        assertTrue(firstEditPage.isRealtimeEditing());
+        
+        // Bulletproofing: Save to make sure the editor is not dirty.
+        firstEditPage.clickSaveAndContinue();
+        
+        // Switch to source mode, make a change, and switch back to wysiwyg.
+        firstEditorToolbar.toggleSourceMode();
+        assertFalse(firstEditPage.isRealtimeEditing());
+        firstEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "eight");
+        firstEditorToolbar.toggleSourceMode();
+        
+        firstTextArea = firstEditor.getRichTextArea();
+        assertTrue(firstEditPage.isRealtimeEditing());
+        assertEquals("eight", firstTextArea.getText());
     }
 
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-like-test</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>16.6.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-like-test-docker</artifactId>
   <name>XWiki Platform - Like - Test - Functional Docker Tests</name>

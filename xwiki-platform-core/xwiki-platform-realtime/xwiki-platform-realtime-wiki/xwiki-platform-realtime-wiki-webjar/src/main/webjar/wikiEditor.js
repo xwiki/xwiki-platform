@@ -228,11 +228,6 @@ define('xwiki-realtime-wikiEditor', [
           getTextValue: function() {
             return editor.getValue();
           },
-          getSaveValue: function() {
-            return {
-              content: editor.getValue()
-            };
-          },
           getTextAtCurrentRevision: function() {
             return $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'}))).then(data => {
               return data.content;

@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Вики содержит документы, которые не отображаются по умолчанию. Эти скрытые документы представляют собой технический контент, такой как классы приложений, страницы настройки, макросы, стили, скрипты и т.д.
-XWiki.XWikiUsers_accessibility.hint=Дополнительная доступность обеспечит различные визуальные улучшения, такие как: большие шрифты, подчеркнутые ссылки и т.д.
+XWiki.XWikiUsers_underline.hint=Выберите, будут ли ссылки подчеркнуты.
 XWiki.XWikiUsers_timezone.hint=Используйте определенный часовой пояс, чтобы даты отражали ваше текущее местоположение.
 XWiki.XWikiUsers_editor.hint=Выберите редактор по умолчанию, переопределив установленный глобально редактор по умолчанию. Если не задано, то редактор по умолчанию выбирается в зависимости от того, что редактируется.
 XWiki.XWikiUsers_usertype.hint=Выберите тип пользователя по умолчанию. Опытные пользователи получат доступ к некоторым функциям редактирования, созданию терминальных страниц и т.д.
@@ -60,5 +60,14 @@ user.profile.network.saving=Сохранение...
 user.profile.network.error=Ошибка сохранения настроек уведомления
 user.profile.status.done=Готово
 user.profile.status.saving=Сохранение...
-user.profile.status.error=Ошибка сохранения пользовательского статуса</content>
+user.profile.status.error=Ошибка сохранения пользовательского статуса
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+XWiki.XWikiUsers_accessibility.hint=Дополнительная доступность обеспечит различные визуальные улучшения, такие как: большие шрифты, подчеркнутые ссылки и т.д.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

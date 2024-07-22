@@ -36,5 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.deletedDocuments.deleteAll=Eliminar tot</content>
+  <content>index.spacesMacro.title=Espais
+index.spacesMacro.spaceIndex.title=Vegeu l'índex de l'espai
+index.spacesMacro.spaceIndex.alt=Índex de documents de l'espai
+index.spacesMacro.spaceAdministration.title=Vegeu l'administració de l'espai
+index.spacesMacro.spaceAdministration.alt=Administrar l'espai
+index.spacesMacro.createSpace.link=Crear un nou espai
+index.spacesMacro.createSpace.defaultSpaceName=Nom de l'espai
+index.spacesMacro.createSpace.submit=Crear
+index.deletedDocuments.deleteAll=Eliminar tot</content>
 </xwikidoc>

@@ -397,7 +397,7 @@ public class LocalizationScriptService implements ScriptService
             while (iterator.hasNext()) {
                 String line = iterator.nextLine();
                 if (StringUtils.isNotBlank(line)) {
-                    locales.add(new Locale(line));
+                    locales.add(LocaleUtils.toLocale(line));
                 }
             }
             iterator.close();

@@ -498,7 +498,7 @@ public class BasePage extends BaseElement
      */
     public void logout()
     {
-        getDrawerMenu().toggle();
+        getDrawerMenu().show();
         getDriver().findElement(By.id("tmLogout")).click();
         // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
         // TestUtils#createUser*(), which expect the currently cached token to be valid, will fail because they would be

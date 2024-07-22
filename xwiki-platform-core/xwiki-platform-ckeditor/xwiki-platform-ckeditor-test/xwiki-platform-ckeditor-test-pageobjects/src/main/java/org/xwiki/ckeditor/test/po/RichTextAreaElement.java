@@ -120,6 +120,24 @@ public class RichTextAreaElement extends BaseElement
         }
     }
 
+    /**
+     * Clicks somewhere on the edited content.
+     * 
+     * @param contentSelector specifies an element from the edited content to click on
+     * @since 15.10.11
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void click(By contentSelector)
+    {
+        try {
+            WebElement rootEditableElement = getRootEditableElement();
+            getDriver().findElementWithoutWaiting(rootEditableElement, contentSelector).click();
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
+    }
+
     protected void maybeSwitchToEditedContent()
     {
         if (this.isFrame) {

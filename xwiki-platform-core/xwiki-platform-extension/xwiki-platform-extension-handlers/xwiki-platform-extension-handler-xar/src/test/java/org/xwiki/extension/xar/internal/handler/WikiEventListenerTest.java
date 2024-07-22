@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.WikiCopiedEvent;
+import org.xwiki.environment.Environment;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
@@ -67,6 +68,7 @@ public class WikiEventListenerTest
     {
         this.wikiDescriptorManager =
             this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
+        this.repositoryUtil.getComponentManager().unregisterComponent(Environment.class, "default");
     }
 
     @Before

@@ -411,11 +411,14 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         XWikiContext xcontext = this.xcontextProvider.get();
 
         WikiReference currentWiki = xcontext.getWikiReference();
+        DocumentReference currentContextUser = xcontext.getUserReference();
 
         ExtendedMimeMessage message = null;
         try {
             // Switch to user's wiki to make sure the mail is generated from target user point of view
             xcontext.setWikiReference(this.currentUser.getWikiReference());
+            // Ensure to use the user we target in email to properly create notifications.
+            xcontext.setUserReference(this.currentUser);
 
             DocumentReference templateDocumentReference =
                 this.documentReferenceResolver.resolve(this.templateReference, this.currentUser);
@@ -434,6 +437,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         } finally {
             // Restore wiki
             xcontext.setWikiReference(currentWiki);
+            // Restore context user
+            xcontext.setUserReference(currentContextUser);
         }
 
         // Look for the next email to send

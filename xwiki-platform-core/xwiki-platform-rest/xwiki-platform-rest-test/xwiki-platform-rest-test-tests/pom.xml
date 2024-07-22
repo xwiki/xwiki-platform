@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest-test</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-test-tests</artifactId>
   <name>XWiki Platform - REST - Tests - Functional Tests</name>
@@ -83,7 +83,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
+      <artifactId>xwiki-platform-search-test-utils</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

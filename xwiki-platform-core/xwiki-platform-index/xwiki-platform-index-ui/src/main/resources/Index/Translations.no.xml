@@ -36,5 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.deletedDocuments.deleteAll=Slett alle</content>
+  <content>index.spacesMacro.title=Rom
+index.spacesMacro.spaceIndex.title=Se rominnhold
+index.spacesMacro.spaceIndex.alt=Romindeks
+index.spacesMacro.spaceAdministration.title=Se romadministrering
+index.spacesMacro.spaceAdministration.alt=Administrer rom
+index.spacesMacro.createSpace.link=Opprett nytt rom
+index.spacesMacro.createSpace.defaultSpaceName=Romnavn
+index.spacesMacro.createSpace.submit=Opprett
+index.deletedDocuments.deleteAll=Slett alle</content>
 </xwikidoc>

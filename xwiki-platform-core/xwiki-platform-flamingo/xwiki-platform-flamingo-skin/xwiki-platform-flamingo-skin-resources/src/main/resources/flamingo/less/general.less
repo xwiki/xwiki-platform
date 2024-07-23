@@ -146,6 +146,9 @@ body.content {
 
   &.preference-underlining-only-inline-links {
     // Define an inline link mixin
+    .inline-link {
+      text-decoration: underline;
+    }
     .not-inline-link {
       text-decoration: none;
       // Make sure we don't take over the default behaviour on hover with too much specificity.
@@ -156,7 +159,7 @@ body.content {
 
     // Main rule for the content
     #xwikicontent a {
-      text-decoration: underline;
+      .inline-link();
     }
 
     // UIs where we want to underline outside of content.
@@ -165,7 +168,7 @@ body.content {
     .commentauthor // Similarly to the page last modificator, we want to underline comment authors.
     {
       & a {
-        text-decoration: underline;
+        .inline-link();
       }
     }
 

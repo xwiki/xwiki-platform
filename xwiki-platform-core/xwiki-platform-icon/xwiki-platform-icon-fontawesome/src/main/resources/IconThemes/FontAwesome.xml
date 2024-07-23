@@ -391,6 +391,7 @@ user = user
 user_add=user-plus
 user_delete=user-times
 vcard = vcard-o
+wand = magic
 weather_clouds = cloud
 weather_sun = sun-o
 weather_snow=snowflake-o

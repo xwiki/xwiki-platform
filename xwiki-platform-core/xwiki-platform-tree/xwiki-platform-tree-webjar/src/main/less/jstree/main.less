@@ -4,15 +4,26 @@
 	.jstree-anchor,
 	.jstree-animated,
 	.jstree-wholerow { transition:background-color 0.15s, box-shadow 0.15s; }
-	.jstree-hovered { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
-	.jstree-context { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
-	.jstree-clicked { background:@clicked-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @clicked-shadow-color; }
+	// XWiki customization start
+	// .jstree-hovered { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
+	// .jstree-context { background:@hovered-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
+	// .jstree-clicked { background:@clicked-bg-color; border-radius:2px; box-shadow:inset 0 0 1px @clicked-shadow-color; }
+	.jstree-hovered { background:@hovered-bg-color; border-radius:3px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
+	.jstree-context { background:@hovered-bg-color; border-radius:3px; box-shadow:inset 0 0 1px @hovered-shadow-color; }
+	.jstree-clicked { background:@clicked-bg-color; border-radius:3px; box-shadow:inset 0 0 1px @clicked-shadow-color; }
+	// XWiki customization end
 	.jstree-no-icons .jstree-anchor > .jstree-themeicon { display:none; }
 	.jstree-disabled {
-		background:transparent; color:@disabled-color;
+		// XWiki customization start
+		// background:transparent; color:@disabled-color;
+		background:transparent; color:@disabled-color; opacity:@disabled-opacity;
+		// XWiki customization end
 		&.jstree-hovered { background:transparent; box-shadow:none; }
 		&.jstree-clicked { background:@disabled-bg-color; }
-		> .jstree-icon { opacity:0.8; filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale"); /* Firefox 10+ */ filter: gray; /* IE6-9 */ -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */ }
+		// XWiki customization start
+		// > .jstree-icon { opacity:0.8; filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale"); /* Firefox 10+ */ filter: gray; /* IE6-9 */ -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */ }
+		> .jstree-icon { filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale"); /* Firefox 10+ */ filter: gray; /* IE6-9 */ -webkit-filter: grayscale(100%); /* Chrome 19+ & Safari 6+ */ }
+		// XWiki customization end
 	}
 	// search
 	.jstree-search { font-style:italic; color:@search-result-color; font-weight:bold; }

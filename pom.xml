@@ -54,7 +54,7 @@
     <batik.version>1.17</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.2</tika.version>
-    <pdfbox.version>2.0.31</pdfbox.version>
+    <pdfbox.version>2.0.32</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>10.0.21</jetty.server.version>
     <jetty.client.version>${jetty.server.version}</jetty.client.version>

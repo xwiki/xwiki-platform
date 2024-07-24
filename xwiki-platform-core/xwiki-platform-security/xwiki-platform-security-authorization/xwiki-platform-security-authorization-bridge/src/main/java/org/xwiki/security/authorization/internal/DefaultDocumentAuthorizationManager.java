@@ -19,6 +19,8 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.Objects;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -81,21 +83,45 @@ public class DefaultDocumentAuthorizationManager implements DocumentAuthorizatio
         boolean hasAccess;
 
         if (documentRequiredRights.enforce()) {
+            EntityType actualEntityType = getFirstLevelWithRight(right, level, contextDocument);
+
             hasAccess = documentRequiredRights.rights().stream()
-                .filter(requiredRight -> level.isAllowedAncestor(requiredRight.scope()))
+                // Filter required rights of the same level or of an ancestor.
+                .filter(requiredRight ->
+                    // Same level.
+                    Objects.equals(actualEntityType, requiredRight.scope())
+                        // Special case for required right on farm level.
+                        || requiredRight.scope() == null
+                        || (actualEntityType != null && actualEntityType.isAllowedAncestor(requiredRight.scope()))
+                )
                 .anyMatch(requiredRight ->
                     requiredRight.right().equals(right) || requiredRight.right()
                         .getImpliedRights()
-                        // TODO: this is wrong. Not all rights are implied on all levels. For example, if there was
-                        //  no script right on space level, admin right on space level wouldn't imply script right.
-                        // Need to investigate what's the proper solution here but either a) check enabled rights per
-                        // level or b) raise the input level to the first level where the input right is defined.
                         .contains(right));
         } else {
             hasAccess = true;
         }
 
         return hasAccess;
+    }
+
+    private static EntityType getFirstLevelWithRight(Right right, EntityType level, DocumentReference contextDocument)
+    {
+        EntityType actualEntityType = level;
+        EntityReference entityReference = contextDocument.extractReference(level);
+        do {
+            if (Right.getEnabledRights(actualEntityType).contains(right)) {
+                break;
+            }
+
+            entityReference = entityReference.getParent();
+            if (entityReference != null) {
+                actualEntityType = entityReference.getType();
+            } else {
+                actualEntityType = null;
+            }
+        } while (entityReference != null);
+        return actualEntityType;
     }
 
     @Override

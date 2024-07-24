@@ -1,10 +1,17 @@
 // base jstree
 .jstree-node, .jstree-children, .jstree-container-ul { display:block; margin:0; padding:0; list-style-type:none; list-style-image:none; }
 .jstree-node { white-space:nowrap; }
-.jstree-anchor { display:inline-block; color:black; white-space:nowrap; padding:0 4px 0 1px; margin:0; vertical-align:top; }
+// XWiki customization start
+//.jstree-anchor { display:inline-block; color:black; white-space:nowrap; padding:0 4px 0 1px; margin:0; vertical-align:top; }
+.jstree-anchor { display:inline-block; white-space:nowrap; padding:0 4px 0 1px; margin:0; vertical-align:top; }
+// XWiki customization end
 .jstree-anchor:focus { outline:0; }
-.jstree-anchor, .jstree-anchor:link, .jstree-anchor:visited, .jstree-anchor:hover, .jstree-anchor:active { text-decoration:none; color:inherit; }
-.jstree-icon { display:inline-block; text-decoration:none; margin:0; padding:0; vertical-align:top; text-align:center; }
+// XWiki customization start
+// .jstree-anchor, .jstree-anchor:link, .jstree-anchor:visited, .jstree-anchor:hover, .jstree-anchor:active { text-decoration:none; color:inherit; }
+// .jstree-icon { display:inline-block; text-decoration:none; margin:0; padding:0; vertical-align:top; text-align:center; }
+.jstree-anchor, .jstree-anchor:link, .jstree-anchor:visited, .jstree-anchor:hover, .jstree-anchor:active { text-decoration:none; }
+.jstree-icon { color:@text-color; display:inline-block; text-decoration:none; margin:0; padding:0; vertical-align:top; text-align:center; }
+// XWiki customization end
 .jstree-icon:empty { display:inline-block; text-decoration:none; margin:0; padding:0; vertical-align:top; text-align:center; }
 .jstree-ocl { cursor:pointer; }
 .jstree-leaf > .jstree-ocl { cursor:default; }
@@ -15,6 +22,36 @@
 .jstree-no-icons .jstree-themeicon,
 .jstree-anchor > .jstree-themeicon-hidden { display:none; }
 .jstree-hidden, .jstree-node.jstree-hidden { display:none; }
+
+// XWiki customization start
+.jstree-no-links {
+  .jstree-anchor:focus {
+    outline: 0;
+  }
+  .jstree-anchor,
+  .jstree-anchor:link,
+  .jstree-anchor:visited,
+  .jstree-anchor:hover,
+  .jstree-anchor:active {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+.jstree-no-link {
+  &.jstree-anchor:focus {
+    outline: 0;
+  }
+  &.jstree-anchor,
+  &.jstree-anchor:link,
+  &.jstree-anchor:visited,
+  &.jstree-anchor:hover,
+  &.jstree-anchor:active {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+// XWiki customization end
 
 // base jstree rtl
 .jstree-rtl {

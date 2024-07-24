@@ -174,7 +174,7 @@ public class XarDocumentModel
     public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthor";
 
     /**
-     * @since 16.6.0RC!
+     * @since 16.6.0RC1
      */
     @Unstable
     public static final String ELEMENT_ENFORCE_REQUIRED_RIGHTS = "enforceRequiredRights";

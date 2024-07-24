@@ -64,8 +64,16 @@ public class TestDocumentFactory extends AbstractSecureEntityFactory<TestDocumen
             DefaultTestDocument.TYPE, new EntityReference(XWikiConstants.XWIKI_SPACE, EntityType.SPACE,
             reference.getRoot()))
             : null;
+        boolean enforceRequiredRights = Boolean.parseBoolean(attributes.getValue("enforceRequiredRights"));
 
 
-        return new DefaultTestDocument(reference, creator, attributes.getValue("alt"), parent);
+        return new DefaultTestDocument(reference, creator, attributes.getValue("alt"), enforceRequiredRights, parent);
+    }
+
+    @Override
+    protected void registerFactories(ElementParser parser, TestDocument entity)
+    {
+        super.registerFactories(parser, entity);
+        parser.register(new TestRequiredRightFactory(entity));
     }
 }

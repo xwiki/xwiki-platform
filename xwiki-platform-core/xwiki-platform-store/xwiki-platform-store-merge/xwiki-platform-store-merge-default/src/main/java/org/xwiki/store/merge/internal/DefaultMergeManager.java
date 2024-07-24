@@ -305,6 +305,14 @@ public class DefaultMergeManager implements MergeManager
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.HIDDEN, hiddenPropertyMergeResult);
             mergedDocument.setHidden(hiddenPropertyMergeResult.getMergeResult());
 
+            // Enforce required rights
+            MergeManagerResult<Boolean, Boolean> enforceRequiredRightsMergeResult =
+                this.mergeObject(previousDoc.isEnforceRequiredRights(), newDoc.isEnforceRequiredRights(),
+                    currentDoc.isEnforceRequiredRights(), configuration);
+            mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.ENFORCE_REQUIRED_RIGHTS,
+                enforceRequiredRightsMergeResult);
+            mergedDocument.setEnforceRequiredRights(enforceRequiredRightsMergeResult.getMergeResult());
+
             // CustomClass
             MergeManagerResult<String, String> customClassMergeResult = this.mergeLines(previousDoc.getCustomClass(),
                 newDoc.getCustomClass(), currentDoc.getCustomClass(), configuration);

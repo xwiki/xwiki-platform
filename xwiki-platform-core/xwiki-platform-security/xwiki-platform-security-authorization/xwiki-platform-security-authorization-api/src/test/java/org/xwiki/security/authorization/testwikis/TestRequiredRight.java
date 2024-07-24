@@ -17,48 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.security.authorization.testwikis;
 
-import java.util.Collection;
-
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.EntityType;
+import org.xwiki.security.authorization.Right;
 
 /**
- * Public interface of test entities representing documents.
+ * Public interface of test entities that represent required rights.
  *
  * @version $Id$
- * @since 5.0M2
  */
-public interface TestDocument extends SecureTestEntity
+public interface TestRequiredRight extends TestEntity
 {
     /**
-     * @return the reference of the document represented by this test document.
+     * @return the right to require
      */
-    DocumentReference getDocumentReference();
+    Right getRight();
 
     /**
-     * @return the reference of the creator of the document represented by this test entity. May be null.
+     * @return the scope on which the right shall be required.
      */
-    DocumentReference getCreator();
-
-    /**
-     * @return the alternate description for this test document.
-     */
-    String getDescription();
-
-    /**
-     * @return if required rights shall be enforced
-     */
-    boolean isEnforceRequiredRights();
-
-    /**
-     * @param requiredRight the required right to add
-     */
-    void addRequiredRight(TestRequiredRight requiredRight);
-
-    /**
-     * @return the required rights
-     */
-    Collection<TestRequiredRight> getRequiredRights();
+    EntityType getScope();
 }

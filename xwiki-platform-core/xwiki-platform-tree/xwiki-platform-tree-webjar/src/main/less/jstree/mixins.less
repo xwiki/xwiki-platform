@@ -80,8 +80,10 @@
 	}
 	.jstree-themeicon-custom { background-color:transparent; background-image:none; background-position:0 0; }
 
+	// XWiki customization start
 	// This line is commented out compared to upstream source as throbber.gif is not available in xwiki-platofrm-tree-webjar and this style is override in tree.less to use spinner.gif.
-	//> .jstree-container-ul .jstree-loading > .jstree-ocl { background:url("@{image-path}throbber.gif") center center no-repeat; }
+	// > .jstree-container-ul .jstree-loading > .jstree-ocl { background:url("@{image-path}throbber.gif") center center no-repeat; }
+	// XWiki customization end
 
 	.jstree-file { background:url("@{image}") -(@image-height * 3 + @correction) -(@image-height * 2 + @correction) no-repeat; }
 	.jstree-folder { background:url("@{image}") -(@image-height * 8 + @correction) -(@correction) no-repeat; }

@@ -67,9 +67,6 @@ public class RightsFilterListener extends AbstractEventListener
      */
     public static final String NAME = "org.xwiki.security.authorization.internal.RightsFilterListener";
 
-    private static final LocalDocumentReference REQUIRED_RIGHT_CLASS =
-        new LocalDocumentReference("XWiki", "RequiredRightClass");
-
     @Inject
     private AuthorizationManager authorization;
 

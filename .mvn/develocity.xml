@@ -45,7 +45,7 @@
        more to save the goal outputs since they're not going to be re-used.
     -->
     <local>
-      <enabled><![CDATA[env['CI'] == null]]></enabled>
+      <enabled>#{env['CI'] == null}</enabled>
     </local>
     <remote>
       <!-- Notes:
@@ -53,7 +53,7 @@
       -->
       <enabled>true</enabled>
       <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
-      <storeEnabled><![CDATA[isTrue(env['CI']) and isTrue(env['DEVELOCITY_ACCESS_KEY'])]]></storeEnabled>
+      <storeEnabled>#{env['CI'] != null}</storeEnabled>
       <server>
         <!-- Note: Remote cache authentication is handled in the .m2/.develocity/keys.properties file and not
              anymore in the Maven settings.xml file -->

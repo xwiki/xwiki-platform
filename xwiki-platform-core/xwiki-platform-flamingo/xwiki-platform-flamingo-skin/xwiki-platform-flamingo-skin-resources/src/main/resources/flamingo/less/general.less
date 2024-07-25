@@ -165,7 +165,7 @@ body {
     // UIs where we want to underline outside of content.
     .xdocLastModification, // Under the title, this link is inline so we want to underline it.
     .panel[class*="HelpTipsPanel "], // This panel, unlike other panels, contains mostly text with underline links.
-    .commentauthor // Similarly to the page last modificator, we want to underline comment authors.
+    .commentauthor, #commentform > label // Similarly to the page last modificator, we want to underline comment authors
     {
       & a {
         .inline-link();

@@ -720,8 +720,16 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
 }
 
 /* Hide all of the eventType rows that are after a category toggler that is in the collapsed state. */
-.notifPreferences tr:has(> td > button.collapsed) ~ tr {
+.notifPreferences tr:has(&gt; td &gt; button.collapsed) ~ tr {
   display: none;
+}
+
+.notifPreferences tr &gt; td &gt; button &gt; *:first-child {
+  transition: transform .2s ease-in-out;
+}
+
+.notifPreferences tr &gt; td &gt; button.collapsed &gt; *:first-child {
+  transform: rotate(90deg);
 }
 
 .notificationAppCell {

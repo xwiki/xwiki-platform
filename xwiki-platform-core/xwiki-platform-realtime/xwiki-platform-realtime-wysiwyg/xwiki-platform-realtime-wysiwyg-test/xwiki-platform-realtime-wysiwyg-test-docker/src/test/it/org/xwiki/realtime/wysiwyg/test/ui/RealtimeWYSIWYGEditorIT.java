@@ -1372,6 +1372,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Check that the source button is available.
         assertTrue(secondEditorToolbar.canToggleSourceMode());
+
         //
         // First Tab
         //
@@ -1533,6 +1534,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstEditorToolbar.toggleSourceMode();
         
         firstTextArea = firstEditor.getRichTextArea();
+        // We are editing alone, so we should have joined the realtime session after switching back to wysiwyg.
         assertTrue(firstEditPage.isRealtimeEditing());
         assertEquals("eight", firstTextArea.getText());
     }

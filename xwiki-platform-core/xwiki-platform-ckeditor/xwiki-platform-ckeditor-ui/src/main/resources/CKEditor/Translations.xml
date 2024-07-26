@@ -269,7 +269,7 @@ ckeditor.plugin.focusedplaceholder.placeholder.td=Cell
 ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Temporarily leaving the realtime session.
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No changes were made. Re-joining the realtime session.
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
-ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=There are unsaved changes. Permanently leaving the realtime session.
+ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
 
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 

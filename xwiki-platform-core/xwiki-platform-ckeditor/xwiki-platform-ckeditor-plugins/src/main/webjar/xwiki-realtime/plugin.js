@@ -68,23 +68,15 @@
           // The result of editor.getSnapshot() right after switching to source.
           previousValue: null
         };
-      });
-    },
-
-    afterInit: function(editor) {
-      // The source command is not registered if the editor is loaded in-line.
-      var sourceCommand = editor.getCommand('source');
-      if (sourceCommand) {
-        // editor.on('mode', this.onMode.bind(this));
         editor.on('beforeSetMode', this.beforeSetMode.bind(this));
-      }
+      });
     },
 
     beforeSetMode: function(event) {
 
       const newMode = event.data;
       const editor = event.editor;
-
+      const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
 
       // This handles the switching between wysiwyg and source mode.
       // The switch between wysiwyg and source modes marks the editor as dirty.
@@ -108,9 +100,7 @@
       // We keep track of the realtime status before switching to source mode in the
       // editor._realtimeSource attribute.
 
-
       if (editor.mode === 'wysiwyg' && newMode === 'source') {
-        const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
         // Switching from wysiwyg to source mode.
 
         // Store the realtime state before switching to source mode
@@ -132,11 +122,17 @@
           // Show the user that we left the realtime session.
           realtimeCheckbox.prop('checked', false);
 
+
+          // We listen for the `dataReady` event and not the `mode` event
+          // because the xwiki-source plugin listens for `mode` to update
+          // the content of the sourcearea.
+          // Because of this, dataReady is fired only once after a switch
+          // to source.
           const dataReady = function() {
             // After switching to source.
 
             // Bulletproofing, when switching to source, setData is called multiple times.
-            if (editor.mode != 'source') {
+            if (editor.mode !== 'source') {
               editor.once('dataReady', dataReady);
               return;
             }
@@ -156,8 +152,7 @@
         }
 
       } else if (editor.mode === 'source' && newMode === 'wysiwyg') {
-        // Swithing from source  to wysiwyg mode.
-        const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
+        // Swithing from source to wysiwyg mode.
 
         // We only need to change the behavior if we were in a realtime session before switching to source.
         if (editor._realtimeSource.realtime) {
@@ -173,7 +168,7 @@
             // After switching to wysiwyg.
 
             // Bulletproofing, in iframe mode, when switching to wysiwyg, setData is called multiple times.
-            if (editor.mode != 'wysiwyg') {
+            if (editor.mode !== 'wysiwyg') {
               editor.once('dataReady', dataReady);
               return;
             }

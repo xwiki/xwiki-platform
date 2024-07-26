@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * A channel associated to an XWiki entity.
@@ -118,5 +119,12 @@ public class EntityChannel
         EntityChannel otherChannel = (EntityChannel) object;
         return new EqualsBuilder().append(this.entityReference, otherChannel.entityReference)
             .append(this.path, otherChannel.path).append(this.key, otherChannel.key).isEquals();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this).append("entity", this.entityReference).append("path", this.path)
+            .append("key", this.key).build();
     }
 }

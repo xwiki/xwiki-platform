@@ -17,16 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.panels.test.ui;
+package org.xwiki.panels.test.ui.docker;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.panels.test.po.NewPagePanel;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
-import org.xwiki.test.ui.browser.IgnoreBrowsers;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test page creation using the NewPage Panel.
@@ -34,26 +35,25 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  * @version $Id$
  * @since 2.5RC1
  */
-public class NewPagePanelIT extends AbstractTest
+@UITest
+public class NewPagePanelIT
 {
     /**
      * Tests if a new page can be created using the create page panel.
      */
     @Test
-    @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testCreatePageFromPanel()
+    public void createPageFromPanel(TestUtils testUtils, TestReference testReference)
     {
         NewPagePanel newPagePanel = NewPagePanel.gotoPage();
 
-        CreatePagePage createPagePage = newPagePanel.createPage(getTestClassName(), getTestMethodName());
+        String pageName = testReference.getLastSpaceReference().getName();
+        String spaceName = testReference.getLastSpaceReference().getParent().getName();
+        CreatePagePage createPagePage = newPagePanel.createPage(spaceName, pageName);
         createPagePage.clickCreate();
         WikiEditPage editPage = new WikiEditPage();
 
-        Assert.assertEquals(getTestMethodName(), editPage.getDocumentTitle());
-        Assert.assertEquals("WebHome", editPage.getMetaDataValue("page"));
-        Assert.assertEquals(getTestClassName() + "." + getTestMethodName(), editPage.getMetaDataValue("space"));
+        assertEquals(pageName, editPage.getDocumentTitle());
+        assertEquals("WebHome", editPage.getMetaDataValue("page"));
+        assertEquals(spaceName + "." + pageName, editPage.getMetaDataValue("space"));
     }
 }

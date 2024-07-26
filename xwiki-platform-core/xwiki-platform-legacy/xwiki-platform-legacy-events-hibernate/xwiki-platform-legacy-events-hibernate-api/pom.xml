@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-legacy-events-hibernate</artifactId>
-        <version>16.6.0-SNAPSHOT</version>
+        <version>16.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>xwiki-platform-legacy-events-hibernate-api</artifactId>
     <name>XWiki Platform - Legacy - Events Hibernate - API</name>

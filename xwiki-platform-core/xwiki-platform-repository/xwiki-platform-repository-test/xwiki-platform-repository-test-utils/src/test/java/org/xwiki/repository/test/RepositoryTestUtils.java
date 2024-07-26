@@ -39,6 +39,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
@@ -193,8 +194,13 @@ public class RepositoryTestUtils
 
     public void init() throws Exception
     {
+        init(new TestEnvironment());
+    }
+
+    public void init(TestEnvironment environment) throws Exception
+    {
         // Initialize extensions and repositories
-        this.repositoryUtil.setup();
+        this.repositoryUtil.setup(environment);
     }
 
     // Test utils

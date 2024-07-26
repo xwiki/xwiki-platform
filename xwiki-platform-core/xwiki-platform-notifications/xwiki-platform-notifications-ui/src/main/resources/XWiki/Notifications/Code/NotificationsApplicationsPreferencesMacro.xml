@@ -712,30 +712,36 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       <code>.notifPreferences tbody {
   margin-top: 2em;
 }
+
 .notifPreferences .appOdd {
-  background: #e5e5e5;
+  background: @breadcrumb-bg;
 }
+
 .notifPreferences .appEven {
-  background: #fafafa;
+  background: @xwiki-page-content-bg;
 }
+
 .notifPreferences .rowApp td, .notifPreferences .rowApp th{
   height: 3em;
 }
+
 .notifPreferences th:nth-child(1) {
   vertical-align: top;
   width: 250px;
 }
+
 .notificationAppCell {
   vertical-align: top;
   width: 33%;
 }
+
 .notificationCollapseButtonCell {
   vertical-align: top;
   text-align: right;
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>NotificationPreferencesTable</name>

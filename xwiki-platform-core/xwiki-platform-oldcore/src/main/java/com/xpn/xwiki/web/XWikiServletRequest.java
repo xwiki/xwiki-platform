@@ -19,9 +19,13 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Optional;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.util.Util;
 
@@ -32,6 +36,8 @@ import com.xpn.xwiki.util.Util;
  */
 public class XWikiServletRequest extends HttpServletRequestWrapper implements XWikiRequest
 {
+    public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = XWikiRequest.class.getName() + "#effectiveAuthor";
+
     public XWikiServletRequest(HttpServletRequest request)
     {
         // Passing null to #XWikiServletRequest(HttpServletRequest) used partially work so keeping it working to be safe
@@ -100,5 +106,11 @@ public class XWikiServletRequest extends HttpServletRequestWrapper implements XW
         }
 
         return request.getRemoteHost();
+    }
+
+    @Override
+    public Optional<UserReference> getEffectiveAuthor()
+    {
+        return Optional.ofNullable((UserReference) getAttribute(ATTRIBUTE_EFFECTIVE_AUTHOR));
     }
 }

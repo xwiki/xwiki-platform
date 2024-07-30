@@ -94,6 +94,18 @@
               <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <!-- UIExtensionClass is automatically generated -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-uiextension-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- PanelClass is automatically generated -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-panels-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
             <!-- Instance module has its own Hibernate mapping file -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>

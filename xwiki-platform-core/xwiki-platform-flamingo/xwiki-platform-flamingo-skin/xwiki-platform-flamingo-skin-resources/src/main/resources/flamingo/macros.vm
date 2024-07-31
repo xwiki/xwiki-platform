@@ -75,8 +75,10 @@
  * @since 16.6.0-rc-1
  *#
 #macro(getShortcutValue $userPreferenceName $translationKey)
-#if($!xwiki.getUserPreference($userPreferenceName)!='')$escapetool.javascript($escapetool.xml($xwiki.getUserPreference($userPreferenceName)))##
-#{else}$escapetool.javascript($escapetool.xml($services.localization.render($translationKey)))#end##
+  #set ($shortcutPreferenceObject = $xwiki.getDocument($xcontext.getUser()).getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', $translationKey))
+  #if("$!shortcutPreferenceObject"!='')$escapetool.javascript($escapetool.xml($shortcutPreferenceObject.value))##
+  #else $escapetool.javascript($escapetool.xml($services.localization.render($translationKey)))##
+  #end
 #end
 #**
  * Displays a submit button for the editor. This macro calls submitButton,

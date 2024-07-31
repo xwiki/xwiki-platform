@@ -36,45 +36,55 @@ public class MandatoryDocInitializedTest extends AbstractTest
 {
     private static final String GROOVY_CODE =
     """
-      {{groovy}}
-          import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
-          import java.text.SimpleDateFormat;
-          import java.lang.management.ManagementFactory;
-        
-          // define the pages that shouldn't be created during the build.
-          def allowedExceptions = ["XWiki.XWikiServerXwiki"];
+        {{groovy}}
+        import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
+        import java.text.SimpleDateFormat;
+        import java.lang.management.ManagementFactory;
 
-          def dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm");
-          def rb = ManagementFactory.getRuntimeMXBean();
-          def startedSince = new Date(rb.getStartTime());
-        
-          def allowedExceptionsRef = [];
-          for (exception in allowedExceptions) {
-            allowedExceptionsRef.add(services.model.resolveDocument(exception));
-          }
-          def componentManager = services.component.getContextComponentManager();
-          def documentInitializersList = componentManager.getInstanceList(MandatoryDocumentInitializer.class);
-        
-          def foundErrors = [];
-          for (initializer in documentInitializersList) {
-            def ref = initializer.getDocumentReference();
-            if (!allowedExceptionsRef.contains(ref)) {
-              def classDoc = xwiki.getDocument(ref);
-              def creationDate = classDoc.getCreationDate();
-              if (creationDate.after(startedSince)) {
-                foundErrors.add(ref.toString() + " ("+dateFormat.format(creationDate)+")");
-              }
-            }
-          }
+        // define the pages that should be created at startup
+        def startupPages = ["XWiki.XWikiServerXwiki"];
 
-          if (foundErrors.size() > 0) {
-            println "Instance started at " + dateFormat.format(startedSince);
-            println foundErrors.size() + " page found created after:\\n";
-            for (error in foundErrors) {
-              println "     * " + error;
-            }
+        def dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+        def rb = ManagementFactory.getRuntimeMXBean();
+        def startedSince = new Date(rb.getStartTime());
+        
+        def startupPageRef = [];
+        for (startupPage in startupPages) {
+          startupPageRef.add(services.model.resolveDocument(startupPage));
+        }
+
+        def componentManager = services.component.getContextComponentManager();
+        def documentInitializersList = componentManager.getInstanceList(MandatoryDocumentInitializer.class);
+        
+        def foundErrorsCreatedAfter = [];
+        def foundErrorsCreatedBefore = [];
+        for (initializer in documentInitializersList) {
+          def ref = initializer.getDocumentReference();
+          def classDoc = xwiki.getDocument(ref);
+          def creationDate = classDoc.getCreationDate();
+          def shouldBeBefore = (!startupPageRef.contains(ref));
+          if (shouldBeBefore && creationDate.after(startedSince)) {
+            foundErrorsCreatedAfter.add(ref.toString() + " ("+dateFormat.format(creationDate)+")");
+          } else if (!shouldBeBefore && creationDate.before(startedSince)) {
+            foundErrorsCreatedBefore.add(ref.toString() + " ("+dateFormat.format(creationDate)+")");
           }
-      {{/groovy}}   
+        }
+
+        if (foundErrorsCreatedAfter.size() > 0) {
+          println "Instance started at " + dateFormat.format(startedSince);
+          println foundErrorsCreatedAfter.size() + " page found created after:\\n";
+          for (error in foundErrorsCreatedAfter) {
+            println "     * " + error;
+          }
+        }
+        if (foundErrorsCreatedBefore.size() > 0) {
+          println "Instance started at " + dateFormat.format(startedSince);
+          println foundErrorsCreatedBefore.size() + " page found created before while they should be created at startup:\\n";
+          for (error in foundErrorsCreatedBefore) {
+            println "     * " + error;
+          }
+        }
+        {{/groovy}}
     """;
 
     @Test

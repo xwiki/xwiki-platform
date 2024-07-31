@@ -34,53 +34,50 @@ import static org.junit.Assert.assertEquals;
  */
 public class MandatoryDocInitializedTest extends AbstractTest
 {
-    private static final String GROOVY_CODE =
-    """
-        {{groovy}}
-        import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
-        import java.time.temporal.ChronoUnit;
-        import java.text.SimpleDateFormat;
-        
-        // define the pages that shouldn't be created during the build.
-        def allowedExceptions = ["XWiki.XWikiServerXwiki"];
-        
-        // Get creation date at build time.
-        def adminRef = services.model.resolveDocument("XWiki.Admin");
-        def adminDoc = xwiki.getDocument(adminRef);
-        def adminCreationDate = adminDoc.getCreationDate();
-        def adminCreationDateDay = adminDoc.getCreationDate().toInstant().truncatedTo(ChronoUnit.DAYS);
-        
-        def allowedExceptionsRef = [];
-        for (exception in allowedExceptions) {
-          allowedExceptionsRef.add(services.model.resolveDocument(exception));
-        }
-        
-        def componentManager = services.component.getContextComponentManager();
-        def documentInitializersList = componentManager.getInstanceList(MandatoryDocumentInitializer.class);
-        
-        def dateFormat = new SimpleDateFormat("dd/MM/YYYY");
-        def foundErrors = [];
-        for (initializer in documentInitializersList) {
-          def ref = initializer.getDocumentReference();
-          if (!allowedExceptionsRef.contains(ref)) {
-            def classDoc = xwiki.getDocument(ref);
-            def creationDate = classDoc.getCreationDate();
-            def creationDateDay = classDoc.getCreationDate().toInstant().truncatedTo(ChronoUnit.DAYS);
-            if (!creationDateDay.equals(adminCreationDateDay)) {
-              foundErrors.add(ref.toString() + " ("+dateFormat.format(creationDateDay.toDate())+")");
-            }
-          }
-        }
-        
-        if (foundErrors.size() > 0) {
-            def adminDateFormat = dateFormat.format(adminCreationDateDay.toDate());
-            println foundErrors.size() + " page found created after the build ("+adminDateFormat+"):\\n";
-            for (error in foundErrors) {
-              println "     * " + error;
-            }
-        }
-        {{/groovy}}        
-    """;
+    private static final String GROOVY_CODE = "{{groovy}}\n"
+        + "   import com.xpn.xwiki.doc.MandatoryDocumentInitializer;\n"
+        + "   import java.time.temporal.ChronoUnit;\n"
+        + "   import java.text.SimpleDateFormat;\n"
+        + "   \n"
+        + "   // define the pages that shouldn't be created during the build.\n"
+        + "   def allowedExceptions = [\"XWiki.XWikiServerXwiki\"];\n"
+        + "   \n"
+        + "   // Get creation date at build time.\n"
+        + "   def adminRef = services.model.resolveDocument(\"XWiki.Admin\");\n"
+        + "   def adminDoc = xwiki.getDocument(adminRef);\n"
+        + "   def adminCreationDate = adminDoc.getCreationDate();\n"
+        + "   def adminCreationDateDay = adminDoc.getCreationDate().toInstant().truncatedTo(ChronoUnit.DAYS);\n"
+        + "   \n"
+        + "   def allowedExceptionsRef = [];\n"
+        + "   for (exception in allowedExceptions) {\n"
+        + "     allowedExceptionsRef.add(services.model.resolveDocument(exception));\n"
+        + "   }\n"
+        + "   \n"
+        + "   def componentManager = services.component.getContextComponentManager();\n"
+        + "   def documentInitializersList = componentManager.getInstanceList(MandatoryDocumentInitializer.class);\n"
+        + "   \n"
+        + "   def dateFormat = new SimpleDateFormat(\"dd/MM/YYYY\");\n"
+        + "   def foundErrors = [];\n"
+        + "   for (initializer in documentInitializersList) {\n"
+        + "     def ref = initializer.getDocumentReference();\n"
+        + "     if (!allowedExceptionsRef.contains(ref)) {\n"
+        + "       def classDoc = xwiki.getDocument(ref);\n"
+        + "       def creationDate = classDoc.getCreationDate();\n"
+        + "       def creationDateDay = classDoc.getCreationDate().toInstant().truncatedTo(ChronoUnit.DAYS);\n"
+        + "       if (!creationDateDay.equals(adminCreationDateDay)) {\n"
+        + "         foundErrors.add(ref.toString() + \" (\"+dateFormat.format(creationDateDay.toDate())+\")\");\n"
+        + "       }\n"
+        + "     }\n"
+        + "   }\n"
+        + "   \n"
+        + "   if (foundErrors.size() > 0) {\n"
+        + "       def adminDateFormat = dateFormat.format(adminCreationDateDay.toDate());\n"
+        + "       println foundErrors.size() + \" page found created after the build (\"+adminDateFormat+\"):\\\\n\";\n"
+        + "       for (error in foundErrors) {\n"
+        + "         println \"     * \" + error;\n"
+        + "       }\n"
+        + "   }\n"
+        + "   {{/groovy}}";
 
     @Test
     public void docsAreInitialized() throws Exception

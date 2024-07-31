@@ -34,6 +34,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WindowType;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
@@ -825,6 +826,19 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
             AttachmentReference attachmentReference = new AttachmentReference("image.gif", testReference);
             assertEquals(setup.getURL(attachmentReference, "download", "width=50&rev=1.1"), image.getAttribute("src"));
             Dimension imageSize = image.getSize();
+
+            if (imageSize.width != 50 && "20".equals(image.getDomProperty("naturalWidth"))) {
+                // FIXME: The image appears as broken / missing in Chrome sometimes even though:
+                // - the image URL is the right one (we just asserted it above)
+                // - the image naturalWidth = 20 (which indicates that the image is loaded and displayed)
+                // This happens only when running the test with the servlet engine (Tomcat) in a Docker container. I
+                // haven't been able to reproduce when testing manually on the same XWiki test instance. We force Chrome
+                // to reload the image in this case.
+                reloadImage(image, setup);
+                // Get the updated image size.
+                imageSize = image.getSize();
+            }
+
             assertEquals(50, imageSize.width);
             assertEquals(50, imageSize.height);
         });
@@ -836,6 +850,17 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("third");
         assertEquals("before first third", firstTextArea.getText());
+    }
+
+    private void reloadImage(WebElement image, TestUtils setup)
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("let image = arguments[0];\n");
+        script.append("let src = image.src;\n");
+        script.append("image.src = '';\n");
+        script.append("image.src = src;\n");
+        setup.getDriver().executeScript(script.toString(), image);
+        setup.getDriver().waitUntilCondition(ExpectedConditions.domPropertyToBe(image, "complete", "true"));
     }
 
     @Test

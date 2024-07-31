@@ -1217,6 +1217,7 @@ public class TestUtils
     /**
      * @since 16.4.0RC1
      * @since 15.10.11
+     * @since 14.10.22
      */
     public String executeWikiPlain(String wikiContent, Syntax wikiSyntax) throws Exception
     {
@@ -1229,6 +1230,7 @@ public class TestUtils
     /**
      * @since 16.4.0RC1
      * @since 15.10.11
+     * @since 14.10.22
      */
     public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters)
         throws Exception

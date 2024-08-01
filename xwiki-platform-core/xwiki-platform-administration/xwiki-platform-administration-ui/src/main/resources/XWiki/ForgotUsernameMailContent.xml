@@ -96,28 +96,21 @@
     </class>
     <property>
       <html>&lt;h2&gt;Hello,&lt;/h2&gt;
-#set ($wikiurl = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
+#set ($wikiURL = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
 #set ($xwikiLoginURL = $xwiki.getURL('XWiki.XWikiLogin', 'login'))
-#set ($wikiname = $request.serverName)
-#set ($severalUsernames = ($usernames.size() &gt; 0))
-&lt;p&gt;A forgot username request has been performed on &lt;a href="$wikiurl"&gt;$wikiname&lt;/a&gt;.
+#set ($wikiName = $request.serverName)
+&lt;p&gt;A forgot username request has been made on &lt;a href="$escapetool.xml($wikiURL)"&gt;$escapetool.xml($wikiName)&lt;/a&gt;.
 If you did not make the request, please ignore this message.&lt;/p&gt;
-&lt;p&gt;We found the following username#if($severalUsernames)s#end related to this email address:
-:&lt;br/&gt;
-#if ($severalUsernames)
+&lt;p&gt;We found the following usernames related to this email address:&lt;/p&gt;
 &lt;ul&gt;
 #foreach ($username in $usernames)
-  &lt;li&gt;$username&lt;/li&gt;
+  &lt;li&gt;$escapetool.xml($username)&lt;/li&gt;
 #end
 &lt;/ul&gt;
-#else
-&lt;strong&gt;$usernames.get(0)&lt;/strong&gt;
-#end
 
 &lt;p&gt;
-You can login from this page: &lt;a href="$xwikiLoginURL"&gt;XWiki Login&lt;/a&gt;.
-&lt;/p&gt;
-</html>
+You can login from this page: &lt;a href="$escapetool.xml($xwikiLoginURL)"&gt;XWiki Login&lt;/a&gt;.
+&lt;/p&gt;</html>
     </property>
     <property>
       <language>en</language>
@@ -128,14 +121,15 @@ You can login from this page: &lt;a href="$xwikiLoginURL"&gt;XWiki Login&lt;/a&g
     <property>
       <text>Hello,
 
-A forgot username request has been made on ${request.getServerName()}.
-We found the following username(s) related to this email address:
+A forgot username request has been made on ${request.getServerName()}. If you did not make the request, please ignore this message.
+
+We found the following usernames related to this email address:
 
 #foreach ($username in $usernames)
   $usernames
 #end
 
-You can login with this username from this URL: $xwiki.getURL('XWiki.XWikiLogin', 'login').</text>
+You can login from this URL: $xwiki.getURL('XWiki.XWikiLogin', 'login').</text>
     </property>
   </object>
 </xwikidoc>

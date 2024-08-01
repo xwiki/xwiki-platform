@@ -83,6 +83,9 @@ rendering.macro.documentTree.parameter.limit.description=The maximum number of c
 rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
 
+rendering.macro.children.name=Children
+rendering.macro.children.description=Displays a tree of children pages of the current page
+
 index.documentTree.empty=No pages found
 index.documentTree.more={0} more ...
 

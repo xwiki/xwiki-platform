@@ -98,6 +98,8 @@ ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you 
 ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
 
+ckeditor.plugin.table.header.accessibilitywarning=Your table content can be made easier to understand by using headers.
+
 ckeditor.plugin.toolbar.basicStyles=Basic Styles
 ckeditor.plugin.toolbar.lists=Lists
 ckeditor.plugin.toolbar.bulletedlist=Bulleted List

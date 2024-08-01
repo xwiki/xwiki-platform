@@ -20,7 +20,7 @@
 (function() {
   'use strict';
   CKEDITOR.plugins.add('xwiki-table', {
-    requires: 'table',
+    requires: 'table,xwiki-localization',
     init: function(editor) {
       // The table plugin is using the deprecated align attribute for various reasons. See
       // https://dev.ckeditor.com/ticket/3762 . We could overwrite the table dialog to use the margin:auto style but it
@@ -57,7 +57,7 @@
 
     // Take the dialog window name and its definition from the event data.
     var dialogName = event.data.name;
-    var dialogDefinition = event.data.definition;
+      var dialogDefinition = event.data.definition;
     if (dialogName === 'table') {
       enhanceTableDialog(dialogDefinition, event.editor);
     }
@@ -68,6 +68,16 @@
     // Reset the default values.
     ['txtBorder', 'txtWidth', 'txtCellSpace', 'txtCellPad'].forEach(function(fieldId) {
       delete infoTab.get(fieldId)['default'];
+    });
+    // Set a new default for the Headers value
+    infoTab.get( 'selHeaders' )[ 'default' ] = 'row';
+    // Create a warning message for the accessibility without headers
+    // We navigate the structure of the macro to insert this message exactly next to the header.
+    infoTab.elements[0].children[0].children.splice(4, 0,{
+      type : 'html',
+      html : '<span class="box warningmessage">' + 
+        editor.localization.get('xwiki-table.header.accessibilitywarning') + 
+        '</span>'
     });
   };
 

@@ -402,6 +402,52 @@
   }
 }
 
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  row-gap: 1em;
+  column-gap: 1%;
+  padding-left: 0;
+}
+
+li.card {
+  list-style: none;
+  flex-shrink: 1;
+  width: 24%;
+}
+
+.three-cols > li.card {
+  width: 32%;
+}
+
+.two-cols > li.card {
+  width: 49%;
+}
+
+@media (max-width: @screen-lg-min) {
+  li.card {
+    width: 32%;
+  }
+}
+
+@media (max-width: @screen-md-min) {
+  .card-list > li.card {
+    width: 49%;
+  }
+}
+
+@media (max-width: @screen-sm-min) {
+  .card-list > li.card {
+    width: 100%;
+  }
+}
+
+li.card > .well {
+  height: 100%;
+  margin-bottom: 0px;
+}
+
 .video-modal .modal-body {
   text-align: center;
 }

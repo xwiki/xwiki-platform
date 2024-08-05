@@ -364,13 +364,9 @@ public class NotificationFilterPreferenceStore
                         hibernateStore.executeWrite(context, session -> {
                             session
                                 .createQuery("delete from DefaultNotificationFilterPreference "
-                                    + "where page like :wikiPrefix "
-                                    + "or pageOnly like :wikiPrefix "
-                                    + "or user like :wikiPrefix "
-                                    + "or wiki = :wikiId")
+                                    + "where entity like :wikiPrefix or entity = :wikiId")
                                 .setParameter("wikiPrefix", wikiReference.getName() + ":%")
                                 .setParameter("wikiId", wikiReference.getName()).executeUpdate();
-
                             return null;
                         });
                     } catch (XWikiException e) {
@@ -378,7 +374,6 @@ public class NotificationFilterPreferenceStore
                             "Failed to delete the notification preferences for wiki [%s]",
                             wikiReference.getName()), e);
                     }
-
                     return null;
                 });
             }

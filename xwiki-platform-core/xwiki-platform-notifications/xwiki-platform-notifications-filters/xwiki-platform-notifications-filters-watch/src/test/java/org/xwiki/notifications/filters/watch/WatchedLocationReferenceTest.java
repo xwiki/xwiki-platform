@@ -39,6 +39,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
@@ -194,7 +195,8 @@ class WatchedLocationReferenceTest
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Set.of(NotificationFormat.values()));
-        filterPreference.setPageOnly(this.serializedReference);
+        filterPreference.setEntity(this.serializedReference);
+        filterPreference.setScope(NotificationFilterScope.PAGE);
 
         Date now = new Date();
         // We remove 10 seconds to be sure not having any flickering behaviour
@@ -229,7 +231,8 @@ class WatchedLocationReferenceTest
         filterPreference.setFilterType(NotificationFilterType.EXCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(Set.of(NotificationFormat.values()));
-        filterPreference.setPage(this.serializedReference);
+        filterPreference.setEntity(this.serializedReference);
+        filterPreference.setScope(NotificationFilterScope.SPACE);
 
         Date now = new Date();
         // We remove 10 seconds to be sure not having any flickering behaviour

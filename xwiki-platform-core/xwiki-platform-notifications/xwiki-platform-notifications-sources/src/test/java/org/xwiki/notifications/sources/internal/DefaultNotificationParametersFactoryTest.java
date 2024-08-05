@@ -47,6 +47,7 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.SystemUserNotificationFilter;
@@ -293,37 +294,44 @@ public class DefaultNotificationParametersFactoryTest
 
         List<NotificationFilterPreference> notificationFilterPreferences = new ArrayList<>();
         DefaultNotificationFilterPreference filterPref = getFilterPreference("PAGE", 0);
-        filterPref.setPageOnly("mywiki@@a");
+        filterPref.setEntity("mywiki@@a");
+        filterPref.setScope(NotificationFilterScope.PAGE);
         notificationFilterPreferences
             .add(new ScopeNotificationFilterPreference(filterPref, this.entityReferenceResolver));
 
         filterPref = getFilterPreference("PAGE", 1);
-        filterPref.setPageOnly("mywiki@@b");
+        filterPref.setEntity("mywiki@@b");
+        filterPref.setScope(NotificationFilterScope.PAGE);
         notificationFilterPreferences
             .add(new ScopeNotificationFilterPreference(filterPref, this.entityReferenceResolver));
 
         filterPref = getFilterPreference("PAGE", 2);
-        filterPref.setPageOnly("mywiki@@c");
+        filterPref.setEntity("mywiki@@c");
+        filterPref.setScope(NotificationFilterScope.PAGE);
         notificationFilterPreferences
             .add(new ScopeNotificationFilterPreference(filterPref, this.entityReferenceResolver));
 
         filterPref = getFilterPreference("SPACE", 0);
-        filterPref.setPage("mywiki@@space1");
+        filterPref.setEntity("mywiki@@space1");
+        filterPref.setScope(NotificationFilterScope.SPACE);
         notificationFilterPreferences
             .add(new ScopeNotificationFilterPreference(filterPref, this.entityReferenceResolver));
 
         filterPref = getFilterPreference("SPACE", 1);
-        filterPref.setPage("mywiki@@space2");
+        filterPref.setEntity("mywiki@@space2");
+        filterPref.setScope(NotificationFilterScope.SPACE);
         notificationFilterPreferences
             .add(new ScopeNotificationFilterPreference(filterPref, this.entityReferenceResolver));
 
         filterPref = getFilterPreference("WIKI", 0);
-        filterPref.setWiki("wiki1");
+        filterPref.setEntity("wiki1");
+        filterPref.setScope(NotificationFilterScope.WIKI);
         notificationFilterPreferences
             .add(new ScopeNotificationFilterPreference(filterPref, this.entityReferenceResolver));
 
         filterPref = getFilterPreference("WIKI", 1);
-        filterPref.setWiki("wiki2");
+        filterPref.setEntity("wiki2");
+        filterPref.setScope(NotificationFilterScope.WIKI);
         notificationFilterPreferences
             .add(new ScopeNotificationFilterPreference(filterPref, this.entityReferenceResolver));
 
@@ -355,7 +363,8 @@ public class DefaultNotificationParametersFactoryTest
         expectedNotificationParameters.filters = new HashSet<>(this.filterList);
 
         DefaultNotificationFilterPreference filterPreference = getFilterPreference("WIKI", 0);
-        filterPreference.setWiki("mywiki");
+        filterPreference.setEntity("mywiki");
+        filterPreference.setScope(NotificationFilterScope.WIKI);
         expectedNotificationParameters.filterPreferences = List.of(
             new ScopeNotificationFilterPreference(filterPreference, this.entityReferenceResolver)
         );
@@ -378,7 +387,8 @@ public class DefaultNotificationParametersFactoryTest
         expectedNotificationParameters.filters = new HashSet<>(this.filterList);
 
         DefaultNotificationFilterPreference filterPreference0 = getFilterPreference("SPACE", 0);
-        filterPreference0.setPage("mywiki@@s1");
+        filterPreference0.setEntity("mywiki@@s1");
+        filterPreference0.setScope(NotificationFilterScope.SPACE);
         expectedNotificationParameters.filterPreferences = List.of(
             new ScopeNotificationFilterPreference(filterPreference0, this.entityReferenceResolver)
         );

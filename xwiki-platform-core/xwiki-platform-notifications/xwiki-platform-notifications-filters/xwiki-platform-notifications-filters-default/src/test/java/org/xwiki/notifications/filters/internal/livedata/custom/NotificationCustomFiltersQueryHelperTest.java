@@ -27,6 +27,7 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -145,7 +146,7 @@ class NotificationCustomFiltersQueryHelperTest
         when(ldQuery.getSort()).thenReturn(List.of(sortEntry1, sortEntry2, sortEntry3));
 
         String queryString = "select nfp from DefaultNotificationFilterPreference nfp where owner = :owner "
-            + "order by nfp.pageOnly asc, nfp.page asc, nfp.wiki asc, nfp.user asc, nfp.enabled desc, "
+            + "order by nfp.scope asc, nfp.enabled desc, "
             + "nfp.emailEnabled asc, nfp.alertEnabled desc";
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(queryString, Query.HQL)).thenReturn(query);
@@ -273,11 +274,9 @@ class NotificationCustomFiltersQueryHelperTest
         ));
 
         String queryString = "select nfp from DefaultNotificationFilterPreference nfp where owner = :owner "
-            + "and ((nfp.pageOnly like :constraint_0 or nfp.page like :constraint_0 or nfp.wiki like :constraint_0 or "
-            + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
-            + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
-            + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
+            + "and ((nfp.entity like :constraint_0) or (nfp.entity like :constraint_1) or "
+            + "(nfp.entity = :constraint_2)) and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and nfp.scope = :scope and "
             + "nfp.filterType = :filterType";
 
         Query query = mock(Query.class);
@@ -297,6 +296,7 @@ class NotificationCustomFiltersQueryHelperTest
         when(query.bindValue("constraint_2", queryParameter3)).thenReturn(query);
 
         when(query.bindValue("filterType", NotificationFilterType.INCLUSIVE)).thenReturn(query);
+        when(query.bindValue("scope", NotificationFilterScope.PAGE)).thenReturn(query);
 
         when(query.setWiki(wikiName)).thenReturn(query);
         when(query.setOffset(offset.intValue())).thenReturn(query);
@@ -314,6 +314,7 @@ class NotificationCustomFiltersQueryHelperTest
         verify(query).bindValue("constraint_1", queryParameter2);
         verify(query).bindValue("constraint_2", queryParameter3);
         verify(query).bindValue("filterType", NotificationFilterType.INCLUSIVE);
+        verify(query).bindValue("scope", NotificationFilterScope.PAGE);
         verify(query).setWiki(wikiName);
         verify(query).setOffset(offset.intValue());
         verify(query).setLimit(limit);
@@ -383,11 +384,9 @@ class NotificationCustomFiltersQueryHelperTest
         ));
 
         String queryString = "select count(nfp.id) from DefaultNotificationFilterPreference nfp where owner = :owner "
-            + "and ((nfp.pageOnly like :constraint_0 or nfp.page like :constraint_0 or nfp.wiki like :constraint_0 or "
-            + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
-            + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
-            + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
+            + "and ((nfp.entity like :constraint_0) or (nfp.entity like :constraint_1) or "
+            + "(nfp.entity = :constraint_2)) and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and nfp.scope = :scope and "
             + "nfp.filterType = :filterType";
 
         Query query = mock(Query.class);
@@ -407,6 +406,7 @@ class NotificationCustomFiltersQueryHelperTest
         when(query.bindValue("constraint_2", queryParameter3)).thenReturn(query);
 
         when(query.bindValue("filterType", NotificationFilterType.INCLUSIVE)).thenReturn(query);
+        when(query.bindValue("scope", NotificationFilterScope.PAGE)).thenReturn(query);
 
         when(query.setWiki(wikiName)).thenReturn(query);
 
@@ -417,6 +417,7 @@ class NotificationCustomFiltersQueryHelperTest
         verify(query).bindValue("constraint_1", queryParameter2);
         verify(query).bindValue("constraint_2", queryParameter3);
         verify(query).bindValue("filterType", NotificationFilterType.INCLUSIVE);
+        verify(query).bindValue("scope", NotificationFilterScope.PAGE);
         verify(query).setWiki(wikiName);
         verify(query, never()).setOffset(anyInt());
         verify(query, never()).setLimit(anyInt());
@@ -500,13 +501,11 @@ class NotificationCustomFiltersQueryHelperTest
         when(ldQuery.getSort()).thenReturn(List.of(sortEntry1, sortEntry2, sortEntry3));
 
         String queryString = "select nfp from DefaultNotificationFilterPreference nfp where owner = :owner "
-            + "and ((nfp.pageOnly like :constraint_0 or nfp.page like :constraint_0 or nfp.wiki like :constraint_0 or "
-            + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
-            + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
-            + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
+            + "and ((nfp.entity like :constraint_0) or (nfp.entity like :constraint_1) or "
+            + "(nfp.entity = :constraint_2)) and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and nfp.scope = :scope and "
             + "nfp.filterType = :filterType "
-            + "order by nfp.pageOnly asc, nfp.page asc, nfp.wiki asc, nfp.user asc, nfp.enabled desc, "
+            + "order by nfp.scope asc, nfp.enabled desc, "
             + "nfp.emailEnabled asc, nfp.alertEnabled desc";
 
         Query query = mock(Query.class);
@@ -526,6 +525,7 @@ class NotificationCustomFiltersQueryHelperTest
         when(query.bindValue("constraint_2", queryParameter3)).thenReturn(query);
 
         when(query.bindValue("filterType", NotificationFilterType.INCLUSIVE)).thenReturn(query);
+        when(query.bindValue("scope", NotificationFilterScope.PAGE)).thenReturn(query);
 
         when(query.setWiki(wikiName)).thenReturn(query);
         when(query.setOffset(offset.intValue())).thenReturn(query);
@@ -543,6 +543,7 @@ class NotificationCustomFiltersQueryHelperTest
         verify(query).bindValue("constraint_1", queryParameter2);
         verify(query).bindValue("constraint_2", queryParameter3);
         verify(query).bindValue("filterType", NotificationFilterType.INCLUSIVE);
+        verify(query).bindValue("scope", NotificationFilterScope.PAGE);
         verify(query).setWiki(wikiName);
         verify(query).setOffset(offset.intValue());
         verify(query).setLimit(limit);
@@ -626,11 +627,9 @@ class NotificationCustomFiltersQueryHelperTest
         when(ldQuery.getSort()).thenReturn(List.of(sortEntry1, sortEntry2, sortEntry3));
 
         String queryString = "select count(nfp.id) from DefaultNotificationFilterPreference nfp where owner = :owner "
-            + "and ((nfp.pageOnly like :constraint_0 or nfp.page like :constraint_0 or nfp.wiki like :constraint_0 or "
-            + "nfp.user like :constraint_0) or (nfp.pageOnly like :constraint_1 or nfp.page like :constraint_1 or "
-            + "nfp.wiki like :constraint_1 or nfp.user like :constraint_1) or (nfp.pageOnly = :constraint_2 or "
-            + "nfp.page = :constraint_2 or nfp.wiki = :constraint_2 or nfp.user = :constraint_2)) and "
-            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and length(nfp.pageOnly) > 0 and "
+            + "and ((nfp.entity like :constraint_0) or (nfp.entity like :constraint_1) or "
+            + "(nfp.entity = :constraint_2)) and "
+            + "length(nfp.allEventTypes) = 0 and nfp.enabled = true and nfp.scope = :scope and "
             + "nfp.filterType = :filterType";
 
         Query query = mock(Query.class);
@@ -651,6 +650,8 @@ class NotificationCustomFiltersQueryHelperTest
 
         when(query.bindValue("filterType", NotificationFilterType.INCLUSIVE)).thenReturn(query);
 
+        when(query.bindValue("scope", NotificationFilterScope.PAGE)).thenReturn(query);
+
         when(query.setWiki(wikiName)).thenReturn(query);
 
         when(query.execute()).thenReturn(List.of(3L));
@@ -660,6 +661,7 @@ class NotificationCustomFiltersQueryHelperTest
         verify(query).bindValue("constraint_1", queryParameter2);
         verify(query).bindValue("constraint_2", queryParameter3);
         verify(query).bindValue("filterType", NotificationFilterType.INCLUSIVE);
+        verify(query).bindValue("scope", NotificationFilterScope.PAGE);
         verify(query).setWiki(wikiName);
         verify(query, never()).setOffset(anyInt());
         verify(query, never()).setLimit(anyInt());

@@ -36,6 +36,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
@@ -236,17 +237,18 @@ public class WatchedLocationReference implements WatchedEntityReference
         filterPreference.setStartingDate(new Date());
 
         // Properties
+        filterPreference.setEntity(serializedReference);
 
         // Scope value
         switch (entityReference.getType()) {
             case WIKI:
-                filterPreference.setWiki(serializedReference);
+                filterPreference.setScope(NotificationFilterScope.WIKI);
                 break;
             case SPACE:
-                filterPreference.setPage(serializedReference);
+                filterPreference.setScope(NotificationFilterScope.SPACE);
                 break;
             case DOCUMENT:
-                filterPreference.setPageOnly(serializedReference);
+                filterPreference.setScope(NotificationFilterScope.PAGE);
                 break;
             default:
                 break;

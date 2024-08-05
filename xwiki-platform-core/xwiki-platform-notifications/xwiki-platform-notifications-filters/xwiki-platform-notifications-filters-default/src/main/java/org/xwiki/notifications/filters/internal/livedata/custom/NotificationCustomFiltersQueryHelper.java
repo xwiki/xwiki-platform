@@ -37,6 +37,7 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -84,7 +85,7 @@ public class NotificationCustomFiltersQueryHelper
                     this.handleNotificationFormatsFilter(queryFilter, queryWhereClauses);
 
                 case NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD ->
-                    this.handleScopeFilter(queryFilter, queryWhereClauses);
+                    this.handleScopeFilter(queryFilter, queryWhereClauses, result);
 
                 case NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
                     this.handleFilterTypeFilter(queryFilter, queryWhereClauses, result);
@@ -119,16 +120,16 @@ public class NotificationCustomFiltersQueryHelper
         }
     }
 
-    private void handleScopeFilter(LiveDataQuery.Filter queryFilter, List<String> queryWhereClauses)
+    private void handleScopeFilter(LiveDataQuery.Filter queryFilter, List<String> queryWhereClauses,
+        FiltersHQLQuery result)
     {
         // We authorize only a single constraint here
         LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
         if (EQUALS_OPERATOR.equals(constraint.getOperator())
             && !StringUtils.isBlank(String.valueOf(constraint.getValue()))) {
-            NotificationCustomFiltersLiveDataConfigurationProvider.Scope scope =
-                NotificationCustomFiltersLiveDataConfigurationProvider.Scope.valueOf(
-                    String.valueOf(constraint.getValue()));
-            queryWhereClauses.add(String.format("length(nfp.%s) > 0", scope.getFieldName()));
+            queryWhereClauses.add("nfp.scope = :scope");
+            result.bindings.put("scope",
+                NotificationFilterScope.valueOf(String.valueOf(constraint.getValue())));
         }
     }
 
@@ -137,6 +138,7 @@ public class NotificationCustomFiltersQueryHelper
         // We authorize only a single constraint here
         LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
         String constraintValue = String.valueOf(constraint.getValue());
+        // FIXME: This should be changed
         if (EQUALS_OPERATOR.equals(constraint.getOperator())
             && !StringUtils.isEmpty(constraintValue)) {
             if (NotificationFormat.ALERT.name().equals(constraintValue)) {
@@ -164,6 +166,7 @@ public class NotificationCustomFiltersQueryHelper
     {
         // We authorize only a single constraint here
         LiveDataQuery.Constraint constraint = queryFilter.getConstraints().get(0);
+        // FIXME: this should be changed
         if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
             if (NotificationCustomFiltersLiveDataConfigurationProvider.ALL_EVENTS_OPTION_VALUE.equals(
                 constraint.getValue()))
@@ -184,16 +187,12 @@ public class NotificationCustomFiltersQueryHelper
         List<String> clauses = new ArrayList<>();
         int clauseCounter = 0;
 
-        // for searching in location we actually need to look in 4 columns in DB, so we reuse same constraint binding
-        // in those 4 columns, and since we might have multiple constraints we use a counter to name those bindings
-        String clauseValue = "(nfp.pageOnly like :constraint_%1$s or nfp.page like :constraint_%1$s or "
-            + "nfp.wiki like :constraint_%1$s or nfp.user like :constraint_%1$s)";
+        String clauseValue = "(nfp.entity like :constraint_%s)";
         String constraintName = "constraint_%s";
 
         for (LiveDataQuery.Constraint constraint : locationFilter.getConstraints()) {
             if (EQUALS_OPERATOR.equals(constraint.getOperator())) {
-                clauses.add(String.format("(nfp.pageOnly = :constraint_%1$s or nfp.page = :constraint_%1$s or "
-                    + "nfp.wiki = :constraint_%1$s or nfp.user = :constraint_%1$s)", clauseCounter));
+                clauses.add(String.format("(nfp.entity = :constraint_%s)", clauseCounter));
                 DefaultQueryParameter queryParameter = new DefaultQueryParameter(null);
                 queryParameter.literal(String.valueOf(constraint.getValue()));
                 result.bindings.put(String.format(constraintName, clauseCounter), queryParameter);
@@ -276,12 +275,14 @@ public class NotificationCustomFiltersQueryHelper
                 case NotificationCustomFiltersLiveDataConfigurationProvider.IS_ENABLED_FIELD ->
                     String.format("nfp.enabled %s", sortOperator);
 
+                case NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD ->
+                    String.format("nfp.entity %s", sortOperator);
+
                 case NotificationCustomFiltersLiveDataConfigurationProvider.NOTIFICATION_FORMATS_FIELD ->
                     handleNotificationFormatSort(sortEntry);
 
-                case NotificationCustomFiltersLiveDataConfigurationProvider.LOCATION_FIELD,
-                    NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD ->
-                    handleLocationSort(sortEntry);
+                case NotificationCustomFiltersLiveDataConfigurationProvider.SCOPE_FIELD ->
+                    String.format("nfp.scope %s", sortOperator);
 
                 case NotificationCustomFiltersLiveDataConfigurationProvider.FILTER_TYPE_FIELD ->
                     String.format("nfp.filterType %s", sortOperator);

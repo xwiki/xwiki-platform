@@ -40,6 +40,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
@@ -237,15 +238,16 @@ public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigr
                 if (value != null) {
                     DefaultNotificationFilterPreference pref = createNotificationFilterPreference(
                         String.format(WATCHLIST_FILTER_PREFERENCES_NAME, property.name(), sha256Hex(value)));
+                    pref.setEntity(value);
                     switch (property) {
                         case PAGE:
-                            pref.setPageOnly(value);
+                            pref.setScope(NotificationFilterScope.PAGE);
                             break;
                         case SPACE:
-                            pref.setPage(value);
+                            pref.setScope(NotificationFilterScope.SPACE);
                             break;
                         case WIKI:
-                            pref.setWiki(value);
+                            pref.setScope(NotificationFilterScope.WIKI);
                             break;
                         default:
                             break;

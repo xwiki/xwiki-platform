@@ -40,6 +40,7 @@ import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.livedata.NotificationFilterLiveDataTranslationHelper;
 
@@ -74,48 +75,6 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
     private static final String STATIC_LIST_DISPLAYER = "staticList";
     private static final String VALUE_KEY = "value";
     private static final String LABEL_KEY = "label";
-
-    /**
-     * Defines the different scopes a filter might have.
-     *
-     * @version $Id$
-     */
-    public enum Scope
-    {
-        /**
-         * Filter preference targeting a wiki.
-         */
-        WIKI("wiki"),
-
-        /**
-         * Filter preference targeting a space.
-         */
-        SPACE("page"),
-
-        /**
-         * Filter preference targeting a page.
-         */
-        PAGE("pageOnly"),
-
-        /**
-         * Filter preference targeting a user.
-         */
-        USER("user");
-
-        private final String fieldName;
-        Scope(String fieldName)
-        {
-            this.fieldName = fieldName;
-        }
-
-        /**
-         * @return the database field name used to hold value of the concerned scope.
-         */
-        String getFieldName()
-        {
-            return this.fieldName;
-        }
-    };
 
     @Inject
     private ContextualLocalizationManager l10n;
@@ -211,7 +170,7 @@ public class NotificationCustomFiltersLiveDataConfigurationProvider implements P
         descriptor.setId(SCOPE_FIELD);
         descriptor.setType(STRING_TYPE);
         descriptor.setDisplayer(new LiveDataPropertyDescriptor.DisplayerDescriptor(SCOPE_FIELD));
-        descriptor.setFilter(createFilterList(Stream.of(Scope.values())
+        descriptor.setFilter(createFilterList(Stream.of(NotificationFilterScope.values())
             .map(item -> Map.of(
                 VALUE_KEY, item.name(),
                 LABEL_KEY, this.translationHelper.getScopeTranslation(item)

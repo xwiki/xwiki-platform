@@ -44,6 +44,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterScope;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
@@ -199,6 +200,7 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
         assertEquals(Optional.empty(), this.entryStore.get(entryId));
         DefaultNotificationFilterPreference notificationFilterPreference =
             mock(DefaultNotificationFilterPreference.class);
+        when(notificationFilterPreference.getScope()).thenReturn(NotificationFilterScope.SPACE);
         when(this.notificationFilterPreferenceStore.getFilterPreference(entryId, wikiReference))
             .thenReturn(Optional.of(notificationFilterPreference));
         DocumentReference userDoc = new DocumentReference("xwiki", "XWiki", "Foo");
@@ -215,7 +217,7 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
             .thenReturn(Set.of(NotificationFormat.ALERT, NotificationFormat.EMAIL));
         String page = "foo:Space.Page";
         SpaceReference spaceReference = new SpaceReference("foo", List.of("Space", "Page"));
-        when(notificationFilterPreference.getPage()).thenReturn(page);
+        when(notificationFilterPreference.getEntity()).thenReturn(page);
         when(notificationFilterPreference.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(notificationFilterPreference.isEnabled()).thenReturn(true);
 
@@ -314,7 +316,8 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
         when(filterPref1.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL));
         String user = "xwiki:XWiki.User1";
         //DocumentReference user1DocRef = new DocumentReference("xwiki", "XWiki", "User1");
-        when(filterPref1.getUser()).thenReturn(user);
+        when(filterPref1.getEntity()).thenReturn(user);
+        when(filterPref1.getScope()).thenReturn(NotificationFilterScope.USER);
         when(filterPref1.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
         when(filterPref1.isEnabled()).thenReturn(false);
 
@@ -324,7 +327,8 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
         when(filterPref2.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT));
         String wikiFilter2 = "bla";
         //WikiReference wikiReferenceFilter = new WikiReference(wikiFilter2);
-        when(filterPref2.getWiki()).thenReturn(wikiFilter2);
+        when(filterPref2.getEntity()).thenReturn(wikiFilter2);
+        when(filterPref2.getScope()).thenReturn(NotificationFilterScope.WIKI);
         when(filterPref2.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
         when(filterPref2.isEnabled()).thenReturn(true);
 
@@ -335,7 +339,8 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
             NotificationFormat.ALERT));
         String pageOnly = "xwiki:XWiki.User1";
         DocumentReference pageOnlyRef = new DocumentReference("xwiki", "XWiki", "User1");
-        when(filterPref3.getPageOnly()).thenReturn(pageOnly);
+        when(filterPref3.getEntity()).thenReturn(pageOnly);
+        when(filterPref3.getScope()).thenReturn(NotificationFilterScope.PAGE);
         when(filterPref3.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(filterPref3.isEnabled()).thenReturn(true);
 

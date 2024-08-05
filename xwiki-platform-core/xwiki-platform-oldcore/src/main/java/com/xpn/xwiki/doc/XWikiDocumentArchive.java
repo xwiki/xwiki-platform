@@ -263,6 +263,9 @@ public class XWikiDocumentArchive
             Collection nodes = archive.getNodes(getWikiReference(), getId());
             for (Iterator it = nodes.iterator(); it.hasNext();) {
                 XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+                if (!it.hasNext()) {
+                    throw new IllegalStateException("The number of nodes is an odd number.");
+                }
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
                 updateNode(nodeInfo);
                 this.updatedNodeInfos.add(nodeInfo);

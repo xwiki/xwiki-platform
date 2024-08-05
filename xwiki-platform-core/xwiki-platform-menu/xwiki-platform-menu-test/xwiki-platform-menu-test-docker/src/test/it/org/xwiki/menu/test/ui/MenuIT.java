@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.application.test.po.ApplicationIndexHomePage;
 import org.xwiki.appwithinminutes.test.po.EntryNamePane;
@@ -168,5 +169,16 @@ class MenuIT
         // Verify that the menu is displayed inside left panels
         administrationPage = AdministrationPage.gotoPage();
         assertTrue(administrationPage.hasLeftPanel("menu1"));
+    }
+
+    @Test
+    @Order(4)
+    void testAlert(TestUtils testUtils) throws InterruptedException
+    {
+        ViewPage viewPage = testUtils.gotoPage("Main", "WebHome");
+        testUtils.getDriver().executeJavascript("window.onbeforeunload = function () { return false; }");
+        viewPage.edit();
+        testUtils.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
+        testUtils.getDriver().switchTo().alert().dismiss();
     }
 }

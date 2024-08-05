@@ -43,7 +43,7 @@
     #info($services.localization.render('core.register.successful', [$xwiki.getUserName($xwname),
       $escapetool.xml($request.xwikiname)]))
   #end
-  #if (!$reg || $reg < 0)
+  #if (!$reg || $reg > 0)
     <p>$services.localization.render('core.register.welcome')</p>
     #set ($registrationConfig = $NULL)
     #_loadConfig($registrationConfig)

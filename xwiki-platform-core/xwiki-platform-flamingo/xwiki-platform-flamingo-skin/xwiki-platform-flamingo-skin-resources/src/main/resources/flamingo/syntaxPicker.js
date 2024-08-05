@@ -49,9 +49,14 @@
     #set ($discard = $l10n.put($key, $services.localization.render($key)))
   #end
 #end
+#set ($iconNames = ['cross'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
 #[[*/
 // Start JavaScript-only code.
-(function(l10n) {
+(function(l10n, icons) {
   "use strict";
 
 /**
@@ -114,9 +119,9 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">`
+              + icons.cross +
+            `</button>
             <h4 class="modal-title"></h4>
           </div>
           <div class="modal-body"></div>
@@ -360,4 +365,4 @@ require(['jquery'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$l10n]));
+}).apply(']]#', $jsontool.serialize([$l10n, $icons]));

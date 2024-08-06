@@ -35,8 +35,7 @@ import org.xwiki.rendering.syntax.Syntax;
  * Component to use the icon theme to provide a proper block for displaying an icon.
  *
  * @version $Id$
- * @since 15.10.9
- * @since 16.3.0RC1
+ * @since 16.7.0RC1
  */
 @Component
 @Singleton

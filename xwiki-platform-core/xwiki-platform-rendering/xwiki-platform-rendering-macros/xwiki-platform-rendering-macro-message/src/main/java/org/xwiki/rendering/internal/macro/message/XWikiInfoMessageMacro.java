@@ -30,7 +30,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * Displays an info message.
  *
  * @version $Id$
- * @since 16.6.0RC1
+ * @since 16.7.0RC1
  */
 @Component
 @Named("info")

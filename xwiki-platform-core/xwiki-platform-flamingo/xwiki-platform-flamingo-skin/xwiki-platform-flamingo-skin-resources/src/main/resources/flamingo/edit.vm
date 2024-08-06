@@ -173,7 +173,8 @@
   ## This javascript must be placed here since it uses velocity variables set in the template above.
   <script>
     //<![CDATA[
-    if ($('tmEditWysiwyg')) {
+    let form = document.forms[$jsontool.serialize($formname)];
+    if (form && $('tmEditWysiwyg')) {
       var switchEditor = function(editor, event) {
         // We switch the editor by submitting the edit form to the new editor (in order to preserve the unsaved changes
         // made to the edited content). We don't submit the edit form using one of the existing action buttons (e.g.
@@ -184,7 +185,6 @@
         // fields for syntax conversion before the form is submitted. In order to overcome this we trigger an event to
         // let the form fields know that their values are about to be submitted. It makes sense to use the preview action
         // events because we don't want to save the content, we want to preview it in a different editor.
-        var form = document.forms.${formname};
         form.fire('xwiki:actions:beforePreview');
         // This is needed in order to silence the leave confirmation (we're not going to loose unsaved changes).
         form.fire('xwiki:actions:preview');

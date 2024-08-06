@@ -21,6 +21,7 @@ package org.xwiki.annotation.rest.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -45,7 +46,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationsRESTResource
 {
     /**
      * @param wiki the wiki of the document to get annotations for
-     * @param space the space of the document to get annotations for
+     * @param spaceNames the space names of the document to get annotations for
      * @param page the name of the document to get annotation for
      * @return annotations of a given XWiki page. Note that we're returning a response holding the AnnotatedContent
      *         instead of an AnnotatedContent object because we need to be able to set custom expire fields to prevent
@@ -53,10 +54,10 @@ public class AnnotationsRESTResource extends AbstractAnnotationsRESTResource
      * @throws XWikiRestException when failing to parse space
      */
     @GET
-    public Response doGetAnnotatedContent(@PathParam("spaceName") String space, @PathParam("pageName") String page,
-        @PathParam("wikiName") String wiki) throws XWikiRestException
+    public Response doGetAnnotatedContent(@PathParam("spaceName") @Encoded String spaceNames,
+        @PathParam("pageName") String page, @PathParam("wikiName") String wiki) throws XWikiRestException
     {
-        DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+        DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(spaceNames), page);
         return getAnnotatedContent(documentReference);
     }
 
@@ -64,17 +65,18 @@ public class AnnotationsRESTResource extends AbstractAnnotationsRESTResource
      * Add annotation to a given page.
      *
      * @param wiki the wiki of the document to add annotation on
-     * @param space the space of the document to add annotation on
+     * @param spaceNames the space names of the document to add annotation on
      * @param page the name of the document to add annotation on
      * @param request the request object with the annotation to be added
      * @return AnnotationRequestResponse, responseCode = 0 if no error
      * @throws XWikiRestException when failing to parse space
      */
     @POST
-    public AnnotationResponse doPostAnnotation(@PathParam("wikiName") String wiki, @PathParam("spaceName") String space,
-        @PathParam("pageName") String page, AnnotationAddRequest request) throws XWikiRestException
+    public AnnotationResponse doPostAnnotation(@PathParam("wikiName") String wiki,
+        @PathParam("spaceName") @Encoded String spaceNames, @PathParam("pageName") String page,
+        AnnotationAddRequest request) throws XWikiRestException
     {
-        DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+        DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(spaceNames), page);
         return postAnnotation(documentReference, request);
     }
 }

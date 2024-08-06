@@ -271,11 +271,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private void startContainer() throws Exception
     {
+        List<String> networkAliases = new ArrayList<>();
+        networkAliases.add(this.testConfiguration.getServletEngine().getInternalIP());
+        networkAliases.addAll(this.testConfiguration.getServletEngineNetworkAliases());
+
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
         // start listening.
         this.servletContainer
             .withNetwork(Network.SHARED)
-            .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
+            .withNetworkAliases(networkAliases.toArray(new String[networkAliases.size()]))
             .waitingFor(
                 Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
@@ -380,7 +384,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // JODConverter: https://bit.ly/2w8B82Q
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
-                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 && "
+                                + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
+                                + "libxml2 libxslt1-dev && "
                                 + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
                                 + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "

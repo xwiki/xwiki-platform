@@ -1213,6 +1213,8 @@ public class TestUtils
 
     /**
      * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
      */
     public String executeWikiPlain(String wikiContent, Syntax wikiSyntax) throws Exception
     {
@@ -1224,6 +1226,8 @@ public class TestUtils
 
     /**
      * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
      */
     public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
     {
@@ -1478,6 +1482,20 @@ public class TestUtils
             return "";
         }
         return this.secretToken;
+    }
+
+    /**
+     * Sets the secret token used for CSRF protection. Use this method to restore a token that was previously saved. If
+     * you want to cache the current token you should use {@link #recacheSecretToken()} instead.
+     *
+     * @param secretToken the new secret token to use
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setSecretToken(String secretToken)
+    {
+        this.secretToken = secretToken;
     }
 
     /**

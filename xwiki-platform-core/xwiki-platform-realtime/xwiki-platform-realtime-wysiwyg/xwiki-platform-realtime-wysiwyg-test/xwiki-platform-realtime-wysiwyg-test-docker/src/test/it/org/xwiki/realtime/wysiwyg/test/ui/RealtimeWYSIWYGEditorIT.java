@@ -24,13 +24,19 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WindowType;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
@@ -38,12 +44,15 @@ import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal.ConflictChoice;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditor;
+import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeCKEditorToolBar.Coeditor;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeRichTextAreaElement.CoeditorPosition;
 import org.xwiki.realtime.wysiwyg.test.po.RealtimeWYSIWYGEditPage;
+import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -78,13 +87,16 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
 
         // Solr search is used to get suggestions for the link quick action.
         "org.xwiki.platform:xwiki-platform-search-solr-query"
-    }
+    },
+    servletEngineNetworkAliases = RealtimeWYSIWYGEditorIT.XWIKI_ALIAS
 )
 class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 {
+    public static final String XWIKI_ALIAS = "xwiki-alias";
+
     @Test
     @Order(1)
-    void editAlone(TestReference testReference, TestUtils setup) throws Exception
+    void editAlone(TestReference testReference, TestUtils setup)
     {
         // Start fresh.
         setup.deletePage(testReference);
@@ -105,8 +117,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify that we're editing alone.
         assertTrue(editor.getToolBar().isEditingAlone());
 
-        // The Source button is currently disabled.
-        assertFalse(editor.getToolBar().canToggleSourceMode());
+        // The Source button is now available.
+        assertTrue(editor.getToolBar().canToggleSourceMode());
 
         RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
         textArea.sendKeys("one");
@@ -155,7 +167,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     @Test
     @Order(2)
-    void editWithSelf(TestReference testReference, TestUtils setup)
+    void editWithSelf(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -200,7 +212,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         // Switch back to the first tab and verify the list of coeditors.
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         coeditors = firstEditor.getToolBar().waitForCoeditor(secondCoeditorId).getCoeditors();
         assertEquals(1, coeditors.size());
         self = coeditors.get(0);
@@ -253,12 +265,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.getCoeditorPosition(secondCoeditorId).waitForLocation(new Point(4, 48));
 
         // Verify that clicking on the coeditor indicator scrolls the editing area to the coeditor position.
         // But first we need to add enough paragraphs to make the editing area scrollable.
-        for (int i = 0; i< 20; i++) {
+        for (int i = 0; i < 20; i++) {
             firstTextArea.sendKeys(Keys.ENTER);
         }
         firstTextArea.sendKeys("end");
@@ -278,7 +290,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     @Test
     @Order(3)
-    void inplaceEditableMacro(TestReference testReference, TestUtils setup)
+    void inplaceEditableMacro(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -319,7 +331,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         // Continue typing to verify that the selection is not lost in the second tab. Wait for the inserted macro to be
         // rendered server-side.
         firstTextArea.waitUntilTextContains("my");
@@ -339,7 +351,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         // Don't wait for content from the first tab because we want to check that the selection is preserved.
         firstTextArea.sendKeys(" three");
 
@@ -364,7 +376,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     @Test
     @Order(4)
-    void editDifferentParagraphs(TestReference testReference, TestUtils setup)
+    void editDifferentParagraphs(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -392,17 +404,19 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondTextArea.waitUntilTextContains("Start.");
         secondTextArea.sendKeys(Keys.END, Keys.ENTER);
 
-        String firstUserText = "The five boxing wizards jump quickly. The quick brown fox jumps over the lazy dog. First";
-        String secondUserText = "The quick brown fox jumps over the lazy dog. The five boxing wizards jump quickly. Second";
+        String firstUserText =
+            "The five boxing wizards jump quickly. The quick brown fox jumps over the lazy dog. First";
+        String secondUserText =
+            "The quick brown fox jumps over the lazy dog. The five boxing wizards jump quickly. Second";
 
         String[] firstUserWords = firstUserText.split(" ");
         String[] secondUserWords = secondUserText.split(" ");
 
-        for(int i = 0; i < Math.min(firstUserWords.length, secondUserWords.length); i++) {
+        for (int i = 0; i < Math.min(firstUserWords.length, secondUserWords.length); i++) {
             //
             // First Tab
             //
-            setup.getDriver().switchTo().window(firstTabHandle);
+            setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
             firstTextArea.sendKeys(" " + firstUserWords[i]);
 
             //
@@ -423,7 +437,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     @Test
     @Order(5)
-    void editSameParagraph(TestReference testReference, TestUtils setup)
+    void editSameParagraph(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -454,11 +468,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         String text = "The quick brown fox jumps over the lazy dog.";
         String[] words = text.split(" ");
 
-        for(int i = 0; i < words.length; i++) {
+        for (int i = 0; i < words.length; i++) {
             //
             // First Tab
             //
-            setup.getDriver().switchTo().window(firstTabHandle);
+            setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
             firstTextArea.sendKeys(words[i] + " ");
 
             //
@@ -471,7 +485,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
         // First Tab
         //
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.sendKeys("First. ");
 
         //
@@ -487,7 +501,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     @Test
     @Order(6)
-    void applyInlineStylesOnTheSameParagraph(TestReference testReference, TestUtils setup)
+    void applyInlineStylesOnTheSameParagraph(TestReference testReference, TestUtils setup,
+        MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -520,7 +535,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
 
         // If we don't wait then the italic style might be applied before the "underline" word is retrieved, which leads
         // to the "underline" word being inserted inside the italic style.
@@ -542,7 +557,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         // Select the "bold" word and apply the bold style.
         firstTextArea.sendKeys(Keys.ARROW_LEFT, Keys.ARROW_LEFT);
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
@@ -561,7 +576,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.sendKeys(Keys.ARROW_RIGHT, "er");
 
         firstTextArea.waitUntilTextContains("end");
@@ -574,7 +589,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     @Test
     @Order(7)
-    void imageWithCaption(TestReference testReference, TestUtils setup) throws Exception
+    void imageWithCaption(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
+        throws Exception
     {
         // Start fresh.
         setup.deletePage(testReference);
@@ -592,10 +608,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Second Tab
         //
 
-        // TODO: Find a way to open an incognito window that would allow us to login with a different user. Temporary
-        // attachments are stored in the user session so using two tabs where the same user is logged in doesn't allow
-        // us to verify that images uploaded by one user are visible to the other coeditors in the real-time session.
-        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsBob(setup);
 
         RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
@@ -619,12 +633,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Tree");
         firstTextArea.sendKeys(Keys.ARROW_DOWN, Keys.HOME, "Small ");
 
         // Verify that the image uploaded from the second tab is visible in the first tab.
-        firstTextArea.verifyContent((content) -> {
+        firstTextArea.verifyContent(content -> {
             Dimension imageSize = content.getImages().get(0).getSize();
             assertEquals(20, imageSize.width);
             assertEquals(20, imageSize.height);
@@ -634,7 +648,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Second Tab
         //
 
-        setup.getDriver().switchTo().window(secondTabHandle);
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
         secondTextArea.waitUntilTextContains("Small");
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_LEFT));
         secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "b"));
@@ -643,7 +657,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
         firstTextArea.sendKeys(Keys.ARROW_LEFT, "est");
         firstTextArea.waitUntilContentContains("<strong>Tree</strong>");
         firstEditPage.clickSaveAndView();
@@ -653,7 +667,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     @Test
     @Order(8)
-    void editSameMacro(TestReference testReference, TestUtils setup)
+    void editSameMacro(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -692,10 +706,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
         secondTextArea.waitUntilTextContains("one");
-        // Focus the rich text area.
-        secondTextArea.click();
-        // Move the caret inside the information box.
-        secondTextArea.sendKeys(Keys.ARROW_UP, "two ");
+        // Click on the information box content to be able to type inside it.
+        secondTextArea.click(By.xpath("//p[. = 'one']"));
+        secondTextArea.sendKeys(Keys.HOME, "two ");
 
         MacroDialogEditModal secondMacroEditModal = secondEditor.getBalloonToolBar().editMacro();
         // We want to verify that remote changes don't steal the focus from the modal.
@@ -705,7 +718,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         // Wait for the content to be synchronized before applying the macro parameter changes, otherwise we might
         // overwrite the text typed in the second tab.
         firstTextArea.waitUntilTextContains("two");
@@ -736,7 +749,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Some cool title");
 
         // Edit again the macro an verify that we have the correct parameter value.
@@ -748,10 +761,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("{{info cssClass=\"bar\" title=\"Some cool title\"}}\ntwo one\n{{/info}}",
             WikiEditPage.gotoPage(testReference).getContent());
     }
-    
+
     @Test
     @Order(9)
-    void reloadEditorsMergeConflictManualSave(TestReference testReference, TestUtils setup)
+    void reloadEditorsMergeConflictManualSave(TestReference testReference, TestUtils setup,
+        MultiUserTestUtils multiUserSetup) throws Exception
     {
         //
         // First Tab
@@ -759,12 +773,13 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Start fresh.
         setup.deletePage(testReference);
+        setup.createPage(testReference, "before\n\n[[image:image.gif||width=\"50px\"]]");
+        setup.attachFile(testReference, "image.gif", getClass().getResourceAsStream("/image.gif"), false);
 
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("First");
-        firstEditPage.clickSaveAndContinue();
+        firstTextArea.sendKeys(Keys.END, " first");
 
         //
         // Second Tab
@@ -776,7 +791,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
-        secondTextArea.waitUntilTextContains("First");
+        secondTextArea.waitUntilTextContains("first");
 
         //
         // Third Tab
@@ -786,11 +801,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage thirdEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor thirdEditor = thirdEditPage.getContenEditor();
         RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
-        thirdTextArea.waitUntilTextContains("First");
+        thirdTextArea.waitUntilTextContains("first");
 
         thirdEditPage.leaveRealtimeEditing();
 
-        thirdTextArea.sendKeys(Keys.END, " Third");
+        thirdTextArea.sendKeys(Keys.END, " third");
         thirdEditPage.clickSaveAndContinue();
 
         //
@@ -798,26 +813,60 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondTextArea.sendKeys(Keys.END, " Second");
+        secondTextArea.sendKeys(Keys.END, " second");
         secondEditPage.clickSaveAndContinue(false);
 
         EditConflictModal editConflictModal = new EditConflictModal();
         editConflictModal.makeChoiceAndSubmit(ConflictChoice.RELOAD, false);
 
-        secondTextArea.waitUntilTextContains("Third");
+        secondTextArea.waitUntilTextContains("third");
+        // Verify that the image is still properly rendered.
+        secondTextArea.verifyContent(content -> {
+            WebElement image = content.getImages().get(0);
+            AttachmentReference attachmentReference = new AttachmentReference("image.gif", testReference);
+            assertEquals(setup.getURL(attachmentReference, "download", "width=50&rev=1.1"), image.getAttribute("src"));
+            Dimension imageSize = image.getSize();
+
+            if (imageSize.width != 50 && "20".equals(image.getDomProperty("naturalWidth"))) {
+                // FIXME: The image appears as broken / missing in Chrome sometimes even though:
+                // - the image URL is the right one (we just asserted it above)
+                // - the image naturalWidth = 20 (which indicates that the image is loaded and displayed)
+                // This happens only when running the test with the servlet engine (Tomcat) in a Docker container. I
+                // haven't been able to reproduce when testing manually on the same XWiki test instance. We force Chrome
+                // to reload the image in this case.
+                reloadImage(image, setup);
+                // Get the updated image size.
+                imageSize = image.getSize();
+            }
+
+            assertEquals(50, imageSize.width);
+            assertEquals(50, imageSize.height);
+        });
 
         //
         // First tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
-        firstTextArea.waitUntilTextContains("Third");
-        assertEquals("First Third", firstTextArea.getText());
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("third");
+        assertEquals("before first third", firstTextArea.getText());
     }
-    
+
+    private void reloadImage(WebElement image, TestUtils setup)
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("let image = arguments[0];\n");
+        script.append("let src = image.src;\n");
+        script.append("image.src = '';\n");
+        script.append("image.src = src;\n");
+        setup.getDriver().executeScript(script.toString(), image);
+        setup.getDriver().waitUntilCondition(ExpectedConditions.domPropertyToBe(image, "complete", "true"));
+    }
+
     @Test
     @Order(10)
-    void reloadEditorsSilentMergeConflictManualSave(TestReference testReference, TestUtils setup)
+    void reloadEditorsSilentMergeConflictManualSave(TestReference testReference, TestUtils setup,
+        MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -871,14 +920,14 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Third");
         assertEquals("First\nThird", firstTextArea.getText());
     }
 
     @Test
     @Order(11)
-    void removeAllContent(TestReference testReference, TestUtils setup)
+    void removeAllContent(TestReference testReference, TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
         //
         // First Tab
@@ -935,9 +984,592 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // First Tab
         //
 
-        setup.getDriver().switchTo().window(firstTabHandle);
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("end");
         firstTextArea.sendKeys(Keys.END, "ing");
         assertEquals("ending", firstTextArea.getText());
+    }
+
+    @Test
+    @Order(12)
+    void noLockWarningSameEditor(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // We are already logged-in as John, edit the page as John, effectively locking it.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        //
+        // Second Tab
+        //
+        multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsBob(setup);
+
+        // Edit the same page as Bob, John still has the lock, but because he is active in the realtime session
+        // no warning message should be handled.
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+
+        // If we get the editor, that means there was no warning.
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+
+        // Write some text to check that we joined the same session.
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.sendKeys("Hello from Bob!");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("Bob!");
+        assertEquals("Hello from Bob!", firstTextArea.getText());
+    }
+
+    @Test
+    @Order(13)
+    void lockWarningSameEditor(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // We are already logged-in as John, edit the page as John, effectively locking it.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        firstEditPage.getContenEditor();
+
+        // Leaving the realtime session should not release the lock.
+        firstEditPage.leaveRealtimeEditing();
+
+        //
+        // Second Tab
+        //
+        multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsBob(setup);
+
+        // Edit the same page as Bob, John still has the lock, but because he is not active in the realtime session
+        // a warning message should appear.
+        setup.gotoPage(testReference, "edit", "editor=wysiwyg");
+
+        // Check that we did not get to the edit page.
+        assertFalse(setup.isInWYSIWYGEditMode());
+    }
+
+    @Test
+    @Order(14)
+    void lockWarningWysiwygAndWikiEditors(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // We are already logged-in as John, edit the page as John, effectively locking it.
+        RealtimeWYSIWYGEditPage.gotoPage(testReference).getContenEditor();
+
+        //
+        // Second Tab
+        //
+        multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        loginAsBob(setup);
+
+        // Edit the same page as Bob, John still has the lock, but because he is using a different editor
+        // a warning message should appear.
+        setup.gotoPage(testReference, "edit", "editor=wiki");
+
+        // Check that we did not get to the edit page.
+        assertFalse(setup.isInWYSIWYGEditMode());
+    }
+
+    @Test
+    @Order(15)
+    void restrictScriptMacroExecution(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // We are already logged in as John.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+
+        setup.loginAsSuperAdmin();
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // Insert an empty Velocity macro.
+        secondTextArea.sendKeys("before", Keys.RETURN);
+        secondTextArea.sendKeys("/velo");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/velo", "Velocity");
+        secondTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        secondTextArea.waitUntilMacrosAreRendered();
+        String text = secondTextArea.getText();
+        assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
+
+        // Edit the inserted Velocity macro.
+        secondTextArea.sendKeys(Keys.ENTER);
+        new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
+        secondTextArea.waitUntilTextContains("superadmin");
+        text = secondTextArea.getText();
+        assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // Even if John didn't make any changes yet, the script macro is executed with the minimum script rights
+        // between the current user (John) and the script author associated with the realtime session (superadmin
+        // currently).
+        firstTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
+
+        // It's not enough to wait for the Velocity macro error message because the content is re-rendered twice (first
+        // time when the Velocity macro is inserted and a second time when the Velocity macro is edited), but the output
+        // is the same.
+        firstTextArea.waitUntilContentEditable();
+
+        // Change the content (without modifying the script macro).
+        firstTextArea.sendKeys(Keys.END, " dinner");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+
+        // Wait for the change made by John to be sure that the script author associated with the realtime session has
+        // been updated.
+        secondTextArea.waitUntilTextContains(" dinner");
+
+        // Edit the macro again.
+        secondTextArea.sendKeys(Keys.ENTER);
+        new MacroDialogEditModal().waitUntilReady().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
+        // This time the script macro is not executed because John has been associated as script author of the realtime
+        // session.
+        secondTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
+        text = secondTextArea.getText();
+        assertFalse(text.contains("User: superadmin"), "Unexpected text content: " + text);
+
+        secondTextArea.sendKeys(Keys.ARROW_LEFT, Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_LEFT));
+        secondTextArea.sendKeys("lunch");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("lunch");
+
+        // The second user has modified the Velocity macro, which triggered a re-rendering of the content on this tab.
+        firstTextArea.waitUntilContentEditable();
+
+        // Try to inject a script macro.
+        firstTextArea.sendKeys(Keys.HOME);
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.ARROW_RIGHT));
+        firstTextArea.sendKeys(Keys.ENTER, Keys.ENTER, Keys.ARROW_UP, "/velo");
+        qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/velo", "Velocity");
+        firstTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        firstTextArea.waitUntilMacrosAreRendered();
+
+        // Edit the inserted Velocity macro to add some script.
+        firstTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
+        new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
+        firstTextArea.waitUntilMacrosAreRendered();
+        text = firstTextArea.getText();
+        assertFalse(text.contains("injected"), "Unexpected text content: " + text);
+
+        // Leave the edit mode to see that the script level associated with the realtime session remains the same.
+        firstEditPage.clickCancel();
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+
+        secondTextArea.waitUntilTextContains("before\nFailed to execute the [velocity] macro.");
+        text = secondTextArea.getText();
+        assertFalse(text.contains("injected"), "Unexpected text content: " + text);
+
+        // The content is re-rendered twice because the first user has inserted and modified the Velocity macro.
+        secondTextArea.waitUntilContentEditable();
+
+        // Edit again the macro to see that the script level doesn't change.
+        secondTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
+        new MacroDialogEditModal().waitUntilReady().setMacroContent("Current: $xcontext.userReference").clickSubmit();
+        secondTextArea.waitUntilMacrosAreRendered();
+        text = secondTextArea.getText();
+        assertFalse(text.contains("Current: superadmin"), "Unexpected text content: " + text);
+        assertTrue(text.contains("Failed to execute the [velocity] macro."), "Unexpected text content: " + text);
+    }
+
+    @Test
+    @Order(16)
+    void editPageTranslations(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Force the English locale, in case this test is run multiple times (it switches to German locale at some
+        // point).
+        DocumentReference testReferenceEN = new DocumentReference(testReference, Locale.ENGLISH);
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReferenceEN);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        firstTextArea.sendKeys("default content");
+
+        // Save the page so that we can translate it.
+        firstTextArea.sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
+
+        //
+        // Second Tab
+        //
+
+        // Translate the created page in a new tab using the alias so that we don't change the locale of the first tab.
+        String secondTabHandle = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+
+        // But first we need to enabled multilingual support.
+        setup.loginAsSuperAdmin();
+        setMultiLingual(true, "en", "fr", "de");
+
+        // Switch to French locale and start editing the French translation.
+        setup.gotoPage(testReference, "edit", "editor=wysiwyg&language=fr");
+
+        RealtimeWYSIWYGEditPage secondEditPage = new RealtimeWYSIWYGEditPage();
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // The translated content is initialized with the default content.
+        secondTextArea.waitUntilTextContains("default content");
+
+        // Replace the default content with a script macro call. We want to check two things:
+        // * different channels are used to synchronize the content of different translations
+        // * each translation has its own script author
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        secondTextArea.sendKeys("French content", Keys.ENTER, "/velo");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/velo", "Velocity");
+        secondTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        secondTextArea.waitUntilMacrosAreRendered();
+
+        // Edit the inserted Velocity macro.
+        secondTextArea.sendKeys(Keys.ENTER);
+        new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
+        secondTextArea.waitUntilTextContains("superadmin");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+
+        // Try to insert a script macro. The current user doesn't have script right.
+        firstTextArea.sendKeys(Keys.ENTER, "/velo");
+        qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/velo", "Velocity");
+        firstTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        firstTextArea.waitUntilTextContains("default content\nFailed to execute the [velocity] macro.");
+
+        // Verify that we're editing alone.
+        assertTrue(firstEditor.getToolBar().isEditingAlone());
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+
+        // Edit the inserted Velocity macro to verify that the script author for this translation didn't change after
+        // John modified the default translation in the first tab.
+        secondTextArea.sendKeys(Keys.ENTER);
+        new MacroDialogEditModal().waitUntilReady().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
+        secondTextArea.waitUntilTextContains("User: superadmin");
+
+        // Verify that we're editing alone.
+        assertTrue(secondEditor.getToolBar().isEditingAlone());
+
+        assertEquals("French content\nUser: superadmin", secondEditPage.clickSaveAndView().getContent());
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+
+        firstTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_RIGHT));
+        firstTextArea.sendKeys("English");
+
+        String content = firstEditPage.clickSaveAndView().getContent();
+        assertTrue(content.startsWith("English content\nFailed to execute the [velocity] macro."),
+            "Unexpected content: " + content);
+
+        // Now edit the same (German) translation.
+        setup.gotoPage(testReference, "view", "language=de");
+        new InplaceEditablePage().translateInplace();
+
+        firstEditPage = new RealtimeWYSIWYGEditPage();
+        firstEditor = firstEditPage.getContenEditor();
+        firstTextArea = firstEditor.getRichTextArea();
+
+        // Replace the default (English) content.
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        firstTextArea.sendKeys("German content");
+
+        //
+        // Second Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+
+        setup.gotoPage(testReference, "edit", "editor=wysiwyg&language=de");
+
+        secondEditPage = new RealtimeWYSIWYGEditPage();
+        secondEditor = secondEditPage.getContenEditor();
+        secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilTextContains("German content");
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_RIGHT));
+        secondTextArea.sendKeys("Deutsch");
+
+        //
+        // First Tab
+        //
+
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("Deutsch");
+        assertEquals("Deutsch content", firstTextArea.getText());
+
+        assertEquals("superadmin", firstEditor.getToolBar().getCoeditors().stream().map(Coeditor::getName)
+            .reduce((a, b) -> a + ", " + b).get());
+    }
+
+    @Test
+    @Order(17)
+    void editSource(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeCKEditorToolBar firstEditorToolbar = firstEditor.getToolBar();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        // Check that the source button is available.
+        assertTrue(firstEditorToolbar.canToggleSourceMode());
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab.
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeCKEditorToolBar secondEditorToolbar = secondEditor.getToolBar();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        // Check that the source button is available.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+
+        //
+        // First Tab
+        //
+
+        // Switch back to the first tab
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        // Type in the first tab to have some content.
+        firstTextArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three");
+
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and verify the content.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("three");
+
+        assertEquals("one\ntwo\nthree", secondTextArea.getText());
+
+        // Save to make sure the editor is not marked as dirty.
+        secondEditPage.clickSaveAndContinue();
+
+        // Switch to source mode and check that we are not in the realtime session anymore.
+        secondEditorToolbar.toggleSourceMode();
+        assertFalse(secondEditPage.isRealtimeEditing());
+
+        // Check that we can still switch back to wysiwyg mode.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+
+        // Check the contents of the source mode.
+        assertEquals("one\n\ntwo\n\nthree", secondEditor.getSourceTextArea().getAttribute("value"));
+
+        //
+        // First Tab
+        //
+
+        // Switch to the first tab and make more changes, while the second user is in source mode.
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        firstTextArea.sendKeys(Keys.ENTER, "four");
+
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and switch back to view mode.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondEditorToolbar.toggleSourceMode();
+
+        // After switching back to view mode, we need to recreate the textArea.
+        secondTextArea = secondEditor.getRichTextArea();
+
+        // Check that the second user re-joined the realtime editing session.
+        assertTrue(secondEditPage.isRealtimeEditing());
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        secondTextArea.waitUntilContentContains("four");
+        assertEquals("one\ntwo\nthree\nfour", secondTextArea.getText());
+
+        // Check that we can still switch to source mode.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+
+        // Save again to make the editor not dirty.
+        secondEditPage.clickSaveAndContinue();
+
+        // Switch to source mode.
+        secondEditorToolbar.toggleSourceMode();
+
+        assertFalse(secondEditPage.isRealtimeEditing());
+        // Check the contents of the source mode.
+        assertEquals("one\n\ntwo\n\nthree\n\nfour", secondEditor.getSourceTextArea().getAttribute("value"));
+
+        // Add some content.
+        secondEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "five");
+
+        //
+        // First Tab
+        //
+
+        // Switch to the first tab and make more changes, while the second user is in source mode.
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        firstTextArea.sendKeys(Keys.ENTER, "six");
+
+        //
+        // Second Tab
+        //
+
+        // Switch to the second tab and switch back to view mode.
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondEditorToolbar.toggleSourceMode();
+
+        // After switching back to view mode, we need to recreate the textArea.
+        secondTextArea = secondEditor.getRichTextArea();
+
+        // Check that the second user did not re-join the realtime editing session.
+        assertFalse(secondEditPage.isRealtimeEditing());
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+        assertEquals("one\ntwo\nthree\nfour\nfive", secondTextArea.getText());
+
+        // Join the realtime session again and wait to be in sync.
+        secondEditPage.joinRealtimeEditing();
+        secondTextArea.waitUntilContentContains("six");
+        assertEquals("one\ntwo\nthree\nfour\nsix", secondTextArea.getText());
+
+        // Check that we can still switch to source mode.
+        assertTrue(secondEditorToolbar.canToggleSourceMode());
+
+        // Make the editor dirty by editing the content without saving.
+        secondTextArea.sendKeys(Keys.ARROW_DOWN, Keys.END, Keys.ENTER, "seven");
+
+        // Switch to source mode and back to wysiwyg edit mode.
+        secondEditorToolbar.toggleSourceMode();
+        assertFalse(secondEditPage.isRealtimeEditing());
+        assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven",
+            secondEditor.getSourceTextArea().getAttribute("value"));
+        secondEditorToolbar.toggleSourceMode();
+
+        // Check that the second user did not re-join the realtime editing session.
+        assertFalse(secondEditPage.isRealtimeEditing());
+
+        // We keep the second user out of the realtime editing session now
+        // and we do more tests with the first user.
+
+        //
+        // First Tab
+        //
+
+        // Switch to the first tab.
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        // Check that the source button is available.
+        assertTrue(firstEditorToolbar.canToggleSourceMode());
+
+        // Saving might merge silently. Here is some bulletproofing cleanup.
+        firstEditPage.clickSaveAndContinue();
+        firstTextArea.clear();
+
+        // Make the editor not dirty by saving.
+        firstEditPage.clickSaveAndContinue();
+
+        // Switch to source mode and back to wysiwyg.
+        firstEditorToolbar.toggleSourceMode();
+        assertFalse(firstEditPage.isRealtimeEditing());
+        firstEditorToolbar.toggleSourceMode();
+        assertTrue(firstEditPage.isRealtimeEditing());
+
+        // Bulletproofing: Save to make sure the editor is not dirty.
+        firstEditPage.clickSaveAndContinue();
+
+        // Switch to source mode, make a change, and switch back to wysiwyg.
+        firstEditorToolbar.toggleSourceMode();
+        assertFalse(firstEditPage.isRealtimeEditing());
+        firstEditor.getSourceTextArea().sendKeys(Keys.ENTER, Keys.ENTER, "eight");
+        firstEditorToolbar.toggleSourceMode();
+
+        firstTextArea = firstEditor.getRichTextArea();
+        // We are editing alone, so we should have joined the realtime session after switching back to wysiwyg.
+        assertTrue(firstEditPage.isRealtimeEditing());
+        assertEquals("eight", firstTextArea.getText());
+    }
+
+    private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)
+    {
+        AdministrationPage adminPage = AdministrationPage.gotoPage();
+        LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
+        sectionPage.setMultiLingual(isMultiLingual);
+        sectionPage.setDefaultLanguage("en");
+        sectionPage.setSupportedLanguages(List.of(supportedLanguages));
+        sectionPage.clickSave();
     }
 }

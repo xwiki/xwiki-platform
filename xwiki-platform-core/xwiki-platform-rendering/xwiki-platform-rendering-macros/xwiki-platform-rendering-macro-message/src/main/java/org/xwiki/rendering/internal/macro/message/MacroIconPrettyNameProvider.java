@@ -19,34 +19,20 @@
  */
 package org.xwiki.rendering.internal.macro.message;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 
-/**
- * Displays an info message.
- *
- * @version $Id$
- * @since 16.7.0RC1
- */
-@Component
-@Named("info")
-@Singleton
-public class XWikiInfoMessageMacro extends InfoMessageMacro
-{
-    private static final String ICON_PRETTY_NAME_KEY = "rendering.macro.message.icon.alternative.info";
-    @Inject
-    private ContextualLocalizationManager l10n;
+import javax.inject.Singleton;
 
-    /**
-     * Create and initialize the descriptor of the macro.
-     */
-    public XWikiInfoMessageMacro()
-    {
-        super();
-        this.iconPrettyName = l10n.getTranslationPlain(ICON_PRETTY_NAME_KEY);
-    }
+@Component
+@Singleton
+class MacroIconPrettyNameProvider extends MacroIconPrettyNameProvider {
+  
+  private String TRANSLATION_KEY_PREFIX = "rendering.macro.message.icon.alternative.";
+  @Inject
+  private ContextualLocalizationManager l10n;
+  
+  String getIconPrettyName(String iconName) {
+    return l10n.getTranslationPlain(TRANSLATION_KEY_PREFIX + iconName);
+  }
 }

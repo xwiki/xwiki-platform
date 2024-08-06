@@ -13,7 +13,7 @@
 
 #body {
   // Both left and right panels are displayed
-  &.content {
+  &.content:not(.hideleft):not(.hideright):not(.hidelefthideright) {
     // Left panels are small
     &.panel-left-width-Small {
       .main {
@@ -117,6 +117,12 @@
 
   // Only right panels
   &.hideleft {
+    #leftPanels {
+      display: none;
+    }
+    .main {
+      .make-md-column-push(0);
+    }
     &.panel-right-width-Small {
       .main {
         .make-md-column(11, @main-padding);
@@ -136,6 +142,9 @@
 
   // Only left panels
   &.hideright {
+    #rightPanels {
+      display: none;
+    }
     &.panel-left-width-Small {
       .main {
         .make-md-column(11, @main-padding);
@@ -167,6 +176,12 @@
 
   // No Panels
   &.hidelefthideright {
+    #leftPanels {
+      display: none;
+    }
+    #rightPanels {
+      display: none;
+    }
     .main {
       .make-md-column(12, @main-padding);
     }
@@ -206,6 +221,12 @@
 
 #leftPanels, #rightPanels {
   .make-xs-column(12);
+}
+#rightPanels {
+  left: 0;
+}
+#leftPanels {
+  right: 0;
 }
 
 .rightmenu {
@@ -251,6 +272,92 @@
 #docextrapanes {
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
+}
+
+#leftPanelsToggler, #rightPanelsToggler {
+  /*We make sure it doesn't get over the content. */
+  max-width: @grid-gutter-width - 4px;
+  background-color: @breadcrumb-bg;
+  border: 0;
+  box-shadow: none;
+  .text-muted;
+  /*By default, those buttons are hidden.*/
+  visibility: hidden;
+  opacity: 0;
+  /* Smoothen out the apparition and disparition of the togglers in the UI.*/
+  transition: visibility .2s ease-in-out, opacity .2s ease-in-out;
+  /* They are fixed on the page, always midway through. */
+  position: fixed;
+  top: 50%;
+  /* Make sure the toggler are displayed above the panels. */
+  z-index: 1;
+  /* Smoothen out state transition when expanding and collapsing the panel. */
+  & > * {
+    transition: transform .2s;
+  }
+}
+
+/* We only allow the panel column togglers when the screen is large enough to support the columns next to the content.
+It would not make sense on mobile. 
+A niche weird interaction that would make this style behave unexpectedly is: hide one column, reduce the screen width 
+(e.g. rotate the phone) and the panels are not here and cannot be displayed again until the screen width is increased 
+again (because the toggler is hidden). */
+@media (min-width: @screen-md-min) {
+  /* The panel element does not extend downward enough to select the hover zone directly. 
+  Instead we decide to show the togglers when either of the columns are hovered. 
+  It makes the selector a bit complex, but as long as we rely on the bootstrap columns for the layout, we have floating 
+  columns, that cannot be correctly extended vertically without complex/brittle computation... */
+  #leftPanelsToggler[aria-expanded="false"],
+  #leftPanelsToggler:hover, #leftPanelsToggler:focus,
+  #contentcontainer:hover #contentcolumn:not(:hover) + #leftPanelsToggler,
+  #leftPanelsToggler:has(+ #leftPanels:focus-within),
+  #rightPanelsToggler[aria-expanded="false"],
+  #rightPanelsToggler:hover, #rightPanelsToggler:focus,
+  .leftsidecolumns:has(#contentcolumn:not(:hover)) + #rightPanelsToggler,
+  #rightPanelsToggler:has(+ #rightPanels:focus-within) {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+body#body #leftPanelsToggler {
+  left: 0;
+  border-radius: 0 @border-radius-small @border-radius-small 0;
+  & > * {
+    transform: rotate(180deg);
+  }
+
+  &[aria-expanded="false"] {
+    & + #leftPanels {
+      transition: right 0.2s;
+      right: 100%;
+    }
+
+    & > * {
+      transform: rotate(0);
+    }
+  }
+}
+
+body#body #rightPanelsToggler {
+  /* Merge the button with the panel. */
+  right: 0;
+  border-radius: @border-radius-small 0 0 @border-radius-small;
+  /* Default state has the caret pointing left. ie 'right-caret' rotated 180deg */
+  & > * {
+    transform: rotate(0);
+  }
+
+  &[aria-expanded="false"] {
+    & + #rightPanels {
+      transition: left 0.2s;
+      left: 100%;
+    }
+
+    & > * {
+      transform: rotate(180deg);
+    }
+  }
 }
 
 #xwikicontent {

@@ -26,7 +26,6 @@ import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.syntax.Syntax;
@@ -45,8 +44,6 @@ public class XWikiIconProvider extends DefaultIconProvider
     private IconSetManager iconSetManager;
     @Inject
     private IconRenderer iconRenderer;
-    @Inject
-    private ContextualLocalizationManager l10n;
 
     /**
      * Uses the icon theme to provide the right block for displaying an icon.

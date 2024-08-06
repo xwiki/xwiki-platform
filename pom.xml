@@ -741,7 +741,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>4.3</version>
+        <version>4.3.1</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>

@@ -19,7 +19,12 @@
  */
 package org.xwiki.localization;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,6 +36,33 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
 {
+    // class to avoid synchronization (Init on demand)
+    static class SyncAvoid
+    {
+        /**
+         * Unmodifiable list of available locales.
+         */
+        private static final List<Locale> AVAILABLE_LOCALE_LIST;
+
+        /**
+         * Unmodifiable set of available locales.
+         */
+        private static final Set<Locale> AVAILABLE_LOCALE_SET;
+
+        static {
+            Locale[] jvmLocales = Locale.getAvailableLocales();
+            final List<Locale> list = new ArrayList<>(jvmLocales.length);
+            for (Locale jvmLocale : jvmLocales) {
+                // Make sure the Locale has a valid format from XWiki point of view
+                if (isValid(jvmLocale)) {
+                    list.add(jvmLocale);
+                }
+            }
+            AVAILABLE_LOCALE_LIST = Collections.unmodifiableList(list);
+            AVAILABLE_LOCALE_SET = Collections.unmodifiableSet(new HashSet<>(list));
+        }
+    }
+
     /**
      * @param locale the locale
      * @return the parent locale
@@ -90,5 +122,66 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
         } catch (Exception e) {
             return fallback;
         }
+    }
+
+    /**
+     * @param locale the {@link Locale} to validate
+     * @return true is the locale is a valid {@link Locale} from XWiki point of view
+     * @since 14.10.22
+     * @since 15.10.12
+     * @since 16.4.2
+     * @since 16.7.0RC1
+     */
+    public static boolean isValid(Locale locale)
+    {
+        if (locale != null) {
+            try {
+                // Make sure we can parse the locale String representation
+                LocaleUtils.toLocale(locale.toString());
+
+                return true;
+            } catch (Exception e) {
+                // There is no reason to log the error since it's expected that the JVM is giving us unsupported locales
+                // by default
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtains an unmodifiable list of installed valid locales.
+     * <p>
+     * This methods adds to {@link org.apache.commons.lang3.LocaleUtils#availableLocaleList()} the validation of the
+     * locales format
+     * </p>
+     *
+     * @return the unmodifiable list of available and valid locales
+     * @since 14.10.22
+     * @since 15.10.12
+     * @since 16.4.2
+     * @since 16.7.0RC1
+     */
+    public static List<Locale> availableLocaleList()
+    {
+        return SyncAvoid.AVAILABLE_LOCALE_LIST;
+    }
+
+    /**
+     * Obtains an unmodifiable set of installed valid locales.
+     * <p>
+     * This methods adds to {@link org.apache.commons.lang3.LocaleUtils#availableLocaleSet()} the validation of the
+     * locales format
+     * </p>
+     *
+     * @return the unmodifiable set of available and valid locales
+     * @since 14.10.22
+     * @since 15.10.12
+     * @since 16.4.2
+     * @since 16.7.0RC1
+     */
+    public static Set<Locale> availableLocaleSet()
+    {
+        return SyncAvoid.AVAILABLE_LOCALE_SET;
     }
 }

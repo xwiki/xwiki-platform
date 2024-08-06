@@ -21,27 +21,31 @@
 # DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Creates an ini template for setting JVM arguments (eg -Xmx ).
+# tag::description[]
+This module provide common configuration of Java Servlet web applications over all environments.
+# end::description[]
+
+[xml]
+etc/jetty-ee-webapp.xml
+
+[lib]
+lib/jetty-ee-${jetty.version}.jar
 
 [ini-template]
-## JVM Configuration
-## If JVM args are include in an ini file then --exec is needed
-## to start a new JVM from start.jar with the extra args.
+# tag::ini-template[]
+## Add to the server wide default jars and packages protected or hidden from webapps.
+## Protected (aka System) classes cannot be overridden by a webapp.
+## Hidden (aka Server) classes cannot be seen by a webapp
+## Lists of patterns are comma separated and may be either:
+##  + a qualified classname e.g. 'com.acme.Foo' 
+##  + a package name e.g. 'net.example.'
+##  + a jar file e.g. '${jetty.base.uri}/lib/dependency.jar' 
+##  + a directory of jars,resource or classes e.g. '${jetty.base.uri}/resources' 
+##  + A pattern preceded with a '-' is an exclusion, all other patterns are inclusions
 ##
-## If you wish to avoid an extra JVM running, place JVM args
-## on the normal command line and do not use --exec
-# --exec
-# -Xmx2000m
-# -Xmn512m
-# -XX:+UseConcMarkSweepGC
-# -XX:ParallelCMSThreads=2
-# -XX:+CMSClassUnloadingEnabled
-# -XX:+UseCMSCompactAtFullCollection
-# -XX:CMSInitiatingOccupancyFraction=80
-# -internal:gc
-# -XX:+PrintGCDateStamps
-# -XX:+PrintGCTimeStamps
-# -XX:+PrintGCDetails
-# -XX:+PrintTenuringDistribution
-# -XX:+PrintCommandLineFlags
-# -XX:+DisableExplicitGC
+## The +=, operator appends to a CSV list with a comma as needed.
+##
+#jetty.server.addProtectedClasses+=,org.example.
+#jetty.server.addHiddenClasses+=,org.example.
+# end::ini-template[]
+

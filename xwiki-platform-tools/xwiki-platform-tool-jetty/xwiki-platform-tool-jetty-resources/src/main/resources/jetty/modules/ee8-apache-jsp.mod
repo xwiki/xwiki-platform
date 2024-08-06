@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 Enables use of the apache implementation of JSP.
@@ -30,6 +30,12 @@ ee8
 ee8-servlet
 ee8-annotations
 
+[ini]
+eclipse.jdt.ecj.version?=3.38.0
+ee8.jsp.impl.version?=9.0.90
+
 [lib]
-lib/ee8-apache-jsp/*.jar
+lib/ee8-apache-jsp/org.eclipse.jdt.ecj-${eclipse.jdt.ecj.version}.jar
+lib/ee8-apache-jsp/org.mortbay.jasper.apache-el-${ee8.jsp.impl.version}.jar
+lib/ee8-apache-jsp/org.mortbay.jasper.apache-jsp-${ee8.jsp.impl.version}.jar
 lib/jetty-ee8-apache-jsp-${jetty.version}.jar

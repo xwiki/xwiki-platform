@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 # tag::description[]
@@ -44,7 +44,7 @@ etc/jetty-ee8-deploy.xml
 # jetty.deploy.defaultsDescriptorPath=${jetty.base}/etc/webdefault-ee8.xml
 
 ## Monitored directory scan period (seconds)
-# jetty.deploy.scanInterval=1
+# jetty.deploy.scanInterval=0
 
 ## Whether to extract *.war files
 # jetty.deploy.extractWars=true

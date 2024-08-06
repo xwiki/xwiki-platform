@@ -49,6 +49,7 @@ public class HttpServletUtilsTest
         when(request.getScheme()).thenReturn(url.getProtocol());
         when(request.getServerName()).thenReturn(url.getHost());
         when(request.getServerPort()).thenReturn(url.getPort());
+        when(request.getRequestURL()).thenReturn(new StringBuffer(urlString));
 
         for (Map<String, String> headers : headerGroup) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {

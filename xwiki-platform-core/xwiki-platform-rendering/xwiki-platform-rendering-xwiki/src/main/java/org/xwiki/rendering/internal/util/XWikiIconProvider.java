@@ -46,7 +46,7 @@ public class XWikiIconProvider extends DefaultIconProvider
     private IconRenderer iconRenderer;
 
     /**
-     * Uses the icon theme to provide the right block for displaying an icon.
+     * Uses the icon theme to provide the right block for displaying an inline icon.
      * @param iconName the name of the icon to display
      * @return the block containing an icon.
      */

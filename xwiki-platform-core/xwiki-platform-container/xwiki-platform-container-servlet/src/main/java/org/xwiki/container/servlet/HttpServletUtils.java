@@ -194,17 +194,19 @@ public final class HttpServletUtils
         // Ask the application server (we don't start with that because it's very often wrong or badly configured
         // behind an HTTP proxy...)
         String requestURLString = request.getRequestURL().toString();
-        try {
-            URL requestURL = new URL(requestURLString);
-            builder.append(requestURL.getHost());
-            int port = requestURL.getPort();
-            if (port != -1) {
-                builder.append(':');
-                builder.append(port);
+        if (!requestURLString.isEmpty()) {
+            try {
+                URL requestURL = new URL(requestURLString);
+                builder.append(requestURL.getHost());
+                int port = requestURL.getPort();
+                if (port != -1) {
+                    builder.append(':');
+                    builder.append(port);
+                }
+                return;
+            } catch (MalformedURLException e) {
+                LOGGER.error("The request URL indicated by the application server is wrong: {}", requestURLString, e);
             }
-            return;
-        } catch (MalformedURLException e) {
-            LOGGER.error("The request URL indicated by the application server is wrong: {}", requestURLString, e);
         }
 
         // Ask the application server another way (in which we cannot be sure if the port is explicitly indicated or

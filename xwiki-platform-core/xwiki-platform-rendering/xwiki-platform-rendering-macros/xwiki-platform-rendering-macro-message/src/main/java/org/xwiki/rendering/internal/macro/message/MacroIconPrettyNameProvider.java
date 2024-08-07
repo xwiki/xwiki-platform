@@ -25,14 +25,24 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Component
+/**
+ * XWiki specific component to provide an alternative text for an icon.
+ *
+ * @version $Id$
+ * @since 16.7.0RC1
+ */
+@Component(roles = MacroIconPrettyNameProvider.class)
 @Singleton
-class XWikiMacroIconPrettyNameProvider implements MacroIconPrettyNameProvider 
+public class MacroIconPrettyNameProvider
 {
-    private static final String TRANSLATION_KEY_PREFIX = "rendering.macro.message.icon.alternative.";
+    private static final String TRANSLATION_KEY_PREFIX = "rendering.icon.provider.icon.alternative.";
     @Inject
     private ContextualLocalizationManager l10n;
-  
+
+    /**
+     * @param iconName the name of the icon that needs an alternative text
+     * @return the alternative text associated to the provided icon
+     */
     public String getIconPrettyName(String iconName) 
     {
         return l10n.getTranslationPlain(TRANSLATION_KEY_PREFIX + iconName);

@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Singleton
 public class MacroIconPrettyNameProvider
 {
-    private static final String TRANSLATION_KEY_PREFIX = "rendering.icon.provider.icon.alternative.";
+    private static final String TRANSLATION_KEY_PREFIX = "rendering.macro.message.icon.alternative.";
     @Inject
     private ContextualLocalizationManager l10n;
 

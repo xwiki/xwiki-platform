@@ -22,17 +22,19 @@ package org.xwiki.rendering.internal.macro.message;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Component
 @Singleton
-class MacroIconPrettyNameProvider extends MacroIconPrettyNameProvider {
+class XWikiMacroIconPrettyNameProvider implements MacroIconPrettyNameProvider 
+{
+    private static final String TRANSLATION_KEY_PREFIX = "rendering.macro.message.icon.alternative.";
+    @Inject
+    private ContextualLocalizationManager l10n;
   
-  private String TRANSLATION_KEY_PREFIX = "rendering.macro.message.icon.alternative.";
-  @Inject
-  private ContextualLocalizationManager l10n;
-  
-  String getIconPrettyName(String iconName) {
-    return l10n.getTranslationPlain(TRANSLATION_KEY_PREFIX + iconName);
-  }
+    public String getIconPrettyName(String iconName) 
+    {
+        return l10n.getTranslationPlain(TRANSLATION_KEY_PREFIX + iconName);
+    }
 }

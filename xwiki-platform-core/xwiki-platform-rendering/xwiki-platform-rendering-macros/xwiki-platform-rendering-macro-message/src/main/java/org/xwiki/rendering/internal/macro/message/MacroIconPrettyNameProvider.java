@@ -40,11 +40,11 @@ public class MacroIconPrettyNameProvider
     private ContextualLocalizationManager l10n;
 
     /**
-     * @param iconName the name of the icon that needs an alternative text
+     * @param macroId the id of the macro whose icon needs an alternative text
      * @return the alternative text associated to the provided icon
      */
-    public String getIconPrettyName(String iconName) 
+    public String getIconPrettyName(String macroId)
     {
-        return l10n.getTranslationPlain(TRANSLATION_KEY_PREFIX + iconName);
+        return l10n.getTranslationPlain(TRANSLATION_KEY_PREFIX + macroId);
     }
 }

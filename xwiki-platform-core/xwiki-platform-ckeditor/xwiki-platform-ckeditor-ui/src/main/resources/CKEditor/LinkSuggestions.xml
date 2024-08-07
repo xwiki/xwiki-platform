@@ -186,7 +186,6 @@
   #searchEntities($input 8 $entityReferences)
   #set ($suggestions = [])
   #getSuggestions($entityReferences $suggestions)
-  // TODO: Suggest page creation here.
   #if ($xcontext.action == 'get')
     #set ($discard = $response.setContentType('application/json'))
   #end

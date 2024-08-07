@@ -81,7 +81,7 @@ define('entityResourceSuggester', [
       reference: $resource.convertEntityReferenceToResourceReference(entityReference, base),
       entityReference: entityReference,
       title: translations.get('create.' + item.type),
-      location: ''
+      location: item.location
     };
   };
 

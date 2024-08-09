@@ -1,1 +1,1 @@
-500:org.xwiki.rendering.internal.macro.message.MacroIconPrettyNameProvider
+500:org.xwiki.rendering.internal.macro.message.XWikiMacroIconPrettyNameProvider

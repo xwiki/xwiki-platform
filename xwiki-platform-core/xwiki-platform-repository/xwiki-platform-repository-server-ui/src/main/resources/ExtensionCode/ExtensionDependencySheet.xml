@@ -20,34 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="es">
+<xwikidoc version="1.5" reference="ExtensionCode.ExtensionDependencySheet" locale="">
   <web>ExtensionCode</web>
-  <name>Translations</name>
-  <language>es</language>
-  <defaultLanguage>en</defaultLanguage>
-  <translation>1</translation>
+  <name>ExtensionDependencySheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Extension.WebHome</parent>
+  <parent>ExtensionCode.ExtensionDependencyClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>#if($doc.name == 'ExtensionDependencySheet')ExtensionDependency Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
-extension.repository.name=Nombre
-extension.repository.summary=Resumen
-extension.repository.type=Tipo
-extension.repository.category=Categoría
-extension.repository.authors=Autores
-extension.repository.doc.creationDate=Creado el
-extension.repository.doc.date=Última modificación
-extension.repository.rating=Calificación
-extension.repository.installedCount=Instalaciones
+  <content>{{velocity}}
+## You can modify this page to customize the presentation of your object.
+## At first you should keep the default presentation and just save the document.
 
-## Administration UI
-admin.repository=Repositorio de extensiones</content>
+#set($class = $doc.getObject('ExtensionCode.ExtensionDependencyClass').xWikiClass)
+#foreach($prop in $class.properties)
+  ; $prop.prettyName
+  : $doc.display($prop.getName())
+#end
+{{/velocity}}</content>
 </xwikidoc>

@@ -21,22 +21,19 @@ We brought the following changes from the default Jetty files obtained from the 
       jetty.httpConfig.uriCompliance=RFC3986
       ``` 
 1. Addition of `etc/jetty-xwiki.xml` to print a message in the console when XWiki is started.
-1. Remove support for JSP (since XWiki doesn't use JSPs) by:
-   1. Removing the following from `etc/webdefault-ee8.xml`:
-      ```
-      <servlet id="jsp">
-      ...
-      </servlet>
-      ```
-      Also remove the `<servlet-mapping>` just below it.
-      Under `<welcome-file-list>` alors remove the `<welcome-file>index.jsp</welcome-file>` line.
-   1. Keep only the `apache-el-<version>` lib in `modules/ee8-apache-jsp.mod` (i.e. remove the JSP lib references).
-      We need the EL lib for Hibernate Validator (see XWIKI-19314)
+1. Remove support for JSP (since XWiki doesn't use JSPs) by removing the following from `etc/webdefault.xml`:
+   ```
+   <servlet id="jsp">
+   ...
+   </servlet>
+   ```
+   Also remove the `<servlet-mapping>` just below it.
+   Under `<welcome-file-list>` alors remove the `<welcome-file>index.jsp</welcome-file>` line.
 1. Remove alpn (we don't need TLS/SSL for a demo packaging) and http2 support by:
    1. Remove `lib/jetty-alpn-client-${jetty.version}.jar` from `modules/client.mod`
    1. Remove references to the `alpn` and `http2` modules from `modules/https.mod`
 1. Addition of `modules/xwiki-logging.mod` to configure logging for XWiki (provides the Jetty `logging` module name)
-1. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely, we wrap:
+1. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely, we wrapp:
    ```
    <Arg>
      <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
@@ -55,6 +52,6 @@ We brought the following changes from the default Jetty files obtained from the 
        <Arg><Get class="java.lang.System" name="out"/></Arg>
      </New>
     </Arg>
-   ``` 
+   ```
 1. Note that we don't include all `etc/*.xml` files nor all `modules/*.mod` files since we don't use these extra
-    features.  
+    features. Note that we kept `ee8-apache-jsp.mod` which is needed by the Hibernate Validator (see XWIKI-19314) 

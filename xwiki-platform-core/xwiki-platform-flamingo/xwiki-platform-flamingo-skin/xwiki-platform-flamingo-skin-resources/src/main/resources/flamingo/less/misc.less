@@ -407,6 +407,11 @@ dl.export-tree-legend dt + dd {
   justify-content: space-between;
 }
 
+/* Make sure the right change arrow stays on the right even when the left one is not here. */
+#changes-arrows-box:not(:has(> .changes-arrow-left)) {
+  justify-content: right;
+}
+
 .changes-body > .changes-body-header {
   border-bottom: @border-width solid @xwiki-border-color;
   margin-bottom: (@grid-gutter-width / 2);

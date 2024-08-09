@@ -18,27 +18,17 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# This is the top level mod used when starting Jetty in start_xwiki.*
-# It's called with "--module=xwiki" on the command line to start Jetty.
+# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
-[environment]
-ee8
+[description]
+Creates the $JETTY_BASE/work directory as a persistent temp directory.
+If a work directory exists, it is used for context temp directories, but
+they are persisted between runs of Jetty, so generated files (eg JSPs)
+can be kept.
 
-[depend]
-ext
-resources
+[tags]
 server
-logging
-http
-http-forwarded
-ee8-annotations
-ee8-deploy
-requestlog
-ee8-websocket-javax
-ee8-websocket-jetty
-ee8-apache-jsp
-console-capture
-work
 
-[xml]
-etc/jetty-xwiki.xml
+[files]
+work/
+

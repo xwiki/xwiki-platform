@@ -350,7 +350,7 @@
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
     #define ($delete)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove', $extraAttributes)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'trash', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $delete, 'order': 40000}))
   #end

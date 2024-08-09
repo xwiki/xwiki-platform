@@ -20,5 +20,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>content2</content>
 </xwikidoc>

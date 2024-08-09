@@ -18,26 +18,22 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+
 [description]
-Base configuration for the jetty logging mechanism.
-Provides a ${jetty.base}/resources/jetty-logging.properties.
+Configures logging to use SLF4J.
+A specific implementation of SLF4J is not enabled. 
+If one is not selected then NOP implementation will be used.
 
 [tags]
 logging
 
-[depend]
-logging/slf4j
-resources
-
 [provides]
-logging|default
-
-[files]
-basehome:modules/logging/jetty
+slf4j
 
 [lib]
-lib/logging/jetty-slf4j-impl-${jetty.version}.jar
+lib/logging/slf4j-api-${slf4j.version}.jar
 
 [ini]
-jetty.webapp.addServerClasses+=,org.eclipse.jetty.logging.
-jetty.webapp.addServerClasses+=,${jetty.home.uri}/lib/logging/
+slf4j.version?=2.0.10
+jetty.webapp.addServerClasses+=,org.slf4j.

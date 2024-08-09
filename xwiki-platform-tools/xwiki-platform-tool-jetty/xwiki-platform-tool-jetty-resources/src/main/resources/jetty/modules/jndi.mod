@@ -24,6 +24,7 @@
 Adds the Jetty JNDI implementation to the classpath.
 
 [depend]
+plus
 server
 
 [lib]

@@ -21,10 +21,22 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Enables standard Servlet handling.
+Enable the Jetty WebSocket API support for deployed web applications.
+
+[environment]
+ee8
+
+[tags]
+websocket
 
 [depend]
-server
+ee8-annotations
 
 [lib]
-lib/jetty-servlet-${jetty.version}.jar
+lib/jetty-websocket-core-common-${jetty.version}.jar
+lib/jetty-websocket-core-server-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-servlet-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-jetty-api-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-jetty-common-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-jetty-server-${jetty.version}.jar
+

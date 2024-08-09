@@ -21,44 +21,40 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Logs requests using CustomRequestLog and AsyncRequestLogWriter.
+Adds support for servlet specification web applications to the server classpath.
+Without this, only Jetty-specific handlers may be deployed.
 
-[tags]
-requestlog
-logging
+[environment]
+ee8
 
 [depend]
-server
+ee8-servlet
+ee8-security
 
 [xml]
-etc/jetty-requestlog.xml
+etc/jetty-ee8-webapp.xml
 
-[files]
-logs/
-
-[ini]
-jetty.requestlog.dir?=logs
+[lib]
+lib/jetty-ee8-webapp-${jetty.version}.jar
 
 [ini-template]
-# tag::documentation[]
-## Format string
-# jetty.requestlog.formatString=%{client}a - %u %{dd/MMM/yyyy:HH:mm:ss ZZZ|GMT}t "%r" %s %O "%{Referer}i" "%{User-Agent}i"
+## Add to the server wide default jars and packages protected or hidden from webapps.
+## System classes are protected and cannot be overridden by a webapp.
+## Server classes are hidden and cannot be seen by a webapp
+## Lists of patterns are comma separated and may be either:
+##  + a qualified classname e.g. 'com.acme.Foo' 
+##  + a package name e.g. 'net.example.'
+##  + a jar file e.g. '${jetty.base.uri}/lib/dependency.jar' 
+##  + a directory of jars,resource or classes e.g. '${jetty.base.uri}/resources' 
+##  + A pattern preceded with a '-' is an exclusion, all other patterns are inclusions
+##
+## The +=, operator appends to a CSV list with a comma as needed.
+##
+#jetty.webapp.addSystemClasses+=,org.example.
+#jetty.webapp.addServerClasses+=,org.example.
 
-## Logging directory (relative to $jetty.base)
-# jetty.requestlog.dir=logs
+[ini]
+contextHandlerClass=org.eclipse.jetty.ee8.webapp.WebAppContext
 
-## File path
-# jetty.requestlog.filePath=${jetty.requestlog.dir}/yyyy_mm_dd.request.log
-
-## Date format for rollovered files (uses SimpleDateFormat syntax)
-# jetty.requestlog.filenameDateFormat=yyyy_MM_dd
-
-## How many days to retain old log files
-# jetty.requestlog.retainDays=90
-
-## Whether to append to existing file
-# jetty.requestlog.append=false
-
-## Timezone of the log file rollover
-# jetty.requestlog.timezone=GMT
-# end::documentation[]
+[jpms]
+add-modules:java.instrument

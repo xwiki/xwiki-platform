@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://eclipse.dev/jetty/configure_10_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://www.eclipse.org/jetty/configure_10_0.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
   <Call name="addBean">
@@ -30,7 +30,7 @@
         <Set name="KeyStorePath">
           <Call name="resolvePath" class="org.eclipse.jetty.xml.XmlConfiguration">
             <Arg><Property name="jetty.base"/></Arg>
-            <Arg><Property name="jetty.sslContext.keyStorePath" default="etc/keystore.p12" /></Arg>
+            <Arg><Property name="jetty.sslContext.keyStorePath" deprecated="jetty.sslContext.keyStoreAbsolutePath,jetty.keystore" default="etc/keystore.p12" /></Arg>
           </Call>
         </Set>
         <Set name="KeyStorePassword"><Property name="jetty.sslContext.keyStorePassword" /></Set>

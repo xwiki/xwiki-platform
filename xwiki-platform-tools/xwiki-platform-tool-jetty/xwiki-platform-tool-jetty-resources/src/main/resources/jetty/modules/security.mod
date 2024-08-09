@@ -21,7 +21,7 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Adds core security handling to the classpath.
+Adds servlet standard security handling to the classpath.
 
 [depend]
 server

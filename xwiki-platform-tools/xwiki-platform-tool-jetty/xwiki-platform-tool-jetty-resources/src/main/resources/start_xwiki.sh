@@ -156,6 +156,7 @@ JETTY_BASE=.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
 
 # Specify Jetty's home directory to be the directory named jetty inside the jetty base directory.
+# Thus JETTY_HOME/data and JETTY_HOME/webapps are inside the jetty base directory.
 JETTY_HOME=jetty
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 

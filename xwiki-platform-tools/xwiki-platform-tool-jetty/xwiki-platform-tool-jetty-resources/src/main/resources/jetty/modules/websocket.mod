@@ -18,30 +18,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - https://eclipse.dev/jetty/documentation/
 
 [description]
-Enables session management.
-By enabling this module, it allows session management to be configured via the ini templates
-created or by enabling other session-cache or session-store modules.
-Without this module enabled,
-the server may still use sessions, but their management cannot be configured.
+Enable both websocket-javax and websocket-jetty modules for deployed web applications.
 
 [tags]
-session
+websocket
 
-[depends]
-server
-
-[lib]
-lib/jetty-session-${jetty.version}.jar
-
-[xml]
-etc/sessions/id-manager.xml
-
-[ini-template]
-## The name to uniquely identify this server instance
-#jetty.sessionIdManager.workerName=node1
-
-## Period between runs of the session scavenger (in seconds)
-#jetty.sessionScavengeInterval.seconds=600
+[depend]
+websocket-jetty
+websocket-javax

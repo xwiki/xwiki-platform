@@ -21,24 +21,26 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Enable javax.websocket APIs for deployed web applications.
-
-[environment]
-ee8
+Enable Java WebSocket APIs for deployed web applications.
 
 [tags]
 websocket
 
 [depend]
 client
-ee8-annotations
+annotations
 
 [lib]
-lib/jetty-websocket-core-common-${jetty.version}.jar
-lib/jetty-websocket-core-client-${jetty.version}.jar
-lib/jetty-websocket-core-server-${jetty.version}.jar
-lib/ee8-websocket/jetty-ee8-websocket-servlet-${jetty.version}.jar
-lib/ee8-websocket/jetty-javax-websocket-api-1.1.2.jar
-lib/ee8-websocket/jetty-ee8-websocket-javax-client-${jetty.version}.jar
-lib/ee8-websocket/jetty-ee8-websocket-javax-common-${jetty.version}.jar
-lib/ee8-websocket/jetty-ee8-websocket-javax-server-${jetty.version}.jar
+lib/websocket/websocket-core-common-${jetty.version}.jar
+lib/websocket/websocket-core-client-${jetty.version}.jar
+lib/websocket/websocket-core-server-${jetty.version}.jar
+lib/websocket/websocket-servlet-${jetty.version}.jar
+lib/websocket/jetty-javax-websocket-api-1.1.2.jar
+lib/websocket/websocket-javax-client-${jetty.version}.jar
+lib/websocket/websocket-javax-common-${jetty.version}.jar
+lib/websocket/websocket-javax-server-${jetty.version}.jar
+
+[jpms]
+# The implementation needs to access method handles in
+# classes that are in the web application classloader.
+add-reads: org.eclipse.jetty.websocket.javax.common=ALL-UNNAMED

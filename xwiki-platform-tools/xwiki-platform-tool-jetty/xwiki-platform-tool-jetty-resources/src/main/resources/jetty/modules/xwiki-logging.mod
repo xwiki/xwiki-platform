@@ -20,23 +20,20 @@
 
 [description]
 Base configuration for the jetty logging mechanism.
-Provides a ${jetty.base}/resources/jetty-logging.properties.
-
-[tags]
-logging
+Logs are configured through ${jetty.base}/resources/jetty-logging.properties.
 
 [depend]
-logging/slf4j
 resources
 
 [provides]
-logging|default
+logging
 
 [files]
-basehome:modules/logging/jetty
+logs/
 
 [lib]
-lib/logging/jetty-slf4j-impl-${jetty.version}.jar
+lib/logging/**.jar
+resources/
 
 [ini]
 jetty.webapp.addServerClasses+=,org.eclipse.jetty.logging.

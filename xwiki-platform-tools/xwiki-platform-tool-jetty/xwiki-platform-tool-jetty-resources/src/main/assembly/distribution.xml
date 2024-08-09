@@ -44,16 +44,16 @@
         <!-- lib/ext -->
         <exclude>org.xwiki.platform:xwiki-platform-tool-jetty-listener</exclude>
         <exclude>commons-io:commons-io</exclude>
-        <!-- lib/ee8-annotations -->
+        <!-- lib/annotations -->
         <exclude>org.ow2.asm:*</exclude>
         <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
         <!-- lib/logging -->
         <exclude>org.slf4j:slf4j-api</exclude>
         <exclude>org.eclipse.jetty:jetty-slf4j-impl</exclude>
-        <!-- lib/ee8-websocket -->
-        <exclude>org.eclipse.jetty.ee8.websocket:*</exclude>
+        <!-- lib/websocket -->
+        <exclude>org.eclipse.jetty.websocket:*</exclude>
         <exclude>*:jetty-javax-websocket-api</exclude>
-        <!-- lib/ee8-apache-jsp -->
+        <!-- lib/apache-jsp -->
         <exclude>org.mortbay.jasper:apache-el</exclude>
       </excludes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
@@ -69,7 +69,7 @@
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>/jetty/lib/ee8-annotations</outputDirectory>
+      <outputDirectory>/jetty/lib/annotations</outputDirectory>
       <includes>
         <include>org.ow2.asm:*</include>
         <include>jakarta.annotation:jakarta.annotation-api</include>
@@ -78,9 +78,9 @@
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>/jetty/lib/ee8-websocket</outputDirectory>
+      <outputDirectory>/jetty/lib/websocket</outputDirectory>
       <includes>
-        <include>org.eclipse.jetty.ee8.websocket:*</include>
+        <include>org.eclipse.jetty.websocket:*</include>
         <include>*:jetty-javax-websocket-api</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
@@ -98,9 +98,8 @@
     </dependencySet>
     <!-- EL -->
     <dependencySet>
-      <!-- We don't really need JSP features (only EL implementation) but we keep the same folder and module name to
-           limit customizations -->
-      <outputDirectory>/jetty/lib/ee8-apache-jsp</outputDirectory>
+      <!-- We don't really need JSP features (only EL implementation) but we keep the same folder and module name to limit customizations -->
+      <outputDirectory>/jetty/lib/apache-jsp</outputDirectory>
       <includes>
         <include>org.mortbay.jasper:apache-el</include>
       </includes>
@@ -118,7 +117,7 @@
       </includes>
       <fileMode>755</fileMode>
     </fileSet>
-    <!-- Copy non-shell scripts -->
+    <!-- Copy non shell scripts -->
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>/</outputDirectory>

@@ -21,10 +21,14 @@
 # DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
-Adds the Jetty Plus JNDI support to the classpath.
+Enables Servlet 3.1 resource injection.
 
 [depend]
 server
+security
+jndi
+webapp
 
 [lib]
 lib/jetty-plus-${jetty.version}.jar
+lib/jakarta.transaction-api-*.jar

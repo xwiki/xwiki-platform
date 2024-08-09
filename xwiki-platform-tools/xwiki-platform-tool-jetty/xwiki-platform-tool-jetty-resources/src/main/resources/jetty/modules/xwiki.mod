@@ -38,7 +38,6 @@ ee8-websocket-javax
 ee8-websocket-jetty
 ee8-apache-jsp
 console-capture
-work
 
 [xml]
 etc/jetty-xwiki.xml

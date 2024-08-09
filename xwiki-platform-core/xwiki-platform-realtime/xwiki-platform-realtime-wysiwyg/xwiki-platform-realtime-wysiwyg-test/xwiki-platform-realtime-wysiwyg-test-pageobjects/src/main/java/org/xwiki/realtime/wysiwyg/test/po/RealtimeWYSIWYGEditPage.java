@@ -78,7 +78,18 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     {
         return this.allowRealtimeCheckbox.isSelected();
     }
-
+    
+    /**
+     * @return {code true} if it is possible to join or leave the editing session, {@code false} otherwise
+     * @since 15.10.12
+     * @since 16.4.2
+     * @since 16.7.0RC1
+     */
+    public boolean canToggleRealtimeEditing()
+    {
+        return this.allowRealtimeCheckbox.isEnabled();
+    }
+    
     /**
      * Leave the realtime editing session.
      */

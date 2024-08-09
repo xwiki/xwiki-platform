@@ -1427,6 +1427,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to source mode and check that we are not in the realtime session anymore.
         secondEditorToolbar.toggleSourceMode();
         assertFalse(secondEditPage.isRealtimeEditing());
+        assertFalse(secondEditPage.canToggleRealtimeEditing());
 
         // Check that we can still switch back to wysiwyg mode.
         assertTrue(secondEditorToolbar.canToggleSourceMode());
@@ -1456,6 +1457,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Check that the second user re-joined the realtime editing session.
         assertTrue(secondEditPage.isRealtimeEditing());
+        assertTrue(secondEditPage.canToggleRealtimeEditing());
         assertTrue(secondEditorToolbar.canToggleSourceMode());
         secondTextArea.waitUntilContentContains("four");
         assertEquals("one\ntwo\nthree\nfour", secondTextArea.getText());
@@ -1470,6 +1472,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondEditorToolbar.toggleSourceMode();
 
         assertFalse(secondEditPage.isRealtimeEditing());
+        assertFalse(secondEditPage.canToggleRealtimeEditing());
         // Check the contents of the source mode.
         assertEquals("one\n\ntwo\n\nthree\n\nfour", secondEditor.getSourceTextArea().getAttribute("value"));
 
@@ -1499,6 +1502,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Check that the second user did not re-join the realtime editing session.
         assertFalse(secondEditPage.isRealtimeEditing());
         assertTrue(secondEditorToolbar.canToggleSourceMode());
+        assertTrue(secondEditPage.canToggleRealtimeEditing());
         assertEquals("one\ntwo\nthree\nfour\nfive", secondTextArea.getText());
 
         // Join the realtime session again and wait to be in sync.
@@ -1515,12 +1519,27 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Switch to source mode and back to wysiwyg edit mode.
         secondEditorToolbar.toggleSourceMode();
         assertFalse(secondEditPage.isRealtimeEditing());
+        assertFalse(secondEditPage.canToggleRealtimeEditing());
         assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven",
             secondEditor.getSourceTextArea().getAttribute("value"));
         secondEditorToolbar.toggleSourceMode();
+        assertTrue(secondEditPage.canToggleRealtimeEditing());
 
         // Check that the second user did not re-join the realtime editing session.
         assertFalse(secondEditPage.isRealtimeEditing());
+        
+        // Switch to source mode and back to wysiwyg again.
+        // We should stay out of the realtime editing session.
+        secondEditorToolbar.toggleSourceMode();
+        assertFalse(secondEditPage.isRealtimeEditing());
+        assertFalse(secondEditPage.canToggleRealtimeEditing());
+        
+        assertEquals("one\n\ntwo\n\nthree\n\nfour\n\nsix\n\nseven",
+            secondEditor.getSourceTextArea().getAttribute("value"));
+        
+        secondEditorToolbar.toggleSourceMode();
+        assertFalse(secondEditPage.isRealtimeEditing());
+        assertTrue(secondEditPage.canToggleRealtimeEditing());
 
         // We keep the second user out of the realtime editing session now
         // and we do more tests with the first user.

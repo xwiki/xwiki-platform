@@ -20,10 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://eclipse.dev/jetty/configure_10_0.dtd">
 
 <!-- =============================================================== -->
-<!-- Attach the "ee8" environment app deployment provider            -->
+<!-- Create the deployment manager                                   -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- The deplyment manager handles the lifecycle of deploying web    -->
+<!-- applications. Apps are provided by instances of the             -->
+<!-- AppProvider interface.                                          -->
 <!-- =============================================================== -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
   <Call id="DeploymentManager" name="getBean">
@@ -38,7 +42,7 @@
   <Ref refid="DeploymentManager">
     <Call name="addAppProvider">
       <Arg>
-        <New id="WebAppProvider-ee8" class="org.eclipse.jetty.deploy.providers.ContextProvider">
+        <New id="WebAppProvider" class="org.eclipse.jetty.deploy.providers.ContextProvider">
           <Set name="EnvironmentName">ee8</Set>
           <Set name="monitoredDirName">
             <Call name="resolvePath" class="org.eclipse.jetty.xml.XmlConfiguration">

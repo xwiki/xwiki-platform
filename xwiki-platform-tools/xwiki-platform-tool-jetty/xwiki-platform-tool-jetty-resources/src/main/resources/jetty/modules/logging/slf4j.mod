@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://jetty.org/docs/index.html
+# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
 
 [description]
 Configures logging to use SLF4J.
@@ -35,5 +35,5 @@ slf4j
 lib/logging/slf4j-api-${slf4j.version}.jar
 
 [ini]
-slf4j.version?=2.0.13
-jetty.webapp.addHiddenClasses+=,org.slf4j.
+slf4j.version?=2.0.10
+jetty.webapp.addServerClasses+=,org.slf4j.

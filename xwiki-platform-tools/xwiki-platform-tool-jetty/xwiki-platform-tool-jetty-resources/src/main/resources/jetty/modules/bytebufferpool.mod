@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 Configures the ByteBufferPool used by ServerConnectors.
@@ -53,3 +53,6 @@ etc/jetty-bytebufferpool.xml
 
 ## Maximum direct memory held idle by the pool (0 for heuristic, -1 for unlimited).
 #jetty.byteBufferPool.maxDirectMemory=0
+
+## Whether statistics are enabled.
+#jetty.byteBufferPool.statisticsEnabled=false

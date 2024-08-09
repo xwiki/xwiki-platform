@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://eclipse.dev/jetty/configure_10_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
   <!-- ===================================================================== -->
@@ -36,7 +36,7 @@
           <Property name="jetty.sessionIdManager.workerName">
             <Default>node<Env name="JETTY_WORKER_INSTANCE">
                            <Default>
-                             <Env name="GAE_MODULE_INSTANCE">
+                             <Env name="GAE_INSTANCE" deprecated="GAE_MODULE_INSTANCE">
                                <Default>0</Default>
                              </Env>
                            </Default>

@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 Enables Annotation scanning for deployed web applications.
@@ -30,9 +30,17 @@ ee8
 plus
 ee8-plus
 
+[ini]
+ee8.asm.version?=9.7
+ee8.jakarta.annotation.api.version?=1.3.5
+
 [lib]
 lib/jetty-ee8-annotations-${jetty.version}.jar
-lib/ee8-annotations/*.jar
+lib/ee8-annotations/asm-${ee8.asm.version}.jar
+lib/ee8-annotations/asm-analysis-${ee8.asm.version}.jar
+lib/ee8-annotations/asm-commons-${ee8.asm.version}.jar
+lib/ee8-annotations/asm-tree-${ee8.asm.version}.jar
+lib/ee8-annotations/jakarta.annotation-api-${ee8.jakarta.annotation.api.version}.jar
 
 [jpms]
 add-modules:org.objectweb.asm

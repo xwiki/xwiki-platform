@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-macro</artifactId>
-    <version>16.4.2</version>
+    <version>16.4.3-SNAPSHOT</version>
   </parent>
   <name>XWiki Platform - Notifications - Macro - UI</name>
   <artifactId>xwiki-platform-notifications-macro-ui</artifactId>

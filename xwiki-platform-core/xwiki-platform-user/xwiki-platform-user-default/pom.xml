@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>16.4.2</version>
+    <version>16.4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-default</artifactId>
   <name>XWiki Platform - User - Default</name>

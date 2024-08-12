@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-requiredrights</artifactId>
-    <version>16.4.2</version>
+    <version>16.4.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-requiredrights-test</artifactId>
   <name>XWiki Platform - Security - Required Rights - Tests - Parent POM</name>

@@ -115,7 +115,7 @@ define('xwiki-realtime-wysiwyg', [
 
       // Notify the others that we're editing in realtime.
       this._realtimeContext.setRealtimeEnabled(true);
-  
+
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
         if (this._connection.status === ConnectionStatus.CONNECTED) {

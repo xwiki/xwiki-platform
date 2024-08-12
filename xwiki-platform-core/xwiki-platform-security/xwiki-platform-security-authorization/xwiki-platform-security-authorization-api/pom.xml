@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-authorization</artifactId>
-    <version>16.4.2-SNAPSHOT</version>
+    <version>16.4.2</version>
   </parent>
   <artifactId>xwiki-platform-security-authorization-api</artifactId>
   <name>XWiki Platform - Security - Authorization - API</name>

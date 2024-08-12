@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.4.2-SNAPSHOT</version>
+    <version>16.4.2</version>
   </parent>
   <artifactId>xwiki-platform-sandbox</artifactId>
   <name>XWiki Platform - Sandbox Application</name>

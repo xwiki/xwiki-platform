@@ -20,7 +20,7 @@
 (function() {
   'use strict';
   var $ = jQuery;
-  
+
   // Declare the configuration namespace.
   CKEDITOR.config['xwiki-realtime'] = CKEDITOR.config['xwiki-realtime'] || {
     __namespace: true
@@ -267,7 +267,7 @@
 
   function preserveSpaceCharAtTheEndOfLine(editor) {
     editor.on('beforeGetData', () => {
-      const range = editor.getSelection()?.getRanges()[0];
+      const range = !editor.isDetached() && editor.getSelection()?.getRanges()[0];
       const textNode = range?.startContainer;
       // Check if the caret is at the end of a text node that ends with a space and is followed by a line break.
       if (editor.mode === 'wysiwyg' && range?.collapsed && textNode.type === CKEDITOR.NODE_TEXT &&
@@ -313,7 +313,7 @@
       return new Promise((resolve, reject) => {
         require(['xwiki-realtime-wysiwyg'], RealtimeWysiwygEditor => {
           editor._realtime = new RealtimeWysiwygEditor(new Adapter(editor, CKEDITOR), realtimeContext);
-  
+
           // When someone is offline, they may have left their tab open for a long time and the lock may have
           // disappeared. We're refreshing it when the editor is focused so that other users will know that someone is
           // editing the document.
@@ -324,6 +324,8 @@
           resolve(editor._realtime);
         }, reject);
       });
+    }, (error) => {
+      console.debug(`Realtime editing is disabled for [${info.field}] field because: ${error}`);
     });
   }
 })();

@@ -25,6 +25,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.JavaVersion;
@@ -74,6 +76,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
     private static final String ROOT_USER = "root";
+
+    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -206,10 +210,32 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
         this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");
 
+        // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
+        // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
+        if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
+            this.servletContainer.setCommand("--module=ee8-webapp,ee8-deploy,ee8-jstl");
+        }
+
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
         // socket (otherwise we can't manage the Docker containers from within XWiki, which is a use case for the PDF
         // export application).
         this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
+    }
+
+    private int extractJettyVersionFromDockerTag(String tag)
+    {
+        int result = 12;
+        if (tag != null) {
+            Matcher matcher = MAJOR_VERSION.matcher(tag);
+            if (matcher.find()) {
+                try {
+                    result = Integer.valueOf(matcher.group());
+                } catch (NumberFormatException e) {
+                    // On error consider we're on Jetty 12
+                }
+            }
+        }
+        return result;
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception

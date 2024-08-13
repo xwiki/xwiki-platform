@@ -192,17 +192,11 @@
               <linkTarget>/var/lib/xwiki/tmp</linkTarget>
             </data>
 
-            <!-- Custom Jetty context configuration -->
+            <!-- Be more explicit about which configuration file is used by XJetty -->
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
-              <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
-            </data>
-            <data>
-              <type>link</type>
-              <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee8-web.xml</linkName>
+              <linkName>/usr/lib/xwiki/WEB-INF/xjetty-web.xml</linkName>
               <linkTarget>/etc/xwiki/jetty-ee8-web.xml</linkTarget>
             </data>
           </dataSet>

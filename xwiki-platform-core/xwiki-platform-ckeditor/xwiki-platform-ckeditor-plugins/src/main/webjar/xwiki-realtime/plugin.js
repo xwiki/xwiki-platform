@@ -79,13 +79,7 @@
       const editor = event.editor;
       const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
 
-      if (editor.mode === 'source') {
-        realtimeCheckbox.prop('disabled', true);
-      }
-
-      if (editor.mode === 'wysiwyg') {
-        realtimeCheckbox.prop('disabled', false);
-      }
+      realtimeCheckbox.prop('disabled', editor.mode !== 'wysiwyg');
     },
 
     beforeSetMode: function(event) {

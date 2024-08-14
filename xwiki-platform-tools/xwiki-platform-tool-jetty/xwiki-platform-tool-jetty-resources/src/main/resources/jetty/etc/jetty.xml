@@ -84,7 +84,10 @@
       <Set name="maxErrorDispatches" property="jetty.httpConfig.maxErrorDispatches"/>
       <Set name="persistentConnectionsEnabled" property="jetty.httpConfig.persistentConnectionsEnabled"/>
       <Set name="httpCompliance"><Call class="org.eclipse.jetty.http.HttpCompliance" name="from"><Arg><Property name="jetty.httpConfig.compliance" deprecated="jetty.http.compliance" default="RFC7230"/></Arg></Call></Set>
-      <Set name="uriCompliance"><Call class="org.eclipse.jetty.http.UriCompliance" name="from"><Arg><Property name="jetty.httpConfig.uriCompliance" default="DEFAULT"/></Arg></Call></Set>
+      <!-- TODO: Put back <Property name="jetty.httpConfig.uriCompliance" default="DEFAULT"/> instead of
+           RFC3986,AMBIGUOUS_PATH_ENCODING when we understand how to pass that value from xwiki.ini again.
+           See https://github.com/jetty/jetty.project/issues/12162 -->
+      <Set name="uriCompliance"><Call class="org.eclipse.jetty.http.UriCompliance" name="from"><Arg>RFC3986,AMBIGUOUS_PATH_ENCODING</Arg></Call></Set>
       <Set name="requestCookieCompliance"><Call class="org.eclipse.jetty.http.CookieCompliance" name="from"><Arg><Property name="jetty.httpConfig.requestCookieCompliance" default="RFC6265"/></Arg></Call></Set>
       <Set name="responseCookieCompliance"><Call class="org.eclipse.jetty.http.CookieCompliance" name="from"><Arg><Property name="jetty.httpConfig.responseCookieCompliance" default="RFC6265"/></Arg></Call></Set>
       <Set name="relativeRedirectAllowed"><Property name="jetty.httpConfig.relativeRedirectAllowed" default="false"/></Set>

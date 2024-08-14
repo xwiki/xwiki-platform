@@ -56,6 +56,13 @@
       <artifactId>commons-io</artifactId>
       <optional>true</optional>
     </dependency>
+    <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
+         by jetty is referenced in its mod files. -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.13</version>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>

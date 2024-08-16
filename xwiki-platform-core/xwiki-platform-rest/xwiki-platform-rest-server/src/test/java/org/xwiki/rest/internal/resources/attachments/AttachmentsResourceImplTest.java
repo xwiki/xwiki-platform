@@ -65,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -152,6 +153,8 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             new Object[] {"Path.To", "Page", "1.3", textAttachment},
             new Object[] {"Path.To", "Page", "1.3", imageAttachment});
         when(query.execute()).thenReturn(results);
+
+        when(this.authorization.hasAccess(same(Right.VIEW), any())).thenReturn(true);
 
         DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
         when(this.defaultSpaceReferenceResover.resolve(eq("Path.To"), any()))

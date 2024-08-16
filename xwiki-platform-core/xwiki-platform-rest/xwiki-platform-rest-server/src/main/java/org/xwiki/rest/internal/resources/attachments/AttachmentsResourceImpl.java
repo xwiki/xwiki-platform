@@ -47,7 +47,6 @@ import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
@@ -61,9 +60,6 @@ import com.xpn.xwiki.api.Document;
 public class AttachmentsResourceImpl extends BaseAttachmentsResource implements AttachmentsResource
 {
     private static final String NAME = "name";
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
 
     @Override
     public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,

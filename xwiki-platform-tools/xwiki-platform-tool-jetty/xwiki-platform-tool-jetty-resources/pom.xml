@@ -40,11 +40,7 @@
 
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
-    <jetty.version>12.0.12</jetty.version>
-    <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
-         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
-         version here. -->
-    <jetty.slf4j.version>2.0.13</jetty.slf4j.version>
+    <jetty.version>${jetty.server.version}</jetty.version>
   </properties>
   <dependencies>
     <dependency>
@@ -64,7 +60,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${jetty.slf4j.version}</version>
+      <version>${jetty.server.slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

@@ -32,7 +32,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -57,6 +56,8 @@ import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiUser;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Default implementation for {@link AuthenticationFailureManager}.
@@ -134,8 +135,8 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         this.failureStrategyList = new LinkedList<>();
         for (String failureStrategyName : this.failureStrategyNames) {
             try {
-                this.failureStrategyList.add(this.componentManager.getInstance(AuthenticationFailureStrategy.class,
-                    failureStrategyName));
+                this.failureStrategyList
+                    .add(this.componentManager.getInstance(AuthenticationFailureStrategy.class, failureStrategyName));
             } catch (ComponentLookupException e) {
                 logger.error("Error while getting authentication failure strategy [{}]. ", failureStrategyName, e);
             }
@@ -156,9 +157,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     {
         // historically the feature was considered as disabled if max attempts = 0, max time = 0 or the strategy list
         // was empty. We keep that as possible way to say it's disabled.
-        return configuration.isAuthenticationSecurityEnabled()
-            && getMaxNbAttempts() != 0
-            && getMaxTime() != 0
+        return configuration.isAuthenticationSecurityEnabled() && getMaxNbAttempts() != 0 && getMaxTime() != 0
             && !getFailureStrategyList().isEmpty();
     }
 
@@ -169,9 +168,9 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     }
 
     /**
-     * Determine which username we should skip.
-     * We don't handle empty usernames to avoid triggering the security mechanism for nothing and having unexpected
-     * behaviours.
+     * Determine which username we should skip. We don't handle empty usernames to avoid triggering the security
+     * mechanism for nothing and having unexpected behaviours.
+     * 
      * @param username the username to check.
      * @return {@code true} if the username is empty.
      */
@@ -350,14 +349,14 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     }
 
     /**
-     * This class aims at storing the authentication failure record information about a login.
-     * It only stores the first failing date and the number of failing attempts since then.
-     * Those two are resetted if another failure happens outside of the given time window.
-     * (See {@link AuthenticationConfiguration#getTimeWindow()})
+     * This class aims at storing the authentication failure record information about a login. It only stores the first
+     * failing date and the number of failing attempts since then. Those two are resetted if another failure happens
+     * outside of the given time window. (See {@link AuthenticationConfiguration#getTimeWindow()})
      */
     class AuthFailureRecord
     {
         private long firstFailingDate;
+
         private int nbAttempts;
 
         AuthFailureRecord()
@@ -374,12 +373,12 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
                 this.firstFailingDate = new Date().getTime();
                 this.nbAttempts++;
 
-            // If the threshold not reached yet and we're out of the time window, we can reset the data.
+                // If the threshold not reached yet and we're out of the time window, we can reset the data.
             } else if (firstFailingDate + getMaxTime() < new Date().getTime()) {
                 this.firstFailingDate = new Date().getTime();
                 this.nbAttempts = 1;
 
-            // Else the threshold not reached but we are in the time window: we increment the number of attempts.
+                // Else the threshold not reached but we are in the time window: we increment the number of attempts.
             } else {
                 this.nbAttempts++;
             }

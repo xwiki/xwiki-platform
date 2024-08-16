@@ -30,12 +30,17 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.xwiki.container.Container;
+
 /**
  * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
  * context. This trick is used in to give a daemon thread access to the XWiki api.
  *
  * @version $Id$
+ * @deprecated use the {@link Container} API instead
  */
+// TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
+//@Deprecated(since = "42.0.0")
 public class XWikiServletResponseStub implements XWikiResponse
 {
     private OutputStream outputStream;

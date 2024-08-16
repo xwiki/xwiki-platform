@@ -232,7 +232,7 @@ class BrowserPDFPrinterTest
     void navigate() throws Exception
     {
         URL url = new URL("http://xwiki.org");
-        when(this.browserTab.navigate(url, null, false, 60)).thenReturn(true);
+        when(this.browserTab.navigate(url, (jakarta.servlet.http.Cookie[]) null, false, 60)).thenReturn(true);
         assertTrue(this.browserTab.navigate(url));
     }
 }

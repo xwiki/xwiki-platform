@@ -190,6 +190,7 @@ public class CommentAddAction extends XWikiAction
         }
     }
 
+    @Deprecated(since = "42.0.0")
     protected void handleTemporaryUploadedFiles(XWikiDocument document, XWikiRequest request) throws XWikiException
     {
         String[] uploadedFiles = request.getParameterValues("uploadedFiles");

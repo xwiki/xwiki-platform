@@ -19,10 +19,10 @@
  */
 package org.xwiki.websocket.internal;
 
-import javax.websocket.CloseReason;
-import javax.websocket.MessageHandler;
-import javax.websocket.RemoteEndpoint.Basic;
-import javax.websocket.Session;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.RemoteEndpoint.Basic;
+import jakarta.websocket.Session;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

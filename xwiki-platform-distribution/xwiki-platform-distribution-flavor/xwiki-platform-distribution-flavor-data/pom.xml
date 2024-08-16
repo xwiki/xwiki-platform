@@ -209,18 +209,6 @@
               <artifactId>xwiki-platform-notifications-preferences-default</artifactId>
               <version>${project.version}</version>
             </dependency>
-            <!-- We need the Servlet API dep since it's used by the Packager and since it has
-                 a provided scope in XWiki core it's not inherited as part of transitive deps -->
-            <dependency>
-              <groupId>javax.servlet</groupId>
-              <artifactId>javax.servlet-api</artifactId>
-              <version>${servlet.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.mortbay.jasper</groupId>
-              <artifactId>apache-el</artifactId>
-              <version>${apachache-el.version}</version>
-            </dependency>
             <!-- Ratings API has a migrator to migrate old Ratings xobjects to the new store -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>

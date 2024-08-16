@@ -83,9 +83,13 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
 
         // It's safe to overwrite the following bindings because they don't have a real state. Moreover the request and
         // the response objects from the XWiki context can be replaced so the script bindings have to be synchronized.
-        scriptContext.setAttribute("request", new ScriptXWikiServletRequest(xcontext.getRequest(), this.authorization),
-            ScriptContext.ENGINE_SCOPE);
-        scriptContext.setAttribute("response", xcontext.getResponse(), ScriptContext.ENGINE_SCOPE);
+        if (xcontext.getRequest() != null) {
+            scriptContext.setAttribute("request",
+                new ScriptXWikiServletRequest(xcontext.getRequest(), this.authorization), ScriptContext.ENGINE_SCOPE);
+        }
+        if (xcontext.getResponse() != null) {
+            scriptContext.setAttribute("response", xcontext.getResponse(), ScriptContext.ENGINE_SCOPE);
+        }
 
         // Current document
         Document docAPI = null;

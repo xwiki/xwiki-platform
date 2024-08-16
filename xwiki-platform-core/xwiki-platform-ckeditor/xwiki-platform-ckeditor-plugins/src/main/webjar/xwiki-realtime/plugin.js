@@ -69,7 +69,17 @@
           previousValue: null
         };
         editor.on('beforeSetMode', this.beforeSetMode.bind(this));
+        editor.on('mode', this.mode.bind(this));
       });
+    },
+
+    mode: function(event) {
+      // The user should not be able to join the realtime editing session while in source mode.
+      // We disable the allow realtime checkbox while in source mode, and enable it when we go back to wysiwyg.
+      const editor = event.editor;
+      const realtimeCheckbox = editor._realtimeInterface.getAllowRealtimeCheckbox();
+
+      realtimeCheckbox.prop('disabled', editor.mode !== 'wysiwyg');
     },
 
     beforeSetMode: function(event) {

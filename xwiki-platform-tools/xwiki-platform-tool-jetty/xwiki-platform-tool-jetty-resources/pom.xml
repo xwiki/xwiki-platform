@@ -41,6 +41,7 @@
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
     <jetty.version>${jetty.server.version}</jetty.version>
+    <slf4j.version>${jetty.server.slf4j.version}</slf4j.version>
   </properties>
   <dependencies>
     <dependency>
@@ -54,13 +55,6 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <optional>true</optional>
-    </dependency>
-    <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
-         by jetty is referenced in its mod files. -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${jetty.server.slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

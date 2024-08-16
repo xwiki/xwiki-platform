@@ -19,22 +19,27 @@
  */
 package org.xwiki.container.servlet;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestEvent;
+import jakarta.servlet.ServletRequestListener;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Make threads names created by the application server more meaningful.
+ * Make threads names created by the application server more meaningful. TODO When it will be possible it would be
+ * better to do this a component like a RequestInitializer component to work for any kind of container. Right now
+ * component can't really access the initial URL.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
- * TODO When it will be possible it would be better to do this a component like a RequestInitializer component to work
- *      for any kind of container. Right now component can't really access the initial URL.
  * @version $Id$
- * @since 2.0M3
+ * @since 42.0.0
  */
 public class SetThreadNameServletRequestListener implements ServletRequestListener
 {
-    /** The name of the servlet request attribute holding the original name of the processing thread. */
+    /**
+     * The name of the servlet request attribute holding the original name of the processing thread.
+     */
     private static final String ORIGINAL_THREAD_NAME_ATTRIBUTE = "xwiki.thread.originalName";
 
     @Override
@@ -42,9 +47,7 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
     {
         ServletRequest servletRequest = sre.getServletRequest();
 
-        if (servletRequest instanceof HttpServletRequest) {
-            HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-
+        if (servletRequest instanceof HttpServletRequest httpServletRequest) {
             String threadName = httpServletRequest.getRequestURL().toString();
 
             if (httpServletRequest.getQueryString() != null) {
@@ -65,8 +68,7 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
     public void requestDestroyed(ServletRequestEvent sre)
     {
         ServletRequest servletRequest = sre.getServletRequest();
-        if (servletRequest instanceof HttpServletRequest) {
-            HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+        if (servletRequest instanceof HttpServletRequest httpServletRequest) {
             Thread.currentThread().setName("" + httpServletRequest.getAttribute(ORIGINAL_THREAD_NAME_ATTRIBUTE));
         }
     }

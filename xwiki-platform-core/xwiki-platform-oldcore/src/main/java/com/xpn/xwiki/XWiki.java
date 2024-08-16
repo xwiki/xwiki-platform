@@ -1131,6 +1131,7 @@ public class XWiki implements EventListener
         return entityResourceReference;
     }
 
+    @Deprecated(since = "42.0.0")
     public static URL getRequestURL(XWikiRequest request) throws XWikiException
     {
         return HttpServletUtils.getSourceURL(request);
@@ -3229,6 +3230,7 @@ public class XWiki implements EventListener
      * @return A list of language codes, in the client preference order; might be empty if the header is not well
      *         formed.
      */
+    @Deprecated(since = "42.0.0")
     private List<String> getAcceptedLanguages(XWikiRequest request)
     {
         List<String> result = new ArrayList<String>();
@@ -5727,6 +5729,7 @@ public class XWiki implements EventListener
     /**
      * @since 2.3M1
      */
+    @Deprecated(since = "42.0.0")
     public DocumentReference getDocumentReference(XWikiRequest request, XWikiContext context)
     {
         DocumentReference reference;
@@ -5793,6 +5796,7 @@ public class XWiki implements EventListener
         return path.substring(segment.length());
     }
 
+    @Deprecated(since = "42.0.0")
     public boolean prepareDocuments(XWikiRequest request, XWikiContext context, VelocityContext vcontext)
         throws XWikiException
     {

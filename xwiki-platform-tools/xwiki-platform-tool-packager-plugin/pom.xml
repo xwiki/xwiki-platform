@@ -148,8 +148,8 @@
     <!-- We need the Servlet API dep since it's used by the Packager and since it has
          a provided scope in XWiki core it's not inherited as part of transitive deps -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
 

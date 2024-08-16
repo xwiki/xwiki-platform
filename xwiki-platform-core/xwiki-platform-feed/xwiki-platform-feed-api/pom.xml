@@ -59,6 +59,7 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

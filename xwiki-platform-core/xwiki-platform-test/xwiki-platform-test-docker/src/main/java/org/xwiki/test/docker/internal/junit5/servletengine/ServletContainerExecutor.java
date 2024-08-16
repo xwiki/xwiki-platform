@@ -269,9 +269,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         catalinaOpts.add("-Xmx1024m");
         catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
         catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
-        catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
 
-        // Note: Tomcat 9.x automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
+        // Note: Tomcat automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
         // need to add them as we do for Jetty.
         // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
 
@@ -372,7 +371,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
         // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
         return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
-            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
+            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "10-jdk17" : LATEST);
     }
 
     private GenericContainer<?> createServletContainer() throws Exception

@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

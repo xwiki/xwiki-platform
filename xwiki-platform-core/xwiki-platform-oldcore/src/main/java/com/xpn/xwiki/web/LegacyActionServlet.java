@@ -23,11 +23,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -39,12 +34,20 @@ import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.internal.web.LegacyAction;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 /**
  * Executed the right right action depending on the XWiki configuration (for example leading to view action by default
  * if enabled, etc.).
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
- * @since 13.0
+ * @since 42.0.0
  */
 public class LegacyActionServlet extends HttpServlet
 {

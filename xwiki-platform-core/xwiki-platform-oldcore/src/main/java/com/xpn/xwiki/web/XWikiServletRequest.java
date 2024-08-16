@@ -25,6 +25,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.xwiki.container.Request;
 import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.util.Util;
@@ -34,9 +35,10 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
+@Deprecated(since = "42.0.0")
 public class XWikiServletRequest extends HttpServletRequestWrapper implements XWikiRequest
 {
-    public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = XWikiRequest.class.getName() + "#effectiveAuthor";
+    public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = Request.ATTRIBUTE_EFFECTIVE_AUTHOR;
 
     public XWikiServletRequest(HttpServletRequest request)
     {

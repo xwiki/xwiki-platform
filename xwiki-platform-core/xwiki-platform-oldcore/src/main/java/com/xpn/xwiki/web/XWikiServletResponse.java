@@ -19,23 +19,13 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.url.URLSecurityManager;
-
+@Deprecated(since = "42.0.0")
 public class XWikiServletResponse extends HttpServletResponseWrapper implements XWikiResponse
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);
-
     public XWikiServletResponse(HttpServletResponse response)
     {
         super(response);
@@ -45,31 +35,6 @@ public class XWikiServletResponse extends HttpServletResponseWrapper implements 
     public HttpServletResponse getHttpServletResponse()
     {
         return (HttpServletResponse) getResponse();
-    }
-
-    @Override
-    public void sendRedirect(String redirect) throws IOException
-    {
-        if (!StringUtils.isBlank(redirect)) {
-            URI uri;
-            try {
-                uri = getURLSecurityManager().parseToSafeURI(redirect);
-                getHttpServletResponse().sendRedirect(uri.toString());
-            } catch (URISyntaxException | SecurityException e) {
-                LOGGER.warn(
-                    "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
-                        + "If the request was legitimate, please check the URL security configuration. You "
-                        + "might need to add the domain related to this request in the list of trusted domains in "
-                        + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
-                    redirect);
-                LOGGER.debug("Original error preventing the redirect: ", e);
-            }
-        }
-    }
-
-    private URLSecurityManager getURLSecurityManager()
-    {
-        return Utils.getComponent(URLSecurityManager.class);
     }
 
     public void addCookie(String cookieName, String cookieValue, int age)

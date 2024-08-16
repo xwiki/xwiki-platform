@@ -57,6 +57,8 @@
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>

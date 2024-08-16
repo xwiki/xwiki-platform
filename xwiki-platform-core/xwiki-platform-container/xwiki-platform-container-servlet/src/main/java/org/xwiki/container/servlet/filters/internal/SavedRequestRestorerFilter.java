@@ -27,15 +27,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
@@ -61,8 +61,12 @@ import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
  * safe as a session is, and it will not be available after the session is invalidated. Another consequence is that only
  * HTTP requests are saved.
  * </p>
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
+ * @since 42.0.0
  */
 public class SavedRequestRestorerFilter implements Filter
 {
@@ -156,7 +160,6 @@ public class SavedRequestRestorerFilter implements Filter
          * @return an immutable Map containing parameter names as keys and parameter values as map values
          * @see javax.servlet.ServletRequest#getParameterMap()
          */
-        @SuppressWarnings("unchecked")
         @Override
         public Map<String, String[]> getParameterMap()
         {
@@ -191,13 +194,13 @@ public class SavedRequestRestorerFilter implements Filter
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-        ServletException
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException
     {
         ServletRequest filteredRequest = request;
         // This filter works only for HTTP requests, because they are the only ones with a session.
         if (request instanceof HttpServletRequest
-                && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
+            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
             // Get the saved request, if any (returns null if not applicable)
             SavedRequest savedRequest = getSavedRequest((HttpServletRequest) request);
             // Merge the new and the saved request

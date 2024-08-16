@@ -23,19 +23,24 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.xwiki.wysiwyg.filter.MutableServletRequest;
+import org.xwiki.wysiwyg.internal.filter.http.JavaxToJakartaMutableHttpServletRequest;
 
 /**
- * Simple POJO holding the result of a conversion performed with {@link RequestParameterConverter}.
- * More specifically this class contains a mutable request, resulting of the conversion, a map of errors that might have
- * occurred during the conversion for each parameter, and a map of the output of the conversion for each parameter.
+ * Simple POJO holding the result of a conversion performed with {@link RequestParameterConverter}. More specifically
+ * this class contains a mutable request, resulting of the conversion, a map of errors that might have occurred during
+ * the conversion for each parameter, and a map of the output of the conversion for each parameter.
  *
  * @version $Id$
  * @since 14.10
+ * @deprecated use {@link JakartaRequestParameterConversionResult} instead
  */
+@Deprecated(since = "42.0.0")
 public class RequestParameterConversionResult
 {
     private MutableServletRequest request;
+
     private Map<String, Throwable> errors;
+
     private Map<String, String> output;
 
     /**
@@ -48,6 +53,19 @@ public class RequestParameterConversionResult
         this.request = request;
         this.errors = new LinkedHashMap<>();
         this.output = new LinkedHashMap<>();
+    }
+
+    /**
+     * Default constructor.
+     *
+     * @param result the jakarta result to copy
+     * @since 42.0.0
+     */
+    public RequestParameterConversionResult(JakartaRequestParameterConversionResult result)
+    {
+        this.request = new JavaxToJakartaMutableHttpServletRequest(result.getRequest());
+        this.errors = result.getErrors();
+        this.output = result.getOutput();
     }
 
     /**

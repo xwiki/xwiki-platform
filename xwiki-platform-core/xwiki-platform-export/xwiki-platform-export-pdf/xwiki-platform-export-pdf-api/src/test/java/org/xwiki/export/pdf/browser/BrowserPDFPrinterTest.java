@@ -234,7 +234,7 @@ class BrowserPDFPrinterTest
         when(this.request.getHeader("X-Forwarded-Proto")).thenReturn("ftp");
 
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
-        when(this.browserTab.navigate(browserPrintPreviewURL, null, true, 30)).thenReturn(true);
+        when(this.browserTab.navigate(browserPrintPreviewURL, (Cookie[]) null, true, 30)).thenReturn(true);
 
         this.printer.print(printPreviewURL);
 
@@ -261,7 +261,7 @@ class BrowserPDFPrinterTest
     void navigate() throws Exception
     {
         URL url = new URL("http://xwiki.org");
-        when(this.browserTab.navigate(url, null, false, 60)).thenReturn(true);
+        when(this.browserTab.navigate(url, (jakarta.servlet.http.Cookie[]) null, false, 60)).thenReturn(true);
         assertTrue(this.browserTab.navigate(url));
     }
 }

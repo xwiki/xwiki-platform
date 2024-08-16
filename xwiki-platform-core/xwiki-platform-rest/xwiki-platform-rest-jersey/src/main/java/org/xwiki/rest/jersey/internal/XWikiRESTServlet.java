@@ -21,11 +21,11 @@ package org.xwiki.rest.jersey.internal;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
 
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
@@ -37,9 +37,12 @@ import org.xwiki.component.manager.ComponentManager;
  * <ul>
  * <li>Injection of XWikiResource components</li>
  * </ul>
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 42.0.0
  */
 public class XWikiRESTServlet extends HttpServlet
 {

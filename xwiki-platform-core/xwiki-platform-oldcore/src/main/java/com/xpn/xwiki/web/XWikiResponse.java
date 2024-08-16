@@ -21,6 +21,11 @@ package com.xpn.xwiki.web;
 
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * @version $Id$
+ * @deprecated use {@link org.xwiki.container.Container} API instead
+ */
+@Deprecated(since = "42.0.0")
 public interface XWikiResponse extends HttpServletResponse
 {
     /**

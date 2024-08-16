@@ -29,13 +29,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.Request;
+import org.xwiki.container.servlet.HttpServletUtils;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.url.URLSecurityManager;
@@ -43,12 +46,10 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
- * Default implementation of {@link URLSecurityManager}.
- * This implementation keeps a HashSet in memory containing the trusted domains defined in the configuration and
- * for all subwikis. Use {@link #invalidateCache()} to compute back this hashset.
+ * Default implementation of {@link URLSecurityManager}. This implementation keeps a HashSet in memory containing the
+ * trusted domains defined in the configuration and for all subwikis. Use {@link #invalidateCache()} to compute back
+ * this hashset.
  *
  * @version $Id$
  * @since 13.3RC1
@@ -59,10 +60,12 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultURLSecurityManager implements URLSecurityManager
 {
     private static final char DOT = '.';
+
     private static final char PERCENT = '%';
 
     /**
      * Dedicated string used to escape {@code %} character.
+     * 
      * @see #parseToSafeURI(String)
      */
     private static final String PERCENT_ESCAPE = "__XWIKI_URL_SECURITY_PERCENT__";
@@ -83,13 +86,13 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
+    private Container container;
+
+    @Inject
     private Execution execution;
 
     @Inject
     private Logger logger;
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
 
     private Set<String> trustedDomains;
 
@@ -108,8 +111,9 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                 result.addAll(wikiDescriptor.getAliases());
             }
         } catch (WikiManagerException e) {
-            logger.warn("Error while getting wiki descriptor to fill list of trusted domains: [{}]. "
-                + "The subwikis won't be taken into account for the list of trusted domains.",
+            logger.warn(
+                "Error while getting wiki descriptor to fill list of trusted domains: [{}]. "
+                    + "The subwikis won't be taken into account for the list of trusted domains.",
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
@@ -120,18 +124,19 @@ public class DefaultURLSecurityManager implements URLSecurityManager
 
     private String getCurrentDomain()
     {
-        XWikiContext context = this.contextProvider.get();
-        if (context.getRequest() != null && context.getRequest().getHttpServletRequest() != null) {
-            String request = context.getRequest().getHttpServletRequest().getRequestURL().toString();
+        Request request = this.container.getRequest();
+        if (request instanceof ServletRequest servletRequest) {
             try {
-                URL requestURL = new URL(request);
-                return requestURL.getHost();
+                URL sourceBaseURL = HttpServletUtils.getSourceBaseURL(servletRequest.getRequest());
+
+                return sourceBaseURL.getHost();
             } catch (MalformedURLException e) {
                 // this should never happen
                 throw new RuntimeException(
-                    String.format("URL used to access the server is not a proper URL: [%s]", request));
+                    String.format("Failed to resolve the source URL: [%s]", servletRequest.getRequest().toString()), e);
             }
         }
+
         return "";
     }
 
@@ -152,8 +157,8 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                 }
             } while (!"".equals(host));
 
-            Object bypassCheckProperty = execution.getContext()
-                .getProperty(URLSecurityManager.BYPASS_DOMAIN_SECURITY_CHECK_CONTEXT_PROPERTY);
+            Object bypassCheckProperty =
+                execution.getContext().getProperty(URLSecurityManager.BYPASS_DOMAIN_SECURITY_CHECK_CONTEXT_PROPERTY);
             boolean bypassCheck = bypassCheckProperty != null && Boolean.parseBoolean(bypassCheckProperty.toString());
 
             if (bypassCheck) {
@@ -214,10 +219,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                 // it. Note that the scheme used here is only for building a proper URL for then checking domain:
                 // it's never actually used to perform any request.
                 if (!uri.isAbsolute()) {
-                    URI uriWithScheme = new URI("https",
-                        uri.getRawAuthority(),
-                        uri.getRawPath(),
-                        uri.getRawQuery(),
+                    URI uriWithScheme = new URI("https", uri.getRawAuthority(), uri.getRawPath(), uri.getRawQuery(),
                         uri.getRawFragment());
                     result = this.isDomainTrusted(uriWithScheme.toURL());
                 } else if (this.urlConfiguration.getTrustedSchemes().contains(uri.getScheme().toLowerCase())) {
@@ -248,12 +250,11 @@ public class DefaultURLSecurityManager implements URLSecurityManager
         } catch (URISyntaxException e) {
             // We don't try to repair URI if they use our internal marker to avoid mistakes.
             if (serializedURI.contains(PERCENT_ESCAPE)) {
-                throw new IllegalArgumentException(
-                    String.format("The given uri [%s] contains the string [%s] which is used internally "
+                throw new IllegalArgumentException(String.format(
+                    "The given uri [%s] contains the string [%s] which is used internally "
                         + "for performing escaping operations when trying to 'repair' a URI which cannot be parsed. "
                         + "Check the original error for repairing the URI or try to use a different marker.",
-                        serializedURI,
-                        PERCENT_ESCAPE), e);
+                    serializedURI, PERCENT_ESCAPE), e);
             }
             // Attempt repairing the invalid URI similar to org.eclipse.jetty.client.HttpRedirector#sanitize by
             // extracting the different parts and then passing them to the multi-argument constructor that quotes
@@ -279,8 +280,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
         if (this.isURITrusted(uri)) {
             return uri;
         } else {
-            throw new SecurityException(String.format("The given URI [%s] is not safe on this server.",
-                uri));
+            throw new SecurityException(String.format("The given URI [%s] is not safe on this server.", uri));
         }
     }
 
@@ -297,8 +297,8 @@ public class DefaultURLSecurityManager implements URLSecurityManager
      * replacement chain if and only if this {@code %} character belongs to a percent encoded byte.
      *
      * @param originalString the string to parse
-     * @return a string containing a replacement chain for all {@code %} characters not belonging to a percent
-     *         encoded byte
+     * @return a string containing a replacement chain for all {@code %} characters not belonging to a percent encoded
+     *         byte
      */
     private String replaceUnquotedPercent(String originalString)
     {
@@ -307,8 +307,8 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             char[] charArray = originalString.toCharArray();
             for (int i = 0; i < charArray.length; i++) {
                 char currentChar = charArray[i];
-                if ((currentChar == PERCENT) && (i < (charArray.length - 2))
-                    && isQuotedChar(charArray[i + 1]) && isQuotedChar(charArray[i + 2])) {
+                if ((currentChar == PERCENT) && (i < (charArray.length - 2)) && isQuotedChar(charArray[i + 1])
+                    && isQuotedChar(charArray[i + 2])) {
                     result.append(PERCENT_ESCAPE);
                 } else {
                     result.append(currentChar);
@@ -322,6 +322,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
 
     /**
      * Check if the given char belongs to the range of character that forms a percent encoded byte.
+     * 
      * @param nextChar the char to check if it belongs to the range
      * @return {@code true} if it belongs to the range
      */

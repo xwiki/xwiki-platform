@@ -48,8 +48,8 @@
     <!-- Needed to access the ServletContext in order to be able to use XWikiConfigurationService since when this
          module executes the XWiki object has not been initialized yet and thus we cannot use XWiki.Param(). -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -26,12 +26,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
-import javax.websocket.HandshakeResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.websocket.HandshakeResponse;
 
 import org.junit.jupiter.api.Test;
-
-import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,15 +57,13 @@ class XWikiWebSocketResponseStubTest
 
         stub.addCookie(new Cookie("foo", "bar"));
 
-        XWikiRequest request = mock(XWikiRequest.class);
         Cookie cookie = new Cookie("bar", "abc");
         cookie.setDomain("xwiki.org");
         cookie.setPath("/xwiki/websocket");
-        cookie.setMaxAge(3600);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
-        when(request.getCookie("bar")).thenReturn(cookie);
-        stub.removeCookie("bar", request);
+        cookie.setMaxAge(0);
+        stub.addCookie(cookie);
 
         stub.setDateHeader("datE", 1626247690000L);
         stub.addDateHeader("Date", 1212491130000L);

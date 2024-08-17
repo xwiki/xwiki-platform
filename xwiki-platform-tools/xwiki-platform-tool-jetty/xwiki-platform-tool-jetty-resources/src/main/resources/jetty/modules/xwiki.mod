@@ -21,9 +21,6 @@
 # This is the top level mod used when starting Jetty in start_xwiki.*
 # It's called with "--module=xwiki" on the command line to start Jetty.
 
-[environment]
-ee8
-
 [depend]
 ext
 resources

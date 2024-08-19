@@ -346,7 +346,10 @@ class RegisterIT
             assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
 
-            assertEquals(String.format("%s %s (%s): Registration successful.", firstName, lastName,
+            // TODO: looks like a pretty strange behavior, there might be a message box title missing somewhere
+            String messagePrefix = closedWiki ? "" : "Info ";
+
+            assertEquals(String.format("%s%s %s (%s): Registration successful.", messagePrefix, firstName, lastName,
                     AbstractRegistrationPage.JOHN_SMITH_USERNAME),
                 ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
         }

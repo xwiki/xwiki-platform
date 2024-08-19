@@ -194,7 +194,7 @@ public final class HttpServletUtils
         // Ask the application server (we don't start with that because it's very often wrong or badly configured
         // behind an HTTP proxy...)
         StringBuffer buffer = request.getRequestURL();
-        if (buffer != null && !buffer.isEmpty()) {
+        if (buffer != null && buffer.length() > 0) {
             String requestURLString = buffer.toString();
             try {
                 URL requestURL = new URL(requestURLString);

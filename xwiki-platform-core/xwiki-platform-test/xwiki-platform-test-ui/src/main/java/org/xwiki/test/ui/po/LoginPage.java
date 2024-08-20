@@ -84,7 +84,7 @@ public class LoginPage extends ViewPage
 
     public boolean hasInvalidCredentialsErrorMessage()
     {
-        return getErrorMessages().contains("Error\nInvalid credentials");
+        return getErrorMessages().contains("Invalid credentials");
     }
 
     /**
@@ -92,7 +92,7 @@ public class LoginPage extends ViewPage
      */
     public boolean hasCaptchaErrorMessage()
     {
-        return getErrorMessages().contains("Error\nPlease fill the captcha form to login.");
+        return getErrorMessages().contains("Please fill the captcha form to login.");
     }
 
     /**
@@ -101,7 +101,7 @@ public class LoginPage extends ViewPage
     public String getErrorMessages()
     {
         StringBuilder messages = new StringBuilder();
-        for (WebElement element : getDriver().findElements(By.xpath("//div[@class='errormessage']"))) {
+        for (WebElement element : getDriver().findElements(By.xpath("//div[@class='box errormessage']"))) {
             messages.append(element.getText());
         }
         return messages.toString();

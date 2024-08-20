@@ -473,12 +473,18 @@ public class HtmlPackager
     private static void addSkinToZip(String skinName, ZipOutputStream out, Collection<String> exportedSkinFiles,
         XWikiContext context) throws IOException
     {
-        File file = new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
+        // Protect against non-existing skins.
+        String realPath = context.getWiki().getEngineContext().getRealPath("/skins/" + skinName);
+        if (realPath != null) {
+            File file = new File(realPath);
 
-        // Don't include vm and LESS files by default
-        FileFilter filter = new NotFileFilter(new SuffixFileFilter(new String[] { ".vm", ".less", "skin.properties" }));
+            // Don't include vm and LESS files by default
+            FileFilter filter =
+                new NotFileFilter(new SuffixFileFilter(new String[]{ ".vm", ".less", "skin.properties" }));
 
-        addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR, exportedSkinFiles);
+            addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR,
+                exportedSkinFiles);
+        }
     }
 
     /**

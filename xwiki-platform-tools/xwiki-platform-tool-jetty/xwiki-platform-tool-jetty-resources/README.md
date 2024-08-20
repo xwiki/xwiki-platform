@@ -14,11 +14,10 @@ We brought the following changes from the default Jetty files obtained from the 
       jetty.deploy.scanInterval=0
       jetty.deploy.extractWars=false
       ```
-   1. Configure Jetty to use RFC3986 for URLs (Jetty 10.0.3+ has added a protection in URLs so that encoded characters 
-      such as % are prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
-      https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance):
+   1. Configure Jetty to use RFC3986 for URLs + allow for ambiguous elements in the URLs as XWiki currently needs 
+      them (see the doc in start.d/xwiki.ini).
       ```
-      jetty.httpConfig.uriCompliance=RFC3986
+      jetty.httpConfig.uriCompliance=RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR
       ``` 
 1. Addition of `etc/jetty-xwiki.xml` to print a message in the console when XWiki is started.
 1. Remove support for JSP (since XWiki doesn't use JSPs) by:

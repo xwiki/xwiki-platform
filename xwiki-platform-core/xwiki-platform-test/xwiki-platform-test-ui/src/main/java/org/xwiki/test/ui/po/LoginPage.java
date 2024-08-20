@@ -84,7 +84,7 @@ public class LoginPage extends ViewPage
 
     public boolean hasInvalidCredentialsErrorMessage()
     {
-        return getErrorMessages().contains("Invalid credentials");
+        return getErrorMessages().contains("Error:\nInvalid credentials");
     }
 
     /**
@@ -92,7 +92,7 @@ public class LoginPage extends ViewPage
      */
     public boolean hasCaptchaErrorMessage()
     {
-        return getErrorMessages().contains("Please fill the captcha form to login.");
+        return getErrorMessages().contains("Error:\nPlease fill the captcha form to login.");
     }
 
     /**

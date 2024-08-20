@@ -29,7 +29,6 @@ import org.junit.jupiter.api.TestInfo;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
@@ -44,14 +43,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.6RC1
  */
-@UITest(servletEngine = ServletEngine.TOMCAT, servletEngineTag = "9-jdk17")
-class LoginProtectionIT
+@UITest
+public class LoginProtectionIT
 {
     private static DocumentReference AUTHENTICATION_CONFIGURATION =
         new DocumentReference("xwiki", Arrays.asList("XWiki", "Authentication"), "Configuration");
 
     @BeforeAll
-    void setup(TestUtils setup)
+    public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
         setup.createPage(AUTHENTICATION_CONFIGURATION, "");
@@ -63,7 +62,7 @@ class LoginProtectionIT
     }
 
     @AfterAll
-    void tearDown(TestUtils setup)
+    public void tearDown(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
         setup.deletePage(AUTHENTICATION_CONFIGURATION);
@@ -74,7 +73,7 @@ class LoginProtectionIT
      */
     @Test
     @Order(1)
-    void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo, TestReference testReference,
+    public void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration)
     {
         // fixture:
@@ -135,8 +134,6 @@ class LoginProtectionIT
     @Order(2)
     void canLoginWhenSecurityIsDisabled(TestUtils setup)
     {
-        setup.forceGuestUser();
-
         LoginPage loginPage = LoginPage.gotoPage();
         loginPage.loginAs(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());

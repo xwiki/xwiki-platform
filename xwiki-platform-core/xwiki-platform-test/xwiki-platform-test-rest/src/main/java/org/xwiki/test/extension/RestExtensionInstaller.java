@@ -105,7 +105,6 @@ public class RestExtensionInstaller
         // Resolve the extensions versions if needed
         List<ExtensionId> resolvedExtensions = new ArrayList<>(extensions.size());
         for (ExtensionId extensionId : extensions) {
-            LOGGER.info("Getting extension id: {}", extensionId);
             String version;
             if (extensionId.getVersion() == null && this.mavenResolver != null) {
                 // TODO: search the version of the extension in the dependency tree
@@ -117,7 +116,6 @@ public class RestExtensionInstaller
             }
 
             resolvedExtensions.add(new ExtensionId(extensionId.getId(), version));
-            LOGGER.info("End getting extension id: {}", extensionId);
         }
 
         // Install the extensions
@@ -168,9 +166,7 @@ public class RestExtensionInstaller
 
         JobExecutor jobExecutor = new JobExecutor();
         JobRequest request = getModelFactory().toRestJobRequest(installRequest);
-        LOGGER.info("Job request: {}", request);
         jobExecutor.execute(InstallJob.JOBTYPE, request, xwikiRESTURL, credentials);
-        LOGGER.info("End job request: {}", request);
     }
 
     private ModelFactory getModelFactory() throws ComponentLookupException

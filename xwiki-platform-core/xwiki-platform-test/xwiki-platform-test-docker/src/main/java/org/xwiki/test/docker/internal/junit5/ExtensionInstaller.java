@@ -31,8 +31,6 @@ import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.extension.RestExtensionInstaller;
@@ -54,8 +52,6 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getXWikiURL;
  */
 public class ExtensionInstaller
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionInstaller.class);
-
     private static final String XAR = "xar";
 
     private static final String JAR = "jar";
@@ -105,9 +101,7 @@ public class ExtensionInstaller
      */
     public void installExtensions(String username, String password, String installUserReference) throws Exception
     {
-        LOGGER.info("Installing extensions for {}...", username);
         installExtensions(new UsernamePasswordCredentials(username, password), installUserReference, null);
-        LOGGER.info("... finished installing extensions for {}...", username);
     }
 
     /**
@@ -132,15 +126,12 @@ public class ExtensionInstaller
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones), since they're not been installed
         // in WEB-INF/lib.
-        LOGGER.info("Convert artifacts...");
         List<Artifact> extraArtifacts = this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
             this.testConfiguration.isResolveExtraJARs());
         this.mavenResolver.addCloverJAR(extraArtifacts);
-        LOGGER.info("Get distribution artifacts...");
         Collection<ArtifactResult> distributionArtifactResults =
             this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
         List<ExtensionId> distributionExtensionIds = new ArrayList<>();
-        LOGGER.info("Convert to extension ids...");
         for (ArtifactResult artifactResult : distributionArtifactResults) {
             Artifact artifact = artifactResult.getArtifact();
             ExtensionId extensionId = convertToExtensionId(artifact);
@@ -219,9 +210,7 @@ public class ExtensionInstaller
     public void installExtensions(Collection<ExtensionId> extensions, UsernamePasswordCredentials credentials,
         String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
-        LOGGER.info("REST call to provision extensions...");
         this.restExtensionInstaller.installExtensions(getXWikiURL(this.context), extensions, credentials,
             installUserReference, namespaces, failOnExist);
-        LOGGER.info("...end REST call to provision extensions");
     }
 }

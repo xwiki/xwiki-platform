@@ -208,7 +208,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
         // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
         // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
-        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
+        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");
 
         // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
         // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.

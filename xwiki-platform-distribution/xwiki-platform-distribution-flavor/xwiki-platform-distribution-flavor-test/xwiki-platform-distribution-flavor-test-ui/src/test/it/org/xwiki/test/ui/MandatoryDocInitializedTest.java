@@ -97,7 +97,7 @@ public class MandatoryDocInitializedTest extends AbstractTest
         + "    println \"     * \" + error;\n"
         + "  }\n"
         + "}\n"
-        + "{{/groovy}}"
+        + "{{/groovy}}";
 
     @Test
     public void docsAreInitialized() throws Exception

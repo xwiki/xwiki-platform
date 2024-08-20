@@ -39,7 +39,10 @@ import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
+import { CollaborationKit, User } from "../extensions/collaboration";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
+import CSaveStatus from "./c-save-status.vue";
+import CConnectionStatus from "./c-connection-status.vue";
 import { LinkSuggestService, name } from "@xwiki/cristal-link-suggest-api";
 import Link from "../extensions/link";
 import Markdown from "../extensions/markdown";
@@ -83,7 +86,17 @@ const viewRouterParams = {
   name: "view",
   params: { page: currentPageName.value },
 };
-const submit = async () => {
+const view = () => {
+  // Destroy the editor instance.
+  editor.value?.destroy();
+  // Navigate to view mode.
+  cristal?.getRouter().push(viewRouterParams);
+};
+const save = async (authors: User[]) => {
+  console.log(
+    "Saving changes made by: ",
+    authors.map((author) => author.name).join(", "),
+  );
   // TODO: html does not make any sense here.
   await cristal
     ?.getWikiConfig()
@@ -93,7 +106,43 @@ const submit = async () => {
       title.value,
       "html",
     );
-  cristal?.getRouter().push(viewRouterParams);
+};
+const submit = async () => {
+  await editor.value?.storage.cristalCollaborationKit.autoSaver.save();
+  view();
+};
+
+// TODO: Remove this when we add support for user authentication.
+const names = [
+  "Lea Thompson",
+  "Cyndi Lauper",
+  "Tom Cruise",
+  "Madonna",
+  "Jerry Hall",
+  "Joan Collins",
+  "Winona Ryder",
+  "Christina Applegate",
+  "Alyssa Milano",
+  "Molly Ringwald",
+  "Ally Sheedy",
+  "Debbie Harry",
+  "Olivia Newton-John",
+  "Elton John",
+  "Michael J. Fox",
+  "Axl Rose",
+  "Emilio Estevez",
+  "Ralph Macchio",
+  "Rob Lowe",
+  "Jennifer Grey",
+  "Mickey Rourke",
+  "John Cusack",
+  "Matthew Broderick",
+  "Justine Bateman",
+  "Lisa Bonet",
+];
+const randomName = () => names[Math.floor(Math.random() * names.length)];
+const currentUser = {
+  name: randomName(),
 };
 
 let editor: Ref<Editor | undefined> = ref(undefined);
@@ -112,10 +161,15 @@ async function loadEditor(page: PageData | undefined) {
     } catch (e) {
       console.debug(`[${name}] service not found`);
     }
+
     editor.value = new Editor({
       content: content.value || "",
       extensions: [
-        StarterKit,
+        StarterKit.configure({
+          // Disable the default history in order to use Collaboration's history management so that users undo / redo
+          // only their own changes.
+          history: false,
+        }),
         Placeholder.configure({
           placeholder: "Type '/' to show the available actions",
         }),
@@ -138,6 +192,11 @@ async function loadEditor(page: PageData | undefined) {
         }),
         Link.configure({
           openOnClick: "whenNotEditable",
+        }),
+        CollaborationKit.configure({
+          channel: currentPageName.value,
+          user: currentUser,
+          saveCallback: save,
         }),
       ],
     });
@@ -174,10 +233,19 @@ onUpdated(() => loadEditor(currentPage.value!));
         </div>
       </div>
       <form class="pagemenu" @submit="submit">
-        <x-btn size="small" variant="primary" @click="submit">Save</x-btn>
-        <router-link :to="viewRouterParams">
-          <x-btn size="small">Cancel</x-btn>
-        </router-link>
+        <div class="pagemenu-status">
+          <c-connection-status
+            v-if="editor"
+            :provider="editor.storage.cristalCollaborationKit.provider"
+          ></c-connection-status>
+          <c-save-status
+            v-if="editor"
+            :auto-saver="editor.storage.cristalCollaborationKit.autoSaver"
+          ></c-save-status>
+        </div>
+        <div class="pagemenu-actions">
+          <x-btn size="small" variant="primary" @click="submit">Close</x-btn>
+        </div>
       </form>
     </div>
   </div>
@@ -214,6 +282,18 @@ onUpdated(() => loadEditor(currentPage.value!));
   border-radius: var(--cr-input-border-radius-medium);
   max-width: var(--cr-sizes-max-page-width);
   width: 100%;
+}
+
+.pagemenu-status {
+  /* The content of this section may be a mix of inline and block level elements. */
+  display: flex;
+  /* Push the actions to the right end of the menu. */
+  flex-grow: 1;
+}
+
+.pagemenu-status > * {
+  /* Match the action button padding, which seems to be hard-coded.  */
+  padding: 0 12px;
 }
 
 :deep(.ProseMirror-menubar) {
@@ -258,5 +338,44 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   line-height: var(--cr-font-size-2x-large);
   outline: none;
   border: none;
+}
+
+/*
+ * Collaboration styles.
+ *
+ * TODO: Should we move these styles to a custom TipTap (collaboration) extension?
+ */
+
+/* Show where remote users are typing. */
+.editor :deep(.collaboration-cursor__caret) {
+  border-left: 1px solid var(--cr-input-border-color);
+  border-right: 1px solid var(--cr-input-border-color);
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+
+/* Render the remote user name above the associated caret. */
+.editor :deep(.collaboration-cursor__label) {
+  border-radius: var(--cr-border-radius-large) var(--cr-border-radius-large)
+    var(--cr-border-radius-large) 0;
+  color: var(--cr-input-color);
+  /* The cursor label is injected in the edited content, read-only, so it inherits the content styles. We want the
+    cursor label to have the same styles no matter where the caret is placed inside the edited content (e.g. in a level
+    one heading versus a paragraph). */
+  font-size: 12px;
+  font-style: normal;
+  /* Improves the contrast with the background color. */
+  font-weight: var(--cr-font-weight-bold);
+  left: -1px;
+  /* We need to know the height in order to be able to place the cursor label just above the caret. */
+  line-height: 1;
+  padding: 4px 6px;
+  position: absolute;
+  top: -20px;
+  user-select: none;
+  white-space: nowrap;
 }
 </style>

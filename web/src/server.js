@@ -19,13 +19,37 @@
  */
 
 const express = require("express");
+const expressWebsockets = require("express-ws");
+const Hocuspocus = require("@hocuspocus/server");
 const path = require("path");
 const fs = require("fs");
 
-const app = express();
+// Configure the Hocuspocus WebSocket server used for real-time collaboration.
+const hocuspocusServer = Hocuspocus.Server.configure({
+  // See https://developer.chrome.com/blog/timer-throttling-in-chrome-88/
+  timeout: 60000,
+});
 
+const { app } = expressWebsockets(express());
+
+// Serve static files from the distribution directory.
 app.use("/", express.static(path.resolve(__dirname, "../dist")));
 
+// Add a WebSocket route for Hocuspocus.
+app.ws("/collaboration", (webSocket, request) => {
+  // We can pass contextual information to the Hocuspocus server. For instance, we could authenticate the user here.
+  const context = {
+    //user: {
+    //  id: 'mflorea',
+    //  name: "Marius Florea",
+    //},
+  };
+
+  hocuspocusServer.handleConnection(webSocket, request, context);
+});
+
+// This is a single-page application, so any request that wasn't matched by the previous routes (static files or
+// WebSocket) should return the application HTML.
 app.get("*", function (req, res) {
   const pathToHtmlFile = path.resolve(__dirname, "../dist/index.html");
   const contentFromHtmlFile = fs.readFileSync(pathToHtmlFile, "utf-8");

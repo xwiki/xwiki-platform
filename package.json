@@ -45,5 +45,10 @@
   "engines": {
     "node": "20.15.0"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.4.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "avvvatars-vue": "patches/avvvatars-vue.patch"
+    }
+  }
 }

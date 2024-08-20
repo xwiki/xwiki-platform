@@ -68,4 +68,13 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    proxy: {
+      // Proxy collaboration requests to the WebSocket server.
+      "/collaboration": {
+        target: "ws://localhost:9000",
+        ws: true,
+      }
+    },
+  },
 });

@@ -51,7 +51,7 @@ public class RenderedChanges extends BaseElement
     public boolean hasNoChanges()
     {
         return !getDriver().findElementsWithoutWaiting(this.container,
-            By.xpath("//div[@class = 'box infomessage' and contains(text(), 'No changes')]")).isEmpty()
+            By.xpath("//div[@class = 'infomessage' and contains(text(), 'No changes')]")).isEmpty()
             && getChangedBlocks().isEmpty();
     }
 

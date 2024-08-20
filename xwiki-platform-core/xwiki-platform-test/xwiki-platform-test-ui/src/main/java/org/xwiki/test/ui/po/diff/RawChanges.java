@@ -57,7 +57,7 @@ public class RawChanges extends BaseElement
     public boolean hasNoChanges()
     {
         return !getDriver().findElementsWithoutWaiting(this.container,
-            By.xpath("//div[@class = 'box infomessage' and . = 'No changes']")).isEmpty()
+            By.xpath("//div[@class = 'infomessage' and . = 'No changes']")).isEmpty()
             && getChangedEntities().isEmpty();
     }
 

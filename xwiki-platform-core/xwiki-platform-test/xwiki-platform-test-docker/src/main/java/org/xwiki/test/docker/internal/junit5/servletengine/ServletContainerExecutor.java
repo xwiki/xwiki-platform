@@ -205,16 +205,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         maybeEnableRemoteDebugging(javaOpts);
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
-        // Jetty has a protection for URLs that don't respect the Servlet specification and that are considered
-        // ambiguous.See https://github.com/jetty/jetty.project/issues/12162#issuecomment-2286747043 for an explanation.
-        // Since XWiki uses them, we need to configure Jetty to allow for it. See also
-        //   https://jetty.org/docs/jetty/10/operations-guide/modules/standard.html#server-compliance
-        // Thus we need to relax the following rules in addition to using RFC3986:
-        //   Remove AMBIGUOUS_PATH_ENCODING when https://jira.xwiki.org/browse/XWIKI-22422 is fixed.
-        //   Remove AMBIGUOUS_EMPTY_SEGMENT when https://jira.xwiki.org/browse/XWIKI-22428 is fixed.
-        //   Remove AMBIGUOUS_PATH_SEPARATOR when https://jira.xwiki.org/browse/XWIKI-22435 is fixed.
-        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance="
-            + "RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
+        // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
+        // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
+        // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
+        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
 
         // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
         // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.

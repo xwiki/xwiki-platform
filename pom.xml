@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.31</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>12.0.12</jetty.server.version>
-    <jetty.client.version>10.0.21</jetty.client.version>
+    <jetty.client.version>10.0.23</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
          by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the

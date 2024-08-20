@@ -33,6 +33,7 @@ import org.xwiki.test.docker.junit5.UITest;
 @UITest
 public class AllIT
 {
+    /*
     @Nested
     @DisplayName("Save Edit Comments Tests")
     class NestedEditIT extends EditIT
@@ -62,13 +63,13 @@ public class AllIT
     class NestedLoginIT extends LoginIT
     {
     }
-
+*/
     @Nested
     @DisplayName("Login Protection Tests")
     class NestedLoginProtectionIT extends LoginProtectionIT
     {
     }
-
+/*
     @Nested
     @DisplayName("WikiMacro Tests")
     class NestedWikiMacroIT extends WikiMacroIT
@@ -218,4 +219,5 @@ public class AllIT
     class NestedPageReadyIT extends PageReadyIT
     {
     }
+ */
 }

@@ -33,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.docker.junit5.servletengine.*;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,7 +54,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //  servletEngineTag = "9", browser = Browser.CHROME, verbose = true)
 //@UITest(database = Database.HSQLDB_EMBEDDED, servletEngine = ServletEngine.JETTY_STANDALONE,
 //  browser = Browser.FIREFOX, verbose = true)
-@UITest
+//@UITest(servletEngine = ServletEngine.JETTY, servletEngineTag = "12.0-jdk17", verbose = true)
+@UITest(servletEngine = ServletEngine.JETTY, servletEngineTag = "10-jdk17", verbose = true)
 class MenuIT
 {
     @Test

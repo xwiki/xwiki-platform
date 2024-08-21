@@ -215,7 +215,7 @@ class InvitationIT
             assertMessageValid(messageB);
 
             // Check that the page has the table and the messages.
-            assertTrue(sent.getMessageBoxContent().contains("Information\nYour message has been sent."));
+            assertTrue(sent.getMessageBoxContent().contains("Info\nYour message has been sent."));
             TableElement table = sent.getTable();
             assertEquals(3, table.numberOfRows());
             assertEquals(3, table.numberOfColumns());
@@ -321,7 +321,7 @@ class InvitationIT
             getGreenMail().waitForIncomingEmail(10000, 2);
             messages = getGreenMail().getReceivedMessages();
             assertEquals(2, messages.length, "Non admins cannot send mail to even with permission");
-            assertEquals("Information\nYour message has been sent.", sent.getMessageBoxContent(),
+            assertEquals("Info\nYour message has been sent.", sent.getMessageBoxContent(),
                 "User was not given the message that their mail was sent.");
         } finally {
             stopGreenMail();
@@ -404,7 +404,7 @@ class InvitationIT
                 "The message by the spam reporter is not shown to the admin.");
 
             String memo = "Actually the email lottery is quite legitimate.";
-            String expectedSuccessMessage = "Information\nInvitation successfully marked as not spam. Log entry: " + memo;
+            String expectedSuccessMessage = "Info\nInvitation successfully marked as not spam. Log entry: " + memo;
             // Return their sending privilege.
             String successMessage = inspect.notSpam("Actually the email lottery is quite legitimate.");
 
@@ -634,7 +634,7 @@ class InvitationIT
                 confirm.getLabel().toLowerCase());
 
             confirm.setMemo("Sorry, wrong email address.");
-            assertEquals("Information\nInvitation successfully rescinded.", confirm.confirm());
+            assertEquals("Info\nInvitation successfully rescinded.", confirm.confirm());
 
             // Now switch to guest.
             setup.forceGuestUser();

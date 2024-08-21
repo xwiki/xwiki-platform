@@ -81,9 +81,8 @@ class XWikiIconProviderTest
         // Test
         Block result = iconProvider.get("test");
         // We want to make sure that the returned result is a raw block
-        assertEquals(result.getClass(), RawBlock.class);
-        // We check the icon itself
         assertEquals(RawBlock.class, result.getClass());
+        // We check the icon itself
         assertEquals(testIconFA, ((RawBlock)result).getRawContent());
     }
 
@@ -108,6 +107,10 @@ class XWikiIconProviderTest
 
         // Test
         Block result = iconProvider.get("test");
+        // We want to make sure that the returned result is a raw block
+        assertEquals(RawBlock.class, result.getClass());
+        // We check the icon itself
+        assertEquals(testIconFA, ((RawBlock)result).getRawContent());
     }
 
     @Test

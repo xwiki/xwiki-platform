@@ -27,7 +27,10 @@ import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
-import org.xwiki.rendering.block.*;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.RawBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -38,7 +41,7 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for {@link XWikiIconProvider}.
  *
- * @version $Id
+ * @version $Id$
  */
 @ComponentTest
 class XWikiIconProviderTest
@@ -48,8 +51,10 @@ class XWikiIconProviderTest
 
     @MockComponent
     private IconSetManager iconSetManager;
+
     @MockComponent
     private IconRenderer iconRenderer;
+
     @MockComponent
     private ContextualLocalizationManager l10n;
 
@@ -57,7 +62,8 @@ class XWikiIconProviderTest
     private Translation translationResult;
 
     @Test
-    public void get() throws Exception {
+    void get() throws Exception
+    {
         // Setting up the mocks
         // Mock behaviour for the iconsetManager
         IconSet currentIconSet = new IconSet("fontawesome");
@@ -69,7 +75,7 @@ class XWikiIconProviderTest
         // Mock behaviour for the iconRenderer
         String testIconFA = "<span class=\"fa fa-test\"aria-hidden=\"true\"></span>";
         String testIconSilk = "<img src=\"$xwiki.getSkinFile(\"icons/silk/test.png\")\" alt=\"\" " +
-         "data-xwiki-lightbox=\"false\" />";
+            "data-xwiki-lightbox=\"false\" />";
         when(this.iconRenderer.renderHTML("test", currentIconSet)).thenReturn(testIconFA);
         when(this.iconRenderer.renderHTML("test", defaultIconSet)).thenReturn(testIconSilk);
         // Mock behaviour for the LocalizationManager
@@ -83,11 +89,12 @@ class XWikiIconProviderTest
         // We want to make sure that the returned result is a raw block
         assertEquals(RawBlock.class, result.getClass());
         // We check the icon itself
-        assertEquals(testIconFA, ((RawBlock)result).getRawContent());
+        assertEquals(testIconFA, ((RawBlock) result).getRawContent());
     }
 
     @Test
-    public void getNoTranslation() throws Exception {
+    void getNoTranslation() throws Exception
+    {
         // Setting up the mocks
         // Mock behaviour for the iconsetManager
         IconSet currentIconSet = new IconSet("fontawesome");
@@ -99,7 +106,7 @@ class XWikiIconProviderTest
         // Mock behaviour for the iconRenderer
         String testIconFA = "<span class=\"fa fa-test\"aria-hidden=\"true\"></span>";
         String testIconSilk = "<img src=\"$xwiki.getSkinFile(\"icons/silk/test.png\")\" alt=\"\" " +
-                "data-xwiki-lightbox=\"false\" />";
+            "data-xwiki-lightbox=\"false\" />";
         when(this.iconRenderer.renderHTML("test", currentIconSet)).thenReturn(testIconFA);
         when(this.iconRenderer.renderHTML("test", defaultIconSet)).thenReturn(testIconSilk);
         // Mock behaviour for the LocalizationManager
@@ -110,11 +117,12 @@ class XWikiIconProviderTest
         // We want to make sure that the returned result is a raw block
         assertEquals(RawBlock.class, result.getClass());
         // We check the icon itself
-        assertEquals(testIconFA, ((RawBlock)result).getRawContent());
+        assertEquals(testIconFA, ((RawBlock) result).getRawContent());
     }
 
     @Test
-    public void getDefaultIconsetFallback() throws Exception {
+    void getDefaultIconsetFallback() throws Exception
+    {
         // Setting up the mocks
         // Mock behaviour for the iconsetManager
         IconSet currentIconSet = new IconSet("fontawesome");
@@ -126,7 +134,7 @@ class XWikiIconProviderTest
         // Mock behaviour for the iconRenderer
         String testIconFA = "<span class=\"fa fa-test\"aria-hidden=\"true\"></span>";
         String testIconSilk = "<img src=\"$xwiki.getSkinFile(\"icons/silk/test.png\")\" alt=\"\" " +
-                "data-xwiki-lightbox=\"false\" />";
+            "data-xwiki-lightbox=\"false\" />";
         when(this.iconRenderer.renderHTML("test", currentIconSet)).thenReturn(testIconFA);
         when(this.iconRenderer.renderHTML("test", defaultIconSet)).thenReturn(testIconSilk);
         // Mock behaviour for the LocalizationManager
@@ -138,6 +146,6 @@ class XWikiIconProviderTest
         // Test
         Block result = iconProvider.get("test");
         // We check that the icon provider fell back on the default icon theme when needed
-        assertEquals(testIconSilk, ((RawBlock)result).getRawContent());
+        assertEquals(testIconSilk, ((RawBlock) result).getRawContent());
     }
 }

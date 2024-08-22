@@ -24,14 +24,18 @@ span.box, span.successmessage, span.errormessage, span.warningmessage, span.info
 
 // Used by: message boxes
 div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
-  display: flex;
-  gap: 2rem;
-  justify-content: left;
-  align-items: baseline;
   padding: 2rem;
   border: none;
   border-left: 4px solid;
   box-shadow: none;
+
+  & > .icon-block {
+    // Ensure to let some space between the icon of the message and the content.
+    padding-right: 2rem;
+    // We want the icon to remain on the left. Note that we don't use display: flex for now since it's causing issues
+    // when the box contains some specific content such as em
+    float: left;
+  }
 
   & > img {
     // Improve alignment for silk icons

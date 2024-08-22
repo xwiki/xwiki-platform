@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.util;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.icon.Icon;
@@ -29,6 +31,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -86,10 +89,13 @@ class XWikiIconProviderTest
 
         // Test
         Block result = iconProvider.get("test");
-        // We want to make sure that the returned result is a raw block
-        assertEquals(RawBlock.class, result.getClass());
+        assertEquals(FormatBlock.class, result.getClass());
+        assertEquals("icon-block", result.getParameter("class"));
+        List<Block> children = result.getChildren();
+        assertEquals(1, children.size());
+        assertEquals(RawBlock.class, children.get(0).getClass());
         // We check the icon itself
-        assertEquals(testIconFA, ((RawBlock) result).getRawContent());
+        assertEquals(testIconFA, ((RawBlock) children.get(0)).getRawContent());
     }
 
     @Test
@@ -114,10 +120,13 @@ class XWikiIconProviderTest
 
         // Test
         Block result = iconProvider.get("test");
-        // We want to make sure that the returned result is a raw block
-        assertEquals(RawBlock.class, result.getClass());
+        assertEquals(FormatBlock.class, result.getClass());
+        assertEquals("icon-block", result.getParameter("class"));
+        List<Block> children = result.getChildren();
+        assertEquals(1, children.size());
+        assertEquals(RawBlock.class, children.get(0).getClass());
         // We check the icon itself
-        assertEquals(testIconFA, ((RawBlock) result).getRawContent());
+        assertEquals(testIconFA, ((RawBlock) children.get(0)).getRawContent());
     }
 
     @Test
@@ -145,7 +154,12 @@ class XWikiIconProviderTest
 
         // Test
         Block result = iconProvider.get("test");
-        // We check that the icon provider fell back on the default icon theme when needed
-        assertEquals(testIconSilk, ((RawBlock) result).getRawContent());
+        assertEquals(FormatBlock.class, result.getClass());
+        assertEquals("icon-block", result.getParameter("class"));
+        List<Block> children = result.getChildren();
+        assertEquals(1, children.size());
+        assertEquals(RawBlock.class, children.get(0).getClass());
+        // We check the icon itself
+        assertEquals(testIconSilk, ((RawBlock) children.get(0)).getRawContent());
     }
 }

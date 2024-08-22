@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.util;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
@@ -27,7 +29,9 @@ import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.RawBlock;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -56,7 +60,9 @@ public class XWikiIconProvider extends DefaultIconProvider
         try {
             IconSet iconSet = getIconSet(iconName);
             String iconContent = this.iconRenderer.renderHTML(iconName, iconSet);
-            return new RawBlock(iconContent, Syntax.HTML_5_0);
+            FormatBlock formatBlock = new FormatBlock(List.of(new RawBlock(iconContent, Syntax.HTML_5_0)), Format.NONE);
+            formatBlock.setParameter("class", "icon-block");
+            return formatBlock;
         } catch (IconException e) {
             return super.get(iconName);
         }

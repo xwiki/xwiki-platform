@@ -130,7 +130,7 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
      * @since 14.10.22
      * @since 15.10.12
      * @since 16.4.2
-     * @since 16.7.0RC1
+     * @since 16.7.0
      */
     public static boolean isValid(Locale locale)
     {
@@ -160,7 +160,7 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
      * @since 14.10.22
      * @since 15.10.12
      * @since 16.4.2
-     * @since 16.7.0RC1
+     * @since 16.7.0
      */
     public static List<Locale> availableLocaleList()
     {
@@ -178,7 +178,7 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
      * @since 14.10.22
      * @since 15.10.12
      * @since 16.4.2
-     * @since 16.7.0RC1
+     * @since 16.7.0
      */
     public static Set<Locale> availableLocaleSet()
     {

@@ -4259,7 +4259,7 @@ public class XWiki implements EventListener
     /**
      * @param documentReference the reference of the user document
      * @param xcontext the XWiki context
-     * @since 16.7.0RC1
+     * @since 16.7.0
      */
     @Unstable
     public void setUserDefaultGroup(DocumentReference documentReference, XWikiContext xcontext)

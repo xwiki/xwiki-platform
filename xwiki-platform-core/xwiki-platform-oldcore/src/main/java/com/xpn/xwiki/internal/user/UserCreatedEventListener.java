@@ -40,7 +40,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * Automatically add new users to the configured groups.
  * 
  * @version $Id$
- * @since 16.7.0RC1
+ * @since 16.7.0
  */
 @Component
 @Singleton

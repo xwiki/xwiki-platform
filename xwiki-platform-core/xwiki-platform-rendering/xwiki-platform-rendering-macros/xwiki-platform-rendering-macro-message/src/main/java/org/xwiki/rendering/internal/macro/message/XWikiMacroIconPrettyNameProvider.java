@@ -29,7 +29,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
  * XWiki specific component to provide an alternative text for an icon.
  *
  * @version $Id$
- * @since 16.7.0RC1
+ * @since 16.7.0
  */
 @Component(roles = MacroIconPrettyNameProvider.class)
 @Singleton

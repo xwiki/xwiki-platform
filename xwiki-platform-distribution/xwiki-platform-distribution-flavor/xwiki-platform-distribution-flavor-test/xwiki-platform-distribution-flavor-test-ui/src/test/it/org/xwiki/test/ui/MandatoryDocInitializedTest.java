@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  * are not created at first start only. See also XWIKI-22368.
  *
  * @version $Id$
- * @since 16.7.0RC1
+ * @since 16.7.0
  */
 public class MandatoryDocInitializedTest extends AbstractTest
 {

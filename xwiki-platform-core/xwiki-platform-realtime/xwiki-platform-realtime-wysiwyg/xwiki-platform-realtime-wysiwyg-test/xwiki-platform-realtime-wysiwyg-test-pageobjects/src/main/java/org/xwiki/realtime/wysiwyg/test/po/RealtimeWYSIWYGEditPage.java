@@ -83,7 +83,7 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
      * @return {code true} if it is possible to join or leave the editing session, {@code false} otherwise
      * @since 15.10.12
      * @since 16.4.2
-     * @since 16.7.0RC1
+     * @since 16.7.0
      */
     public boolean canToggleRealtimeEditing()
     {

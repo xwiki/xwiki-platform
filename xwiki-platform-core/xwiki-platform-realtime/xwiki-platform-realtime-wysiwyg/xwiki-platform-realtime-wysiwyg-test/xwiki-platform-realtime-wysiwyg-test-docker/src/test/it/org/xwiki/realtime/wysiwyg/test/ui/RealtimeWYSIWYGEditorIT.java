@@ -371,7 +371,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         // Save and check the result.
         ViewPage viewPage = secondEditPage.clickSaveAndView();
-        assertEquals("Info\nmy info message\none two three", viewPage.getContent());
+        assertEquals("Information\nmy info message\none two three", viewPage.getContent());
     }
 
     @Test

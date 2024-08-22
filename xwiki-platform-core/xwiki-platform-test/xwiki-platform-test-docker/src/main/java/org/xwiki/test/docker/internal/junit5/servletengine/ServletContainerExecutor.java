@@ -221,7 +221,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
         if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
             this.servletContainer.setCommand(this.servletContainer.getCommandParts()[0],
-                "--module=ee8-webapp,ee8-deploy,ee8-jstl");
+                "--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
         }
 
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker

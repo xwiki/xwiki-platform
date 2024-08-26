@@ -78,6 +78,8 @@ public class DefaultDocumentAuthorizationManager implements DocumentAuthorizatio
     {
         DocumentRequiredRights documentRequiredRights =
             this.documentRequiredRightsManager.getRequiredRights(contextDocument)
+                // This means non-existing documents don't enforce required rights.
+                // This should be changed in a future version?
                 .orElse(DocumentRequiredRights.EMPTY);
 
         boolean hasAccess;

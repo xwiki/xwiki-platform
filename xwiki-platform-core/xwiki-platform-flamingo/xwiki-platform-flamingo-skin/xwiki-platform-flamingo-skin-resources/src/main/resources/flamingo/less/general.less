@@ -213,11 +213,14 @@ body.content {
     }
 
     // Helper classes for easier content customization. Note that those only work for this preference.
-    #xwikicontent .force-no-underline a {
+    // This class can either be used on a common parent or the links themselves.
+    #xwikicontent .force-no-underline a,
+    #xwikicontent a.force-no-underline {
       text-decoration: none;
     }
 
-    .force-underline a {
+    .force-underline a,
+    a.force-underline {
       text-decoration: underline;
     }
   }

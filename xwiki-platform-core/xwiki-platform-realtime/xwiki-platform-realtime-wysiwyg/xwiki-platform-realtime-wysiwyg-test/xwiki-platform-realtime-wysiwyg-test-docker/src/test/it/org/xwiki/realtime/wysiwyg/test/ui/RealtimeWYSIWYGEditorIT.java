@@ -1364,6 +1364,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         assertEquals("superadmin", firstEditor.getToolBar().getCoeditors().stream().map(Coeditor::getName)
             .reduce((a, b) -> a + ", " + b).get());
+
+        // cancel all editions
+        firstEditPage.clickCancel();
+        multiUserSetup.switchToBrowserTab(secondTabHandle);
+        secondEditPage.clickCancel();
     }
 
     @Test

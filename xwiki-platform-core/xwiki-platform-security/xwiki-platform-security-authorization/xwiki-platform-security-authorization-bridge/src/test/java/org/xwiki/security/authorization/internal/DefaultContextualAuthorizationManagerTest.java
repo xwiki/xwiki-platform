@@ -25,11 +25,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -65,6 +68,9 @@ class DefaultContextualAuthorizationManagerTest
     @MockComponent
     private RenderingContext renderingContext;
 
+    @MockComponent
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
     @InjectMockComponents
     private DefaultContextualAuthorizationManager contextualAuthorizationManager;
 
@@ -78,6 +84,7 @@ class DefaultContextualAuthorizationManagerTest
     {
         this.currentWikiReference = new WikiReference("wiki");
         this.oldcore.getXWikiContext().setWikiId(this.currentWikiReference.getName());
+        when(this.documentAuthorizationManager.hasRequiredRight(any(), any(), any())).thenReturn(true);
     }
 
     // Tests
@@ -131,6 +138,23 @@ class DefaultContextualAuthorizationManagerTest
         } else {
             assertTrue(this.contextualAuthorizationManager.hasAccess(right));
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("contentRightsSource")
+    void requiredRightsPreAccess(Right right) throws AuthorizationException
+    {
+        when(this.authorizationManager.hasAccess(eq(right), any(), any())).thenReturn(true);
+
+        XWikiDocument contextDocument = mock();
+        DocumentReference documentReference = mock();
+        when(contextDocument.getDocumentReference()).thenReturn(documentReference);
+        this.oldcore.getXWikiContext().setDoc(contextDocument);
+
+        when(this.documentAuthorizationManager.hasRequiredRight(right, EntityType.DOCUMENT, documentReference))
+            .thenReturn(false);
+
+        assertFalse(this.contextualAuthorizationManager.hasAccess(right));
     }
 
     static Stream<Right> contentRightsSource()

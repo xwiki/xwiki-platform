@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,8 +36,10 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.internal.XWikiConstants;
 
@@ -71,6 +74,12 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void checkAccess(Right right) throws AccessDeniedException
@@ -138,7 +147,27 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
         if (CONTENT_AUTHOR_RIGHTS.contains(right)) {
             XWikiDocument doc = getProgrammingDocument();
             boolean restricted = this.renderingContext.isRestricted() || (doc != null && doc.isRestricted());
-            return !(restricted || (right == Right.PROGRAM && this.xcontextProvider.get().hasDroppedPermissions()));
+            return !(restricted || hasDroppedProgrammingRight(right)) && hasRequiredRight(right, doc);
+        }
+
+        return true;
+    }
+
+    private boolean hasDroppedProgrammingRight(Right right)
+    {
+        return right == Right.PROGRAM && this.xcontextProvider.get().hasDroppedPermissions();
+    }
+
+    private boolean hasRequiredRight(Right right, XWikiDocument programmingDocument)
+    {
+        if (programmingDocument != null) {
+            try {
+                return this.documentAuthorizationManager.hasRequiredRight(right, EntityType.DOCUMENT,
+                    programmingDocument.getDocumentReference());
+            } catch (AuthorizationException e) {
+                this.logger.error("Failed to load required rights for [{}]",
+                    programmingDocument.getDocumentReference(), e);
+            }
         }
 
         return true;

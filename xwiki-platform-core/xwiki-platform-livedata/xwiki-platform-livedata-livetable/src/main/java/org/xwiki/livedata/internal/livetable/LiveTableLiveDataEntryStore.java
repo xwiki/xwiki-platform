@@ -170,6 +170,11 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     {
         String className = (String) this.getParameters().get(CLASS_NAME_PARAMETER);
 
+        String customClassName = (String) this.getParameters().get(property + "_class");
+        if (customClassName != null) {
+            className = customClassName;
+        }
+
         // We can't update an object property if the object type is undefined.
         if (className == null && !StringUtils.defaultIfEmpty(property, "").startsWith(DOC_PREFIX)) {
             throw new LiveDataException(UNDEFINED_CLASS_ERROR_MESSAGE);

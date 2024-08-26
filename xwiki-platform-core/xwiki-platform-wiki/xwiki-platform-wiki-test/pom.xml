@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki</artifactId>
-    <version>16.7.0-SNAPSHOT</version>
+    <version>16.7.0</version>
   </parent>
   <artifactId>xwiki-platform-wiki-test</artifactId>
   <name>XWiki Platform - Wiki - Tests - Parent POM</name>

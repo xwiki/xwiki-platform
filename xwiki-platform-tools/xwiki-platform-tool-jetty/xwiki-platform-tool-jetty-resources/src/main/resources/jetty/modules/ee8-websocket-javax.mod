@@ -18,13 +18,27 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Enables standard Servlet handling.
+Enable javax.websocket APIs for deployed web applications.
+
+[environment]
+ee8
+
+[tags]
+websocket
 
 [depend]
-server
+client
+ee8-annotations
 
 [lib]
-lib/jetty-servlet-${jetty.version}.jar
+lib/jetty-websocket-core-common-${jetty.version}.jar
+lib/jetty-websocket-core-client-${jetty.version}.jar
+lib/jetty-websocket-core-server-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-servlet-${jetty.version}.jar
+lib/ee8-websocket/jetty-javax-websocket-api-1.1.2.jar
+lib/ee8-websocket/jetty-ee8-websocket-javax-client-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-javax-common-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-javax-server-${jetty.version}.jar

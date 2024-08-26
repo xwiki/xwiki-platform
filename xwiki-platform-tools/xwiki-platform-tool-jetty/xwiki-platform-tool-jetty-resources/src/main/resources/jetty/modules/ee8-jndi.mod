@@ -18,11 +18,16 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Enables use of the apache implementation of JSP.
+Adds the Jetty EE8 JNDI reference factories
+
+[environment]
+ee8
+
+[depend]
+jndi
 
 [lib]
-lib/apache-jsp/*.jar
-
+lib/jetty-ee8-jndi-${jetty.version}.jar

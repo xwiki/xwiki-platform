@@ -18,38 +18,34 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Adds support for servlet specification web applications to the server classpath.
-Without this, only Jetty-specific handlers may be deployed.
-
-[depend]
-servlet
-security
+# tag::description[]
+This module provide common configuration of Java Servlet web applications over all environments.
+# end::description[]
 
 [xml]
-etc/jetty-webapp.xml
+etc/jetty-ee-webapp.xml
 
 [lib]
-lib/jetty-webapp-${jetty.version}.jar
-
+lib/jetty-ee-${jetty.version}.jar
 
 [ini-template]
+# tag::ini-template[]
 ## Add to the server wide default jars and packages protected or hidden from webapps.
-## System classes are protected and cannot be overridden by a webapp.
-## Server classes are hidden and cannot be seen by a webapp
+## Protected (aka System) classes cannot be overridden by a webapp.
+## Hidden (aka Server) classes cannot be seen by a webapp
 ## Lists of patterns are comma separated and may be either:
-##  + a qualified classname e.g. 'com.acme.Foo'
+##  + a qualified classname e.g. 'com.acme.Foo' 
 ##  + a package name e.g. 'net.example.'
-##  + a jar file e.g. '${jetty.base.uri}/lib/dependency.jar'
-##  + a directory of jars,resource or classes e.g. '${jetty.base.uri}/resources'
+##  + a jar file e.g. '${jetty.base.uri}/lib/dependency.jar' 
+##  + a directory of jars,resource or classes e.g. '${jetty.base.uri}/resources' 
 ##  + A pattern preceded with a '-' is an exclusion, all other patterns are inclusions
 ##
 ## The +=, operator appends to a CSV list with a comma as needed.
 ##
-#jetty.webapp.addSystemClasses+=,org.example.
-#jetty.webapp.addServerClasses+=,org.example.
+#jetty.server.addProtectedClasses+=,org.example.
+#jetty.server.addHiddenClasses+=,org.example.
+# end::ini-template[]
 
-[jpms]
-add-modules:java.instrument

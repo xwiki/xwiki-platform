@@ -838,7 +838,9 @@ define('xwiki-realtime-loader', [
         // Found a lock link. Check active sessions.
         this.checkSessions(info);
         throw new Error('Lock detected');
-      } else if (window.XWiki.editor === info.type) {
+      // We currently support editing in realtime only the content field (using either the Wiki editor, the standalone
+      // WYSIWYG editor or the Inplace editor).
+      } else if (info.field === 'content' && window.XWiki.editor === info.type) {
         // No lock and we are using the right editor. Start realtime.
         const realtimeContext = new RealtimeContext(info);
         const keys = await realtimeContext.updateChannels();
@@ -856,6 +858,8 @@ define('xwiki-realtime-loader', [
           });
         }
         return await beforeLaunchRealtime(realtimeContext);
+      } else {
+        throw new Error('Realtime editing is not supported in this context.');
       }
     },
 

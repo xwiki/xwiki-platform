@@ -117,15 +117,19 @@ public final class BrowserTestUtils
         }
     }
 
-    private static String getImageTag(TestConfiguration testConfiguration)
+    private static String getImageTag(TestConfiguration testConfiguration, String defaultVersion)
     {
-        return (StringUtils.isBlank(testConfiguration.getBrowserTag())) ? LATEST : testConfiguration.getBrowserTag();
+        return (StringUtils.isBlank(testConfiguration.getBrowserTag())) ? defaultVersion
+            : testConfiguration.getBrowserTag();
     }
 
     private static String getImageName(TestConfiguration testConfiguration, boolean useSeleniarm)
     {
         boolean isChrome = CHROME.equals(testConfiguration.getBrowser());
-        String imageTag = getImageTag(testConfiguration);
+
+        // FIXME: We force using Firefox 128.0 for now as we're having trouble with Firefox 129.0 in test.
+        // Rollback those changes once XWIKI-22442 is fixed.
+        String imageTag = (isChrome) ? getImageTag(testConfiguration, LATEST) : getImageTag(testConfiguration, "128.0");
         String baseImageName;
         if (useSeleniarm) {
             baseImageName = (isChrome) ? SELENIARM_CHROME_DOCKER_IMAGE_NAME : SELENIARM_FIREFOX_DOCKER_IMAGE_NAME;

@@ -18,26 +18,25 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 Enable the Jetty WebSocket API support for deployed web applications.
+
+[environment]
+ee8
 
 [tags]
 websocket
 
 [depend]
-annotations
+ee8-annotations
 
 [lib]
-lib/websocket/websocket-core-common-${jetty.version}.jar
-lib/websocket/websocket-core-server-${jetty.version}.jar
-lib/websocket/websocket-servlet-${jetty.version}.jar
-lib/websocket/websocket-jetty-api-${jetty.version}.jar
-lib/websocket/websocket-jetty-common-${jetty.version}.jar
-lib/websocket/websocket-jetty-server-${jetty.version}.jar
+lib/jetty-websocket-core-common-${jetty.version}.jar
+lib/jetty-websocket-core-server-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-servlet-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-jetty-api-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-jetty-common-${jetty.version}.jar
+lib/ee8-websocket/jetty-ee8-websocket-jetty-server-${jetty.version}.jar
 
-[jpms]
-# The implementation needs to access method handles in
-# classes that are in the web application classloader.
-add-reads: org.eclipse.jetty.websocket.jetty.common=ALL-UNNAMED

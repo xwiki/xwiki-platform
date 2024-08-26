@@ -21,7 +21,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+<Configure class="org.eclipse.jetty.ee8.webapp.WebAppContext">
   <!-- In order to avoid getting a "java.lang.IllegalStateException: Form too large" error when editing large page in
        XWiki we need to tell Jetty to allow for large content since by default it only allows for 20K. We do this by
        passing the "org.eclipse.jetty.server.Request.maxFormContentSize" attribute.
@@ -31,15 +31,9 @@
   -->
   <Set name="maxFormContentSize">1000000</Set>
   <!-- Increasing the maxFormKeys in order to be able to import correctly a full wiki (more than 1000 pages in 11.10).
-  The import should be fixed at a point to allow importing everything without creating a form with a field by page.
-  Once done this configuration can be removed. See https://jira.xwiki.org/browse/XWIKI-11597 for a follow up. -->
+       The import should be fixed at a point to allow importing everything without creating a form with a field by 
+       page. Once done this configuration can be removed. See https://jira.xwiki.org/browse/XWIKI-11597 for a follow 
+       up. 
+  -->
   <Set name="maxFormKeys">2000</Set>
-
-  <!-- Allow symlinks since most of XWiki WEB-INF are symlinks -->
-  <!-- FIXME: find the Jetty 10 alternative -->
-  <Call name="addAliasCheck">
-    <Arg>
-      <New class="org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker" />
-    </Arg>
-  </Call>
 </Configure>

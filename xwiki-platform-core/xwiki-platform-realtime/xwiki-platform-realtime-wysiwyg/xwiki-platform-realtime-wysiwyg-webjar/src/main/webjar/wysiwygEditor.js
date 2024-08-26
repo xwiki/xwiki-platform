@@ -115,7 +115,7 @@ define('xwiki-realtime-wysiwyg', [
 
       // Notify the others that we're editing in realtime.
       this._realtimeContext.setRealtimeEnabled(true);
-  
+
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
         if (this._connection.status === ConnectionStatus.CONNECTED) {
@@ -524,11 +524,17 @@ define('xwiki-realtime-wysiwyg', [
         } else {
           // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
           // abort the current realtime session.
-          this.setEditable(false);
           this._onAbort();
           if (!this._saver.getLocalEditFlag()) {
             // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
             // Netflux channel.
+            //
+            // The editor was previously put in read-only mode when we got disconnected from the WebSocket (i.e. when
+            // the WebSocket connection status changed, see above). The editor takes into account nested calls to
+            // setReadOnly so we need to make sure the previous setEditable(false) has a corresponding call to
+            // setEditable(true). The user won't be able to edit right away because the editor is put back in read-only
+            // mode while we reconnect to the realtime session (in _startRealtimeSync).
+            this.setEditable(true);
             this._startRealtimeSync();
           } else {
             // We can't rejoin the realtime session using the new Netflux channel because we would lose the unsaved

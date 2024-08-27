@@ -31,8 +31,8 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Base class for CKEditor integration tests.
@@ -97,35 +97,8 @@ public abstract class AbstractCKEditorIT
 
     protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
     {
-        try {
-            // Dismiss the page leave confirmation modal if already open. We have to do this because we need to insert
-            // the page reload marker, see below, which is not possible while the modal is open.
-            setup.getDriver().switchTo().alert().dismiss();
-        } catch (Exception e) {
-            // The page leave confirmation modal wasn't open.
-        }
-
         if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
-            // Leaving the edit mode with unsaved changes triggers the confirmation alert which stops the navigation.
-            // Selenium doesn't wait for the new web page to be loaded after the alert is handled so we have to do this
-            // ourselves. Adding the page reload marker helps us detect when the new web page is loaded after the
-            // confirmation alert is handled.
-            setup.getDriver().addPageNotYetReloadedMarker();
-
-            // We pass the action because we don't want this call to wait for view mode to be loaded. We do our own wait
-            // (after handling the confirmation alert), as mentioned above.
-            setup.gotoPage(testReference, "view");
-
-            try {
-                // Confirm the page leave (discard unsaved changes) if we are asked for.
-                setup.getDriver().switchTo().alert().accept();
-            } catch (Exception e) {
-                // The page leave confirmation hasn't been shown, probably because there were no unsaved changes.
-            }
-
-            // Wait for the new web page to be loaded.
-            setup.getDriver().waitUntilPageIsReloaded();
-            new ViewPage();
+            new WikiEditPage().clickCancel();
         }
     }
 

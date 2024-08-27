@@ -19,52 +19,46 @@
  */
 package org.xwiki.repository.test.po;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.repository.test.po.edit.ExtensionInlinePage;
+import org.xwiki.repository.test.po.edit.ExtensionSupporterInlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * @version $Id$
- * @since 4.2M1
+ * @since 16.8.0RC1
  */
-public class ExtensionPage extends ViewPage
+public class ExtensionSupportPage extends ViewPage
 {
-    @FindBy(xpath = "//a[@title='Update extension']")
-    private WebElement update;
+    public static final LocalDocumentReference LOCAL_REFERENCE =
+        new LocalDocumentReference(List.of("Extension", "Support"), "WebHome");
 
-    public static ExtensionPage gotoPage(String pageName)
+    @FindBy(name = "ExtensionCode.ExtensionSupporterClass_0_name")
+    private WebElement supporterNameInput;
+
+    @FindBy(name = "register_supporter")
+    private WebElement registerButton;
+
+    public static ExtensionSupportPage gotoPage()
     {
-        getUtil().gotoPage(new LocalDocumentReference(Arrays.asList("Extension", pageName), "WebHome"));
+        getUtil().gotoPage(LOCAL_REFERENCE);
 
-        return new ExtensionPage();
+        return new ExtensionSupportPage();
     }
 
-    /**
-     * @since 4.2M1
-     */
-    public boolean isValidExtension()
+    public void setSupporterName(String supporterName)
     {
-        List<WebElement> elements = getDriver().findElements(By.xpath(
-            "//div[@class = 'box successmessage' and ./p[contains(., 'Installable with the Extension Manager')]]"));
-        return !elements.isEmpty();
+        this.supporterNameInput.clear();
+        this.supporterNameInput.sendKeys(supporterName);
     }
 
-    public ExtensionPage updateExtension()
+    public ExtensionSupporterInlinePage clickRegister()
     {
-        this.update.click();
+        this.registerButton.click();
 
-        return new ExtensionPage();
-    }
-
-    @Override
-    protected ExtensionInlinePage createInlinePage()
-    {
-        return new ExtensionInlinePage();
+        return new ExtensionSupporterInlinePage();
     }
 }

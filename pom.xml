@@ -117,7 +117,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.3</pgsql.version>
+    <pgsql.version>42.7.4</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.11.0.0</oracle.version>

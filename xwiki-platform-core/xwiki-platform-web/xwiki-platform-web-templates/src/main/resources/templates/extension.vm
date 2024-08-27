@@ -1037,7 +1037,7 @@ $namespace##
                   #if ($extensionSupporterPlan.isPaying())
                     $escapetool.xml($services.localization.render('extensions.info.support.supportPlanPaying', [$extensionSupporterPlan.name]))
                   #else
-                    $extensionSupporterPlan.name
+                    $escapetool.xml($extensionSupporterPlan.name)
                   #end
                 </a>
               </span>
@@ -1058,7 +1058,7 @@ $namespace##
                       #if ($extensionSupporterPlan.isPaying())
                         $escapetool.xml($services.localization.render('extensions.info.support.supportPlanPaying', [$extensionSupporterPlan.name]))
                       #else
-                        $extensionSupporterPlan.name
+                        $escapetool.xml($extensionSupporterPlan.name)
                       #end
                       </a>
                     </span>

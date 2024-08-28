@@ -227,7 +227,7 @@
     <dependency>
       <groupId>org.xwiki.contrib.templates</groupId>
       <artifactId>application-templates-ui</artifactId>
-      <version>1.0.10</version>
+      <version>1.0.11</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>

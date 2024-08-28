@@ -222,6 +222,7 @@
       'showWikis': $showWikis
     })
     #set ($treeToggle = "<button class='dropdown-toggle' data-toggle='dropdown'>" +
+      "<span class='sr-only'>$services.localization.render('web.hierarchy.toggler.label', [$pathData.get($openToIndex).label]) </span>" +
       "$services.icon.renderHTML('caret-down')</button>")
     #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>#documentTree($treeParams)</div>")
   #end

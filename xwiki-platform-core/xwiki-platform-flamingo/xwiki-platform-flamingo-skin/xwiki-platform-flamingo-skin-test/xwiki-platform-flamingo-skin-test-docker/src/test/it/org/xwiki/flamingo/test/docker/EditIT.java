@@ -241,8 +241,6 @@ public class EditIT
      * page.
      */
     @Test
-    @IgnoreBrowser(value = "firefox", reason = "Alert handling in Firefox currently isn't working, see also "
-        + "https://jira.xwiki.org/browse/XWIKI-22282")
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {

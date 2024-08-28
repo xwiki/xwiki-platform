@@ -119,8 +119,8 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">`
-              + icons.cross +
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">` +
+              icons.cross +
             `</button>
             <h4 class="modal-title"></h4>
           </div>

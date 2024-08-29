@@ -3284,7 +3284,7 @@ public class Document extends Api
     @Unstable
     public void setEnforceRequiredRights(boolean enforceRequiredRights)
     {
-        this.doc.setEnforceRequiredRights(enforceRequiredRights);
+        getDoc().setEnforceRequiredRights(enforceRequiredRights);
 
         updateAuthor();
 

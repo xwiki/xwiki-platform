@@ -214,7 +214,7 @@
             <data>
               <src>${war.path}/WEB-INF</src>
               <type>directory</type>
-              <excludes>**/lib,**/lib/*,**/classes,**/classes/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties,**/jetty-web.xml,**/jetty-ee*-web.xml</excludes>
+              <excludes>**/lib,**/lib/*,**/classes,**/classes/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
               <mapper>
                 <type>perm</type>
                 <prefix>/etc/xwiki</prefix>

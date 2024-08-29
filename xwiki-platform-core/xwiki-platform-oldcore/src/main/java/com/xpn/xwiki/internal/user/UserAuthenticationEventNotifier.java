@@ -21,15 +21,21 @@
 package com.xpn.xwiki.internal.user;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 import org.xwiki.security.authentication.UserAuthenticatedEvent;
+import org.xwiki.security.authentication.UserUnauthenticatedEvent;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * This notifier helps dealing with events triggered when a user is authenticated through XWiki Oldcore's
@@ -40,9 +46,9 @@ import org.xwiki.user.UserReferenceResolver;
  * @version $Id$
  * @since 13.3RC1
  */
-@Component(roles = UserAuthenticatedEventNotifier.class)
+@Component(roles = UserAuthenticationEventNotifier.class)
 @Singleton
-public class UserAuthenticatedEventNotifier
+public class UserAuthenticationEventNotifier
 {
 
     @Inject
@@ -54,6 +60,9 @@ public class UserAuthenticatedEventNotifier
     @Inject
     private UserReferenceResolver<String> userReferenceResolver;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     /**
      * Resolve a string as a {@code UserReference} and notify a {@code UserAuthenticatedEvent} created with that user
      * reference.
@@ -61,10 +70,31 @@ public class UserAuthenticatedEventNotifier
      * @param stringUserReference string form of the reference of user that will be resolved as a {@code
      * UserReference} and passed to the {@code UserAuthenticatedEvent} instance creation
      */
-    public void notify(String stringUserReference)
+    public void notifyUserAuthenticated(String stringUserReference)
     {
-        UserReference userReference = this.userReferenceResolver.resolve(stringUserReference);
-        this.notify(new UserAuthenticatedEvent(userReference));
+        if (!StringUtils.isBlank(stringUserReference)) {
+            UserReference userReference = this.userReferenceResolver.resolve(stringUserReference);
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("User [{}] authenticated", userReference);
+            }
+            this.notify(new UserAuthenticatedEvent(userReference));
+        }
+    }
+
+    /**
+     * Notify that the given user is now logged out.
+     *
+     * @param stringUserReference the user for whom to fire a {@link UserUnauthenticatedEvent}.
+     */
+    public void notifyUserUnauthenticated(String stringUserReference)
+    {
+        if (!StringUtils.isBlank(stringUserReference)) {
+            UserReference userReference = this.userReferenceResolver.resolve(stringUserReference);
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("User [{}] unauthenticated", userReference);
+            }
+            this.notify(new UserUnauthenticatedEvent(userReference));
+        }
     }
 
     /**
@@ -72,11 +102,8 @@ public class UserAuthenticatedEventNotifier
      *
      * @param event {@code UserAuthenticatedEvent}
      */
-    private void notify(UserAuthenticatedEvent event)
+    private void notify(Event event)
     {
-        if (this.logger.isDebugEnabled()) {
-            this.logger.debug("User authenticated for [{}]", event.getUserReference());
-        }
-        this.observationManager.notify(event, null);
+        this.observationManager.notify(event, null, this.contextProvider.get());
     }
 }

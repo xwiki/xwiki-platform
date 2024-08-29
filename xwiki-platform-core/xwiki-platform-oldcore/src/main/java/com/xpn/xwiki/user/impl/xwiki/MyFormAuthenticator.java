@@ -38,21 +38,21 @@ import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
+import com.xpn.xwiki.internal.user.UserAuthenticationEventNotifier;
 import com.xpn.xwiki.web.Utils;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
 
-    private UserAuthenticatedEventNotifier userAuthenticatedEventNotifier;
+    private UserAuthenticationEventNotifier userAuthenticationEventNotifier;
 
-    private UserAuthenticatedEventNotifier getUserAuthenticatedEventNotifier()
+    private UserAuthenticationEventNotifier getUserAuthenticatedEventNotifier()
     {
-        if ( this.userAuthenticatedEventNotifier == null ) {
-            this.userAuthenticatedEventNotifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
+        if ( this.userAuthenticationEventNotifier == null ) {
+            this.userAuthenticationEventNotifier = Utils.getComponent(UserAuthenticationEventNotifier.class);
         }
-        return this.userAuthenticatedEventNotifier;
+        return this.userAuthenticationEventNotifier;
     }
 
     /**
@@ -168,7 +168,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                     request.setUserPrincipal(principal);
 
-                    this.getUserAuthenticatedEventNotifier().notify(principal.getName());
+                    this.getUserAuthenticatedEventNotifier().notifyUserAuthenticated(principal.getName());
 
                 } else {
                     // Failed to authenticate, better cleanup the user stored in the session
@@ -240,7 +240,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
             request.setUserPrincipal(principal);
 
-            this.getUserAuthenticatedEventNotifier().notify(principal.getName());
+            this.getUserAuthenticatedEventNotifier().notifyUserAuthenticated(principal.getName());
 
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
@@ -292,7 +292,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         HttpServletResponse httpServletResponse, URLPatternMatcher urlPatternMatcher) throws Exception
     {
         boolean result = super.processLogout(securityRequestWrapper, httpServletResponse, urlPatternMatcher);
-        if (result == true) {
+        if (result) {
+            this.getUserAuthenticatedEventNotifier().notifyUserUnauthenticated(securityRequestWrapper.getRemoteUser());
             if (this.persistentLoginManager != null) {
                 this.persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
             }

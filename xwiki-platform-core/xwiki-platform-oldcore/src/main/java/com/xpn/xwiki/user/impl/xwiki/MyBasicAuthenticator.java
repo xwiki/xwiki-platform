@@ -35,20 +35,20 @@ import org.xwiki.security.authentication.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
+import com.xpn.xwiki.internal.user.UserAuthenticationEventNotifier;
 import com.xpn.xwiki.web.Utils;
 
 public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAuthenticator
 {
 
-    private UserAuthenticatedEventNotifier userAuthenticatedEventNotifier;
+    private UserAuthenticationEventNotifier userAuthenticationEventNotifier;
 
-    private UserAuthenticatedEventNotifier getUserAuthenticatedEventNotifier()
+    private UserAuthenticationEventNotifier getUserAuthenticatedEventNotifier()
     {
-        if ( this.userAuthenticatedEventNotifier == null ) {
-            this.userAuthenticatedEventNotifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
+        if ( this.userAuthenticationEventNotifier == null ) {
+            this.userAuthenticationEventNotifier = Utils.getComponent(UserAuthenticationEventNotifier.class);
         }
-        return this.userAuthenticatedEventNotifier;
+        return this.userAuthenticationEventNotifier;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
             request.setUserPrincipal(principal);
 
-            this.getUserAuthenticatedEventNotifier().notify(principal.getName());
+            this.getUserAuthenticatedEventNotifier().notifyUserAuthenticated(principal.getName());
 
             return false;
         } else {
@@ -135,8 +135,8 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
                 // Since this scope is static, no UserAuthenticatedEventNotifier is available
                 // So we create one here
-                UserAuthenticatedEventNotifier notifier = Utils.getComponent(UserAuthenticatedEventNotifier.class);
-                notifier.notify(principal.getName());
+                UserAuthenticationEventNotifier notifier = Utils.getComponent(UserAuthenticationEventNotifier.class);
+                notifier.notifyUserAuthenticated(principal.getName());
 
                 return principal;
             } else {

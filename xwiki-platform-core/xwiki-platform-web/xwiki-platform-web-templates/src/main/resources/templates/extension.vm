@@ -1016,6 +1016,21 @@ $namespace##
   </div>
 #end
 
+#macro(displayExtensionSupportPlanName $extensionSupporterPlan)
+  #set ($isURLSafe = $extensionSupporterPlan.uRL && $services.html.isAttributeSafe('a', 'href', $extensionSupporterPlan.uRL))
+  #if ($isURLSafe)
+  <a target="_blank" rel="noopener noreferrer" class="external wikiexternallink" href="$escapetool.xml($extensionSupporterPlan.uRL)">
+  #end
+    #if ($extensionSupporterPlan.isPaying())
+      $escapetool.xml($services.localization.render('extensions.info.support.supportPlanPaying', [$extensionSupporterPlan.name]))
+    #else
+      $escapetool.xml($extensionSupporterPlan.name)
+    #end
+  #if ($isURLSafe)
+  </a>
+  #end
+#end
+
 #macro (displayExtensionSupportPlans $extensionSupportPlans $supporterList)
   #set ($extensionSupporters = $extensionSupportPlans.supporters)
   #if (!$extensionSupporters.isEmpty())
@@ -1033,13 +1048,7 @@ $namespace##
               #set ($extensionSupporterPlan = $extensionSupporterPlans.get(0))
               <span class="supporter-name">$extensionSupporter.name: </span>
               <span class="plan-name infomessage">
-                <a target="_blank" class="external wikiexternallink" href="$escapetool.xml($extensionSupporterPlan.uRL)">
-                  #if ($extensionSupporterPlan.isPaying())
-                    $escapetool.xml($services.localization.render('extensions.info.support.supportPlanPaying', [$extensionSupporterPlan.name]))
-                  #else
-                    $escapetool.xml($extensionSupporterPlan.name)
-                  #end
-                </a>
+                #displayExtensionSupportPlanName($extensionSupporterPlan)
               </span>
             </$supporterElementName>
           #else
@@ -1054,13 +1063,7 @@ $namespace##
                 <div class="support-flex">
                   #foreach ($extensionSupporterPlan in $extensionSupporterPlans)
                     <span class="plan-name infomessage">
-                      <a target="_blank" class="external wikiexternallink" href="$escapetool.xml($extensionSupporterPlan.uRL)">
-                      #if ($extensionSupporterPlan.isPaying())
-                        $escapetool.xml($services.localization.render('extensions.info.support.supportPlanPaying', [$extensionSupporterPlan.name]))
-                      #else
-                        $escapetool.xml($extensionSupporterPlan.name)
-                      #end
-                      </a>
+                      #displayExtensionSupportPlanName($extensionSupporterPlan)
                     </span>
                   #end
                 </div>

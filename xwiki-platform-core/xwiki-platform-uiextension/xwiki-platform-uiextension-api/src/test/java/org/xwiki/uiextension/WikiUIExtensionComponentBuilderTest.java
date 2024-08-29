@@ -34,6 +34,7 @@ import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.logging.LoggerConfiguration;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -45,7 +46,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -101,7 +102,7 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
     private AuthorExecutor authorExecutor;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @InjectMockComponents
     private WikiUIExtensionComponentBuilder builder;
@@ -143,7 +144,8 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
             return callable.call();
         });
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOC_REF)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, DOC_REF))
+            .thenReturn(true);
 
         // The document holding the UI extension object.
         this.componentDoc = mock(XWikiDocument.class, "xwiki:XWiki.MyUIExtension");

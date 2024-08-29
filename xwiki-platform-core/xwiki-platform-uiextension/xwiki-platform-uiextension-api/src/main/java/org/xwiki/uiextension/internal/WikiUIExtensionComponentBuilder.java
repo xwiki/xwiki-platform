@@ -34,9 +34,10 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -70,7 +71,7 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
     private Provider<WikiUIExtension> extensionProvider;
 
     @Inject
-    private AuthorizationManager authorization;
+    private DocumentAuthorizationManager authorization;
 
     @Override
     public EntityReference getClassReference()
@@ -90,15 +91,17 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
     private void checkRights(XWikiDocument extensionsDoc, WikiComponentScope scope) throws WikiComponentException
     {
         if (scope == WikiComponentScope.GLOBAL) {
-            if (!this.authorization.hasAccess(Right.PROGRAM, extensionsDoc.getAuthorReference(), null)) {
+            if (!this.authorization.hasAccess(Right.PROGRAM, null, extensionsDoc.getAuthorReference(),
+                extensionsDoc.getDocumentReference()))
+            {
                 throw new WikiComponentException("Registering global UI extensions requires programming rights");
             }
-        } else if (scope == WikiComponentScope.WIKI) {
-            if (!this.authorization.hasAccess(Right.ADMIN, extensionsDoc.getAuthorReference(),
-                extensionsDoc.getDocumentReference().getWikiReference())) {
-                throw new WikiComponentException(
-                    "Registering UI extensions at wiki level requires wiki administration rights");
-            }
+        } else if (scope == WikiComponentScope.WIKI &&
+            !this.authorization.hasAccess(Right.ADMIN, EntityType.WIKI, extensionsDoc.getAuthorReference(),
+                extensionsDoc.getDocumentReference()))
+        {
+            throw new WikiComponentException(
+                "Registering UI extensions at wiki level requires wiki administration rights");
         }
     }
 

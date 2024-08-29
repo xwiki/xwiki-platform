@@ -284,6 +284,8 @@ private void buildInsideNode(map)
       // Keep builds for 30 days since we want to be able to see all builds if there are a lot at a given time, to be
       // able to identify flickers, etc.
       daysToKeepStr = '30'
+      // We don't need to trigger xwiki-platform monthly since it's already the case of xwiki-commons
+      monthlyTrigger = false
       if (map.pom != null) {
         pom = map.pom
       }
